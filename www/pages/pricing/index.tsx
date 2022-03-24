@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
-import { Accordion, Badge, Button, Divider, Space, Typography } from '@supabase/ui'
+import { Accordion, Badge, Button, Divider, IconCheck, Space, Typography } from '@supabase/ui'
 
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
@@ -20,6 +20,50 @@ export default function IndexPage() {
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
+
+  const tiers = [
+    {
+      name: 'Free',
+      href: '#',
+      priceMonthly: 0,
+      warning: 'Limit of 2 free projects per user',
+      description: 'Perfect for hobby projects and experiments.',
+      features: [
+        '10K authenticated users',
+        '500MB Database',
+        '1GB Storage',
+        '25 Realtime connections',
+        '1 day backup',
+        'Standard support',
+      ],
+      scale: 'Anything more than the above you must upgrade',
+      shutdown: 'Free projects are shutdown after 7 days of inactivity.',
+    },
+    {
+      name: 'Pay As You Go',
+      href: '#',
+      priceMonthly: 25,
+      warning: '+ usage costs',
+      description: 'Everything you need to scale your project into production.',
+      features: [
+        '100K authenticated users',
+        '8GB Database',
+        '50GB Storage',
+        'Unlimited Realtime connections',
+        '7 days backup',
+        'High priority support',
+      ],
+      scale: 'Additional fees apply for usage and storage beyond the limits above.',
+      shutdown: '',
+    },
+  ]
+
+  const allPlans = [
+    'Custom SMTP server',
+    '0Auth Providers',
+    'Dedicated project instance',
+    'Unlimited API requests',
+  ]
 
   return (
     <DefaultLayout>
@@ -37,55 +81,140 @@ export default function IndexPage() {
           ],
         }}
       />
-      <div className="bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
-          <div className="text-center">
-            <Typography.Title>Predictable pricing, no surprises</Typography.Title>
-            <Typography.Text>
-              <p className="text-lg">
-                Start with a hobby project, collaborate with a team, and scale to millions of users.
+
+      <div className="bg-gray-800">
+        <div className="pt-12 sm:pt-16 lg:pt-24">
+          <div className="max-w-7xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto space-y-2 lg:max-w-none">
+              <h2 className="text-lg leading-6 font-semibold text-gray-300 uppercase tracking-wider">
+                Pricing
+              </h2>
+              <p className="text-3xl text-white sm:text-4xl lg:text-5xl">
+                Predictable pricing, no surprises
               </p>
-            </Typography.Text>
-            <div className="grid grid-cols-12 gap-8 mt-16">
-              {/* <div className="col-span-12 lg:col-span-6">
-                <div className="rounded border border-green-500 dark:border-green-900 bg-green-500 bg-opacity-10 grid grid-cols-6">
-                  <div className="p-6 col-span-6">
-                    <Space className="mb-4">
-                      <Typography.Title level={3} className="flex gap-2">
-                        Special Beta Pricing
-                      </Typography.Title>
-                      <Badge dot>Limited time offer</Badge>
-                    </Space>
-                    <Typography.Text>
-                      <p className="lg:text-lg mb-2">
-                        Lock into permanent beta pricing for 2 years if you upgrade today.
-                      </p>
-                    </Typography.Text>
+              <p className="text-xl text-gray-300">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Harum sequi unde
+                repudiandae natus.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-8 pb-12 bg-gray-50 dark:bg-gray-700 sm:mt-12 sm:pb-16 lg:mt-16 lg:pb-24">
+          <div className="relative">
+            <div className="absolute inset-0 h-3/4 bg-gray-800" />
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="max-w-md mx-auto space-y-4 lg:max-w-5xl lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+                {tiers.map((tier) => (
+                  <div
+                    key={tier.name}
+                    className="flex flex-col rounded-lg shadow-lg overflow-hidden border dark:border-dark"
+                  >
+                    <div className="px-10 bg-white dark:bg-gray-700 pt-8 h-64">
+                      <h3
+                        className="inline-flex rounded-full text-sm font-normal tracking-wide lg:text-xl mb-2 dark:text-gray-200"
+                        id="tier-standard"
+                      >
+                        {tier.name}
+                      </h3>
+                      <div className="flex items-baseline text-6xl font-extrabold dark:text-white">
+                        ${tier.priceMonthly}
+                        <span className="ml-1 text-2xl font-medium text-gray-500">/mo</span>
+                      </div>
+                      {tier.warning && (
+                        <span className="mt-4 text-xs  bg-brand-100 bg-opacity-30 text-brand-900 dark:text-brand-600 relative rounded-md px-2 py-1">
+                          {tier.warning}
+                        </span>
+                      )}
+                      <p className="mt-4 text-lg text-gray-500">{tier.description}</p>
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-gray-50 dark:bg-gray-700 border-t dark:border-dark space-y-6 sm:p-10 sm:pt-6">
+                      <div>
+                        <p className="text-gray-400 dark:text-gray-300">Included for free:</p>
+                        <ul role="list" className="divide-y dark:divide-gray-600">
+                          {tier.features.map((feature) => (
+                            <li key={feature} className="flex items-start py-2 items-center">
+                              <div className="h-6 w-6 bg-brand-600 bg-opacity-30 rounded-full flex items-center justify-center">
+                                <IconCheck
+                                  className="h-4 w-4 text-green-500"
+                                  aria-hidden="true"
+                                  strokeWidth={2}
+                                />
+                              </div>
+                              <p className="ml-3 text-lg text-gray-700 dark:text-gray-100 mb-0">
+                                {feature}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">{tier.scale}</p>
+                        <p className="text-xs text-gray-500">{tier.shutdown}</p>
+                      </div>
+                      <a href={tier.href}>
+                        <Button block size="large">
+                          Get Started
+                        </Button>
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            All plans include:
+            <ul role="list">
+              {allPlans.map((feature) => (
+                <li key={feature} className="flex items-start mb-1">
+                  <div className="flex-shrink-0">
+                    <IconCheck className="h-6 w-6 text-green-500" aria-hidden="true" />
+                  </div>
+                  <p className="ml-3 text-lg text-gray-700 dark:text-gray-100 mb-0">{feature}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-4 relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:mt-5">
+            <div className="max-w-md mx-auto lg:max-w-5xl">
+              <div className="rounded-lg bg-gray-100 border dark:border-dark dark:bg-gray-700 px-6 py-8 sm:p-10 lg:flex lg:items-center">
+                <div className="flex-1">
+                  <div>
+                    <h3 className="inline-flex px-4 py-1 rounded-full text-sm font-semibold tracking-wide uppercase bg-white text-gray-800">
+                      Enterprise
+                    </h3>
+                  </div>
+                  <div className="mt-4 text-lg text-gray-600">
+                    Get full access to all of standard license features for solo projects that make
+                    less than $20k gross revenue for{' '}
+                    <span className="font-semibold text-gray-900">$29</span>.
                   </div>
                 </div>
-              </div> */}
-              {/* <div className="col-span-12 lg:col-span-6">
-                <div className="rounded border border-gray-200 dark:border-gray-600 grid grid-cols-12">
-                  <img
-                    src={`${basePath}/images/t-shirt-promo.jpg`}
-                    className="col-span-6 h-30 object-cover"
-                  />
-                  <div className="p-6 lg:col-span-6">
-                    <Typography.Title level={4}>Free tshirt</Typography.Title>
-                    <Typography.Text>
-                      We are giving away free tshirts to anyone who signs up for the Beta Pro plan
-                    </Typography.Text>
-                  </div>
+                <div className="mt-6 rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
+                  <a
+                    href="#"
+                    className="flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
+                  >
+                    Contact us for Pricing
+                  </a>
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-0 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
-          {/* <!-- xs to lg --> */}
 
+      <div className="bg-white dark:bg-gray-800">
+        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative md:pt-24 lg:pt-24 py-16">
+          <div className="text-center">
+            <h2 className="text-3xl">Compare plans</h2>
+            <p className="text-lg mb-16">
+              Start with a hobby project, collaborate with a team, and scale to millions of users.
+            </p>
+          </div>
+
+          {/* <!-- xs to lg --> */}
           <div className=" lg:hidden">
             {/* Free - Mobile  */}
             <div className="px-4">
@@ -409,21 +538,21 @@ export default function IndexPage() {
             </a>
           </Link>
           <div className="mt-16">
-            <div className="grid grid-cols-2 gap-y-10 gap-x-10">
+            {/* <div className="grid grid-cols-2 gap-y-10 gap-x-10"> */}
+            <Accordion>
               {pricingFaq.map((faq) => {
                 return (
                   <div>
-                    <Accordion bordered>
-                      <Accordion.Item label={faq.question}>
-                        <Typography>
-                          <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                        </Typography>
-                      </Accordion.Item>
-                    </Accordion>
+                    <Accordion.Item label={<span className="text-xl">{faq.question}</span>}>
+                      <Typography>
+                        <p className="text-gray-500 dark:text-gray-400 m-0">{faq.answer}</p>
+                      </Typography>
+                    </Accordion.Item>
                   </div>
                 )
               })}
-            </div>
+            </Accordion>
+            {/* </div> */}
           </div>
         </div>
       </div>
