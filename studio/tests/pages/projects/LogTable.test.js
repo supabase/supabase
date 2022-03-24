@@ -1,5 +1,6 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 test('can display log data', async () => {
   render(
     <LogTable
@@ -16,9 +17,8 @@ test('can display log data', async () => {
     />
   )
 
-  await waitFor(() => screen.getByText(/happened/))
-  const row = screen.getByText(/happened/)
-  fireEvent.click(row)
+  const row = await screen.findByText(/some-uuid/)
+  userEvent.click(row)
   await waitFor(() => screen.getByText(/my_key/))
   await waitFor(() => screen.getByText(/something_value/))
 })
