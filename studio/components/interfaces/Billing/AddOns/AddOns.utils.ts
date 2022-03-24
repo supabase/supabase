@@ -10,7 +10,7 @@ export const formatComputeSizes = (computeSizes: any[]) => {
     description: 'Basic set up to get started',
     metadata: {
       default_price_id: undefined,
-      supabase_prod_id: undefined,
+      supabase_prod_id: 'addon_instance_micro',
       features: '2 CPUs • 1GB memory • 2,085Mbps Disk IO',
     },
     prices: [
@@ -30,9 +30,29 @@ export const formatComputeSizes = (computeSizes: any[]) => {
   }
 
   return [microOption]
-    .concat(computeSizes.filter((option: any) => option.name.includes('[Small]')))
-    .concat(computeSizes.filter((option: any) => option.name.includes('[Medium]')))
-    .concat(computeSizes.filter((option: any) => option.name.includes('[Large]')))
-    .concat(computeSizes.filter((option: any) => option.name.includes('[XLarge]')))
-    .concat(computeSizes.filter((option: any) => option.name.includes('[XXLarge]')))
+    .concat(
+      computeSizes.filter(
+        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_small'
+      )
+    )
+    .concat(
+      computeSizes.filter(
+        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_medium'
+      )
+    )
+    .concat(
+      computeSizes.filter(
+        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_large'
+      )
+    )
+    .concat(
+      computeSizes.filter(
+        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_xlarge'
+      )
+    )
+    .concat(
+      computeSizes.filter(
+        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_xxlarge'
+      )
+    )
 }
