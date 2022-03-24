@@ -45,7 +45,7 @@ test('dedupes log lines with exact id', async () => {
   )
 
   // should only have one element, this line will fail if there are >1 element
-  await screen.findByText(/happened/)
+  await screen.findByText(/some-uuid/)
 })
 
 test('can display custom columns and headers based on data input', async () => {
