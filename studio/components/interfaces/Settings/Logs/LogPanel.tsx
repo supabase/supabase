@@ -18,6 +18,7 @@ import utc from 'dayjs/plugin/utc'
 interface Props {
   defaultSearchValue?: string
   defaultFromValue?: string
+  defaultToValue?: string
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
@@ -44,12 +45,14 @@ const LogPanel: FC<Props> = ({
   onSearch = () => {},
   defaultSearchValue = '',
   defaultFromValue = '',
+  defaultToValue = '',
   onCustomClick,
   onSelectTemplate,
   isShowingEventChart,
   onToggleEventChart,
 }) => {
   const [search, setSearch] = useState('')
+  const [to, setTo] = useState({ value: '', error: '' })
   const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
 
@@ -61,10 +64,22 @@ const LogPanel: FC<Props> = ({
   }, [defaultSearchValue])
 
   useEffect(() => {
+    if (to.value !== defaultToValue) {
+      setTo({ value: defaultToValue, error: '' })
+    }
     if (from.value !== defaultFromValue) {
       setFrom({ value: defaultFromValue, error: '' })
     }
-  }, [defaultFromValue])
+  }, [defaultToValue, defaultFromValue])
+
+  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value !== '' && isNaN(Date.parse(value))) {
+      setTo({ value, error: 'Invalid ISO 8601 timestamp' })
+    } else {
+      setTo({ value, error: '' })
+    }
+  }
 
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -74,48 +89,51 @@ const LogPanel: FC<Props> = ({
       setFrom({ value, error: '' })
     }
   }
-  const handleFromReset = async () => {
+  const handleReset = async () => {
+    setTo({ value: '', error: '' })
     setFrom({ value: '', error: '' })
     const value = dayjs().utc().toISOString()
     setDefaultTimestamp(value)
-    onSearch({ query: search, from: '' })
+    onSearch({ query: search, to: '', from: '' })
   }
 
-  const handleSearch = () => onSearch({ query: search, from: from.value })
+  const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
 
-  const showFromReset = from.value !== ''
+  const showReset = to.value !== '' || from.value !== ''
   return (
     <div className="bg-panel-header-light dark:bg-panel-header-dark">
       <div className="px-2 py-1 flex items-center justify-between w-full">
         <div className="flex flex-row gap-x-4 items-center">
-          <Button
-            type="text"
-            icon={
-              <div className="relative">
-                {newCount > 0 && (
-                  <div
-                    className={[
-                      'absolute flex items-center justify-center -top-3 right-3',
-                      'h-4 w-4 z-50',
-                    ].join(' ')}
-                  >
-                    <div className="absolute z-20">
-                      <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
-                        {newCount}
-                      </Typography.Text>
+          {!isCustomQuery && (
+            <Button
+              type="text"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div
+                      className={[
+                        'absolute flex items-center justify-center -top-3 right-3',
+                        'h-4 w-4 z-50',
+                      ].join(' ')}
+                    >
+                      <div className="absolute z-20">
+                        <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                          {newCount}
+                        </Typography.Text>
+                      </div>
+                      <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
+                      <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
                     </div>
-                    <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
-                    <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
-                  </div>
-                )}
-                <IconRefreshCw />
-              </div>
-            }
-            loading={isLoading}
-            onClick={onRefresh}
-          >
-            Refresh
-          </Button>
+                  )}
+                  <IconRefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              onClick={onRefresh}
+            >
+              Refresh
+            </Button>
+          )}
           <Dropdown
             side="bottom"
             align="start"
@@ -130,12 +148,13 @@ const LogPanel: FC<Props> = ({
             </Button>
           </Dropdown>
 
-          <div className="flex items-center space-x-2">
-            <p className="text-xs">Search logs via query</p>
-            <Toggle size="tiny" checked={isCustomQuery} onChange={onCustomClick} />
-          </div>
+          {!isCustomQuery && (
+            <Button as="span" type="outline" onClick={onCustomClick}>
+              Explore via query
+            </Button>
+          )}
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center   gap-x-4">
           {!isCustomQuery && (
             <>
               <div className="flex flex-row">
@@ -144,14 +163,24 @@ const LogPanel: FC<Props> = ({
                   align="end"
                   portalled
                   overlay={
-                    <Input
-                      label="From"
-                      labelOptional="UTC"
-                      value={from.value === '' ? defaultTimestamp : from.value}
-                      onChange={handleFromChange}
-                      error={from.error}
-                      className="w-72 p-3"
-                      actions={[
+                    <>
+                      <Input
+                        label="From"
+                        labelOptional="UTC"
+                        value={from.value === '' ? defaultTimestamp : from.value}
+                        onChange={handleFromChange}
+                        error={from.error}
+                        className="w-72 p-3"
+                      />
+                      <Input
+                        label="To"
+                        labelOptional="UTC"
+                        value={to.value === '' ? defaultTimestamp : to.value}
+                        onChange={handleToChange}
+                        error={to.error}
+                        className="w-72 p-3"
+                      />
+                      <div className="flex flex-row justify-end pb-2 px-4">
                         <Button
                           key="set"
                           size="tiny"
@@ -160,29 +189,29 @@ const LogPanel: FC<Props> = ({
                           onClick={handleSearch}
                         >
                           Set
-                        </Button>,
-                      ]}
-                    />
+                        </Button>
+                      </div>
+                    </>
                   }
                 >
                   <Button
                     as="span"
                     size="tiny"
-                    className={showFromReset ? '!rounded-r-none' : ''}
-                    type={showFromReset ? 'outline' : 'text'}
+                    className={showReset ? '!rounded-r-none' : ''}
+                    type={showReset ? 'outline' : 'text'}
                     icon={<IconClock size="tiny" />}
                   >
-                    {from.value ? 'Custom' : 'Now'}
+                    {to.value || from.value ? 'Custom' : 'Now'}
                   </Button>
                 </Popover>
-                {showFromReset && (
+                {showReset && (
                   <Button
                     size="tiny"
-                    className={showFromReset ? '!rounded-l-none' : ''}
+                    className={showReset ? '!rounded-l-none' : ''}
                     icon={<IconX size="tiny" />}
                     type="outline"
                     title="Clear timestamp filter"
-                    onClick={handleFromReset}
+                    onClick={handleReset}
                   />
                 )}
               </div>

@@ -23,8 +23,11 @@ export interface Project {
   region: string
   connectionString: string
   inserted_at: string
-  subscription_tier: string
-  subscription_tier_prod_id: string
+  subscription_id: string
+
+  // Possibly deprecated, just double check
+  subscription_tier?: string
+  subscription_tier_prod_id?: string
 }
 
 export interface User {

@@ -1,11 +1,21 @@
 interface Metadata {
   [key: string]: string | number | Object | Object[]
 }
-export type LogSearchCallback = (filters: {
-  query: string
-  from?: string
-  fromMicro?: number
-}) => void
+export type LogSearchCallback = (filters: { query: string; to?: string; from?: string; fromMicro?: number, toMicro?: number }) => void
+
+export interface LogsEndpointParams {
+  // project ref
+  project: string
+  // micro unix timestamp
+  timestamp_start?: string
+  // micro timestamp
+  timestamp_end?: string
+  period_start?: string
+  period_end?: string
+  sql: string
+  rawSql: string
+}
+
 export interface LogData {
   id: string
   timestamp: number

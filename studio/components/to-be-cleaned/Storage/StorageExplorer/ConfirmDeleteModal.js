@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Space, Alert } from '@supabase/ui'
+import { Modal, Button, Alert } from '@supabase/ui'
 
 const ConfirmDeleteModal = ({
   visible = false,
