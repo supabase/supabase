@@ -2,8 +2,6 @@ import { FC, useState } from 'react'
 import { Button, Modal } from '@supabase/ui'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 
-import { useStore } from 'hooks'
-
 interface Props {
   returnUrl: string
   onCancel: () => void
@@ -14,9 +12,6 @@ interface Props {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
-  const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref ?? ''
-
   const stripe = useStripe()
   const elements = useElements()
 

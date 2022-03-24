@@ -89,6 +89,7 @@ const BillingUpdate: NextPage = () => {
   const onConfirmDowngrade = () => {
     if (freeProjectsOwned >= freeProjectsLimit) {
       setShowDowngradeError(true)
+      setShowConfirmDowngrade(false)
       setSelectedPlan(undefined)
     } else {
       router.push(`/project/${projectRef}/settings/billing/update/free`)
