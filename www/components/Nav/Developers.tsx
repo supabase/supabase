@@ -12,14 +12,12 @@ type Props = {
 
 const Developers = () => {
   const { basePath } = useRouter()
+
   const iconSections = Object.values(DevelopersData).map((company: Props) => {
     const { text, description, url, icon } = company
 
     const content = (
-      <a
-        href={url}
-        className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-scale-500 transition ease-in-out duration-150"
-      >
+      <div className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50 dark:hover:bg-scale-500 transition ease-in-out duration-150">
         {/* <!-- Heroicon name: support --> */}
         <svg
           className="flex-shrink-0 h-5 w-5 stroke-scale-900"
@@ -35,7 +33,7 @@ const Developers = () => {
           <h5 className="text-base text-scale-1200">{text}</h5>
           <p className="text-sm text-scale-900">{description}</p>
         </div>
-      </a>
+      </div>
     )
     return url ? (
       <a
