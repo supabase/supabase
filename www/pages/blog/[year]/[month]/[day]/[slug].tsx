@@ -102,22 +102,17 @@ function BlogPostPage(props: any) {
     return (
       <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
-          <Card className="cursor-pointer" hoverable>
-            <Space direction="vertical">
+          <div className="cursor-pointer border border-scale-500 p-6 transition rounded hover:bg-scale-100 dark:hover:bg-scale-300">
+            <div className="space-y-4">
               <div>
-                <p>{label}</p>
+                <p className="text-sm text-scale-900">{label}</p>
               </div>
               <div>
-                <h4>{post.title}</h4>
-                <p>{post.date}</p>
+                <h4 className="text-lg text-scale-1200">{post.title}</h4>
+                <p className="small">{post.date}</p>
               </div>
-              <div>
-                {post.tags.map((tag: string) => {
-                  return <Badge key={`category-badge-${tag}`}>{tag}</Badge>
-                })}
-              </div>
-            </Space>
-          </Card>
+            </div>
+          </div>
         </div>
       </Link>
     )
@@ -191,7 +186,7 @@ function BlogPostPage(props: any) {
               <p>
                 <a
                   href={'/blog'}
-                  className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                  className="transition text-sm text-scale-900 hover:text-scale-1200 cursor-pointer flex items-center"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -203,8 +198,8 @@ function BlogPostPage(props: any) {
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
                   <p className="text-brand-900">Blog post</p>
-                  <h1 className="text-5xl">{props.blog.title}</h1>
-                  <div className="flex space-x-3 text-sm">
+                  <h1 className="h1">{props.blog.title}</h1>
+                  <div className="text-scale-900 flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
@@ -213,7 +208,7 @@ function BlogPostPage(props: any) {
                     <div className="mt-6 mb-8 lg:mb-0 w-max">
                       <Link href={author.author_url}>
                         <a className="cursor-pointer">
-                          <div className="flex items-center">
+                          <div className="flex gap-3 items-center">
                             {author.author_image_url && (
                               <div className="w-10">
                                 <Image
@@ -226,7 +221,7 @@ function BlogPostPage(props: any) {
                               </div>
                             )}
                             <div className="flex flex-col">
-                              <span className="text-xs mb-0">{author.author}</span>
+                              <span className="text-sm text-scale-1200 mb-0">{author.author}</span>
                               <span className="text-xs mb-0 text-scale-900">{author.position}</span>
                             </div>
                           </div>
@@ -240,7 +235,7 @@ function BlogPostPage(props: any) {
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <div className="relative overflow-auto w-full h-96 mb-8 border dark:border-gray-600">
+                    <div className="relative overflow-auto w-full h-96 mb-8 border rounded">
                       <Image
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
@@ -313,14 +308,16 @@ function BlogPostPage(props: any) {
                       <div className="mb-4">
                         <p className="text-sm text-scale-1200">Related articles</p>
                       </div>
-                      <div className="space-y-0">
+                      <div className="space-y-3">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                             <div>
                               <p className="cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                  <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  <span className="text-sm hover:text-gray-900 dark:hover:text-white">
+                                <div className="flex gap-2">
+                                  <div className="text-scale-900">
+                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  </div>
+                                  <span className="text-sm text-scale-1100 hover:text-gray-1200">
                                     {post.title}
                                   </span>
                                 </div>
@@ -329,11 +326,13 @@ function BlogPostPage(props: any) {
                             </div>
                           </Link>
                         ))}
-                        <Link href={`/blog`} as={`/blog`}>
-                          <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
-                            View all posts
-                          </a>
-                        </Link>
+                        <div className="mt-2">
+                          <Link href={`/blog`} passHref>
+                            <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
+                              View all posts
+                            </a>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>

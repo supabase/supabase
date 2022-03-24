@@ -138,7 +138,7 @@ function FeaturedThumb(blog: PostTypes) {
     <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <div className="relative overflow-auto w-full h-96 border dark:border-dark rounded-lg">
+          <div className="relative overflow-auto w-full h-96 border rounded-lg">
             <Image
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
@@ -146,17 +146,15 @@ function FeaturedThumb(blog: PostTypes) {
             />
           </div>
           <div className="flex flex-col space-y-2">
-            <div className="flex space-x-2 text-sm">
+            <div className="text-scale-900 flex space-x-2 text-sm">
               <p>{blog.date}</p>
               <p>•</p>
               <p>{blog.readingTime}</p>
             </div>
 
             <div>
-              <h2 className="text-4xl">{blog.title}</h2>
-              <p className="m-0">
-                <span className="text-xl">{blog.description}</span>
-              </p>
+              <h2 className="h2">{blog.title}</h2>
+              <p className="p text-xl">{blog.description}</p>
             </div>
 
             {author && (
