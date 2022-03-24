@@ -1,0 +1,274 @@
+---
+id: auth-vonage
+title: Phone Auth with Vonage
+description: How to set up and use Mobile OTP with Vonage and Supabase.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Overview
+
+In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
+
+There are two reasons to use Supabase SMS OTP tokens:
+
+- You want users to log in with mobile + password, and the mobile should be verified via SMS
+- You want users to log in with mobile ONLY (i.e. passwordless login)
+
+We'll cover:
+
+- [Getting your Vonage API Key](#finding-your-vonage-api-key)
+- [Using OTP with password based logins](#using-otp-with-password-based-logins)
+- [Using OTP as a passwordless sign-in mechanism](#using-otp-as-a-passwordless-sign-in-mechanism)
+
+What you'll need:
+
+- A Vonage account (sign up here: https://dashboard.nexmo.com/sign-up)
+- A Supabase project (create one here: https://app.supabase.io)
+- A mobile phone capable of receiving SMS
+
+## Steps
+
+### Getting your Vonage credentials
+
+Start by logging into your Vonage Dashboard at https://dashboard.nexmo.com/
+
+You will see you API Key and API Secret here, which is actually all you need to get started.
+
+In most countries, a phone number is actually optional and you can also use any Alphanumeric Sender ID of up to 11 characters length (8 for India) as a Sender ID (from). This means you do not need a number to test with in most cases.
+
+To find out more about supported countries for Alphanumeric Sender ID, check this overview: https://help.nexmo.com/hc/en-us/articles/115011781468-SMS-Features-Overview-Outbound-only-
+
+Hint: Some countries might need a Sender ID Registration to allow sending with an Alphanumeric Sender ID. You can find this information in the help article as well. If Alpha Sender IDs are not supported, you will need to buy a phone number.
+
+### Getting a phone number (optional)
+
+If you want a phone number to send SMS from, you can buy one from the Vonage Dashboard under Numbers > Buy Numbers (https://dashboard.nexmo.com/buy-numbers).
+
+Select the country you want a number for. You will need a mobile phone number with SMS or SMS+Voice capability. After you have bought the number, you will be able to send SMS from it.
+
+### Configure Supabase
+
+Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/settings).
+
+You should see an option to enable Phone Signup.
+
+Toggle it on, and copy the api key, api secret and optionally phone number values over from the Vonage dashboard. Click save.
+
+Now the backend should be setup, we can proceed to add our client-side code!
+
+#### SMS custom template
+
+The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
+
+Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/templates).
+
+Use the variable `.Code` in the template to display the code.
+
+### Using OTP with password based logins
+
+In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whoever takes over the phone number in the future.
+
+Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
+```js
+let { user, error } = await supabase.auth.signUp({
+  phone: '491512223334444',
+  password: 'some-password',
+})
+```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://xxx.supabase.co/auth/v1/signup' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "491512223334444",
+  "password": "some-password"
+}'
+```
+
+</TabItem>
+</Tabs>
+
+The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
+
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
+```js
+let { session, error } = await supabase.auth.verifyOTP({
+  phone: '491512223334444',
+  token: '123456',
+})
+```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "type": "sms",
+  "phone": "491512223334444",
+  "token": "123456"
+}'
+```
+
+</TabItem>
+</Tabs>
+
+If successful the user will now be logged in and you should receive a valid session like:
+
+```json
+{
+  "access_token": "eyJxxx...",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "yyy..."
+}
+```
+
+The access token can be sent in the Authorization header as a Bearer token for any CRUD operations on supabase-js. See our guide on [Row Level Security](/docs/guides/auth#row-level-security) for more info on restricting access on a user basis.
+
+Also now that the mobile has been verified, the user can use the number and password to sign in without needing to verify their number each time:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
+```js
+let { user, error } = await supabase.auth.signIn({
+  phone: '491512223334444',
+  password: 'some-password',
+})
+```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://xxx.supabase.co/auth/v1/token?grant_type=password' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "491512223334444",
+  "password": "some-password"
+}'
+```
+
+</TabItem>
+</Tabs>
+
+### Using OTP as a passwordless sign-in mechanism
+
+In this scenario you are granting your user's the ability to login to their account without needing to set a password on their account, all they have to do to log in is verify their mobile each time using the OTP.
+
+In javascript we can use the `signIn` method with a single parameter: `phone`
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
+```js
+let { user, error } = await supabase.auth.signIn({
+  phone: '491512223334444',
+})
+```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://xxx.supabase.co/auth/v1/otp' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "phone": "491512223334444"
+}'
+```
+
+</TabItem>
+</Tabs>
+
+The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
+
+<Tabs
+defaultValue="JS"
+values={[
+  {label: 'Javascript', value: 'JS'},
+  {label: 'HTTP', value: 'HTTP'},
+]}>
+<TabItem value="JS">
+
+```js
+let { session, error } = await supabase.auth.verifyOTP({
+  phone: '491512223334444',
+  token: '123456',
+})
+```
+
+</TabItem>
+<TabItem value="HTTP">
+
+```bash
+curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
+-H "apikey: SUPABASE_KEY" \
+-H "Content-Type: application/json" \
+-d '{
+  "type": "sms",
+  "phone": "491512223334444",
+  "token": "123456"
+}'
+```
+
+</TabItem>
+</Tabs>
+
+and the response should also be the same as above:
+
+```json
+{
+  "access_token": "eyJxxx...",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "yyy..."
+}
+```
+
+The user does not have a password therefore will need to sign in via this method each time they want to access your service.
+
+## Resources
+
+- [Vonage Signup](https://dashboard.nexmo.com/sign-up)
+- [Supabase Dashboard](https://app.supabase.io)
+- [Supabase Row Level Security](/docs/guides/auth#row-level-security)
