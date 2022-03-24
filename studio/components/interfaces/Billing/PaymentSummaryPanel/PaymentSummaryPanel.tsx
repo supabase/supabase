@@ -50,11 +50,12 @@ const PaymentSummaryPanel: FC<Props> = ({
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
 
+  console.log('PaymentSummaryPanel', currentComputeSize, selectedComputeSize)
+
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
-  console.log('PaymentSummaryPanel', currentComputeSize, selectedComputeSize)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
   const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
 
