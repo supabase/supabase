@@ -20,7 +20,7 @@ const Product = () => {
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 mt-3">
           <p className="text-sm text-scale-1000">{description}</p>
           {label && (
-            <div>
+            <div className="mt-2">
               <Badge>{label}</Badge>
             </div>
           )}
