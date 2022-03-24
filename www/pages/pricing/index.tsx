@@ -21,6 +21,33 @@ export default function IndexPage() {
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
+  const MobileHeaders = ({
+    title,
+    description,
+    priceDescription,
+    price,
+    tier,
+  }: {
+    description: string
+    priceDescription: string
+    price: string
+    tier: string
+  }) => {
+    return (
+      <div className="px-4">
+        <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
+        <span className="h1">${price}</span>
+        <p className="p">{priceDescription}</p>
+        <p className="p">{description}</p>
+        <Link href="https://app.supabase.io" passHref>
+          <Button as="a" type="default" size="medium" block>
+            Get started
+          </Button>
+        </Link>
+      </div>
+    )
+  }
+
   return (
     <DefaultLayout>
       <NextSeo
@@ -39,45 +66,10 @@ export default function IndexPage() {
       />
       <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
         <div className="text-center">
-          <h1 className="text-5xl">Predictable pricing, no surprises</h1>
-          <p>
-            <p className="text-lg">
-              Start with a hobby project, collaborate with a team, and scale to millions of users.
-            </p>
+          <h1 className="h1">Predictable pricing, no surprises</h1>
+          <p className="p">
+            Start with a hobby project, collaborate with a team, and scale to millions of users.
           </p>
-          <div className="grid grid-cols-12 gap-8 mt-16">
-            {/* <div className="col-span-12 lg:col-span-6">
-                <div className="rounded border border-green-500 dark:border-green-900 bg-green-500 bg-opacity-10 grid grid-cols-6">
-                  <div className="p-6 col-span-6">
-                    <Space className="mb-4">
-                      <h3 className="flex gap-2">
-                        Special Beta Pricing
-                      </h3>
-                      <Badge dot>Limited time offer</Badge>
-                    </Space>
-                    <p>
-                      <p className="lg:text-lg mb-2">
-                        Lock into permanent beta pricing for 2 years if you upgrade today.
-                      </p>
-                    </p>
-                  </div>
-                </div>
-              </div> */}
-            {/* <div className="col-span-12 lg:col-span-6">
-                <div className="rounded border border-gray-200 dark:border-gray-600 grid grid-cols-12">
-                  <img
-                    src={`${basePath}/images/t-shirt-promo.jpg`}
-                    className="col-span-6 h-30 object-cover"
-                  />
-                  <div className="p-6 lg:col-span-6">
-                    <h4>Free tshirt</h4>
-                    <p>
-                      We are giving away free tshirts to anyone who signs up for the Beta Pro plan
-                    </p>
-                  </div>
-                </div>
-              </div> */}
-          </div>
         </div>
       </div>
       <div className="container mx-auto px-0 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
@@ -85,23 +77,13 @@ export default function IndexPage() {
 
         <div className=" lg:hidden">
           {/* Free - Mobile  */}
-          <div className="px-4">
-            <h2 className="text-lg leading-6 font-medium text-scale-900 dark:text-white">Free</h2>
-            <p className="mt-4">
-              <span className="text-4xl font-normal text-scale-900 dark:text-white">$0</span>
-              <p>/project /month</p>
-            </p>
-            <p className="my-4 text-sm text-scale-500">
-              Perfect for hobby projects and experiments.
-            </p>
-            <Link href="https://app.supabase.io" as="https://app.supabase.io">
-              <a>
-                <Button type="default" size="medium" block>
-                  Get started
-                </Button>
-              </a>
-            </Link>
-          </div>
+
+          <MobileHeaders
+            tier="Free"
+            price={'0'}
+            priceDescription={'/project /month'}
+            description={'Perfect for hobby projects and experiments'}
+          />
 
           <PricingTableRowMobile
             category={pricing.database}
@@ -122,23 +104,12 @@ export default function IndexPage() {
           <PricingTableRowMobile category={pricing.support} tier={'free'} />
 
           {/* Pro - Mobile  */}
-          <div className="px-4 mt-16">
-            <h2 className="text-lg leading-6 font-medium text-scale-900 dark:text-white">Pro</h2>
-            <p className="mt-4">
-              <span className="text-4xl font-normal text-scale-900 dark:text-white">$25</span>
-              <p>/project /month</p>
-            </p>
-            <p className="my-4 text-sm text-scale-500">
-              Everything you need to scale your project into production.
-            </p>
-            <Link href="https://app.supabase.io" as="https://app.supabase.io">
-              <a>
-                <Button type="default" size="medium" block>
-                  Get started
-                </Button>
-              </a>
-            </Link>
-          </div>
+          <MobileHeaders
+            tier="Pro"
+            price={'25'}
+            priceDescription={'/project /month'}
+            description={'Everything you need to scale your project into production'}
+          />
 
           <PricingTableRowMobile
             category={pricing.database}
@@ -159,25 +130,12 @@ export default function IndexPage() {
           <PricingTableRowMobile category={pricing.support} tier={'pro'} />
 
           {/* Enterprise - Mobile  */}
-          <div className="px-4 mt-16">
-            <h2 className="text-lg leading-6 font-medium text-scale-900 dark:text-white">
-              Pay as you go
-            </h2>
-            <p className="mt-4">
-              <span className="text-4xl font-normal text-scale-900 dark:text-white">$25</span>
-              <p>/project /month plus usage costs</p>
-            </p>
-            <p className="my-4 text-sm text-scale-500">
-              Designated support team, account manager and technical specialist.
-            </p>
-            <Link href="https://app.supabase.io" as="https://app.supabase.io">
-              <a>
-                <Button type="default" size="medium" block>
-                  Get started
-                </Button>
-              </a>
-            </Link>
-          </div>
+          <MobileHeaders
+            tier="Pay as you go"
+            price={'25'}
+            priceDescription={'/project /month plus usage costs'}
+            description={'Designated support team, account manager and technical specialist'}
+          />
 
           <PricingTableRowMobile
             category={pricing.database}
@@ -202,10 +160,21 @@ export default function IndexPage() {
         <div className="hidden lg:block">
           <table className="w-full h-px table-fixed">
             <caption className="sr-only">Pricing plan comparison</caption>
-            <thead className="thead--plans sticky z-10 top-[62px] border-b border-scale-700 dark:border-scale-400">
+            <thead
+              className="
+              thead--plans 
+              sticky 
+              z-10 
+              top-[62px] 
+              border-b 
+              border-scale-700 
+              dark:border-scale-400 
+              bg-scale-200
+            "
+            >
               <tr>
                 <th
-                  className="relative pb-4 px-6 text-sm font-medium text-scale-1200 dark:text-white text-left"
+                  className="relative pb-4 px-6 text-sm font-normal text-scale-900 text-left"
                   scope="col"
                 >
                   <span className="sr-only">Feature by</span>
@@ -216,8 +185,11 @@ export default function IndexPage() {
                   ></div>
                 </th>
 
-                <th className="w-1/4 pb-4 px-6 text-left font-medium" scope="col">
-                  <h4>Free</h4>
+                <th
+                  className="w-1/4 pb-4 px-6 text-sm text-left font-normal text-scale-1200"
+                  scope="col"
+                >
+                  <span>Free</span>
                   <div
                     className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
                     style={{ height: '1px' }}
@@ -225,10 +197,10 @@ export default function IndexPage() {
                 </th>
 
                 <th
-                  className="w-1/4 pb-4 px-6 text-lg leading-6 font-medium text-scale-900 text-left"
+                  className="w-1/4 pb-4 px-6 text-sm leading-6 font-normal text-scale-1200 text-left"
                   scope="col"
                 >
-                  <h4>Pro</h4>
+                  <span>Pro</span>
                   <div
                     className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
                     style={{ height: '1px' }}
@@ -236,10 +208,10 @@ export default function IndexPage() {
                 </th>
 
                 <th
-                  className="w-1/4 pb-4 px-6 text-lg leading-6 font-medium text-scale-900 text-left"
+                  className="w-1/4 pb-4 px-6 text-sm leading-6 font-normal text-scale-1200 text-left"
                   scope="col"
                 >
-                  <h4>Pay as you go</h4>
+                  <span>Pay as you go</span>
                   <div
                     className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
                     style={{ height: '1px' }}
@@ -258,70 +230,56 @@ export default function IndexPage() {
 
                 <td className="h-full py-8 px-6 align-top">
                   <div className="relative h-full table">
-                    <p>
-                      <span className="text-4xl font-normal text-scale-900 dark:text-white">
-                        $0
-                      </span>
-                      <p> /project /month</p>
-                    </p>
-                    <p className="mt-4 mb-16 ">
-                      <p>Perfect for hobby projects and experiments.</p>
-                    </p>
-                    <div className="absolute bottom-0">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="default">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
-                    </div>
+                    <span className="h1 text-scale-1200">$0</span>
+                    <p className="p"> /project /month</p>
+
+                    <p className="p text-sm">Perfect for hobby projects and experiments</p>
+
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="default">
+                          Get started
+                        </Button>
+                      </a>
+                    </Link>
                   </div>
                 </td>
 
                 <td className="h-full py-8 px-6 align-top">
                   <div className="relative h-full table">
-                    <p>
-                      <span className="text-4xl font-normal text-scale-900 dark:text-white">
-                        $25
-                      </span>
-                      <p> /project /month</p>
+                    <span className="h1 text-scale-1200">$25</span>
+                    <p className="p"> /project /month</p>
+
+                    <p className="p text-sm">
+                      Everything you need to scale your project into production
                     </p>
-                    <p className="mt-4 mb-16 ">
-                      <p>Everything you need to scale your project into production.</p>
-                    </p>
-                    <div className="absolute bottom-0">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="default">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
-                    </div>
+
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="default">
+                          Get started
+                        </Button>
+                      </a>
+                    </Link>
                   </div>
                 </td>
 
                 <td className="h-full py-8 px-6 align-top">
                   <div className="relative h-full table">
-                    <p>
-                      <span className="text-4xl font-normal text-scale-900 dark:text-white">
-                        $25
-                      </span>
-                      <p> /project /month plus usage costs</p>
+                    <span className="h1 text-scale-1200">$25</span>
+                    <p className="p"> /project /month plus usage costs</p>
+
+                    <p className="p text-sm">
+                      Designated support team, account manager and technical specialist
                     </p>
-                    <p className="mt-4 mb-16 ">
-                      <p>Designated support team, account manager and technical specialist.</p>
-                    </p>
-                    <div className="absolute bottom-0">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                        <a>
-                          <Button size="medium" type="default">
-                            Get started
-                          </Button>
-                        </a>
-                      </Link>
-                    </div>
+
+                    <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <a>
+                        <Button size="medium" type="default">
+                          Get started
+                        </Button>
+                      </a>
+                    </Link>
                   </div>
                 </td>
               </tr>
@@ -381,8 +339,8 @@ export default function IndexPage() {
 
       <div className="border-t dark:border-scale-600">
         <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
-          <h2>Frequently asked questions</h2>
-          <p className="w-2/3 lg:w-4/12 mb-4 text-base">
+          <h2 className="h3">Frequently asked questions</h2>
+          <p className="p max-w-sm mb-4 text-base">
             Can&apos;t find the answer to your question, ask someone in the community either on our
             Discord or GitHub.
           </p>
@@ -401,7 +359,7 @@ export default function IndexPage() {
             </a>
           </Link>
           <div className="mt-16">
-            <div className="grid grid-cols-2 gap-y-10 gap-x-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
               {pricingFaq.map((faq, i) => {
                 return (
                   <div>

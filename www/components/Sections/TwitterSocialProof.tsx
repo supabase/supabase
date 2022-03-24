@@ -31,44 +31,36 @@ function TwitterSocialProof() {
     <>
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
-          <h3 className="text-3xl">Join the community</h3>
-          <p>
-            <p className="lg:text-lg">
-              Supported by a network of early advocates, contributors, and champions.
-            </p>
-            <div className="my-4 flex gap-2 justify-center">
-              <Link
-                href={'https://github.com/supabase/supabase/discussions'}
-                as={'https://github.com/supabase/supabase/discussions'}
-              >
-                <Button
-                  as="a"
-                  // @ts-ignore
-                  target="_blank"
-                  size="small"
-                  iconRight={<IconMessageCircle size={14} />}
-                  type="secondary"
-                >
-                  GitHub discussions
-                </Button>
-              </Link>
-              <Link
-                href={'https://github.com/supabase/supabase/discussions'}
-                as={'https://github.com/supabase/supabase/discussions'}
-              >
-                <Button
-                  as="a"
-                  type="alternative"
-                  // @ts-ignore
-                  target="_blank"
-                  size="small"
-                  iconRight={<IconMessageCircle size={14} />}
-                >
-                  Discord
-                </Button>
-              </Link>
-            </div>
+          <h3 className="h2">Join the community</h3>
+          <p className="p">
+            Supported by a network of early advocates, contributors, and champions.
           </p>
+          <div className="my-8 flex gap-2 justify-center">
+            <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
+              <Button
+                as="a"
+                // @ts-ignore
+                target="_blank"
+                size="small"
+                iconRight={<IconMessageCircle size={14} />}
+                type="default"
+              >
+                GitHub discussions
+              </Button>
+            </Link>
+            <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
+              <Button
+                as="a"
+                type="default"
+                // @ts-ignore
+                target="_blank"
+                size="small"
+                iconRight={<IconMessageCircle size={14} />}
+              >
+                Discord
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
       <div className="mt-6">

@@ -35,8 +35,8 @@ function APISection(props: Props) {
   return (
     <div className="grid grid-cols-12 lg:gap-16">
       <div className="col-span-12 lg:col-span-5 xl:col-span-5 pb-8">
-        <h2>{props.title}</h2>
-        <p>{props.text}</p>
+        <h2 className="h3">{props.title}</h2>
+        <p className="p">{props.text}</p>
         {props.documentation_link && (
           <Link href={props.documentation_link} as={props.documentation_link}>
             <a>

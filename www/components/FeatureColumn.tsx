@@ -1,13 +1,9 @@
 function FeatureColumn({ icon, title, text }: any) {
   return (
     <>
-      <p>
-        <p>{icon}</p>
-      </p>
-      <h4>{title}</h4>
-      <p>
-        <p>{text}</p>
-      </p>
+      {icon && <div className="mb-2">{icon}</div>}
+      <h4 className="text-base mb-4">{title}</h4>
+      <p className="p">{text}</p>
     </>
   )
 }

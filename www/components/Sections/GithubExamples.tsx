@@ -26,20 +26,18 @@ function GithubExamples() {
     <>
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
-          <h2>Community driven examples, libraries and guides</h2>
-          <p className="block mb-6">
-            <p className="text-base lg:text-lg">
-              Supported by a network of early advocates, contributors, and champions.
-            </p>
+          <h2 className="h3">Community driven examples, libraries and guides</h2>
+          <p className="p ">
+            Supported by a network of early advocates, contributors, and champions.
           </p>
-          <div className="flex items-center space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
+          <div className="flex items-center gap-2 justify-center py-4">
             <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
-              <Button as="a" type="default" icon={<IconBookOpen />}>
+              <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
                 View guides
               </Button>
             </Link>
             <Link href="/docs/guides/examples" as="/docs/guides/examples">
-              <Button as="a" type="default">
+              <Button size="small" as="a" type="default">
                 View all examples
               </Button>
             </Link>
@@ -47,7 +45,7 @@ function GithubExamples() {
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
             >
-              <Button as="a" type="default" icon={<IconGitHub />}>
+              <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
                 Official GitHub library
               </Button>
             </Link>

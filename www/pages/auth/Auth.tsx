@@ -24,6 +24,7 @@ import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
@@ -226,15 +227,15 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-5 mb-8">
-              <h2>User permissions without the middleware</h2>
-              <p>
-                <p className="text-base lg:text-lg">
-                  Supabase Auth works without any additional servers. Build Authorization rules with
-                  Postgres' Row Level Security, controlling who can create, edit and delete specific
-                  rows in your database.
-                </p>
-                <p>Policies can be written in SQL or using the dashboard online.</p>
+              <h2 className="h3">User permissions without the middleware</h2>
+
+              <p className="p text-base lg:text-lg">
+                Supabase Auth works without any additional servers. Build Authorization rules with
+                Postgres' Row Level Security, controlling who can create, edit and delete specific
+                rows in your database.
               </p>
+              <p className="p">Policies can be written in SQL or using the dashboard online.</p>
+
               <Link href="/docs/guides/auth#policy-examples">
                 <a>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
@@ -260,7 +261,7 @@ function AuthPage() {
             <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
               <div className="mb-4 flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex justify-center items-center">
-                  <IconKey size="small" strokeWidth={1.5} />
+                  <ProductIcon icon={Solutions['authentication'].icon} />
                 </div>
                 <p className="m-0">
                   <IconX />
@@ -268,16 +269,16 @@ function AuthPage() {
                 <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
               </div>
 
-              <h2 className="mb-4">React Auth</h2>
-              <p>
-                <p className="text-base lg:text-lg">
-                  Pre-built auth widgets to get started in minutes.
-                </p>
-                <p>
-                  Supabase provides React libraries which handle common scenarios, including logging
-                  in, signing up, magic link and forgot password forms.
-                </p>
+              <h2 className="h3">React Auth</h2>
+
+              <p className="p text-base lg:text-lg">
+                Pre-built auth widgets to get started in minutes.
               </p>
+              <p className="p">
+                Supabase provides React libraries which handle common scenarios, including logging
+                in, signing up, magic link and forgot password forms.
+              </p>
+
               <Link
                 href="https://github.com/supabase/ui#using-supabase-ui-auth"
                 as="https://github.com/supabase/ui#using-supabase-ui-auth"

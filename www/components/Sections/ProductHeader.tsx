@@ -16,32 +16,33 @@ interface Types {
 const ProductHeader = (props: Types) => (
   <div className="container mx-auto px-6 sm:px-16 xl:px-20 relative pt-16 lg:pt-32 pb-0">
     <div className="grid grid-cols-12">
-      <div className="col-span-12 lg:col-span-5">
-        {props.icon || props.title ? (
-          <div className="flex flex-row mb-4 item-center">
-            {props.icon && <ProductIcon icon={props.icon} />}
-            {props.title && (
-              <h4 className="ml-3" key={`product-name-${props.title}`}>
-                {props.title}
-              </h4>
-            )}
-          </div>
-        ) : null}
-        <h1 className="text-5xl" key={`h1`}>
-          {props.h1}
-        </h1>
-        {props.subheader && (
-          <p>
-            {props.subheader.map((subheader, i) => {
+      <div className="col-span-12 lg:col-span-5 space-y-8">
+        <div>
+          {props.icon || props.title ? (
+            <div className="flex mb-4 items-center gap-2">
+              {props.icon && <ProductIcon icon={props.icon} />}
+              {props.title && (
+                <span className="text-scale-1200" key={`product-name-${props.title}`}>
+                  {props.title}
+                </span>
+              )}
+            </div>
+          ) : null}
+          <h1 className="h1" key={`h1`}>
+            {props.h1}
+          </h1>
+        </div>
+        <div>
+          {props.subheader &&
+            props.subheader.map((subheader, i) => {
               return (
-                <p className="lg:text-lg" key={i}>
+                <p className="p lg:text-lg" key={i}>
                   {subheader}
                 </p>
               )
             })}
-          </p>
-        )}
-        <div className="mt-12 flex flex-row md:flex-row md:items-center">
+        </div>
+        <div className="flex flex-row md:flex-row md:items-center">
           <Link href="https://app.supabase.io/" as="https://app.supabase.io/">
             <a>
               <Button size="medium" className="text-white">
@@ -52,7 +53,7 @@ const ProductHeader = (props: Types) => (
           {props.documentation_url && (
             <Link href={props.documentation_url} as={props.documentation_url}>
               <a className="ml-2">
-                <Button type="text" size="medium" icon={<IconBookOpen />}>
+                <Button type="default" size="medium" icon={<IconBookOpen />}>
                   See documentation
                 </Button>
               </a>
