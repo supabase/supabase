@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Modal } from '@supabase/ui'
 
 import { withAuth, useStore, useSubscriptionStats } from 'hooks'
-import { get, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
