@@ -40,7 +40,6 @@ const LogTable = ({ data = [], queryType }: Props) => {
     return { key: v, name: v, resizable: true, formatter }
   })
   let columns
-
   if (!queryType) {
     columns = DEFAULT_COLUMNS
   } else {
@@ -246,13 +245,9 @@ const LogTable = ({ data = [], queryType }: Props) => {
             const row = r as LogData
             return row.id
           }}
-          onRowClick={(r) => {
-            // if (!hasLogDataFormat) return
-            const row = r as LogData
-            setFocusedLog(logMap[row.id])
-          }}
+          onRowClick={(r) => setFocusedLog(r)}
         />
-        {hasId && focusedLog && (
+        {focusedLog && (
           <div className="w-1/2 flex flex-col">
             <LogSelection
               onClose={() => setFocusedLog(null)}
