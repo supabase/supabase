@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { Radio } from '@supabase/ui'
+import { getProductPrice } from '../Billing.utils'
 
 interface Props {
   computeSizes: any[]
@@ -18,12 +19,7 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
       </div>
       <Radio.Group type="cards" className="billing-compute-radio">
         {computeSizes.map((option: any) => {
-          const defaultPriceId = option.metadata.default_price_id
-          const price =
-            defaultPriceId !== undefined
-              ? option.prices.find((price: any) => price.id === defaultPriceId).unit_amount
-              : option.prices[0].unit_amount
-
+          const defaultPrice = getProductPrice(option)
           return (
             <Radio
               hidden
@@ -38,7 +34,7 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
                 </div>
               }
               value={option.id}
-              optionalLabel={<div>${price / 100} / month</div>}
+              optionalLabel={<div>${defaultPrice.unit_amount / 100} / month</div>}
               checked={selectedComputeSize?.id === option.id}
               onChange={() => onSelectOption(option)}
             />
