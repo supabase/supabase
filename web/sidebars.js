@@ -189,6 +189,7 @@ module.exports = {
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
+        'guides/integrations/clerk',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
