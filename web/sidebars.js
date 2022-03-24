@@ -193,6 +193,7 @@ module.exports = {
         'guides/integrations/plasmic',
         'guides/integrations/prisma',
         'guides/integrations/snaplet',
+        'guides/integrations/stytch',
         'guides/integrations/vercel',
       ],
     },
