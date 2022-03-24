@@ -16,6 +16,7 @@ import {
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import UpdateSuccess from '../UpdateSuccess'
+import { formatComputeSizes } from '../AddOns/AddOns.utils'
 import { formSubscriptionUpdatePayload } from './ProUpgrade.utils'
 
 // Do not allow compute size changes for af-south-1
@@ -38,12 +39,14 @@ const ProUpgrade: FC<Props> = ({
   const { ui } = useStore()
 
   const { addons } = products
+  const computeSizes = formatComputeSizes(addons)
+
   const projectRef = ui.selectedProject?.ref
   const projectRegion = ui.selectedProject?.region ?? ''
 
   const currentComputeSize =
-    addons.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
-    addons.find((option: any) => option.name.includes('[Small]'))
+    computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
+    computeSizes.find((option: any) => option.name.includes('[Micro]'))
 
   const isManagingProSubscription =
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
@@ -208,7 +211,7 @@ const ProUpgrade: FC<Props> = ({
                         <Badge color="green">Optional</Badge>
                       </div>
                       <ComputeSizeSelection
-                        computeSizes={addons || []}
+                        computeSizes={computeSizes || []}
                         selectedComputeSize={selectedComputeSize}
                         onSelectOption={onSelectComputeSizeOption}
                       />
