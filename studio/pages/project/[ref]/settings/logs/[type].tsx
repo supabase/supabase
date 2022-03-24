@@ -32,12 +32,14 @@ import {
   LOG_TYPE_LABEL_MAPPING,
   genDefaultQuery,
   genCountQuery,
+  LogsTableName,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { isUndefined } from 'lodash'
 import dayjs from 'dayjs'
 import InformationBox from 'components/ui/InformationBox'
+import useLogsPreview from 'hooks/analytics/useLogsPreview'
 
 /**
  * Acts as a container component for the entire log display
@@ -52,251 +54,121 @@ import InformationBox from 'components/ui/InformationBox'
  */
 export const LogPage: NextPage = () => {
   const router = useRouter()
-  const { ref, type, q, s, te } = router.query
-  const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [editorValue, setEditorValue] = useState('')
+  const { ref, type, s, te, ts } = router.query
   const [showChart, setShowChart] = useState(true)
-  const [mode, setMode] = useState<'simple' | 'custom'>('simple')
-  const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
-  const [params, setParams] = useState({
-    type: '',
-    search_query: '',
-    sql: '',
-    timestamp_start: '',
-    timestamp_end: '',
+  const table = type === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
+
+  const [
+    { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
+    { loadOlder, setFilters, refresh, setTo, setFrom },
+  ] = useLogsPreview(ref as string, table, {
+    initialFilters: { search_query: s as string },
+    whereStatementFactory: (filterObj) =>
+      `${
+        filterObj.search_query ? `REGEXP_CONTAINS(event_message, '${filterObj.search_query}')` : ''
+      }`,
   })
+
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
-  const checkIfSelectQuery = (value: string) =>
-    value.toLowerCase().includes('select') ? true : false
-  const table = type === 'api' ? 'edge_logs' : 'postgres_logs'
-  useEffect(() => {
-    setParams({ ...params, type: type as string })
-  }, [type])
 
   useEffect(() => {
-    // on mount, set initial values
-    if (q !== undefined && q !== '') {
-      onSelectTemplate({
-        mode: 'custom',
-        searchString: q as string,
-      })
-    } else {
-      onSelectTemplate({
-        mode: 'simple',
-        searchString: (s || '') as string,
-      })
-    }
+    setFilters((prev) => ({ ...prev, search_query: s as string }))
     if (te) {
-      setParams((prev) => ({ ...prev, timestamp_end: te as string }))
+      setTo(te as string)
     } else {
-      setParams((prev) => ({ ...prev, timestamp_end: '' }))
+      setTo('')
     }
-  }, [q, s, te])
-
-  const genQueryParams = (params: { [k: string]: string }) => {
-    // remove keys which are empty strings, null, or undefined
-    for (const k in params) {
-      const v = params[k]
-      if (v === null || v === '' || isUndefined(v)) {
-        delete params[k]
-      }
-    }
-    const qs = new URLSearchParams(params).toString()
-    return qs
-  }
-  // handle log fetching
-  const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
-    let queryParams
-    // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
-    if (prevPageData === null) {
-      // reduce interval window limit by using the timestamp of the last log
-      queryParams = genQueryParams(params)
-    } else if ((prevPageData.result ?? []).length === 0) {
-      // no rows returned, indicates that no more data to retrieve and append.
-      return null
+    if (ts) {
+      setFrom(ts as string)
     } else {
-      const len = prevPageData.result.length
-      const { timestamp: tsLimit }: LogData = prevPageData.result[len - 1]
-      // create new key from params
-      queryParams = genQueryParams({ ...params, timestamp_end: String(tsLimit) })
+      setFrom('')
     }
+  }, [s, te, ts])
 
-    const logUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${queryParams}`
-    return logUrl
-  }
-  const {
-    data = [],
-    error: swrError,
-    isValidating,
-    mutate,
-    size,
-    setSize,
-  } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
-  let logData: LogData[] = []
-  let error: null | string | object = swrError ? swrError.message : null
-  data.forEach((response) => {
-    if (!error && response?.result) {
-      logData = [...logData, ...response.result]
-    }
-    if (!error && response && response.error) {
-      error = response.error
-    }
-  })
-
-  const countUrl = `${API_URL}/projects/${ref}/analytics/endpoints/logs.${type}?${genQueryParams({
-    ...params,
-    sql: genCountQuery(table),
-    period_start: String(latestRefresh),
-  })}`
-  const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
-  const newCount = countData?.result?.[0]?.count ?? 0
-
-  const handleRefresh = () => {
-    setLatestRefresh(new Date().toISOString())
-    setParams({ ...params, timestamp_end: '' })
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        te: undefined,
-      },
-    })
-    setSize(1)
-  }
-
-  const handleModeToggle = () => {
-    if (mode === 'simple') {
-      setMode('custom')
-      onSelectTemplate({
-        mode: 'custom',
-        searchString: genDefaultQuery(table),
-      })
-    } else {
-      setMode('simple')
-    }
-  }
-
-  const onSelectTemplate = (template: LogTemplate) => {
-    setMode(template.mode)
-    if (template.mode === 'simple') {
-      setParams((prev) => ({ ...prev, search_query: template.searchString, sql: '' }))
-    } else {
-      setEditorValue(template.searchString)
-      setParams((prev) => ({
-        ...prev,
-        sql: template.searchString,
-        search_query: '',
-        timestamp_end: '',
-      }))
-      setEditorId(uuidv4())
-    }
-  }
-  const handleEditorSubmit = () => {
-    setParams((prev) => ({ ...prev, sql: editorValue, search_query: '' }))
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        q: editorValue,
-        s: undefined,
-        te: undefined,
-      },
-    })
-  }
-  const handleSearch: LogSearchCallback = ({ query, from, fromMicro }) => {
-    const unixMicro = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
-    setParams((prev) => ({
-      ...prev,
-      search_query: query || '',
-      timestamp_end: unixMicro ? String(unixMicro) : '',
-      sql: '',
-    }))
+  useEffect(() => {
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
         q: undefined,
-        s: query || '',
-        te: unixMicro,
+        s: filters.search_query || '',
+        ts: params.timestamp_start,
+        te: params.timestamp_end,
       },
     })
-    setEditorValue('')
+  }, [params.timestamp_end, params.timestamp_start, filters.search_query])
+  const onSelectTemplate = (template: LogTemplate) => {
+    setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
-  const cleanEditorValue = (value: string) => {
-    if (typeof value !== 'string') return value
-    return value.replace(/\n/g, ' ')
+
+  const handleRefresh = () => {
+    refresh()
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        te: undefined,
+        ts: undefined,
+      },
+    })
   }
+
+  const handleSearch: LogSearchCallback = ({ query, to, from, fromMicro, toMicro }) => {
+    let toValue, fromValue
+    if (to || toMicro) {
+      toValue = toMicro ? toMicro : dayjs(to).valueOf() * 1000
+
+      setTo(String(toValue))
+    }
+    if (from || fromMicro) {
+      const fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
+      setFrom(String(fromValue))
+    }
+    setFilters((prev) => ({ ...prev, search_query: query || '' }))
+  }
+
   return (
     <SettingsLayout title={title}>
       <div className="h-full flex flex-col flex-grow">
         <LogPanel
           isShowingEventChart={showChart}
           onToggleEventChart={() => setShowChart(!showChart)}
-          isCustomQuery={mode === 'custom'}
-          isLoading={isValidating}
+          isCustomQuery={false}
+          isLoading={isLoading}
           newCount={newCount}
-          templates={TEMPLATES.filter((template) => template.for?.includes(type as string))}
+          templates={TEMPLATES.filter(
+            (template) => template.for?.includes(type as string) && template.mode === 'simple'
+          )}
           onRefresh={handleRefresh}
           onSearch={handleSearch}
-          defaultSearchValue={params.search_query}
-          defaultFromValue={
+          defaultSearchValue={filters.search_query}
+          defaultToValue={
             params.timestamp_end ? dayjs(Number(params.timestamp_end) / 1000).toISOString() : ''
           }
-          onCustomClick={handleModeToggle}
+          defaultFromValue={
+            params.timestamp_start
+              ? dayjs(Number(params.timestamp_start) / 1000).toISOString()
+              : oldestTimestamp
+              ? dayjs(Number(oldestTimestamp) / 1000).toISOString()
+              : ''
+          }
+          onCustomClick={() => {
+            router.push(`/project/${ref}/settings/logs/explorer?q=${params.rawSql}`)
+          }}
           onSelectTemplate={onSelectTemplate}
         />
-        {mode === 'custom' && (
-          <React.Fragment>
-            <div className="min-h-[7rem] h-28">
-              <CodeEditor
-                id={editorId}
-                language="pgsql"
-                defaultValue={editorValue}
-                onInputChange={(v) => setEditorValue(v || '')}
-                onInputRun={handleRefresh}
-              />
-            </div>
-            <div className="flex flex-row justify-end items-center px-2 py-1 w-full">
-              {mode === 'custom' && (
-                <InformationBox
-                  className="shrink mr-auto"
-                  block={false}
-                  size="tiny"
-                  icon={<IconInfo size="tiny" />}
-                  title={`Custom queries are restricted to a ${
-                    type === 'database' ? '2 hour' : '7 day'
-                  } querying window.`}
-                />
-              )}
-              <div className="flex flex-row gap-x-2 justify-end p-2">
-                <Button
-                  type="text"
-                  onClick={() => {
-                    setEditorValue(genDefaultQuery(table))
-                    setEditorId(uuidv4())
-                  }}
-                >
-                  Reset
-                </Button>
-                <Button type={editorValue ? 'secondary' : 'text'} onClick={handleEditorSubmit}>
-                  Run
-                </Button>
-              </div>
-            </div>
-          </React.Fragment>
-        )}
-        {showChart && mode !== 'custom' && (
+        {showChart && (
           <div>
             <LogEventChart
-              data={!isValidating ? logData : undefined}
+              data={!isLoading ? logData : undefined}
               onBarClick={(timestampMicro) => {
-                handleSearch({ query: params.search_query, fromMicro: timestampMicro })
+                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
               }}
             />
           </div>
         )}
         <div className="flex flex-col flex-grow relative">
-          {isValidating && (
+          {isLoading && (
             <div
               className={[
                 'absolute top-0 w-full h-full flex items-center justify-center',
@@ -307,13 +179,11 @@ export const LogPage: NextPage = () => {
             </div>
           )}
 
-          <LogTable data={logData} isCustomQuery={mode === 'custom'} />
+          <LogTable data={logData} isCustomQuery={false} />
           <div className="p-2">
-            {mode === 'simple' && (
-              <Button onClick={() => setSize(size + 1)} icon={<IconRewind />} type="default">
-                Load older
-              </Button>
-            )}
+            <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
+              Load older
+            </Button>
           </div>
 
           {error && (

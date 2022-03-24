@@ -108,6 +108,11 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
         {projects.map((project: any) => (
           <ProjectSummary key={project.ref} project={project} />
         ))}
+        {projects.length === 0 && (
+          <Panel.Content>
+            <p className="text-sm text-scale-1100">No projects created yet</p>
+          </Panel.Content>
+        )}
       </Panel>
     </div>
   )

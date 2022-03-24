@@ -117,7 +117,7 @@ test('Refresh page', async () => {
 
 test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
-    if (url.includes('search_query') && url.includes('something')) {
+    if (url.includes('something')) {
       return {
         result: [logDataFixture({ event_message: 'some event happened' })],
       }
@@ -131,7 +131,6 @@ test('Search will trigger a log refresh', async () => {
 
   await waitFor(
     () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('something'))
 
       // updates router query params
@@ -147,8 +146,7 @@ test('Search will trigger a log refresh', async () => {
     },
     { timeout: 1500 }
   )
-
-  await waitFor(() => screen.getByText(/happened/), { timeout: 1000 })
+  await screen.findByText(/happened/)
 })
 
 test('poll count for new messages', async () => {
@@ -177,24 +175,10 @@ test('s= query param will populate the search bar', async () => {
   render(<LogPage />)
   // should populate search input with the search param
   await screen.findByDisplayValue('someSearch')
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('search_query=someSearch'))
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('someSearch'))
 })
 
-test('q= query param will populate the query input', async () => {
-  const router = defaultRouterMock()
-  router.query = { ...router.query, type: 'api', q: 'some_query', s: 'someSearch' }
-  useRouter.mockReturnValue(router)
-  render(<LogPage />)
-  // should populate editor with the query param
-  await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
-  })
-
-  // query takes precedence of search queryparam
-  expect(() => !screen.queryByDisplayValue(/someSearch/))
-})
-
-test('te= query param will populate the timestamp from input', async () => {
+test('te= query param will populate the timestamp to input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
@@ -213,63 +197,26 @@ test('te= query param will populate the timestamp from input', async () => {
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByDisplayValue(isoString)
 })
-test('custom sql querying', async () => {
-  get.mockImplementation((url) => {
-    if (url.includes('sql=') && url.includes('select')) {
-      return {
-        result: [
-          {
-            my_count: 12345,
-          },
-        ],
-      }
-    }
-    return { result: [] }
-  })
-  const { container } = render(<LogPage />)
-  let editor = container.querySelector('.monaco-editor')
-  expect(editor).toBeFalsy()
-  // TODO: abstract this out into a toggle selection helper
-  const toggle = getToggleByText(/via query/)
-  expect(toggle).toBeTruthy()
-  userEvent.click(toggle)
+test('ts= query param will populate the timestamp from input', async () => {
+  // get time 20 mins before
+  const newDate = new Date()
+  newDate.setMinutes(new Date().getMinutes() - 20)
+  const isoString = newDate.toISOString()
+  const unixMicro = newDate.getTime() * 1000 //microseconds
+  const router = defaultRouterMock()
+  router.query = { ...router.query, ts: unixMicro }
+  useRouter.mockReturnValue(router)
+  render(<LogPage />)
 
-  // type into the query editor
   await waitFor(() => {
-    editor = container.querySelector('.monaco-editor')
-    expect(editor).toBeTruthy()
+    expect(get).toHaveBeenCalledWith(
+      expect.stringContaining(`timestamp_start=${encodeURIComponent(unixMicro)}`)
+    )
   })
-  editor = container.querySelector('.monaco-editor')
-  // clear the default query
-  userEvent.type(editor, '{backspace}'.repeat(100))
-  // type new query
-  userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
-  // should show sandbox warning alert
-  await screen.findByText(/restricted to a 7 day querying window/)
-
-  // should trigger query
-  userEvent.click(await screen.findByText('Run'))
-  await waitFor(
-    () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
-    },
-    { timeout: 1000 }
-  )
-
-  await screen.findByText(/my_count/) //column header
-  const rowValue = await screen.findByText(/12345/) // row value
-
-  // clicking on the row value should not show log selection panel
-  userEvent.click(rowValue)
-  await expect(screen.findByText(/Metadata/)).rejects.toThrow()
-
-  // should not see chronological features
-  await expect(screen.findByText(/Load older/)).rejects.toThrow()
+  userEvent.click(await screen.findByText('Custom'))
+  await screen.findByDisplayValue(isoString)
 })
+
 
 test('load older btn will fetch older logs', async () => {
   get.mockImplementation((url) => {
@@ -319,31 +266,6 @@ test('bug: load older btn does not error out when previous page is empty', async
   })
 })
 
-test('bug: log selection gets hidden when custom query is run', async () => {
-  const result = [
-    logDataFixture({
-      event_message: 'some event happened',
-      metadata: {
-        my_key: 'something_value',
-      },
-    }),
-  ]
-  get.mockResolvedValue({ result })
-  const {container} =render(<LogPage />)
-  userEvent.click(await screen.findByText(/happened/))
-  await screen.findByDisplayValue(/something_value/)
-  get.mockResolvedValue({ data: [] })
-
-  const toggle = getToggleByText(/via query/)
-  expect(toggle).toBeTruthy()
-  userEvent.click(toggle)
-  const editor = container.querySelector('.monaco-editor')
-  userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
-  userEvent.click(await screen.findByText('Run'))
-
-  await expect(screen.findByDisplayValue(/something_value/)).rejects.toThrow()
-})
-
 test('log event chart hide', async () => {
   render(<LogPage />)
   await screen.findByText('Events')
@@ -362,32 +284,12 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   })
   const { container, rerender } = render(<LogPage />)
 
-  await waitFor(() => {
-    let editor = container.querySelector('.monaco-editor')
-    expect(editor).toBeFalsy()
-  })
   await expect(screen.findByDisplayValue('simple-query')).rejects.toThrow()
 
-  // change the router values for query editor
   const router = defaultRouterMock()
-  router.query = { ...router.query, q: 'advanced-query' }
+  router.query = { ...router.query, s: 'simple-query' }
   useRouter.mockReturnValue(router)
   rerender(<LogPage />)
 
-  await waitFor(() => {
-    let editor = container.querySelector('.monaco-editor')
-    expect(editor).toBeTruthy()
-  })
-  await expect(screen.findByDisplayValue('simple-query')).rejects.toThrow()
-
-  // change the router values
-  router.query = { ...router.query, q: undefined, s: 'simple-query' }
-  useRouter.mockReturnValue(router)
-  rerender(<LogPage />)
-
-  await waitFor(() => {
-    let editor = container.querySelector('.monaco-editor')
-    expect(editor).toBeFalsy()
-  })
   await screen.findByDisplayValue('simple-query')
 })

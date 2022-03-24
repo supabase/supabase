@@ -16,6 +16,10 @@ import Table from 'components/to-be-cleaned/Table'
 
 const PAGE_LIMIT = 10
 
+/**
+ * Eventually deprecate this - as we move on to show invoices by project on the organization billing page
+ */
+
 interface Props {
   organization: any
 }
