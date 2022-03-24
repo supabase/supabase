@@ -1,5 +1,3 @@
-import { sortBy, concat } from 'lodash'
-
 export * from './infrastructure'
 export * from './metrics'
 
