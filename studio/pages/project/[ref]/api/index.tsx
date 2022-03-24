@@ -34,7 +34,7 @@ const PageConfig = () => {
       let rpcs: any = {}
 
       Object.entries(paths || []).forEach(([name, val]) => {
-        let trimmed = name.substr(1)
+        let trimmed = name.slice(1)
         let id = trimmed.replace(functionPath, '')
         let displayName = id.replace(/_/g, ' ')
         let camelCase = snakeToCamel(id)
