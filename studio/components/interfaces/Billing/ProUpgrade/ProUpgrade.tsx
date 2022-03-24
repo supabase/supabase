@@ -62,7 +62,6 @@ const ProUpgrade: FC<Props> = ({
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
 
-  // Ignore for first iteration, just use default payment method
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>()
   const [selectedComputeSize, setSelectedComputeSize] = useState<any>(currentComputeSize)
   const [subscriptionPreview, setSubscriptionPreview] = useState<SubscriptionPreview>()
@@ -73,7 +72,6 @@ const ProUpgrade: FC<Props> = ({
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
-      // [TODO] Figure out how to get the DEFAULT payment method
       setSelectedPaymentMethod(paymentMethods[0].id)
     }
   }, [isLoadingPaymentMethods, paymentMethods])
