@@ -1,4 +1,3 @@
-import useSWR from 'swr'
 import React, { useEffect, useReducer, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -9,38 +8,24 @@ import {
   IconAlertCircle,
   IconRewind,
   Button,
-  IconInfo,
   Card,
   Input,
 } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts/'
-import CodeEditor from 'components/ui/CodeEditor'
 import {
   LogTable,
-  LogEventChart,
-  Count,
-  Logs,
   LogTemplate,
   TEMPLATES,
-  LogData,
   LogSearchCallback,
   LOG_TYPE_LABEL_MAPPING,
-  genDefaultQuery,
-  genCountQuery,
   LogsTableName,
   filterSqlWhereBuilder,
-  FilterObject,
   filterReducer,
+  QueryType,
 } from 'components/interfaces/Settings/Logs'
-import { uuidv4 } from 'lib/helpers'
-import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
-import { isUndefined } from 'lodash'
 import dayjs from 'dayjs'
-import InformationBox from 'components/ui/InformationBox'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 
@@ -125,7 +110,7 @@ export const LogPage: NextPage = () => {
   }
 
   const handleSearch: LogSearchCallback = ({ query, to, from, fromMicro, toMicro }) => {
-    let toValue, fromValue
+    let toValue
     if (to || toMicro) {
       toValue = toMicro ? toMicro : dayjs(to).valueOf() * 1000
 
@@ -196,10 +181,6 @@ export const LogPage: NextPage = () => {
           dispatchWhereFilters={dispatchWhereFilters}
           whereFilters={whereFilters}
           table={table}
-          te={te}
-          ts={ts}
-          setTo={setTo}
-          setFrom={setFrom}
         />
         {/* {showChart && (
           <div>
@@ -223,7 +204,7 @@ export const LogPage: NextPage = () => {
             </div>
           )}
 
-          <LogTable data={logData} isCustomQuery={false} queryType={type} />
+          <LogTable data={logData} isCustomQuery={false} queryType={type as QueryType} />
           <div className="p-2">
             <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
               Load older

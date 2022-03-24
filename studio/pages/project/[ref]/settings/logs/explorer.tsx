@@ -1,45 +1,15 @@
-import useSWR from 'swr'
 import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import {
-  Typography,
-  IconLoader,
-  IconAlertCircle,
-  IconRewind,
-  Button,
-  IconInfo,
-  Card,
-  Input,
-} from '@supabase/ui'
+import { Typography, IconLoader, IconAlertCircle, Button, Card, Input } from '@supabase/ui'
 
 import { withAuth } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts/'
 import CodeEditor from 'components/ui/CodeEditor'
-import {
-  LogPanel,
-  LogTable,
-  LogEventChart,
-  Count,
-  Logs,
-  LogTemplate,
-  TEMPLATES,
-  LogData,
-  LogSearchCallback,
-  LOG_TYPE_LABEL_MAPPING,
-  genDefaultQuery,
-  genCountQuery,
-  LogsTableName,
-} from 'components/interfaces/Settings/Logs'
+import { LogPanel, LogTable, LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
-import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
-import { isUndefined } from 'lodash'
 import dayjs from 'dayjs'
-import InformationBox from 'components/ui/InformationBox'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 
 /**

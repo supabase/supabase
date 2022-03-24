@@ -21,7 +21,8 @@ export interface LogData {
   id: string
   timestamp: number
   event_message: string
-  metadata: Metadata
+  metadata: Metadata,
+  [other: string]: unknown;
 }
 
 export interface LogTemplate {
