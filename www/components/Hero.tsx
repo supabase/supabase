@@ -23,18 +23,20 @@ const Hero = () => {
                       <h1
                         className="
                         sm:leading-none 
-                        text-xl lg:text-4xl xl:text-5xl"
+                        text-xl lg:text-4xl xl:text-5xl
+                        text-scale-1200
+                        "
                       >
                         <span className="block">The Open Source</span>
                         <span className="text-brand-900 md:ml-0 block">Firebase Alternative</span>
                       </h1>
                       <div>
-                        <p className="text-base sm:mt-5 lg:text-lg ">
+                        <p className="p text-base sm:mt-5 lg:text-lg ">
                           Create a backend in less than 2 minutes. Start your project with a
                           Postgres Database, Authentication, instant APIs, Realtime subscriptions
                           and Storage.
                         </p>
-                        <p className="text-base">Serverless functions coming soon</p>
+                        <p className="p text-base">Serverless functions coming soon</p>
                       </div>
                     </div>
                     <div className="flex gap-2 items-center">
@@ -50,7 +52,7 @@ const Hero = () => {
                       </Link>
                     </div>
                     <div className="flex flex-col gap-4">
-                      <small className="text-xs">backed by</small>
+                      <small className="small text-xs">backed by</small>
                       <div className="w-full sm:max-w-lg lg:ml-0">
                         <div className="flex flex-wrap items-center justify-start">
                           <img
