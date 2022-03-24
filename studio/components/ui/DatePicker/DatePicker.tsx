@@ -70,11 +70,8 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
     const to = dayjs(initialValues.to)
   }
 
-  function handleDatePickerChange(dates: [from: string, to: string]) {
+  function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
     const [from, to] = dates
-
-    console.log('start', from)
-    console.log('end', to)
     setStartDate(from)
     setEndDate(to)
   }
