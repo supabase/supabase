@@ -101,54 +101,42 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <p>
-                <p className="mb-4 flex items-center space-x-2">
-                  <ProductIcon icon={Solutions['database'].icon} />
-                  <IconX />
-                  <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
-                </p>
-              </p>
-              <h4>Just Postgres</h4>
-              <p>
-                <p className="text-base lg:text-lg">
-                  Every Supabase project is a dedicated Postgres database.
-                </p>
-                <p>
-                  100% portable. Bring your existing Postgres database, or migrate away at any time.
-                </p>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
+              </div>
+              <h4 className="h4">Just Postgres</h4>
+              <p className="p">Every Supabase project is a dedicated Postgres database.</p>
+              <p className="p text-sm">
+                100% portable. Bring your existing Postgres database, or migrate away at any time.
               </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p>
-                <p className="mb-4 flex items-center space-x-2">
-                  <ProductIcon icon={Solutions['database'].icon} />
-                  <IconX />
-                  <ProductIcon icon={Solutions['authentication'].icon} />
-                </p>
-              </p>
-              <h4>Built-in Auth</h4>
-              <p>
-                <p className="text-base lg:text-lg">
-                  Leveraging PostgreSQL's proven Row Level Security.
-                </p>
-                <p>
-                  Integrated with JWT authentication which controls exactly what your users can
-                  access.
-                </p>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <ProductIcon icon={Solutions['authentication'].icon} />
+              </div>
+
+              <h4 className="h4">Built-in Auth</h4>
+              <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
+              <p className="p text-sm">
+                Integrated with JWT authentication which controls exactly what your users can
+                access.
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p>
-                <p className="mb-4 flex items-center space-x-2">
-                  <ProductIcon icon={Solutions['database'].icon} />
-                  <IconX />
-                  <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
-                </p>
-              </p>
-              <h4>Realtime enabled</h4>
-              <p>
-                <p className="text-base lg:text-lg">Data-change listeners over websockets.</p>
-                <p>Subscribe and react to database changes, milliseconds after they happen.</p>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
+              </div>
+
+              <h4 className="h4">Realtime enabled</h4>
+              <p className="p">Data-change listeners over websockets.</p>
+              <p className="p text-sm">
+                Subscribe and react to database changes, milliseconds after they happen.
               </p>
             </div>
           </div>
@@ -158,11 +146,10 @@ function Database() {
         <SectionContainer className="text-center md:pb-0 lg:pb-0">
           <div className="grid grid-cols-12">
             <div className="col-span-12 lg:col-span-8 lg:col-start-3">
-              <h2>Easy to use dashboard</h2>
-              <p>
-                <p className="text-base lg:text-lg">
-                  The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
-                </p>
+              <h2 className="h3">Easy to use dashboard</h2>
+
+              <p className="p">
+                The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
               </p>
             </div>
           </div>
@@ -292,23 +279,21 @@ function Database() {
         <SectionContainer className="lg:py-48">
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
-              <h2>Extend your database</h2>
-              <p className="block mb-8">
-                <p className="lg:text-lg">Supabase works natively with Postgres extensions.</p>
-                <p>
-                  Choose from a huge collection of Postgres extensions, enabled with a single click.
-                </p>
+              <h2 className="h3">Extend your database</h2>
+
+              <p className="p">Supabase works natively with Postgres extensions.</p>
+              <p className="p">
+                Choose from a huge collection of Postgres extensions, enabled with a single click.
               </p>
+
               <FeatureColumn
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
-              <Link href="/docs/guides/database" as="/docs/guides/database">
-                <a>
-                  <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
+              <Link href="/docs/guides/database" passHref>
+                <Button as="a" size="small" type="default" icon={<IconArrowUpRight />}>
+                  Explore documentation
+                </Button>
               </Link>
             </div>
             <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">

@@ -6,8 +6,10 @@ function ExampleCard(props: any) {
     <>
       <div
         className="h-40 
-          bg-white dark:bg-scale-300 
-          border border-scale-400
+          bg-white 
+          dark:bg-scale-300 
+          border 
+          border-scale-400
           border-t border-r border-l 
           p-5
           flex flex-col justify-between
@@ -15,27 +17,22 @@ function ExampleCard(props: any) {
           "
       >
         <div className="mb-4">
-          <h4 className="text-xl mb-3">{props.title}</h4>
-
-          <p className="text-sm">{props.description}</p>
-          <p className="text-sm flex flex-row items-center mb-2">
-            Created by:
-            <img
-              src={props.author_img}
-              className="ml-2 inline w-6 rounded-full border dark:border-gray-500"
-            />
-            <span className="ml-2">{props.author}</span>
-          </p>
+          <h4 className="h6">{props.title}</h4>
+          <p className="p text-sm">{props.description}</p>
+          <div>
+            <img src={props.author_img} className="inline w-6 rounded-full border-scale-500" />
+            <span className="text-sm ml-2">{props.author}</span>
+          </div>
         </div>
       </div>
       <Divider light />
       <div>
         <div
           className="
-          bg-scale-400
+          bg-scale-100
+          dark:bg-scale-400
           border border-scale-400
           border-b border-r border-l border-t-0
-          bg-scale-300
           p-5
           flex flex-col justify-between
           rounded rounded-t-none"

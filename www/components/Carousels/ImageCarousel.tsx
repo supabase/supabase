@@ -11,6 +11,7 @@ import 'swiper/swiper.min.css'
 import ImageCarouselStyles from './ImageCarousel.module.css'
 import Link from 'next/link'
 import Image from 'next/image'
+import TextLink from '../TextLink'
 
 interface Content {
   title: string
@@ -133,17 +134,14 @@ function ImageCarousel(props: ImageCarouselProps) {
           </div>
         </div>
       </div>
-      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-5 xl:col-start-8">
         <div className={`sbui-tabs--underline-alt ${props.altTabView ? 'block' : 'hidden'} mb-3`}>
           <Tabs
             scrollable
             type="underlined"
             size="small"
-            // @ts-ignore
             activeId={imageSwiperActiveIndex.toString()}
-            // @ts-ignore
             onChange={(id: string) => handleImageSwiperNav(Number(id))}
-            block
           >
             {props.content.map((content: Content, i: number) => {
               return (
@@ -151,9 +149,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                   label={content.label ? content.label : content.title}
                   id={i.toString()}
                   key={i}
-                >
-                  <span></span>
-                </Tabs.Panel>
+                />
               )
             })}
           </Tabs>
@@ -168,29 +164,13 @@ function ImageCarousel(props: ImageCarouselProps) {
         >
           {props.content.map((content, i) => {
             return (
-              <SwiperSlide key={i}>
-                <div className="ml-1">
-                  <h4>{content.title}</h4>
-                  <p>
-                    <p className="text-base">{content.text}</p>
-                  </p>
-                  {content.url && (
-                    <p>
-                      <Link href={content.url} as={content.url}>
-                        <a>
-                          <Button
-                            className="mb-8"
-                            type="default"
-                            size="small"
-                            icon={<IconArrowUpRight />}
-                          >
-                            {content.cta ? content.cta : 'View documentation'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </p>
-                  )}
-                </div>
+              <SwiperSlide key={i} className="py-4">
+                <h4 className="text-xl text-scale-1200 mb-4">{content.title}</h4>
+                <p className="p text-base">{content.text}</p>
+                <TextLink
+                  label={content.cta ? content.cta : 'View documentation'}
+                  url={content.url}
+                />
               </SwiperSlide>
             )
           })}

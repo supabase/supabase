@@ -15,7 +15,7 @@ const Product = () => {
       <div className="flex lg:flex-col">
         <div className="flex flex-row items-center">
           <ProductIcon icon={icon} />
-          <h5 className="ml-3 mb-0 text-base text-scale-1200">{name}</h5>
+          <h5 className="ml-3 mb-0 text-base text-scale-1200 overwrite">{name}</h5>
         </div>
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 mt-3">
           <p className="text-sm text-scale-1000">{description}</p>

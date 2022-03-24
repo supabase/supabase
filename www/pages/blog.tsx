@@ -118,7 +118,7 @@ function Blog(props: any) {
                   className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16"
                   key={idx}
                 >
-                  <BlogListItem blog={blog} />
+                  <BlogListItem post={blog} />
                 </div>
               ))}
             </ol>

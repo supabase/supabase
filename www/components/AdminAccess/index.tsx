@@ -15,8 +15,8 @@ const AdminAccess = () => {
 
   return (
     <SectionContainer>
-      <div>
-        <h2 className="mb-16">Build your app without leaving the dashboard</h2>
+      <div className="mb-16">
+        <h2 className="h3">Build your app without leaving the dashboard</h2>
       </div>
       <ImageCarousel content={AdminAccessData} altTabView={true} />
     </SectionContainer>

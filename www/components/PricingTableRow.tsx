@@ -108,9 +108,9 @@ export const PricingTableRowMobile = (props: any) => {
     <>
       <table className="mt-8 w-full">
         <caption className="bg-scale-50 dark:bg-dark-900 border-t border-scale-200 dark:border-scale-600 py-3 px-4 text-sm font-medium text-scale-1200 dark:text-white text-left">
-          <div className="flex space-x-4 items-center">
+          <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <h4 className="m-0">{category.title}</h4>
+            <span className="text-scale-1200 font-normal">{category.title}</span>
           </div>
         </caption>
         <thead>
@@ -123,11 +123,11 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-scale-900 dark:divide-scale-600 ">
+        <tbody className="divide-y divide-scale-600">
           {category.features.map((feat: any) => {
             return (
-              <tr className="border-t border-scale-200 dark:border-scale-600 ">
-                <th className="py-5 px-4 text-sm font-normal text-scale-500 text-left" scope="row">
+              <tr className="border-t ">
+                <th className="py-5 px-4 text-sm font-normal text-scale-1100 text-left" scope="row">
                   <span>
                     <p>{feat.title}</p>
                   </span>
@@ -142,9 +142,7 @@ export const PricingTableRowMobile = (props: any) => {
                       <Minus tier={tier} />
                     </div>
                   ) : (
-                    <span className="block text-sm text-scale-1200 dark:text-white">
-                      {feat.tiers[tier]}
-                    </span>
+                    <span className="block text-sm text-scale-1200">{feat.tiers[tier]}</span>
                   )}
                 </td>
               </tr>
