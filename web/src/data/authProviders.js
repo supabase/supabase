@@ -172,7 +172,6 @@ const authProviders = [
   },
   {
     name: 'Vonage',
-    // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-vonage',
     official: false,
     supporter: 'Supabase',
