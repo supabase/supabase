@@ -32,20 +32,20 @@ test('dedupes log lines with exact id', async () => {
           id: 'some-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
-          metadata: {}
+          metadata: {},
         },
         {
           id: 'some-uuid',
           timestamp: 1621323232312,
           event_message: 'some event happened',
-          metadata: {}
+          metadata: {},
         },
       ]}
     />
   )
 
   // should only have one element, this line will fail if there are >1 element
-  await waitFor(() => screen.getByText(/happened/))
+  await screen.findByText(/happened/)
 })
 
 test('can display custom columns and headers based on data input', async () => {

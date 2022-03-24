@@ -209,7 +209,23 @@ export const genQueryParams = (params: { [k: string]: string }) => {
   return qs
 }
 
-export const FILTER_OPTIONS: any = {
+
+interface Filter {
+  label: string
+  key: string
+  options: {
+    key: string
+    label: string
+    description?: string
+  }[]
+}
+type FilterOptions = {
+  [table: string] : {
+    [filterName: string]: Filter
+  }
+}
+
+export const FILTER_OPTIONS: FilterOptions = {
   // Postgres logs
   postgres_logs: {
     severity: {
