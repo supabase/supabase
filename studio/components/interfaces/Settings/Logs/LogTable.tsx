@@ -145,13 +145,19 @@ const LogTable = ({ data = [], queryType }: Props) => {
   }
 
   const stringData = JSON.stringify(data)
-  const logMap = useMemo(() => {
-    if (!hasId) return {} as LogMap
-    const logData = data as LogData[]
-    return logData.reduce((acc: LogMap, d: LogData) => {
+  const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
+    const deduped = [...new Set(data)] as LogData[]
+
+    if (!hasId) {
+      return [deduped, {} as LogMap]
+    }
+
+    const map = deduped.reduce((acc: LogMap, d: LogData) => {
       acc[d.id] = d
       return acc
     }, {}) as LogMap
+
+    return [deduped, map]
   }, [stringData])
 
   useEffect(() => {
@@ -170,11 +176,9 @@ const LogTable = ({ data = [], queryType }: Props) => {
     if (hasId && hasTimestamp) {
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
     } else {
-      const deduped = [...new Set(data)]
-      return deduped
+      return dedupedData
     }
   }, [stringData])
-
   return (
     <>
       {!queryType && (
