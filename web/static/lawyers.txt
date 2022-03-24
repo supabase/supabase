@@ -9,6 +9,8 @@ Supabase™ is a trademark of Supabase Inc.
 
 If you're a creator/contributor to one of these packages, thanks!
 
+Last updated: 2022-03-24
+
 --  ------------------------------------  ----------------------  --------------------------------------------------------------------  ---------------------------------------------------------------------------------------  -------------------------
  0  lodash@4.17.21                        MIT                     https://github.com/lodash/lodash                                      https://github.com/lodash/lodash/raw/master/LICENSE                                      @supabase/ui
  1  prop-types@15.7.2                     MIT                     https://github.com/facebook/prop-types                                https://github.com/facebook/prop-types/raw/master/LICENSE                                @supabase/ui
