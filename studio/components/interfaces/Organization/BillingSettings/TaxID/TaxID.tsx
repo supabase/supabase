@@ -170,7 +170,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                       </Select>
                       <Input
                         value={taxId.value}
-                        placeholder={(TAX_IDS as any)[taxId.type].placeholder}
+                        placeholder={(TAX_IDS as any)[taxId.type]?.placeholder ?? ''}
                         onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
                       />
                       <Button
