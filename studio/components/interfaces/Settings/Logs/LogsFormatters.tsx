@@ -174,8 +174,8 @@ export const HeaderFormmater = ({ value }: any) => {
  * for http response codes
  */
 
-export function jsonSyntaxHighlight(json: string) {
-  json = JSON.stringify(json, null, 2)
+export function jsonSyntaxHighlight(input: Object) {
+  let json: string = JSON.stringify(input, null, 2)
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // console.log('json', json)
