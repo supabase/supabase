@@ -10,7 +10,7 @@ const CTABanner = (props: any) => {
       `}
     >
       <div className="col-span-12">
-        <h2>
+        <h2 className="h2">
           <span className="text-scale-900">Build in a weekend,</span>
           <span className="text-scale-1200 dark:text-white"> scale to millions</span>
         </h2>
