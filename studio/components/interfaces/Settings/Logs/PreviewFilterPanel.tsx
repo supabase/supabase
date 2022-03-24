@@ -42,7 +42,6 @@ dayjs.extend(utc)
  * Logs control panel header + wrapper
  */
 const PreviewFilterPanel: FC<Props> = ({
-  templates = [],
   isLoading,
   isCustomQuery,
   newCount,
@@ -51,9 +50,6 @@ const PreviewFilterPanel: FC<Props> = ({
   defaultSearchValue = '',
   defaultToValue = '',
   onCustomClick,
-  onSelectTemplate,
-  isShowingEventChart,
-  onToggleEventChart,
   dispatchWhereFilters,
   whereFilters: filters,
   table,
@@ -80,13 +76,6 @@ const PreviewFilterPanel: FC<Props> = ({
       setTo({ value: defaultToValue, error: '' })
     }
   }, [defaultToValue])
-
-  const handleFromReset = async () => {
-    setTo({ value: '', error: '' })
-    const value = dayjs().utc().toISOString()
-    setDefaultTimestamp(value)
-    onSearch({ query: search, to: '' })
-  }
 
   //   const handleSearch = () => onSearch({ query: search, to: to.value })
 
