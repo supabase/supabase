@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import Meta from '~/components/Favicons'
 import '../styles/index.css'
 import { post } from './../lib/fetchWrapper'
+import { ThemeProvider } from '~/components/Providers'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -66,7 +67,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <Component {...pageProps} />
+      <ThemeProvider>
+        <Component {...pageProps} />
+      </ThemeProvider>
     </>
   )
 }

@@ -7,7 +7,7 @@
         "url": "/database"
       },
       {
-        "text": "Authentication",
+        "text": "Auth",
         "url": "/auth"
       },
       {
@@ -46,6 +46,10 @@
       {
         "text": "Terms of service",
         "url": "/docs/company/terms"
+      },
+      {
+        "text": "Privacy Policy",
+        "url": "/docs/company/privacy"
       }
     ]
   },

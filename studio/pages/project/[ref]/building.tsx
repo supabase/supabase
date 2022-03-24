@@ -3,16 +3,16 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 
-import BaseLayout from 'components/layouts'
+import ProjectLayout from 'components/layouts'
 
 type ProjectBuildingPageState = {} & any
 const ProjectBuildingPage: React.FC<ProjectBuildingPageState> = () => {
   const { ui } = useStore()
   const project: any = ui.selectedProject
   return (
-    <BaseLayout title="Project Building">
+    <ProjectLayout title="Project Building">
       <RedirectToDashboard projectRef={project?.ref ?? ''} />
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 export default withAuth(observer(ProjectBuildingPage))
@@ -24,7 +24,10 @@ const RedirectToDashboard: React.FC<RedirectToDashboardState> = ({ projectRef })
   const router = useRouter()
 
   React.useEffect(() => {
-    router.push(`/project/${projectRef}`)
+    // Use redirect to reload store data properly after project has been
+    // been created or unpaused, this is necessarily especially for unpausing
+    // so that the dashboard fetches the updated connection strings
+    window.location.replace(`/project/${projectRef}`)
   }, [])
   return null
 }

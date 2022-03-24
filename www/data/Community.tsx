@@ -1,4 +1,3 @@
-import { Card, Space, Typography } from '@supabase/ui'
 import DeveloperSignups from 'data/DeveloperSignups'
 
 type CommunityItem = {
@@ -31,35 +30,35 @@ const data: CommunityItem[] = [
   },
   {
     title: 'GitHub',
-    stat: '24,000+',
-    statLabel: 'Github stars',
+    stat: '28,000+',
+    statLabel: 'GitHub stars',
     img: 'github.png',
     invertImgDarkMode: true,
     detail: () => (
       <div>
-        <Typography.Text>Some growth chart?</Typography.Text>
+        <p>Some growth chart?</p>
       </div>
     ),
   },
   {
     title: 'Twitter',
-    stat: '20,000+',
+    stat: '25,000+',
     statLabel: 'Followers',
     img: 'twitter.png',
     detail: () => (
       <div>
-        <Typography.Text>Some twitter callouts</Typography.Text>
+        <p>Some twitter callouts</p>
       </div>
     ),
   },
   {
     title: 'Discord',
-    stat: '4,000+',
+    stat: '5,000+',
     statLabel: 'SuperTroopers',
     img: 'discord.png',
     detail: () => (
       <div>
-        <Typography.Text>Something great</Typography.Text>
+        <p>Something great</p>
       </div>
     ),
   },

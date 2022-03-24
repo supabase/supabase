@@ -33,13 +33,14 @@ const PolicyEditorModalTitle = ({
   }
   if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
     return (
-      <div className="px-6 pt-5">
+      <div className="">
         <div className="flex items-center space-x-3">
-          <Typography.Text type="secondary">
-            <div className="cursor-pointer" onClick={onSelectBackFromTemplates}>
-              <IconChevronLeft />
-            </div>
-          </Typography.Text>
+          <span
+            onClick={onSelectBackFromTemplates}
+            className="cursor-pointer text-scale-900 hover:text-scale-1200 transition-colors"
+          >
+            <IconChevronLeft strokeWidth={2} size={14} />
+          </span>
           <Typography.Title level={4} className="m-0">
             Select a template to use for your new policy
           </Typography.Title>
@@ -48,7 +49,7 @@ const PolicyEditorModalTitle = ({
     )
   }
   return (
-    <div className="flex items-center space-x-3 px-6 pt-5">
+    <div className="flex items-center space-x-3">
       <Typography.Title level={4} className="m-0">
         {getTitle()}
       </Typography.Title>
@@ -174,11 +175,12 @@ const PolicyEditorModal = ({
 
   return (
     <Modal
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       closable
       hideFooter
       visible={visible}
       contentStyle={{ padding: 0 }}
-      title={[
+      header={[
         <PolicyEditorModalTitle
           key="0"
           view={view}
@@ -188,10 +190,10 @@ const PolicyEditorModal = ({
           onSelectBackFromTemplates={onSelectBackFromTemplates}
         />,
       ]}
-      style={{ maxWidth: 'none', width: '60rem' }}
+      // style={{ maxWidth: 'none', width: '60rem' }}
       onCancel={onSelectCancel}
     >
-      <div className="w-full">
+      <div className="">
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."

@@ -33,9 +33,9 @@
   /* 
     Customization here for both Light and Dark themes
   */
-  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica',
-    'Arial', sans-serif;
+  --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', 'Arial',
+    sans-serif;
   --custom-font-code: 'office code pro', Menlo, monospace;
   --custom-font-size-base: 1rem;
   --custom-border-radius: 3px;
@@ -236,7 +236,9 @@ body {
   display: inline-block;
 }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   font-weight: bold !important;
 }
 
@@ -652,20 +654,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   }
 }
 
-.DummyData {
-  overflow-x: auto;
-}
-.DummyData div {
-  padding-right: 30px;
-}
-.Collapsable summary {
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-}
-.Collapsable summary:hover {
-  cursor: pointer;
-}
-
 div[class^='codeBlockContent'],
 div[class*=' codeBlockContent'],
 .prism-code {
@@ -804,94 +792,11 @@ a.hash-link {
   display: none;
 }
 
-.HowSections .col {
-  margin-bottom: 20px;
-}
-.HowSections img.diagram {
-  margin: 0px auto 30px auto;
-  display: block;
-}
-.HowCard {
-  position: relative;
-}
-.HowCard::before,
-.HowCard::after {
-  bottom: 100%;
-  border: solid transparent;
-  content: '';
-  height: 0;
-  left: 50%;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
-  margin-bottom: -1px;
-}
-.HowCard::before {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-
-  border-bottom: 5px solid black;
-  border-width: 12px;
-  margin-left: -12px;
-}
-.HowCard::after {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-
-  border-bottom: 5px solid var(--ifm-card-background-color);
-  border-width: 11px;
-  margin-left: -11px;
-}
-
 .Blog .code-with-header {
   margin-bottom: 30px;
 }
 .badge--secondary {
   color: var(--ifm-color-content);
-}
-
-.Figure {
-  text-align: center;
-  margin: 30px 0;
-}
-.Figure figure {
-  margin: 0 auto;
-  width: 100%;
-}
-.Figure img {
-  box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-.Figure figcaption {
-  font-size: 0.8rem;
-}
-
-.Mermaid {
-  text-align: center;
-  margin: 80px 0;
-  font-family: var(--custom-font-base);
-  color: var(--ifm-color-content);
-  font-size: 0.9rem;
-}
-.Mermaid .graph {
-  overflow-x: auto;
-  margin: 0px calc(var(--ifm-spacing-horizontal) * -1);
-  padding: var(--ifm-spacing-horizontal);
-}
-.Mermaid div,
-.Mermaid tspan,
-.Mermaid g.classGroup text {
-  font-family: var(--custom-font-base);
-  color: var(--ifm-color-content);
-  /* font-size: 0.9em; */
-}
-.Mermaid figcaption {
-  font-size: 0.8rem;
-  margin-bottom: 20px;
 }
 
 .DocSearch-Button {
@@ -1073,198 +978,6 @@ html[data-theme='dark'] .navbar-item-twitter:before {
 }
 .navbar__item .dropdown__menu li:not(:first-child) {
   margin-top: 5px;
-}
-
-.w-full {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Section */
-.Section {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.Section-Hash {
-  margin-left: 8px;
-  color: var(--custom-content-color-light);
-  opacity: 0.4;
-}
-.Section-Title:hover .Section-Hash {
-  color: var(--custom-primary);
-  opacity: 1;
-}
-.Section-Title {
-  cursor: pointer;
-  scroll-margin: 74px; /* Navbar size (60) + a little margin */
-}
-
-/* Showcase */
-.ShowcaseCard {
-  position: relative;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-shadow: none;
-  border: 1px solid #333;
-  padding: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing);
-}
-
-.ShowcaseCard:hover {
-  transition: all 0.2s ease;
-  border: 1px solid var(--custom-primary);
-  box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
-}
-
-.ShowcaseCard-Img {
-  height: 100%;
-  width: auto;
-}
-
-.ShowcaseCard-ImgContainer {
-  height: 140px;
-  display: flex;
-  justify-content: center;
-}
-
-.ShowcaseCard-Text {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.ShowcaseCard-Text p {
-  width: 100%;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: 0;
-}
-
-.ShowcaseCard-Text h3 {
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  backdrop-filter: blur(3px) contrast(80%);
-  padding: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing);
-  transition: 0.2s ease;
-}
-
-.ShowcaseCard-Content {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: var(--ifm-card-vertical-spacing);
-  height: 100%;
-}
-
-.ShowcaseCard:hover h3 {
-  opacity: 1;
-}
-
-.ShowcaseCard-Tag {
-  color: var(--custom-primary);
-  font-weight: bold;
-  font-size: 12px;
-  margin: 8px 4px 12px 0px;
-}
-
-.ShowcaseCard-Footer {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-}
-
-.ShowcaseCard-Footer-Item {
-  width: 100%;
-}
-
-/* Spaces between children */
-.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:first-child {
-  margin-right: 4px;
-}
-
-.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
-  margin-left: 4px;
-  margin-right: 4px;
-}
-
-.ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:last-child {
-  margin-right: 0px;
-}
-
-@media screen and (max-width: 997px) {
-  .ShowcaseCard-ImgContainer {
-    height: 120px;
-    align-self: center;
-  }
-
-  .ShowcaseCard-Content {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .ShowcaseCard-Text {
-    width: 100%;
-    margin-left: var(--ifm-card-horizontal-spacing);
-  }
-
-  .ShowcaseCard-Tag {
-    margin-top: 0px;
-  }
-
-  .ShowcaseCard-Footer a {
-    margin: var(--ifm-card-vertical-spacing) var(--ifm-card-horizontal-spacing) 0 0;
-  }
-
-  .ShowcaseCard-Text h3 {
-    position: relative;
-    bottom: 0;
-    opacity: 1;
-    backdrop-filter: blur(0) contrast(100%);
-    padding: 0;
-  }
-}
-
-@media screen and (max-width: 650px) {
-  .ShowcaseCard-ImgContainer {
-    height: 80px;
-  }
-}
-
-@media screen and (max-width: 650px) {
-  .ShowcaseCard-Content {
-    flex-direction: column;
-    padding: 0px;
-  }
-
-  .ShowcaseCard-Text {
-    margin: 0px;
-    padding: 0px;
-  }
-
-  .ShowcaseCard-Text h3 {
-    margin-top: var(--ifm-card-vertical-spacing);
-  }
-}
-
-@media screen and (max-width: 380px) {
-  .ShowcaseCard-Footer {
-    flex-direction: column;
-  }
-
-  /* Spaces between children */
-  .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:first-child {
-    margin-right: 0px;
-  }
-
-  .ShowcaseCard-Footer-Spaced .ShowcaseCard-Footer-Item:nth-child(even) {
-    margin-left: 0px;
-    margin-right: 0px;
-  }
 }
 
 /* New CSS */

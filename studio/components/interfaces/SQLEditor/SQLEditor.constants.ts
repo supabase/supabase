@@ -94,6 +94,39 @@ language sql volatile;
   `.trim(),
   },
   {
+    id: 8,
+    type: 'template',
+    title: 'pg_stat_statements report',
+    description: 'Select from pg_stat_statements and view recent queries',
+    sql: `-- pg_stat_statements report
+
+-- A limit of 100 has been added below
+
+SELECT 
+    a.rolname,
+    s.query,
+    s.calls,
+    -- -- Postgres 13, 14
+    s.total_exec_time + s.total_plan_time as total_time,
+    s.min_exec_time + s.min_plan_time as min_time,
+    s.max_exec_time + s.max_plan_time as max_time,
+    s.mean_exec_time + s.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    s.rows / s.calls as avg_rows,
+    s.wal_bytes,
+    s.wal_records
+  from pg_stat_statements as s
+    join pg_authid as a on s.userid = a.oid
+  ORDER BY 
+    total_time DESC 
+  LIMIT 
+    100`,
+  },
+  {
     id: 9,
     type: 'quickstart',
     title: 'Countries',

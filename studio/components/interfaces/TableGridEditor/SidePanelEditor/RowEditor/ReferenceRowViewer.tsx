@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { Space, SidePanel, Typography, IconLoader, IconXCircle } from '@supabase/ui'
+import { SidePanel, IconLoader, IconXCircle } from '@supabase/ui'
 import { PostgresRelationship } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
@@ -33,45 +33,41 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
   return (
     <SidePanel
       visible={visible}
-      wide
-      align="right"
-      // @ts-ignore
-      title={
+      size="large"
+      header={
         <div>
           Viewing reference row from{' '}
-          <Typography.Text code>
+          <code className="text-sm">
             {foreignKey?.target_table_schema ?? ''}.{foreignKey?.target_table_name ?? ''}
-          </Typography.Text>
+          </code>
         </div>
       }
       hideFooter={false}
       onCancel={closePanel}
       customFooter={<ActionBar backButtonLabel="Close" closePanel={closePanel} />}
     >
-      {loading ? (
-        <div className="flex flex-col items-center justify-center space-y-2 h-full">
-          <Typography>
+      <SidePanel.Content>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center space-y-2 h-full">
             <IconLoader className="animate-spin" />
-          </Typography>
-          <Typography.Text className="opacity-50">Loading reference row</Typography.Text>
-        </div>
-      ) : !row ? (
-        <div className="flex flex-col items-center justify-center space-y-2 h-full">
-          <Typography>
+            <p className="text-sm text-scale-1100">Loading reference row</p>
+          </div>
+        ) : !row ? (
+          <div className="flex flex-col items-center justify-center space-y-2 h-full">
             <IconXCircle />
-          </Typography>
-          <Typography.Text className="opacity-50">
-            Unable to find the corresponding row in {foreignKey?.target_table_schema}.
-            {foreignKey?.target_table_name}
-          </Typography.Text>
-        </div>
-      ) : (
-        <Space direction="vertical" size={6} style={{ width: '100%' }}>
-          {rowFields.map((field: RowField) => {
-            return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
-          })}
-        </Space>
-      )}
+            <p className="text-sm text-scale-1100">
+              Unable to find the corresponding row in {foreignKey?.target_table_schema}.
+              {foreignKey?.target_table_name}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {rowFields.map((field: RowField) => {
+              return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
+            })}
+          </div>
+        )}
+      </SidePanel.Content>
     </SidePanel>
   )
 }

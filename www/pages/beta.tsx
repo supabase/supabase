@@ -19,6 +19,10 @@ const site_title = `${APP_NAME} | We are now in Beta`
 // Dark text: text-dark-400
 // Light text: text-dark-300
 
+type Props = {
+  darkMode: boolean
+}
+
 const NavFlyOutMenu = (props: any) => {
   const { scrollTo } = props
   const segments = IntroductionSegments.map((segment: any) => segment.chapters)
@@ -99,24 +103,27 @@ const SectionHeader = (props: any) => {
   )
 }
 
-const Hero = () => {
+const Hero = (props: Props) => {
   const { basePath } = useRouter()
+  const { darkMode } = props
   return (
     <div
       style={{
-        backgroundImage: `url('${basePath}/images/beta-hero.png')`,
+        backgroundImage: darkMode
+          ? `url('${basePath}/images/beta-hero.png')`
+          : `url('${basePath}/images/beta-hero-light.png')`,
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
-      className="py-16 lg:py-36 bg-dark-800 bg-no-repeat"
+      className="py-16 lg:py-36 bg-gray-50 dark:bg-scale-300 bg-no-repeat"
     >
       <div className="container mx-auto px-8 lg:px-28 py-20 h-full grid grid-cols-12 gap-4 items-center text-dark-300">
-        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-white">
+        <div className="col-span-12 md:col-span-9 lg:col-span-8 xl:col-span-6 text-scale-900 dark:text-white">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
-            Today, we're moving to <span className="text-brand-700">Beta</span>
+            Today, we're moving to <span className="text-brand-900">Beta</span>
           </p>
-          <time itemProp="datePublished" dateTime="2020-12-03" className="opacity-50 text-sm">
+          <time itemProp="datePublished" dateTime="2020-12-03" className="opacity-80 text-sm">
             Published December 3rd, 2020
           </time>
         </div>
@@ -127,88 +134,86 @@ const Hero = () => {
 
 const Introduction = () => {
   return (
-    <div className="bg-dark-900">
-      <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
-        <div className="col-span-12 sm:col-span-9 xl:col-span-8">
-          <p>
-            <span className="text-2xl block text-white">
-              After the launch of our{' '}
-              <a
-                href="https://news.ycombinator.com/item?id=23319901"
-                target="_blank"
-                className="text-brand-700 hover:text-brand-800"
-              >
-                Alpha
-              </a>{' '}
-              Program in June,
-            </span>
-          </p>
-        </div>
-        <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20">
-          <p>
-            we've been fortunate to work with thousands of early adopters on improving both our Open
-            Source, and Hosted offerings. Companies like{' '}
+    <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4 text-dark-300">
+      <div className="col-span-12 sm:col-span-9 xl:col-span-8">
+        <p>
+          <span className="text-2xl block text-black">
+            After the launch of our{' '}
             <a
-              href="/blog/2020/12/02/case-study-xendit"
+              href="https://news.ycombinator.com/item?id=23319901"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
-              Xendit
-            </a>
-            ,{' '}
-            <a
-              href="/blog/2020/12/02/case-study-monitoro"
-              target="_blank"
-              className="text-brand-700 hover:text-brand-800"
-            >
-              Monitoro
-            </a>
-            , and{' '}
-            <a
-              href="/blog/2020/12/02/case-study-tayfa"
-              target="_blank"
-              className="text-brand-700 hover:text-brand-800"
-            >
-              TAYFA
+              Alpha
             </a>{' '}
-            are using Supabase to ship more products, faster.
-          </p>
-        </div>
+            Program in June,
+          </span>
+        </p>
+      </div>
+      <div className="col-span-12 sm:col-span-9 xl:col-span-6 text-base mb-20 text-dark-400">
+        <p>
+          we've been fortunate to work with thousands of early adopters on improving both our Open
+          Source, and Hosted offerings. Companies like{' '}
+          <a
+            href="/blog/2020/12/02/case-study-xendit"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            Xendit
+          </a>
+          ,{' '}
+          <a
+            href="/blog/2020/12/02/case-study-monitoro"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            Monitoro
+          </a>
+          , and{' '}
+          <a
+            href="/blog/2020/12/02/case-study-tayfa"
+            target="_blank"
+            className="text-brand-900 hover:text-brand-900"
+          >
+            TAYFA
+          </a>{' '}
+          are using Supabase to ship more products, faster.
+        </p>
+      </div>
 
-        <div className="col-span-12 text-base mb-10">
-          <p className="w-60 pb-2 border-b-2 border-dark-200 dark:border-dark-400">
-            Alpha Program in Numbers
-          </p>
-        </div>
+      <div className="col-span-12 text-base mb-10">
+        <p className="w-60 pb-2 border-b-2 border-dark-200 text-dark-400 dark:border-dark-400">
+          Alpha Program in Numbers
+        </p>
+      </div>
 
-        <div
-          id="alphaNumbers"
-          className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0"
-        >
-          {AlphaNumbers.map((stat: any, idx: number) => (
-            <div
-              key={`stat_${idx}`}
-              className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
-            >
-              <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-                <div className="w-12 h-12 rounded-md bg-dark-700 flex items-center justify-center dark:bg-white">
-                  {stat.icon}
-                </div>
-              </div>
-              <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10">
-                <p className="text-5xl lg:text-6xl">
-                  <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
-                    {stat.value}
-                  </CountUp>
-                  {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
-                </p>
-              </div>
-              <div className="col-span-12 sm:col-span-9 md:col-span-10 col-start-0 sm:col-start-5 md:col-start-4 xl:col-start-3">
-                <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
+      <div
+        id="alphaNumbers"
+        className="col-span-12 grid grid-cols-12 gap-y-12 lg:gap-y-20 mb-20 gap-x-3 sm:gap-x-0"
+      >
+        {AlphaNumbers.map((stat: any, idx: number) => (
+          <div
+            key={`stat_${idx}`}
+            className="col-span-6 sm:col-span-4 grid grid-cols-8 sm:grid-cols-12 gap-x-1 md:gap-x-0 xl:gap-x-6 items-center"
+          >
+            <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
+              <div className="w-12 h-12 rounded-md bg-scale-1200 flex items-center justify-center dark:bg-white">
+                {stat.icon}
               </div>
             </div>
-          ))}
-        </div>
+            <div className="col-span-7 sm-col-span-8 md:col-span-9 xl:col-span-10 text-dark-400">
+              <p className="text-5xl lg:text-6xl">
+                <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
+                  {stat.value}
+                </CountUp>
+                {stat.unit && <span className="text-2xl ml-1">{stat.unit}</span>}
+              </p>
+            </div>
+            <div className="col-span-12 sm:col-span-9 md:col-span-10 col-start-0 sm:col-start-5 md:col-start-4 xl:col-start-3">
+              <p className="text-xs lg:text-base text-dark-300 dark:text-dark-400">{stat.name}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -217,11 +222,11 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="bg-gray-50 dark:bg-dark-700 text-dark-400 dark:text-dark-200">
+    <div className="bg-gray-50 dark:bg-scale-300 text-dark-400 dark:text-dark-200">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-4">
         <div className="col-span-12 text-base mb-10">
           <p className="text-2xl text-black dark:text-white">
-            Supabase <span className="text-brand-600 dark:text-brand-700">Beta</span> is starting
+            Supabase <span className="text-brand-900 dark:text-brand-900">Beta</span> is starting
             now.
           </p>
         </div>
@@ -312,7 +317,7 @@ const Performance = () => {
                       <Bar
                         color={
                           stat.name === 'Supabase'
-                            ? 'bg-brand-600 dark:bg-brand-700'
+                            ? 'bg-brand-900 dark:bg-brand-800'
                             : 'bg-dark-300 dark:bg-dark-400'
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
@@ -351,7 +356,7 @@ const Performance = () => {
               <a
                 href="https://elixir-lang.org/"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 Elixir
               </a>{' '}
@@ -359,7 +364,7 @@ const Performance = () => {
               <a
                 href="https://github.com/supabase/realtime"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 Realtime engine
               </a>
@@ -367,7 +372,7 @@ const Performance = () => {
               <a
                 href="https://postgrest.org/en/v7.0.0/"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 PostgREST
               </a>{' '}
@@ -379,7 +384,7 @@ const Performance = () => {
               <a
                 href="https://github.com/supabase/benchmarks/"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 benchmarks
               </a>{' '}
@@ -417,7 +422,7 @@ const Performance = () => {
 
 const Security = () => {
   return (
-    <div id="security" className="bg-gray-50 dark:bg-dark-700">
+    <div id="security" className="bg-gray-50 dark:bg-scale-300">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={2} header="Security" />
 
@@ -441,7 +446,7 @@ const Security = () => {
               <li className="mb-5">
                 Published a disclosure policy so that ethical hackers can help us find
                 vulnerabilities in our systems. We've received reports from this initiative already,
-                and we'll continue to formalise our bounty program throughout the Beta.
+                and we'll continue to formalize our bounty program throughout the Beta.
               </li>
               <li className="mb-5">
                 We now run an ongoing internal Capture the Flag competition, where team members are
@@ -452,7 +457,7 @@ const Security = () => {
                 <a
                   href="https://snyk.io/"
                   target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
+                  className="text-brand-900 hover:text-brand-900"
                 >
                   Snyk
                 </a>{' '}
@@ -465,7 +470,7 @@ const Security = () => {
                 <a
                   href="https://github.com/PostgREST/postgrest/pull/1600#issuecomment-735257952"
                   target="_blank"
-                  className="text-brand-700 hover:text-brand-800"
+                  className="text-brand-900 hover:text-brand-900"
                 >
                   now uses
                 </a>{' '}
@@ -512,7 +517,7 @@ const Reliability = () => {
               <a
                 href="https://status.supabase.com"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 https://status.supabase.com
               </a>{' '}
@@ -535,7 +540,7 @@ const Reliability = () => {
 const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
-    <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-dark-700">
+    <div id="newFeaturesAndIntegrations" className="bg-gray-50 dark:bg-scale-300">
       <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
@@ -556,7 +561,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/auth-signup"
                     target="_blank"
-                    className="text-brand-700 hover:text-brand-800"
+                    className="text-brand-900 hover:text-brand-900"
                   >
                     JavaScript
                   </a>{' '}
@@ -564,7 +569,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/gotrue/server/about#endpoints"
                     target="_blank"
-                    className="text-brand-700 hover:text-brand-800"
+                    className="text-brand-900 hover:text-brand-900"
                   >
                     HTTP
                   </a>
@@ -586,7 +591,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/guides/client-libraries#realtime-changes"
                     target="_blank"
-                    className="text-brand-700 hover:text-brand-800"
+                    className="text-brand-900 hover:text-brand-900"
                   >
                     subscribe to changes in your database
                   </a>{' '}
@@ -605,7 +610,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/select#query-foreign-tables"
                     target="_blank"
-                    className="text-brand-700 hover:text-brand-800"
+                    className="text-brand-900 hover:text-brand-900"
                   >
                     querying from multiple tables
                   </a>{' '}
@@ -613,7 +618,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/rpc"
                     target="_blank"
-                    className="text-brand-700 hover:text-brand-800"
+                    className="text-brand-900 hover:text-brand-900"
                   >
                     invoke complex functions
                   </a>
@@ -702,7 +707,7 @@ const BetaPricing = () => (
               <a
                 href="mailto:rory@supabase.io"
                 target="_blank"
-                className="text-brand-700 hover:text-brand-800"
+                className="text-brand-900 hover:text-brand-900"
               >
                 rory@supabase.io
               </a>
@@ -715,7 +720,7 @@ const BetaPricing = () => (
           </ul>
           <p>
             The Supabase Base Tier is now called the Supabase Pro tier as per the{' '}
-            <a href="https://supabase.com/pricing" className="text-brand-700 hover:text-brand-800">
+            <a href="https://supabase.com/pricing" className="text-brand-900 hover:text-brand-900">
               pricing page
             </a>
             .
@@ -727,7 +732,7 @@ const BetaPricing = () => (
 )
 
 const OpenSource = () => (
-  <div id="openSource" className="bg-gray-50 dark:bg-dark-700">
+  <div id="openSource" className="bg-gray-50 dark:bg-scale-300">
     <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
@@ -746,7 +751,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/sponsors/supabase/"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               sponsorship
             </a>{' '}
@@ -758,7 +763,7 @@ const OpenSource = () => (
             <a
               href="/blog/2020/12/02/supabase-striveschool"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               partnering with Strive School
             </a>{' '}
@@ -771,7 +776,7 @@ const OpenSource = () => (
             <a
               href="mailto:rory@supabase.io"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               rory@supabase.io
             </a>{' '}
@@ -782,7 +787,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/supabase"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               our GitHub.
             </a>{' '}
@@ -818,7 +823,7 @@ const FundingPartners = () => (
             <a
               href="https://twitter.com/supabase"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               Twitter
             </a>{' '}
@@ -831,7 +836,7 @@ const FundingPartners = () => (
 )
 
 const ScalingOurTeam = () => (
-  <div id="scalingOurTeam" className="bg-gray-50 dark:bg-dark-700">
+  <div id="scalingOurTeam" className="bg-gray-50 dark:bg-scale-300">
     <div className="container mx-auto px-8 lg:px-28 py-20 grid grid-cols-12 gap-y-10 text-dark-400 dark:text-dark-200">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
@@ -855,7 +860,7 @@ const ScalingOurTeam = () => (
             <a
               href="mailto:work@supabase.io"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               work@supabase.io
             </a>
@@ -916,7 +921,7 @@ const WhatsNext = () => (
             <a
               href="mailto:support@supabase.io"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               support@supabase.io
             </a>{' '}
@@ -924,7 +929,7 @@ const WhatsNext = () => (
             <a
               href="https://github.com/supabase/supabase/discussions"
               target="_blank"
-              className="text-brand-700 hover:text-brand-800"
+              className="text-brand-900 hover:text-brand-900"
             >
               discussion
             </a>{' '}
@@ -936,9 +941,10 @@ const WhatsNext = () => (
   </div>
 )
 
-const Beta = () => {
+const Beta = (props: Props) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const { basePath } = useRouter()
+  const { darkMode } = props
 
   const references: any = {
     performance: useRef<HTMLDivElement>(null),
@@ -993,7 +999,7 @@ const Beta = () => {
       />
       <Container>
         <div className="sticky inset-0 z-50">
-          <div className="shadow-lg py-5 px-5 xl:px-20 bg-dark-800 flex items-center justify-between">
+          <div className="shadow-lg py-5 px-5 xl:px-20 bg-scale-1200 dark:bg-scale-300 flex items-center justify-between">
             <Link href="/">
               <a>
                 <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
@@ -1010,7 +1016,7 @@ const Beta = () => {
             <NavFlyOutMenu scrollTo={scrollTo} />
           </FlyOut>
         </div>
-        <Hero />
+        <Hero darkMode={darkMode} />
         <Introduction />
         <TableOfContents scrollTo={scrollTo} />
         <div ref={references['performance']}>

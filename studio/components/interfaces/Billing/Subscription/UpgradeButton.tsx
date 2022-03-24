@@ -1,9 +1,9 @@
-import React, { useReducer, useState } from 'react'
+import { FC, useReducer, useState } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Button, Modal, Input, Divider, Typography, IconCheckCircle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { SubscriptionStats, useStore } from 'hooks'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
@@ -11,12 +11,19 @@ import { CancellationReasons } from './SubcriptionCancellation.constants'
 
 /**
  * Generates a Stripe Billing Portal link for a project.
+ * To be deprecate after native billing is completely rolled out
  *
  * @param {Object}   props.projectRef        Project Ref
  * @param {Boolean}  props.paid              Tier name
  */
 
-export default function UpgradeButton({ projectRef, paid }: any) {
+interface Props {
+  projectRef: string
+  paid: boolean
+  subscriptionStats: SubscriptionStats
+}
+
+const UpgradeButton: FC<Props> = ({ projectRef, paid, subscriptionStats }) => {
   const router = useRouter()
   const { ui, app } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
@@ -24,7 +31,7 @@ export default function UpgradeButton({ projectRef, paid }: any) {
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState<boolean>(false)
 
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
-  const freeProjectsOwned = ui?.profile?.total_free_projects ?? 0
+  const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
   const isOrgOwner = ui.selectedOrganization?.is_owner
 
   /**
@@ -70,7 +77,7 @@ export default function UpgradeButton({ projectRef, paid }: any) {
         closable
         visible={showFreeProjectLimitWarning}
         onCancel={() => setShowFreeProjectLimitWarning(false)}
-        title="Free project limit reached"
+        header="Free project limit reached"
         description="Please delete one of your free projects to downgrade this project back to free tier"
         size="tiny"
         showIcon
@@ -86,7 +93,13 @@ export default function UpgradeButton({ projectRef, paid }: any) {
             </Button>
           </div>
         }
-      />
+      >
+        <Modal.Content>
+          <p className="text-sm text-scale-1100 py-4">
+            Please delete one of your free projects to downgrade this project back to free tier
+          </p>
+        </Modal.Content>
+      </Modal>
       <div className="flex flex-col items-end space-y-2">
         <Button
           disabled={!isOrgOwner}
@@ -105,6 +118,8 @@ export default function UpgradeButton({ projectRef, paid }: any) {
     </>
   )
 }
+
+export default UpgradeButton
 
 function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
   const router = useRouter()
@@ -150,6 +165,7 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
 
   return (
     <Modal
+      header="Reason for cancelling"
       loading={loading}
       visible={visible}
       closable
@@ -157,23 +173,24 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
       hideFooter
       onCancel={() => setVisible(false)}
     >
-      <div>
-        <div className="px-6 pb-4">
-          <Typography.Title level={3} className="m-0">
-            Reason for cancelling
-          </Typography.Title>
-        </div>
-        <Divider light />
-        <div className="px-6 py-4 space-y-4">
-          <Typography.Text type="secondary" className="mb-2">
-            <p>We always strive to improve Supabase as much as we can.</p>
-          </Typography.Text>
-          <Typography.Text type="secondary">
-            <p>
-              please let us know the reasons you are cancelling your subscription so we can improve
-              in the future.
-            </p>
-          </Typography.Text>
+      <div className="py-4 space-y-4">
+        <Modal.Content>
+          <div className="">
+            <div>
+              <p className="text-base text-scale-1200">
+                <p>We always strive to improve Supabase as much as we can.</p>
+              </p>
+              <p className="text-sm text-scale-1100">
+                <p>
+                  please let us know the reasons you are cancelling your subscription so we can
+                  improve in the future.
+                </p>
+              </p>
+            </div>
+          </div>
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
           <div className="flex flex-wrap gap-2" data-toggle="buttons">
             {CancellationReasons.map((option) => {
               const active = selectedCancellationReasons.find((x) => x === option)
@@ -186,8 +203,8 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
                     duration-100 cursor-pointer text-sm
                     ${
                       active
-                        ? ` opacity-100 bg-white text-typography-body-light hover:bg-opacity-75`
-                        : ` bg-gray-500 opacity-25 hover:opacity-50 text-typography-body-dark`
+                        ? ` opacity-100 bg-white text-scale-100 hover:bg-opacity-75`
+                        : ` bg-scale-1200 opacity-25 hover:opacity-50 text-scale-100`
                     }
                 `}
                 >
@@ -203,9 +220,9 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
               )
             })}
           </div>
-        </div>
-        <Divider light />
-        <div className="px-6 py-4 space-y-4">
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
           <Input.TextArea
             id="feedback"
             onChange={(e) => setAdditionalFeedback(e.target.value)}
@@ -213,9 +230,9 @@ function UnsubcribeExitSurvey({ visible, setVisible, handleDowngrade }: any) {
             label="Anything else we can improve on?"
             placeholder="Anything else we should know, or could improve on?"
           />
-        </div>
-        <Divider light />
-        <div className="flex justify-end px-6 py-6 w-full space-x-2">
+        </Modal.Content>
+        <Modal.Seperator />
+        <div className="flex gap-2 justify-end px-6 w-full">
           <Button type="default" onClick={() => setVisible(false)}>
             Cancel
           </Button>

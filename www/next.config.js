@@ -592,6 +592,11 @@ module.exports = withMDX({
       },
       {
         permanent: true,
+        source: '/docs/reference/javascript/reset-password-email',
+        destination: '/docs/reference/javascript/auth-api-resetpasswordforemail',
+      },
+      {
+        permanent: true,
         source: '/oss',
         destination: '/docs/oss',
       },
@@ -614,6 +619,21 @@ module.exports = withMDX({
         permanent: true,
         source: '/docs/guides/database/connecting/direct-connections',
         destination: '/docs/guides/database/connection-pooling',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides',
+        destination: '/docs/',
+      },
+      {
+        permanent: true,
+        source: '/guides/database/introduction',
+        destination: '/guides/database',
+      },
+      {
+        permanent: true,
+        source: '/guides/auth',
+        destination: '/guides/auth/intro',
       },
     ]
   },

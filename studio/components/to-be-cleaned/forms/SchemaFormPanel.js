@@ -52,7 +52,7 @@ export default function SchemaFormPanel({
             hasChanged ? 'opacity-100' : 'opacity-0 cursor-default'
           }`}
         >
-          <Button onClick={onClickCancel} type="secondary" disabled={!hasChanged}>
+          <Button onClick={onClickCancel} type="default" disabled={!hasChanged}>
             {cancelLabel || 'Cancel'}
           </Button>
           <Button

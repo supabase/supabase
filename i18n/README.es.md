@@ -48,7 +48,7 @@ Supabase es una combinación de herramientas de código abierto. Estamos constru
 
 Supabase es una [plataforma alojada](https://app.supabase.io). Te puedes registrar y comenzar a utilizar Supabase sin instalar nada. También puedes tener un [_host_ propio](https://supabase.com/docs/guides/self-hosting) y [desarrollar en local](https://supabase.com/docs/guides/local-development).
 
-![Arquitectura](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![Arquitectura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos objeto-relacional con más de 30 años de desarrollo activo que se ha ganado su fuerte reputación por ser confiable, robusto y de alto rendimiento.
 - [Tiempo Real](https://github.com/supabase/realtime) es un server construido en Elixir que permite escuchar a los _inserts_, _updates_ y _deletes_ de PostgreSQL utilizando WebSockets. Supabase escucha a la funcionalidad de replicación integrada de PostgreSQL, convierte el byte de replicación en un JSON y después transmite el JSON a través de WebSockets.

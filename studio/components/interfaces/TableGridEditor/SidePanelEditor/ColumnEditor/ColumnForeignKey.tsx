@@ -23,11 +23,9 @@ const ColumnForeignKey: FC<Props> = ({
   const hasNoForeignKey = isUndefined(originalForeignKey) && isUndefined(column?.foreignKey)
   if (hasNoForeignKey) {
     return (
-      <div>
-        <Button type="secondary" onClick={onSelectEditRelation}>
-          Add foreign key relation
-        </Button>
-      </div>
+      <Button type="default" onClick={onSelectEditRelation}>
+        Add foreign key relation
+      </Button>
     )
   }
 
@@ -87,20 +85,19 @@ const ColumnForeignKeyInformation: FC<{
 }> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between text-scale-900">
           <div className="space-y-2">
-            <Typography.Text>This column has the following foreign key relation:</Typography.Text>
+            <span>This column has the following foreign key relation:</span>
             <div className="flex items-center space-x-2">
-              <Typography.Text code small>
-                {columnName}
-              </Typography.Text>
+              <span className="text-code">{columnName}</span>
               <IconArrowRight size={14} strokeWidth={2} />
-              <Typography.Text code small>
+              <span className="text-code">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
-              </Typography.Text>
+              </span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -125,23 +122,22 @@ const ColumnForeignKeyAdded: FC<{
 }> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between text-scale-1100">
           <div className="space-y-2">
-            <Typography.Text>
+            <span>
               The following foreign key relation will be{' '}
-              <span className="text-green-500">added</span>:
-            </Typography.Text>
-            <div className="flex items-center space-x-2">
-              <Typography.Text code small>
-                {columnName}
-              </Typography.Text>
+              <span className="text-green-900">added</span>:
+            </span>
+            <div className="flex items-center space-x-2 text-scale-1200">
+              <span className="text-code">{columnName}</span>
               <IconArrowRight size={14} strokeWidth={2} />
-              <Typography.Text code small>
+              <span className="text-code">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
                 {foreignKey?.target_column_name}
-              </Typography.Text>
+              </span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -165,13 +161,14 @@ const ColumnForeignKeyRemoved: FC<{
 }> = ({ columnName, originalForeignKey, onSelectEditRelation }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <Typography.Text>
               The following foreign key relation will be{' '}
-              <span className="text-yellow-500">removed</span> from this column:
+              <span className="text-amber-900">removed</span> from this column:
             </Typography.Text>
             <div className="flex items-center space-x-2">
               <Typography.Text code small>
@@ -210,6 +207,7 @@ const ColumnForeignKeyUpdated: FC<{
 }) => {
   return (
     <InformationBox
+      block
       icon={<IconLink />}
       title={
         <div className="flex items-center justify-between">

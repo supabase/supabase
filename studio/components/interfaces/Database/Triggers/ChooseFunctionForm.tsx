@@ -6,14 +6,15 @@ import { Transition } from '@headlessui/react'
 import {
   Button,
   IconChevronDown,
+  IconHelpCircle,
   IconTerminal,
-  IconTool,
   SidePanel,
   Typography,
 } from '@supabase/ui'
 import { Dictionary } from '@supabase/grid'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import InformationBox from 'components/ui/InformationBox'
 
 interface IChooseFunctionFormStore {
   functionSchemas: string[]
@@ -55,16 +56,16 @@ const ChooseFunctionForm: React.FC<ChooseFunctionFormProps> = ({
 
   return (
     <SidePanel
-      wide
-      title="Pick a function"
+      size="large"
+      header="Pick a function"
       visible={visible}
       onCancel={() => setVisible(!visible)}
       className="hooks-sidepanel"
     >
       {hasPublicSchemaFunctions ? (
         <ChooseFunctionFormContext.Provider value={_localState}>
-          <NoticeBox />
           <div className="space-y-6">
+            <NoticeBox />
             {_localState.functionSchemas.map((schema: string) => (
               <SchemaFunctionGroup key={schema} schema={schema} selectFunction={selectFunction} />
             ))}
@@ -83,36 +84,22 @@ const NoticeBox: React.FC = ({}) => {
   const router = useRouter()
   const { ref } = router.query
   return (
-    <div className="px-6 mb-8">
-      <div className="block w-full bg-white bg-opacity-5 p-3 px-6 border border-white border-opacity-20 rounded">
-        <div className="flex space-x-3">
-          <div className="mt-1">
-            <IconTool className="text-white" size="large" />
-          </div>
-          <div className="flex justify-between w-full items-center">
-            <div>
-              <Typography.Text>
-                Only functions that return a trigger will be displayed below
-              </Typography.Text>
-              <div>
-                <Typography.Text type="secondary">
-                  You can make functions by using the Database Functions
-                </Typography.Text>
-              </div>
-            </div>
-
-            <Button
-              type="secondary"
-              className="flex-grow"
-              onClick={() => {
-                router.push(`/project/${ref}/database/functions`)
-              }}
-            >
-              Go to Functions
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="px-6">
+      <InformationBox
+        icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+        title="Only functions that return a trigger will be displayed below"
+        description={`You can make functions by using the Database Functions`}
+        button={
+          <Button
+            type="secondary"
+            onClick={() => {
+              router.push(`/project/${ref}/database/functions`)
+            }}
+          >
+            Go to Functions
+          </Button>
+        }
+      />
     </div>
   )
 }
@@ -130,9 +117,9 @@ const NoFunctionsState: React.FC = ({}) => {
         router.push(`/project/${ref}/database/functions`)
       }}
     >
-      <Typography.Text type="secondary">
+      <p className="text-sm text-scale-1100">
         You will need to create a trigger based function before you can add it to your trigger.
-      </Typography.Text>
+      </p>
     </ProductEmptyState>
   )
 }
@@ -148,7 +135,7 @@ const SchemaFunctionGroup: React.FC<SchemaFunctionGroupProps> = observer(
     const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
     return (
       <div className="space-y-4">
-        <div className="z-10 sticky top-0 backdrop-filter backdrop-blur px-6 flex items-center space-x-1">
+        <div className="sticky top-0 backdrop-filter backdrop-blur px-6 flex items-center space-x-1">
           <Typography.Title level={5} className="opacity-50">
             schema
           </Typography.Title>
@@ -186,8 +173,8 @@ const Function: React.FC<FunctionProps> = ({ id, completeStatement, name, onClic
     >
       <div className="flex items-center space-x-3 justify-between">
         <div className="flex items-center space-x-3">
-          <div className="bg-green-600 p-1 flex items-center justify-center rounded text-typography-body-dark ">
-            <IconTerminal size="small" strokeWidth={2} />
+          <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
+            <IconTerminal strokeWidth={2} size={14} />
           </div>
           <Typography.Title level={5} className="mb-0">
             {name}

@@ -152,7 +152,7 @@ pages:
       Creates a new user.
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - If "Email Confirmations" is turned on, both a `user` and a `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
     examples:
@@ -370,6 +370,7 @@ pages:
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
+      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - name: Getting your data
         isSpotlight: true
@@ -429,8 +430,8 @@ pages:
         description: |
           If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
-        js: |
-          ```js
+        dart: |
+          ```dart
           final res = await supabase
             .from('messages')
             .select('*, users!inner(*)')
@@ -515,8 +516,7 @@ pages:
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
     notes: |
-      TODO update the link to dart
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
       - name: Updating your data
         isSpotlight: true
@@ -598,8 +598,7 @@ pages:
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
     notes: |
-      TODO update link to dart
-      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
     examples:
       - name: Delete records
         isSpotlight: true
@@ -772,6 +771,7 @@ pages:
     title: 'stream()'
     notes: |
       - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
+      - Takes a list of primary key columns as its argument.
     examples:
       - name: Listening to a specific table
         isSpotlight: true
@@ -779,7 +779,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .execute();
           ```
       - name: Listening to a specific rows within a table
@@ -790,7 +790,7 @@ pages:
           ```dart
           supabase
             .from('countries:id=eq.120')
-            .stream()
+            .stream(['id'])
             .execute();
           ```
       - name: With `order()`
@@ -798,7 +798,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .order('name', ascending: false)
             .execute();
           ```
@@ -807,7 +807,7 @@ pages:
           ```dart
           supabase
             .from('countries')
-            .stream()
+            .stream(['id'])
             .order('name', ascending: false)
             .limit(10)
             .execute();
@@ -1213,6 +1213,14 @@ pages:
   .or():
     description: |
       Finds all rows satisfying at least one of the filters.
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
+        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
+        ```  
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1248,6 +1256,16 @@ pages:
   .not():
     description: |
       Finds all rows which doesn't satisfy the filter.
+    notes: |
+          - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+            ```dart
+            .not('name','eq','Paris')
+            .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+            .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+            .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+            .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+            ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2144,7 +2162,13 @@ pages:
     description: |
       Finds all rows whose `column` satisfies the filter.
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```dart
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true

@@ -45,7 +45,7 @@ const usageLimits = {
                   value={usage.mb}
                   max={500}
                   type={'horizontal'}
-                  barClass={'bg-green-500'}
+                  barClass={'bg-brand-900'}
                   labelBottom={`${new Number(usage.mb).toFixed(2).toLocaleString()} MB`}
                   labelTop={`500 MB`}
                 />
@@ -66,7 +66,7 @@ const usageLimits = {
                   value={usage.mb}
                   max={8000}
                   type={'horizontal'}
-                  barClass={'bg-green-500'}
+                  barClass={'bg-brand-900'}
                   labelBottom={`${new Number(usage.mb).toFixed(2).toLocaleString()} MB`}
                   labelTop={`8 GB`}
                 />
@@ -91,7 +91,7 @@ const usageLimits = {
                 value={stats?.authUsers || 0}
                 max={10000}
                 type={'horizontal'}
-                barClass={'bg-green-500'}
+                barClass={'bg-brand-900'}
                 labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
                 labelTop={`${new Number(10000).toLocaleString()}`}
               />
@@ -105,7 +105,7 @@ const usageLimits = {
                 value={stats?.authUsers || 0}
                 max={100000}
                 type={'horizontal'}
-                barClass={'bg-green-500'}
+                barClass={'bg-brand-900'}
                 labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
                 labelTop={`${new Number(100000).toLocaleString()}`}
               />
@@ -143,7 +143,7 @@ const usageLimits = {
                 value={stats?.bucketSize / (1024 * 1024) || 0}
                 max={1 * 1024}
                 type={'horizontal'}
-                barClass={'bg-green-500'}
+                barClass={'bg-brand-900'}
                 labelBottom={
                   stats?.bucketSize
                     ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
@@ -161,7 +161,7 @@ const usageLimits = {
                 value={stats?.bucketSize / (1024 * 1024) || 0}
                 max={100 * 1024}
                 type={'horizontal'}
-                barClass={'bg-green-500'}
+                barClass={'bg-brand-900'}
                 labelBottom={
                   stats?.bucketSize
                     ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
@@ -344,9 +344,7 @@ export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filt
                   return (
                     <div key={feature.title}>
                       {feature.tiers[tier]?.render && feature.title !== 'Transfer limits' ? (
-                        <Typography.Text type="secondary" className="opacity-50">
-                          {feature.title}
-                        </Typography.Text>
+                        <h5 className="text-scale-900 text-sm">{feature.title}</h5>
                       ) : null}
                       <div className="text-sm text-typography-body-light dark:text-typography-body-dark">
                         {/* @ts-ignore */}

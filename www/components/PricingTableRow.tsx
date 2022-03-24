@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { IconHelpCircle, IconWatch, Space, Typography } from '@supabase/ui'
+import { IconHelpCircle, IconWatch, Space } from '@supabase/ui'
 import ReactTooltip from 'react-tooltip'
 import ProductIcon from 'components/ProductIcon'
 
 const Chevron = (props: any) => (
   <>
     <svg
-      className={`h-5 w-5 text-green-500`}
+      className={`h-5 w-5 text-green-900`}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -25,7 +25,7 @@ const Chevron = (props: any) => (
 const Minus = (props: any) => (
   <>
     <svg
-      className="h-5 w-5 text-gray-400"
+      className="h-5 w-5 text-scale-1200 dark:text-white"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -46,34 +46,32 @@ export const PricingTableRowDesktop = (props: any) => {
 
   return (
     <>
-      <tr className="divide-x dark:divide-gray-600" style={{ borderTop: 'none' }}>
+      <tr className="divide-x dark:divide-scale-900" style={{ borderTop: 'none' }}>
         <th
-          className="pricing-table__product-row bg-gray-50 dark:bg-gray-700 py-3 pl-6 text-sm font-medium text-gray-900 dark:text-white text-left"
+          className="pricing-table__product-row bg-scale-50 dark:bg-scale-300 py-3 pl-6 text-sm font-medium text-scale-1200 dark:text-white text-left"
           scope="colgroup"
         >
-          <Space size={4}>
+          <div className="flex items-center">
             {props.icon && <ProductIcon icon={props.icon} />}
-            <Typography.Title className="m-0" level={4}>
-              {category.title}
-            </Typography.Title>
-          </Space>
+            <h4 className="m-0 ml-2">{category.title}</h4>
+          </div>
         </th>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
-        <td className="pricing-table__product-row bg-gray-50 dark:bg-dark-700 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-scale-50 dark:bg-scale-300 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-scale-50 dark:bg-scale-300 py-5 px-6"></td>
+        <td className="pricing-table__product-row bg-scale-50 dark:bg-scale-300 py-5 px-6"></td>
       </tr>
 
       {category.features.map((feat: any) => {
         return (
-          <tr className="divide-x dark:divide-gray-600">
+          <tr className="divide-x divide-scale-600 dark:divide-scale-400">
             <th
-              className="flex items-center py-5 px-6 text-sm font-normal text-gray-500 dark:text-gray-300 text-left"
+              className="flex items-center py-5 px-6 text-sm font-normal text-scale-1200 dark:text-white text-left"
               scope="row"
             >
               <span>{feat.title} </span>
               {feat.tooltip && (
                 <span
-                  className="ml-2 cursor-pointer hover:text-gray-800 dark:hover:text-white"
+                  className="ml-2 cursor-pointer hover:text-scale-800 dark:hover:text-white"
                   data-tip={feat.tooltip}
                 >
                   <IconHelpCircle size="small" />
@@ -89,7 +87,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   ) : typeof tier === 'boolean' && tier === false ? (
                     <Minus tier={tier} />
                   ) : (
-                    <span className="block text-sm text-gray-700 dark:text-white">{tier}</span>
+                    <span className="block text-sm text-scale-1200 dark:text-white">{tier}</span>
                   )}
                 </td>
               )
@@ -109,13 +107,11 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full">
-        <caption className="bg-gray-50 dark:bg-dark-900 border-t border-gray-200 dark:border-gray-600 py-3 px-4 text-sm font-medium text-gray-900 dark:text-white text-left">
-          <Space size={4}>
+        <caption className="bg-scale-50 dark:bg-dark-900 border-t border-scale-200 dark:border-scale-600 py-3 px-4 text-sm font-medium text-scale-1200 dark:text-white text-left">
+          <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <Typography.Title className="m-0" level={4}>
-              {category.title}
-            </Typography.Title>
-          </Space>
+            <span className="text-scale-1200 font-normal">{category.title}</span>
+          </div>
         </caption>
         <thead>
           <tr>
@@ -127,13 +123,13 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 dark:divide-gray-600 ">
+        <tbody className="divide-y divide-scale-600">
           {category.features.map((feat: any) => {
             return (
-              <tr className="border-t border-gray-200 dark:border-gray-600 ">
-                <th className="py-5 px-4 text-sm font-normal text-gray-500 text-left" scope="row">
+              <tr className="border-t ">
+                <th className="py-5 px-4 text-sm font-normal text-scale-1100 text-left" scope="row">
                   <span>
-                    <Typography.Text type="secondary">{feat.title}</Typography.Text>
+                    <p>{feat.title}</p>
                   </span>
                 </th>
                 <td className="py-5 pr-4 text-right">
@@ -146,9 +142,7 @@ export const PricingTableRowMobile = (props: any) => {
                       <Minus tier={tier} />
                     </div>
                   ) : (
-                    <span className="block text-sm text-gray-700 dark:text-white">
-                      {feat.tiers[tier]}
-                    </span>
+                    <span className="block text-sm text-scale-1200">{feat.tiers[tier]}</span>
                   )}
                 </td>
               </tr>
