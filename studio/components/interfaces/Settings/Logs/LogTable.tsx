@@ -29,7 +29,16 @@ const LogTable = ({ data = [], queryType }: Props) => {
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
-  const DEFAULT_COLUMNS = columnNames.map((v) => ({ key: v, name: v, resizable: true }))
+  const DEFAULT_COLUMNS = columnNames.map((v) => {
+    let formatter = undefined
+    const firstRow: any = data[0]
+    const value = firstRow?.[v]
+    if (typeof value === 'object') {
+      formatter = () => `[Object]`
+    }
+
+    return { key: v, name: v, resizable: true, formatter }
+  })
   let columns
 
   if (!queryType) {
