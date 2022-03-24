@@ -34,8 +34,6 @@ const ProfileCard = observer(() => {
   const { mutateProfile } = useProfile()
   const user = ui.profile
 
-  console.log('User', user?.username, user?.primary_email)
-
   const updateUser = async (model: any) => {
     try {
       const updatedUser = await post(`${API_URL}/profile/update`, model)

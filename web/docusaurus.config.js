@@ -41,6 +41,7 @@ module.exports = {
     },
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
+      appId: 'supabase',
       indexName: 'supabase',
     },
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image

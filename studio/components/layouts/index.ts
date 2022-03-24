@@ -10,6 +10,7 @@ import StorageLayout from './StorageLayout/StorageLayout'
 import AccountLayout from './AccountLayout/AccountLayout'
 import WizardLayout from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
+import BillingLayout from './BillingLayout'
 
 export {
   AuthLayout,
@@ -22,5 +23,6 @@ export {
   AccountLayout,
   WizardLayout,
   VercelIntegrationLayout,
+  BillingLayout,
 }
 export default ProjectLayout

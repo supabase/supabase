@@ -40,6 +40,7 @@ const PageContext = createContext(null)
 
 const OrgSettings = () => {
   const { app, ui } = useStore()
+  const router = useRouter()
   const PageState: any = useLocalObservable(() => ({
     user: {} as any,
     organization: {},
@@ -74,6 +75,13 @@ const OrgSettings = () => {
       app.onOrgDeleted(this.organization)
     },
   }))
+
+  useEffect(() => {
+    // User added a new payment method
+    if (router.query.setup_intent && router.query.redirect_status) {
+      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+    }
+  }, [])
 
   useEffect(() => {
     const organization = ui.selectedOrganization
@@ -136,14 +144,17 @@ const OrganizationSettings = observer(() => {
 })
 
 const TabsView = observer(() => {
-  const PageState: any = useContext(PageContext)
+  const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
+
+  const organization = ui.selectedOrganization
+  const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
 
   return (
     <>
       <div className="space-y-3">
         <section className="mt-4">
-          <h3 className="text-xl">{PageState.organization?.name || 'Organization'} settings</h3>
+          <h1 className="text-3xl">{organization?.name || 'Organization'} settings</h1>
         </section>
         <nav className="">
           <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
@@ -173,9 +184,9 @@ const TabsView = observer(() => {
         ) : selectedTab == 'TEAM' ? (
           <TeamSettings />
         ) : selectedTab == 'BILLING' ? (
-          <BillingSettings organization={PageState.organization} projects={PageState.projects} />
+          <BillingSettings organization={organization} projects={projects} />
         ) : selectedTab == 'INVOICES' ? (
-          <InvoicesSettings organization={PageState.organization} />
+          <InvoicesSettings organization={organization} />
         ) : null}
       </div>
     </>

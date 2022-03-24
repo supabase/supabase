@@ -285,6 +285,28 @@ module.exports = ui({
         //   dark: green[300],
         // },
       },
+      animation: {
+        shimmer: 'shimmer 2s infinite linear',
+        sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': {
+            'background-position': '-1000px 0',
+          },
+          '100%': {
+            'background-position': '1000px 0',
+          },
+        },
+        sway: {
+          '0%, 100%': {
+            transform: 'rotate(-10deg) scale(1.5) translateY(4rem)',
+          },
+          '50%': {
+            transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
+          },
+        },
+      },
     },
     fontFamily: {
       sans: ['circular', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],

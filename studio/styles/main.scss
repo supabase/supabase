@@ -178,3 +178,13 @@ code {
 div[data-radix-portal]:not(.portal--toast) {
   z-index: 2147483646 !important;
 }
+
+.billing-compute-radio {
+  label {
+    @apply items-center justify-between;
+  }
+}
+
+div.fixed.inset-0 {
+  z-index: 11 !important;
+}
