@@ -9,9 +9,10 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
+import { getURL, passwordStrength } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
 import {
+  API_URL,
   PROVIDERS,
   REGIONS,
   REGIONS_DEFAULT,
@@ -20,16 +21,13 @@ import {
   PRICING_PLANS_DEFAULT,
   DEFAULT_FREE_PROJECTS_LIMIT,
 } from 'lib/constants'
+import { useStore, withAuth, useSubscriptionStats } from 'hooks'
 
-import { useStore, withAuth } from 'hooks'
 import { WizardLayout } from 'components/layouts'
-import { getURL } from 'lib/helpers'
-
 import Panel from 'components/to-be-cleaned/Panel'
 import InformationBox from 'components/ui/InformationBox'
-import { passwordStrength } from 'lib/helpers'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useSubscriptionStats } from 'hooks'
+import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
 
 interface StripeCustomer {
   paymentMethods: any
@@ -120,6 +118,13 @@ export const Wizard = observer(() => {
   if (isInvalidSlug && organizations.length > 0) {
     router.push(`/new/${organizations[0].slug}`)
   }
+
+  useEffect(() => {
+    // User added a new payment method
+    if (router.query.setup_intent && router.query.redirect_status) {
+      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+    }
+  }, [])
 
   useEffect(() => {
     async function loadStripeAccountAsync(id: string) {
@@ -407,39 +412,11 @@ const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
 
 const EmptyPaymentMethodWarning = observer(
   ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
-    const router = useRouter()
     const { ui } = useStore()
+    const slug = ui.selectedOrganization?.slug
 
-    const [loading, setLoading] = useState<boolean>(false)
+    const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState<boolean>(false)
 
-    /**
-     * Get a link and then redirect them
-     * path is used to determine what path inside billing portal to redirect to
-     */
-    async function redirectToPortal(path?: any) {
-      if (stripeCustomerId) {
-        setLoading(true)
-        const response = await post(`${API_URL}/stripe/checkout`, {
-          stripe_customer_id: stripeCustomerId,
-          returnTo: `${getURL()}${router.asPath}`,
-        })
-        if (response.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to redirect: ${response.error.message}`,
-          })
-          setLoading(false)
-        } else {
-          const { setupCheckoutPortal } = response
-          window.location.replace(`${setupCheckoutPortal}${path ? path : ''}`)
-        }
-      } else {
-        ui.setNotification({
-          category: 'error',
-          message: `Invalid customer ID`,
-        })
-      }
-    }
     return (
       <div className="mt-4">
         <InformationBox
@@ -453,11 +430,16 @@ const EmptyPaymentMethodWarning = observer(
                 You need to add a payment method for your organization before creating a paid
                 project.
               </p>
-              <Button loading={loading} type="secondary" onClick={() => redirectToPortal()}>
+              <Button type="secondary" onClick={() => setShowAddPaymentMethodModal(true)}>
                 Add a payment method
               </Button>
             </div>
           }
+        />
+        <AddNewPaymentMethodModal
+          visible={showAddPaymentMethodModal}
+          returnUrl={`${getURL()}/new/${slug}`}
+          onCancel={() => setShowAddPaymentMethodModal(false)}
         />
       </div>
     )

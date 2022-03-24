@@ -2,6 +2,7 @@ import fs from 'fs'
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -137,10 +138,13 @@ function FeaturedThumb(blog: PostTypes) {
     <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <img
-            className="h-96 w-full object-cover border border-scale-600 rounded-lg"
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-          />
+          <div className="relative overflow-auto w-full h-96 border dark:border-dark rounded-lg">
+            <Image
+              src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
           <div className="flex flex-col space-y-2">
             <div className="flex space-x-2 text-sm">
               <p>{blog.date}</p>
@@ -158,7 +162,14 @@ function FeaturedThumb(blog: PostTypes) {
             {author && (
               <div className="flex space-x-3 items-center">
                 {author.author_image_url && (
-                  <img src={author.author_image_url} className="rounded-full w-10" />
+                  <div className="relative overflow-auto w-10 h-10">
+                    <Image
+                      src={author.author_image_url}
+                      className="rounded-full"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
                 )}
                 <div className="flex flex-col">
                   <span className="m-0 text-sm text-scale-1200">{author.author}</span>
