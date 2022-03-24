@@ -46,7 +46,7 @@ const CostBreakdownModal: FC<Props> = ({
               <div className="text-xs w-[10%] text-right">Qty</div>
               <div className="text-xs w-[15%] text-right">Amount</div>
             </div>
-            {Object.keys(groupedBreakdown).map((startPeriod: any) => {
+            {Object.keys(groupedBreakdown).map((startPeriod: any, idx: number) => {
               const start = new Date(Number(startPeriod) * 1000).toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'long',
@@ -60,15 +60,15 @@ const CostBreakdownModal: FC<Props> = ({
                 year: 'numeric',
               })
               return (
-                <div className="border-b border-scale-600">
+                <div key={`breakdown-${idx}`} className="border-b border-scale-600">
                   <div className="flex items-center py-2 px-4 ">
                     <div className="text-xs w-full text-scale-1100">
                       {start} - {end}
                     </div>
                   </div>
-                  {groupedBreakdown[startPeriod].map((item: any) => {
+                  {groupedBreakdown[startPeriod].map((item: any, index: number) => {
                     return (
-                      <div className="flex items-center py-2 px-4">
+                      <div key={`breakdown-row-${index}`} className="flex items-center py-2 px-4">
                         <div className="text-sm w-[75%]">{item.description}</div>
                         <div className="text-sm w-[10%] text-right">{item.quantity}</div>
                         <div className="text-sm w-[15%] text-right">
