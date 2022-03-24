@@ -15,7 +15,7 @@ const Home = ({ user }) => {
          * Read more on https://supabase.com/docs/reference/javascript/reset-password-email#notes
          */
         let url = window.location.hash;
-        let query = url.substr(1);
+        let query = url.slice(1);
         let result = {};
 
         query.split("&").forEach((part) => {
