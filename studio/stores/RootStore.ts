@@ -1,4 +1,4 @@
-import { configure } from 'mobx'
+import { configure, reaction } from 'mobx'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
@@ -32,17 +32,38 @@ export class RootStore implements IRootStore {
       connectionString: '',
     })
     this.app = new AppStore(this)
+
+    /**
+     * TODO: meta and content are not observable
+     * meaning that when meta and content object change mobx doesnt trigger new event
+     *
+     * Workaround for now
+     * we need to use ui.selectedProject along with meta and content
+     * cos whenever ui.selectedProject changes, the reaction will create new meta and content stores
+     */
+    reaction(
+      () => this.ui.selectedProject,
+      (selectedProject) => {
+        if (selectedProject) {
+          this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
+          this.meta = new MetaStore(this, {
+            projectRef: selectedProject.ref,
+            connectionString: selectedProject.connectionString ?? '',
+          })
+        } else {
+          this.content = new ProjectContentStore(this, { projectRef: '' })
+          this.meta = new MetaStore(this, {
+            projectRef: '',
+            connectionString: '',
+          })
+        }
+      }
+    )
   }
 
   setProjectRef(value?: string) {
-    if (this.ui.selectedProject?.ref != value) {
-      this.ui.setProjectRef(value)
-      this.content = new ProjectContentStore(this, { projectRef: value || '' })
-      this.meta = new MetaStore(this, {
-        projectRef: value || '',
-        connectionString: this.ui.selectedProject?.connectionString ?? '',
-      })
-    }
+    if (this.ui.selectedProject?.ref === value) return
+    this.ui.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {

@@ -15,6 +15,7 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { BarChart, AreaChart } from './ChartRenderer'
 import { ChartData } from './ChartHandler.types'
+import { TooltipProps } from 'recharts'
 
 interface Props {
   label: string
@@ -30,6 +31,7 @@ interface Props {
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
+  onBarClick?: (v: any) => void
 }
 
 /**
@@ -55,6 +57,7 @@ const ChartHandler: FC<Props> = ({
   hideChartType = false,
   data,
   isLoading,
+  onBarClick,
 }) => {
   const router = useRouter()
   const { ref } = router.query
@@ -121,12 +124,8 @@ const ChartHandler: FC<Props> = ({
   if (loading) {
     return (
       <div className="w-full h-52 flex flex-col space-y-4 items-center justify-center">
-        <Typography.Text className="animate-spin">
-          <IconLoader />
-        </Typography.Text>
-        <Typography.Text type="secondary" small>
-          Loading data for {label}
-        </Typography.Text>
+        <IconLoader className="animate-spin text-scale-700" />
+        <p className="text-xs text-scale-900">Loading data for {label}</p>
       </div>
     )
   }
@@ -134,12 +133,8 @@ const ChartHandler: FC<Props> = ({
   if (isUndefined(chartData)) {
     return (
       <div className="w-full h-52 flex flex-col space-y-4 items-center justify-center">
-        <Typography.Text>
-          <IconAlertCircle />
-        </Typography.Text>
-        <Typography.Text type="secondary" small>
-          Unable to load data for {label}
-        </Typography.Text>
+        <IconAlertCircle className="text-scale-700" />
+        <p className="text-scale-900 text-xs">Unable to load data for {label}</p>
       </div>
     )
   }
@@ -169,6 +164,7 @@ const ChartHandler: FC<Props> = ({
           highlightedValue={highlightedValue}
           label={label}
           customDateFormat={customDateFormat}
+          onBarClick={onBarClick}
         />
       ) : (
         <AreaChart

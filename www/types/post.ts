@@ -2,6 +2,7 @@ import Author from './author'
 
 type PostTypes = {
   slug: string
+  type: 'casestudy' | 'blog'
   title: string
   date: string
   coverImage: string
@@ -18,6 +19,7 @@ type PostTypes = {
   url: string
   tags: []
   logo?: string
+  hideAuthor?: boolean
 }
 
 export default PostTypes

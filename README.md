@@ -106,7 +106,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
   </tr>
   <tr>
     <td>Dart (Flutter)</td>
@@ -181,6 +181,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 
 - [Arabic | العربية](/i18n/README.ar.md)
 - [Albanian / Shqip](/i18n/README.sq.md)
+- [Bangla / বাংলা](/i18n/README.bn.md)
 - [Catalan / Català](/i18n/README.ca.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
@@ -193,7 +194,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Hungarian / Magyar](/i18n/README.hu.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italiano / Italian](/i18n/README.it.md)
+- [Italian / Italiano](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Korean / 한국어](/i18n/README.ko.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)

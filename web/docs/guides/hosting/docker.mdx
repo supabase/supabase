@@ -10,7 +10,7 @@ Docker is the easiest way to get started with self-hosted Supabase.
 
 You need the following installed in your system:
 
-- [Docker](https://docs.docker.com/engine/install/) and docker-compose
+- [Docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/)
 - [Git](https://git-scm.com/downloads)
 
 ## Quick Start
@@ -51,7 +51,7 @@ Replace the values in these files:
 - `.env`: 
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
-- `volumes/kong.yml`
+- `volumes/api/kong.yml`
   - `anon` - replace with an `anon` key
   - `service_role` - replace with a `service` key
 
@@ -63,6 +63,11 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
+
+
+### Securing the Dashboard
+
+The Docker setup doesn't include a management database for managing users and logins. If you plan to deploy the Studio to the web we suggest you put it behind a web proxy with Basic Auth or hide it behind a VPN. 
 
 ## Configuration
 

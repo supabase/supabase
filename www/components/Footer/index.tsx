@@ -3,19 +3,16 @@ import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
+import { useTheme } from '../Providers'
+import { Badge } from '@supabase/ui'
 
-type Props = {
-  darkMode: boolean
-  updateTheme: Function
-}
-
-const Footer = (props: Props) => {
+const Footer = () => {
   const { basePath } = useRouter()
-  const { darkMode, updateTheme } = props
+  const { isDarkMode } = useTheme()
 
   return (
     <footer
-      className="bg-white dark:bg-dark-800 border-t border-gray-100 dark:border-gray-600"
+      className="border-t border-scale-500 dark:border-scale-600"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -29,7 +26,7 @@ const Footer = (props: Props) => {
                 <img
                   className="w-40"
                   src={
-                    darkMode
+                    isDarkMode
                       ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                       : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                   }
@@ -37,15 +34,21 @@ const Footer = (props: Props) => {
                 />
               </a>
             </Link>
-            <div className="flex space-x-6">
-              <a href="https://twitter.com/supabase" className="text-gray-300 hover:text-gray-400">
+            <div className="flex space-x-5">
+              <a
+                href="https://twitter.com/supabase"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
 
-              <a href="https://github.com/supabase" className="text-gray-300 hover:text-gray-400">
+              <a
+                href="https://github.com/supabase"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -56,7 +59,10 @@ const Footer = (props: Props) => {
                 </svg>
               </a>
 
-              <a href="https://discord.supabase.com/" className="text-gray-300 hover:text-gray-400">
+              <a
+                href="https://discord.supabase.com/"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
                   <path
@@ -66,6 +72,21 @@ const Footer = (props: Props) => {
                   />
                 </svg>
               </a>
+
+              <a
+                href="https://youtube.com/c/supabase"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
+                <span className="sr-only">Youtube</span>
+                <svg
+                  className="h-6 w-6"
+                  fill="currentColor"
+                  viewBox="0 0 576 512"
+                  aria-hidden="true"
+                >
+                  <path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z" />
+                </svg>
+              </a>
             </div>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:mt-0 xl:col-span-2">
@@ -73,23 +94,25 @@ const Footer = (props: Props) => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm text-gray-300 dark:text-dark-400">{segment.title}</h3>
+                    <h6 className="text-base text-scale-1200 overwrite">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`text-sm ${
+                            className={`transition-colors text-sm ${
                               link.url
-                                ? 'text-gray-500 dark:text-dark-100'
-                                : 'text-gray-400 dark:text-dark-200'
-                            } hover:text-gray-900 dark:hover:text-gray-300`}
+                                ? 'text-scale-1100 hover:text-scale-1200 '
+                                : 'text-scale-900 hover:text-scale-900'
+                            } `}
                           >
                             {link.text}
                             {!link.url && (
-                              <span className="block text-sm text-gray-300 dark:text-dark-300">
-                                Coming soon
-                              </span>
+                              <div className="inline ml-2 xl:ml-0 xl:block 2xl:inline 2xl:ml-2 text-xs">
+                                <Badge color="scale" size="small">
+                                  Coming soon
+                                </Badge>
+                              </div>
                             )}
                           </a>
                         </li>
@@ -101,11 +124,9 @@ const Footer = (props: Props) => {
             </div>
           </div>
         </div>
-        <div className="mt-32 border-t dark:border-dark pt-8 flex justify-between">
-          <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
-            &copy; Supabase Inc
-          </p>
-          <DarkModeToggle darkMode={darkMode} updateTheme={updateTheme} />
+        <div className="mt-32 border-t border-scale-500 dark:border-scale-600 pt-8 flex justify-between">
+          <p className="mb-0 self-center text-base">&copy; Supabase Inc</p>
+          <DarkModeToggle />
         </div>
       </SectionContainer>
     </footer>

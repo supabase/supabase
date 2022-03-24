@@ -4,9 +4,22 @@ title: Database
 description: Use Supabase to manage your data.
 ---
 
-import ExtensionsComponent from '@site/src/components/Extensions'
 
-Supabase is built on top of [Postgres](/docs/postgres/server/about), an extremely scalable Relational Database.
+Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database, a free and open source 
+database which is considered one of the world's most stable and advanced databases.
+
+
+## Postgres or PostgreSQL?
+
+PostgreSQL the database was derived from the POSTGRES Project, a package written at the University of California at Berkeley in 1986.
+This package included a query language called "PostQUEL".
+
+In 1994, Postgres95 was built on top of POSTGRES code, adding an SQL language interpreter as a replacement for PostQUEL.
+Eventually, Postgres95 was renamed to PostgreSQL to reflect the SQL query capability.
+
+After this, many people referred to it as Postgres since it's less prone to confusion. Supabase is all about 
+simplicity, so we also refer to it as Postgres.
+
 
 ## Features
 
@@ -125,6 +138,73 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 6. Run `TRUNCATE storage.objects` in the *new* project's SQL editor
 7. Run `ALTER ROLE postgres NOSUPERUSER` in the *new* project's SQL editor
 
+#### Migrate storage objects
+
+This script moves storage objects from one project to another. If you have more than 10k objects, we can move the objects for you. Just contact us at [support@supabase.io](mailto:support@supabase.io).
+
+```js
+const { createClient } = require("@supabase/supabase-js");
+
+const OLD_PROJECT_URL = "https://xxx.supabase.co";
+const OLD_PROJECT_SERVICE_KEY = "old-project-service-key-xxx";
+
+const NEW_PROJECT_URL = "https://yyy.supabase.co";
+const NEW_PROJECT_SERVICE_KEY = "new-project-service-key-yyy";
+
+(async () => {
+  const oldSupabaseRestClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY,
+    { schema: "storage" }
+  );
+  const oldSupabaseClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY
+  );
+  const newSupabaseClient = createClient(
+    NEW_PROJECT_URL,
+    NEW_PROJECT_SERVICE_KEY
+  );
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient
+    .from("objects")
+    .select();
+  if (error) {
+    console.log("error getting objects from old bucket");
+    throw error;
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`);
+    try {
+      const { data, error: downloadObjectError } =
+        await oldSupabaseClient.storage
+          .from(objectData.bucket_id)
+          .download(objectData.name);
+      if (downloadObjectError) {
+        throw downloadObjectError;
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        });
+      if (uploadObjectError) {
+        throw uploadObjectError;
+      }
+    } catch (err) {
+      console.log("error moving ", objectData);
+      console.log(err);
+    }
+  }
+})();
+```
+
 #### Caveats
 
 - The new project will have the old project's Storage buckets, but not the objects. You will need to migrate Storage objects manually.
@@ -133,9 +213,7 @@ Migrating projects can be achieved using standard PostgreSQL tooling. This is pa
 
 When you create a new project in Supabase we ask for a password. You can use this password to connect directly to your Postgres database.
 
-If you forget your password, you can reset it from the Dashboard SQL editor:
-
-For example:
+If you forget your password, you can reset it from the Dashboard under the database settings page, or through the SQL editor as such:
 
 ```sql
 alter user postgres 

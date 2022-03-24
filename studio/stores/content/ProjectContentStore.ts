@@ -11,6 +11,7 @@ import { API_URL } from 'lib/constants'
 
 export interface IProjectContentStore {
   isLoading: boolean
+  isInitialized: boolean
   error: any
 
   load: () => void
@@ -37,7 +38,6 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
-
     this.rootStore = rootStore
     this.baseUrl = `${API_URL}/projects/${projectRef}/content`
     makeAutoObservable(this)
@@ -45,6 +45,10 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   get isLoading() {
     return this.state === this.STATES.INITIAL || this.state === this.STATES.LOADING
+  }
+
+  get isInitialized() {
+    return this.state !== this.STATES.INITIAL
   }
 
   async fetchData() {

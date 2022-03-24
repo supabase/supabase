@@ -1,25 +1,26 @@
-import useSWR from 'swr'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { FC, useState } from 'react'
-import { isUndefined } from 'lodash'
-import { useRouter } from 'next/router'
+import useSWR from 'swr'
+import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs } from '@supabase/ui'
+import { useRouter } from 'next/router'
+import { debounce } from 'lodash'
+import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { TIME_PERIODS_INFRA } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
+import { get, patch } from 'lib/common/fetch'
+import { pluckObjectFields, passwordStrength } from 'lib/helpers'
+import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
+
 import { SettingsLayout } from 'components/layouts'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/to-be-cleaned/Panel'
+import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
@@ -107,6 +108,17 @@ const Usage: FC<any> = ({ project }) => {
                     provider={'infra-monitoring'}
                   />
                 )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    attribute={'disk_io_budget'}
+                    label={'Daily Disk IO Budget remaining'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
               </div>
             </Panel.Content>
           </Panel>
@@ -135,6 +147,113 @@ const Usage: FC<any> = ({ project }) => {
   )
 }
 
+const ResetDbPassword: FC<any> = () => {
+  const { ui } = useStore()
+  const projectRef = ui.selectedProject?.ref
+
+  const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
+
+  const [password, setPassword] = useState<string>('')
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
+  const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
+  const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
+
+  useEffect(() => {
+    if (showResetDbPass) {
+      setIsUpdatingPassword(false)
+      setPassword('')
+      setPasswordStrengthMessage('')
+      setPasswordStrengthWarning('')
+      setPasswordStrengthScore(0)
+    }
+  }, [showResetDbPass])
+
+  async function checkPasswordStrength(value: any) {
+    const { message, warning, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthWarning(warning)
+    setPasswordStrengthMessage(message)
+  }
+
+  const delayedCheckPasswordStrength = useRef(
+    debounce((value) => checkPasswordStrength(value), 300)
+  ).current
+
+  const onDbPassChange = (e: any) => {
+    const value = e.target.value
+    setPassword(value)
+    if (value == '') {
+      setPasswordStrengthScore(-1)
+      setPasswordStrengthMessage('')
+    } else delayedCheckPasswordStrength(value)
+  }
+
+  const confirmResetDbPass = async () => {
+    if (passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      setIsUpdatingPassword(true)
+      const res = await patch(`${API_URL}/projects/${projectRef}/db-password`, { password })
+      if (!res.error) {
+        ui.setNotification({ category: 'success', message: res.message })
+        setShowResetDbPass(false)
+      } else {
+        ui.setNotification({ category: 'error', message: 'Failed to reset password' })
+      }
+      setIsUpdatingPassword(false)
+    }
+  }
+
+  return (
+    <>
+      <Panel>
+        <Panel.Content>
+          <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+            <div>
+              <Typography.Text className="block">Database password</Typography.Text>
+              <div style={{ maxWidth: '420px' }}>
+                <p className="opacity-50 text-sm">
+                  You can use this password to connect directly to your Postgres database.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-end justify-end">
+              <Button type="default" onClick={() => setShowResetDbPass(true)}>
+                Reset Database Password
+              </Button>
+            </div>
+          </div>
+        </Panel.Content>
+      </Panel>
+      <Modal
+        title="Reset database password"
+        confirmText="Reset password"
+        alignFooter="right"
+        size="medium"
+        visible={showResetDbPass}
+        loading={isUpdatingPassword}
+        onCancel={() => setShowResetDbPass(false)}
+        onConfirm={() => confirmResetDbPass()}
+      >
+        <div className="w-full space-y-8 mb-8">
+          <Input
+            type="password"
+            onChange={onDbPassChange}
+            error={passwordStrengthWarning}
+            // @ts-ignore
+            descriptionText={
+              <PasswordStrengthBar
+                passwordStrengthScore={passwordStrengthScore}
+                passwordStrengthMessage={passwordStrengthMessage}
+                password={password}
+              />
+            }
+          />
+        </div>
+      </Modal>
+    </>
+  )
+}
+
 const DownloadCertificate: FC<any> = ({ createdAt }) => {
   // instances before 3 : 08 pm sgt 29th April don't have certs installed
   if (new Date(createdAt) < new Date('2021-04-30')) return null
@@ -142,25 +261,25 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
   return (
     <Panel>
       <Panel.Content>
-        <div className="w-full flex items-center justify-between">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
           <div>
             <Typography.Text className="block">SSL Connection</Typography.Text>
-            <div style={{ maxWidth: '320px' }}>
-              <Typography.Text type="secondary" className="opacity-50">
-                <p className="opacity-50">
-                  Use this cert when connecting to your database to prevent snooping and
-                  man-in-the-middle attacks.
-                </p>
-              </Typography.Text>
+            <div style={{ maxWidth: '420px' }}>
+              <p className="opacity-50 text-sm">
+                Use this cert when connecting to your database to prevent snooping and
+                man-in-the-middle attacks.
+              </p>
             </div>
           </div>
-          <Button type="default" icon={<IconDownload />}>
-            <a
-              href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
-            >
-              Download Certificate
-            </a>
-          </Button>
+          <div className="flex items-end justify-end">
+            <Button type="default" icon={<IconDownload />}>
+              <a
+                href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
+              >
+                Download Certificate
+              </a>
+            </Button>
+          </div>
         </div>
       </Panel.Content>
     </Panel>
@@ -191,7 +310,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const defaultConnString =
+  const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
@@ -199,6 +318,10 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     `user=${connectionInfo.db_user} password=[YOUR-PASSWORD] ` +
     `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
     ` dbname=${connectionInfo.db_name}`
+  const psqlConnString =
+    `psql -h ${connectionInfo.db_host} -p ` +
+    `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
+    `-U ${connectionInfo.db_user}`
 
   return (
     <>
@@ -264,6 +387,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
+        <ResetDbPassword />
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
       <div>
@@ -279,7 +403,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
               <Tabs type="underlined">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
-                  <Input copy readOnly disabled value={defaultConnString} />
+                  <Input copy readOnly disabled value={psqlConnString} />
+                </Tabs.Panel>
+
+                {/* @ts-ignore */}
+                <Tabs.Panel id="uri" label="URI">
+                  <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}
@@ -320,7 +449,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
                 {/* @ts-ignore */}
                 <Tabs.Panel id="nodejs" label="Nodejs">
-                  <Input copy readOnly disabled value={defaultConnString} />
+                  <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}

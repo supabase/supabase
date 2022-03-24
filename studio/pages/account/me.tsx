@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Select, Typography } from '@supabase/ui'
+import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -32,8 +32,8 @@ export default withAuth(User)
 const ProfileCard = observer(() => {
   const { ui } = useStore()
   const { mutateProfile } = useProfile()
-
   const user = ui.profile
+
   const updateUser = async (model: any) => {
     try {
       const updatedUser = await post(`${API_URL}/profile/update`, model)
@@ -51,6 +51,9 @@ const ProfileCard = observer(() => {
 
   return (
     <article className="p-4 max-w-4xl">
+      <section>
+        <GithubProfile />
+      </section>
       <section className="">
         {/* @ts-ignore */}
         <SchemaFormPanel
@@ -77,6 +80,39 @@ const ProfileCard = observer(() => {
   )
 })
 
+const GithubProfile = observer(() => {
+  const { ui } = useStore()
+
+  return (
+    <Panel
+      title={[
+        <Typography.Title key="panel-title" level={5} className="mb-0">
+          Account Information
+        </Typography.Title>,
+      ]}
+    >
+      <Panel.Content>
+        <div className="space-y-2">
+          <Input
+            readOnly
+            disabled
+            label="Username"
+            layout="horizontal"
+            value={ui.profile?.username ?? ''}
+          />
+          <Input
+            readOnly
+            disabled
+            label="Email"
+            layout="horizontal"
+            value={ui.profile?.primary_email ?? ''}
+          />
+        </div>
+      </Panel.Content>
+    </Panel>
+  )
+})
+
 const ThemeSettings = observer(() => {
   const { ui } = useStore()
 
@@ -89,7 +125,7 @@ const ThemeSettings = observer(() => {
       ]}
     >
       <Panel.Content>
-        <Select
+        <Listbox
           value={ui.themeOption}
           label="Interface theme"
           descriptionText="Choose a theme preference"
@@ -102,12 +138,18 @@ const ThemeSettings = observer(() => {
               <IconMoon />
             ) : undefined
           }
-          onChange={(e: any) => ui.onThemeOptionChange(e.target.value)}
+          onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
         >
-          <Select.Option value="system">System default</Select.Option>
-          <Select.Option value="dark">Dark</Select.Option>
-          <Select.Option value="light">Light</Select.Option>
-        </Select>
+          <Listbox.Option label="System default" value="system">
+            System default
+          </Listbox.Option>
+          <Listbox.Option label="Dark" value="dark">
+            Dark
+          </Listbox.Option>
+          <Listbox.Option label="Light" value="light">
+            Light
+          </Listbox.Option>
+        </Listbox>
       </Panel.Content>
     </Panel>
   )

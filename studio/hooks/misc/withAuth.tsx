@@ -24,7 +24,7 @@ export function withAuth(
     const { app, ui } = rootStore
     const page = router.pathname.split('/')[3]
 
-    const redirectTo = options?.redirectTo ?? (!isUndefined(ref) ? `/project/${ref}` : '/')
+    const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
     const redirectIfFound = options?.redirectIfFound
 
     const returning =
@@ -42,11 +42,14 @@ export function withAuth(
         if (!profile) {
           ui.setProfile(undefined)
         } else if (returning !== 'minimal') {
-          const { organizations, ...userProfile } = profile
-          const projects: Project[] = flatten(organizations?.map((org: any) => org.projects))
-          app.organizations.initialDataArray(organizations)
-          app.projects.initialDataArray(projects)
-          ui.setProfile(userProfile)
+          ui.setProfile(profile)
+
+          if (!app.organizations.isInitialized) {
+            app.organizations.load()
+          }
+          if (!app.projects.isInitialized) {
+            app.projects.load()
+          }
         }
       }
 
@@ -75,6 +78,10 @@ export function withAuth(
   }
 }
 
+function defaultRedirectTo(ref: string | string[] | undefined) {
+  return IS_PLATFORM ? '/' : !isUndefined(ref) ? `/project/${ref}` : '/'
+}
+
 function checkRedirectTo(
   loading: boolean,
   router: NextRouter,
@@ -83,7 +90,7 @@ function checkRedirectTo(
   redirectIfFound?: boolean
 ) {
   if (loading) return false
-  if (router.asPath == redirectTo) return false
+  if (router.pathname == redirectTo) return false
 
   // If redirectTo is set, redirect if the user was not found.
   if (redirectTo && !redirectIfFound && !profile) return true

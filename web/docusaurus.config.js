@@ -41,6 +41,7 @@ module.exports = {
     },
     algolia: {
       apiKey: '766d56f13dd1e82f43253559b7c86636',
+      appId: 'supabase',
       indexName: 'supabase',
     },
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
@@ -56,17 +57,10 @@ module.exports = {
       },
       items: [
         {
-          label: 'Overview',
+          label: 'Guides',
           to: '/',
           activeBaseRegex:
             '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
-          position: 'left',
-        },
-        {
-          label: 'Guides',
-          to: '/docs/guides',
-          activeBaseRegex:
-            '(^/docs/guides/database/|^/docs/guides/auth/)|(/docs/guides$)|docs/(resources|learn)',
           position: 'left',
         },
         {

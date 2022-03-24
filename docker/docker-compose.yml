@@ -14,8 +14,11 @@ services:
     ports:
       - ${STUDIO_PORT}:3000/tcp
     environment:
-      SUPABASE_URL: http://kong:8000
       STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_REST_URL: ${PUBLIC_REST_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
@@ -37,7 +40,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.2.12
+    image: supabase/gotrue:v2.5.21
     depends_on:
       - db
     restart: unless-stopped
@@ -52,9 +55,11 @@ services:
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
       GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
 
-      GOTRUE_JWT_SECRET: ${JWT_SECRET}
-      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
@@ -80,14 +85,14 @@ services:
     restart: unless-stopped
     environment:
       PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
-      PGRST_DB_SCHEMA: public,storage
+      PGRST_DB_SCHEMAS: public,storage
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
   realtime:
     container_name: supabase-realtime
-    image: supabase/realtime:v0.19.3
+    image: supabase/realtime:v0.21.0
     depends_on:
       - db
     restart: unless-stopped
@@ -154,5 +159,5 @@ services:
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./volumes/db/data:/var/lib/postgresql/data
+      # - ./volumes/db/data:/var/lib/postgresql/data
       - ./volumes/db/init:/docker-entrypoint-initdb.d

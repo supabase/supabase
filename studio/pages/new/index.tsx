@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Typography } from '@supabase/ui'
-import Router from 'next/router'
+import { Button, Input, Typography } from '@supabase/ui'
+import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { WizardLayout } from 'components/layouts'
-import FormField from 'components/to-be-cleaned/forms/FormField'
 import Panel from 'components/to-be-cleaned/Panel'
 
 /**
@@ -15,6 +14,8 @@ import Panel from 'components/to-be-cleaned/Panel'
  */
 const Wizard = () => {
   const { ui, app } = useStore()
+  const router = useRouter()
+
   const [orgName, setOrgName] = useState('')
   const [newOrgLoading, setNewOrgLoading] = useState(false)
 
@@ -36,7 +37,7 @@ const Wizard = () => {
     }
 
     setNewOrgLoading(true)
-    const response = await post(`${API_URL}/organizations/new`, {
+    const response = await post(`${API_URL}/organizations`, {
       name: orgName,
     })
 
@@ -49,11 +50,7 @@ const Wizard = () => {
     } else {
       const org = response
       app.onOrgAdded(org)
-
-      // Router.push('/new/[slug]', `/new/${org.slug}`)
-      // Using window.location.href for now as organization metadata needs to refresh
-      // We do not get is_owner nor stripe_customer_id from the response here
-      window.location.href = `/new/${org.slug}`
+      router.push(`/new/${org.slug}`)
     }
   }
 
@@ -63,20 +60,16 @@ const Wizard = () => {
         hideHeaderStyling
         title={[
           <div key="panel-title">
-            <Typography.Title level={4} className="mb-0">
-              Create a new organization
-            </Typography.Title>
+            <h4>Create a new organization</h4>
           </div>,
         ]}
         footer={[
           <div key="panel-footer" className="flex items-center w-full justify-between">
-            <Button type="default" onClick={() => Router.push('/')}>
+            <Button type="default" onClick={() => router.push('/')}>
               Cancel
             </Button>
-            <div className="space-x-3">
-              <Typography.Text type="secondary" small>
-                You can rename your organization later
-              </Typography.Text>
+            <div className="flex items-center space-x-3">
+              <p className="text-xs text-scale-900">You can rename your organization later</p>
               <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
                 Create organization
               </Button>
@@ -85,25 +78,21 @@ const Wizard = () => {
         ]}
       >
         <Panel.Content className="pt-0">
-          <Typography.Text>
-            This is your organization's name within Supabase.
-            <br />
-          </Typography.Text>
-          <Typography.Text type="secondary">
+          <p className="text-sm">This is your organization's name within Supabase.</p>
+          <p className="text-sm text-scale-1100">
             For example, you can use the name of your company or department
-          </Typography.Text>
+          </p>
         </Panel.Content>
         <Panel.Content className="Form section-block--body has-inputs-centered">
-          <FormField
-            // @ts-ignore
+          <Input
+            autoFocus
             label="Name"
             type="text"
+            layout="horizontal"
             placeholder="Organization name"
+            descriptionText="What's the name of your company or team?"
             value={orgName}
             onChange={onOrgNameChange}
-            description="What's the name of your company or team?"
-            wrapperClasses="pb-2"
-            autoFocus
           />
         </Panel.Content>
       </Panel>

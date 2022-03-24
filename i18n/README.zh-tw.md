@@ -47,7 +47,7 @@ Supabase 是一套開放原始碼工具的組合包。我們以企業等級的�
 
 Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安裝任何東西，就可以開始使用 Supabase。目前還在打造本地端開發體驗：連同平台的穩定度，這是我們專注的核心。
 
-![架構](https://supabase.com/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
+![架構](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是經歷 30 年活躍開發的關聯物件資料庫系統，因此擁有可靠度、功能細緻度與效能著稱。
 - [Realtime](https://github.com/supabase/realtime) 是利用 Websocket 監聽 PostgreSQL 的 insert、update 和 delete 的 Elixir 伺服器。Supabase 監聽 Postgres 內建的複寫 (Replication) 功能，將複寫的 byte stream 轉換為 JSON 格式，接著透過 Websocket 將 JSON 進行廣播。

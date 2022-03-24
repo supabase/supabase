@@ -40,6 +40,7 @@ export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   getObject: ['SELECT'],
   getSignedObject: [],
   getSignedUrl: ['SELECT'],
+  getSignedUrls: ['SELECT'],
   listObjects: ['SELECT'],
   moveObjects: ['SELECT', 'UPDATE'],
   updateObject: ['SELECT', 'UPDATE'],

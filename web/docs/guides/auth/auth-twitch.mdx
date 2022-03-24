@@ -14,7 +14,7 @@ To enable Twitch Auth for your project, you need to set up a Twitch Application 
 Setting up Twitch logins for your application consists of 3 parts:
 
 - Create and configure a Twitch Application [Twitch Developer Console](https://dev.twitch.tv/console)
-- Add your Twitch OAuth Consumer keys to your [Supabase Project](https://supabase.com)
+- Add your Twitch OAuth Consumer keys to your [Supabase Project](https://app.supabase.io)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Steps
@@ -25,11 +25,11 @@ Setting up Twitch logins for your application consists of 3 parts:
 - Click on `Log in with Twitch` at the top right to log in.
 - If you have not already enabled 2-Factor Authentication for your Twitch Account, you will need to do that at [Twitch Security Settings](https://www.twitch.tv/settings/security) before you can continue.
 
-![Twitch Developer Page](/img/guides/twitch-developer-page.png)
+![Twitch Developer Page](/img/guides/auth-twitch/twitch-developer-page.png)
 
 - Once logged in, go to the [Twitch Developer Console](https://dev.twitch.tv/console).
 
-![Twitch Developer Console](/img/guides/twitch-console.png)
+![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
 
 ### Find your callback URL
 
@@ -37,7 +37,7 @@ In the next step you require a callback URL, which looks like this:
 
 `https://<project-ref>.supabase.co/auth/v1/callback`
 
-- Go to your [Supabase Project Dashboard](https://supabase.com).
+- Go to your [Supabase Project Dashboard](https://app.supabase.io).
 - Click on the `Settings` icon at the bottom of the left sidebar.
 - Click on `API` in the list.
 - Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
@@ -49,11 +49,11 @@ In the next step you require a callback URL, which looks like this:
 
 ### Create a Twitch Application
 
-![Twitch Developer Console](/img/guides/twitch-console.png)
+![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
 
 - Click on `+ Register Your Application` at the top right.
 
-![Register Application](/img/guides/twitch-register-your-application.png)
+![Register Application](/img/guides/auth-twitch/twitch-register-your-application.png)
 
 - Enter the name of your application.
 - Type or paste your `OAuth Redirect URL` (the callback URL from the previous step.)
@@ -64,17 +64,17 @@ In the next step you require a callback URL, which looks like this:
 
 - Click `Manage` at the right of your application entry in the list.
 
-![Twitch Applications List](/img/guides/twitch-applications-list.png)
+![Twitch Applications List](/img/guides/auth-twitch/twitch-applications-list.png)
 
 - Copy your Client ID.
 - Click `New Secret` to create a new Client Secret.
 - Copy your Client Secret.
 
-![Get Client ID and Secret](/img/guides/twitch-get-keys.png)
+![Get Client ID and Secret](/img/guides/auth-twitch/twitch-get-keys.png)
 
 ### Add your Twitch credentials into your Supabase Project
 
-- Go to your [Supabase Project Dashboard](https://supabase.com)
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
 - In the left sidebar, click the `Authentication` icon (near the top)
 - Click `Settings` from the list to go to the `Authentication Settings` page
 - Enter the final (hosted) URL of your app under `Site URL` (this is important)

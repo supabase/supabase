@@ -6,33 +6,34 @@ Angelico de los Reyes
 Amy Q
 Ant Wilson
 Beng Eu
+Bo Lu
 Bobbie Soedirgo
 Chris Copplestone
 Dave Wilson
 David Thyresson
 Div Arora
-Erkin
-Francesco Ceccon
-Gurjeet Singh https://gurjeet.singh.im
 Hieu Pham
 Inian P
+Isaiah Hamilton
+Joel Lee
 Jon M
 Jonny Summers-Muir
 Joshen Lim
 Kang Ming Tay
+Lakshmipathi G
 Laura C
 Leo T
 Mark Burggraf
 Oli R
 Paul Copplestone
 Rory Wilding
-Shakeel-Abbas Hussein
+Shane Rice  
 Stanislav M
 Steve Chavez
 Thor Schaeff
 TzeYiing L
 Wen Bo Xie
-
+Monica El Khoury
 ____________
 
 JOBS
@@ -50,6 +51,7 @@ Supabase would not be possible without the work of some other amazing open sourc
 - PostgREST - https://github.com/PostgREST
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/
+- Tailwind CSS - https://tailwindcss.com/
 - Phoenix - https://www.phoenixframework.org/
 - Docusaurus - https://v2.docusaurus.io/
-- GoAuth - https://github.com/netlify/gotrue
+- GoTrue - https://github.com/netlify/gotrue
