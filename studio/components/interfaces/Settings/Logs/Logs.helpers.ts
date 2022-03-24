@@ -1,19 +1,12 @@
-import { Severity } from '@sentry/browser'
-import { filter } from 'lodash'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import { FilterObject } from './Logs.types'
 
 export function filterSqlWhereBuilder(
-  filters: FilterObject,
+  filters: FilterObject | any,
   table: LogsTableName,
-  searchQuery: string
 ) {
-  // console.log('raw filters', filters)
-
   // remove any filter arrays that are empty
-  const filtersSanitized: any = Object.values(filters).filter((x) => x && x.length > 0)
-
-  // console.log('filtersSanitized', filtersSanitized)
+  const filtersSanitized: any = Object.values(filters).filter((x: any) => x && x.length > 0)
 
   const keys = Object.keys(filters)
 
@@ -25,17 +18,13 @@ export function filterSqlWhereBuilder(
 
   keys.map((x: string, i) => {
     // do not parse empty key
-    if (!x) {
-      return
-    }
+    if (!x) return
 
     let count = 0
-
     const filterKeyArray: string[] = []
 
     filters[x].map((value: string, i: number) => {
       // first line should be WHERE
-
       const last = i === filters[x].length - 1
 
       if (count === 0) {
@@ -55,10 +44,7 @@ export function filterSqlWhereBuilder(
       }
     })
 
-    // console.log('filterKeyArray', filterKeyArray)
     whereArray.push(...filterKeyArray)
-
-    // console.log('filters length', filtersSanitized.length)
 
     // if there are multiple filters in an 'and' sequence
     // then `and` is inserted between them
@@ -68,21 +54,12 @@ export function filterSqlWhereBuilder(
 
     return filterKeyArray
   })
-
-  // console.log('whereArray', whereArray)
-
-  // console.log('sqlWhereArray', sqlWhereArray)
   return whereArray
 }
 
 export function filterReducer(state: FilterObject, action: any) {
-  // console.log(state, action)
-
   const oldState = { ...state }
-
   const newState = { ...oldState, ...action }
-
-  console.log('newState', newState)
 
   return newState
 }

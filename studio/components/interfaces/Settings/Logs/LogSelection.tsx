@@ -11,7 +11,7 @@ import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePos
 interface Props {
   log: LogData
   onClose: () => void
-  queryType: QueryType
+  queryType?: QueryType
 }
 
 /**
@@ -38,11 +38,9 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
     switch (queryType) {
       case 'api':
         return DatabaseApiSelectionHeaderRender(log)
-        break
 
       default:
         return null
-        break
     }
   }
 

@@ -2,33 +2,25 @@ import React, { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
-  Dropdown,
   Typography,
-  IconChevronDown,
   IconRefreshCw,
   IconX,
-  Toggle,
   IconSearch,
   IconClock,
   Popover,
-  IconLink,
   IconExternalLink,
-  IconCalendar,
-  IconEye,
-  Checkbox,
-  Form,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import { LogsFilter } from './Logs.filter'
-import { DatePicker } from 'components/ui/DatePicker'
 import DatePickers from './Logs.DatePickers'
 
 interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
+  defaultFromValue?: string
   templates?: any
   isLoading: boolean
   isCustomQuery: boolean
@@ -42,10 +34,6 @@ interface Props {
   dispatchWhereFilters: (x: any) => void
   whereFilters: any
   table: LogsTableName
-  te: { value: string; error: string }
-  ts: { value: string; error: string }
-  setTo: ({}) => void
-  setFrom: ({}) => void
 }
 
 dayjs.extend(utc)
@@ -69,10 +57,6 @@ const PreviewFilterPanel: FC<Props> = ({
   dispatchWhereFilters,
   whereFilters: filters,
   table,
-  // te: to,
-  // ts: from,
-  // setTo,
-  // setFrom,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -189,8 +173,7 @@ const PreviewFilterPanel: FC<Props> = ({
           onSubmit={(e) => {
             // prevent redirection
             e.preventDefault()
-            setSearch(localSearchValue)
-            handleSearch(localSearchValue)
+            handleSearch()
           }}
         >
           <Input
@@ -200,7 +183,7 @@ const PreviewFilterPanel: FC<Props> = ({
             onChange={(e) => setlocalSearchValue(e.target.value)}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setSearch(e.target.value)
-              handleSearch(localSearchValue)
+              handleSearch()
             }}
             icon={
               <div className="text-scale-900">
@@ -211,7 +194,7 @@ const PreviewFilterPanel: FC<Props> = ({
             actions={
               hasEdits && (
                 <button
-                  onClick={() => handleSearch(localSearchValue)}
+                  onClick={() => handleSearch()}
                   className="text-scale-1100 hover:text-scale-1200 mx-2"
                 >
                   {'↲'}
@@ -234,17 +217,14 @@ const PreviewFilterPanel: FC<Props> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {Object.values(FILTER_OPTIONS[table]).map((x) => {
-            // console.log('filter option', x)
-            return (
-              <LogsFilter
-                key={`${x.key}-filter`}
-                options={x}
-                dispatchFilters={dispatchWhereFilters}
-                filtersState={filters}
-              />
-            )
-          })}
+          {Object.values(FILTER_OPTIONS[table]).map((x) => (
+            <LogsFilter
+              key={`${x.key}-filter`}
+              options={x}
+              dispatchFilters={dispatchWhereFilters}
+              filtersState={filters}
+            />
+          ))}
         </div>
 
         <div className="flex flex-row">

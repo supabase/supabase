@@ -72,7 +72,7 @@ beforeEach(() => {
   useRouter.mockReset()
   useRouter.mockReturnValue(defaultRouterMock())
 })
-test('can display log data and metadata', async () => {
+test('can display log data', async () => {
   get.mockResolvedValue({
     result: [
       logDataFixture({

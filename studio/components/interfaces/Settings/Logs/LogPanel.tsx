@@ -11,7 +11,6 @@ import {
   IconSearch,
   IconClock,
   Popover,
-  IconPlay,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -30,8 +29,6 @@ interface Props {
   onSelectTemplate: (template: LogTemplate) => void
   isShowingEventChart: boolean
   onToggleEventChart: () => void
-
-  editorControls: React.ReactNode
 }
 
 dayjs.extend(utc)
@@ -53,8 +50,6 @@ const LogPanel: FC<Props> = ({
   onSelectTemplate,
   isShowingEventChart,
   onToggleEventChart,
-
-  editorControls,
 }) => {
   const [search, setSearch] = useState('')
   const [to, setTo] = useState({ value: '', error: '' })
@@ -266,7 +261,6 @@ const LogPanel: FC<Props> = ({
             </>
           )}
         </div>
-        {editorControls}
       </div>
     </div>
   )
