@@ -72,7 +72,7 @@ test('can display log data and metadata', async () => {
   get.mockResolvedValue({
     result: [
       logDataFixture({
-        event_message: 'some event happened',
+        id: 'some-event-happened-id',
         metadata: {
           my_key: 'something_value',
         },
@@ -80,7 +80,7 @@ test('can display log data and metadata', async () => {
     ],
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-  fireEvent.click(await screen.findByText(/happened/))
+  fireEvent.click(await screen.findByText(/some-event-happened-id/))
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
 })
@@ -91,7 +91,7 @@ test('Refresh page', async () => {
     return {
       result: [
         logDataFixture({
-          event_message: 'some event happened',
+          id: 'some-event-id',
           metadata: { my_key: 'something_value' },
         }),
       ],
@@ -99,23 +99,16 @@ test('Refresh page', async () => {
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
-  const row = await screen.findByText(/happened/)
-  get.mockResolvedValueOnce({ result: [] })
+  const row = await screen.findByText(/some-event-id/)
   fireEvent.click(row)
-  await waitFor(() => screen.getByText(/my_key/))
-
-  // simulate refresh
-  userEvent.click(screen.getByText(/Refresh/))
-  // when log line unmounts and it was focused, should close focus panel
-  await waitFor(() => screen.queryByText(/my_key/) === null, { timeout: 1000 })
-  await waitFor(() => screen.queryByText(/happened/) === null, { timeout: 1000 })
+  await screen.findByText(/my_key/)
 })
 
 test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {
     if (url.includes('something')) {
       return {
-        result: [logDataFixture({ event_message: 'some event happened' })],
+        result: [logDataFixture({ id: 'some-event-id' })],
       }
     }
     return { result: [] }
@@ -141,7 +134,7 @@ test('Search will trigger a log refresh', async () => {
     },
     { timeout: 1500 }
   )
-  await screen.findByText(/happened/)
+  await screen.findByText(/some-event-id/)
 })
 
 test('poll count for new messages', async () => {
@@ -220,7 +213,7 @@ test('load older btn will fetch older logs', async () => {
       return {}
     }
     return {
-      result: [logDataFixture({ event_message: 'first event' })],
+      result: [logDataFixture({ id: 'first event' })],
     }
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
@@ -229,7 +222,7 @@ test('load older btn will fetch older logs', async () => {
   await expect(screen.findByText('second event')).rejects.toThrow()
 
   get.mockResolvedValueOnce({
-    result: [logDataFixture({ event_message: 'second event' })],
+    result: [logDataFixture({ id: 'second event' })],
   })
   // should display first and second log
   userEvent.click(await screen.findByText('Load older'))
