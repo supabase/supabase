@@ -7,6 +7,10 @@ import DatabaseApiSelectionRender, {
   DatabaseApiSelectionHeaderRender,
 } from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
+import FunctionInvocationSelectionRender, {
+  FunctionInvocationHeaderRender,
+} from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 
 interface Props {
   log: LogData
@@ -28,6 +32,14 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
         return <DatabasePostgresSelectionRender log={log} />
         break
 
+      case 'fn_edge':
+        return <FunctionInvocationSelectionRender log={log} />
+        break
+
+      case 'functions':
+        return <FunctionLogsSelectionRender log={log} />
+        break
+
       default:
         return null
         break
@@ -38,6 +50,10 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
     switch (queryType) {
       case 'api':
         return DatabaseApiSelectionHeaderRender(log)
+
+        break
+      case 'fn_edge':
+        return FunctionInvocationHeaderRender(log)
 
       default:
         return null
