@@ -273,7 +273,7 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
                   increaseMonth,
                   prevMonthButtonDisabled,
                   nextMonthButtonDisabled,
-                }) => [
+                }) => (
                   <div className="flex items-center justify-between px-2 py-2">
                     <div className="flex items-center justify-between w-full">
                       <button
@@ -300,8 +300,8 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
                         <IconChevronRight size={16} strokeWidth={2} />
                       </button>
                     </div>
-                  </div>,
-                ]}
+                  </div>
+                )}
               />
               {/* <div className="flex items-center gap-2  pt-4">
                 <Toggle

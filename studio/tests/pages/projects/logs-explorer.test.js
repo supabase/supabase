@@ -72,23 +72,22 @@ beforeEach(() => {
   useRouter.mockReset()
   useRouter.mockReturnValue(defaultRouterMock())
 })
-test.todo('can display log data')
-// , async () => {
-//   get.mockResolvedValue({
-//     result: [
-//       logDataFixture({
-//         event_message: 'some event happened',
-//         metadata: {
-//           my_key: 'something_value',
-//         },
-//       }),
-//     ],
-//   })
-//   render(<LogsExplorerPage />)
-//   fireEvent.click(await screen.findByText(/happened/))
-//   await screen.findByText(/my_key/)
-//   await screen.findByText(/something_value/)
-// })
+test('can display log data', async () => {
+  get.mockResolvedValue({
+    result: [
+      logDataFixture({
+        id: 'some-event-happened',
+        metadata: {
+          my_key: 'something_value',
+        },
+      }),
+    ],
+  })
+  render(<LogsExplorerPage />)
+  fireEvent.click(await screen.findByText(/some-event-happened/))
+  await screen.findByText(/my_key/)
+  await screen.findByText(/something_value/)
+})
 
 test('q= query param will populate the query input', async () => {
   const router = defaultRouterMock()

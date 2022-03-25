@@ -120,7 +120,7 @@ export const LogsExplorerPage: NextPage = () => {
             </div>
           )}
 
-          <LogTable data={logData} isCustomQuery={true} />
+          <LogTable data={logData} />
 
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
