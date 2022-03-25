@@ -17,9 +17,11 @@ import {
   REGIONS,
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  PRICING_PLANS,
-  PRICING_PLANS_DEFAULT,
+  PRICING_TIER_LABELS,
+  PRICING_TIER_DEFAULT_KEY,
+  PRICING_TIER_FREE_KEY,
   DEFAULT_FREE_PROJECTS_LIMIT,
+  PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
 import { useStore, withAuth, useSubscriptionStats } from 'hooks'
 
@@ -63,7 +65,7 @@ export const Wizard = observer(() => {
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
-  const [dbPricingPlan, setDbPricingPlan] = useState(PRICING_PLANS_DEFAULT)
+  const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
@@ -84,7 +86,7 @@ export const Wizard = observer(() => {
     : undefined
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
-  const isSelectFreeTier = dbPricingPlan === PRICING_PLANS.FREE
+  const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
 
   const canCreateProject =
     currentOrg?.is_owner &&
@@ -96,7 +98,7 @@ export const Wizard = observer(() => {
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
     dbRegion != '' &&
-    dbPricingPlan != '' &&
+    dbPricingTierKey != '' &&
     (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
 
   const delayedCheckPasswordStrength = useRef(
@@ -158,7 +160,7 @@ export const Wizard = observer(() => {
   }
 
   function onDbPricingPlanChange(value: string) {
-    setDbPricingPlan(value)
+    setDbPricingTierKey(value)
   }
 
   async function checkPasswordStrength(value: any) {
@@ -176,7 +178,7 @@ export const Wizard = observer(() => {
       name: projectName,
       db_pass: dbPass,
       db_region: dbRegion,
-      db_pricing_plan: dbPricingPlan,
+      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
@@ -327,7 +329,7 @@ export const Wizard = observer(() => {
               <Listbox
                 label="Pricing Plan"
                 layout="horizontal"
-                value={dbPricingPlan}
+                value={dbPricingTierKey}
                 // @ts-ignore
                 onChange={onDbPricingPlanChange}
                 // @ts-ignore
@@ -340,9 +342,9 @@ export const Wizard = observer(() => {
                   </>
                 }
               >
-                {Object.entries(PRICING_PLANS).map(([k, v]) => (
-                  <Listbox.Option key={k} label={v} value={v}>
-                    {`${v}${v === PRICING_PLANS.PRO ? ' - $25/month' : ''}`}
+                {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => (
+                  <Listbox.Option key={k} label={v} value={k}>
+                    {`${v}${k === 'PRO' ? ' - $25/month' : ''}`}
                   </Listbox.Option>
                 ))}
               </Listbox>

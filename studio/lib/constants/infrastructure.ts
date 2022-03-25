@@ -20,13 +20,18 @@ export const REGIONS = {
 
 export const REGIONS_DEFAULT = REGIONS.EAST_US
 
-export const PRICING_PLANS = {
+export const PRICING_TIER_LABELS = {
   FREE: 'Free tier',
   PRO: 'Pro tier',
-  // PAYG: 'Pay as you go',
 }
 
-export const PRICING_PLANS_DEFAULT = PRICING_PLANS.FREE
+export const PRICING_TIER_PRODUCT_IDS = {
+  FREE: 'tier_free',
+  PRO: 'tier_pro',
+}
+
+export const PRICING_TIER_FREE_KEY = 'FREE'
+export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
 export const PROVIDERS = {
   AWS: {
