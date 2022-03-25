@@ -37,13 +37,17 @@ import FunctionLayout from '../interfaces/FunctionLayout'
  */
 export const LogPage: NextPage = () => {
   const router = useRouter()
-  const { ref, type } = router.query
+  const { ref, type, id } = router.query
 
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
 
   return (
     <FunctionLayout title={title}>
-      <LogsPreviewer projectRef={ref as string} queryType={'fn_edge'} />
+      <LogsPreviewer
+        projectRef={ref as string}
+        queryType={'fn_edge'}
+        override={{ key: 'metadata.function_id', value: id }}
+      />
     </FunctionLayout>
   )
 }
