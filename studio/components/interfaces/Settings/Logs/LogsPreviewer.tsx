@@ -25,6 +25,7 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 
 import { LOGS_TABLES } from './Logs.constants'
+import { Override } from './Logs.types'
 
 /**
  * Acts as a container component for the entire log display
@@ -40,15 +41,14 @@ import { LOGS_TABLES } from './Logs.constants'
 interface Props {
   projectRef: string
   queryType: QueryType
+  override: Override
 }
-export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType }) => {
+export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override }) => {
   const router = useRouter()
   const { s, te, ts } = router.query
   const [showChart, setShowChart] = useState(true)
 
   const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
-
-  // const table = queryType === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
 
   console.log('queryType', queryType)
   const table = LOGS_TABLES[queryType]
@@ -63,7 +63,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType }) => {
         ? `where REGEXP_CONTAINS(event_message, '${filterObj.search_query}')`
         : ''
     }
-    ${filterSqlWhereBuilder(whereFilters, table).join('\n')}`,
+    ${filterSqlWhereBuilder(whereFilters, table, override).join('\n')}`,
   })
 
   useEffect(() => {
