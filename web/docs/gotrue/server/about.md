@@ -255,6 +255,8 @@ Default Content (if template is unavailable):
   You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:
 </p>
 <p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>
+
+<!-- <p>Alternatively, enter the code: {{ .Token }}</p> -->
 ```
 
 `MAILER_TEMPLATES_CONFIRMATION` - `string`
@@ -269,6 +271,8 @@ Default Content (if template is unavailable):
 
 <p>Follow this link to confirm your user:</p>
 <p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>
+
+<!-- <p>Alternatively, enter the code: {{ .Token }}</p> -->
 ```
 
 `MAILER_TEMPLATES_RECOVERY` - `string`
@@ -283,6 +287,8 @@ Default Content (if template is unavailable):
 
 <p>Follow this link to reset the password for your user:</p>
 <p><a href="{{ .ConfirmationURL }}">Reset Password</a></p>
+
+<!-- <p>Alternatively, enter the code: {{ .Token }}</p> -->
 ```
 
 `MAILER_TEMPLATES_MAGIC_LINK` - `string`
@@ -297,6 +303,8 @@ Default Content (if template is unavailable):
 
 <p>Follow this link to login:</p>
 <p><a href="{{ .ConfirmationURL }}">Log In</a></p>
+
+<!-- <p>Alternatively, enter the code: {{ .Token }}</p> -->
 ```
 
 `MAILER_TEMPLATES_EMAIL_CHANGE` - `string`
@@ -311,6 +319,8 @@ Default Content (if template is unavailable):
 
 <p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
 <p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
+
+<!-- <p>Alternatively, enter the code: {{ .Token }}</p> -->
 ```
 
 ## Endpoints
