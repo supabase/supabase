@@ -9,6 +9,7 @@ import {
   IconClock,
   Popover,
   IconExternalLink,
+  Toggle
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -53,6 +54,8 @@ const PreviewFilterPanel: FC<Props> = ({
   dispatchWhereFilters,
   whereFilters: filters,
   table,
+  isShowingEventChart,
+  onToggleEventChart
 }) => {
   const [search, setSearch] = useState('')
 
@@ -268,12 +271,10 @@ const PreviewFilterPanel: FC<Props> = ({
             />
           )}
         </div> */}
-        {/* {!isCustomQuery && (
           <div className="flex items-center space-x-2">
             <p className="text-xs">Show event chart</p>
             <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
           </div>
-        )} */}
 
         {!isCustomQuery && (
           <>
