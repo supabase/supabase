@@ -22,7 +22,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
 
         <div
-          className="text-wrap font-mono text-scale-1200 mt-2"
+          className="text-xs text-wrap font-mono text-scale-1200 mt-2"
           dangerouslySetInnerHTML={{
             __html: log.event_message,
           }}

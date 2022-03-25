@@ -24,6 +24,8 @@ import dayjs from 'dayjs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 
+import { LOGS_TABLES } from './Logs.constants'
+
 /**
  * Acts as a container component for the entire log display
  *
@@ -46,7 +48,10 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType }) => {
 
   const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
 
-  const table = queryType === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
+  // const table = queryType === 'api' ? LogsTableName.EDGE : LogsTableName.POSTGRES
+
+  console.log('queryType', queryType)
+  const table = LOGS_TABLES[queryType]
 
   const [
     { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
@@ -60,7 +65,6 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType }) => {
     }
     ${filterSqlWhereBuilder(whereFilters, table).join('\n')}`,
   })
-
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
@@ -125,11 +129,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType }) => {
   }
 
   return (
-    <div
-      className="h-full flex flex-col flex-grow px-5 md:px-5 xl:px-16 py-8 
-        space-y-4
-      "
-    >
+    <div className="h-full flex flex-col flex-grow space-y-4">
       <PreviewFilterPanel
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}

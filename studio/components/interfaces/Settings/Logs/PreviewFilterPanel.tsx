@@ -206,14 +206,15 @@ const PreviewFilterPanel: FC<Props> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {Object.values(FILTER_OPTIONS[table]).map((x) => (
-            <LogsFilter
-              key={`${x.key}-filter`}
-              options={x}
-              dispatchFilters={dispatchWhereFilters}
-              filtersState={filters}
-            />
-          ))}
+          {FILTER_OPTIONS[table] &&
+            Object.values(FILTER_OPTIONS[table]).map((x) => (
+              <LogsFilter
+                key={`${x.key}-filter`}
+                options={x}
+                dispatchFilters={dispatchWhereFilters}
+                filtersState={filters}
+              />
+            ))}
         </div>
 
         <div className="flex flex-row">
