@@ -12,7 +12,6 @@ import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRende
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 
 interface Props {
-  isCustomQuery: boolean
   data?: Array<LogData | Object>
   queryType?: QueryType
 }

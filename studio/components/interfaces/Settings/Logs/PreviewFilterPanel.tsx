@@ -60,9 +60,8 @@ const PreviewFilterPanel: FC<Props> = ({
   const [from, setFrom] = useState({ value: '', error: '' })
   const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
 
-  const [localSearchValue, setlocalSearchValue] = useState(search)
 
-  const hasEdits = localSearchValue !== search
+  const hasEdits = search !== defaultSearchValue
 
   // Sync local state with provided default value
   useEffect(() => {
@@ -169,7 +168,7 @@ const PreviewFilterPanel: FC<Props> = ({
             className="w-60"
             size="tiny"
             placeholder="Search events"
-            onChange={(e) => setlocalSearchValue(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setSearch(e.target.value)
               handleSearch()
@@ -179,7 +178,7 @@ const PreviewFilterPanel: FC<Props> = ({
                 <IconSearch size={14} />
               </div>
             }
-            value={localSearchValue}
+            value={search}
             actions={
               hasEdits && (
                 <button
@@ -217,7 +216,7 @@ const PreviewFilterPanel: FC<Props> = ({
             ))}
         </div>
 
-        <div className="flex flex-row">
+        {/* <div className="flex flex-row">
           <Popover
             side="bottom"
             align="end"
@@ -268,7 +267,7 @@ const PreviewFilterPanel: FC<Props> = ({
               onClick={handleReset}
             />
           )}
-        </div>
+        </div> */}
         {/* {!isCustomQuery && (
           <div className="flex items-center space-x-2">
             <p className="text-xs">Show event chart</p>

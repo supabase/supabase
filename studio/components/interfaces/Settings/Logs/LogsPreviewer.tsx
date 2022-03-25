@@ -137,7 +137,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         isLoading={isLoading}
         newCount={newCount}
         templates={TEMPLATES.filter(
-          (template) => template.for?.includes(queryType) && template.mode === 'simple'
+          (template) => queryType && template.for?.includes(queryType) && template.mode === 'simple'
         )}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
@@ -182,7 +182,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
           </div>
         )}
 
-        <LogTable data={logData} isCustomQuery={false} queryType={queryType} />
+        <LogTable data={logData} queryType={queryType} />
         <div className="p-2">
           <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
             Load older
