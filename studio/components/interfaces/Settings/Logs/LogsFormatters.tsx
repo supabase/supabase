@@ -140,6 +140,17 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
 
+    case 'warning':
+      return (
+        <div className="flex items-center h-full gap-1">
+          <div className=" p-0.5 rounded !text-amber-900">
+            <IconAlertCircle size={14} strokeWidth={2} />
+          </div>
+          <span className="!text-amber-900 !block titlecase">{value}</span>
+        </div>
+      )
+      break
+
     // All other responses
     default:
       return (

@@ -3,9 +3,6 @@ import { jsonSyntaxHighlight, ResponseCodeFormatter, SeverityFormatter } from '.
 
 const FunctionLogsSelectionRender = ({ log }: any) => {
   const request = log?.request
-  const response = log?.response
-  const requestUrl = request?.url
-  const host = request?.host
 
   const DetailedRow = ({
     label,
@@ -30,7 +27,6 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
     <>
       <div className="px-5">
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
-
         <div
           className="text-xs text-wrap font-mono text-scale-1200 mt-2"
           dangerouslySetInnerHTML={{

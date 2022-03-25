@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 
 import FunctionsLayout from './interfaces/FunctionsLayout'
 import {
@@ -9,11 +9,18 @@ import {
   IconGlobe,
   IconSearch,
   Input,
+  Loading,
 } from '@supabase/ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Table from 'components/to-be-cleaned/Table'
 import { memoryUsage } from 'process'
 import FunctionsListItem from './interfaces/FunctionsListItem'
+import { useRouter } from 'next/router'
+
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProjectFunctionsStore } from 'stores/projectFunctionsStore'
+import { toJS } from 'mobx'
 
 const EmptyFunctions = () => {
   return (
@@ -103,54 +110,67 @@ const EmptyFunctions = () => {
   )
 }
 
-const FunctionsList = () => {
-  const PageState = {
-    functions: [
-      {
-        name: 'hello-world',
-        id: 1,
-        runtime: 'Node14',
-        memory: 256,
-        created_at: 1646524256,
-      },
-      {
-        name: 'charge',
-        id: 2,
-        runtime: 'Node14',
-        memory: 256,
-        created_at: 1646524256,
-      },
-      {
-        name: 'projects',
-        id: 3,
-        runtime: 'Node14',
-        memory: 512,
-        created_at: 1646524256,
-      },
-    ],
-  }
+interface Function {
+  id: string
+  slug: string
+  name: string
+  version: 9
+  status: 'ACTIVE' | 'INACTIVE' | 'THROTTLE'
+  created_at: number
+  updated_at: number
+}
+
+const FunctionsList = ({ functions }: { functions: Function[] }) => {
+  // const PageState = {
+  //   functions: [
+  //     {
+  //       name: 'hello-world',
+  //       id: 1,
+  //       runtime: 'Node14',
+  //       memory: 256,
+  //       created_at: 1646524256,
+  //     },
+  //     {
+  //       name: 'charge',
+  //       id: 2,
+  //       runtime: 'Node14',
+  //       memory: 256,
+  //       created_at: 1646524256,
+  //     },
+  //     {
+  //       name: 'projects',
+  //       id: 3,
+  //       runtime: 'Node14',
+  //       memory: 512,
+  //       created_at: 1646524256,
+  //     },
+  //   ],
+  // }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <span className="text-sm text-scale-900">2 functions deployed</span>
+        <span className="text-sm text-scale-900">{`${functions.length} function${
+          functions.length > 1 ? 's' : ''
+        } deployed`}</span>
         <Input icon={<IconSearch size={14} />} size="tiny" />
       </div>
       <div>
         <Table
           head={
             <>
-              <Table.th>Email</Table.th>
+              <Table.th>Name</Table.th>
               <Table.th>Trigger</Table.th>
+              <Table.th>Status</Table.th>
               <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-              <Table.th className="hidden xl:table-cell">Runtime</Table.th>
-              <Table.th className="hidden lg:table-cell">Memory</Table.th>
+              <Table.th className="hidden 2xl:table-cell">Last updated</Table.th>
+              <Table.th className="hidden 2xl:table-cell">Version</Table.th>
             </>
           }
           body={
             <>
-              {PageState.functions.length > 0 &&
-                PageState.functions.map((x: any) => <FunctionsListItem key={x.id} _function={x} />)}
+              {functions.length > 0 &&
+                functions.map((item: any) => <FunctionsListItem key={item.id} function={item} />)}
             </>
           }
         />
@@ -160,7 +180,22 @@ const FunctionsList = () => {
 }
 
 const PageLayout = () => {
+  const router = useRouter()
+  const { ui, functions } = useStore()
+
   const [pageState, setPageState] = useState('list')
+
+  const project = ui.selectedProject
+
+  useEffect(() => {
+    if (project && project.status === PROJECT_STATUS.INACTIVE) {
+      post(`${API_URL}/projects/${ui.selectedProject}/restore`, {})
+    }
+  }, [project])
+
+  useEffect(() => {
+    functions.load()
+  }, [ui.selectedProject])
 
   const Selection = () => (
     <div>
@@ -168,6 +203,13 @@ const PageLayout = () => {
       <Button onClick={() => setPageState('list')}>list</Button>
     </div>
   )
+
+  if (functions.isLoading)
+    return (
+      <FunctionsLayout>
+        <Loading active={true}>loading</Loading>
+      </FunctionsLayout>
+    )
 
   if (pageState === 'empty') {
     return (
@@ -179,7 +221,7 @@ const PageLayout = () => {
   } else {
     return (
       <FunctionsLayout>
-        <FunctionsList />
+        <FunctionsList functions={functions.list()} />
         <Selection />
       </FunctionsLayout>
     )
