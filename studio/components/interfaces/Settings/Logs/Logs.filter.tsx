@@ -56,7 +56,7 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
         align="end"
         size="medium"
         onOpenChange={() => setOpen(!open)}
-        overlay={[
+        overlay={
           <>
             <Form
               initialValues={initialValues()}
@@ -121,8 +121,8 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
                 </>
               )}
             </Form>
-          </>,
-        ]}
+          </>
+        }
         portalled
         showClose
         side="bottom"
