@@ -9,10 +9,9 @@ import React from 'react'
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <BaseLayout>
-      <div className="h-full flex flex-col flex-grow">
+      <div className="h-full flex flex-col flex-grow py-10">
         <div
           className="
-            py-10
             w-full mx-auto
 
             transition-all

@@ -200,7 +200,7 @@ export function jsonSyntaxHighlight(json: string) {
   )
 
   const jsonWithLineWraps = newJson.split(`\n`).map((x) => {
-    return `<span class="line">${x}</span>`
+    return `<span class="line text-xs">${x}</span>`
   })
 
   return jsonWithLineWraps.join('\n')

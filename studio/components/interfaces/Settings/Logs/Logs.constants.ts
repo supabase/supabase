@@ -188,13 +188,91 @@ cross join unnest(m.response) as response
 ${where}
 LIMIT 100
 `
+      break
+
+    case 'postgres_logs':
+      return `SELECT postgres_logs.timestamp, id, event_message, metadata, metadataParsed.error_severity FROM ${table} 
+cross join unnest(metadata) as m 
+cross join unnest(m.parsed) as metadataParsed 
+${where} 
+LIMIT 100
+`
+      break
+
+    case 'function_logs':
+      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level, metadata from ${table}
+cross join unnest(metadata) as metadata
+${where}
+LIMIT 100
+  `
+      break
+
+    case 'function_edge_logs':
+      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.time, m.version from ${table} 
+cross join unnest(metadata) as m
+cross join unnest(m.response) as response
+cross join unnest(m.request) as request
+${where}
+LIMIT 100
+`
+
+    default:
+      return `no sql!! `
+      break
+  }
+}
+
+export const SQL_FILTER_TEMPLATES: any = {
+  postgres_logs: {
+    'severity.error': `metadataParsed.error_severity = 'ERROR'`,
+    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+  },
+  edge_logs: {
+    'status_code.error': `response.status_code between 500 and 599`,
+    'status_code.success': `response.status_code between 200 and 299`,
+    'status_code.warning': `response.status_code between 400 and 499`,
+
+    'product.database': `request.path LIKE '/rest/%'`,
+    'product.storage': `request.path LIKE '/storage/%'`,
+    'product.auth': `request.path LIKE '/auth/%'`,
+    'product.realtime': `request.path LIKE '/realtime/%'`,
+
+    'method.get': `request.method = 'GET'`,
+    'method.post': `request.method = 'POST'`,
+    'method.del': `request.method = 'DEL'`,
+    'method.options': `request.method = 'OPTIONS'`,
+  },
+  function_edge_logs: {
+    'status_code.error': `response.status_code between 500 and 599`,
+    'status_code.success': `response.status_code between 200 and 299`,
+    'status_code.warning': `response.status_code between 400 and 499`,
+  },
+}
+
+// export const genDefaultQuery = (table: string, where: string = ''): string => `SELECT
+//   id, timestamp, event_message, metadata
+// FROM
+//   ${table}${where ? ' WHERE\n  ' + where : ''}
+// LIMIT 100
+// `
+// export const cleanQuery = (str: string) => str.replaceAll(/\n/g, ' ')
 export const cleanQuery = (str: string) => str.replace(/\n/g, ' ')
 // .replace(/\n.*\-\-.*(\n)?$?/, "")
 
 export enum LogsTableName {
   EDGE = 'edge_logs',
   POSTGRES = 'postgres_logs',
+  FUNCTIONS = 'function_logs',
+  FN_EDGE = 'function_edge_logs',
 }
+
+export const LOGS_TABLES = {
+  api: LogsTableName.EDGE,
+  database: LogsTableName.POSTGRES,
+  functions: LogsTableName.FUNCTIONS,
+  fn_edge: LogsTableName.FN_EDGE,
+}
+
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {
@@ -209,7 +287,6 @@ export const genQueryParams = (params: { [k: string]: string }) => {
   return qs
 }
 
-
 interface Filter {
   label: string
   key: string
@@ -220,7 +297,7 @@ interface Filter {
   }[]
 }
 type FilterOptions = {
-  [table: string] : {
+  [table: string]: {
     [filterName: string]: Filter
   }
 }
@@ -313,6 +390,30 @@ export const FILTER_OPTIONS: FilterOptions = {
           key: 'post',
           label: 'POST',
           description: '',
+        },
+      ],
+    },
+  },
+  // function_edge_logs
+  function_edge_logs: {
+    status_code: {
+      label: 'Status code',
+      key: 'status_code',
+      options: [
+        {
+          key: 'error',
+          label: 'Error',
+          description: '500 error codes',
+        },
+        {
+          key: 'success',
+          label: 'Success',
+          description: '200 codes',
+        },
+        {
+          key: 'warning',
+          label: 'Warning',
+          description: '400 codes',
         },
       ],
     },
