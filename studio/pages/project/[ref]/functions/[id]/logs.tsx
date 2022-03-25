@@ -26,7 +26,7 @@ import React from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { SettingsLayout } from 'components/layouts/'
 import { LOG_TYPE_LABEL_MAPPING, QueryType } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
@@ -37,13 +37,21 @@ import FunctionLayout from '../interfaces/FunctionLayout'
  */
 export const LogPage: NextPage = () => {
   const router = useRouter()
-  const { ref, type } = router.query
+  const { ref, type, id } = router.query
+
+  const { functions } = useStore()
+
+  console.log('id', id)
 
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
 
   return (
     <FunctionLayout title={title}>
-      <LogsPreviewer projectRef={ref as string} queryType={'functions'} />
+      <LogsPreviewer
+        projectRef={ref as string}
+        queryType={'functions'}
+        override={{ key: 'metadata.function_id', value: id }}
+      />
     </FunctionLayout>
   )
 }

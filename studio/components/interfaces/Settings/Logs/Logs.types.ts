@@ -21,8 +21,8 @@ export interface LogData {
   id: string
   timestamp: number
   event_message: string
-  metadata: Metadata,
-  [other: string]: unknown;
+  metadata: Metadata
+  [other: string]: unknown
 }
 
 export interface LogTemplate {
@@ -63,4 +63,9 @@ export interface FilterObject {
   s?: string
   // `te` for timestamp start value.
   te?: string
+}
+
+export type Override = {
+  key: string
+  value: string | string[] | undefined
 }

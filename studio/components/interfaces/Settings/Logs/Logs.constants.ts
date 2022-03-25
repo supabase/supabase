@@ -177,7 +177,11 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-export const genDefaultQuery = (table: LogsTableName, where: string | undefined) => {
+export const genDefaultQuery = (
+  table: LogsTableName,
+  where: string | undefined,
+  idFilter?: string
+) => {
   switch (table) {
     case 'edge_logs':
       return `SELECT id, timestamp, event_message, metadata, request, response, request.method, request.path, response.status_code
