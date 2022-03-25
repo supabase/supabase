@@ -92,7 +92,7 @@ const Templates: FC<any> = ({ project }) => {
           <LongTextField
             showInlineError
             name="MAILER_TEMPLATES_CONFIRMATION_CONTENT"
-            rows={6}
+            rows={7}
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
@@ -121,7 +121,7 @@ const Templates: FC<any> = ({ project }) => {
           <LongTextField
             showInlineError
             name="MAILER_TEMPLATES_RECOVERY_CONTENT"
-            rows={6}
+            rows={7}
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
@@ -151,7 +151,7 @@ const Templates: FC<any> = ({ project }) => {
             <LongTextField
               showInlineError
               name="MAILER_TEMPLATES_MAGIC_LINK_CONTENT"
-              rows={6}
+              rows={7}
               readOnly={!IS_PLATFORM}
               inputClassName="font-mono"
               errorMessage="Please enter an email body."
@@ -181,7 +181,7 @@ const Templates: FC<any> = ({ project }) => {
           <LongTextField
             showInlineError
             name="MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT"
-            rows={6}
+            rows={7}
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
@@ -210,7 +210,7 @@ const Templates: FC<any> = ({ project }) => {
           <LongTextField
             showInlineError
             name="MAILER_TEMPLATES_INVITE_CONTENT"
-            rows={6}
+            rows={7}
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
