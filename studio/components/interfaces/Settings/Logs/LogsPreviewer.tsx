@@ -81,18 +81,6 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
     }
   }, [s, te, ts])
 
-  useEffect(() => {
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        q: undefined,
-        s: filters.search_query || '',
-        ts: params.timestamp_start,
-        te: params.timestamp_end,
-      },
-    })
-  }, [params.timestamp_end, params.timestamp_start, filters.search_query])
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
@@ -116,17 +104,27 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
   }
 
   const handleSearch: LogSearchCallback = ({ query, to, from, fromMicro, toMicro }) => {
-    let toValue
+    let toValue, fromValue
     if (to || toMicro) {
       toValue = toMicro ? toMicro : dayjs(to).valueOf() * 1000
 
       setTo(String(toValue))
     }
     if (from || fromMicro) {
-      const fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
+      fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
       setFrom(String(fromValue))
     }
     setFilters((prev) => ({ ...prev, search_query: query || '' }))
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        s: query || '',
+        ts: fromValue,
+        te: toValue,
+      },
+    })
   }
 
   return (
@@ -162,15 +160,15 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         table={table}
       />
       {showChart && (
-          <div>
-            <LogEventChart
-              data={!isLoading ? logData : undefined}
-              onBarClick={(timestampMicro) => {
-                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
-              }}
-            />
-          </div>
-        )}
+        <div>
+          <LogEventChart
+            data={!isLoading ? logData : undefined}
+            onBarClick={(timestampMicro) => {
+              handleSearch({ query: filters.search_query, toMicro: timestampMicro })
+            }}
+          />
+        </div>
+      )}
       <div className="flex flex-col flex-grow relative">
         {isLoading && (
           <div
