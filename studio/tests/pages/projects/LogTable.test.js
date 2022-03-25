@@ -1,5 +1,5 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import { render, fireEvent, waitFor, screen } from '@testing-library/react'
+import { render,  waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 test('can display log data', async () => {
   render(
