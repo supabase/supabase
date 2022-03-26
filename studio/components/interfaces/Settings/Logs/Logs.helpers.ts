@@ -4,7 +4,7 @@ import { FilterObject, Override } from './Logs.types'
 export function filterSqlWhereBuilder(
   filters: FilterObject | any,
   table: LogsTableName,
-  override: Override
+  override?: Override
 ) {
   let count = 0
 
@@ -21,7 +21,7 @@ export function filterSqlWhereBuilder(
 
   if (filtersSanitized.length === 0 && !hasOverride) return whereArray
 
-  if (override.key && override) {
+  if (hasOverride) {
     console.log('override', override)
     count = +1
     const sql = `${override.key}='${override.value}'`
