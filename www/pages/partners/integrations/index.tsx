@@ -116,24 +116,29 @@ function IntegrationPartnersPage(props: Props) {
       <DefaultLayout>
         <SectionContainer className="space-y-12">
           {/* Horizontal link menu */}
-          <div className="flex justify-between w-full">
-            <Typography.Title level={3}>Partners</Typography.Title>
-            <div className="flex space-x-6">
+          <div className="flex flex-col items-start justify-between w-full space-y-3 md:space-y-0 md:flex-row md:items-center">
+            <Typography.Title level={3} className="mb-0">
+              Partners
+            </Typography.Title>
+
+            <div className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6">
               <Link href={`/partners/integrations`}>
                 <a>
-                  <Typography.Title level={5}>INTEGRATIONS</Typography.Title>
+                  <Typography.Title level={5} className="mb-0">
+                    INTEGRATIONS
+                  </Typography.Title>
                 </a>
               </Link>
               <Link href={`/partners/experts`}>
                 <a>
-                  <Typography.Title level={5}>
+                  <Typography.Title level={5} className="mb-0">
                     <span className="text-brand-700 hover:text-brand-800">EXPERTS</span>
                   </Typography.Title>
                 </a>
               </Link>
               <Link href={`/partners/integrations#become-a-partner`}>
                 <a className="text-brand-700 hover:text-brand-800">
-                  <Typography.Title level={5}>
+                  <Typography.Title level={5} className="mb-0">
                     <span className="flex text-brand-700 hover:text-brand-800">
                       BECOME A PARTNER <IconArrowRight />
                     </span>
@@ -145,7 +150,7 @@ function IntegrationPartnersPage(props: Props) {
           {/* Title */}
           <Typography.Title className="text-center">Find an Integration</Typography.Title>
           {/* Search Bar */}
-          <div className="w-full md:flex md:space-x-6">
+          <div className="w-full space-y-3 md:space-y-0 md:flex md:space-x-6">
             <Input
               icon={<IconSearch />}
               placeholder="Search all partners"
