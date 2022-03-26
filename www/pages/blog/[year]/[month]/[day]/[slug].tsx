@@ -93,8 +93,8 @@ function BlogPostPage(props: any) {
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
-    // @ts-ignore
     author.push(
+      // @ts-ignore
       authors.find((authors: string) => {
         // @ts-ignore
         return authors.author_id === authorArray[i]
