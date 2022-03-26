@@ -67,6 +67,10 @@ const StorageExplorer = observer(({ bucket }) => {
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [isSearching, setIsSearching] = useState(false)
+
+  // [TODO JOSHEN FOR INFINITE SCROLLING]
+  // Probably need a useEffect for this to use fetchFolderContents and fetchMoreFolderContents in store
+  // instead of doing a client side filtering in FileExplorerColumn, pending Alaister to update js library
   const [itemSearchString, setItemSearchString] = useState('')
 
   const previewPaneWidth = 450
