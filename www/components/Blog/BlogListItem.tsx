@@ -51,19 +51,20 @@ const BlogListItem = ({ post }: Props) => {
               {post.date && <p className="text-xs text-scale-1100">{post.date}</p>}
               <p className="text-base text-scale-1100 max-w-sm">{post.description}</p>
             </div>
-            {author.map((author: any) => {
-              return (
-                <div className="flex items-center">
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10 mr-4" />
-                  )}
-                  <div className="flex flex-col">
-                    <span className="text-sm m-0 text-scale-1200">{author.author}</span>
-                    <span className="text-xs m-0 text-scale-900">{author.position}</span>
+            <div className="flex items-center -space-x-2">
+              {author.map((author: any) => {
+                return (
+                  <div>
+                    {author.author_image_url && (
+                      <img
+                        src={author.author_image_url}
+                        className="rounded-full w-10 ring-2 ring-white dark:ring-scale-200"
+                      />
+                    )}
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </a>
