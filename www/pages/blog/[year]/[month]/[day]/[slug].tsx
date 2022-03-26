@@ -88,8 +88,19 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   // @ts-ignore
-  const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
+  const authorArray = props.blog.author.split(',')
+
+  const author = []
+  for (let i = 0; i < authorArray.length; i++) {
+    author.push(
+      // @ts-ignore
+      authors.find((authors: string) => {
+        // @ts-ignore
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
 
   const { basePath } = useRouter()
 
@@ -102,22 +113,17 @@ function BlogPostPage(props: any) {
     return (
       <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
-          <Card className="cursor-pointer" hoverable>
-            <Space direction="vertical">
+          <div className="cursor-pointer border border-scale-500 p-6 transition rounded hover:bg-scale-100 dark:hover:bg-scale-300">
+            <div className="space-y-4">
               <div>
-                <p>{label}</p>
+                <p className="text-sm text-scale-900">{label}</p>
               </div>
               <div>
-                <h4>{post.title}</h4>
-                <p>{post.date}</p>
+                <h4 className="text-lg text-scale-1200">{post.title}</h4>
+                <p className="small">{post.date}</p>
               </div>
-              <div>
-                {post.tags.map((tag: string) => {
-                  return <Badge key={`category-badge-${tag}`}>{tag}</Badge>
-                })}
-              </div>
-            </Space>
-          </Card>
+            </div>
+          </div>
         </div>
       </Link>
     )
@@ -191,7 +197,7 @@ function BlogPostPage(props: any) {
               <p>
                 <a
                   href={'/blog'}
-                  className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                  className="transition text-sm text-scale-900 hover:text-scale-1200 cursor-pointer flex items-center"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -203,44 +209,52 @@ function BlogPostPage(props: any) {
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
                   <p className="text-brand-900">Blog post</p>
-                  <h1 className="text-5xl">{props.blog.title}</h1>
-                  <div className="flex space-x-3 text-sm">
+                  <h1 className="h1">{props.blog.title}</h1>
+                  <div className="text-scale-900 flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
-                  {author && (
-                    <div className="mt-6 mb-8 lg:mb-0 w-max">
-                      <Link href={author.author_url}>
-                        <a className="cursor-pointer">
-                          <div className="flex items-center">
-                            {author.author_image_url && (
-                              <div className="w-10">
-                                <Image
-                                  src={author.author_image_url}
-                                  className="rounded-full border dark:border-dark"
-                                  width="100%"
-                                  height="100%"
-                                  layout="responsive"
-                                />
+                  <div className="flex">
+                    {author.map((author: any) => {
+                      return (
+                        <div className="mt-6 mb-8 mr-4 lg:mb-0 w-max">
+                          <Link href={author.author_url}>
+                            <a className="cursor-pointer">
+                              <div className="flex gap-3 items-center">
+                                {author.author_image_url && (
+                                  <div className="w-10">
+                                    <Image
+                                      src={author.author_image_url}
+                                      className="rounded-full border dark:border-dark"
+                                      width="100%"
+                                      height="100%"
+                                      layout="responsive"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-scale-1200 mb-0">
+                                    {author.author}
+                                  </span>
+                                  <span className="text-xs mb-0 text-scale-900">
+                                    {author.position}
+                                  </span>
+                                </div>
                               </div>
-                            )}
-                            <div className="flex flex-col">
-                              <span className="text-xs mb-0">{author.author}</span>
-                              <span className="text-xs mb-0 text-scale-900">{author.position}</span>
-                            </div>
-                          </div>
-                        </a>
-                      </Link>
-                    </div>
-                  )}
+                            </a>
+                          </Link>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <div className="relative overflow-auto w-full h-96 mb-8 border dark:border-gray-600">
+                    <div className="relative overflow-auto w-full h-96 mb-8 border rounded">
                       <Image
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
@@ -270,7 +284,7 @@ function BlogPostPage(props: any) {
                           >
                             <path
                               d="m154.729 400c185.669 0 287.205-153.876 287.205-287.312 0-4.37-.089-8.72-.286-13.052a205.304 205.304 0 0 0 50.352-52.29c-18.087 8.044-37.55 13.458-57.968 15.899 20.841-12.501 36.84-32.278 44.389-55.852a202.42 202.42 0 0 1 -64.098 24.511c-18.42-19.628-44.644-31.904-73.682-31.904-55.744 0-100.948 45.222-100.948 100.965 0 7.925.887 15.631 2.619 23.025-83.895-4.223-158.287-44.405-208.074-105.504a100.739 100.739 0 0 0 -13.668 50.754c0 35.034 17.82 65.961 44.92 84.055a100.172 100.172 0 0 1 -45.716-12.63c-.015.424-.015.837-.015 1.29 0 48.903 34.794 89.734 80.982 98.986a101.036 101.036 0 0 1 -26.617 3.553c-6.493 0-12.821-.639-18.971-1.82 12.851 40.122 50.115 69.319 94.296 70.135-34.549 27.089-78.07 43.224-125.371 43.224a204.9 204.9 0 0 1 -24.078-1.399c44.674 28.645 97.72 45.359 154.734 45.359"
-                              fill-rule="nonzero"
+                              fillRule="nonzero"
                             />
                           </svg>
                         </a>
@@ -313,14 +327,16 @@ function BlogPostPage(props: any) {
                       <div className="mb-4">
                         <p className="text-sm text-scale-1200">Related articles</p>
                       </div>
-                      <div className="space-y-0">
+                      <div className="space-y-3">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                             <div>
                               <p className="cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                  <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  <span className="text-sm hover:text-gray-900 dark:hover:text-white">
+                                <div className="flex gap-2">
+                                  <div className="text-scale-900">
+                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  </div>
+                                  <span className="text-sm text-scale-1100 hover:text-gray-1200">
                                     {post.title}
                                   </span>
                                 </div>
@@ -329,11 +345,13 @@ function BlogPostPage(props: any) {
                             </div>
                           </Link>
                         ))}
-                        <Link href={`/blog`} as={`/blog`}>
-                          <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
-                            View all posts
-                          </a>
-                        </Link>
+                        <div className="mt-2">
+                          <Link href={`/blog`} passHref>
+                            <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
+                              View all posts
+                            </a>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>

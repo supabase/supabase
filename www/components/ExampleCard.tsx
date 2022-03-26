@@ -21,7 +21,7 @@ function ExampleCard(props: any) {
           <p className="p text-sm">{props.description}</p>
           <div>
             <img src={props.author_img} className="inline w-6 rounded-full border-scale-500" />
-            <span className="text-sm ml-2">{props.author}</span>
+            <span className="text-sm ml-2 text-scale-1200">{props.author}</span>
           </div>
         </div>
       </div>
