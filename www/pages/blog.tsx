@@ -132,7 +132,18 @@ function Blog(props: any) {
 
 function FeaturedThumb(blog: PostTypes) {
   // @ts-ignore
-  const author = blog.author ? authors[blog.author] : authors['supabase']
+  const authorArray = blog.author.split(',')
+
+  const author = []
+  for (let i = 0; i < authorArray.length; i++) {
+    // @ts-ignore
+    author.push(
+      authors.find((authors: string) => {
+        // @ts-ignore
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
 
   return (
     <div key={blog.slug} className="cursor-pointer w-full">
@@ -157,24 +168,26 @@ function FeaturedThumb(blog: PostTypes) {
               <p className="p text-xl">{blog.description}</p>
             </div>
 
-            {author && (
-              <div className="flex space-x-3 items-center">
-                {author.author_image_url && (
-                  <div className="relative overflow-auto w-10 h-10">
-                    <Image
-                      src={author.author_image_url}
-                      className="rounded-full"
-                      layout="fill"
-                      objectFit="cover"
-                    />
+            {author.map((author: any) => {
+              return (
+                <div className="flex space-x-3 items-center">
+                  {author.author_image_url && (
+                    <div className="relative overflow-auto w-10 h-10">
+                      <Image
+                        src={author.author_image_url}
+                        className="rounded-full"
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <span className="m-0 text-sm text-scale-1200">{author.author}</span>
+                    <span className="m-0 text-xs text-scale-900">{author.position}</span>
                   </div>
-                )}
-                <div className="flex flex-col">
-                  <span className="m-0 text-sm text-scale-1200">{author.author}</span>
-                  <span className="m-0 text-xs text-scale-900">{author.position}</span>
                 </div>
-              </div>
-            )}
+              )
+            })}
           </div>
         </a>
       </a>

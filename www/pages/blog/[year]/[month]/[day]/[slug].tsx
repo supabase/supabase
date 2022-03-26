@@ -88,8 +88,19 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   // @ts-ignore
-  const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
+  const authorArray = props.blog.author.split(',')
+
+  const author = []
+  for (let i = 0; i < authorArray.length; i++) {
+    // @ts-ignore
+    author.push(
+      authors.find((authors: string) => {
+        // @ts-ignore
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
 
   const { basePath } = useRouter()
 
@@ -204,31 +215,39 @@ function BlogPostPage(props: any) {
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
-                  {author && (
-                    <div className="mt-6 mb-8 lg:mb-0 w-max">
-                      <Link href={author.author_url}>
-                        <a className="cursor-pointer">
-                          <div className="flex gap-3 items-center">
-                            {author.author_image_url && (
-                              <div className="w-10">
-                                <Image
-                                  src={author.author_image_url}
-                                  className="rounded-full border dark:border-dark"
-                                  width="100%"
-                                  height="100%"
-                                  layout="responsive"
-                                />
+                  <div className="flex">
+                    {author.map((author: any) => {
+                      return (
+                        <div className="mt-6 mb-8 mr-4 lg:mb-0 w-max">
+                          <Link href={author.author_url}>
+                            <a className="cursor-pointer">
+                              <div className="flex gap-3 items-center">
+                                {author.author_image_url && (
+                                  <div className="w-10">
+                                    <Image
+                                      src={author.author_image_url}
+                                      className="rounded-full border dark:border-dark"
+                                      width="100%"
+                                      height="100%"
+                                      layout="responsive"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-scale-1200 mb-0">
+                                    {author.author}
+                                  </span>
+                                  <span className="text-xs mb-0 text-scale-900">
+                                    {author.position}
+                                  </span>
+                                </div>
                               </div>
-                            )}
-                            <div className="flex flex-col">
-                              <span className="text-sm text-scale-1200 mb-0">{author.author}</span>
-                              <span className="text-xs mb-0 text-scale-900">{author.position}</span>
-                            </div>
-                          </div>
-                        </a>
-                      </Link>
-                    </div>
-                  )}
+                            </a>
+                          </Link>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
