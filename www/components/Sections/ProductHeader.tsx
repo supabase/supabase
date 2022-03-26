@@ -19,7 +19,7 @@ const ProductHeader = (props: Types) => (
       <div className="col-span-12 lg:col-span-5 space-y-8">
         <div>
           {props.icon || props.title ? (
-            <div className="flex mb-4 items-center gap-2">
+            <div className="flex mb-4 items-center gap-3">
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
                 <span className="text-scale-1200" key={`product-name-${props.title}`}>

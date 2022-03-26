@@ -13,15 +13,14 @@ date: '2022-03-08'
 toc_depth: 3
 ---
 
-
-Data auditing is a system that tracks changes to tables' contents over time. 
+Data auditing is a system that tracks changes to tables' contents over time.
 PostgreSQL has a robust set of features which we can leverage to create a generic auditing solution in 150 lines of SQL.
 
-Auditing is particularly useful for historical analysis. To demonstrate, imagine you have a `users` table that tracks when a user is online. 
-You might add a `status` column which can have one of two values: `online` and `offline`. How would you track how long a user is online for throughout an entire month? 
+Auditing is particularly useful for historical analysis. To demonstrate, imagine you have a `users` table that tracks when a user is online.
+You might add a `status` column which can have one of two values: `online` and `offline`. How would you track how long a user is online for throughout an entire month?
 An auditing system would track every change with timestamps, and so you can measure the difference between each timestamp and sum them up for the entire month.
 
-The goals of our auditing solution are: 
+The goals of our auditing solution are:
 
 - low maintenance
 - easy to use
@@ -60,11 +59,11 @@ select * from audit.record_history
 ```
 
 ```markdown
- id |              record_id               |            old_record_id             |   op   |                 ts                  | table_oid | table_schema | table_name |          record          |        old_record        
+id | record_id | old_record_id | op | ts | table_oid | table_schema | table_name | record | old_record  
 ----+--------------------------------------+--------------------------------------+--------+-------------------------------------+-----------+--------------+------------+--------------------------+--------------------------
-  2 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 |                                      | INSERT | Mon Feb 28 18:13:52.698511 2022 PST |     16452 | public       | members    | {"id": 1, "name": "foo"} | 
-  3 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | UPDATE | Mon Feb 28 18:13:52.698511 2022 PST |     16452 | public       | members    | {"id": 1, "name": "bar"} | {"id": 1, "name": "foo"}
-  4 |                                      | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | DELETE | Mon Feb 28 18:13:52.698511 2022 PST |     16452 | public       | members    |                          | {"id": 1, "name": "bar"}
+2 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | | INSERT | Mon Feb 28 18:13:52.698511 2022 PST | 16452 | public | members | {"id": 1, "name": "foo"} |
+3 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | UPDATE | Mon Feb 28 18:13:52.698511 2022 PST | 16452 | public | members | {"id": 1, "name": "bar"} | {"id": 1, "name": "foo"}
+4 | | 1ecd5ff0-1b6b-5bc2-ad80-1cb19769c081 | DELETE | Mon Feb 28 18:13:52.698511 2022 PST | 16452 | public | members | | {"id": 1, "name": "bar"}
 (3 rows)
 ```
 
@@ -74,10 +73,9 @@ Notice that our `record_id` and `old_record_id` stayed constant as we updated th
 
 ### Namespace
 
-To quote a tenet from [the zen of python](https://www.python.org/dev/peps/pep-0020/): 
+To quote a tenet from [the zen of python](https://www.python.org/dev/peps/pep-0020/):
 
 > Namespaces are one honking great idea -- let's do more of those!
-> 
 
 So first things first, we'll create a separate schema named `audit` to house our auditing entities.
 
@@ -89,12 +87,12 @@ create schema if not exists audit;
 
 Next, we need a table to track inserts, updates and deletes.
 
-Classically, an audit table's schema mirrors the table being audited and appends some metadata columns like the commit's timestamp. That solution has a few maintenance challenges: 
+Classically, an audit table's schema mirrors the table being audited and appends some metadata columns like the commit's timestamp. That solution has a few maintenance challenges:
 
 - enabling auditing on a table requires a database migration
 - when the source table's schema changes, the audit table's schema must also change
 
-So instead, we'll lean on PostgreSQL's schema-less [`JSONB` data type](https://www.postgresql.org/docs/current/datatype-json.html) to store each record's data in a single column. 
+So instead, we'll lean on PostgreSQL's schema-less [`JSONB` data type](https://www.postgresql.org/docs/current/datatype-json.html) to store each record's data in a single column.
 That approach has the added benefit of allowing us to store multiple tables' audit history in a single audit table.
 
 ```sql
@@ -110,23 +108,22 @@ create table audit.record_version(
   table_schema   name not null, -- audited table's schema name e.g. 'public'
   table_name     name not null, -- audited table's table name e.g. 'account'
   -- record data
-  record         jsonb, -- contents of the new record   
+  record         jsonb, -- contents of the new record
   old_record     jsonb  -- previous record contents (for UPDATE/DELETE)
 );
 ```
 
 <details>
-<summary>Postgres version compatibility</summary>
-<p>
-The table above uses PostgreSQL's built-in <a href="https://www.postgresql.org/docs/14/functions-uuid.html">uuid functionality</a>, which is available from version 14. 
-For backwards compatibility you can use the uuid-ossp extension.
-</p>
-<p>
-<code>create extension if not exists "uuid-ossp";</code>
-</p> 
+  <summary>Postgres version compatibility</summary>
+  <p>
+    The table above uses PostgreSQL's built-in{' '}
+    <a href="https://www.postgresql.org/docs/14/functions-uuid.html">uuid functionality</a>, which
+    is available from version 14. For backwards compatibility you can use the uuid-ossp extension.
+  </p>
+  <p>
+    <code>create extension if not exists "uuid-ossp";</code>
+  </p>
 </details>
-    
-    
 
 ### Query Patterns
 
@@ -134,7 +131,7 @@ An audit log doesn't do us much good if its too slow to query! There are 2 query
 
 **Changes to a Table in a Time Range**
 
-For time slices, we need an index on the `ts` column. Since the table is append-only and the `ts` column is populated by insertion date, our values for `ts` are naturally in ascending order. 
+For time slices, we need an index on the `ts` column. Since the table is append-only and the `ts` column is populated by insertion date, our values for `ts` are naturally in ascending order.
 
 PostgreSQL's builtin [BRIN index](https://www.postgresql.org/docs/current/brin-intro.html) can leverage that correlation between value and physical location to produce an index that, at scale, is many hundreds of times smaller than the default (BTREE index) with faster lookup times.
 
@@ -213,7 +210,7 @@ as $$
                 select
                     uuid_generate_v5(
                         'fd62bc3d-8d6e-43c2-919c-802ba3762271',
-                        ( 
+                        (
 													jsonb_build_array(to_jsonb($1))
 													|| jsonb_agg($3 ->> key_)
 												)::text
