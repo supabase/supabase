@@ -20,7 +20,7 @@ const Product = () => {
         <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 mt-3">
           <p className="text-sm text-scale-1000">{description}</p>
           {label && (
-            <div>
+            <div className="mt-2">
               <Badge>{label}</Badge>
             </div>
           )}
@@ -47,7 +47,7 @@ const Product = () => {
       </nav>
       <div className="col-span-6">
         <div className="m-3 mx-6">
-          <p>Latest case studies</p>
+          <p className="p">Latest case studies</p>
           <ul className="mt-6 space-y-3">
             {CaseStudiesData.map((caseStudy: any, idx: number) => {
               if (idx > 1) {
@@ -57,17 +57,7 @@ const Product = () => {
                 <li className="flow-root" key={`flyout_case_${idx}`}>
                   <a
                     href={caseStudy.url}
-                    className="p-3 flex rounded-lg 
-                    
-                    transition ease-in-out duration-150
-
-                    hover:bg-scale-400 
-                    dark:hover:bg-scale-500 
-                    
-                    border 
-                    dark:border-scale-400
-                    
-                    items-center"
+                    className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border items-center"
                   >
                     <div className="hidden sm:block flex-shrink-0">
                       <img
@@ -76,9 +66,11 @@ const Product = () => {
                         alt="caseStudyThumb"
                       />
                     </div>
-                    <div className="min-w-0 flex-1 sm:ml-8">
-                      <h1 className="mb-0 text-normal">{caseStudy.title}</h1>
-                      <p className="text-sm">{caseStudy.description}</p>
+                    <div className="min-w-0 flex-1 sm:ml-4">
+                      <h4 className="text-base text-scale-1200 mb-0 text-normal">
+                        {caseStudy.title}
+                      </h4>
+                      <p className="p text-sm">{caseStudy.description}</p>
                     </div>
                   </a>
                 </li>
