@@ -41,7 +41,7 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
   useEffect(() => {
     ui.load()
 
-    if (window.matchMedia('(prefers-color-scheme: dark)').addEventListener) {
+    if (window?.matchMedia('(prefers-color-scheme: dark)')?.addEventListener) {
       // backwards compatibility for safari < v14
       // limited support for addEventListener()
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', matchMediaEvent)
