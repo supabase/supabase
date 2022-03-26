@@ -235,7 +235,8 @@ export default function IndexPage() {
                   </div>
                   <div className="mt-4 text-lg text-scale-1100">
                     Get a custom plan, tailor made for your company's needs. Scale to millions of
-                    users with enterprise grade features.
+                    users with enterprise grade features. Includes enterprise support + SLAs &amp;
+                    SSO
                   </div>
                 </div>
 
