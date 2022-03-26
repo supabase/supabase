@@ -212,7 +212,7 @@ LIMIT 100
       break
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.time, m.version from ${table} 
+      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
 cross join unnest(metadata) as m
 cross join unnest(m.response) as response
 cross join unnest(m.request) as request
