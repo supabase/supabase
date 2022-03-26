@@ -9,17 +9,19 @@ interface Props {
 
 const BlogListItem = ({ post }: Props) => {
   // @ts-ignore
-  const authorArray = post.author.split(',')
+  const authorArray = post.author && post.author.split(',')
 
   const author = []
-  for (let i = 0; i < authorArray.length; i++) {
-    author.push(
-      // @ts-ignore
-      authors.find((authors: string) => {
+  if (post.author) {
+    for (let i = 0; i < authorArray.length; i++) {
+      author.push(
         // @ts-ignore
-        return authors.author_id === authorArray[i]
-      })
-    )
+        authors.find((authors: string) => {
+          // @ts-ignore
+          return authors.author_id === authorArray[i]
+        })
+      )
+    }
   }
 
   return (
