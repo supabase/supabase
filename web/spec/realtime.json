@@ -75,7 +75,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 336,
+												"id": 334,
 												"name": "Options"
 											}
 										}
@@ -743,7 +743,7 @@
 													"sources": [
 														{
 															"fileName": "RealtimeClient.ts",
-															"line": 380,
+															"line": 386,
 															"character": 44
 														}
 													]
@@ -760,7 +760,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 380,
+									"line": 386,
 									"character": 23
 								}
 							]
@@ -792,7 +792,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 390,
+									"line": 396,
 									"character": 26
 								}
 							]
@@ -839,7 +839,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 360,
+									"line": 366,
 									"character": 22
 								}
 							]
@@ -886,7 +886,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 368,
+									"line": 374,
 									"character": 22
 								}
 							]
@@ -918,45 +918,13 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 352,
+									"line": 354,
 									"character": 21
 								}
 							]
 						},
 						{
 							"id": 332,
-							"name": "_resetHeartbeat",
-							"kind": 2048,
-							"kindString": "Method",
-							"flags": {
-								"isPrivate": true,
-								"isExported": true
-							},
-							"signatures": [
-								{
-									"id": 333,
-									"name": "_resetHeartbeat",
-									"kind": 4096,
-									"kindString": "Call signature",
-									"flags": {
-										"isExported": true
-									},
-									"type": {
-										"type": "intrinsic",
-										"name": "void"
-									}
-								}
-							],
-							"sources": [
-								{
-									"fileName": "RealtimeClient.ts",
-									"line": 397,
-									"character": 25
-								}
-							]
-						},
-						{
-							"id": 334,
 							"name": "_sendHeartbeat",
 							"kind": 2048,
 							"kindString": "Method",
@@ -966,7 +934,7 @@
 							},
 							"signatures": [
 								{
-									"id": 335,
+									"id": 333,
 									"name": "_sendHeartbeat",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -982,7 +950,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 406,
+									"line": 403,
 									"character": 24
 								}
 							]
@@ -1014,7 +982,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 374,
+									"line": 380,
 									"character": 27
 								}
 							]
@@ -1372,7 +1340,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 300,
+									"line": 302,
 									"character": 13
 								}
 							]
@@ -1452,7 +1420,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 342,
+									"line": 344,
 									"character": 16
 								}
 							]
@@ -1562,7 +1530,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 310,
+									"line": 312,
 									"character": 9
 								}
 							]
@@ -1873,7 +1841,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 354,
+												"id": 352,
 												"name": "Message"
 											}
 										}
@@ -2001,7 +1969,7 @@
 							"sources": [
 								{
 									"fileName": "RealtimeClient.ts",
-									"line": 326,
+									"line": 328,
 									"character": 9
 								}
 							]
@@ -2181,7 +2149,6 @@
 								318,
 								313,
 								332,
-								334,
 								321,
 								292,
 								259,
@@ -2219,7 +2186,7 @@
 					]
 				},
 				{
-					"id": 354,
+					"id": 352,
 					"name": "Message",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -2234,14 +2201,14 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 355,
+							"id": 353,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 357,
+									"id": 355,
 									"name": "event",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2259,7 +2226,7 @@
 									}
 								},
 								{
-									"id": 358,
+									"id": 356,
 									"name": "payload",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2277,7 +2244,7 @@
 									}
 								},
 								{
-									"id": 359,
+									"id": 357,
 									"name": "ref",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2295,7 +2262,7 @@
 									}
 								},
 								{
-									"id": 356,
+									"id": 354,
 									"name": "topic",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2318,10 +2285,10 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
+										355,
+										356,
 										357,
-										358,
-										359,
-										356
+										354
 									]
 								}
 							],
@@ -2336,7 +2303,7 @@
 					}
 				},
 				{
-					"id": 336,
+					"id": 334,
 					"name": "Options",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -2353,7 +2320,7 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 337,
+							"id": 335,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -2362,7 +2329,7 @@
 							},
 							"children": [
 								{
-									"id": 344,
+									"id": 342,
 									"name": "decode",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2383,7 +2350,7 @@
 									}
 								},
 								{
-									"id": 343,
+									"id": 341,
 									"name": "encode",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2404,7 +2371,7 @@
 									}
 								},
 								{
-									"id": 346,
+									"id": 344,
 									"name": "headers",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2429,7 +2396,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 347,
+													"id": 345,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2438,7 +2405,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 348,
+															"id": 346,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -2447,7 +2414,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 349,
+																	"id": 347,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2472,7 +2439,7 @@
 									}
 								},
 								{
-									"id": 340,
+									"id": 338,
 									"name": "heartbeatIntervalMs",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2502,7 +2469,7 @@
 									}
 								},
 								{
-									"id": 342,
+									"id": 340,
 									"name": "logger",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2523,7 +2490,7 @@
 									}
 								},
 								{
-									"id": 341,
+									"id": 339,
 									"name": "longpollerTimeout",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2553,7 +2520,7 @@
 									}
 								},
 								{
-									"id": 350,
+									"id": 348,
 									"name": "params",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2578,7 +2545,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 351,
+													"id": 349,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2587,7 +2554,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 352,
+															"id": 350,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -2596,7 +2563,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 353,
+																	"id": 351,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -2621,7 +2588,7 @@
 									}
 								},
 								{
-									"id": 345,
+									"id": 343,
 									"name": "reconnectAfterMs",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2642,7 +2609,7 @@
 									}
 								},
 								{
-									"id": 339,
+									"id": 337,
 									"name": "timeout",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2672,7 +2639,7 @@
 									}
 								},
 								{
-									"id": 338,
+									"id": 336,
 									"name": "transport",
 									"kind": 32,
 									"kindString": "Variable",
@@ -2698,16 +2665,16 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										344,
-										343,
-										346,
-										340,
 										342,
 										341,
-										350,
-										345,
+										344,
+										338,
+										340,
 										339,
-										338
+										348,
+										343,
+										337,
+										336
 									]
 								}
 							],
@@ -2722,7 +2689,7 @@
 					}
 				},
 				{
-					"id": 360,
+					"id": 358,
 					"name": "noop",
 					"kind": 64,
 					"kindString": "Function",
@@ -2731,7 +2698,7 @@
 					},
 					"signatures": [
 						{
-							"id": 361,
+							"id": 359,
 							"name": "noop",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -2763,21 +2730,1731 @@
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						354,
-						336
+						352,
+						334
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						360
+						358
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "RealtimeClient.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 360,
+			"name": "\"RealtimePresence\"",
+			"kind": 1,
+			"kindString": "Module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "/home/runner/work/realtime-js/realtime-js/src/RealtimePresence.ts",
+			"children": [
+				{
+					"id": 361,
+					"name": "RealtimePresence",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 372,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Initializes the Presence"
+							},
+							"signatures": [
+								{
+									"id": 374,
+									"name": "new RealtimePresence",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Initializes the Presence"
+									},
+									"parameters": [
+										{
+											"id": 375,
+											"name": "channel",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"comment": {
+												"shortText": "The RealtimeSubscription"
+											},
+											"type": {
+												"type": "reference",
+												"id": 110,
+												"name": "RealtimeSubscription"
+											}
+										},
+										{
+											"id": 376,
+											"name": "opts",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"comment": {
+												"shortText": "The options,\n       for example `{events: {state: 'state', diff: 'diff'}}`\n"
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOpts"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 361,
+										"name": "RealtimePresence"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 56,
+									"character": 3
+								}
+							]
+						},
+						{
+							"id": 373,
+							"name": "channel",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPublic": true,
+								"isExported": true,
+								"isConstructorProperty": true
+							},
+							"comment": {
+								"shortText": "The RealtimeSubscription"
+							},
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 64,
+									"character": 28
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 110,
+								"name": "RealtimeSubscription"
+							}
+						},
+						{
+							"id": 364,
+							"name": "joinRef",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 47,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "intrinsic",
+										"name": "null"
+									}
+								]
+							},
+							"defaultValue": "null"
+						},
+						{
+							"id": 363,
+							"name": "pendingDiffs",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 46,
+									"character": 14
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"id": 441,
+									"name": "RawPresenceDiff"
+								}
+							},
+							"defaultValue": "[]"
+						},
+						{
+							"id": 362,
+							"name": "state",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 45,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 424,
+								"name": "PresenceState"
+							}
+						},
+						{
+							"id": 417,
+							"name": "inPendingSyncState",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 418,
+									"name": "inPendingSyncState",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 316,
+									"character": 28
+								}
+							]
+						},
+						{
+							"id": 413,
+							"name": "list",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 414,
+									"name": "list",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 415,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 416,
+											"name": "by",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 445,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T",
+														"default": {
+															"type": "intrinsic",
+															"name": "any"
+														}
+													}
+												],
+												"name": "PresenceChooser"
+											}
+										}
+									],
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "typeParameter",
+											"name": "T",
+											"default": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 312,
+									"character": 6
+								}
+							]
+						},
+						{
+							"id": 402,
+							"name": "onJoin",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 403,
+									"name": "onJoin",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 404,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnJoinCallback"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 300,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 405,
+							"name": "onLeave",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 406,
+									"name": "onLeave",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 407,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnLeaveCallback"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 304,
+									"character": 9
+								}
+							]
+						},
+						{
+							"id": 408,
+							"name": "onSync",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 409,
+									"name": "onSync",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"parameters": [
+										{
+											"id": 410,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 411,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"signatures": [
+														{
+															"id": 412,
+															"name": "__call",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "void"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "RealtimePresence.ts",
+															"line": 308,
+															"character": 18
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 308,
+									"character": 8
+								}
+							]
+						},
+						{
+							"id": 389,
+							"name": "list",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isStatic": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 390,
+									"name": "list",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Returns the array of presences, with selected metadata."
+									},
+									"typeParameter": [
+										{
+											"id": 391,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 392,
+											"name": "presences",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 424,
+												"name": "PresenceState"
+											}
+										},
+										{
+											"id": 393,
+											"name": "chooser",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"id": 445,
+														"typeArguments": [
+															{
+																"type": "typeParameter",
+																"name": "T",
+																"default": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														],
+														"name": "PresenceChooser"
+													},
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "typeParameter",
+											"name": "T",
+											"default": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 234,
+									"character": 13
+								}
+							]
+						},
+						{
+							"id": 394,
+							"name": "map",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isStatic": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 395,
+									"name": "map",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"typeParameter": [
+										{
+											"id": 396,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {
+												"isExported": true
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 397,
+											"name": "obj",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 424,
+												"name": "PresenceState"
+											}
+										},
+										{
+											"id": 398,
+											"name": "func",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 445,
+												"typeArguments": [
+													{
+														"type": "typeParameter",
+														"name": "T",
+														"default": {
+															"type": "intrinsic",
+															"name": "any"
+														}
+													}
+												],
+												"name": "PresenceChooser"
+											}
+										}
+									],
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "typeParameter",
+											"name": "T",
+											"default": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 247,
+									"character": 20
+								}
+							]
+						},
+						{
+							"id": 383,
+							"name": "syncDiff",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isStatic": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 384,
+									"name": "syncDiff",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Used to sync a diff of presence join and leave\nevents from the server, as they happen. Like `syncState`, `syncDiff`\naccepts optional `onJoin` and `onLeave` callbacks to react to a user\njoining or leaving from a device."
+									},
+									"parameters": [
+										{
+											"id": 385,
+											"name": "state",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 424,
+												"name": "PresenceState"
+											}
+										},
+										{
+											"id": 386,
+											"name": "diff",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"id": 441,
+														"name": "RawPresenceDiff"
+													},
+													{
+														"type": "reference",
+														"id": 428,
+														"name": "PresenceDiff"
+													}
+												]
+											}
+										},
+										{
+											"id": 387,
+											"name": "onJoin",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnJoinCallback"
+											}
+										},
+										{
+											"id": 388,
+											"name": "onLeave",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnLeaveCallback"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 424,
+										"name": "PresenceState"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 174,
+									"character": 17
+								}
+							]
+						},
+						{
+							"id": 377,
+							"name": "syncState",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isStatic": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 378,
+									"name": "syncState",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Used to sync the list of presences on the server\nwith the client's state. An optional `onJoin` and `onLeave` callback can\nbe provided to react to changes in the client's local presences across\ndisconnects and reconnects with the server."
+									},
+									"parameters": [
+										{
+											"id": 379,
+											"name": "currentState",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 424,
+												"name": "PresenceState"
+											}
+										},
+										{
+											"id": 380,
+											"name": "newState",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"id": 432,
+														"name": "RawPresenceState"
+													},
+													{
+														"type": "reference",
+														"id": 424,
+														"name": "PresenceState"
+													}
+												]
+											}
+										},
+										{
+											"id": 381,
+											"name": "onJoin",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnJoinCallback"
+											}
+										},
+										{
+											"id": 382,
+											"name": "onLeave",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "PresenceOnLeaveCallback"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 424,
+										"name": "PresenceState"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 120,
+									"character": 18
+								}
+							]
+						},
+						{
+							"id": 399,
+							"name": "transformState",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isPrivate": true,
+								"isStatic": true,
+								"isExported": true
+							},
+							"signatures": [
+								{
+									"id": 400,
+									"name": "transformState",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "Remove 'metas' key\nChange 'phx_ref' to 'presence_id'\nRemove 'phx_ref' and 'phx_ref_prev'",
+										"tags": [
+											{
+												"tag": "example",
+												"text": "\n// returns {\n abc123: [\n   { presence_id: '2', user_id: 1 },\n   { presence_id: '3', user_id: 2 }\n ]\n}\nRealtimePresence.transformState({\n abc123: {\n   metas: [\n     { phx_ref: '2', phx_ref_prev: '1' user_id: 1 },\n     { phx_ref: '3', user_id: 2 }\n   ]\n }\n})\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 401,
+											"name": "state",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"id": 432,
+														"name": "RawPresenceState"
+													},
+													{
+														"type": "reference",
+														"id": 424,
+														"name": "PresenceState"
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 424,
+										"name": "PresenceState"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 275,
+									"character": 31
+								}
+							]
+						},
+						{
+							"id": 365,
+							"name": "caller",
+							"kind": 2097152,
+							"kindString": "Object literal",
+							"flags": {
+								"isExported": true
+							},
+							"children": [
+								{
+									"id": 366,
+									"name": "onJoin",
+									"kind": 64,
+									"kindString": "Function",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 367,
+											"name": "onJoin",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 53,
+											"character": 10
+										}
+									]
+								},
+								{
+									"id": 368,
+									"name": "onLeave",
+									"kind": 64,
+									"kindString": "Function",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 369,
+											"name": "onLeave",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 54,
+											"character": 11
+										}
+									]
+								},
+								{
+									"id": 370,
+									"name": "onSync",
+									"kind": 64,
+									"kindString": "Function",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 371,
+											"name": "onSync",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 55,
+											"character": 10
+										}
+									]
+								}
+							],
+							"groups": [
+								{
+									"title": "Functions",
+									"kind": 64,
+									"children": [
+										366,
+										368,
+										370
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 48,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "object"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								372
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								373,
+								364,
+								363,
+								362
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								417,
+								413,
+								402,
+								405,
+								408,
+								389,
+								394,
+								383,
+								377,
+								399
+							]
+						},
+						{
+							"title": "Object literals",
+							"kind": 2097152,
+							"children": [
+								365
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 44,
+							"character": 37
+						}
+					]
+				},
+				{
+					"id": 419,
+					"name": "Presence",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 14,
+							"character": 13
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 420,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"indexSignature": [
+								{
+									"id": 422,
+									"name": "__index",
+									"kind": 8192,
+									"kindString": "Index signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 423,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							],
+							"children": [
+								{
+									"id": 421,
+									"name": "presence_id",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 15,
+											"character": 13
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Variables",
+									"kind": 32,
+									"children": [
+										421
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 14,
+									"character": 15
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 445,
+					"name": "PresenceChooser",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"typeParameter": [
+						{
+							"id": 446,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 42,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 447,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 448,
+									"name": "__call",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 449,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 450,
+											"name": "presences",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "typeParameter",
+										"name": "T"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 42,
+									"character": 25
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 428,
+					"name": "PresenceDiff",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 21,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 429,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 430,
+									"name": "joins",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 22,
+											"character": 7
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 424,
+										"name": "PresenceState"
+									}
+								},
+								{
+									"id": 431,
+									"name": "leaves",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 23,
+											"character": 8
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 424,
+										"name": "PresenceState"
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Variables",
+									"kind": 32,
+									"children": [
+										430,
+										431
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 21,
+									"character": 19
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 424,
+					"name": "PresenceState",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 19,
+							"character": 18
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 425,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"indexSignature": [
+								{
+									"id": 426,
+									"name": "__index",
+									"kind": 8192,
+									"kindString": "Index signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 427,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "reference",
+											"id": 419,
+											"name": "Presence"
+										}
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 19,
+									"character": 20
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 441,
+					"name": "RawPresenceDiff",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 37,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 442,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 443,
+									"name": "joins",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 38,
+											"character": 7
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 432,
+										"name": "RawPresenceState"
+									}
+								},
+								{
+									"id": 444,
+									"name": "leaves",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "RealtimePresence.ts",
+											"line": 39,
+											"character": 8
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 432,
+										"name": "RawPresenceState"
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Variables",
+									"kind": 32,
+									"children": [
+										443,
+										444
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 37,
+									"character": 22
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 432,
+					"name": "RawPresenceState",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "RealtimePresence.ts",
+							"line": 26,
+							"character": 21
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 433,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"indexSignature": [
+								{
+									"id": 434,
+									"name": "__index",
+									"kind": 8192,
+									"kindString": "Index signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 435,
+											"name": "key",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 485,
+										"typeArguments": [
+											{
+												"type": "stringLiteral",
+												"value": "metas"
+											},
+											{
+												"type": "array",
+												"elementType": {
+													"type": "reflection",
+													"declaration": {
+														"id": 436,
+														"name": "__type",
+														"kind": 65536,
+														"kindString": "Type literal",
+														"flags": {},
+														"indexSignature": [
+															{
+																"id": 439,
+																"name": "__index",
+																"kind": 8192,
+																"kindString": "Index signature",
+																"flags": {},
+																"parameters": [
+																	{
+																		"id": 440,
+																		"name": "key",
+																		"kind": 32768,
+																		"kindString": "Parameter",
+																		"flags": {},
+																		"type": {
+																			"type": "intrinsic",
+																			"name": "string"
+																		}
+																	}
+																],
+																"type": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														],
+														"children": [
+															{
+																"id": 437,
+																"name": "phx_ref",
+																"kind": 32,
+																"kindString": "Variable",
+																"flags": {
+																	"isOptional": true
+																},
+																"sources": [
+																	{
+																		"fileName": "RealtimePresence.ts",
+																		"line": 30,
+																		"character": 13
+																	}
+																],
+																"type": {
+																	"type": "union",
+																	"types": [
+																		{
+																			"type": "intrinsic",
+																			"name": "undefined"
+																		},
+																		{
+																			"type": "intrinsic",
+																			"name": "string"
+																		}
+																	]
+																}
+															},
+															{
+																"id": 438,
+																"name": "phx_ref_prev",
+																"kind": 32,
+																"kindString": "Variable",
+																"flags": {
+																	"isOptional": true
+																},
+																"sources": [
+																	{
+																		"fileName": "RealtimePresence.ts",
+																		"line": 31,
+																		"character": 18
+																	}
+																],
+																"type": {
+																	"type": "union",
+																	"types": [
+																		{
+																			"type": "intrinsic",
+																			"name": "undefined"
+																		},
+																		{
+																			"type": "intrinsic",
+																			"name": "string"
+																		}
+																	]
+																}
+															}
+														],
+														"groups": [
+															{
+																"title": "Variables",
+																"kind": 32,
+																"children": [
+																	437,
+																	438
+																]
+															}
+														],
+														"sources": [
+															{
+																"fileName": "RealtimePresence.ts",
+																"line": 28,
+																"character": 12
+															}
+														]
+													}
+												}
+											}
+										],
+										"name": "Record"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "RealtimePresence.ts",
+									"line": 26,
+									"character": 23
+								}
+							]
+						}
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						361
+					]
+				},
+				{
+					"title": "Type aliases",
+					"kind": 4194304,
+					"children": [
+						419,
+						445,
+						428,
+						424,
+						441,
+						432
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "RealtimePresence.ts",
 					"line": 1,
 					"character": 0
 				}
@@ -4287,7 +5964,7 @@
 			]
 		},
 		{
-			"id": 436,
+			"id": 525,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6908,7 +8585,7 @@
 			]
 		},
 		{
-			"id": 362,
+			"id": 451,
 			"name": "\"lib/transformers\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -6918,7 +8595,7 @@
 			"originalName": "/home/runner/work/realtime-js/realtime-js/src/lib/transformers.ts",
 			"children": [
 				{
-					"id": 363,
+					"id": 452,
 					"name": "PostgresTypes",
 					"kind": 4,
 					"kindString": "Enumeration",
@@ -6930,7 +8607,7 @@
 					},
 					"children": [
 						{
-							"id": 364,
+							"id": 453,
 							"name": "abstime",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6947,7 +8624,7 @@
 							"defaultValue": "\"abstime\""
 						},
 						{
-							"id": 365,
+							"id": 454,
 							"name": "bool",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6964,7 +8641,7 @@
 							"defaultValue": "\"bool\""
 						},
 						{
-							"id": 366,
+							"id": 455,
 							"name": "date",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6981,7 +8658,7 @@
 							"defaultValue": "\"date\""
 						},
 						{
-							"id": 367,
+							"id": 456,
 							"name": "daterange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -6998,7 +8675,7 @@
 							"defaultValue": "\"daterange\""
 						},
 						{
-							"id": 368,
+							"id": 457,
 							"name": "float4",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7015,7 +8692,7 @@
 							"defaultValue": "\"float4\""
 						},
 						{
-							"id": 369,
+							"id": 458,
 							"name": "float8",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7032,7 +8709,7 @@
 							"defaultValue": "\"float8\""
 						},
 						{
-							"id": 370,
+							"id": 459,
 							"name": "int2",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7049,7 +8726,7 @@
 							"defaultValue": "\"int2\""
 						},
 						{
-							"id": 371,
+							"id": 460,
 							"name": "int4",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7066,7 +8743,7 @@
 							"defaultValue": "\"int4\""
 						},
 						{
-							"id": 372,
+							"id": 461,
 							"name": "int4range",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7083,7 +8760,7 @@
 							"defaultValue": "\"int4range\""
 						},
 						{
-							"id": 373,
+							"id": 462,
 							"name": "int8",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7100,7 +8777,7 @@
 							"defaultValue": "\"int8\""
 						},
 						{
-							"id": 374,
+							"id": 463,
 							"name": "int8range",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7117,7 +8794,7 @@
 							"defaultValue": "\"int8range\""
 						},
 						{
-							"id": 375,
+							"id": 464,
 							"name": "json",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7134,7 +8811,7 @@
 							"defaultValue": "\"json\""
 						},
 						{
-							"id": 376,
+							"id": 465,
 							"name": "jsonb",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7151,7 +8828,7 @@
 							"defaultValue": "\"jsonb\""
 						},
 						{
-							"id": 377,
+							"id": 466,
 							"name": "money",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7168,7 +8845,7 @@
 							"defaultValue": "\"money\""
 						},
 						{
-							"id": 378,
+							"id": 467,
 							"name": "numeric",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7185,7 +8862,7 @@
 							"defaultValue": "\"numeric\""
 						},
 						{
-							"id": 379,
+							"id": 468,
 							"name": "oid",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7202,7 +8879,7 @@
 							"defaultValue": "\"oid\""
 						},
 						{
-							"id": 380,
+							"id": 469,
 							"name": "reltime",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7219,7 +8896,7 @@
 							"defaultValue": "\"reltime\""
 						},
 						{
-							"id": 381,
+							"id": 470,
 							"name": "text",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7236,7 +8913,7 @@
 							"defaultValue": "\"text\""
 						},
 						{
-							"id": 382,
+							"id": 471,
 							"name": "time",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7253,7 +8930,7 @@
 							"defaultValue": "\"time\""
 						},
 						{
-							"id": 383,
+							"id": 472,
 							"name": "timestamp",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7270,7 +8947,7 @@
 							"defaultValue": "\"timestamp\""
 						},
 						{
-							"id": 384,
+							"id": 473,
 							"name": "timestamptz",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7287,7 +8964,7 @@
 							"defaultValue": "\"timestamptz\""
 						},
 						{
-							"id": 385,
+							"id": 474,
 							"name": "timetz",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7304,7 +8981,7 @@
 							"defaultValue": "\"timetz\""
 						},
 						{
-							"id": 386,
+							"id": 475,
 							"name": "tsrange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7321,7 +8998,7 @@
 							"defaultValue": "\"tsrange\""
 						},
 						{
-							"id": 387,
+							"id": 476,
 							"name": "tstzrange",
 							"kind": 16,
 							"kindString": "Enumeration member",
@@ -7343,30 +9020,30 @@
 							"title": "Enumeration members",
 							"kind": 16,
 							"children": [
-								364,
-								365,
-								366,
-								367,
-								368,
-								369,
-								370,
-								371,
-								372,
-								373,
-								374,
-								375,
-								376,
-								377,
-								378,
-								379,
-								380,
-								381,
-								382,
-								383,
-								384,
-								385,
-								386,
-								387
+								453,
+								454,
+								455,
+								456,
+								457,
+								458,
+								459,
+								460,
+								461,
+								462,
+								463,
+								464,
+								465,
+								466,
+								467,
+								468,
+								469,
+								470,
+								471,
+								472,
+								473,
+								474,
+								475,
+								476
 							]
 						}
 					],
@@ -7379,7 +9056,7 @@
 					]
 				},
 				{
-					"id": 394,
+					"id": 483,
 					"name": "BaseValue",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7414,7 +9091,7 @@
 					}
 				},
 				{
-					"id": 388,
+					"id": 477,
 					"name": "Columns",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7431,14 +9108,14 @@
 						"elementType": {
 							"type": "reflection",
 							"declaration": {
-								"id": 389,
+								"id": 478,
 								"name": "__type",
 								"kind": 65536,
 								"kindString": "Type literal",
 								"flags": {},
 								"children": [
 									{
-										"id": 392,
+										"id": 481,
 										"name": "flags",
 										"kind": 32,
 										"kindString": "Variable",
@@ -7461,7 +9138,7 @@
 										}
 									},
 									{
-										"id": 390,
+										"id": 479,
 										"name": "name",
 										"kind": 32,
 										"kindString": "Variable",
@@ -7479,7 +9156,7 @@
 										}
 									},
 									{
-										"id": 391,
+										"id": 480,
 										"name": "type",
 										"kind": 32,
 										"kindString": "Variable",
@@ -7497,7 +9174,7 @@
 										}
 									},
 									{
-										"id": 393,
+										"id": 482,
 										"name": "type_modifier",
 										"kind": 32,
 										"kindString": "Variable",
@@ -7531,10 +9208,10 @@
 										"title": "Variables",
 										"kind": 32,
 										"children": [
-											392,
-											390,
-											391,
-											393
+											481,
+											479,
+											480,
+											482
 										]
 									}
 								],
@@ -7550,7 +9227,7 @@
 					}
 				},
 				{
-					"id": 396,
+					"id": 485,
 					"name": "Record",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7565,21 +9242,21 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 397,
+							"id": 486,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"indexSignature": [
 								{
-									"id": 398,
+									"id": 487,
 									"name": "__index",
 									"kind": 8192,
 									"kindString": "Index signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 399,
+											"id": 488,
 											"name": "key",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -7592,7 +9269,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
@@ -7608,7 +9285,7 @@
 					}
 				},
 				{
-					"id": 395,
+					"id": 484,
 					"name": "RecordValue",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -7625,14 +9302,14 @@
 						"types": [
 							{
 								"type": "reference",
-								"id": 394,
+								"id": 483,
 								"name": "BaseValue"
 							},
 							{
 								"type": "array",
 								"elementType": {
 									"type": "reference",
-									"id": 394,
+									"id": 483,
 									"name": "BaseValue"
 								}
 							}
@@ -7640,7 +9317,7 @@
 					}
 				},
 				{
-					"id": 413,
+					"id": 502,
 					"name": "convertCell",
 					"kind": 64,
 					"kindString": "Function",
@@ -7667,7 +9344,7 @@
 					},
 					"signatures": [
 						{
-							"id": 414,
+							"id": 503,
 							"name": "convertCell",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7693,7 +9370,7 @@
 							},
 							"parameters": [
 								{
-									"id": 415,
+									"id": 504,
 									"name": "type",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7709,7 +9386,7 @@
 									}
 								},
 								{
-									"id": 416,
+									"id": 505,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7718,14 +9395,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -7739,7 +9416,7 @@
 					]
 				},
 				{
-					"id": 400,
+					"id": 489,
 					"name": "convertChangeData",
 					"kind": 64,
 					"kindString": "Function",
@@ -7758,7 +9435,7 @@
 					},
 					"signatures": [
 						{
-							"id": 401,
+							"id": 490,
 							"name": "convertChangeData",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7776,7 +9453,7 @@
 							},
 							"parameters": [
 								{
-									"id": 402,
+									"id": 491,
 									"name": "columns",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7785,12 +9462,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 388,
+										"id": 477,
 										"name": "Columns"
 									}
 								},
 								{
-									"id": 403,
+									"id": 492,
 									"name": "record",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7800,12 +9477,12 @@
 									"comment": {},
 									"type": {
 										"type": "reference",
-										"id": 396,
+										"id": 485,
 										"name": "Record"
 									}
 								},
 								{
-									"id": 404,
+									"id": 493,
 									"name": "options",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7818,7 +9495,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 405,
+											"id": 494,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -7827,7 +9504,7 @@
 											},
 											"children": [
 												{
-													"id": 406,
+													"id": 495,
 													"name": "skipTypes",
 													"kind": 32,
 													"kindString": "Variable",
@@ -7856,7 +9533,7 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														406
+														495
 													]
 												}
 											],
@@ -7874,7 +9551,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 396,
+								"id": 485,
 								"name": "Record"
 							}
 						}
@@ -7888,7 +9565,7 @@
 					]
 				},
 				{
-					"id": 407,
+					"id": 496,
 					"name": "convertColumn",
 					"kind": 64,
 					"kindString": "Function",
@@ -7912,7 +9589,7 @@
 					},
 					"signatures": [
 						{
-							"id": 408,
+							"id": 497,
 							"name": "convertColumn",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -7935,7 +9612,7 @@
 							},
 							"parameters": [
 								{
-									"id": 409,
+									"id": 498,
 									"name": "columnName",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7951,7 +9628,7 @@
 									}
 								},
 								{
-									"id": 410,
+									"id": 499,
 									"name": "columns",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7960,12 +9637,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 388,
+										"id": 477,
 										"name": "Columns"
 									}
 								},
 								{
-									"id": 411,
+									"id": 500,
 									"name": "record",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -7977,12 +9654,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 396,
+										"id": 485,
 										"name": "Record"
 									}
 								},
 								{
-									"id": 412,
+									"id": 501,
 									"name": "skipTypes",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8003,7 +9680,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8017,7 +9694,7 @@
 					]
 				},
 				{
-					"id": 417,
+					"id": 506,
 					"name": "noop",
 					"kind": 64,
 					"kindString": "Function",
@@ -8026,28 +9703,28 @@
 					},
 					"signatures": [
 						{
-							"id": 418,
+							"id": 507,
 							"name": "noop",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 419,
+									"id": 508,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8061,7 +9738,7 @@
 					]
 				},
 				{
-					"id": 429,
+					"id": 518,
 					"name": "toArray",
 					"kind": 64,
 					"kindString": "Function",
@@ -8088,7 +9765,7 @@
 					},
 					"signatures": [
 						{
-							"id": 430,
+							"id": 519,
 							"name": "toArray",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -8114,7 +9791,7 @@
 							},
 							"parameters": [
 								{
-									"id": 431,
+									"id": 520,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8123,12 +9800,12 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								},
 								{
-									"id": 432,
+									"id": 521,
 									"name": "type",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8143,7 +9820,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8157,7 +9834,7 @@
 					]
 				},
 				{
-					"id": 420,
+					"id": 509,
 					"name": "toBoolean",
 					"kind": 64,
 					"kindString": "Function",
@@ -8167,7 +9844,7 @@
 					},
 					"signatures": [
 						{
-							"id": 421,
+							"id": 510,
 							"name": "toBoolean",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -8176,7 +9853,7 @@
 							},
 							"parameters": [
 								{
-									"id": 422,
+									"id": 511,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8185,14 +9862,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8206,7 +9883,7 @@
 					]
 				},
 				{
-					"id": 426,
+					"id": 515,
 					"name": "toJson",
 					"kind": 64,
 					"kindString": "Function",
@@ -8216,7 +9893,7 @@
 					},
 					"signatures": [
 						{
-							"id": 427,
+							"id": 516,
 							"name": "toJson",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -8225,7 +9902,7 @@
 							},
 							"parameters": [
 								{
-									"id": 428,
+									"id": 517,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8234,14 +9911,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8255,7 +9932,7 @@
 					]
 				},
 				{
-					"id": 423,
+					"id": 512,
 					"name": "toNumber",
 					"kind": 64,
 					"kindString": "Function",
@@ -8265,7 +9942,7 @@
 					},
 					"signatures": [
 						{
-							"id": 424,
+							"id": 513,
 							"name": "toNumber",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -8274,7 +9951,7 @@
 							},
 							"parameters": [
 								{
-									"id": 425,
+									"id": 514,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8283,14 +9960,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8304,7 +9981,7 @@
 					]
 				},
 				{
-					"id": 433,
+					"id": 522,
 					"name": "toTimestampString",
 					"kind": 64,
 					"kindString": "Function",
@@ -8323,7 +10000,7 @@
 					},
 					"signatures": [
 						{
-							"id": 434,
+							"id": 523,
 							"name": "toTimestampString",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -8341,7 +10018,7 @@
 							},
 							"parameters": [
 								{
-									"id": 435,
+									"id": 524,
 									"name": "value",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -8350,14 +10027,14 @@
 									},
 									"type": {
 										"type": "reference",
-										"id": 395,
+										"id": 484,
 										"name": "RecordValue"
 									}
 								}
 							],
 							"type": {
 								"type": "reference",
-								"id": 395,
+								"id": 484,
 								"name": "RecordValue"
 							}
 						}
@@ -8376,32 +10053,32 @@
 					"title": "Enumerations",
 					"kind": 4,
 					"children": [
-						363
+						452
 					]
 				},
 				{
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						394,
-						388,
-						396,
-						395
+						483,
+						477,
+						485,
+						484
 					]
 				},
 				{
 					"title": "Functions",
 					"kind": 64,
 					"children": [
-						413,
-						400,
-						407,
-						417,
-						429,
-						420,
-						426,
-						423,
-						433
+						502,
+						489,
+						496,
+						506,
+						518,
+						509,
+						515,
+						512,
+						522
 					]
 				}
 			],
@@ -8470,13 +10147,14 @@
 			"kind": 1,
 			"children": [
 				222,
+				360,
 				109,
-				436,
+				525,
 				3,
 				43,
 				197,
 				29,
-				362,
+				451,
 				1
 			]
 		}
