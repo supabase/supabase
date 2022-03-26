@@ -6,23 +6,23 @@ import { isUndefined } from 'lodash'
 import { Typography } from '@supabase/ui'
 
 import { Project } from 'types'
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useStore, withAuth } from 'hooks'
+import { auth } from 'lib/gotrue'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+
+import Connecting from 'components/ui/Loading'
 import { AccountLayout } from 'components/layouts'
-import { auth } from 'lib/gotrue'
 import Landing from 'components/interfaces/Home/Landing'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
-import Connecting from 'components/ui/Loading'
 
 const Home: NextPage = () => {
   const { app, ui } = useStore()
   const { profile } = ui
 
   const router = useRouter()
-  const { mutateProfile } = useProfile()
 
   const [isDeletingProject, setIsDeletingProject] = useState<boolean>(false)
   const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project>()
@@ -36,12 +36,17 @@ const Home: NextPage = () => {
       const params = new URLSearchParams(queryParams)
       if (router.query?.next?.includes('https://vercel.com')) {
         router.push(`/vercel/integrate?${params.toString()}`)
-      }
-      if (router.query?.next?.includes('new-project')) {
+      } else if (router.query?.next?.includes('new-project')) {
         router.push('/new/project')
-      }
-      if (router.query['x-amzn-marketplace-token'] != undefined) {
+      } else if (router.query['x-amzn-marketplace-token'] != undefined) {
         router.push(`/account/associate?${params.toString()}`)
+      } else if (
+        typeof router.query?.next === 'string' &&
+        router.query?.next?.startsWith('project/_/')
+      ) {
+        router.push(router.query.next as string)
+      } else {
+        router.push('/')
       }
       return <Connecting />
     }
@@ -60,7 +65,7 @@ const Home: NextPage = () => {
       return ui.setNotification({ category: 'error', message: response.error.message })
     }
 
-    app.onProjectDeleted(response, mutateProfile)
+    app.onProjectDeleted(response)
     ui.setNotification({ category: 'success', message: `Deleted ${project.name} successfully!` })
 
     setIsDeletingProject(false)
@@ -84,20 +89,29 @@ const Home: NextPage = () => {
         },
       ]}
     >
-      <div className="p-4">
-        {IS_PLATFORM && (
-          <div className="my-2">
-            <div className="flex">
-              <div className="">
-                <OrganizationDropdown organizations={app.organizations} />
+      {app.organizations.isLoading ? (
+        <div className="flex h-full items-center justify-center space-x-2">
+          <Connecting />
+        </div>
+      ) : (
+        <div className="py-4 px-5">
+          {IS_PLATFORM && (
+            <div className="my-2">
+              <div className="flex">
+                <div className="">
+                  <OrganizationDropdown organizations={app.organizations} />
+                </div>
               </div>
             </div>
+          )}
+          <div className="my-8 space-y-8">
+            <ProjectList
+              onSelectDelete={onSelectDeleteProject}
+              onSelectRestore={onRestoreProject}
+            />
           </div>
-        )}
-        <div className="my-8 space-y-8">
-          <ProjectList onSelectDelete={onSelectDeleteProject} onSelectRestore={onRestoreProject} />
         </div>
-      </div>
+      )}
       <TextConfirmModal
         visible={!isUndefined(selectedProjectToDelete)}
         title="Are you absolutely sure?"

@@ -108,6 +108,17 @@ const Usage: FC<any> = ({ project }) => {
                     provider={'infra-monitoring'}
                   />
                 )}
+
+                {dateRange && (
+                  <ChartHandler
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    attribute={'disk_io_budget'}
+                    label={'Daily Disk IO Budget remaining'}
+                    interval={dateRange.interval}
+                    provider={'infra-monitoring'}
+                  />
+                )}
               </div>
             </Panel.Content>
           </Panel>
@@ -200,11 +211,9 @@ const ResetDbPassword: FC<any> = () => {
             <div>
               <Typography.Text className="block">Database password</Typography.Text>
               <div style={{ maxWidth: '420px' }}>
-                <Typography.Text type="secondary" className="opacity-50">
-                  <p className="opacity-50">
-                    You can use this password to connect directly to your Postgres database.
-                  </p>
-                </Typography.Text>
+                <p className="opacity-50 text-sm">
+                  You can use this password to connect directly to your Postgres database.
+                </p>
               </div>
             </div>
             <div className="flex items-end justify-end">
@@ -256,12 +265,10 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
           <div>
             <Typography.Text className="block">SSL Connection</Typography.Text>
             <div style={{ maxWidth: '420px' }}>
-              <Typography.Text type="secondary" className="opacity-50">
-                <p className="opacity-50">
-                  Use this cert when connecting to your database to prevent snooping and
-                  man-in-the-middle attacks.
-                </p>
-              </Typography.Text>
+              <p className="opacity-50 text-sm">
+                Use this cert when connecting to your database to prevent snooping and
+                man-in-the-middle attacks.
+              </p>
             </div>
           </div>
           <div className="flex items-end justify-end">
@@ -303,7 +310,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const defaultConnString =
+  const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
@@ -311,6 +318,10 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
     `user=${connectionInfo.db_user} password=[YOUR-PASSWORD] ` +
     `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
     ` dbname=${connectionInfo.db_name}`
+  const psqlConnString =
+    `psql -h ${connectionInfo.db_host} -p ` +
+    `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
+    `-U ${connectionInfo.db_user}`
 
   return (
     <>
@@ -392,7 +403,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
               <Tabs type="underlined">
                 {/* @ts-ignore */}
                 <Tabs.Panel id="psql" label="PSQL">
-                  <Input copy readOnly disabled value={defaultConnString} />
+                  <Input copy readOnly disabled value={psqlConnString} />
+                </Tabs.Panel>
+
+                {/* @ts-ignore */}
+                <Tabs.Panel id="uri" label="URI">
+                  <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}
@@ -433,7 +449,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
                 {/* @ts-ignore */}
                 <Tabs.Panel id="nodejs" label="Nodejs">
-                  <Input copy readOnly disabled value={defaultConnString} />
+                  <Input copy readOnly disabled value={uriConnString} />
                 </Tabs.Panel>
 
                 {/* @ts-ignore */}

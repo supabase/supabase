@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Divider, Typography } from '@supabase/ui'
+import { Input, Typography } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
@@ -8,6 +8,8 @@ import Loading from 'components/ui/Loading'
 import Panel from 'components/to-be-cleaned/Panel'
 import PgBouncerConfig from './PgBouncerConfig'
 import DownloadCertificate from './DownloadCertificate'
+
+import Divider from 'components/ui/Divider'
 
 interface Props {}
 
@@ -163,7 +165,7 @@ const BouncerSettings: FC<Props> = ({}) => {
             />
 
             <div className="flex space-x-3">
-              <Typography.Text type="secondary">
+              <p className="text-sm text-scale-1100">
                 <p>
                   Learn more about connection strings{' '}
                   <Typography.Link href="https://supabase.com/docs/reference/postgres/connection-strings">
@@ -175,7 +177,7 @@ const BouncerSettings: FC<Props> = ({}) => {
                   </Typography.Link>
                   .
                 </p>
-              </Typography.Text>
+              </p>
             </div>
           </Panel.Content>
         </Panel>

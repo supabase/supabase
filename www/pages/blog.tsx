@@ -2,6 +2,7 @@ import fs from 'fs'
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -88,9 +89,9 @@ function Blog(props: any) {
         <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
-              {props.blogs.slice(0, 1).map((blog: any, idx: any) => {
-                return FeaturedThumb(blog)
-              })}
+              {props.blogs.slice(0, 1).map((blog: any, i: number) => (
+                <FeaturedThumb key={i} {...blog} />
+              ))}
             </div>
           </div>
         </div>
@@ -102,7 +103,7 @@ function Blog(props: any) {
                 <div className="col-span-12 lg:col-span-12">
                   <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
                     {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} label={categoryId}>
+                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId}>
                         {/* <p>{categoryId}</p> */}
                         <></>
                       </Tabs.Panel>
@@ -114,8 +115,11 @@ function Blog(props: any) {
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
               {blogs.map((blog: PostTypes, idx: number) => (
-                <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16">
-                  <BlogListItem blog={blog} key={idx} />
+                <div
+                  className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16"
+                  key={idx}
+                >
+                  <BlogListItem blog={blog} />
                 </div>
               ))}
             </ol>
@@ -134,10 +138,13 @@ function FeaturedThumb(blog: PostTypes) {
     <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <img
-            className="h-96 w-full object-cover border dark:border-dark rounded-lg"
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-          />
+          <div className="relative overflow-auto w-full h-96 border dark:border-dark rounded-lg">
+            <Image
+              src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
           <div className="flex flex-col space-y-4">
             <div className="flex space-x-2">
               <Typography.Text type="secondary">{blog.date}</Typography.Text>
@@ -155,7 +162,14 @@ function FeaturedThumb(blog: PostTypes) {
             {author && (
               <div className="flex space-x-3 items-center">
                 {author.author_image_url && (
-                  <img src={author.author_image_url} className="rounded-full w-10" />
+                  <div className="relative overflow-auto w-10 h-10">
+                    <Image
+                      src={author.author_image_url}
+                      className="rounded-full"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
                 )}
                 <div className="flex flex-col">
                   <Typography.Text>{author.author}</Typography.Text>

@@ -6,14 +6,12 @@ import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
 import dayjs from 'dayjs'
 import {
-  Typography,
   Dropdown,
   Button,
   IconSave,
   Badge,
   IconSettings,
   IconArrowRight,
-  Divider,
   IconHome,
   IconChevronRight,
   IconPlus,
@@ -30,7 +28,7 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 
 const ReactGridLayout = WidthProvider(RGL)
-const { Title } = Typography
+
 const LAYOUT_COLUMN_COUNT = 24
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -306,15 +304,12 @@ const Reports = () => {
                 }
               >
                 <Dropdown.TriggerItem icon={cat.icon ? cat.icon : <IconHome size="tiny" />}>
-                  <div className="flex items-center justify-between w-full">
-                    <span>{cat.label}</span>
-                    <Typography.Text type="secondary">
-                      <IconChevronRight size="small" />
-                    </Typography.Text>
-                  </div>
+                  {cat.label}
+                  <Dropdown.RightSlot>
+                    <IconChevronRight size={14} />
+                  </Dropdown.RightSlot>
                 </Dropdown.TriggerItem>
               </Dropdown>
-              <Divider light />
             </>
           )
         })}
@@ -324,9 +319,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <Title level={3} className="m-0">
-        Reports
-      </Title>
+      <h1 className="text-xl text-scale-1200">Reports</h1>
 
       <div className="flex mb-4 items-center space-x-3 justify-between">
         <div className="flex space-x-3 items-center">
@@ -340,15 +333,15 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden lg:flex space-x-1 items-center ">
-              <Typography.Text type="secondary">
+              <span className="text-sm text-scale-1100">
                 {dayjs(startDate).format('MMM D, YYYY')}
-              </Typography.Text>
-              <Typography.Text type="secondary" className="opacity-50">
+              </span>
+              <span className="text-scale-900">
                 <IconArrowRight size={12} />
-              </Typography.Text>
-              <Typography.Text type="secondary">
+              </span>
+              <span className="text-sm text-scale-1100">
                 {dayjs(endDate).format('MMM D, YYYY')}
-              </Typography.Text>
+              </span>
             </div>
           )}
         </div>
@@ -423,7 +416,7 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
         <div
           key={x.id}
           data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
-          className="relative react-grid-layout__report-item bg-white dark:bg-gray-700 border shadow-sm dark:border-dark rounded px-6 py-4 hover:border-green-600 dark:hover:border-green-600 group"
+          className="relative react-grid-layout__report-item bg-panel-body-light dark:bg-panel-body-dark border border-panel-border-light dark:border-panel-border-dark shadow-sm rounded px-6 py-4 hover:border-green-900 dark:hover:border-green-900 group"
         >
           <ChartHandler
             startDate={startDate}
@@ -436,8 +429,8 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
           />
           <div className="absolute top-3 inset-x-0 ">
             <div className="flex justify-around">
-              <div className="w-24 h-3 space-y-2 flex flex-col cursor-drag">
-                <div className="transition-all border-4 border-dotted border-green-600 h-3 w-full hidden opacity-50 group-hover:block hover:opacity-100"></div>
+              <div className="w-24 h-3 space-y-2 flex flex-col cursor-move">
+                <div className="transition-all border-4 border-dotted border-green-900 h-3 w-full hidden opacity-50 group-hover:block hover:opacity-100"></div>
               </div>
             </div>
           </div>

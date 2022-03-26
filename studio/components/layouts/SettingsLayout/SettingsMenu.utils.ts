@@ -1,7 +1,9 @@
+import { LOG_TYPE_LABEL_MAPPING } from 'components/interfaces/Settings/Logs'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { LOG_TYPE_LABEL_MAPPING } from 'lib/constants'
 
 export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
+  const logTypes: string[] = ['explorer', 'database', 'api']
+
   return [
     {
       title: 'Project settings',
@@ -9,7 +11,14 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
         { name: 'General', key: 'general', url: `/project/${ref}/settings/general`, items: [] },
         { name: 'Database', key: 'database', url: `/project/${ref}/settings/database`, items: [] },
         { name: 'API', key: 'api', url: `/project/${ref}/settings/api`, items: [] },
-        { name: 'Auth Settings', key: 'auth', url: `/project/${ref}/auth/settings`, items: [] },
+        { name: 'Authentication', key: 'auth', url: `/project/${ref}/auth/settings`, items: [] },
+        // TODO(thebengeu): Uncomment once all tenants migrated to multitenant storage API.
+        // {
+        //   name: 'Storage',
+        //   key: 'storage',
+        //   url: `/project/${ref}/storage/settings`,
+        //   items: [],
+        // },
         {
           name: 'Billing & Usage',
           key: 'billing',
@@ -20,15 +29,12 @@ export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
     },
     {
       title: 'Logs',
-      // items: ['database', 'auth', 'realtime', 'rest', 'storage'].map((type: string) => {
-      items: ['database', 'rest'].map((type: string) => {
-        return {
-          name: LOG_TYPE_LABEL_MAPPING[type],
-          key: `logs-${type}`,
-          url: `/project/${ref}/settings/logs/${type}`,
-          items: [],
-        }
-      }),
+      items: logTypes.map((type: string) => ({
+        name: LOG_TYPE_LABEL_MAPPING[type],
+        key: `logs-${type}`,
+        url: `/project/${ref}/settings/logs/${type}`,
+        items: [],
+      })),
     },
   ]
 }

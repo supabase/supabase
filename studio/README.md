@@ -4,7 +4,7 @@ A dashboard for managing your self-hosted Supabase project, and used on our [hos
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
-- [Supabase UI](https://ui.supabase.io/)
+- [Supabase UI](https://ui.supabase.com/)
 - [MobX](https://www.mobxjs.com/)
 
 ## Disclaimer
@@ -71,4 +71,20 @@ Then run the following commands to install dependencies and start the dashboard.
 ```
 npm install
 npm run dev
+```
+
+## UI Testing Notes
+
+### `<Popover>` vs `<Dropdown>`
+
+When simulating clicks on these components, do the following:
+
+```js
+// for Popovers
+import userEvent from '@testing-library/user-event'
+userEvent.click('Hello world')
+
+// for Popovers
+import clickDropdown from 'tests/helpers'
+clickDropdown('Hello world')
 ```
