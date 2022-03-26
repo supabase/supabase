@@ -72,31 +72,17 @@ export const LogPage: NextPage = () => {
   const title = `Logs - ${LOG_TYPE_LABEL_MAPPING[type as keyof typeof LOG_TYPE_LABEL_MAPPING]}`
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, search_query: s as string }))
-    if (te) {
-      setTo(te as string)
-    } else {
-      setTo('')
+    if (filters.search_query !== s) {
+      setFilters((prev) => ({ ...prev, search_query: s as string }))
     }
-    if (ts) {
+    if (te !== params.timestamp_end) {
+      setTo(te as string)
+    }
+    if (ts !== params.timestamp_start) {
       setFrom(ts as string)
-    } else {
-      setFrom('')
     }
   }, [s, te, ts])
 
-  useEffect(() => {
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        q: undefined,
-        s: filters.search_query || '',
-        ts: params.timestamp_start,
-        te: params.timestamp_end,
-      },
-    })
-  }, [params.timestamp_end, params.timestamp_start, filters.search_query])
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
@@ -121,10 +107,20 @@ export const LogPage: NextPage = () => {
       setTo(String(toValue))
     }
     if (from || fromMicro) {
-      const fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
+      fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
       setFrom(String(fromValue))
     }
     setFilters((prev) => ({ ...prev, search_query: query || '' }))
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        s: query || '',
+        ts: fromValue,
+        te: toValue,
+      },
+    })
   }
 
   return (
