@@ -159,7 +159,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         whereFilters={whereFilters}
         table={table}
       />
-      {showChart && (
+      {showChart && !isLoading ? (
         <div>
           <LogEventChart
             data={!isLoading ? logData : undefined}
@@ -168,26 +168,21 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
             }}
           />
         </div>
-      )}
+      ) : null}
       <div className="flex flex-col flex-grow relative">
-        {isLoading && (
-          <div
-            className={[
-              'absolute top-0 w-full h-full flex items-center justify-center',
-              'bg-gray-100 opacity-75 z-50',
-            ].join(' ')}
-          >
-            <IconLoader className="animate-spin" />
-          </div>
-        )}
-
-        <LogTable data={logData} queryType={queryType} />
+        {isLoading && <div className="logs-shimmering-loader w-full h-0.5"></div>}
+        <div
+          className={
+            'flex h-full flex-grow transition-opacity ' + (isLoading ? 'opacity-30' : 'opacity-100')
+          }
+        >
+          <LogTable data={logData} queryType={queryType} />
+        </div>
         <div className="p-2">
           <Button onClick={() => loadOlder()} icon={<IconRewind />} type="default">
             Load older
           </Button>
         </div>
-
         {error && (
           <div className="flex w-full h-full justify-center items-center mx-auto">
             <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
