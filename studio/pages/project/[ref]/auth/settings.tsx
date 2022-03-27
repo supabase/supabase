@@ -121,6 +121,7 @@ const Settings = () => {
             'JWT_EXP',
             'DISABLE_SIGNUP',
             'PASSWORD_MIN_LENGTH',
+            'SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION',
           ])}
           model={{
             SITE_URL: model.SITE_URL || undefined,
@@ -128,6 +129,7 @@ const Settings = () => {
             DISABLE_SIGNUP: model.DISABLE_SIGNUP,
             JWT_EXP: model.JWT_EXP || undefined,
             PASSWORD_MIN_LENGTH: model.PASSWORD_MIN_LENGTH || undefined,
+            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: model.SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION || false,
           }}
           onSubmit={(model: any) => onFormSubmit(model)}
         >
@@ -143,6 +145,7 @@ const Settings = () => {
           />
           <NumField name="JWT_EXP" step="1" />
           <NumField name="PASSWORD_MIN_LENGTH" step="1" />
+          <ToggleField name="SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION" />
           <ToggleField name="DISABLE_SIGNUP" />
         </SchemaFormPanel>
       </div>

@@ -6,6 +6,7 @@
     "JWT_EXP",
     "JWT_AUD",
     "JWT_DEFAULT_GROUP_NAME",
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION",
     "EXTERNAL_EMAIL_ENABLED",
     "EXTERNAL_PHONE_ENABLED",
     "EXTERNAL_APPLE_ENABLED",
@@ -395,6 +396,11 @@
     "PASSWORD_MIN_LENGTH": {
       "title": "Minimum password length",
       "type": "integer"
+    },
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
+      "title": "Enable strict password updates",
+      "type": "boolean",
+      "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
     },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",

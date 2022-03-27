@@ -38,6 +38,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     MAILER_URLPATHS_CONFIRMATION: '',
     MAILER_URLPATHS_RECOVERY: '',
     MAILER_URLPATHS_EMAIL_CHANGE: '',
+    SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: false,
     SMTP_ADMIN_EMAIL: '',
     SMTP_HOST: null,
     SMTP_PORT: null,
