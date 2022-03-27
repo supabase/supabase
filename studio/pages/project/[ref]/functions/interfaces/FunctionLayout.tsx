@@ -6,18 +6,19 @@ import { Tab } from '@headlessui/react'
 import FunctionsNav from './FunctionsNav'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
 
   const router = useRouter()
-  const { id } = router.query
+  const { id, ref } = router.query
 
   useEffect(() => {
     functions.load()
   }, [ui.selectedProject])
 
-  if (!functions.isInitialized) {
+  if (!functions.list()) {
     return (
       <BaseLayout>
         <Loading active={true}>loading</Loading>
@@ -25,11 +26,12 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
     )
   }
 
+  console.log('has functions')
+
   const item = functions.byId(id)
+  console.log(item)
 
   const name = item?.name || ''
-
-  console.log('item', item)
 
   return (
     <BaseLayout>
@@ -58,7 +60,17 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
             >
               <IconCode size={14} strokeWidth={3} />
             </div>
-            <h1 className="text-2xl text-scale-1200">Functions</h1>
+            <Link href={`/project/${ref}/functions`}>
+              <h1
+                className="
+              transition-colors 
+              text-2xl text-scale-1200 
+              cursor-pointer 
+              hover:text-scale-1100"
+              >
+                Functions
+              </h1>
+            </Link>
 
             <span className="text-scale-800 dark:text-scale-700">
               <svg
