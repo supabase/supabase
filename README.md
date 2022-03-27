@@ -217,7 +217,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
 
 ---
-
+ 
 ## Sponsors
 
 [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
