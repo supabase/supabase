@@ -1,15 +1,17 @@
-import { Accordion, Button, IconCheck, Typography } from '@supabase/ui'
+import { Accordion, Button, Collapsible, IconCheck, IconChevronUp, Typography } from '@supabase/ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { Fragment, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
+import { Check, PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
 import pricing from '~/data/Pricing.json'
 import pricingFaq from '~/data/PricingFAQ.json'
+import pricingAddOn from '~/data/PricingAddOn.json'
+import classNames from 'classnames'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -35,6 +37,7 @@ export default function IndexPage() {
       ],
       scale: 'Anything more than the above you must upgrade',
       shutdown: 'Free projects are shutdown after 7 days of inactivity.',
+      cta: 'Get Started',
     },
     {
       name: 'Pro',
@@ -52,22 +55,24 @@ export default function IndexPage() {
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
+      cta: 'Get Started',
     },
-    // {
-    //   name: 'Enterprise',
-    //   href: '#',
-    //   description: 'Tailored to your business needs.',
-    //   features: [
-    //     '∞ authenticated users',
-    //     '∞ GB Database',
-    //     '∞ GB Storage',
-    //     'Unlimited Realtime connections',
-    //     'Backups never deleted',
-    //     'Enterprise support',
-    //   ],
-    //   scale: 'Additional fees apply for usage and storage beyond the limits above.',
-    //   shutdown: '',
-    // },
+    {
+      name: 'Enterprise',
+      href: 'mailto:support@supabase.io',
+      description: 'Tailored to your business needs.',
+      features: [
+        'Unlimited Authenticated Users',
+        'Unlimited GB Database',
+        'Unlimited GB Storage',
+        'Unlimited Realtime connections',
+        '30 days Point in Time backup',
+        'Enterprise Support',
+      ],
+      scale: '',
+      shutdown: '',
+      cta: 'Contact Us',
+    },
   ]
 
   const allPlans = [
@@ -82,16 +87,21 @@ export default function IndexPage() {
     priceDescription,
     price,
     tier,
+    showDollarSign = true,
   }: {
     description: string
     priceDescription: string
     price: string
     tier: string
+    showDollarSign?: boolean
   }) => {
     return (
       <div className="px-4">
         <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
-        <span className="h1">${price}</span>
+        <span className="h1">
+          {showDollarSign && '$'}
+          {price}
+        </span>
         <p className="p">{priceDescription}</p>
         <p className="p">{description}</p>
         <Link href="https://app.supabase.io" passHref>
@@ -102,6 +112,8 @@ export default function IndexPage() {
       </div>
     )
   }
+
+  const [isDatabaseAddOnOpen, setIsDatabaseAddOnOpen] = useState(false)
 
   return (
     <DefaultLayout>
@@ -120,11 +132,11 @@ export default function IndexPage() {
         }}
       />
 
-      <div className="shadow-lg">
-        <div className="py-12 bg-scale-100 lg:py-24">
+      <div className="shadow-sm">
+        <div className="py-16 bg-scale-100 lg:py-28">
           <div className="px-4 mx-auto text-center max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto space-y-2 lg:max-w-none">
-              <h2 className="text-3xl text-scale-1200 sm:text-4xl lg:text-5xl">
+              <h2 className="text-3xl text-scale-1200 md:text-5xl lg:text-6xl">
                 Predictable pricing, no surprises
               </h2>
               <p className="text-xl text-scale-1100">
@@ -136,23 +148,23 @@ export default function IndexPage() {
 
         <div className="flex flex-col pb-12 bg-scale-100 sm:pb-16 lg:pb-24">
           <div className="relative pt-8">
-            <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/4" />
+            <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" />
 
             <div className="relative z-10 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-              <div className="max-w-md mx-auto space-y-4 lg:max-w-5xl lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
+              <div className="max-w-md mx-auto space-y-4 lg:max-w-7xl lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
                 {tiers.map((tier) => (
                   <div
                     key={tier.name}
                     className="flex flex-col overflow-hidden rounded-lg shadow-lg"
                   >
-                    <div className="h-64 px-10 pt-8 bg-white dark:bg-scale-700">
+                    <div className="h-64 px-10 pt-8 bg-white dark:bg-scale-300">
                       <h3
                         className="inline-flex mb-2 text-sm font-normal tracking-wide rounded-full lg:text-xl text-scale-1200"
                         id="tier-standard"
                       >
                         {tier.name}
                       </h3>
-                      <div className="flex items-baseline text-6xl font-extrabold text-scale-1200">
+                      <div className="flex items-baseline text-6xl font-extrabold lg:text-4xl xl:text-6xl text-scale-1200">
                         {tier.priceMonthly !== undefined ? (
                           <>
                             <span>${tier.priceMonthly}</span>
@@ -170,20 +182,22 @@ export default function IndexPage() {
                       <p className="mt-4 text-lg text-scale-1100">{tier.description}</p>
                     </div>
 
-                    <div className="flex flex-col justify-between flex-1 px-6 pt-6 pb-8 space-y-6 border-t bg-scale-100 dark:border-dark sm:p-10 sm:pt-6">
+                    <div className="flex flex-col justify-between flex-1 px-6 pt-6 pb-8 space-y-6 border-t bg-scale-100 dark:border-scale-600 sm:p-10 sm:pt-6">
                       <div>
                         <p className="text-scale-900">Included with plan:</p>
                         <ul role="list" className="divide-y">
                           {tier.features.map((feature) => (
                             <li key={feature} className="flex items-center py-2">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 bg-opacity-30">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 dark:bg-brand-400 bg-opacity-30">
                                 <IconCheck
-                                  className="w-4 h-4 text-green-800"
+                                  className="w-4 h-4 text-green-800 dark:text-green-900"
                                   aria-hidden="true"
                                   strokeWidth={2}
                                 />
                               </div>
-                              <p className="mb-0 ml-3 text-lg text-scale-1100">{feature}</p>
+                              <p className="mb-0 ml-3 text-base text-scale-1100 dark:text-scale-1200">
+                                {feature}
+                              </p>
                             </li>
                           ))}
                         </ul>
@@ -193,8 +207,8 @@ export default function IndexPage() {
                         <p className="text-xs text-scale-900">{tier.shutdown}</p>
                       </div>
                       <a href={tier.href}>
-                        <Button block size="large">
-                          Get Started
+                        <Button block size="large" className="dark:text-white">
+                          {tier.cta}
                         </Button>
                       </a>
                     </div>
@@ -203,100 +217,131 @@ export default function IndexPage() {
               </div>
             </div>
           </div>
-
-          <div className="flex justify-start w-full max-w-5xl px-6 mx-auto mt-8 overflow-hidden lg:px-0">
-            <div className="flex flex-col">
-              <span className="text-scale-900">All plans include:</span>
-              <ul role="list" className="divide-y">
-                {allPlans.map((feature) => (
-                  <li key={feature} className="flex items-center py-2">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 bg-opacity-30">
-                      <IconCheck
-                        className="w-4 h-4 text-green-800"
-                        aria-hidden="true"
-                        strokeWidth={2}
-                      />
-                    </div>
-                    <p className="mb-0 ml-3 text-lg text-scale-1100">{feature}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="relative px-4 mx-auto mt-12 max-w-7xl sm:px-6 lg:px-8">
-            <div className="max-w-md mx-auto lg:max-w-5xl">
-              <div className="px-6 py-8 border rounded-lg shadow-lg border-brand-500 bg-scale-100 sm:p-10 lg:flex lg:items-center">
-                <div className="flex-1">
-                  <div>
-                    <h3 className="inline-flex px-4 py-1 text-sm font-semibold tracking-wide uppercase rounded-full bg-brand-600 bg-opacity-30 text-brand-1100">
-                      Enterprise
-                    </h3>
-                  </div>
-                  <div className="mt-4 text-lg text-scale-1100">
-                    Get a custom plan, tailor made for your company's needs. Scale to millions of
-                    users with enterprise grade features. Includes enterprise support + SLAs &amp;
-                    SSO
-                  </div>
-                </div>
-
-                <div className="mt-6 rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
-                  <Link
-                    href="mailto:support@supabase.io"
-                    as="mailto:support@supabase.io"
-                    passHref={true}
-                  >
-                    <Button as="a" size="large" type="outline" className="w-full">
-                      Contact Us for Pricing
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-scale-800">
+      <div className="container relative px-0 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+        <div className="text-center">
+          <h2 className="text-3xl text-scale-1200">Add-Ons</h2>
+          <p className="mb-16 text-lg text-scale-1100">
+            Level up your database&apos;s performance with Supabase Database add-ons.
+          </p>
+        </div>
+
+        <div>
+          <Collapsible open={isDatabaseAddOnOpen} onOpenChange={setIsDatabaseAddOnOpen}>
+            <Collapsible.Trigger asChild>
+              <button
+                className={classNames(
+                  'flex flex-row items-center w-full border rounded-t group text-scale-1200 border-scale-500',
+                  !isDatabaseAddOnOpen && 'rounded-b'
+                )}
+                type="button"
+              >
+                <div className="flex flex-col items-start flex-1 lg:items-center lg:flex-row">
+                  <span className="flex-shrink-0 p-3">See add-on pricing plans</span>
+
+                  <div className="flex items-center justify-between flex-1 lg:border-l border-scale-500">
+                    <div className="grid grid-cols-1 gap-4 p-3 grid-flow-rows lg:grid-cols-2">
+                      <div className="flex items-center space-x-2">
+                        <Check />
+                        <span>Dedicated Postgres Database</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Check />
+                        <span>Optimized Database Instances</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Check />
+                        <span>Realtime Functionality</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 p-3">
+                  <IconChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
+                </div>
+              </button>
+            </Collapsible.Trigger>
+
+            <Collapsible.Content>
+              <div>
+                <table className="hidden w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:table">
+                  <thead>
+                    <tr className="bg-scale-500">
+                      <th className="p-3 text-left">Plan</th>
+                      <th className="p-3 text-left">Pricing</th>
+                      <th className="p-3 text-left">CPU</th>
+                      <th className="p-3 text-left">Memory</th>
+                      <th className="p-3 text-left">Connections: Direct</th>
+                      <th className="p-3 text-left">Connections: Pooler</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pricingAddOn.database.tiers.map((tier, i) => (
+                      <tr key={i} className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                        <td className="p-3">{tier.plan}</td>
+                        <td className="p-3">{tier.pricing}</td>
+                        <td className="p-3">{tier.cpu}</td>
+                        <td className="p-3">{tier.memory}</td>
+                        <td className="p-3">{tier.directConnections}</td>
+                        <td className="p-3">{tier.poolerConnections}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <table className="w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:hidden">
+                  <tbody>
+                    {pricingAddOn.database.tiers.map((tier, i) => (
+                      <Fragment key={i}>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">Plan</th>
+                          <td className="px-4 py-3">{tier.plan}</td>
+                        </tr>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">Pricing</th>
+                          <td className="px-4 py-3">{tier.pricing}</td>
+                        </tr>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">CPU</th>
+                          <td className="px-4 py-3">{tier.cpu}</td>
+                        </tr>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">Memory</th>
+                          <td className="px-4 py-3">{tier.memory}</td>
+                        </tr>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">Connections: Direct</th>
+                          <td className="px-4 py-3">{tier.directConnections}</td>
+                        </tr>
+                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
+                          <th className="py-3 pl-4 text-left">Connections: Pooler</th>
+                          <td className="px-4 py-3">{tier.poolerConnections}</td>
+                        </tr>
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Collapsible.Content>
+          </Collapsible>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-scale-100">
         <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 md:pt-24 lg:pt-24">
           <div className="text-center">
-            <h2 className="text-3xl">Compare plans</h2>
-            <p className="mb-16 text-lg">
+            <h2 className="text-3xl text-scale-1200">Compare plans</h2>
+            <p className="mb-16 text-lg text-scale-1100">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
 
-          {/* <!-- xs to lg --> */}
-          <div className="lg:hidden">
-            {/* Free - Mobile  */}
-            <div className="px-4">
-              <h2 className="text-lg font-medium leading-6 text-scale-900 dark:text-white">Free</h2>
-              <p className="mt-4">
-                <span className="text-4xl font-normal text-scale-900 dark:text-white">$0</span>
-                <Typography.Text type="secondary">/project /month</Typography.Text>
-              </p>
-              <p className="my-4 text-sm text-scale-500">
-                Perfect for hobby projects and experiments.
-              </p>
-              <Link href="https://app.supabase.io" as="https://app.supabase.io">
-                <a>
-                  <Button type="outline" size="medium" block>
-                    Get started
-                  </Button>
-                </a>
-              </Link>
-            </div>
-            <div className="container relative px-6 pt-24 mx-auto lg:px-16 xl:px-20 md:pt-24 lg:pt-24">
-              <div className="text-center">
-                <h1 className="h1">Predictable pricing, no surprises</h1>
-                <p className="p">
-                  Start with a hobby project, collaborate with a team, and scale to millions of
-                  users.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="container relative px-0 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+          <div className="container relative px-0 py-4 mx-auto lg:px-16 xl:px-20 sm:py-12 md:py-16 lg:py-20">
             {/* <!-- xs to lg --> */}
 
             <div className=" lg:hidden">
@@ -357,8 +402,9 @@ export default function IndexPage() {
               <MobileHeaders
                 tier="Enterprise"
                 price={'Contact Us'}
-                priceDescription={'/project /month plus usage costs'}
+                priceDescription={'for a quote'}
                 description={'Designated support team, account manager and technical specialist'}
+                showDollarSign={false}
               />
 
               <PricingTableRowMobile
@@ -386,15 +432,15 @@ export default function IndexPage() {
                 <caption className="sr-only">Pricing plan comparison</caption>
                 <thead
                   className="
-              thead--plans 
-              sticky 
-              z-10 
-              top-[62px] 
-              border-b 
-              border-scale-700 
-              dark:border-scale-400 
-              bg-scale-200
-            "
+                    thead--plans 
+                    sticky 
+                    z-10 
+                    top-[62px] 
+                    border-b 
+                    border-scale-700 
+                    dark:border-scale-400 
+                    bg-scale-200
+                  "
                 >
                   <tr>
                     <th
@@ -587,27 +633,27 @@ export default function IndexPage() {
               </Link>
               <div className="mt-16">
                 {/* @ts-ignore */}
-                <Accordion type="bordered">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
-                    {pricingFaq.map((faq, i) => {
-                      return (
-                        <div>
-                          {/* @ts-ignore */}
-                          <Accordion
-                            type="bordered"
-                            openBehaviour="multiple"
-                            size="medium"
-                            className="text-scale-900 dark:text-white"
-                          >
-                            <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
-                              <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                            </Accordion.Item>
-                          </Accordion>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </Accordion>
+                {/* <Accordion type="bordered"> */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
+                  {pricingFaq.map((faq, i) => {
+                    return (
+                      <div key={i}>
+                        {/* @ts-ignore */}
+                        <Accordion
+                          type="bordered"
+                          openBehaviour="multiple"
+                          size="medium"
+                          className="text-scale-900 dark:text-white"
+                        >
+                          <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
+                            <ReactMarkdown>{faq.answer}</ReactMarkdown>
+                          </Accordion.Item>
+                        </Accordion>
+                      </div>
+                    )
+                  })}
+                </div>
+                {/* </Accordion> */}
               </div>
             </div>
           </div>

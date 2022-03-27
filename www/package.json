@@ -18,7 +18,7 @@
     "@next/mdx": "^10.0.7",
     "@supabase/supabase-js": "^1.6.0",
     "@supabase/ui": "v0.37.0-alpha.50",
-    "classnames": "2.2.6",
+    "classnames": "^2.3.1",
     "date-fns": "2.10.0",
     "deepmerge": "^4.2.2",
     "globby": "^12.0.2",
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.2",
-    "@types/classnames": "^2.2.10",
+    "@types/classnames": "^2.3.1",
     "@types/jest": "^25.2.2",
     "@types/node": "^14.0.1",
     "@types/react": "^16.9.35",
