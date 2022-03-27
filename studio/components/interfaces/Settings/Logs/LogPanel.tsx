@@ -29,6 +29,7 @@ interface Props {
   onSelectTemplate: (template: LogTemplate) => void
   isShowingEventChart: boolean
   onToggleEventChart: () => void
+  editorControls: React.ReactNode
 }
 
 dayjs.extend(utc)
@@ -50,6 +51,7 @@ const LogPanel: FC<Props> = ({
   onSelectTemplate,
   isShowingEventChart,
   onToggleEventChart,
+  editorControls,
 }) => {
   const [search, setSearch] = useState('')
   const [to, setTo] = useState({ value: '', error: '' })
@@ -100,6 +102,7 @@ const LogPanel: FC<Props> = ({
   const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
 
   const showReset = to.value !== '' || from.value !== ''
+
   return (
     <div
       className="
@@ -110,7 +113,7 @@ const LogPanel: FC<Props> = ({
     "
     >
       <div className="px-5 py-2 flex items-center justify-between w-full">
-        <div className="flex flex-row gap-x-4 items-center">
+        <div className="flex flex-row gap-x-4 items-center justify-between w-full">
           {!isCustomQuery && (
             <Button
               type="text"
@@ -141,25 +144,38 @@ const LogPanel: FC<Props> = ({
               Refresh
             </Button>
           )}
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={templates.map((template: LogTemplate) => (
-              <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
-                <Typography.Text>{template.label}</Typography.Text>
-              </Dropdown.Item>
-            ))}
-          >
-            <Button as="span" type="default" iconRight={<IconChevronDown />}>
-              Templates
-            </Button>
-          </Dropdown>
 
-          {!isCustomQuery && (
-            <Button as="span" type="outline" onClick={onCustomClick}>
-              Explore via query
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <Dropdown
+              side="bottom"
+              align="start"
+              overlay={templates.map((template: LogTemplate) => (
+                <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
+                  <Typography.Text>{template.label}</Typography.Text>
+                </Dropdown.Item>
+              ))}
+            >
+              <Button as="span" type="default" iconRight={<IconChevronDown />}>
+                Insert source
+              </Button>
+            </Dropdown>
+
+            <Dropdown
+              side="bottom"
+              align="start"
+              overlay={templates.map((template: LogTemplate) => (
+                <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
+                  <Typography.Text>{template.label}</Typography.Text>
+                </Dropdown.Item>
+              ))}
+            >
+              <Button as="span" type="default" iconRight={<IconChevronDown />}>
+                Templates
+              </Button>
+            </Dropdown>
+          </div>
+
+          <div>{editorControls}</div>
         </div>
         <div className="flex items-center   gap-x-4">
           {!isCustomQuery && (
@@ -229,6 +245,7 @@ const LogPanel: FC<Props> = ({
                 </div>
               )}
               {/* wrap with form so that if user presses enter, the search value will submit automatically */}
+
               <form
                 id="log-panel-search"
                 onSubmit={(e) => {

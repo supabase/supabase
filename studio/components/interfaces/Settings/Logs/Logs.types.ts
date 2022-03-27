@@ -27,6 +27,7 @@ export interface LogData {
 
 export interface LogTemplate {
   label?: string
+  description?: string
   mode: 'custom' | 'simple'
   for?: string[]
   searchString: string
