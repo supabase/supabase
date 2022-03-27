@@ -180,7 +180,7 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
         </div>
       </div>
 
-      <div
+      {/* <div
         className="
        col-span-2
         bg-scale-300 rounded px-10 py-8 flex flex-col gap-8"
@@ -248,7 +248,7 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   )
 }
@@ -256,8 +256,6 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
 const PageLayout = () => {
   const router = useRouter()
   const { ui, functions } = useStore()
-
-  const [pageState, setPageState] = useState('list')
 
   const project = ui.selectedProject
 
@@ -270,13 +268,6 @@ const PageLayout = () => {
   useEffect(() => {
     functions.load()
   }, [ui.selectedProject])
-
-  const Selection = () => (
-    <div>
-      <Button onClick={() => setPageState('empty')}>empty list</Button>
-      <Button onClick={() => setPageState('list')}>list</Button>
-    </div>
-  )
 
   if (functions.isLoading)
     return (
@@ -296,7 +287,6 @@ const PageLayout = () => {
     return (
       <FunctionsLayout>
         <FunctionsList functions={functions.list()} />
-        <Selection />
       </FunctionsLayout>
     )
   }

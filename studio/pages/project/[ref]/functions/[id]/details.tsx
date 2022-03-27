@@ -96,7 +96,7 @@ const PageLayout = () => {
 
   return (
     <FunctionLayout>
-      <div className="grid gap-y-12 lg:grid-cols-2 lg:gap-x-16 py-12">
+      <div className="grid gap-y-12 lg:grid-cols-2 lg:gap-x-16">
         <div>
           <div
             className="

@@ -19,7 +19,7 @@ const FunctionsNav = ({ item }) => {
     >
       <Tabs.Panel id="metrics" label="Metrics" />
       <Tabs.Panel id="details" label="Details" />
-      <Tabs.Panel id="triggers" label="Triggers" />
+      {/* <Tabs.Panel id="triggers" label="Triggers" /> */}
       <Tabs.Panel id="invocations" label="Invocations" />
       <Tabs.Panel id="logs" label="Logs" />
     </Tabs>

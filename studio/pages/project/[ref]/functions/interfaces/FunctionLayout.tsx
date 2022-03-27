@@ -1,12 +1,13 @@
 import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
-import { IconCode, IconSlash, Loading, Tabs } from '@supabase/ui'
+import { IconAlertCircle, IconCode, IconSlash, Loading, Tabs } from '@supabase/ui'
 import { Tab } from '@headlessui/react'
 import FunctionsNav from './FunctionsNav'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import WarningBanner from 'components/ui/WarningBanner'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
@@ -35,6 +36,11 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <BaseLayout>
+      <WarningBanner
+        title={' Supabase Functions is a pre release version'}
+        description={'We do advise you use Supabase Functions in production at this time'}
+      />
+
       <div className="h-full flex flex-col flex-grow py-10">
         <div
           className="
