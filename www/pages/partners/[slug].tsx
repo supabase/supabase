@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { IconChevronLeft, IconExternalLink, Typography } from '@supabase/ui'
+import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
@@ -34,39 +34,40 @@ function Partner({ partner }: { partner: Partner }) {
           ],
         }}
       />
+
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mb-2 space-y-12 lg:col-span-2">
+          <div className="max-w-5xl col-span-12 mx-auto mb-2 space-y-12 lg:col-span-2">
             {/* Back button */}
-            <Typography.Text type="secondary">
-              <Link
-                href={`/partners/${partner.type === 'technology' ? 'integrations' : 'experts'}`}
-              >
-                <a className="flex items-center cursor-pointer hover:text-gray-900 dark:hover:text-white">
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </a>
-              </Link>
-            </Typography.Text>
+            <Link href={`/partners/${partner.type === 'technology' ? 'integrations' : 'experts'}`}>
+              <a className="flex items-center transition-colors cursor-pointer text-scale-1200 hover:text-scale-1000">
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </a>
+            </Link>
 
             <div className="flex items-center space-x-4">
               <img
-                className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-f0"
+                className="rounded-full bg-scale-400 w-14 h-14 flex-shrink-f0"
                 src={partner.logo}
                 alt={partner.title}
               />
-              <Typography.Title className="mb-0">{partner.title}</Typography.Title>
+              <h1 className="text-6xl font-semibold text-scale-1200" style={{ marginBottom: 0 }}>
+                {partner.title}
+              </h1>
             </div>
 
             <div
-              className="p-4 bg-dark-100 dark:bg-dark-700"
+              className="py-6 bg-scale-400"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
-                initialSlide={3}
+                initialSlide={0}
                 spaceBetween={0}
                 slidesPerView={4}
                 speed={300}
+                // slidesOffsetBefore={300}
+                centerInsufficientSlides={true}
                 breakpoints={{
                   320: {
                     slidesPerView: 1,
@@ -99,65 +100,62 @@ function Partner({ partner }: { partner: Partner }) {
 
             <div className="grid gap-3 lg:grid-cols-4">
               <div className="lg:col-span-3">
-                <Typography.Title
-                  level={2}
-                  className="mt-8 mb-4 font-bold"
-                  style={{ fontSize: '1.5rem' }}
+                <h2
+                  className="mt-8 font-bold text-scale-1200"
+                  style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
-                </Typography.Title>
+                </h2>
 
-                <div
-                  className="prose dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: partner.overview }}
-                />
+                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
               </div>
 
               <div>
-                <Typography.Title
-                  level={2}
-                  className="mt-8 mb-4 font-bold"
-                  style={{ fontSize: '1.5rem' }}
+                <h2
+                  className="mt-8 font-bold text-scale-1200"
+                  style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Details
-                </Typography.Title>
+                </h2>
 
-                <div className="divide-y">
+                <div className="divide-y text-scale-1200">
                   <div className="flex items-center justify-between py-2">
-                    <Typography.Text strong>Developer</Typography.Text>
-                    <Typography.Text>{partner.developer}</Typography.Text>
+                    <strong>Developer</strong>
+                    <span>{partner.developer}</span>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <Typography.Text strong>Category</Typography.Text>
+                    <strong>Category</strong>
                     <Link
                       href={`/partners/${
                         partner.type === 'technology' ? 'integrations' : 'experts'
                       }#${partner.category.toLowerCase()}`}
                     >
-                      <a className="text-brand-700 hover:text-brand-800">{partner.category}</a>
+                      <a className="transition-colors text-brand-900 hover:text-brand-800">
+                        {partner.category}
+                      </a>
                     </Link>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <Typography.Text strong>Website</Typography.Text>
+                    <strong>Website</strong>
                     <a
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand-700 hover:text-brand-800"
+                      className="transition-colors text-brand-900 hover:text-brand-800"
                     >
                       {new URL(partner.website).host}
                     </a>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <Typography.Text strong>Documentation</Typography.Text>
+                    <strong>Documentation</strong>
                     <a
                       href={partner.docs}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand-700 hover:text-brand-800"
+                      className="transition-colors text-brand-900 hover:text-brand-800"
                     >
                       <span className="flex items-center space-x-1">
                         <span>Read</span>

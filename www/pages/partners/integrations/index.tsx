@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { IconArrowRight, IconLoader, IconSearch, Input, Select, Typography } from '@supabase/ui'
+import { IconArrowRight, IconLoader, IconSearch, Input, Select } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -117,38 +117,28 @@ function IntegrationPartnersPage(props: Props) {
         <SectionContainer className="space-y-12">
           {/* Horizontal link menu */}
           <div className="flex flex-col items-start justify-between w-full space-y-3 md:space-y-0 md:flex-row md:items-center">
-            <Typography.Title level={3} className="mb-0">
+            <h3 className="h3" style={{ marginBottom: 0 }}>
               Partners
-            </Typography.Title>
+            </h3>
 
             <div className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6">
               <Link href={`/partners/integrations`}>
-                <a>
-                  <Typography.Title level={5} className="mb-0">
-                    INTEGRATIONS
-                  </Typography.Title>
-                </a>
+                <a className="text-scale-1200">INTEGRATIONS</a>
               </Link>
               <Link href={`/partners/experts`}>
-                <a>
-                  <Typography.Title level={5} className="mb-0">
-                    <span className="text-brand-700 hover:text-brand-800">EXPERTS</span>
-                  </Typography.Title>
-                </a>
+                <a className="transition-colors text-brand-900 hover:text-brand-800">EXPERTS</a>
               </Link>
               <Link href={`/partners/integrations#become-a-partner`}>
-                <a className="text-brand-700 hover:text-brand-800">
-                  <Typography.Title level={5} className="mb-0">
-                    <span className="flex text-brand-700 hover:text-brand-800">
-                      BECOME A PARTNER <IconArrowRight />
-                    </span>
-                  </Typography.Title>
+                <a className="flex items-center space-x-1 transition-colors text-brand-900 hover:text-brand-800">
+                  BECOME A PARTNER <IconArrowRight />
                 </a>
               </Link>
             </div>
           </div>
+
           {/* Title */}
-          <Typography.Title className="text-center">Find an Integration</Typography.Title>
+          <h1 className="text-center h1">Find an Integration</h1>
+
           {/* Search Bar */}
           <div className="w-full space-y-3 md:space-y-0 md:flex md:space-x-6">
             <Input
@@ -183,14 +173,16 @@ function IntegrationPartnersPage(props: Props) {
               <option value="become-a-partner">Become a partner</option>
             </Select>
           </div>
+
           {/* Partner Tiles */}
           <div className="grid space-y-10">
             {partners.length ? (
               <TileGrid partnersByCategory={partnersByCategory} />
             ) : (
-              <Typography.Title level={2}>No Partners Found</Typography.Title>
+              <h2 className="h2">No Partners Found</h2>
             )}
           </div>
+
           {/* Become a partner form */}
           <BecomeAPartner supabase={supabase} />
         </SectionContainer>

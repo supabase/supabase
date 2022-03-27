@@ -1,4 +1,3 @@
-import { Card, Space, Typography } from '@supabase/ui'
 import Link from 'next/link'
 import { Partner } from '~/types/partners'
 
@@ -11,29 +10,23 @@ export default function TileGrid({
     <>
       {Object.keys(partnersByCategory).map((category) => (
         <div key={category} id={category.toLowerCase()} className="space-y-8">
-          <Typography.Title level={2}>{category}</Typography.Title>
+          <h2 className="h2">{category}</h2>
           <div className="grid max-w-lg gap-5 mx-auto lg:grid-cols-3 lg:max-w-none">
             {partnersByCategory[category].map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
-                <a>
-                  <Card key={`partner_${p.slug}`} hoverable>
-                    <Space className="justify-between h-30" direction="vertical">
-                      <div className="flex justify-between w-full space-x-6">
-                        <div>
-                          <Typography.Text small type="secondary">
-                            {p.category}
-                          </Typography.Text>
-                          <Typography.Title level={3}>{p.title}</Typography.Title>
-                        </div>
-                        <img
-                          className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
-                          src={p.logo}
-                          alt={p.title}
-                        />
-                      </div>
-                      <Typography.Text type="default">{p.description}</Typography.Text>
-                    </Space>
-                  </Card>
+                <a className="flex flex-col w-full h-full p-4 transition-all border rounded-lg shadow border-scale-300 bg-scale-400 hover:-translate-y-1 hover:shadow-lg">
+                  <div className="flex justify-between w-full space-x-6">
+                    <div>
+                      <span className="text-sm text-scale-1100">{p.category}</span>
+                      <h3 className="h3">{p.title}</h3>
+                    </div>
+                    <img
+                      className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
+                      src={p.logo}
+                      alt={p.title}
+                    />
+                  </div>
+                  <span className="text-scale-1200">{p.description}</span>
                 </a>
               </Link>
             ))}
