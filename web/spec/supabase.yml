@@ -1003,8 +1003,12 @@ pages:
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            headers: { Authorization: 'Bearer ${supabase.auth.session()?.access_token}' },
-            body: { foo: 'bar' }
+            headers: { 
+              Authorization: 'Bearer ${supabase.auth.session()?.access_token}' 
+            },
+            body: { 
+              foo: 'bar' 
+            }
           })
           ```
 
