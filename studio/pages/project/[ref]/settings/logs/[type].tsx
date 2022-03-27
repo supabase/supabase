@@ -99,7 +99,11 @@ export const LogPage: NextPage = () => {
 
   return (
     <SettingsLayout title={title}>
-      <LogsPreviewer projectRef={ref as string} queryType={type as QueryType} />
+      <LogsPreviewer
+        projectRef={ref as string}
+        queryType={type as QueryType}
+        condensedLayout={true}
+      />
     </SettingsLayout>
   )
 }

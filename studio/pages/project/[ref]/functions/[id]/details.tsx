@@ -96,9 +96,14 @@ const PageLayout = () => {
 
   return (
     <FunctionLayout>
-      <div className="grid grid-cols-2 lg:gap-x-16 py-12">
+      <div className="grid gap-y-12 lg:grid-cols-2 lg:gap-x-16 py-12">
         <div>
-          <div className="px-12 py-8 bg-scale-100 dark:bg-scale-300 rounded border">
+          <div
+            className="
+          px-12 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
+          
+          "
+          >
             {console.log('inside the render', functions.byId(id))}
             <div>{selectedFunction?.createdAt}</div>
 
@@ -179,7 +184,12 @@ const PageLayout = () => {
           </div>
         </div>
         <div>
-          <div className="px-12 py-8 bg-scale-100 dark:bg-scale-300 rounded border space-y-6">
+          <div
+            className="px-12 py-8 
+          bg-scale-100 dark:bg-scale-300 border drop-shadow-sm 
+          rounded
+          space-y-6"
+          >
             <div className="flex items-center gap-3">
               <div className="border p-2 flex items-center justify-center w-8 h-8 text-scale-100 dark:text-scale-1200 bg-scale-1200 dark:bg-scale-100 rounded">
                 <IconTerminal strokeWidth={2} />
