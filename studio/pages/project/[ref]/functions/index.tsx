@@ -8,6 +8,7 @@ import {
   IconExternalLink,
   IconGlobe,
   IconSearch,
+  IconTerminal,
   Input,
   Loading,
 } from '@supabase/ui'
@@ -23,70 +24,98 @@ import { useProjectFunctionsStore } from 'stores/projectFunctionsStore'
 import { toJS } from 'mobx'
 
 const EmptyFunctions = () => {
+  const router = useRouter()
+  const { ref } = router.query
+
+  interface Commands {
+    command: string
+    description: string
+  }
+  const commands: Commands[] = [
+    {
+      command: 'supabase init',
+      description: "Needed if the project hasen't been inited before",
+    },
+    {
+      command: 'supabase login',
+      description: "Writes the user's API token to disk",
+    },
+    {
+      command: `sudo supabase link --ref ${ref}`,
+      description: `Sets the Supabase project to be associated with your project ${ref}`,
+    },
+    {
+      command: 'supabase functions new hello',
+      description: ' creates a function stub at ./functions/hello.ts',
+    },
+    {
+      command: 'supabase functions deploy hello',
+      description: 'Deploys function at ./functions/hello.ts',
+    },
+  ]
   return (
     <>
-      <p className="text-scale-1200 text-base max-w-lg">
-        Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
-        management.
-      </p>
-      <p className="text-scale-1100 text-sm max-w-lg">
-        No servers to provision, manage, or upgrade Automatically scale based on the load Integrated
-        monitoring, logging, and debugging capability Built-in security at role and per function
-        level based on the principle of least privilege Key networking capabilities for hybrid and
-        multi-cloud scenarios
-      </p>
-      <div className="flex gap-2">
-        <Button iconRight={<IconChevronRight />}>Get started</Button>
-        <Button type="link" iconRight={<IconExternalLink />}>
-          Documentation
-        </Button>
-      </div>
-      <div className="bg-scale-300 rounded px-10 py-8 flex flex-col gap-8">
-        <h2 className="text-sm text-scale-1100">Function examples</h2>
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="flex flex-col gap-3">
-            <div
-              className="
-              h-10 w-10 
-              bg-indigo-900 
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
-            >
-              <IconGlobe />
-            </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
-            </div>
+      <div className="grid grid-cols-2 gap-8 max-w-7xl">
+        <div className="space-y-4">
+          <p className="text-scale-1200 text-base max-w-lg">
+            Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
+            management.
+          </p>
+          <p className="text-scale-1100 text-sm max-w-lg">
+            No servers to provision, manage, or upgrade Automatically scale based on the load
+            Integrated monitoring, logging, and debugging capability Built-in security at role and
+            per function level based on the principle of least privilege Key networking capabilities
+            for hybrid and multi-cloud scenarios
+          </p>
+          <div className="flex gap-2">
+            <Button iconRight={<IconChevronRight />}>Get started</Button>
+            <Button type="link" iconRight={<IconExternalLink />}>
+              Documentation
+            </Button>
           </div>
-          <div className="flex flex-col gap-3">
-            <div
-              className="
-              h-10 w-10 
-              bg-indigo-900 
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
-            >
-              <IconGlobe />
+        </div>
+        <div
+          className="
+      bg-scale-100 dark:bg-scale-300 px-5 py-4 
+      shadow
+      max-w-lg
+      border rounded 
+      space-y-8"
+        >
+          <div className="flex items-center gap-3">
+            <div className="border p-2 flex items-center justify-center w-8 h-8 bg-scale-100 rounded">
+              <IconTerminal strokeWidth={2} />
             </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
-            </div>
+            <h4>Terminal instructions</h4>
           </div>
-          <div className="flex flex-col gap-3">
-            <div
-              className="
+          <div className="space-y-4">
+            {commands.map((item: Commands) => {
+              return (
+                <>
+                  <Input
+                    size="small"
+                    readOnly
+                    value={item.command}
+                    copy
+                    icon={'$'}
+                    descriptionText={item.description}
+                  />
+                  {/* <p className="text-sm text-scale-900">{item.description}</p> */}
+                </>
+              )
+            })}
+          </div>
+        </div>
+        <div
+          className="
+       col-span-2
+        bg-scale-300 rounded px-10 py-8 flex flex-col gap-8"
+        >
+          <h2 className="text-sm text-scale-1100">Function examples</h2>
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="flex flex-col gap-3">
+              <div
+                className="
               h-10 w-10 
               bg-indigo-900 
               bordershadow-indigo-900
@@ -94,14 +123,55 @@ const EmptyFunctions = () => {
               text-scale-fixed-100
               flex items-center justify-center
             "
-            >
-              <IconGlobe />
+              >
+                <IconGlobe />
+              </div>
+              <div className="">
+                <h3 className="text-scale-1200">Stripe payments</h3>
+                <p className="text-scale-1100">
+                  Charge a payment credit card when a database event occurs
+                </p>
+              </div>
             </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
+            <div className="flex flex-col gap-3">
+              <div
+                className="
+              h-10 w-10 
+              bg-indigo-900 
+              bordershadow-indigo-900
+              rounded-md
+              text-scale-fixed-100
+              flex items-center justify-center
+            "
+              >
+                <IconGlobe />
+              </div>
+              <div className="">
+                <h3 className="text-scale-1200">Stripe payments</h3>
+                <p className="text-scale-1100">
+                  Charge a payment credit card when a database event occurs
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div
+                className="
+              h-10 w-10 
+              bg-indigo-900 
+              bordershadow-indigo-900
+              rounded-md
+              text-scale-fixed-100
+              flex items-center justify-center
+            "
+              >
+                <IconGlobe />
+              </div>
+              <div className="">
+                <h3 className="text-scale-1200">Stripe payments</h3>
+                <p className="text-scale-1100">
+                  Charge a payment credit card when a database event occurs
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -211,7 +281,7 @@ const PageLayout = () => {
       </FunctionsLayout>
     )
 
-  if (pageState === 'empty') {
+  if (functions.list().length <= 0) {
     return (
       <FunctionsLayout>
         <EmptyFunctions />

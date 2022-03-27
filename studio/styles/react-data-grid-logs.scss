@@ -45,32 +45,23 @@
 }
 
 .logs-shimmering-loader {
-  animation: logsShimmer 2s infinite linear;
+  animation: shimmer 1.5s infinite linear;
   background: linear-gradient(
     to right,
-    var(--colors-brand3) 4%,
+    var(--colors-scale2) 0%,
     var(--colors-brand9) 25%,
-    var(--colors-brand3) 36%
+    var(--colors-brand4) 35%,
+    var(--colors-scale2) 45%,
+    var(--colors-scale3) 75%
   );
-  background-size: 1000px 100%;
-}
-
-.dark .logs-shimmering-loader {
-  animation: logsShimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    var(--colors-brand9) 0%,
-    var(--colors-brand4) 33%,
-    var(--colors-brand9) 100%
-  );
-  background-size: 1000px 100%;
+  background-size: 3000px 100%;
 }
 
 @keyframes logsShimmer {
   0% {
     background-position: -1000px 0;
   }
-  100% {
+  50% {
     background-position: 1000px 0;
   }
 }
