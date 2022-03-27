@@ -95,26 +95,30 @@ function InviteMemberModal({ organization, members = [] }) {
         icon={<IconKey size="xlarge" background="brand" />}
         visible={isOpen}
         onCancel={toggle}
-        title="Invite a member to organization"
+        header="Invite a member to organization"
         description="Members you'd like to invite must already be registered on Supabase"
         layout="vertical"
         hideFooter
       >
-        <div className="w-full">
-          <div className="mt-3 text-center sm:mt-5">
-            <InputSearchWithResults className="mt-2" />
-          </div>
-
-          <div className="mt-5">
-            <Button
-              onClick={addMember}
-              loading={PageState.addMemberLoading}
-              disabled={PageState.addBtnDisable}
-              block
-            >
-              {PageState.addBtnText}
-            </Button>
-          </div>
+        <div className="w-full py-4 space-y-4">
+          <Modal.Content>
+            <div className="text-center">
+              <InputSearchWithResults className="" />
+            </div>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <div className="">
+              <Button
+                onClick={addMember}
+                loading={PageState.addMemberLoading}
+                disabled={PageState.addBtnDisable}
+                block
+              >
+                {PageState.addBtnText}
+              </Button>
+            </div>
+          </Modal.Content>
         </div>
       </Modal>
     </PageContext.Provider>
@@ -171,23 +175,23 @@ const InputSearchWithResults = observer(({ className }) => {
     }`
     return (
       <div className={className}>
-        <div className="flex px-6 py-4 rounded-md bg-green-100">
+        <div className="flex px-6 py-2 items-center rounded bg-scale-400 border">
           <div className="flex-grow text-left">
-            <p className="text-green-800 leading-6 font-medium">
-              {PageState.selectedProfile.username}
-            </p>
-            <p className="text-sm leading-5 text-green-800">
+            <p className="text-scale-1200 font-medium">{PageState.selectedProfile.username}</p>
+            <p className="text-sm leading-5 text-scale-1100">
               {fullName !== ' ' ? `${fullName} • Invite collaborator` : 'Invite collaborator'}
             </p>
           </div>
-          <div className="m-auto">
-            <button className="text-green-500 hover:text-green-900">
-              <IconX strokeWidth={1} onClick={reset} />
-            </button>
-          </div>
+          <button className="text-scale-900 hover:text-scale-1200">
+            <IconX strokeWidth={2} onClick={reset} />
+          </button>
         </div>
       </div>
     )
+  }
+
+  const onSelectDropdownOption = (e, option) => {
+    if (!option.isMember) PageState.selectedProfile = option
   }
 
   return (
@@ -201,13 +205,55 @@ const InputSearchWithResults = observer(({ className }) => {
           className="form-input"
           onChange={onInputChange}
           autoComplete="off"
+          value={PageState.keywords}
           placeholder="search by username or email"
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
           {loading && <IconLoader className="animate-spin" size={16} />}
         </div>
       </div>
-      <ProfileDropdown className="relative w-full mt-1 z-10" />
+      {PageState.profiles && PageState.profiles.length !== 0 ? (
+        <>
+          <div className="flex flex-col gap-1 py-4">
+            {PageState.profiles.map((profile, i) => {
+              const { first_name, last_name, username, isMember } = profile
+              const fullName = `${first_name || ''} ${last_name || ''}`
+              let subText = isMember ? 'Already in this organization' : 'Invite collaborator'
+              if (fullName !== ' ') subText = `${fullName} • ${subText}`
+              return (
+                <Button
+                  block
+                  key={`option_${i}`}
+                  className={`px-3 py-1 ${
+                    isMember
+                      ? 'cursor-not-allowed opacity-50'
+                      : 'cursor-pointer hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark'
+                  } first:rounded-t-md last:rounded-b-md`}
+                  onClick={(e) => onSelectDropdownOption(e, profile)}
+                  type="default"
+                  style={{ justifyContent: 'flex-start' }}
+                  size="medium"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="block truncate">{username}</span>
+                    <span className="text-scale-900 block truncate" type="secondary">
+                      {subText}
+                    </span>
+                  </div>
+                </Button>
+              )
+            })}
+          </div>
+        </>
+      ) : PageState.profiles &&
+        PageState.profiles.length === 0 &&
+        !loading &&
+        PageState.keywords ? (
+        <>
+          <p className="text-sm text-scale-1200 mt-4">Could not find account.</p>
+          <p className="text-sm text-scale-1100">Has the user already signed up?</p>
+        </>
+      ) : null}
     </div>
   )
 })
@@ -231,7 +277,7 @@ const ProfileDropdown = observer(({ className }) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <div className="origin-top-right absolute w-full max-h-48 rounded-md shadow-lg overflow-y-auto">
+        <div className="origin-top-right w-full max-h-48 rounded-md shadow-lg overflow-y-auto z-100 fixed">
           <div className="rounded-md bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 text-left">
             <div
               className="py-1"

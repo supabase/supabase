@@ -2,7 +2,6 @@ import { createContext, useContext } from 'react'
 import { makeAutoObservable } from 'mobx'
 import {
   find,
-  findIndex,
   compact,
   isEqual,
   isNull,
@@ -97,27 +96,16 @@ class StorageExplorerStore {
 
   /* Methods which are commonly used + For better readability */
 
-  normalizeSupabaseURL(url) {
-    return url.replace(
-      process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
-      process.env.NEXT_PUBLIC_ALT_CUSTOMER_DOMAIN
-    )
-  }
-
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    this.supabaseClient = createClient(
-      this.normalizeSupabaseURL(`https://${serviceEndpoint}`),
-      serviceKey,
-      {
-        localStorage: {
-          getItem: (key) => {
-            return undefined
-          },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
+    this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
+      localStorage: {
+        getItem: (key) => {
+          return undefined
         },
-      }
-    )
+        setItem: (key, value) => {},
+        removeItem: (key) => {},
+      },
+    })
   }
 
   updateFileInPreviewCache = (fileCache) => {

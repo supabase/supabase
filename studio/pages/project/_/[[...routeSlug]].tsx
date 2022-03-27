@@ -5,9 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { withAuth } from 'hooks'
-import BaseLayout from 'components/layouts'
 import ProjectList from 'components/interfaces/Home/ProjectList'
-import { Typography } from '@supabase/ui'
 
 interface Props {}
 
@@ -50,20 +48,19 @@ const GenericProjectPage: NextPage = () => {
   }
 
   return (
-    <BaseLayout hideHeader hideIconBar>
+    <div>
       <Header />
       <div className="py-8 w-full max-w-5xl mx-auto">
-        <Typography.Title level={3}>Select a project to continue</Typography.Title>
+        <h3 className="text-2xl">Select a project to continue</h3>
         <div className="my-6 space-y-8">
           <ProjectList
             rewriteHref={urlRewriterFactory(routeSlug)}
-            showInactiveProjects={false}
             onSelectDelete={() => {}}
             onSelectRestore={() => {}}
           />
         </div>
       </div>
-    </BaseLayout>
+    </div>
   )
 }
 

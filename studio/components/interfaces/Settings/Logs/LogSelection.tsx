@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
-import { Input, Typography, IconX } from '@supabase/ui'
+import { Typography, IconX, Input } from '@supabase/ui'
 
 import { LogData } from './Logs.types'
 
@@ -39,18 +39,25 @@ const LogSelection: FC<Props> = ({ log, onClose }) => {
       <div className="flex-grow overflow-y-auto bg-panel-body-light dark:bg-panel-body-dark">
         <div className="p-4 flex-col space-y-4">
           <div className="space-y-2">
-            <Typography.Text small>Event message</Typography.Text>
-            <Typography.Text code className="block w-full overflow-x-auto" small>
-              {log.event_message}{' '}
-            </Typography.Text>
+            <p className="text-sm">Event message</p>
+            <Input
+              copy
+              readOnly
+              size="small"
+              layout="vertical"
+              className="text-sm input-mono"
+              value={log.event_message}
+            />
           </div>
           <div className="space-y-2">
-            <Typography.Text small>Metadata</Typography.Text>
+            <p className="text-sm">Metadata</p>
             <Input.TextArea
-              className="font-mono mt-4"
-              size="tiny"
-              rows={25}
-              disabled
+              copy
+              readOnly
+              size="small"
+              layout="vertical"
+              rows={20}
+              className="input-mono"
               value={JSON.stringify(log.metadata, null, 2)}
             />
           </div>

@@ -34,8 +34,6 @@ const ProfileCard = observer(() => {
   const { mutateProfile } = useProfile()
   const user = ui.profile
 
-  console.log('User', user?.username, user?.primary_email)
-
   const updateUser = async (model: any) => {
     try {
       const updatedUser = await post(`${API_URL}/profile/update`, model)
@@ -100,16 +98,14 @@ const GithubProfile = observer(() => {
             disabled
             label="Username"
             layout="horizontal"
-            value=""
-            placeholder={ui.profile?.username ?? ''}
+            value={ui.profile?.username ?? ''}
           />
           <Input
             readOnly
             disabled
             label="Email"
             layout="horizontal"
-            value=""
-            placeholder={ui.profile?.primary_email ?? ''}
+            value={ui.profile?.primary_email ?? ''}
           />
         </div>
       </Panel.Content>
@@ -144,9 +140,15 @@ const ThemeSettings = observer(() => {
           }
           onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
         >
-          <Listbox.Option label='System default' value="system">System default</Listbox.Option>
-          <Listbox.Option label='Dark' value="dark">Dark</Listbox.Option>
-          <Listbox.Option label='Light' value="light">Light</Listbox.Option>
+          <Listbox.Option label="System default" value="system">
+            System default
+          </Listbox.Option>
+          <Listbox.Option label="Dark" value="dark">
+            Dark
+          </Listbox.Option>
+          <Listbox.Option label="Light" value="light">
+            Light
+          </Listbox.Option>
         </Listbox>
       </Panel.Content>
     </Panel>

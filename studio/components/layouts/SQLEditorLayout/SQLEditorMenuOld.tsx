@@ -4,7 +4,6 @@ import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
-  Divider,
   Menu,
   Input,
   Typography,
@@ -15,6 +14,8 @@ import {
   IconTrash,
   IconChevronDown,
   Loading,
+  Modal,
+  IconEdit2,
 } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
@@ -22,10 +23,10 @@ import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
-import Modal from 'components/to-be-cleaned/ModalsDeprecated/Modal'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import { createSqlSnippet } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
 const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   const sqlEditorStore: any = useSqlStore()
@@ -33,12 +34,13 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   const active = sqlEditorStore.activeTab.id === id
 
   return (
-    <Menu.Item rounded key={id} active={active} onClick={() => sqlEditorStore.selectTab(id)}>
-      <div className="flex">
-        <Typography.Text className="flex-grow truncate flex items-center">{name}</Typography.Text>
-        {active && <DropdownMenu tabInfo={tabInfo} />}
-      </div>
-    </Menu.Item>
+    <ProductMenuItem
+      key={id}
+      isActive={active}
+      name={name}
+      action={active && <DropdownMenu tabInfo={tabInfo} />}
+      onClick={() => sqlEditorStore.selectTab(id)}
+    />
   )
 })
 
@@ -51,6 +53,8 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
 
   const [tabId, setTabId] = useState('')
   const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
   const { id, name } = tabInfo || {}
 
   function onCloseRenameModal() {
@@ -62,24 +66,14 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
     setRenameModalOpen(true)
   }
 
-  async function removeQuery(e: any) {
-    confirmAlert({
-      title: 'Confirm to remove',
-      message: `Are you sure you want to remove '${name}' ?`,
-      onAsyncConfirm: async () => {
-        await contentStore.del(id)
-        await contentStore.load()
-        sqlEditorStore.closeTab(id)
-      },
-    })
-  }
-
   function renderMenu() {
     return (
       <>
-        <Dropdown.Item onClick={renameQuery}>Rename query</Dropdown.Item>
-        <Divider light />
-        <Dropdown.Item onClick={removeQuery} icon={<IconTrash size="tiny" />}>
+        <Dropdown.Item onClick={renameQuery} icon={<IconEdit2 size="tiny" />}>
+          Rename query
+        </Dropdown.Item>
+        <Dropdown.Seperator />
+        <Dropdown.Item onClick={() => setDeleteModalOpen(true)} icon={<IconTrash size="tiny" />}>
           Remove query
         </Dropdown.Item>
       </>
@@ -90,17 +84,40 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
     <div>
       {IS_PLATFORM ? (
         <Dropdown side="bottom" align="end" overlay={renderMenu()}>
-          <Button as="span" type="text" icon={<IconChevronDown />} style={{ padding: '3px' }} />
+          <Button
+            as="span"
+            type="text"
+            icon={<IconChevronDown size={12} />}
+            style={{ padding: '3px' }}
+          />
         </Dropdown>
       ) : (
         <Button as="span" type="text" style={{ padding: '3px' }} />
       )}
 
-      {/* @ts-ignore */}
-      <Modal open={renameModalOpen} handleCloseEvent={onCloseRenameModal}>
-        {/* @ts-ignore */}
-        <RenameQuery tabId={tabId} onComplete={onCloseRenameModal} />
-      </Modal>
+      <RenameQuery
+        // @ts-ignore -- @mildtomato not sure what is wrong here
+        visible={renameModalOpen}
+        onCancel={onCloseRenameModal}
+        tabId={tabId}
+        onComplete={onCloseRenameModal}
+      />
+
+      <ConfirmationModal
+        header="Confirm to remove"
+        buttonLabel="Confirm"
+        visible={deleteModalOpen}
+        onSelectConfirm={async () => {
+          await contentStore.del(id)
+          await contentStore.load()
+          sqlEditorStore.closeTab(id)
+        }}
+        onSelectCancel={() => setDeleteModalOpen(false)}
+      >
+        <Modal.Content>
+          <p className="text-sm text-scale-1100 py-4">{`Are you sure you want to remove '${name}' ?`}</p>
+        </Modal.Content>
+      </ConfirmationModal>
     </div>
   )
 })
@@ -163,42 +180,36 @@ const SideBarContent = observer(() => {
       : queries.filter((tab: any) => tab.name.includes(filterString))
 
   return (
-    <div className="mt-8">
-      <Menu>
+    <div className="mt-6">
+      <Menu type="pills">
         {IS_PLATFORM && (
-          <div className="my-4 px-3 space-y-1">
-            <Menu.Misc>
-              <Button
-                block
-                className="mx-1"
-                icon={<IconPlus />}
-                type="text"
-                style={{ justifyContent: 'start' }}
-                onClick={() => handleNewQuery()}
-                loading={loadingNewQuery}
-              >
-                New query
-              </Button>
-            </Menu.Misc>
-            <Menu.Misc>
-              <Input
-                icon={<IconSearch size="tiny" />}
-                className="sbui-input-no-border mx-1"
-                placeholder="Search"
-                onChange={(e) => setFilterString(e.target.value)}
-                value={filterString}
-                size="tiny"
-                actions={
-                  filterString && (
-                    <IconX
-                      size={'tiny'}
-                      className="cursor-pointer mr-2"
-                      onClick={() => setFilterString('')}
-                    />
-                  )
-                }
-              />
-            </Menu.Misc>
+          <div className="my-4 px-3 space-y-1 mx-3">
+            <Button
+              block
+              icon={<IconPlus />}
+              type="default"
+              style={{ justifyContent: 'start' }}
+              onClick={() => handleNewQuery()}
+              loading={loadingNewQuery}
+            >
+              New query
+            </Button>
+            <Input
+              icon={<IconSearch size="tiny" />}
+              placeholder="Search"
+              onChange={(e) => setFilterString(e.target.value)}
+              value={filterString}
+              size="tiny"
+              actions={
+                filterString && (
+                  <IconX
+                    size={'tiny'}
+                    className="cursor-pointer mr-2"
+                    onClick={() => setFilterString('')}
+                  />
+                )
+              }
+            />
           </div>
         )}
 
@@ -210,19 +221,17 @@ const SideBarContent = observer(() => {
         ) : (
           <div className="space-y-6">
             {IS_PLATFORM && (
-              <div className="px-3 dash-product-menu">
+              <div className="px-3">
                 <Menu.Group title="Getting started" />
                 {getStartedTabs.map((tab: any) => {
                   const { id, name } = tab || {}
                   return (
-                    <Menu.Item
-                      rounded
+                    <ProductMenuItem
                       key={id}
-                      active={sqlEditorStore.activeTab.id === id}
+                      name={name}
+                      isActive={sqlEditorStore.activeTab.id === id}
                       onClick={() => sqlEditorStore.selectTab(id)}
-                    >
-                      <Typography.Text className="truncate">{name}</Typography.Text>
-                    </Menu.Item>
+                    />
                   )
                 })}
               </div>

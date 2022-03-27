@@ -66,16 +66,16 @@ const StackedAreaChart: React.FC<Props> = ({
 
   const formatToDate = (value: string | number | any) => {
     if (!dateFormat) return value
-    if (typeof value === 'number') {
+    if (!isNaN(Number(value))) {
       const unix = String(value).length > 10 ? Number(String(value).slice(0, 10)) : value
       return dayjs.unix(unix).format(dateFormat)
     } else {
       return dayjs(value).format(dateFormat)
     }
   }
-  const minHeight = { small: '120px', normal: '160px', large: '280px' }[size]
+  const minHeight = { small: 120, normal: 160, large: 280 }[size]
   return (
-    <ResponsiveContainer height="100%" minHeight={minHeight} width="100%">
+    <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
       <AreaChart data={transformed} onClick={(_tooltipData: any) => {}}>
         <CartesianGrid strokeDasharray="3 3" style={{ stroke: '#444444' }} />
         <XAxis
@@ -109,7 +109,7 @@ const StackedAreaChart: React.FC<Props> = ({
         ))}
         <Tooltip
           labelFormatter={xAxisFormatAsDate ? formatToDate : undefined}
-          labelClassName="text-gray-100"
+          labelClassName="text-white"
           contentStyle={{ backgroundColor: '#444444', borderColor: '#444444', fontSize: '12px' }}
           wrapperClassName="bg-gray-600"
         />

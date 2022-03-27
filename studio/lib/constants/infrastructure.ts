@@ -100,9 +100,9 @@ export const PROJECT_STATUS = {
 }
 
 export const STRIPE_PRODUCT_IDS = {
-  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID,
-  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID,
   FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID,
+  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID,
+  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID,
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
@@ -116,11 +116,11 @@ export const PASSWORD_STRENGTH = {
 }
 
 export const PASSWORD_STRENGTH_COLOR = {
-  0: 'bg-red-500',
-  1: 'bg-red-500',
-  2: 'bg-yellow-500',
-  3: 'bg-yellow-500',
-  4: 'bg-green-500',
+  0: 'bg-red-900',
+  1: 'bg-red-900',
+  2: 'bg-yellow-900',
+  3: 'bg-yellow-900',
+  4: 'bg-green-900',
 }
 
 export const PASSWORD_STRENGTH_PERCENTAGE = {
@@ -132,3 +132,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 }
 
 export const DEFAULT_FREE_PROJECTS_LIMIT = 2
+
+export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB

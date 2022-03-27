@@ -1,7 +1,5 @@
 import { useRouter } from 'next/router'
-import SectionHeader from 'components/UI/SectionHeader'
-import ProjectExamples from 'data/ProjectExamples.json'
-import { Button, Card, Typography, Space, IconGitHub } from '@supabase/ui'
+import { Button, IconGitHub } from '@supabase/ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
@@ -14,29 +12,24 @@ const BuiltExamples = () => {
   return (
     <SectionContainer className="xl:pt-32">
       <div className="text-center">
-        <Typography.Title level={2}>What can you build with supabase?</Typography.Title>
-        <Typography.Text>
-          <p className="lg:text-lg">
-            There are many example apps and starter projects to get going
-          </p>
-          <Space className="justify-center">
-            <Link href="/docs/guides/examples" as="/docs/guides/examples">
-              <a>
-                <Button type="default">View all examples</Button>
-              </a>
-            </Link>
-            <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
-            >
-              <a>
-                <Button type="default" icon={<IconGitHub />}>
-                  Official github library
-                </Button>
-              </a>
-            </Link>
-          </Space>
-        </Typography.Text>
+        <h3 className="h2">What can you build with supabase?</h3>
+        <p className="p">There are many example apps and starter projects to get going</p>
+        <div className="flex gap-2 justify-center py-4">
+          <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
+            <Button as="a" type="default" size="small">
+              View all examples
+            </Button>
+          </Link>
+          <Link
+            href="https://github.com/supabase/supabase/tree/master/examples"
+            as="https://github.com/supabase/supabase/tree/master/examples"
+            passHref
+          >
+            <Button as="a" type="default" icon={<IconGitHub />} size="small">
+              Official github library
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="grid grid-cols-12 gap-5 mt-16">
         {Examples.slice(0, 6).map((example, i) => {

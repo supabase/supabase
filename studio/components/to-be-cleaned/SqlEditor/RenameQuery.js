@@ -1,14 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { AutoField } from 'uniforms-bootstrap4'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
 import { useStore } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import { Button, Form, Input, Modal } from '@supabase/ui'
 
-const RenameQuery = observer(({ tabId, onComplete }) => {
+const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
   const { ui } = useStore()
 
   const router = useRouter()
@@ -50,33 +49,49 @@ const RenameQuery = observer(({ tabId, onComplete }) => {
     }
   }
 
-  function onCancel() {
-    if (onComplete) onComplete()
-  }
-
   return (
-    <SchemaFormPanel
-      title="Rename"
-      schema={{
-        properties: {
-          name: { title: 'Name', type: 'string' },
-          desc: { title: 'Description', type: 'string' },
-        },
-        required: ['name'],
-        type: 'object',
-      }}
-      model={model}
-      onSubmit={onRename}
-      onReset={onCancel}
-    >
-      <AutoField
-        name="name"
-        inputRef={(x) => x?.focus()}
-        showInlineError
-        errorMessage="Please enter a query name"
-      />
-      <AutoField name="desc" placeholder="Describe query" />
-    </SchemaFormPanel>
+    <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
+      <Form
+        onReset={onCancel}
+        validateOnBlur
+        initialValues={{
+          name: model ? model.name : '',
+          description: model ? model.desc : '',
+        }}
+        validate={(values) => {
+          const errors = {}
+          if (!values.name) errors.name = 'Please enter a query name'
+          return errors
+        }}
+        onSubmit={async (values, { setSubmitting }) => {
+          setSubmitting(true)
+          await onRename(values)
+          setSubmitting(false)
+        }}
+      >
+        {({ isSubmitting }) => (
+          <div className="py-4 space-y-4">
+            <Modal.Content>
+              <Input label="Name" id="name" name="name" />
+            </Modal.Content>
+            <Modal.Content>
+              <Input label="Description" id="desc" placeholder="Describe query" />
+            </Modal.Content>
+            <Modal.Seperator />
+            <Modal.Content>
+              <div className="flex items-center justify-end gap-2">
+                <Button htmlType="reset" type="default" onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button htmlType="submit" loading={isSubmitting}>
+                  Rename query
+                </Button>
+              </div>
+            </Modal.Content>
+          </div>
+        )}
+      </Form>
+    </Modal>
   )
 })
 

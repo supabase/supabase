@@ -1,7 +1,7 @@
 import { FC } from 'react'
-import Link from 'next/link'
-import { Badge, Divider, Menu, Typography } from '@supabase/ui'
-import { ProductMenuItem, ProductMenuGroup } from './ProductMenu.types'
+import { Badge, Menu } from '@supabase/ui'
+import ProductMenuItem from './ProductMenuItem'
+import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
 
 interface Props {
   page?: string
@@ -10,35 +10,39 @@ interface Props {
 
 const ProductMenu: FC<Props> = ({ page, menu }) => {
   return (
-    <div className="my-6 flex flex-col flex-grow space-y-4 overflow-y-auto">
-      {menu.map((group: ProductMenuGroup, idx: number) => (
-        <div key={group.title} className="space-y-4">
-          <div className="mx-4 space-y-2">
-            <div className="mx-4 w-full flex">
-              <Typography.Text type="secondary" small>
-                {group.title}
-              </Typography.Text>
-            </div>
-            {group.isPreview && (
-              <div className="mx-2">
-                <Badge color="yellow">Not production ready</Badge>
+    <div className="flex flex-col space-y-8 overflow-y-auto">
+      <Menu type="pills">
+        {menu.map((group: ProductMenuGroup, idx: number) => (
+          <div key={group.title}>
+            <div className="space-y-8 my-6">
+              <div className="mx-3">
+                <Menu.Group
+                  //@ts-ignore
+                  title={
+                    <div className="flex flex-col space-y-2">
+                      <span>{group.title}</span>
+                      {group.isPreview && <Badge color="amber">Not production ready</Badge>}
+                    </div>
+                  }
+                />
+                <div>
+                  {group.items.map((item: ProductMenuGroupItem) => (
+                    <ProductMenuItem
+                      key={item.key}
+                      url={item.url}
+                      name={item.name}
+                      icon={item.icon}
+                      isActive={page === item.key}
+                      target={item.isExternal ? '_blank' : '_self'}
+                    />
+                  ))}
+                </div>
               </div>
-            )}
-            <div className="dash-product-menu space-y-1">
-              {group.items.map((item: ProductMenuItem) => (
-                <Link key={item.key} href={item.url}>
-                  <a className="block" target={item.isExternal ? '_blank' : '_self'}>
-                    <Menu.Item icon={item.icon} rounded active={page === item.key}>
-                      <Typography.Text className="truncate">{item.name}</Typography.Text>
-                    </Menu.Item>
-                  </a>
-                </Link>
-              ))}
             </div>
+            {idx !== menu.length - 1 && <div className="bg-scale-500 h-px w-full"></div>}
           </div>
-          {idx !== menu.length - 1 && <Divider light />}
-        </div>
-      ))}
+        ))}
+      </Menu>
     </div>
   )
 }

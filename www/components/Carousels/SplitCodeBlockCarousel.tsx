@@ -2,7 +2,7 @@ import { useState } from 'react'
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { Tabs, Typography, Button, Space } from '@supabase/ui'
+import { Tabs, Button, Space } from '@supabase/ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
@@ -44,18 +44,18 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
 
   const details = (
     <div className="">
-      <Typography.Text>
+      <p>
         <span className="block text-white mb-8">Allow fetch something</span>
-      </Typography.Text>
-      <Typography.Text type="secondary">
+      </p>
+      <p>
         <p>
           This would only allow the authenticated user access to a folder that is named after their
           own account UID. This is useful for things like profile images.
         </p>
-      </Typography.Text>
-      <Typography.Text>
+      </p>
+      <p>
         <Button type="outline">View documentation</Button>
-      </Typography.Text>
+      </p>
     </div>
   )
 
@@ -76,7 +76,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           )
         })}
       </Tabs>
-      <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 overflow-hidden">
+      <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-scale-300 overflow-hidden">
         <Swiper
           // @ts-ignore
           onSwiper={setApiSwiper}
@@ -99,7 +99,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           })}
         </Swiper>
 
-        <div className="overflow-hidden bg-gray-800 p-8 dark rounded-md border border-t-none border-t-0 border-gray-600">
+        <div className="overflow-hidden p-8 bg-scale-300 rounded-md border border-t-none border-t-0 border-gray-600">
           <Swiper
             // @ts-ignore
             onSwiper={setSwiperDetails}
@@ -116,28 +116,26 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
               return (
                 <SwiperSlide key={i}>
                   <div className="">
-                    <Typography.Text>
-                      <span className="block text-lg text-white mb-4">
+                    <p>
+                      <span className="block text-lg text-scale-1200 dark:text-white mb-4">
                         {extension.detail_title}
                       </span>
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className="block mb-6">
+                    </p>
+                    <p className="block mb-6">
                       <p>{extension.detail_text}</p>
-                    </Typography.Text>
+                    </p>
                     <Space className="justify-between">
                       {extension.url && (
                         <Link href={extension.url} as={extension.url}>
-                          <a>
-                            <Typography.Text>
-                              <Button type="outline">View documentation</Button>
-                            </Typography.Text>
+                          <a className="ml-px">
+                            <Button as="a" type="default">
+                              View documentation
+                            </Button>
                           </a>
                         </Link>
                       )}
                       <div>
-                        <Typography.Text type="secondary" className="mr-4">
-                          {extension.badges_label}
-                        </Typography.Text>
+                        <p className="mr-4">{extension.badges_label}</p>
                         {extension.badges &&
                           extension.badges.map((badge, i) => {
                             return <Badge key={badge}>{badge}</Badge>

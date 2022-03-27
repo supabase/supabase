@@ -52,13 +52,23 @@
 
 .shimmering-loader {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #fafafa 4%, #ffffff 25%, #fafafa 36%);
+  background: linear-gradient(
+    to right,
+    var(--colors-scale3) 4%,
+    var(--colors-scale4) 25%,
+    var(--colors-scale3) 36%
+  );
   background-size: 1000px 100%;
 }
 
 .dark .shimmering-loader {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, #181818 4%, #333333 25%, #181818 36%);
+  background: linear-gradient(
+    to right,
+    var(--colors-scale4) 4%,
+    var(--colors-scale5) 25%,
+    var(--colors-scale4) 36%
+  );
   background-size: 1000px 100%;
 }
 

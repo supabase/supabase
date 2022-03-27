@@ -72,29 +72,35 @@ const InviteUserModal = () => {
         size="small"
         key="invite-user-modal"
         visible={visible}
-        title="Invite new user"
+        header="Invite new user"
         hideFooter
         onCancel={handleToggle}
         closable
       >
-        <Input
-          label="User email"
-          icon={<IconMail />}
-          autoFocus
-          // @ts-ignore
-          ref={inputRef}
-          value={emailValue}
-          onChange={onInputChange}
-          type="text"
-          name="email"
-          id="email"
-          placeholder="User email"
-          className="w-full"
-        />
-
-        <Button onClick={onInviteUser} loading={loading} disabled={loading} block>
-          Invite user
-        </Button>
+        <div className="py-4 space-y-6">
+          <Modal.Content>
+            <Input
+              label="User email"
+              icon={<IconMail />}
+              descriptionText="Type in the full email address"
+              autoFocus
+              // @ts-ignore
+              ref={inputRef}
+              value={emailValue}
+              onChange={onInputChange}
+              type="email"
+              name="email"
+              id="email"
+              placeholder="User email"
+              className="w-full"
+            />
+          </Modal.Content>
+          <Modal.Content>
+            <Button onClick={onInviteUser} size="small" loading={loading} disabled={loading} block>
+              Invite user
+            </Button>
+          </Modal.Content>
+        </div>
       </Modal>
     </div>
   )
