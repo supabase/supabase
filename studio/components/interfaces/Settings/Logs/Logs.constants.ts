@@ -15,6 +15,7 @@ export const TEMPLATES: LogTemplate[] = [
   },
   {
     label: 'Commits By User',
+    description: 'Print which users made what commits on the database',
     mode: 'custom',
     searchString: `SELECT
     p.user_name, count(*) as count
@@ -30,6 +31,7 @@ GROUP BY
   },
   {
     label: 'Metadata IP',
+    description: 'Print all the IP addresses that used Supabase api',
     mode: 'custom',
     searchString: `SELECT timestamp, h.x_real_ip
 FROM edge_logs
