@@ -42,7 +42,7 @@ const EmptyFunctions = () => {
   }
   const commands: Commands[] = [
     {
-      command: 'Run supabase ',
+      command: 'supabase init ',
       description: "Needed if the project hasen't been inited before",
       jsx: () => {
         return (
@@ -54,7 +54,7 @@ const EmptyFunctions = () => {
       comment: 'Initialize Supabase locally',
     },
     {
-      command: 'Login to supabase',
+      command: 'supabase login',
       description: "Writes the user's API token to disk",
       jsx: () => {
         return (
@@ -66,12 +66,12 @@ const EmptyFunctions = () => {
       comment: 'Login using your access token',
     },
     {
-      command: `sudo supabase link --ref ${ref}`,
+      command: `supabase link --ref ${ref}`,
       description: `Sets the Supabase project to be associated with your project ${ref}`,
       jsx: () => {
         return (
           <>
-            sudo <span className="text-brand-1100">supabase</span> link --ref {ref}
+            <span className="text-brand-1100">supabase</span> link --ref {ref}
           </>
         )
       },
@@ -96,6 +96,19 @@ const EmptyFunctions = () => {
         return (
           <>
             <span className="text-brand-1100">supabase</span> functions deploy hello
+          </>
+        )
+      },
+      comment: 'Deploy your function',
+    },
+    {
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'`,
+      description: 'Deploys function at ./functions/hello.ts',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
+            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'
           </>
         )
       },
