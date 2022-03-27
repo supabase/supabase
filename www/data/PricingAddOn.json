@@ -1,0 +1,69 @@
+{
+  "database": {
+    "tiers": [
+      {
+        "plan": "Free (Included)",
+        "pricing": "$0",
+        "cpu": "2-core ARM (burstable)",
+        "memory": "1 GB",
+        "diskIO": "Up to 2,085",
+        "directConnections": "10 (recommended)",
+        "poolerConnections": "50 (recommended)"
+      },
+      {
+        "plan": "Small",
+        "pricing": "$5",
+        "cpu": "2-core ARM (burstable)",
+        "memory": "2 GB",
+        "diskIO": "Up to 2,085",
+        "directConnections": "10 (recommended)",
+        "poolerConnections": "50 (recommended)"
+      },
+      {
+        "plan": "Medium",
+        "pricing": "$50",
+        "cpu": "2-core ARM (burstable)",
+        "memory": "4 GB",
+        "diskIO": "Up to 2,085",
+        "directConnections": "50 (recommended)",
+        "poolerConnections": "500 (recommended)"
+      },
+      {
+        "plan": "Large",
+        "pricing": "$100",
+        "cpu": "2-core ARM (non-burstable)",
+        "memory": "8 GB",
+        "diskIO": "Up to 4,750",
+        "directConnections": "100 (recommended)",
+        "poolerConnections": "1000 (recommended)"
+      },
+      {
+        "plan": "XL",
+        "pricing": "$200",
+        "cpu": "4-core ARM",
+        "memory": "16 GB",
+        "diskIO": "Up to 4,750",
+        "directConnections": "200 (recommended)",
+        "poolerConnections": "2000 (recommended)"
+      },
+      {
+        "plan": "2XL",
+        "pricing": "$400",
+        "cpu": "8-core ARM",
+        "memory": "32 GB",
+        "diskIO": "Up to 4,750",
+        "directConnections": "400 (recommended)",
+        "poolerConnections": "4000 (recommended)"
+      },
+      {
+        "plan": "Custom (need more?)",
+        "pricing": "Contact Us",
+        "cpu": "Contact Us",
+        "memory": "Contact Us",
+        "diskIO": "Contact Us",
+        "directConnections": "Contact Us",
+        "poolerConnections": "Contact Us"
+      }
+    ]
+  }
+}
