@@ -37,6 +37,7 @@ interface Props {
   dispatchWhereFilters: (x: any) => void
   whereFilters: any
   table: LogsTableName
+  condensedLayout: Boolean
 }
 
 dayjs.extend(utc)
@@ -58,6 +59,7 @@ const PreviewFilterPanel: FC<Props> = ({
   table,
   isShowingEventChart,
   onToggleEventChart,
+  condensedLayout,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -158,7 +160,9 @@ const PreviewFilterPanel: FC<Props> = ({
   // console.log('this is what is going through', FILTER_OPTIONS[table])
 
   return (
-    <div className="flex items-center justify-between w-full">
+    <div
+      className={'flex items-center justify-between w-full' + (condensedLayout ? ' px-5 pt-4' : '')}
+    >
       <div className="flex flex-row gap-4 items-center">
         <form
           id="log-panel-search"
