@@ -188,3 +188,7 @@ div[data-radix-portal]:not(.portal--toast) {
 div.fixed.inset-0 {
   z-index: 11 !important;
 }
+
+.recharts-tooltip-cursor {
+  @apply fill-transparent;
+}
