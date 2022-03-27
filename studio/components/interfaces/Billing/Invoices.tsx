@@ -74,7 +74,14 @@ const Invoices: FC<Props> = ({ projectRef }) => {
 
   const fetchInvoice = async (invoiceId: string) => {
     const invoice = await get(`${API_URL}/stripe/invoices/${invoiceId}`)
-    window.open(invoice.invoice_pdf, '_blank')
+    if (invoice?.invoice_pdf) {
+      window.open(invoice.invoice_pdf, '_blank')
+    } else {
+      ui.setNotification({
+        category: 'info',
+        message: 'Unable to fetch the selected invoice',
+      })
+    }
   }
 
   return (
