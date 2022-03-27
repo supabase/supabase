@@ -1,12 +1,30 @@
 import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
-import { IconCode, IconSlash, Tabs } from '@supabase/ui'
+import { IconCode, IconSlash, Loading, Tabs } from '@supabase/ui'
 import { Tab } from '@headlessui/react'
 import FunctionsNav from '../interfaces/FunctionsNav'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
+  const { functions, ui } = useStore()
+
+  const router = useRouter()
+  const { id } = router.query
+
+  useEffect(() => {
+    functions.load()
+  }, [ui.selectedProject])
+
+  if (!functions.isInitialized) {
+    return (
+      <BaseLayout>
+        <Loading active={true}>loading</Loading>
+      </BaseLayout>
+    )
+  }
+
   return (
     <BaseLayout>
       <div
