@@ -7,7 +7,7 @@ import FunctionsNav from '../interfaces/FunctionsNav'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-const PageLayout = ({ children }: { children?: React.ReactNode }) => {
+const PageLayout = ({ children, centered }: { children?: React.ReactNode; centered?: boolean }) => {
   const { functions, ui } = useStore()
 
   const router = useRouter()
@@ -27,8 +27,26 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <BaseLayout>
-      <div
-        className="
+      {centered ? (
+        <>
+          <div className="mx-auto max-w-5xl py-32 px-5">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
+            flex items-center justify-center
+          "
+              >
+                <IconCode size={14} strokeWidth={3} />
+              </div>
+              <h1 className="text-2xl text-scale-1200">Functions</h1>
+            </div>
+
+            {children}
+          </div>
+        </>
+      ) : (
+        <div
+          className="
             py-10
             w-full mx-auto
 
@@ -43,20 +61,21 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
             flex flex-col
             gap-8
         "
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
             flex items-center justify-center
           "
-          >
-            <IconCode size={14} strokeWidth={3} />
+            >
+              <IconCode size={14} strokeWidth={3} />
+            </div>
+            <h1 className="text-2xl text-scale-1200">Functions</h1>
           </div>
-          <h1 className="text-2xl text-scale-1200">Functions</h1>
-        </div>
 
-        {children}
-      </div>
+          {children}
+        </div>
+      )}
     </BaseLayout>
   )
 }
