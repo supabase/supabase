@@ -132,6 +132,7 @@ module.exports = {
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
+            'guides/auth/auth-keycloak',
             'guides/auth/auth-linkedin',
             'guides/auth/auth-notion',
             'guides/auth/auth-slack',
