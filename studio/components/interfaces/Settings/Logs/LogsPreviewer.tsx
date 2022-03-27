@@ -158,6 +158,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         dispatchWhereFilters={dispatchWhereFilters}
         whereFilters={whereFilters}
         table={table}
+        condensedLayout={condensedLayout}
       />
       {showChart && !isLoading ? (
         <div>
