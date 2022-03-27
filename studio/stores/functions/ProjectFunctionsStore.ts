@@ -11,6 +11,7 @@ import { IRootStore } from '../RootStore'
 export interface IProjectFunctionsStore {
   isLoading: boolean
   isInitialized: boolean
+  isLoaded: boolean
   error: any
 
   load: () => void
@@ -49,6 +50,10 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
 
   get isInitialized() {
     return this.state !== this.STATES.INITIAL
+  }
+
+  get isLoaded() {
+    return this.state !== this.STATES.LOADED
   }
 
   async fetchData() {
