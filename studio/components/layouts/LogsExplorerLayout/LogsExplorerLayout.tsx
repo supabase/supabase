@@ -3,7 +3,8 @@ import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 import { IconList } from '@supabase/ui'
-// import FunctionsNav from '../interfaces/Settings/Logs/LogsNav'
+import FunctionsNav from '../interfaces/Settings/Logs/LogsNav'
+import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
@@ -11,7 +12,8 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
       <div className="h-full flex flex-col flex-grow">
         <div
           className="
-            py-10
+            pt-10
+            pb-2
             w-full mx-auto
 
             transition-all
@@ -36,7 +38,7 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
             </div>
             <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
           </div>
-          {/* <FunctionsNav /> */}
+          <LogsNavigation />
         </div>
         <div
           // weird repetitive styling

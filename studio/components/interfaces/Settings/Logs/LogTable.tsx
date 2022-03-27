@@ -35,8 +35,7 @@ const LogTable = ({ data = [], queryType }: Props) => {
     if (typeof value === 'object') {
       formatter = () => `[Object]`
     }
-
-    return { key: v, name: v, resizable: true, formatter }
+    return { key: v, name: v, resizable: true, formatter, header: v }
   })
   let columns
   if (!queryType) {
@@ -179,82 +178,97 @@ const LogTable = ({ data = [], queryType }: Props) => {
   }, [stringData])
   return (
     <>
-      {!queryType && (
-        <div
-          className="
-        w-full bg-scale-300 rounded
+      <section
+        className={'flex flex-1 flex-col ' + (!queryType ? 'shadow-lg' : '')}
+        style={{ maxHeight }}
+      >
+        {!queryType && (
+          <div>
+            <div
+              className="
+        w-full bg-scale-100 dark:bg-scale-300 
+
+       rounded-tl rounded-tr
+       border-t
+       border-l
+       border-r
+
         flex items-center justify-between
         px-5 py-2
       "
-        >
-          <div className="flex items-center gap-2">
-            {data && data.length ? (
-              <>
-                <span className="text-sm text-scale-1200">Query results</span>
-                <span className="text-sm text-scale-1100">{data && data.length}</span>
-              </>
-            ) : (
-              <span className="text-xs text-scale-1200">Results will be shown below</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button type="default" icon={<IconEye />}>
-              Histogram
-            </Button>
-            <Button type="default" icon={<IconDownloadCloud />}>
-              Download
-            </Button>
-          </div>
-        </div>
-      )}
-      <section className="flex flex-1 flex-row" style={{ maxHeight }}>
-        <DataGrid
-          style={{ height: '100%' }}
-          className={`
-            flex-grow flex-1
-            ${false ? '' : ' data-grid--simple-logs'} 
-          `}
-          rowHeight={40}
-          headerRowHeight={0}
-          onSelectedCellChange={({ idx, rowIdx }) => {
-            if (!hasId) return
-            setFocusedLog(data[rowIdx] as LogData)
-          }}
-          noRowsFallback={
-            <div className="p-4">
-              <Typography.Text type="secondary" small className="font-mono">
-                No data returned from query
-              </Typography.Text>
+            >
+              <div className="flex items-center gap-2">
+                {data && data.length ? (
+                  <>
+                    <span className="text-sm text-scale-1200">Query results</span>
+                    <span className="text-sm text-scale-1100">{data && data.length}</span>
+                  </>
+                ) : (
+                  <span className="text-xs text-scale-1200">Results will be shown below</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button type="default" icon={<IconEye />}>
+                  Histogram
+                </Button>
+                <Button type="default" icon={<IconDownloadCloud />}>
+                  Download
+                </Button>
+              </div>
             </div>
-          }
-          columns={columns as any}
-          rowClass={(r) => {
-            const row = r as LogData
-
-            let classes = []
-            classes.push(
-              `${row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'}`
-            )
-
-            return classes.join(' ')
-          }}
-          rows={logDataRows}
-          rowKeyGetter={(r) => {
-            if (!hasId) return Object.keys(r)[0]
-            const row = r as LogData
-            return row.id
-          }}
-          onRowClick={(r) => setFocusedLog(r)}
-        />
-        {focusedLog && (
-          <div className="w-1/2 flex flex-col">
-            <LogSelection
-              onClose={() => setFocusedLog(null)}
-              log={focusedLog}
-              queryType={queryType}
-            />
           </div>
         )}
+        <div className={'flex flex-row h-full ' + (!queryType ? 'border-l border-r' : '')}>
+          <DataGrid
+            style={{ height: '100%' }}
+            className={`
+            flex-grow flex-1
+            ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'} 
+          `}
+            rowHeight={40}
+            headerRowHeight={0}
+            onSelectedCellChange={({ idx, rowIdx }) => {
+              if (!hasId) return
+              setFocusedLog(data[rowIdx] as LogData)
+            }}
+            noRowsFallback={
+              <div className="p-4">
+                <Typography.Text type="secondary" small className="font-mono">
+                  No data returned from query
+                </Typography.Text>
+              </div>
+            }
+            columns={columns as any}
+            rowClass={(r) => {
+              const row = r as LogData
+
+              let classes = []
+              classes.push(
+                `${
+                  row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
+                }`
+              )
+
+              return classes.join(' ')
+            }}
+            rows={logDataRows}
+            rowKeyGetter={(r) => {
+              if (!hasId) return Object.keys(r)[0]
+              const row = r as LogData
+              return row.id
+            }}
+            onRowClick={(r) => setFocusedLog(r)}
+          />
+          {focusedLog && (
+            <div className="w-1/2 flex flex-col">
+              <LogSelection
+                onClose={() => setFocusedLog(null)}
+                log={focusedLog}
+                queryType={queryType}
+              />
+            </div>
+          )}
+        </div>
       </section>
     </>
   )
