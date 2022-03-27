@@ -6,6 +6,7 @@ import { Tab } from '@headlessui/react'
 import FunctionsNav from '../interfaces/FunctionsNav'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import WarningBanner from 'components/ui/WarningBanner'
 
 const PageLayout = ({ children, centered }: { children?: React.ReactNode; centered?: boolean }) => {
   const { functions, ui } = useStore()
@@ -27,6 +28,10 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
 
   return (
     <BaseLayout>
+      <WarningBanner
+        title={' Supabase Functions is a pre release version'}
+        description={'We do advise you use Supabase Functions in production at this time'}
+      />
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-32 px-5">
