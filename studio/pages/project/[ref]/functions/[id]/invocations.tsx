@@ -20,7 +20,11 @@ export const LogPage: NextPage = () => {
 
   return (
     <FunctionLayout title={title}>
-      <LogsPreviewer projectRef={ref as string} queryType={'fn_edge'} />
+      <LogsPreviewer
+        projectRef={ref as string}
+        queryType={'fn_edge'}
+        override={{ key: 'function_id', value: id }}
+      />
     </FunctionLayout>
   )
 }
