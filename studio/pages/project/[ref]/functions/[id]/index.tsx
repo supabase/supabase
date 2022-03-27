@@ -55,7 +55,7 @@ const CHART_INTERVALS = [
   { key: '7day', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
 
-function calculateAverage(array: any, attribute: string) {
+function calculateHighlightedValue(array: any, attribute: string, options?: { sum: boolean }) {
   if (!array) return ''
 
   var total = 0
@@ -67,7 +67,11 @@ function calculateAverage(array: any, attribute: string) {
     count++
   })
 
-  return total / count
+  if (options?.sum) {
+    return total
+  } else {
+    return total / count
+  }
 }
 
 const PageLayout = () => {
@@ -112,8 +116,6 @@ const PageLayout = () => {
       router.push(`/project/${ref}/functions/${id}/logs?te=${timestamp}`)
     }
   }
-
-  console.log('average', data?.result ? calculateAverage(data?.result, 'avg_execution_time') : null)
 
   return (
     <FunctionLayout>
@@ -160,7 +162,10 @@ const PageLayout = () => {
                       data={charts}
                       format="ms"
                       isLoading={!charts.data && !error ? true : false}
-                      highlightedValue={calculateAverage(data?.result, 'avg_execution_time')}
+                      highlightedValue={calculateHighlightedValue(
+                        data?.result,
+                        'avg_execution_time'
+                      )}
                       // onBarClick={(v) => handleBarClick(v, '/rest')}
                     />
                   </Panel.Content>
@@ -178,7 +183,9 @@ const PageLayout = () => {
                       customDateFormat={datetimeFormat}
                       data={charts}
                       isLoading={!charts.data && !error ? true : false}
-                      highlightedValue={calculateAverage(data?.result, 'count')}
+                      highlightedValue={calculateHighlightedValue(data?.result, 'count', {
+                        sum: true,
+                      })}
                       onBarClick={(v) => handleBarClick(v, '/auth')}
                     />
                   </Panel.Content>
