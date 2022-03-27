@@ -26,6 +26,34 @@
   }
 }
 
+.data-grid--logs-explorer {
+  .rdg-cell,
+  .rdg-cell span {
+    @apply text-scale-1100 font-normal #{!important};
+    border-left: none;
+    border-right: none;
+  }
+
+  .rdg-cell:first-child {
+    @apply pl-5;
+  }
+  .rdg-cell:last-child {
+    @apply pr-5;
+  }
+
+  .rdg-row {
+    &.rdg-row--focussed {
+      @apply border-r border-brand-900;
+      border-right-width: 4px;
+    }
+
+    &.rdg-row--focussed .rdg-cell,
+    &.rdg-row--focussed .rdg-cell span {
+      @apply text-scale-1200 font-semibold #{!important};
+    }
+  }
+}
+
 .syntax-highlight {
   counter-reset: line-numbering;
   font-family: Menlo, Monaco, monospace;

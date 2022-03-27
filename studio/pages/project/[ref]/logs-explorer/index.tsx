@@ -43,6 +43,8 @@ import InformationBox from 'components/ui/InformationBox'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 
 /**
  * Acts as a container component for the entire log display
@@ -93,16 +95,22 @@ export const LogsExplorerPage: NextPage = () => {
   }
 
   const EditorControls = () => (
-    <div className="flex items-center gap-2">
-      <Button
-        type="default"
-        onClick={() => {
-          setEditorValue('')
-          setEditorId(uuidv4())
-        }}
-      >
-        Clear query
-      </Button>
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        <Button
+          type="default"
+          onClick={() => {
+            setEditorValue('')
+            setEditorId(uuidv4())
+          }}
+        >
+          Clear query
+        </Button>
+        <Button type="default" disabled>
+          Save query
+        </Button>
+      </div>
+
       <Button
         type={editorValue ? 'alternative' : 'default'}
         disabled={!editorValue}
@@ -117,7 +125,7 @@ export const LogsExplorerPage: NextPage = () => {
   return (
     <LogsExplorerLayout>
       <div className="h-full flex flex-col flex-grow gap-4">
-        <div>
+        <div className="border rounded">
           <LogPanel
             isShowingEventChart={false}
             onToggleEventChart={() => null}
@@ -138,7 +146,8 @@ export const LogsExplorerPage: NextPage = () => {
             editorControls={<EditorControls />}
           />
 
-          <div className="min-h-[7rem] h-28">
+          <div className="min-h-[7rem] h-48">
+            <ShimmerLine active={isLoading} />
             <CodeEditor
               id={editorId}
               language="pgsql"
@@ -149,19 +158,14 @@ export const LogsExplorerPage: NextPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col flex-grow relative">
-          {isLoading && (
-            <div
-              className={[
-                'absolute top-0 w-full h-full flex items-center justify-center',
-                'bg-gray-100 opacity-75 z-50',
-              ].join(' ')}
-            >
-              <IconLoader className="animate-spin" />
-            </div>
-          )}
+        <div className="flex flex-col flex-grow relative pb-8">
+          {/* <LogTable data={logData} isCustomQuery={true} /> */}
 
-          <LogTable data={logData} isCustomQuery={true} />
+          <LoadingOpacity active={isLoading}>
+            <div className="flex flex-grow h-full">
+              <LogTable data={logData} isCustomQuery={true} />
+            </div>
+          </LoadingOpacity>
 
           {error && (
             <div className="flex w-full h-full justify-center items-center mx-auto">
