@@ -105,15 +105,16 @@ const ForeignKeySelector: FC<Props> = ({
 
   return (
     <SidePanel
-      key="ColumnConfiguration"
+      key="ForeignKeySelector"
+      size="medium"
       visible={visible}
       onCancel={closePanel}
       // @ts-ignore
-      title={
-        <div>
+      header={
+        <span>
           Edit foreign key relation for{' '}
-          <Typography.Text code>{get(column, ['name'], '')}</Typography.Text>
-        </div>
+          <span className="text-code">{get(column, ['name'], '')}</span>
+        </span>
       }
       customFooter={
         <ActionBar
@@ -124,72 +125,67 @@ const ForeignKeySelector: FC<Props> = ({
         />
       }
     >
-      <div className="space-y-6">
-        <InformationBox
-          block
-          icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
-          title="What are foreign keys?"
-          description={
-            <p>
-              Foreign keys help maintain referential integrity of your data by ensuring that no one
-              can insert rows into the table that do not have a matching entry to another table
-            </p>
-          }
-          url="https://www.postgresql.org/docs/current/tutorial-fk.html"
-          urlLabel="Postgres Foreign Key Documentation"
-        />
+      <SidePanel.Content>
+        <div className="space-y-6">
+          <InformationBox
+            icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+            title="What are foreign keys?"
+            description={`Foreign keys help maintain referential integrity of your data by ensuring that no
+                one can insert rows into the table that do not have a matching entry to another
+                table.`}
+            url="https://www.postgresql.org/docs/current/tutorial-fk.html"
+            urlLabel="Postgres Foreign Key Documentation"
+          />
 
-        <Listbox
-          label="Select a table to reference to"
-          value={selectedTable?.id}
-          error={errors.table}
-          onChange={(value: string) => updateSelectedTable(Number(value))}
-        >
-          <Listbox.Option key="empty" value="" label="---">
-            ---
-          </Listbox.Option>
-          {sortBy(tables, ['schema']).map((table: PostgresTable) => {
-            return (
-              <Listbox.Option key={table.id} value={table.id} label={table.name}>
-                <div className="flex items-center">
-                  {/* For aria searching to target the table name instead of schema */}
-                  <Typography.Text className="hidden">{table.name}</Typography.Text>
-                  <Typography.Text small className="opacity-50 mr-2">
-                    {table.schema}
-                  </Typography.Text>
-                  {table.name}
-                </div>
-              </Listbox.Option>
-            )
-          })}
-        </Listbox>
-
-        {selectedForeignKey?.table && (
           <Listbox
-            value={selectedColumn?.id}
-            // @ts-ignore
-            label={
-              <div>
-                Select a column from{' '}
-                <Typography.Text code>{selectedForeignKey?.table}</Typography.Text> to reference to
-              </div>
-            }
-            error={errors.column}
-            onChange={(value: string) => updateSelectedColumn(value)}
+            label="Select a table to reference to"
+            value={selectedTable?.id}
+            error={errors.table}
+            onChange={(value: string) => updateSelectedTable(Number(value))}
           >
-            {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
-              <Listbox.Option key={column.id} value={column.id} label={column.name}>
-                <div className="flex items-center">
-                  {column.name}
-                  <Typography.Text small className="opacity-50 ml-2">
-                    {column.format}
-                  </Typography.Text>
-                </div>
-              </Listbox.Option>
-            ))}
+            <Listbox.Option key="empty" value="" label="---">
+              ---
+            </Listbox.Option>
+            {sortBy(tables, ['schema']).map((table: PostgresTable) => {
+              return (
+                <Listbox.Option key={table.id} value={table.id} label={table.name}>
+                  <div className="flex items-center gap-2">
+                    {/* For aria searching to target the table name instead of schema */}
+                    <span className="hidden">{table.name}</span>
+                    <span className="text-scale-900">{table.schema}</span>
+                    <span className="text-scale-1200">{table.name}</span>
+                  </div>
+                </Listbox.Option>
+              )
+            })}
           </Listbox>
-        )}
-      </div>
+
+          {selectedForeignKey?.table && (
+            <Listbox
+              value={selectedColumn?.id}
+              // @ts-ignore
+              label={
+                <div>
+                  Select a column from{' '}
+                  <Typography.Text code>{selectedForeignKey?.table}</Typography.Text> to reference
+                  to
+                </div>
+              }
+              error={errors.column}
+              onChange={(value: string) => updateSelectedColumn(value)}
+            >
+              {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
+                <Listbox.Option key={column.id} value={column.id} label={column.name}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-scale-1200">{column.name}</span>
+                    <span className="text-scale-900">{column.format}</span>
+                  </div>
+                </Listbox.Option>
+              ))}
+            </Listbox>
+          )}
+        </div>
+      </SidePanel.Content>
     </SidePanel>
   )
 }

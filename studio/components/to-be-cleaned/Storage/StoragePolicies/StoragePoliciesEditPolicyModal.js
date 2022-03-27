@@ -142,51 +142,61 @@ const StoragePoliciesEditPolicyModal = ({
   }
 
   /* Misc components */
-  const StoragePolicyTemplatesTitle = () => (
-    <div className="px-6 pt-5">
-      <div className="flex items-center space-x-3">
-        <Typography.Text type="secondary">
-          <div className="cursor-pointer" onClick={onSelectBackFromTemplates}>
-            <IconChevronLeft />
+
+  const StoragePolicyEditorModalTitle = ({
+    view,
+    bucketName,
+    onSelectBackFromTemplates = () => {},
+  }) => {
+    const getTitle = () => {
+      if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
+        return `Adding new policy to ${bucketName}`
+      }
+      if (view === POLICY_MODAL_VIEWS.REVIEW) {
+        return `Reviewing policies to be created for ${bucketName}`
+      }
+    }
+    if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
+      return (
+        <div className="">
+          <div className="flex items-center space-x-3">
+            <span
+              onClick={onSelectBackFromTemplates}
+              className="cursor-pointer text-scale-900 hover:text-scale-1200 transition-colors"
+            >
+              <IconChevronLeft strokeWidth={2} size={14} />
+            </span>
+            <Typography.Title level={4} className="m-0">
+              Select a template to use for your new policy
+            </Typography.Title>
           </div>
-        </Typography.Text>
+        </div>
+      )
+    }
+    return (
+      <div className="flex items-center space-x-3">
         <Typography.Title level={4} className="m-0">
-          Select a template to use for your new policy
+          {getTitle()}
         </Typography.Title>
       </div>
-    </div>
-  )
-
-  const StoragePolicyReviewTitle = ({ bucketName = '' }) => (
-    <div className="flex items-center space-x-3 px-6 pt-5">
-      <Typography.Title level={4} className="m-0">
-        Reviewing policies to be added for {bucketName}
-      </Typography.Title>
-    </div>
-  )
-
-  const StoragePolicyTitle = ({ bucketName = '' }) => (
-    <div className="flex items-center space-x-3 px-6 pt-5">
-      <Typography.Title level={4} className="m-0">
-        Adding new policy to ${bucketName}
-      </Typography.Title>
-    </div>
-  )
+    )
+  }
 
   return (
     <Modal
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       closable
       hideFooter
       visible={visible}
       contentStyle={{ padding: 0 }}
-      title={
-        view === POLICY_MODAL_VIEWS.TEMPLATES
-          ? [<StoragePolicyTemplatesTitle key="0" />]
-          : view === POLICY_MODAL_VIEWS.REVIEW
-          ? [<StoragePolicyReviewTitle key="1" bucketName={bucketName} />]
-          : [<StoragePolicyTitle key="2" bucketName={bucketName} />]
-      }
-      style={{ maxWidth: 'none', width: '60rem' }}
+      header={[
+        <StoragePolicyEditorModalTitle
+          key="0"
+          view={view}
+          bucketName={bucketName}
+          onSelectBackFromTemplates={onSelectBackFromTemplates}
+        />,
+      ]}
       onCancel={onSelectCancel}
     >
       <div className="w-full">

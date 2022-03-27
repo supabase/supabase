@@ -85,7 +85,7 @@ export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return links.map((x: any) => (
-    <div key={x.heading} className="py-5 border-b dark:border-dark px-3">
+    <div key={x.heading} className="py-5 border-b dark:border-dark px-6">
       <Menu.Group title={x.heading} />
       {x.versionLabel && (
         <div className="px-3 mb-1">
@@ -104,7 +104,7 @@ const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
 }
 const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return (
-    <ul className="dash-product-menu space-y-1">
+    <ul className="space-y-1">
       {links.map((x: any, i: number) => {
         // disable active state for link with subitems
         const isActive = x.isActive && !subitems
@@ -164,18 +164,19 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
   return (
     <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
-        <Menu.Item
-          rounded
-          key={id}
-          style={{
-            marginLeft: isSubitem && '.5rem',
-          }}
-          active={isActive ? true : false}
+        <button
+          className="cursor-pointer flex space-x-2 items-center outline-none focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 group py-1 font-normal border-scale-500 group-hover:border-scale-900"
           onClick={onClick || (() => {})}
-          icon={external && <IconArrowUpRight size={'tiny'} />}
         >
-          {isSubitem ? <Typography.Text small>{label}</Typography.Text> : label}
-        </Menu.Item>
+          {external && (
+            <span className="transition truncate text-sm text-scale-900 group-hover:text-scale-1100">
+              <IconArrowUpRight size={'tiny'} />
+            </span>
+          )}
+          <span className="transition truncate text-sm w-full text-scale-1100 group-hover:text-scale-1200">
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+        </button>
       </a>
     </Link>
   )

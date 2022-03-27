@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Button, Input, Space, Typography } from '@supabase/ui'
+import TextConfirmModal from '../ModalsDeprecated/TextConfirmModal'
 
 interface Props {
   visible: boolean
@@ -28,43 +28,18 @@ const DeleteBucketModal: FC<Props> = ({
   }
 
   return (
-    <Modal
+    <TextConfirmModal
       visible={visible}
       title={`Confirm deletion of ${bucket.name}`}
-      description="Are you sure you want to delete the selected bucket? This action cannot be undone."
-      size="small"
-      customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            danger
-            loading={deleting}
-            onClick={onConfirmDelete}
-            disabled={bucket.name !== validationInput}
-          >
-            {deleting ? 'Deleting' : 'Delete'}
-          </Button>
-        </Space>
-      }
-    >
-      <div className="w-full">
-        <p className="mb-2 text-sm">
-          <Typography.Text>
-            Please type <span className="font-bold">{bucket.name}</span> to confirm
-          </Typography.Text>
-        </p>
-        <Input
-          autoFocus
-          type="text"
-          className="w-full"
-          value={validationInput}
-          onChange={(event) => setValidationInput(event.target.value)}
-        />
-      </div>
-    </Modal>
+      confirmPlaceholder="Type in name of bucket"
+      onConfirm={onConfirmDelete}
+      onCancel={onSelectCancel}
+      confirmString={bucket.name}
+      loading={deleting}
+      text={`This will delete your bucket called ${bucket.name}.`}
+      alert="You cannot recover this bucket once it is deleted!"
+      confirmLabel={`Delete bucket ${bucket.name}`}
+    />
   )
 }
 

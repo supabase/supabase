@@ -50,11 +50,10 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
 
   return (
     <SidePanel
-      wide
-      title={'JSON'}
+      size="large"
+      header={'JSON'}
       visible={visible}
       onCancel={closePanel}
-      onConfirm={validateJSON}
       customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
     >
       <TwoOptionToggle

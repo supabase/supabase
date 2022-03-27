@@ -9,7 +9,6 @@ import {
   IconMusic,
   IconFilm,
   IconFile,
-  Typography,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import { useContextMenu } from 'react-contexify'
@@ -23,11 +22,7 @@ import { formatBytes } from 'lib/helpers'
 
 const RowIcon = ({ view, status, fileType, mimeType }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return (
-      <Typography.Text>
-        <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-      </Typography.Text>
-    )
+    return <IconLoader size={16} strokeWidth={2} className="animate-spin" />
   }
 
   if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
@@ -38,47 +33,29 @@ const RowIcon = ({ view, status, fileType, mimeType }) => {
         ? '/img/folder-filled.svg'
         : '/img/file-filled.svg'
     return (
-      <Typography.Text>
-        <SVG
-          src={iconSrc}
-          alt={fileType}
-          preProcessor={(code) =>
-            code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
-          }
-        />
-      </Typography.Text>
+      <SVG
+        src={iconSrc}
+        alt={fileType}
+        preProcessor={(code) =>
+          code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
+        }
+      />
     )
   }
 
   if (mimeType?.includes('image')) {
-    return (
-      <Typography.Text>
-        <IconImage size={16} strokeWidth={2} />
-      </Typography.Text>
-    )
+    return <IconImage size={16} strokeWidth={2} />
   }
 
   if (mimeType?.includes('audio')) {
-    return (
-      <Typography.Text>
-        <IconMusic size={16} strokeWidth={2} />
-      </Typography.Text>
-    )
+    return <IconMusic size={16} strokeWidth={2} />
   }
 
   if (mimeType?.includes('video')) {
-    return (
-      <Typography.Text>
-        <IconFilm size={16} strokeWidth={2} />
-      </Typography.Text>
-    )
+    return <IconFilm size={16} strokeWidth={2} />
   }
 
-  return (
-    <Typography.Text>
-      <IconFile size={16} strokeWidth={2} />
-    </Typography.Text>
-  )
+  return <IconFile size={16} strokeWidth={2} />
 }
 
 const FileExplorerRow = ({
@@ -256,36 +233,24 @@ const FileExplorerRow = ({
             }}
           >
             {view === STORAGE_VIEWS.COLUMNS ? (
-              <Typography.Text className="w-full truncate">{item.name}</Typography.Text>
+              <p className="text-sm w-full truncate">{item.name}</p>
             ) : (
               <>
-                <Typography.Text className="truncate" style={{ width: '30%', minWidth: '250px' }}>
-                  {item.name}
-                </Typography.Text>
-                <Typography.Text className="truncate" style={{ width: '15%', minWidth: '100px' }}>
-                  {size}
-                </Typography.Text>
-                <Typography.Text className="truncate" style={{ width: '15%', minWidth: '100px' }}>
-                  {mimeType}
-                </Typography.Text>
-                <Typography.Text className="truncate" style={{ width: '20%', minWidth: '180px' }}>
-                  {createdAt}
-                </Typography.Text>
-                <Typography.Text className="truncate" style={{ width: '20%', minWidth: '175px' }}>
-                  {updatedAt}
-                </Typography.Text>
+                <p className="text-sm truncate w-[30%] min-w-[250px]">{item.name}</p>
+                <p className="text-sm truncate w-[15%] min-w-[100px]">{size}</p>
+                <p className="text-sm truncate w-[15%] min-w-[100px]">{mimeType}</p>
+                <p className="text-sm truncate w-[20%] min-w-[180px]">{createdAt}</p>
+                <p className="text-sm truncate w-[20%] min-w-[175px]">{updatedAt}</p>
                 {/* The 175px here is intentional due to the irregular width of the header checkbox and row icon */}
               </>
             )}
           </div>
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <Typography.Text>
-              <IconLoader
-                className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
-                size={16}
-                strokeWidth={2}
-              />
-            </Typography.Text>
+            <IconLoader
+              className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
+              size={16}
+              strokeWidth={2}
+            />
           ) : (
             <Dropdown
               side="bottom"
@@ -298,11 +263,9 @@ const FileExplorerRow = ({
                 )),
               ]}
             >
-              <Typography.Text type="secondary">
-                <div className="storage-row-menu opacity-0">
-                  <IconMoreVertical size={16} strokeWidth={2} />
-                </div>
-              </Typography.Text>
+              <div className="storage-row-menu opacity-0">
+                <IconMoreVertical size={16} strokeWidth={2} />
+              </div>
             </Dropdown>
           )}
         </div>

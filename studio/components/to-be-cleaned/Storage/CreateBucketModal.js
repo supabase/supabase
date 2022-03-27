@@ -45,22 +45,22 @@ const CreateBucketModal = ({
   return (
     <Modal
       visible={visible}
-      title="Create new bucket"
-      size="large"
+      header="Create storage bucket"
+      size="medium"
       onCancel={onSelectCancel}
       customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
+        <div className="flex items-center gap-2">
+          <Button type="default" onClick={onSelectCancel}>
             Cancel
           </Button>
           <Button type="primary" loading={saving} onClick={onCreateBucket}>
             {saving ? 'Creating bucket' : 'Create bucket'}
           </Button>
-        </Space>
+        </div>
       }
     >
-      <div className="space-y-6 w-full pb-3">
-        <form className="space-y-6">
+      <form className="space-y-6 py-4">
+        <Modal.Content>
           <div className="flex items-center relative">
             <Input
               autoFocus
@@ -71,7 +71,7 @@ const CreateBucketModal = ({
                   Only lowercase letters, numbers, dots, and hyphens
                 </Typography.Text>
               }
-              layout="horizontal"
+              layout="vertical"
               error={error}
               type="text"
               className="w-full"
@@ -80,24 +80,33 @@ const CreateBucketModal = ({
               onChange={(event) => setBucketName(event.target.value)}
             />
           </div>
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
           <div className="space-y-4">
             <Toggle
               name="isPublic"
-              label="Make bucket public"
-              layout="horizontal"
+              label="Public bucket"
+              descriptionText="Anyone can read any object without any authorization"
+              layout="flex"
               size="medium"
               onChange={() => setIsPublic(!isPublic)}
             />
             {isPublic && (
-              <Alert title="Warning: Public bucket" variant="warning" withIcon>
-                Users can read objects in public buckets without any authorization. RLS policies are
-                still required other operations such as object uploads and deletes.
+              <Alert title="Public buckets are not protected" variant="warning" withIcon>
+                <p className="mb-2">
+                  Users can read objects in public buckets without any authorization.
+                </p>
+                <p>
+                  Row level security (RLS) policies are still required for other operations such as
+                  object uploads and deletes.
+                </p>
               </Alert>
             )}
           </div>
-          <button className="hidden" type="submit" onClick={onCreateBucket} />
-        </form>
-      </div>
+        </Modal.Content>
+        <button className="hidden" type="submit" onClick={onCreateBucket} />
+      </form>
     </Modal>
   )
 }

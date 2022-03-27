@@ -1,101 +1,116 @@
-{
-  "rory_wilding": {
-    "author": "Rory Wilding",
-    "author_url": "https://github.com/roryw10",
-    "author_image_url": "https://github.com/roryw10.png",
-    "position": "Head of Growth"
-  },
-  "ant_wilson": {
-    "author": "Ant Wilson",
-    "author_url": "https://github.com/awalias",
-    "author_image_url": "https://github.com/awalias.png",
-    "position": "CTO and Co-Founder"
-  },
-  "paul_copplestone": {
-    "author": "Paul Copplestone",
-    "author_url": "https://github.com/kiwicopple",
-    "author_image_url": "https://github.com/kiwicopple.png",
-    "position": "CEO and Co-Founder"
-  },
-  "angelico_de_los_reyes": {
+[
+  {
+    "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
+    "position": "",
     "author_url": "https://github.com/dragarcia",
-    "author_image_url": "https://avatars0.githubusercontent.com/u/26374889?s=400&u=f5e35e9b47a50fa2b4d8c4bb96babd921071bcf1&v=4",
-    "position": ""
+    "author_image_url": "https://github.com/dragarcia.png"
   },
-  "thor_schaeff": {
-    "author": "Thor Schaeff",
-    "author_url": "https://github.com/thorwebdev",
-    "author_image_url": "https://github.com/thorwebdev.png",
-    "position": "DevRel & DX"
+  {
+    "author_id": "ant_wilson",
+    "author": "Ant Wilson",
+    "position": "CTO and Co-Founder",
+    "author_url": "https://github.com/awalias",
+    "author_image_url": "https://github.com/awalias.png"
   },
-  "supabase": {
-    "author": "Supabase",
-    "author_url": "https://github.com/supabase",
-    "author_image_url": "https://github.com/supabase.png",
-    "position": ""
-  },
-  "inian": {
-    "author": "Inian Parameshwaran",
-    "author_url": "https://twitter.com/everConfusedGuy",
-    "position": "Engineering",
-    "username": "inian",
-    "author_image_url": "https://avatars.githubusercontent.com/u/2155545?v=4"
-  },
-  "soedirgo": {
+  {
+    "author_id": "soedirgo",
     "author": "Bobbie Soedirgo",
-    "author_url": "https://github.com/soedirgo",
-    "position": "Engineering",
     "username": "soedirgo",
+    "position": "Engineering",
+    "author_url": "https://github.com/soedirgo",
     "author_image_url": "https://github.com/soedirgo.png"
   },
-  "fracek": {
-    "author": "Francesco Ceccon",
-    "author_url": "https://github.com/fracek",
-    "position": "Engineering",
-    "username": "fracek",
-    "author_image_url": "https://github.com/fracek.png"
-  },
-  "steve_chavez": {
-    "author": "Steve Chavez",
-    "author_url": "https://github.com/steve-chavez",
-    "position": "Engineering & PostgREST maintainer",
-    "username": "steve-chavez",
-    "author_image_url": "https://github.com/steve-chavez.png"
-  },
-  "kangmingtay": {
-    "author": "Kang Ming Tay",
-    "author_url": "https://github.com/kangmingtay",
-    "position": "Engineering",
-    "username": "kangmingtay",
-    "author_image_url": "https://github.com/kangmingtay.png"
-  },
-  "div_arora": {
+  {
+    "author_id": "div_arora",
     "author": "Div Arora",
-    "author_url": "https://github.com/darora",
-    "position": "Engineering",
     "username": "darora",
+    "position": "Engineering",
+    "author_url": "https://github.com/darora",
     "author_image_url": "https://github.com/darora.png"
   },
-  "gurjeet": {
-    "author": "Gurjeet Singh",
-    "author_url": "https://github.com/gurjeet",
+  {
+    "author_id": "fracek",
+    "author": "Francesco Ceccon",
+    "username": "fracek",
     "position": "Engineering",
+    "author_url": "https://github.com/fracek",
+    "author_image_url": "https://github.com/fracek.png"
+  },
+  {
+    "author_id": "gurjeet",
+    "author": "Gurjeet Singh",
     "username": "gurjeet",
+    "position": "Engineering",
+    "author_url": "https://github.com/gurjeet",
     "author_image_url": "https://github.com/gurjeet.png"
   },
-  "wenbo_xie": {
-    "author": "Wen Bo Xie",
-    "author_url": "https://github.com/w3b6x9",
+  {
+    "author_id": "inian",
+    "author": "Inian Parameshwaran",
+    "username": "inian",
     "position": "Engineering",
-    "username": "w3b6x9",
-    "author_image_url": "https://github.com/w3b6x9.png"
+    "author_url": "https://twitter.com/everConfusedGuy",
+    "author_image_url": "https://avatars.githubusercontent.com/u/2155545?v=4"
   },
-  "oli_rice": {
-    "author": "Oliver Rice",
-    "author_url": "https://github.com/olirice",
+  {
+    "author_id": "kangmingtay",
+    "author": "Kang Ming Tay",
+    "username": "kangmingtay",
     "position": "Engineering",
+    "author_url": "https://github.com/kangmingtay",
+    "author_image_url": "https://github.com/kangmingtay.png"
+  },
+  {
+    "author_id": "oli_rice",
+    "author": "Oliver Rice",
     "username": "olirice",
+    "position": "Engineering",
+    "author_url": "https://github.com/olirice",
     "author_image_url": "https://github.com/olirice.png"
+  },
+  {
+    "author_id": "paul_copplestone",
+    "author": "Paul Copplestone",
+    "position": "CEO and Co-Founder",
+    "author_url": "https://github.com/kiwicopple",
+    "author_image_url": "https://github.com/kiwicopple.png"
+  },
+  {
+    "author_id": "rory_wilding",
+    "author": "Rory Wilding",
+    "position": "Head of Growth",
+    "author_url": "https://github.com/roryw10",
+    "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "steve_chavez",
+    "author": "Steve Chavez",
+    "username": "steve-chavez",
+    "position": "Engineering & PostgREST maintainer",
+    "author_url": "https://github.com/steve-chavez",
+    "author_image_url": "https://github.com/steve-chavez.png"
+  },
+  {
+    "author_id": "supabase",
+    "author": "Supabase",
+    "position": "",
+    "author_url": "https://github.com/supabase",
+    "author_image_url": "https://github.com/supabase.png"
+  },
+  {
+    "author_id": "thor_schaeff",
+    "author": "Thor Schaeff",
+    "position": "DevRel & DX",
+    "author_url": "https://github.com/thorwebdev",
+    "author_image_url": "https://github.com/thorwebdev.png"
+  },
+  {
+    "author_id": "wenbo_xie",
+    "author": "Wen Bo Xie",
+    "username": "w3b6x9",
+    "position": "Engineering",
+    "author_url": "https://github.com/w3b6x9",
+    "author_image_url": "https://github.com/w3b6x9.png"
   }
-}
+]

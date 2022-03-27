@@ -25,7 +25,7 @@ const OrgDropdown = () => {
                 {x.name}
               </Dropdown.Item>
             ))}
-          <Divider light />
+          <Dropdown.Seperator />
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>

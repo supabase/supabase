@@ -1,4 +1,4 @@
-import { IconBarChart2, Loading, Typography } from '@supabase/ui'
+import { IconBarChart2, Loading } from '@supabase/ui'
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,
@@ -88,24 +88,28 @@ const Header = ({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   const chartTitle = (
-    <Typography.Text small={minimalHeader ? true : false} className="mb-0" type="secondary">
+    <h3 className={'text-scale-900 ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {label ?? attribute}
-    </Typography.Text>
+    </h3>
   )
   const highlighted = (
-    <Typography.Title level={minimalHeader ? 5 : 3} className="my-0 font-normal">
+    <h5
+      className={
+        'text-xl text-scale-1200 font-normal ' + (minimalHeader ? 'text-base' : 'text-2xl')
+      }
+    >
       {title}
       <span className="text-lg">{format}</span>
-    </Typography.Title>
+    </h5>
   )
   const date = (
-    <Typography.Text type="secondary" className="opacity-50" small>
+    <h5 className="text-xs text-scale-900">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
         <span className="opacity-0">x</span>
       )}
-    </Typography.Text>
+    </h5>
   )
 
   if (minimalHeader) {
@@ -133,16 +137,32 @@ const NoData = () => (
   <div
     className="
       h-full w-full
-      border border-dashed dark:border-dark
+      border border-dashed border-scale-600
       flex flex-col items-center justify-center
+      space-y-2 text-center
     "
   >
-    <Typography.Text className="mb-2">
-      <IconBarChart2 />
-    </Typography.Text>
-    <Typography.Text>No data to show</Typography.Text>
+    <IconBarChart2 className="text-scale-800" />
+    <div>
+      <p className="text-scale-1100 text-xs">No data to show</p>
+      <p className="text-scale-900 text-xs">May take 24 hours for data to show</p>
+    </div>
   </div>
 )
+const total = (data: any, format: any, attribute: any) => {
+  let total = 0
+  data?.map((item: any) => {
+    total = total + Number(item[attribute])
+  })
+  if (format === '%') {
+    return Number(total).toFixed(2)
+  }
+  return numberWithCommas(total)
+}
+
+function numberWithCommas(x: any) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
 
 export function BarChart({
   data,
@@ -155,7 +175,7 @@ export function BarChart({
   label,
   onBarClick,
   minimalHeader,
-  minmalChart,
+  minimalChart,
   className = '',
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
@@ -180,6 +200,9 @@ export function BarChart({
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
+  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
+  const chartHeight = minimalChart ? 96 : 160
+
   return (
     <Loading active={!data}>
       <div className={className}>
@@ -194,10 +217,10 @@ export function BarChart({
           customDateFormat={customDateFormat}
           displayDateInUtc={displayDateInUtc}
         />
-        <div style={{ width: '100%', height: minmalChart ? '96px' : '160px' }}>
+        <div style={{ width: '100%', height: `${chartHeight}px` }}>
           {hasData ? (
             <>
-              <ResponsiveContainer>
+              <ResponsiveContainer width="100%" height={chartHeight}>
                 <RechartBarChart
                   data={data}
                   margin={{
@@ -253,17 +276,17 @@ export function BarChart({
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="flex items-center justify-between -mt-5">
-                  <Typography.Text type="secondary" className="opacity-50" small>
+                <div className="text-xs text-scale-900 flex items-center justify-between -mt-5">
+                  <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
-                  </Typography.Text>
-                  <Typography.Text type="secondary" className="opacity-50" small>
+                  </span>
+                  <span>
                     {day(data[data?.length - 1]?.period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                     )}
-                  </Typography.Text>
+                  </span>
                 </div>
               )}
             </>
@@ -305,6 +328,9 @@ export function AreaChart({
     setMouseLeave(true)
   }
 
+  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
+  const chartHeight = 160
+
   return (
     <Loading active={!data}>
       <Header
@@ -319,12 +345,12 @@ export function AreaChart({
       <div
         style={{
           width: '100%',
-          height: '160px',
+          height: `${chartHeight}px`,
         }}
       >
         {hasData ? (
           <>
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <RechartAreaChart
                 data={data}
                 margin={{
@@ -372,17 +398,17 @@ export function AreaChart({
               </RechartAreaChart>
             </ResponsiveContainer>
             {data && (
-              <div className="flex items-center justify-between -mt-5">
-                <Typography.Text type="secondary" className="opacity-50" small>
+              <div className="text-scale-900 text-xs flex items-center justify-between -mt-5">
+                <span>
                   {dayjs(data[0].period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                   )}
-                </Typography.Text>
-                <Typography.Text type="secondary" className="opacity-50" small>
+                </span>
+                <span>
                   {dayjs(data[data?.length - 1]?.period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
                   )}
-                </Typography.Text>
+                </span>
               </div>
             )}
           </>

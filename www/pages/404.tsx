@@ -1,8 +1,7 @@
-import { NextPage } from 'next'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 import DefaultLayout from '../components/Layouts/Default'
 
@@ -42,14 +41,14 @@ const Error404 = () => {
           </nav>
         </div>
         <div className="absolute">
-          <Typography.Title
+          <h1
             className={`select-none filter transition opacity-[5%] duration-200 ${
               show404 ? 'blur-sm' : 'blur-none'
             }`}
             style={{ fontSize: '28rem' }}
           >
             404
-          </Typography.Title>
+          </h1>
         </div>
         <div
           className={`transition flex flex-col space-y-6 items-center justify-center ${
@@ -57,16 +56,16 @@ const Error404 = () => {
           }`}
         >
           <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
-            <Typography.Title level={3}>Looking for something? 🔍</Typography.Title>
-            <Typography.Text className="text-center">
+            <h1 className="text-2xl m-2">Looking for something? 🔍</h1>
+            <p className="text-center text-sm">
               We couldn't find the page that you're looking for!
-            </Typography.Text>
+            </p>
           </div>
           <div className="flex items-center space-x-4">
             <Link href="/">
-              <a>
-                <Button>Head back</Button>
-              </a>
+              <Button as="a" size="small" className="text-white">
+                Head back
+              </Button>
             </Link>
           </div>
         </div>
