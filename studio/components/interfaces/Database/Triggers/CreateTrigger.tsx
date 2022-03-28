@@ -20,7 +20,7 @@ import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
 import FormEmptyBox from 'components/to-be-cleaned/FormBoxEmpty'
-import NoTableState from 'components/to-be-cleaned/NoTableState'
+import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 
 class CreateTriggerFormState {
