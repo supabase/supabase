@@ -132,7 +132,7 @@ function AuthPage() {
               <Typography.Text>
                 <p className="text-base">
                   Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
-                  Gitlab, Twitter, Discord, and Bitbucket.
+                  Gitlab, Twitter, Discord, and many more.
                 </p>
               </Typography.Text>
             </div>
