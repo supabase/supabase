@@ -1,0 +1,78 @@
+---
+id: auth-workos
+title: 'Login with WorkOS'
+description: Add WorkOS OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+WorkOS OAuth consists of five broad steps:
+
+- Create a new client in your specified workos organization.
+- Ensure that the new client has the "Client Protocol" set to "openid-connect" and the "Access Type" is set to "confidential".
+- The `Client ID` of the client created will be used as the `client id`.
+- Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
+- Whitelist the callback url of your application.
+
+## Steps
+
+### Access your WorkOS Admin console
+
+- TODO
+
+### Create a WorkOS Client
+
+The "Client ID" of the created client will serve as the `client_id` when you make API calls to authenticate the user.
+
+### Client Settings
+
+After you've created the client successfully, ensure that you set the following settings:
+
+1. The "Client Protocol" should be set to "openid-connect".
+2. The "Access Type" should be set to "confidential".
+3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
+
+![Obtain the client id, set the client protocol and access type](/img/guides/auth-workos/workos-client-id.png)
+![Set redirect uri](/img/guides/auth-workos/workos-redirect-uri.png)
+
+### Obtain the Client Secret
+
+This will serve as the `client_secret` when you make API calls to authenticate the user.
+Under the "Credentials" tab, the `Secret` value will be used as the `client secret`.
+
+### Add login code to your client app
+
+The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'workos',
+})
+```
+
+Add a function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithWorkOS() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'workos',
+  }
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- TODO
