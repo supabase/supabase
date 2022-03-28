@@ -46,9 +46,7 @@ const ProUpgrade: FC<Props> = ({
 
   const currentComputeSize =
     computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
-    computeSizes.find((option: any) => option.name.includes('[Micro]'))
-  console.log('DEBUG: ProUpgrade 001', currentComputeSize)
-  console.log('DEBUG: ProUpgrade 002', computeSizes)
+    computeSizes.find((option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro')
 
   const isManagingProSubscription =
     currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||

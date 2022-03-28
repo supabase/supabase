@@ -101,8 +101,9 @@ function convertArgumentTypes(value: string) {
   if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
   const temp = items.map((x) => {
     const str = x.trim()
-    const name = str.substr(0, str.indexOf(' '))
-    const type = str.substr(str.indexOf(' ') + 1)
+    const space = str.indexOf(' ')
+    const name = str.slice(0, space !== 1 ? space : 0)
+    const type = str.slice(space + 1)
     return { name, type }
   })
   return { value: temp }

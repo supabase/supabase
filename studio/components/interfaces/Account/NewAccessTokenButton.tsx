@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Input, Button, Modal, Form } from '@supabase/ui'
+import { Input, Button, Modal, Form, Alert } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -101,15 +101,21 @@ interface NewTokenItemProps {
 
 const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
   return (
-    <Input
-      label="Successfully generated a new token!"
-      readOnly
-      copy={true}
-      className="input-mono max-w-xl"
-      disabled
-      value={data.token}
-      onChange={() => {}}
-      descriptionText="This token never will be displayed again."
-    />
+    <Alert withIcon variant="success" title="Successfully generated a new token!">
+      <div className="w-full space-y-2">
+        <p className="text-sm">
+          Do copy this access token and store it in a secure place - you will not be able to see it
+          again.
+        </p>
+        <Input
+          readOnly
+          size="small"
+          copy={true}
+          className="input-mono max-w-xl"
+          value={data.token}
+          onChange={() => {}}
+        />
+      </div>
+    </Alert>
   )
 })
