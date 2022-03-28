@@ -60,13 +60,14 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   )
 
   return (
-    <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt">
+    <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt space-y-2">
       <Tabs
         scrollable
         // @ts-ignore
         activeId={apiSwiperActiveIndex.toString()}
         // @ts-ignore
         onChange={(id: string) => handleApiSwiperNavChange(Number(id))}
+        type="pills"
       >
         {props.content.map((extension, i) => {
           return (
@@ -76,78 +77,73 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
           )
         })}
       </Tabs>
-      <div className="border border-gray-100 dark:border-gray-600 rounded-md bg-scale-300 overflow-hidden">
+
+      <Swiper
+        // @ts-ignore
+        onSwiper={setApiSwiper}
+        style={{ zIndex: 0 }}
+        initialSlide={apiSwiperActiveIndex}
+        spaceBetween={0}
+        slidesPerView={1}
+        speed={300}
+        autoHeight={true}
+        allowTouchMove={false}
+      >
+        {props.content.map((extension, i) => {
+          return (
+            <SwiperSlide key={i}>
+              <CodeBlock key={i} lang={extension.lang}>
+                {extension.code}
+              </CodeBlock>
+            </SwiperSlide>
+          )
+        })}
+      </Swiper>
+
+      <div className="overflow-hidden p-8 bg-scale-100 dark:bg-scale-300 rounded-md border border-scale-500">
         <Swiper
           // @ts-ignore
-          onSwiper={setApiSwiper}
+          onSwiper={setSwiperDetails}
           style={{ zIndex: 0 }}
-          initialSlide={apiSwiperActiveIndex}
+          initialSlide={0}
           spaceBetween={0}
           slidesPerView={1}
+          direction="horizontal"
+          // style={{ overflow: 'hidden' }}
           speed={300}
-          autoHeight={true}
           allowTouchMove={false}
         >
           {props.content.map((extension, i) => {
             return (
               <SwiperSlide key={i}>
-                <CodeBlock key={i} lang={extension.lang}>
-                  {extension.code}
-                </CodeBlock>
+                <p>
+                  <span className="block text-lg text-scale-1200 dark:text-white mb-4">
+                    {extension.detail_title}
+                  </span>
+                </p>
+                <p className="p block mb-6">{extension.detail_text}</p>
+                <Space className="justify-between">
+                  {extension.url && (
+                    <Link href={extension.url} as={extension.url}>
+                      <a className="ml-px">
+                        <Button as="a" type="default">
+                          View documentation
+                        </Button>
+                      </a>
+                    </Link>
+                  )}
+                  <div>
+                    <p className="p mr-4">{extension.badges_label}</p>
+                    {extension.badges &&
+                      extension.badges.map((badge, i) => {
+                        return <Badge key={badge}>{badge}</Badge>
+                      })}
+                  </div>
+                </Space>
               </SwiperSlide>
             )
           })}
         </Swiper>
-
-        <div className="overflow-hidden p-8 bg-scale-300 rounded-md border border-t-none border-t-0 border-gray-600">
-          <Swiper
-            // @ts-ignore
-            onSwiper={setSwiperDetails}
-            style={{ zIndex: 0 }}
-            initialSlide={0}
-            spaceBetween={0}
-            slidesPerView={1}
-            direction="horizontal"
-            // style={{ overflow: 'hidden' }}
-            speed={300}
-            allowTouchMove={false}
-          >
-            {props.content.map((extension, i) => {
-              return (
-                <SwiperSlide key={i}>
-                  <div className="">
-                    <p>
-                      <span className="block text-lg text-scale-1200 dark:text-white mb-4">
-                        {extension.detail_title}
-                      </span>
-                    </p>
-                    <p className="block mb-6">
-                      <p>{extension.detail_text}</p>
-                    </p>
-                    <Space className="justify-between">
-                      {extension.url && (
-                        <Link href={extension.url} as={extension.url}>
-                          <a className="ml-px">
-                            <Button as="a" type="default">
-                              View documentation
-                            </Button>
-                          </a>
-                        </Link>
-                      )}
-                      <div>
-                        <p className="mr-4">{extension.badges_label}</p>
-                        {extension.badges &&
-                          extension.badges.map((badge, i) => {
-                            return <Badge key={badge}>{badge}</Badge>
-                          })}
-                      </div>
-                    </Space>
-                  </div>
-                </SwiperSlide>
-              )
-            })}
-          </Swiper>
-        </div>
       </div>
     </div>
   )
