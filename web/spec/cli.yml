@@ -8,6 +8,7 @@ info:
 
     - [x] Running Supabase locally
     - [x] Managing database migrations
+    - [x] Creating and developing Edge Functions
     - [x] Pushing your local changes to production
     - [ ] Manage your Supabase Account
     - [ ] Manage your Supabase Projects
@@ -107,6 +108,10 @@ info:
           - supabase db remote set
           - supabase db remote commit
           - supabase db push
+          - supabase functions delete
+          - supabase functions deploy
+          - supabase functions new
+          - supabase functions serve
           - supabase migration new
       - name: 'Config reference'
         items:
@@ -251,6 +256,42 @@ pages:
         sh: |
           ```sh
           supabase db push [--dry-run]
+          ```
+  supabase functions delete:
+    description: |
+      Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions delete
+          ```
+  supabase functions deploy:
+    description: |
+      Deploy a Function to the linked Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions deploy
+          ```
+  supabase functions new:
+    description: |
+      Create a new Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions new
+          ```
+  supabase functions serve:
+    description: |
+      Serve a Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions serve
           ```
 
   supabase migration new:
