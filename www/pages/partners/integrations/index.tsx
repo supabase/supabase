@@ -164,7 +164,7 @@ function IntegrationPartnersPage(props: Props) {
                   <PartnerLinkBox
                     title="Experts"
                     color="blue"
-                    description="Experts in supabase"
+                    description="Explore our certified Supabase agency experts that build with Supabase"
                     href={`/partners/experts`}
                     icon={
                       <svg
@@ -186,7 +186,7 @@ function IntegrationPartnersPage(props: Props) {
                   <PartnerLinkBox
                     title="Become a partner"
                     color="brand"
-                    description="Experts in supabase"
+                    description="Fill out a quick 30 second form to apply to become a partner"
                     href={`/partners/experts`}
                     icon={
                       <svg
