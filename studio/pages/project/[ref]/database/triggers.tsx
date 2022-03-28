@@ -22,7 +22,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 
 const TriggersPage: FC<any> = () => {
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
 
   const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
@@ -30,11 +30,13 @@ const TriggersPage: FC<any> = () => {
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchTriggers()
-  }, [])
+    if (ui.selectedProject) {
+      fetchTriggers()
+    }
+  }, [ui.selectedProject])
 
   const fetchTriggers = async () => {
-    await meta.triggers.load()
+    meta.triggers.load()
   }
 
   const createTrigger = () => {
