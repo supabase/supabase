@@ -35,7 +35,7 @@ function TagBlogsPage(props: Props) {
     <>
       <NextSeo title={`Blog | ${tag}`} description="Latest news from the Supabase team." />
       <DefaultLayout>
-        <div className="container mx-auto px-8 sm:px-16 xl:px-20 py-16">
+        <div className="container px-8 py-16 mx-auto sm:px-16 xl:px-20">
           <div className="flex space-x-1">
             <p className="cursor-pointer">
               <Link href="/blog">Blog</Link>
@@ -43,10 +43,10 @@ function TagBlogsPage(props: Props) {
             <p>/</p>
             <p>{`${tag}`}</p>
           </div>
-          <ol className="grid grid-cols-12 py-16 gap-8 lg:gap-16">
+          <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
             {blogs.map((blog: PostTypes, idx: number) => (
-              <div className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16">
-                <BlogListItem blog={blog} key={idx} />
+              <div className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4">
+                <BlogListItem post={blog} key={idx} />
               </div>
             ))}
           </ol>
