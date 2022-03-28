@@ -32,9 +32,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       visibility: 'user',
       content: {
         content_id: '1.0',
-        sql: `SELECT * FROM
-(SELECT version()) "version",
-(SELECT current_setting('server_version_num') AS version_number) version_number;`,
+        sql: `select * from
+  (select version()) as version,
+  (select current_setting('server_version_num')) as version_number;`,
         schema_version: '1',
         favorite: false,
       },
