@@ -7,7 +7,7 @@
         "url": "/database"
       },
       {
-        "text": "Authentication",
+        "text": "Auth",
         "url": "/auth"
       },
       {
@@ -38,6 +38,14 @@
       {
         "text": "Brand Assets / Logos",
         "url": "/brand-assets"
+      },
+      {
+        "text": "Integrations",
+        "url": "/partners/integrations"
+      },
+      {
+        "text": "Experts",
+        "url": "/partners/experts"
       },
       {
         "text": "System Status",

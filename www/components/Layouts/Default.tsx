@@ -24,7 +24,7 @@ const DefaultLayout = (props: Props) => {
   return (
     <>
       {!hideHeader && <Nav />}
-      <div className="min-h-screen bg-white dark:bg-gray-800">
+      <div className="min-h-screen">
         <main>{children}</main>
       </div>
       {!hideFooter && <Footer />}

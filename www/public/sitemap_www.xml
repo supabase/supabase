@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://supabase.com/404</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/_app</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -50,6 +56,12 @@
 
   <url>
     <loc>https://supabase.com/storage</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/partners/[slug]</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -496,6 +508,60 @@
 
   <url>
     <loc>https://supabase.com/blog/2021/12/02/supabase-acquires-logflare</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/12/03/launch-week-three-friday-five-more-things</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/12/03/pg-graphql</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/12/03/supabase-holiday-hackdays-hackathon</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/12/15/beta-november-2021-launch-week-recap</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2021/12/17/holiday-hackdays-winners-2021</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/01/20/product-hunt-golden-kitty-awards-2021</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/01/20/supabase-beta-december-2021</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/02/22/supabase-beta-january-2022</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/08/audit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

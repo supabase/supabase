@@ -87,8 +87,8 @@ const ImageGrid = ({
               className={`
                   col-span-1 flex items-center justify-center 
                 bg-gray-50 
-                dark:bg-gray-700
-                  ${x.link && 'hover:bg-gray-100 dark:hover:bg-gray-600'}
+                dark:bg-scale-400
+                  ${x.link && 'hover:bg-gray-100 dark:hover:bg-scale-600'}
                   p-8 ${className}`}
             >
               <div
