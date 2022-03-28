@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Typography, Toggle } from '@supabase/ui'
+import { Badge, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -82,19 +82,23 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   return (
     <div
       className="
-        border border-border-secondary-light dark:border-border-secondary-dark
+        border border-panel-border-light dark:border-panel-border-dark
+        shadow-sm
+        overflow-hidden
         rounded
-        flex flex-col"
+        flex flex-col
+      "
     >
       <div
         className="
           p-4 px-6 flex 
           bg-panel-header-light dark:bg-panel-header-dark
-          border-b border-border-secondary-light dark:border-border-secondary-dark"
+          border-b border-panel-border-light dark:border-panel-border-dark
+        "
       >
-        <div className="m-0 h-5 uppercase flex-1">
-          <Typography.Title level={5}>{extension.name}</Typography.Title>
-        </div>
+        <h3 className="m-0 h-5 uppercase flex-1 truncate text-base text-scale-1200 truncate">
+          {extension.name}
+        </h3>
         {loading ? (
           <img className="loading-spinner" src="/img/spinner.gif"></img>
         ) : (

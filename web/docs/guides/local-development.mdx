@@ -7,7 +7,7 @@ description: How to use Supabase on your local development machine.
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
+Supabase provides a CLI so that you can develop your application locally, with the ability to deploy your application to the Supabase platform.
 
 ## Getting started
 
@@ -42,27 +42,35 @@ supabase init
 
 This command will create a `supabase` folder which holds all the configuration for developing your project locally.
 
+### Remote project 
+
+We can link any local project to a remote database. Use the connection string from your Supabase project here.
+
+```bash
+supabase db remote set 'postgresql://postgres:<your_password>@db.<your_project_ref>.supabase.co:5432/postgres'
+```
+
+After that, run:
+
+```bash
+supabase db remote commit
+```
+
+This command captures any changes that you have made to your database before setting up the CLI.
+
+You'll notice that `supabase/migrations` is now populated with a migration in `..._remote_commit.sql`. 
+This migration captures all the changes required on your local database to match the schema of your remote Supabase project.
+
 ### Start Supabase
 
 ```bash
 supabase start
 ```
 
-This command uses Docker to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+The `supabase start` command uses Docker to start the open source [services](/docs/#how-it-works) of Supabase. 
+This command may take a while to run if this is the first time using the CLI.
 
-Once this is running, you will see an output that contains your local Supabase credentials:
-
-```txt
-Started local development setup.
-
-         API URL: http://localhost:54321
-          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-      Studio URL: http://localhost:54323
-        anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
-service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
-```
-
-Now you can open a browser and visit the Studio at [http://localhost:54323](http://localhost:54323).
+Once all of the Supabase services are running, you'll see an output that contains your local Supabase credentials.
 
 ### Accessing Services Directly
 
@@ -122,65 +130,81 @@ supabase stop
 
 Stop Supabase services and let's build a real application next.
 
-
-## Example application
-
-Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application.
-This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
-
-```bash
-# create a fresh React app
-npx create-react-app react-demo --use-npm
-
-# move into the new folder
-cd react-demo
-
-# set up Supabase
-supabase init
-
-# Save the install supabase-js library
-npm install --save @supabase/supabase-js
-```
-
-Now that your application is prepared, start the backend:
-
-```bash
-supabase start  # Start Supabase
-```
-
-You can use Supabase anywhere in your application. Copy this snippet into `src/App.js`:
-
-```js
-import { createClient } from '@supabase/supabase-js'
-
-const SUPABASE_URL = '<your API URL>'
-const SUPABASE_ANON_KEY = '<your anon key>'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-```
-
-Then start the frontend in a separate terminal:
-
-```bash
-npm start       # Start the React app
-```
-
-If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:54321`.
-
-When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the application and run
-
-```bash
-supabase stop   # Stop Supabase
-```
-
-to stop Supabase services.
-
 ## Migrations
 
-You can also use the CLI to manage your migrations. Follow the tour [here](https://github.com/supabase/cli/tree/main/examples/tour) to get started.
+You can also use the CLI to manage your migrations. 
+
+
+## 2. Making database changes
+
+To modify your local database, simply run some SQL against the `DB URL` shown by `supabase start`. 
+
+For this example, we'll create a table called `employees`, using the "Supabase Studio" link provided. 
+Open the Studio, navigate to the "SQL Editor" section, and then run the following SQL command:
+
+```sql
+create table employees (
+	id serial primary key,
+	name text
+);
+```
+
+Now we have the `employees` table in the local database, but how do we incorporate this into migrations? The CLI can automatically detect changes by running:
+
+```sh
+supabase db commit create_employees
+```
+
+This will create a new migration named `<timestamp>_create_employees.sql` that represents any changes we've made to the local database since `supabase start`.
+
+Let's add some sample data into the table. To do this we can use the seed script in `supabase/seed.sql`. 
+
+```sql
+-- in supabase/seed.sql
+insert into employees (id, name) 
+values 
+  (1, 'Erlich Backman'), 
+  (2, 'Richard Hendricks'),
+  (3, 'Monica Hall');
+```
+
+Now run the following to rerun the migration scripts and the seed script:
+
+```bash
+supabase db reset
+```
+
+If you look again within Studio, you should now see the contents of `employees`. 
+
+## 3. Resetting database changes
+
+If you run any SQL on the local database that you want to revert, you can use the `reset` command.
+
+```sql
+-- run on local database
+alter table employees 
+  add department text default 'Hooli';
+```
+
+To revert this change we can run:
+
+```sh
+supabase db reset
+```
+
+And the local database will be reset.
+
+## 4. Deploying migrations
+
+Finally, we need to deploy these local changes to the remote database (i.e. your remote Supabase project). 
+We can do this by running: 
+
+```sh
+supabase db push
+```
 
 ## Next steps
 
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- Got a question? [Ask in our Discussions](https://github.com/supabase/supabase/discussions).
 - CLI repository: [GitHub](https://github.com/supabase/cli).
 - Sign in: [app.supabase.io](https://app.supabase.io)
