@@ -53,6 +53,7 @@ const PreviewFilterPanel: FC<Props> = ({
   onSearch = () => {},
   defaultSearchValue = '',
   defaultToValue = '',
+  defaultFromValue = '',
   onCustomClick,
   dispatchWhereFilters,
   whereFilters: filters,
@@ -81,15 +82,6 @@ const PreviewFilterPanel: FC<Props> = ({
       setTo({ value: defaultToValue, error: '' })
     }
   }, [defaultToValue])
-
-  //   const handleSearch = () => onSearch({ query: search, to: to.value })
-
-  // const handleSearch = (value: string) =>
-  //   onSearch({
-  //     query: value,
-  //     to: to.value,
-  //     // , from: from.value
-  //   })
 
   const RefreshButton = () => {
     return !isCustomQuery ? (
@@ -151,13 +143,7 @@ const PreviewFilterPanel: FC<Props> = ({
     onSearch({ query: search, to: '', from: '' })
   }
 
-  const showReset = to.value !== '' || from.value !== ''
-
-  const showFromReset = to.value !== ''
-
   const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
-
-  // console.log('this is what is going through', FILTER_OPTIONS[table])
 
   return (
     <div
@@ -206,6 +192,8 @@ const PreviewFilterPanel: FC<Props> = ({
             setTo({ value: e.to, error: '' })
             handleSearch()
           }}
+          to={defaultToValue}
+          from={defaultFromValue}
         />
 
         <div>
@@ -223,59 +211,6 @@ const PreviewFilterPanel: FC<Props> = ({
               />
             ))}
         </div>
-
-        {/* <div className="flex flex-row">
-          <Popover
-            side="bottom"
-            align="end"
-            portalled
-            overlay={
-              <>
-                <Input
-                  label="From"
-                  labelOptional="UTC"
-                  value={from.value === '' ? defaultTimestamp : from.value}
-                  onChange={handleFromChange}
-                  error={from.error}
-                  className="w-72 p-3"
-                />
-                <Input
-                  label="To"
-                  labelOptional="UTC"
-                  value={to.value === '' ? defaultTimestamp : to.value}
-                  onChange={handleToChange}
-                  error={to.error}
-                  className="w-72 p-3"
-                />
-                <div className="flex flex-row justify-end pb-2 px-4">
-                  <Button key="set" size="tiny" title="Set" type="secondary" onClick={handleSearch}>
-                    Set
-                  </Button>
-                </div>
-              </>
-            }
-          >
-            <Button
-              as="span"
-              size="tiny"
-              className={showReset ? '!rounded-r-none' : ''}
-              type={showReset ? 'outline' : 'text'}
-              icon={<IconClock size="tiny" />}
-            >
-              {to.value || from.value ? 'Custom' : 'Now'}
-            </Button>
-          </Popover>
-          {showReset && (
-            <Button
-              size="tiny"
-              className={showReset ? '!rounded-l-none' : ''}
-              icon={<IconX size="tiny" />}
-              type="outline"
-              title="Clear timestamp filter"
-              onClick={handleReset}
-            />
-          )}
-        </div> */}
         <div className="flex items-center space-x-2">
           <Button
             type="default"
@@ -285,74 +220,6 @@ const PreviewFilterPanel: FC<Props> = ({
             Event chart
           </Button>
         </div>
-
-        {!isCustomQuery && (
-          <>
-            <div className="flex flex-row gap-2">
-              {/* <Popover
-                side="bottom"
-                align="end"
-                portalled
-                overlay={
-                  <Input
-                    label="To"
-                    labelOptional="UTC"
-                    value={to.value === '' ? defaultTimestamp : to.value}
-                    onChange={handleFromChange}
-                    error={to.error}
-                    className="w-72 p-3"
-                    actions={[
-                      <Button
-                        key="set"
-                        size="tiny"
-                        title="Set"
-                        type="secondary"
-                        onClick={() => handleSearch(localSearchValue)}
-                      >
-                        Set
-                      </Button>,
-                    ]}
-                  />
-                }
-              >
-                <Button
-                  as="span"
-                  size="tiny"
-                  className={showFromReset ? '!rounded-r-none' : ''}
-                  type={showFromReset ? 'default' : 'secondary'}
-                  icon={<IconClock size="tiny" />}
-                >
-                  {to.value ? 'Custom' : 'Now'}
-                </Button>
-              </Popover> */}
-
-              {/* Clear the filters could be here */}
-            </div>
-            {/* {showFromReset && ( */}
-            {/* <Button
-              size="tiny"
-              className={showFromReset ? '!rounded-l-none' : ''}
-              type="warning"
-              title="Clear timestamp filter"
-              onClick={handleFromReset}
-            >
-              Clear filter
-            </Button> */}
-            {/* )} */}
-            {/* {!isCustomQuery && (
-              <>
-                <div className="flex items-center space-x-2">
-                  <p className="text-xs">Show event chart</p>
-                  <Toggle size="tiny" checked={isShowingEventChart} onChange={onToggleEventChart} />
-                </div>
-                <Button type="default" icon={<IconEye size={12} />}>
-                  Show Histogram
-                </Button>
-              </>
-            )} */}
-            {/* wrap with form so that if user presses enter, the search value will submit automatically */}
-          </>
-        )}
       </div>
       <Button type="secondary" onClick={onCustomClick} iconRight={<IconExternalLink size={10} />}>
         Explore via query

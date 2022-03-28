@@ -7,6 +7,7 @@ import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
 import { useFlag } from 'hooks'
+import { clickDropdown } from 'tests/helpers'
 useFlag.mockReturnValue(true)
 
 test.todo('templates')
@@ -57,6 +58,13 @@ test('Manual refresh', async () => {
   const btn = await screen.findByText(/Refresh/)
   userEvent.click(btn)
   expect(mockFn).toBeCalled()
+})
+test('Datepicker dropdown', async () => {
+  render(<PreviewFilterPanel />)
+  clickDropdown(await screen.findByText(/Last hour/))
+  userEvent.click(await screen.findByText(/Last 3 hours/))
+  await screen.findByText(/Last 3 hours/)
+  await expect(screen.findByText(/Last hour/)).rejects.toThrow()
 })
 
 test.todo('timestamp to/from filter default value')
