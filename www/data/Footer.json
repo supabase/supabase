@@ -40,6 +40,14 @@
         "url": "/brand-assets"
       },
       {
+        "text": "Integrations",
+        "url": "/partners/integrations"
+      },
+      {
+        "text": "Experts",
+        "url": "/partners/experts"
+      },
+      {
         "text": "System Status",
         "url": "https://status.supabase.com/"
       },
