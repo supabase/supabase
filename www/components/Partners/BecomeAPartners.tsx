@@ -13,7 +13,7 @@ const INITIAL_VALUES = {
   title: '',
   email: '',
   phone: '',
-  country: 'SG',
+  country: 'US',
   details: '',
 }
 
