@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Partner } from '~/types/partners'
 
@@ -34,16 +35,17 @@ export default function TileGrid({
                 hover:shadow-lg"
                   >
                     <div className="flex w-full space-x-6">
-                      <img
-                        className="
-                      transition-all scale-100 group-hover:scale-110
-                      flex-shrink-0 w-12 h-12 bg-gray-300 rounded-full
-                      "
-                        src={p.logo}
-                        alt={p.title}
-                      />
+                      <div className="w-10 h-10 transition-all scale-100 group-hover:scale-110">
+                        <Image
+                          layout="fixed"
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 bg-gray-300 rounded-full"
+                          src={p.logo}
+                          alt={p.title}
+                        />
+                      </div>
                       <div>
-                        {/* <span className="text-xs text-scale-900">{p.category}</span> */}
                         <h3 className="transition-colors text-xl text-scale-1100 group-hover:text-scale-1200 mb-2">
                           {p.title}
                         </h3>
