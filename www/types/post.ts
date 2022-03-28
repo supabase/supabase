@@ -1,23 +1,25 @@
 import Author from './author'
 
 type PostTypes = {
-  slug: string
+  slug?: string
+  type: 'casestudy' | 'blog'
   title: string
-  date: string
-  coverImage: string
-  author: Author
-  excerpt: string
-  ogImage: {
+  date?: string
+  coverImage?: string
+  author?: Author
+  excerpt?: string
+  ogImage?: {
     url: string
   }
-  content: string
+  content?: string
   thumb: string
-  image: string
-  readingTime: string
+  image?: string
+  readingTime?: string
   description: string
   url: string
-  tags: []
+  tags?: []
   logo?: string
+  hideAuthor?: boolean
 }
 
 export default PostTypes

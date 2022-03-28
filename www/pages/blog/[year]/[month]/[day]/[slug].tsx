@@ -1,4 +1,4 @@
-import { Badge, Card, Divider, IconChevronLeft, IconFile, Space, Typography } from '@supabase/ui'
+import { Badge, Card, Divider, IconChevronLeft, IconFile, Space } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
@@ -88,8 +88,19 @@ export async function getStaticProps({ params }: any) {
 
 function BlogPostPage(props: any) {
   // @ts-ignore
-  const author = props.blog.author ? authors[props.blog.author] : authors['supabase']
   const content = hydrate(props.blog.content, { components })
+  const authorArray = props.blog.author.split(',')
+
+  const author = []
+  for (let i = 0; i < authorArray.length; i++) {
+    author.push(
+      // @ts-ignore
+      authors.find((authors: string) => {
+        // @ts-ignore
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
 
   const { basePath } = useRouter()
 
@@ -102,31 +113,26 @@ function BlogPostPage(props: any) {
     return (
       <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
-          <Card className="cursor-pointer" hoverable>
-            <Space direction="vertical">
+          <div className="cursor-pointer border border-scale-500 p-6 transition rounded hover:bg-scale-100 dark:hover:bg-scale-300">
+            <div className="space-y-4">
               <div>
-                <Typography.Text>{label}</Typography.Text>
+                <p className="text-sm text-scale-900">{label}</p>
               </div>
               <div>
-                <Typography.Title level={4}>{post.title}</Typography.Title>
-                <Typography.Text>{post.date}</Typography.Text>
+                <h4 className="text-lg text-scale-1200">{post.title}</h4>
+                <p className="small">{post.date}</p>
               </div>
-              <div>
-                {post.tags.map((tag: string) => {
-                  return <Badge key={`category-badge-${tag}`}>{tag}</Badge>
-                })}
-              </div>
-            </Space>
-          </Card>
+            </div>
+          </div>
         </div>
       </Link>
     )
   }
 
   const toc = props.blog.toc && (
-    <Space direction="vertical" size={8} className="py-8 lg:py-0">
+    <div className="space-y-8 py-8 lg:py-0">
       <div>
-        <Space>
+        <div className="space-x-2">
           {props.blog.tags.map((tag: string) => {
             return (
               <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
@@ -134,17 +140,17 @@ function BlogPostPage(props: any) {
               </a>
             )
           })}
-        </Space>
+        </div>
       </div>
       <div>
-        <Typography.Text type="secondary">Table of contents</Typography.Text>
-        <Typography>
-          <div className={blogStyles['toc']}>
+        <p className="text-scale-1200">On this page</p>
+        <div>
+          <div className={[blogStyles['toc'], 'prose prose-toc'].join(' ')}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
-        </Typography>
+        </div>
       </div>
-    </Space>
+    </div>
   )
 
   return (
@@ -181,7 +187,6 @@ function BlogPostPage(props: any) {
       <DefaultLayout>
         <div
           className="
-          bg-white dark:bg-dark-800
             container px-8 sm:px-16 xl:px-20 mx-auto
             py-16
           "
@@ -189,63 +194,67 @@ function BlogPostPage(props: any) {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-2 mb-2">
               {/* Back button */}
-              <Typography.Text type="secondary">
+              <p>
                 <a
                   href={'/blog'}
-                  className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center"
+                  className="transition text-sm text-scale-900 hover:text-scale-1200 cursor-pointer flex items-center"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
                 </a>
-              </Typography.Text>
+              </p>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
               <div className="mb-16 space-y-8 max-w-5xl">
                 <div className="space-y-4">
-                  <Typography.Text type="success">Blog post</Typography.Text>
-                  <Typography.Title>{props.blog.title}</Typography.Title>
-                  <div className="flex space-x-3">
-                    <Typography.Text>{props.blog.date}</Typography.Text>
-                    <Typography.Text type="secondary">•</Typography.Text>
-                    <Typography.Text>
-                      {generateReadingTime(props.blog.content.renderedOutput)}
-                    </Typography.Text>
+                  <p className="text-brand-900">Blog post</p>
+                  <h1 className="h1">{props.blog.title}</h1>
+                  <div className="text-scale-900 flex space-x-3 text-sm">
+                    <p>{props.blog.date}</p>
+                    <p>•</p>
+                    <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
-                  {author && (
-                    <div className="mt-6 mb-8 lg:mb-0 w-max">
-                      <Link href={author.author_url}>
-                        <a className="cursor-pointer">
-                          <Space size={4}>
-                            {author.author_image_url && (
-                              <div className="w-10">
-                                <Image
-                                  src={author.author_image_url}
-                                  className="rounded-full border dark:border-dark"
-                                  width="100%"
-                                  height="100%"
-                                  layout="responsive"
-                                />
+                  <div className="flex">
+                    {author.map((author: any) => {
+                      return (
+                        <div className="mt-6 mb-8 mr-4 lg:mb-0 w-max">
+                          <Link href={author.author_url}>
+                            <a className="cursor-pointer">
+                              <div className="flex gap-3 items-center">
+                                {author.author_image_url && (
+                                  <div className="w-10">
+                                    <Image
+                                      src={author.author_image_url}
+                                      className="rounded-full border dark:border-dark"
+                                      width="100%"
+                                      height="100%"
+                                      layout="responsive"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-scale-1200 mb-0">
+                                    {author.author}
+                                  </span>
+                                  <span className="text-xs mb-0 text-scale-900">
+                                    {author.position}
+                                  </span>
+                                </div>
                               </div>
-                            )}
-                            <Space direction="vertical" size={0}>
-                              <Typography.Text>{author.author}</Typography.Text>
-                              <Typography.Text type="secondary" small>
-                                {author.position}
-                              </Typography.Text>
-                            </Space>
-                          </Space>
-                        </a>
-                      </Link>
-                    </div>
-                  )}
+                            </a>
+                          </Link>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <div className="relative overflow-auto w-full h-96 mb-8 border dark:border-gray-600">
+                    <div className="relative overflow-auto w-full h-96 mb-8 border rounded">
                       <Image
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
@@ -253,19 +262,19 @@ function BlogPostPage(props: any) {
                       />
                     </div>
                   )}
-                  <article className={blogStyles['article']}>
-                    <Typography>{content}</Typography>
+                  <article className={[blogStyles['article'], 'prose prose-docs'].join(' ')}>
+                    {content}
                   </article>
-                  <div className="text-gray-900 dark:text-white">Share with your friends</div>
-                  <div className="flex space-x-4 mt-4">
-                    <div>
+                  <div className="py-16">
+                    <div className="text-sm text-scale-900 dark:text-scale-1000">
+                      Share this article
+                    </div>
+                    <div className="flex space-x-4 items-center mt-4">
                       <Link
-                        href={`https://twitter.com/share?text=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
+                        passHref
+                        href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
                       >
-                        <a
-                          target="_blank"
-                          className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
-                        >
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                           <svg
                             height="26"
                             width="26"
@@ -275,21 +284,17 @@ function BlogPostPage(props: any) {
                           >
                             <path
                               d="m154.729 400c185.669 0 287.205-153.876 287.205-287.312 0-4.37-.089-8.72-.286-13.052a205.304 205.304 0 0 0 50.352-52.29c-18.087 8.044-37.55 13.458-57.968 15.899 20.841-12.501 36.84-32.278 44.389-55.852a202.42 202.42 0 0 1 -64.098 24.511c-18.42-19.628-44.644-31.904-73.682-31.904-55.744 0-100.948 45.222-100.948 100.965 0 7.925.887 15.631 2.619 23.025-83.895-4.223-158.287-44.405-208.074-105.504a100.739 100.739 0 0 0 -13.668 50.754c0 35.034 17.82 65.961 44.92 84.055a100.172 100.172 0 0 1 -45.716-12.63c-.015.424-.015.837-.015 1.29 0 48.903 34.794 89.734 80.982 98.986a101.036 101.036 0 0 1 -26.617 3.553c-6.493 0-12.821-.639-18.971-1.82 12.851 40.122 50.115 69.319 94.296 70.135-34.549 27.089-78.07 43.224-125.371 43.224a204.9 204.9 0 0 1 -24.078-1.399c44.674 28.645 97.72 45.359 154.734 45.359"
-                              fill-rule="nonzero"
+                              fillRule="nonzero"
                             />
                           </svg>
                         </a>
                       </Link>
-                    </div>
 
-                    <div>
                       <Link
-                        href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=Checkout%20@supabase's%20new%20blog%20post%20%7C%20${props.blog.title}`}
+                        passHref
+                        href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=${props.blog.title}`}
                       >
-                        <a
-                          target="_blank"
-                          className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
-                        >
+                        <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                           <svg
                             width="20"
                             height="20"
@@ -302,26 +307,6 @@ function BlogPostPage(props: any) {
                         </a>
                       </Link>
                     </div>
-
-                    <button
-                      onClick={() => copyLink()}
-                      className="text-gray-300 hover:text-gray-400 dark:hover:text-gray-400"
-                    >
-                      <svg
-                        className="h-6 w-6"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </button>
                   </div>
                   <div className="grid lg:grid-cols-1 gap-8 py-8">
                     <div>
@@ -336,40 +321,40 @@ function BlogPostPage(props: any) {
                 </div>
                 {/* Sidebar */}
                 <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
-                  <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
+                  <div className="space-y-8 lg:mb-16 lg:top-16 lg:sticky">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
-                        <Typography.Text type="secondary">Related articles</Typography.Text>
+                        <p className="text-sm text-scale-1200">Related articles</p>
                       </div>
-                      <Space direction="vertical">
+                      <div className="space-y-3">
                         {props.relatedPosts.map((post: any) => (
                           <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                             <div>
-                              <Typography.Text className="cursor-pointer">
-                                <Space>
-                                  <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  <span className="hover:text-gray-900 dark:hover:text-white">
+                              <p className="cursor-pointer">
+                                <div className="flex gap-2">
+                                  <div className="text-scale-900">
+                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
+                                  </div>
+                                  <span className="text-sm text-scale-1100 hover:text-gray-1200">
                                     {post.title}
                                   </span>
-                                </Space>
-                              </Typography.Text>
+                                </div>
+                              </p>
                               <Divider light className="mt-2" />
                             </div>
                           </Link>
                         ))}
-                        <Link href={`/blog`} as={`/blog`}>
-                          <div>
-                            <Typography.Text type="secondary">
-                              <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
-                                View all posts
-                              </span>
-                            </Typography.Text>
-                          </div>
-                        </Link>
-                      </Space>
+                        <div className="mt-2">
+                          <Link href={`/blog`} passHref>
+                            <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
+                              View all posts
+                            </a>
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                  </Space>
+                  </div>
                 </div>
               </div>
             </div>
@@ -396,32 +381,32 @@ function BlogPostPage(props: any) {
                 <Space direction="vertical" size={8} className="lg:mb-16 lg:top-16 lg:sticky">
                   <div className="hidden lg:block">{toc}</div>
                   <div>
-                    <Typography.Title className="mb-4" level={5}>
+                    <h5 className="mb-4">
                       Related articles
-                    </Typography.Title>
+                    </h5>
                     <Space direction="vertical">
                       {props.relatedPosts.map((post: any) => (
                         <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
                           <div>
-                            <Typography.Text className="cursor-pointer">
+                            <p className="cursor-pointer">
                               <Space>
                                 <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                 <span className="hover:text-gray-900 dark:hover:text-white">
                                   {post.title}
                                 </span>
                               </Space>
-                            </Typography.Text>
+                            </p>
                             <Divider light className="mt-2" />
                           </div>
                         </Link>
                       ))}
                       <Link href={`/blog`} as={`/blog`}>
                         <div>
-                          <Typography.Text type="secondary">
+                          <p>
                             <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer">
                               View all posts
                             </span>
-                          </Typography.Text>
+                          </p>
                         </div>
                       </Link>
                     </Space>

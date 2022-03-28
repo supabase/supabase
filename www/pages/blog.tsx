@@ -10,7 +10,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import { Typography, Tabs } from '@supabase/ui'
+import { Tabs } from '@supabase/ui'
 import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
@@ -86,7 +86,7 @@ function Blog(props: any) {
         ]}
       />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden py-12">
+        <div className="overflow-hidden py-12">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
@@ -96,7 +96,7 @@ function Blog(props: any) {
           </div>
         </div>
 
-        <div className="border-t dark:border-dark">
+        <div className="border-t border-scale-600">
           <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
@@ -119,7 +119,7 @@ function Blog(props: any) {
                   className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16"
                   key={idx}
                 >
-                  <BlogListItem blog={blog} />
+                  <BlogListItem post={blog} />
                 </div>
               ))}
             </ol>
@@ -132,53 +132,62 @@ function Blog(props: any) {
 
 function FeaturedThumb(blog: PostTypes) {
   // @ts-ignore
-  const author = blog.author ? authors[blog.author] : authors['supabase']
+  const authorArray = blog.author.split(',')
+
+  const author = []
+  for (let i = 0; i < authorArray.length; i++) {
+    // @ts-ignore
+    author.push(
+      authors.find((authors: any) => {
+        // @ts-ignore
+        return authors.author_id === authorArray[i]
+      })
+    )
+  }
 
   return (
     <div key={blog.slug} className="cursor-pointer w-full">
       <a href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <div className="relative overflow-auto w-full h-96 border dark:border-dark rounded-lg">
+          <div className="relative overflow-auto w-full h-96 border rounded-lg">
             <Image
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
               objectFit="cover"
             />
           </div>
-          <div className="flex flex-col space-y-4">
-            <div className="flex space-x-2">
-              <Typography.Text type="secondary">{blog.date}</Typography.Text>
-              <Typography.Text type="secondary">•</Typography.Text>
-              <Typography.Text type="secondary">{blog.readingTime}</Typography.Text>
+          <div className="flex flex-col space-y-2">
+            <div className="text-scale-900 flex space-x-2 text-sm">
+              <p>{blog.date}</p>
+              <p>•</p>
+              <p>{blog.readingTime}</p>
             </div>
 
             <div>
-              <Typography.Title level={2}>{blog.title}</Typography.Title>
-              <Typography.Text className="m-0" type="secondary">
-                <span className="text-xl">{blog.description}</span>
-              </Typography.Text>
+              <h2 className="h2">{blog.title}</h2>
+              <p className="p text-xl">{blog.description}</p>
             </div>
 
-            {author && (
-              <div className="flex space-x-3 items-center">
-                {author.author_image_url && (
-                  <div className="relative overflow-auto w-10 h-10">
-                    <Image
-                      src={author.author_image_url}
-                      className="rounded-full"
-                      layout="fill"
-                      objectFit="cover"
-                    />
+            {author.map((author: any) => {
+              return (
+                <div className="flex space-x-3 items-center">
+                  {author.author_image_url && (
+                    <div className="relative overflow-auto w-10 h-10">
+                      <Image
+                        src={author.author_image_url}
+                        className="rounded-full"
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <span className="m-0 text-sm text-scale-1200">{author.author}</span>
+                    <span className="m-0 text-xs text-scale-900">{author.position}</span>
                   </div>
-                )}
-                <div className="flex flex-col">
-                  <Typography.Text>{author.author}</Typography.Text>
-                  <Typography.Text type="secondary" small>
-                    {author.position}
-                  </Typography.Text>
                 </div>
-              </div>
-            )}
+              )
+            })}
           </div>
         </a>
       </a>

@@ -5,7 +5,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import {
   Button,
-  Auth,
+  // Auth,
   Card,
   Checkbox,
   Divider,
@@ -13,7 +13,6 @@ import {
   Select,
   Space,
   Tabs,
-  Typography,
   Input,
   Toggle,
   IconCode,
@@ -49,13 +48,11 @@ function AuthPage() {
       <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
         <div className="grid grid-cols-12">
           <div className="col-span-8">
-            <Typography.Title level={2} className="mb-4">
-              ReactJS Auth Widget
-            </Typography.Title>
-            <Typography.Text>
+            <h2 className="mb-4">ReactJS Auth Widget</h2>
+            <p>
               An API built from the groud up just for Storage.With powerful library clients coming
               soon that allow for asset optimasation and image transformation
-            </Typography.Text>
+            </p>
           </div>
           <div className="col-span-8">
             <div
@@ -85,16 +82,16 @@ function AuthPage() {
                           <div>
                             <Space size={3} direction="vertical">
                               <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
-                              <Typography.Title level={3}>{companyName}</Typography.Title>
+                              <h3>{companyName}</h3>
                             </Space>
                           </div>
-                          <Auth
+                          {/* <Auth
                             providers={socialLogins ? socials : []}
                             socialButtonSize={widgetSize}
                             socialLayout={socialLoginLayout}
                             supabaseClient={supabase}
                             socialColors={socialColors}
-                          />
+                          /> */}
                         </Space>
                       </Card>
                     </div>
@@ -109,7 +106,7 @@ function AuthPage() {
   import { Auth } from './'
   import { createClient } from '@supabase/supabase-js'
   // @ts-ignore
-  import { Typography, Button, Space } from '../../index'
+  import { Button, Space } from '../../index'
   
   export default function app() { 
   
@@ -141,10 +138,8 @@ function AuthPage() {
               <div className={`p-8`}>
                 <Space size={12} direction="vertical">
                   <div>
-                    <Typography.Title level={3}>Customise your login form</Typography.Title>
-                    <Typography.Text>
-                      Our ReactJS Auth form will help you get going even quicker{' '}
-                    </Typography.Text>
+                    <h3>Customise your login form</h3>
+                    <p>Our ReactJS Auth form will help you get going even quicker </p>
                   </div>
                   <Divider light />
                   <Input

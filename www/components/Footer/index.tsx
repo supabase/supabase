@@ -4,6 +4,7 @@ import SectionContainer from '../Layouts/SectionContainer'
 import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
 import { useTheme } from '../Providers'
+import { Badge } from '@supabase/ui'
 
 const Footer = () => {
   const { basePath } = useRouter()
@@ -11,7 +12,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="bg-white dark:bg-dark-800 border-t border-gray-100 dark:border-gray-600"
+      className="border-t border-scale-500 dark:border-scale-600"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -34,14 +35,20 @@ const Footer = () => {
               </a>
             </Link>
             <div className="flex space-x-5">
-              <a href="https://twitter.com/supabase" className="text-gray-300 hover:text-gray-400">
+              <a
+                href="https://twitter.com/supabase"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
                 </svg>
               </a>
 
-              <a href="https://github.com/supabase" className="text-gray-300 hover:text-gray-400">
+              <a
+                href="https://github.com/supabase"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -52,7 +59,10 @@ const Footer = () => {
                 </svg>
               </a>
 
-              <a href="https://discord.supabase.com/" className="text-gray-300 hover:text-gray-400">
+              <a
+                href="https://discord.supabase.com/"
+                className="transition text-scale-900 hover:text-scale-1200"
+              >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
                   <path
@@ -65,7 +75,7 @@ const Footer = () => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="text-gray-300 hover:text-gray-400"
+                className="transition text-scale-900 hover:text-scale-1200"
               >
                 <span className="sr-only">Youtube</span>
                 <svg
@@ -84,23 +94,25 @@ const Footer = () => {
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h3 className="text-sm text-gray-300 dark:text-dark-400">{segment.title}</h3>
+                    <h6 className="text-base text-scale-1200 overwrite">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`text-sm ${
+                            className={`transition-colors text-sm ${
                               link.url
-                                ? 'text-gray-500 dark:text-dark-100'
-                                : 'text-gray-400 dark:text-dark-200'
-                            } hover:text-gray-900 dark:hover:text-gray-300`}
+                                ? 'text-scale-1100 hover:text-scale-1200 '
+                                : 'text-scale-900 hover:text-scale-900'
+                            } `}
                           >
                             {link.text}
                             {!link.url && (
-                              <span className="block text-sm text-gray-300 dark:text-dark-300">
-                                Coming soon
-                              </span>
+                              <div className="inline ml-2 xl:ml-0 xl:block 2xl:inline 2xl:ml-2 text-xs">
+                                <Badge color="scale" size="small">
+                                  Coming soon
+                                </Badge>
+                              </div>
                             )}
                           </a>
                         </li>
@@ -112,10 +124,8 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="mt-32 border-t dark:border-dark pt-8 flex justify-between">
-          <p className="mb-0 self-center text-base text-gray-400 dark:text-dark-400">
-            &copy; Supabase Inc
-          </p>
+        <div className="mt-32 border-t border-scale-500 dark:border-scale-600 pt-8 flex justify-between">
+          <small className="small">&copy; Supabase Inc</small>
           <DarkModeToggle />
         </div>
       </SectionContainer>

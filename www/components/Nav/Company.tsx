@@ -82,7 +82,7 @@ const Company = () => {
         <div className="mt-6 text-sm font-medium">
           <a
             href="/blog"
-            className="text-gray-600 hover:text-gray-500 dark:text-brand-600 dark:hover:text-brand-700 transition ease-in-out duration-150"
+            className="text-gray-600 hover:text-gray-500 dark:text-brand-900 dark:hover:text-brand-700 transition ease-in-out duration-150"
           >
             View all posts <span aria-hidden="true">&rarr;</span>
           </a>

@@ -1,13 +1,4 @@
-import {
-  Badge,
-  Button,
-  IconArrowUpRight,
-  IconShuffle,
-  IconX,
-  Space,
-  Tabs,
-  Typography,
-} from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, IconShuffle, IconX, Space, Tabs } from '@supabase/ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
@@ -110,64 +101,43 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <Typography.Text>
-                <p className="mb-4">
-                  <Space>
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <img
-                      src={`${basePath}/images/product/database/postgresql-icon.svg`}
-                      width={30}
-                    />
-                  </Space>
-                </p>
-              </Typography.Text>
-              <Typography.Title level={4}>Just Postgres</Typography.Title>
-              <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  Every Supabase project is a dedicated Postgres database.
-                </p>
-                <p>
-                  100% portable. Bring your existing Postgres database, or migrate away at any time.
-                </p>
-              </Typography.Text>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
+              </div>
+              <h4 className="h4">Just Postgres</h4>
+              <p className="p">Every Supabase project is a dedicated Postgres database.</p>
+              <p className="p text-sm">
+                100% portable. Bring your existing Postgres database, or migrate away at any time.
+              </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <Typography.Text>
-                <p className="mb-4">
-                  <Space>
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <ProductIcon icon={Solutions['authentication'].icon} />
-                  </Space>
-                </p>
-              </Typography.Text>
-              <Typography.Title level={4}>Built-in Auth</Typography.Title>
-              <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  Leveraging PostgreSQL's proven Row Level Security.
-                </p>
-                <p>
-                  Integrated with JWT authentication which controls exactly what your users can
-                  access.
-                </p>
-              </Typography.Text>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <ProductIcon icon={Solutions['authentication'].icon} />
+              </div>
+
+              <h4 className="h4">Built-in Auth</h4>
+              <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
+              <p className="p text-sm">
+                Integrated with JWT authentication which controls exactly what your users can
+                access.
+              </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <Typography.Text>
-                <p className="mb-4">
-                  <Space>
-                    <ProductIcon icon={Solutions['database'].icon} />
-                    <IconX />
-                    <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
-                  </Space>
-                </p>
-              </Typography.Text>
-              <Typography.Title level={4}>Realtime enabled</Typography.Title>
-              <Typography.Text>
-                <p className="text-base lg:text-lg">Data-change listeners over websockets.</p>
-                <p>Subscribe and react to database changes, milliseconds after they happen.</p>
-              </Typography.Text>
+              <div className="mb-4 flex items-center space-x-2">
+                <ProductIcon icon={Solutions['database'].icon} />
+                <IconX />
+                <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
+              </div>
+
+              <h4 className="h4">Realtime enabled</h4>
+              <p className="p">Data-change listeners over websockets.</p>
+              <p className="p text-sm">
+                Subscribe and react to database changes, milliseconds after they happen.
+              </p>
             </div>
           </div>
         </SectionContainer>
@@ -176,12 +146,11 @@ function Database() {
         <SectionContainer className="text-center md:pb-0 lg:pb-0">
           <div className="grid grid-cols-12">
             <div className="col-span-12 lg:col-span-8 lg:col-start-3">
-              <Typography.Title level={2}>Easy to use dashboard</Typography.Title>
-              <Typography.Text>
-                <p className="text-base lg:text-lg">
-                  The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
-                </p>
-              </Typography.Text>
+              <h2 className="h3">Easy to use dashboard</h2>
+
+              <p className="p">
+                The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
+              </p>
             </div>
           </div>
         </SectionContainer>
@@ -228,9 +197,7 @@ function Database() {
                       handle="@Elsolo244"
                       key="@Elsolo244"
                       img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
-                      quote="Where has
-                @supabase
-                been all my life? 😍"
+                      quote="Where has @supabase been all my life? 😍"
                     />,
                   ]}
                 />
@@ -267,24 +234,16 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <Space>
-                    <Typography.Text type="secondary">
-                      <p className="m-0">Libraries coming soon:</p>{' '}
-                    </Typography.Text>
-                    <Badge dot={false} color="blue">
-                      Python
-                    </Badge>
-                    <Badge dot={false} color="blue">
-                      Dart
-                    </Badge>
-                    <Badge dot={false} color="blue">
-                      C#
-                    </Badge>
-                    <Badge dot={false} color="blue">
-                      Kotlin
-                    </Badge>
-                  </Space>
+                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
+                  <p>
+                    <p className="m-0">Libraries coming soon:</p>
+                  </p>
+                  <div className="space-x-1 ml-1">
+                    <Badge dot={false}>Python</Badge>
+                    <Badge dot={false}>Dart</Badge>
+                    <Badge dot={false}>C#</Badge>
+                    <Badge dot={false}>Kotlin</Badge>
+                  </div>
                 </div>
                 <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
                   {/* <TweetCard
@@ -320,23 +279,21 @@ function Database() {
         <SectionContainer className="lg:py-48">
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
-              <Typography.Title level={2}>Extend your database</Typography.Title>
-              <Typography.Text className="block mb-8">
-                <p className="lg:text-lg">Supabase works natively with Postgres extensions.</p>
-                <p>
-                  Choose from a huge collection of Postgres extensions, enabled with a single click.
-                </p>
-              </Typography.Text>
+              <h2 className="h3">Extend your database</h2>
+
+              <p className="p">Supabase works natively with Postgres extensions.</p>
+              <p className="p">
+                Choose from a huge collection of Postgres extensions, enabled with a single click.
+              </p>
+
               <FeatureColumn
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
-              <Link href="/docs/guides/database" as="/docs/guides/database">
-                <a>
-                  <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
+              <Link href="/docs/guides/database" passHref>
+                <Button as="a" size="small" type="default" icon={<IconArrowUpRight />}>
+                  Explore documentation
+                </Button>
               </Link>
             </div>
             <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
