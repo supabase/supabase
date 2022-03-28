@@ -22,7 +22,7 @@ export default function IndexPage() {
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
   const MobileHeaders = ({
-    title,
+    // title,
     description,
     priceDescription,
     price,
@@ -64,7 +64,7 @@ export default function IndexPage() {
           ],
         }}
       />
-      <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative pt-24 md:pt-24 lg:pt-24">
+      <div className="container relative px-6 pt-24 mx-auto lg:px-16 xl:px-20 md:pt-24 lg:pt-24">
         <div className="text-center">
           <h1 className="h1">Predictable pricing, no surprises</h1>
           <p className="p">
@@ -72,7 +72,7 @@ export default function IndexPage() {
           </p>
         </div>
       </div>
-      <div className="container mx-auto px-0 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
+      <div className="container relative px-0 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
         {/* <!-- xs to lg --> */}
 
         <div className=" lg:hidden">
@@ -174,7 +174,7 @@ export default function IndexPage() {
             >
               <tr>
                 <th
-                  className="relative pb-4 px-6 text-sm font-normal text-scale-900 text-left"
+                  className="relative px-6 pb-4 text-sm font-normal text-left text-scale-900"
                   scope="col"
                 >
                   <span className="sr-only">Feature by</span>
@@ -186,7 +186,7 @@ export default function IndexPage() {
                 </th>
 
                 <th
-                  className="w-1/4 pb-4 px-6 text-sm text-left font-normal text-scale-1200"
+                  className="w-1/4 px-6 pb-4 text-sm font-normal text-left text-scale-1200"
                   scope="col"
                 >
                   <span>Free</span>
@@ -197,7 +197,7 @@ export default function IndexPage() {
                 </th>
 
                 <th
-                  className="w-1/4 pb-4 px-6 text-sm leading-6 font-normal text-scale-1200 text-left"
+                  className="w-1/4 px-6 pb-4 text-sm font-normal leading-6 text-left text-scale-1200"
                   scope="col"
                 >
                   <span>Pro</span>
@@ -208,7 +208,7 @@ export default function IndexPage() {
                 </th>
 
                 <th
-                  className="w-1/4 pb-4 px-6 text-sm leading-6 font-normal text-scale-1200 text-left"
+                  className="w-1/4 px-6 pb-4 text-sm font-normal leading-6 text-left text-scale-1200"
                   scope="col"
                 >
                   <span>Pay as you go</span>
@@ -219,21 +219,21 @@ export default function IndexPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="border-scale-700 dark:border-scale-400 divide-y divide-scale-700 dark:divide-scale-400">
+            <tbody className="divide-y border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400">
               <tr className="divide-x divide-scale-700 dark:divide-scale-400">
                 <th
-                  className="py-8 px-6 text-sm font-medium text-scale-900 dark:text-white text-left align-top"
+                  className="px-6 py-8 text-sm font-medium text-left align-top text-scale-900 dark:text-white"
                   scope="row"
                 >
                   Pricing
                 </th>
 
-                <td className="h-full py-8 px-6 align-top">
-                  <div className="relative h-full table">
+                <td className="h-full px-6 py-8 align-top">
+                  <div className="relative table h-full">
                     <span className="h1 text-scale-1200">$0</span>
                     <p className="p"> /project /month</p>
 
-                    <p className="p text-sm">Perfect for hobby projects and experiments</p>
+                    <p className="text-sm p">Perfect for hobby projects and experiments</p>
 
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
@@ -245,12 +245,12 @@ export default function IndexPage() {
                   </div>
                 </td>
 
-                <td className="h-full py-8 px-6 align-top">
-                  <div className="relative h-full table">
+                <td className="h-full px-6 py-8 align-top">
+                  <div className="relative table h-full">
                     <span className="h1 text-scale-1200">$25</span>
                     <p className="p"> /project /month</p>
 
-                    <p className="p text-sm">
+                    <p className="text-sm p">
                       Everything you need to scale your project into production
                     </p>
 
@@ -264,12 +264,12 @@ export default function IndexPage() {
                   </div>
                 </td>
 
-                <td className="h-full py-8 px-6 align-top">
-                  <div className="relative h-full table">
+                <td className="h-full px-6 py-8 align-top">
+                  <div className="relative table h-full">
                     <span className="h1 text-scale-1200">$25</span>
                     <p className="p"> /project /month plus usage costs</p>
 
-                    <p className="p text-sm">
+                    <p className="text-sm p">
                       Designated support team, account manager and technical specialist
                     </p>
 
@@ -302,7 +302,7 @@ export default function IndexPage() {
                   Choose your plan
                 </th>
 
-                <td className="pt-5 px-6">
+                <td className="px-6 pt-5">
                   <Link href="https://app.supabase.io" as="https://app.supabase.io">
                     <a>
                       <Button size="medium" type="default" block>
@@ -312,7 +312,7 @@ export default function IndexPage() {
                   </Link>
                 </td>
 
-                <td className="pt-5 px-6">
+                <td className="px-6 pt-5">
                   <Link href="https://app.supabase.io" as="https://app.supabase.io">
                     <a>
                       <Button size="medium" type="default" block>
@@ -322,7 +322,7 @@ export default function IndexPage() {
                   </Link>
                 </td>
 
-                <td className="pt-5 px-6">
+                <td className="px-6 pt-5">
                   <Link href="mailto:support@supabase.io" as="mailto:support@supabase.io">
                     <a>
                       <Button size="medium" type="default" block>
@@ -338,9 +338,9 @@ export default function IndexPage() {
       </div>
 
       <div className="border-t dark:border-scale-600">
-        <div className="container mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24">
+        <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
           <h2 className="h3">Frequently asked questions</h2>
-          <p className="p max-w-sm mb-4 text-base">
+          <p className="max-w-sm mb-4 text-base p">
             Can&apos;t find the answer to your question, ask someone in the community either on our
             Discord or GitHub.
           </p>

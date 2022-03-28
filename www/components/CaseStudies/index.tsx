@@ -1,10 +1,8 @@
-import { useRouter } from 'next/router'
-import Benchmark from 'components/CaseStudies/benchmark'
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
-import { Card, Space } from '@supabase/ui'
-import SectionContainer from '../Layouts/SectionContainer'
+import { useRouter } from 'next/router'
 import BlogListItem from '../Blog/BlogListItem'
+import SectionContainer from '../Layouts/SectionContainer'
 
 const CaseStudies = () => {
   const { basePath } = useRouter()
@@ -22,24 +20,25 @@ const CaseStudies = () => {
           }
         />
       </div>
-      <div className="mt-5 max-w-lg mx-auto grid gap-8 lg:gap-12 lg:grid-cols-3 lg:max-w-none">
-        {CaseStudiesData.map((caseStudy: any, idx: number) => (
-          <>
-            <BlogListItem
-              post={{
-                type: 'casestudy',
-                title: caseStudy.title,
-                description: caseStudy.description,
-                thumb: `${basePath}/${caseStudy.imgUrl}`,
-                hideAuthor: true,
-              }}
-            />
-            {/* <a href={caseStudy.url} key={idx}>
+      <div className="grid max-w-lg gap-8 mx-auto mt-5 lg:gap-12 lg:grid-cols-3 lg:max-w-none">
+        {CaseStudiesData.map((caseStudy, idx: number) => (
+          <BlogListItem
+            key={idx}
+            post={{
+              type: 'casestudy',
+              title: caseStudy.title,
+              description: caseStudy.description,
+              thumb: `${basePath}/${caseStudy.imgUrl}`,
+              hideAuthor: true,
+              url: caseStudy.url.replace('/blog/', ''),
+            }}
+          />
+          /* <a href={caseStudy.url} key={idx}>
               <Card
                 key={`caseStudy_${idx}`}
                 hoverable
                 cover={
-                  <img src={`${basePath}/${caseStudy.imgUrl}`} className="h-64 object-cover" />
+                  <img src={`${basePath}/${caseStudy.imgUrl}`} className="object-cover h-64" />
                 }
                 className="bg-scale-400"
               >
@@ -49,8 +48,7 @@ const CaseStudies = () => {
                 </div>
                 <p className="p">{caseStudy.description}</p>
               </Card>
-            </a> */}
-          </>
+            </a> */
         ))}
       </div>
       {/* <Benchmark /> */}
