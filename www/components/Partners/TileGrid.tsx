@@ -7,7 +7,7 @@ export default function TileGrid({
   hideCategories = false,
 }: {
   partnersByCategory: { [category: string]: Partner[] }
-  hideCategories: boolean
+  hideCategories?: boolean
 }) {
   return (
     <>
