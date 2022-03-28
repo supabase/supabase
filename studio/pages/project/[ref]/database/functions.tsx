@@ -23,18 +23,20 @@ import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 const FunctionsPage: FC<any> = () => {
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProject) {
+      fetchFunctions()
+    }
+  }, [ui.selectedProject])
 
   const fetchFunctions = async () => {
-    await meta.functions.load()
+    meta.functions.load()
   }
 
   const createFunction = () => {
