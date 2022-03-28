@@ -12,7 +12,6 @@ export function filterSqlWhereBuilder(
   const filtersSanitized: any = Object.values(filters).filter((x: any) => x && x.length > 0)
 
   const keys = Object.keys(filters)
-  console.log('override first', override)
 
   const hasOverride = override && override.value && override.key
   // build array of where statements
@@ -22,9 +21,8 @@ export function filterSqlWhereBuilder(
   if (filtersSanitized.length === 0 && !hasOverride) return whereArray
 
   if (hasOverride) {
-    console.log('override', override)
     count = +1
-    const sql = `${override.key}='${override.value}'`
+    const sql = `${override?.key}='${override?.value}'`
     whereArray.push(sql)
   }
 

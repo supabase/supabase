@@ -62,6 +62,7 @@ import { getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { find } from 'lodash'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
@@ -173,13 +174,13 @@ test('te= query param will populate the timestamp to input', async () => {
   const isoString = newDate.toISOString()
   const unixMicro = newDate.getTime() * 1000 //microseconds
   const router = defaultRouterMock()
-  router.query = { ...router.query, ts: unixMicro }
+  router.query = { ...router.query, te: unixMicro }
   useRouter.mockReturnValue(router)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`timestamp_start=${encodeURIComponent(unixMicro)}`)
+      expect.stringContaining(`timestamp_end=${encodeURIComponent(unixMicro)}`)
     )
   })
   userEvent.click(await screen.findByText('Custom'))
@@ -258,7 +259,7 @@ test('bug: load older btn does not error out when previous page is empty', async
 test('log event chart hide', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await screen.findByText('Events')
-  const toggle = getToggleByText(/Show event chart/)
+  const toggle = await screen.findByText(/Event chart/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
 })

@@ -279,10 +279,6 @@ export const LOGS_TABLES = {
   fn_edge: LogsTableName.FN_EDGE,
 }
 
-export enum LogsTableName {
-  EDGE = 'edge_logs',
-  POSTGRES = 'postgres_logs',
-}
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {

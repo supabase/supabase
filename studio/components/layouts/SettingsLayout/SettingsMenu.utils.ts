@@ -2,7 +2,7 @@ import { LOG_TYPE_LABEL_MAPPING } from 'components/interfaces/Settings/Logs'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (ref: string): ProductMenuGroup[] => {
-  const logTypes: string[] = ['explorer', 'database', 'api']
+  const logTypes: string[] = ['database', 'api']
 
   return [
     {
