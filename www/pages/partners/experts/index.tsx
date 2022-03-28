@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartners'
+import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -64,65 +65,76 @@ function ExpertPartnersPage(props: Props) {
       />
       <DefaultLayout>
         <SectionContainer className="space-y-12">
-          {/* Horizontal link menu */}
-          <div className="flex flex-col items-start justify-between w-full space-y-3 md:space-y-0 md:flex-row md:items-center">
-            <h3 className="h3" style={{ marginBottom: 0 }}>
-              Partners
-            </h3>
-
-            <div className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6">
-              <Link href={`/partners/integrations`}>
-                <a className="transition-colors text-brand-900 hover:text-brand-800">
-                  INTEGRATIONS
-                </a>
-              </Link>
-              <Link href={`/partners/experts`}>
-                <a className="text-scale-1200">EXPERTS</a>
-              </Link>
-              <Link href={`/partners/integrations#become-a-partner`}>
-                <a className="flex items-center space-x-1 transition-colors text-brand-900 hover:text-brand-800">
-                  BECOME A PARTNER <IconArrowRight />
-                </a>
-              </Link>
+          <div>
+            <h1 className="h1">Find an Expert</h1>
+            <h2 className="text-xl text-scale-900">
+              Extend and automate your workflow by using integrations for your favorite tools.
+            </h2>
+          </div>
+          <div className="grid grid-cols-12 lg:gap-16 xl:gap-32">
+            <div className="col-span-3">
+              {/* Horizontal link menu */}
+              <div className="space-y-6">
+                {/* Search Bar */}
+                <div className="space-y-4">
+                  <div className="text-sm text-scale-900 mb-2">Explore more</div>
+                  <PartnerLinkBox
+                    title="Integrations"
+                    color="blue"
+                    description="Extend and automate your workflow by using integrations for your favorite tools."
+                    href={`/partners/integrations`}
+                    icon={
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="1"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
+                        />
+                      </svg>
+                    }
+                  />
+                  <PartnerLinkBox
+                    title="Become a partner"
+                    color="brand"
+                    description="Experts in supabase"
+                    href={`/partners/experts`}
+                    icon={
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="1"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    }
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-center h1">Find an Expert</h1>
-
-          {/* Search Bar */}
-          <div className="w-full space-y-3 md:space-y-0 md:flex md:space-x-6">
-            <Input
-              icon={<IconSearch />}
-              placeholder="Search all partners"
-              type="text"
-              className="md:w-1/2"
-            />
-            <Select
-              className="font-sans md:w-1/2"
-              onChange={(e) => {
-                router.push(`#${e.target.value}`)
-              }}
-            >
-              <option value="" disabled selected>
-                Category
-              </option>
-              {Object.keys(partnersByCategory).map((category) => (
-                <option key={category} value={category.toLowerCase()}>
-                  {category}
-                </option>
-              ))}
-              <option value="become-a-partner">Become a partner</option>
-            </Select>
-          </div>
-
-          {/* Partner Tiles */}
-          <div className="grid">
-            {partners.length ? (
-              <TileGrid partnersByCategory={partnersByCategory} />
-            ) : (
-              <h2 className="h2">No Partners Found</h2>
-            )}
+            <div className="col-span-9">
+              {/* Partner Tiles */}
+              <div className="grid">
+                {partners.length ? (
+                  <TileGrid partnersByCategory={partnersByCategory} hideCategories={true} />
+                ) : (
+                  <h2 className="h2">No Partners Found</h2>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Become a partner form */}
