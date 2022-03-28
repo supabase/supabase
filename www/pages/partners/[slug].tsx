@@ -56,7 +56,7 @@ function Partner({ partner }: { partner: Partner }) {
                 src={partner.logo}
                 alt={partner.title}
               />
-              <h1 className="text-6xl font-semibold text-scale-1200" style={{ marginBottom: 0 }}>
+              <h1 className="h1" style={{ marginBottom: 0 }}>
                 {partner.title}
               </h1>
             </div>
@@ -109,10 +109,10 @@ function Partner({ partner }: { partner: Partner }) {
               </Swiper>
             </div>
 
-            <div className="grid gap-3 lg:grid-cols-4">
+            <div className="grid gap-3 lg:grid-cols-4 space-y-16">
               <div className="lg:col-span-3">
                 <h2
-                  className="mt-8 font-bold text-scale-1200"
+                  className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
@@ -123,7 +123,7 @@ function Partner({ partner }: { partner: Partner }) {
 
               <div>
                 <h2
-                  className="mt-8 font-bold text-scale-1200"
+                  className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Details
@@ -131,12 +131,12 @@ function Partner({ partner }: { partner: Partner }) {
 
                 <div className="divide-y text-scale-1200">
                   <div className="flex items-center justify-between py-2">
-                    <strong>Developer</strong>
-                    <span>{partner.developer}</span>
+                    <span className="text-scale-900">Developer</span>
+                    <span className="text-scale-1200">{partner.developer}</span>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <strong>Category</strong>
+                    <span className="text-scale-900">Category</span>
                     <Link
                       href={`/partners/${
                         partner.type === 'technology' ? 'integrations' : 'experts'
@@ -149,7 +149,7 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <strong>Website</strong>
+                    <span className="text-scale-900">Website</span>
                     <a
                       href={partner.website}
                       target="_blank"
@@ -161,7 +161,7 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <strong>Documentation</strong>
+                    <span className="text-scale-900">Documentation</span>
                     <a
                       href={partner.docs}
                       target="_blank"
@@ -169,7 +169,7 @@ function Partner({ partner }: { partner: Partner }) {
                       className="transition-colors text-brand-900 hover:text-brand-800"
                     >
                       <span className="flex items-center space-x-1">
-                        <span>Read</span>
+                        <span>Learn</span>
                         <IconExternalLink size="small" />
                       </span>
                     </a>

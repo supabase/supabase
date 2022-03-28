@@ -3,7 +3,7 @@ import { IconArrowRight, IconLoader, IconSearch, Input, Select } from '@supabase
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -183,11 +183,12 @@ function IntegrationPartnersPage(props: Props) {
                       </svg>
                     }
                   />
+
                   <PartnerLinkBox
+                    href={`/partners/integrations#become-a-partner`}
                     title="Become a partner"
                     color="brand"
                     description="Fill out a quick 30 second form to apply to become a partner"
-                    href={`/partners/experts`}
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -233,8 +234,8 @@ function IntegrationPartnersPage(props: Props) {
             </div>
           </div>
           {/* Become a partner form */}
-          <BecomeAPartner supabase={supabase} />
         </SectionContainer>
+        <BecomeAPartner supabase={supabase} />
       </DefaultLayout>
     </>
   )

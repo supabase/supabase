@@ -104,7 +104,7 @@ function ExpertPartnersPage(props: Props) {
                     title="Become a partner"
                     color="brand"
                     description="Fill out a quick 30 second form to apply to become a partner"
-                    href={`/partners/experts`}
+                    href={`/partners/integrations#become-a-partner`}
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -138,8 +138,8 @@ function ExpertPartnersPage(props: Props) {
           </div>
 
           {/* Become a partner form */}
-          <BecomeAPartner supabase={supabase} />
         </SectionContainer>
+        <BecomeAPartner supabase={supabase} />
       </DefaultLayout>
     </>
   )
