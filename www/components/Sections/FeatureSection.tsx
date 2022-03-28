@@ -1,4 +1,4 @@
-import { IconDatabase, Typography } from '@supabase/ui'
+import { IconDatabase } from '@supabase/ui'
 
 const FeatureSection = (props: any) => {
   return (
@@ -7,8 +7,8 @@ const FeatureSection = (props: any) => {
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Write less code</Typography.Title>
-        <Typography.Text>
+        <h4>Write less code</h4>
+        <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
@@ -17,14 +17,14 @@ const FeatureSection = (props: any) => {
             Familiar and easy to use permissions mean that your content is secure and accessible
             only to the right users
           </p>
-        </Typography.Text>
+        </p>
       </div>
       <div className="col-span-3 col-start-5">
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Blazing fast</Typography.Title>
-        <Typography.Text>
+        <h4>Blazing fast</h4>
+        <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
@@ -33,14 +33,14 @@ const FeatureSection = (props: any) => {
             Familiar and easy to use permissions mean that your content is secure and accessible
             only to the right users
           </p>
-        </Typography.Text>
+        </p>
       </div>
       <div className="col-span-3 col-start-9">
         <p className="mb-4">
           <IconDatabase />
         </p>
-        <Typography.Title level={4}>Dependable</Typography.Title>
-        <Typography.Text>
+        <h4>Dependable</h4>
+        <p>
           <p className="lg:text-lg">
             Use media in your project without needing to reply on external services or learn new
             frameworks.
@@ -49,7 +49,7 @@ const FeatureSection = (props: any) => {
             Familiar and easy to use permissions mean that your content is secure and accessible
             only to the right users
           </p>
-        </Typography.Text>
+        </p>
       </div>
     </div>
   )

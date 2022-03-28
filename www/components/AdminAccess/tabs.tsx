@@ -1,5 +1,5 @@
 import TabMarkup from 'data/AdminAccess.json'
-import { Tabs as SBTabs, Typography, Button } from '@supabase/ui'
+import { Tabs as SBTabs, Button } from '@supabase/ui'
 
 type Props = {
   tabId: string
@@ -26,9 +26,9 @@ function Tabs(props: Props) {
           >
             <SBTabs.Panel id="tabTableEditor" label="Table Editor">
               <div className="mt-5">
-                <Typography.Title level={3}>{TabMarkup['tabTableEditor'].header}</Typography.Title>
+                <h3>{TabMarkup['tabTableEditor'].header}</h3>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabTableEditor'].description}</Typography.Text>
+                  <p>{TabMarkup['tabTableEditor'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabTableEditor'].url}>
@@ -38,9 +38,9 @@ function Tabs(props: Props) {
 
             <SBTabs.Panel id="tabSqlEditor" label=" SQL Editor">
               <div className="mt-5">
-                <Typography.Title level={3}>{TabMarkup['tabSqlEditor'].header}</Typography.Title>
+                <h3>{TabMarkup['tabSqlEditor'].header}</h3>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabSqlEditor'].description}</Typography.Text>
+                  <p>{TabMarkup['tabSqlEditor'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabSqlEditor'].url}>
@@ -49,9 +49,9 @@ function Tabs(props: Props) {
             </SBTabs.Panel>
             <SBTabs.Panel id="tabAuthRules" label="Auth Rules">
               <div className="mt-5">
-                <Typography.Title level={3}>{TabMarkup['tabAuthRules'].header}</Typography.Title>
+                <h3>{TabMarkup['tabAuthRules'].header}</h3>
                 <dd className="mt-8">
-                  <Typography.Text>{TabMarkup['tabAuthRules'].description}</Typography.Text>
+                  <p>{TabMarkup['tabAuthRules'].description}</p>
                 </dd>
               </div>
               <a href={TabMarkup['tabAuthRules'].url}>
