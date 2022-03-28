@@ -68,7 +68,6 @@ function useLogsPreview<Filters>(
   useEffect(() => {
     if (filters !== {}) {
       const generatedSql = genDefaultQuery(table, options.whereStatementFactory(filters))
-      console.log('generatedSql: \n\n', generatedSql)
       setParams((prev) => ({ ...prev, sql: cleanQuery(generatedSql), rawSql: generatedSql }))
     }
   }, [JSON.stringify(filters)])
@@ -114,11 +113,8 @@ function useLogsPreview<Filters>(
 
   const refresh = () => {
     const generatedSql = genDefaultQuery(table, options.whereStatementFactory(filters))
-    console.log('generatedSql: \n\n', generatedSql)
     setParams((prev) => ({ ...prev, sql: cleanQuery(generatedSql), rawSql: generatedSql }))
-
     setLatestRefresh(new Date().toISOString())
-    // setParams({ ...params, timestamp_end: '' })
   }
 
   let error: null | string | object = swrError ? swrError.message : null

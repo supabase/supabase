@@ -331,7 +331,7 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
           </>
         }
       >
-        <Button type="default" icon={<IconCalendar />}>
+        <Button type="default" as="span" icon={<IconCalendar />}>
           {/* Custom */}
           {appliedStartDate && appliedEndDate ? (
             <>

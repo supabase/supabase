@@ -73,8 +73,6 @@ const ChartHandler: FC<Props> = ({
   const chartData = data || fetchedData
   const loading = isLoading || fetching
 
-  console.log('data in ChartHandler', data)
-
   useEffect(() => {
     let cancel = false
 
