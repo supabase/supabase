@@ -103,7 +103,7 @@ function ExpertPartnersPage(props: Props) {
                   <PartnerLinkBox
                     title="Become a partner"
                     color="brand"
-                    description="Experts in supabase"
+                    description="Fill out a quick 30 second form to apply to become a partner"
                     href={`/partners/experts`}
                     icon={
                       <svg
