@@ -29,6 +29,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       }}
       customDateFormat="MMM D, HH:mm"
       displayDateInUtc
+      noDataMessage={""}
     />
   )
 }
