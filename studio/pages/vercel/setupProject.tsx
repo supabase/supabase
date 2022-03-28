@@ -16,7 +16,7 @@ import {
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   API_URL,
-  PRICING_PLANS_DEFAULT,
+  PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 import {
@@ -198,7 +198,7 @@ const CreateProject = observer(() => {
       db_pass: dbPass,
       db_region: dbRegion,
       db_sql: dbSql || '',
-      db_pricing_plan: PRICING_PLANS_DEFAULT,
+      db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }

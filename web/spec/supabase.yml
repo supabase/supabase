@@ -234,7 +234,7 @@ pages:
       ```
 
   Initializing:
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.constructor'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
       You can initialize a new Supabase client using the `createClient()` method.
 
@@ -777,11 +777,11 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
+      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false. 
     examples:
       - name: Create a new user.
         isSpotlight: true
@@ -791,6 +791,23 @@ pages:
             email: 'user@email.com',
             password: 'password',
             data: { name: 'Yoda' }
+          })
+      - name: Auto-confirm email.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.createUser({
+            email: 'user@email.com',
+            email_confirm: true
+          })
+          ```
+      - name: Auto-confirm phone.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.createUser({
+            phone: '1234567890',
+            phone_confirm: true
           })
           ```
 
@@ -865,7 +882,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.api
+          const { data, error } = await supabase.auth.api
             .resetPasswordForEmail('user@email.com')
           ```
 
@@ -944,7 +961,7 @@ pages:
           ```js
           const { data: user, error } = await supabase.auth.api.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            { phone_number: true }
+            { phone_confirm: true }
           )
           ```
 
@@ -1296,7 +1313,7 @@ pages:
 
   subscribe():
     title: 'on().subscribe()'
-    $ref: '@supabase/supabase-js."lib/SupabaseQueryBuilder".SupabaseQueryBuilder.on'
+    $ref: '@supabase/supabase-js.lib/SupabaseQueryBuilder.SupabaseQueryBuilder.on'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
@@ -1388,7 +1405,7 @@ pages:
 
   removeSubscription():
     title: 'removeSubscription()'
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeSubscription'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeSubscription'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1401,7 +1418,7 @@ pages:
 
   removeAllSubscriptions():
     title: 'removeAllSubscriptions()'
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.removeAllSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllSubscriptions'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1414,7 +1431,7 @@ pages:
 
   getSubscriptions():
     title: 'getSubscriptions()'
-    $ref: '@supabase/supabase-js."SupabaseClient".SupabaseClient.getSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getSubscriptions'
     examples:
       - name: Get all subscriptions
         isSpotlight: true
