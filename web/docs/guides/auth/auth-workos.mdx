@@ -11,39 +11,39 @@ To enable WorkOS Auth for your project, you need to set up WorkOS OAuth applicat
 
 ## Overview
 
-WorkOS OAuth consists of five broad steps:
+WorkOS OAuth consists of four broad steps:
 
-- Create a new client in your specified workos organization.
-- Ensure that the new client has the "Client Protocol" set to "openid-connect" and the "Access Type" is set to "confidential".
-- The `Client ID` of the client created will be used as the `client id`.
-- Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
-- Whitelist the callback url of your application.
-
+- Create a new organization from your WorkOS Dashboard.
+- Obtain the `Client ID` from the Configuration tab and configure redirect URI.
+- Obtain the `WorkOS Secret` from the credentials tab.
+- Add your WorkOS credentials into your Supabase project
 ## Steps
 
-### Access your WorkOS Admin console
+### Create a WorkOS Organization
 
-- TODO
+Log in to the dashboard and hop over to the Organizations tab to create and organization
+![Create an Organization](/img/guides/auth-workos/workos-create-organization.png)
 
-### Create a WorkOS Client
+### Obtain the Client ID and configure Redirect URI
 
-The "Client ID" of the created client will serve as the `client_id` when you make API calls to authenticate the user.
+Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
 
-### Client Settings
+![Fetch Client ID and configure Redirect URI](/img/guides/auth-workos/workos-clientid-redirect-uri.png)
 
-After you've created the client successfully, ensure that you set the following settings:
+### Obtain the WorkOS Secret
 
-1. The "Client Protocol" should be set to "openid-connect".
-2. The "Access Type" should be set to "confidential".
-3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
+Head over to the API Keys page and obtain the secret key.
 
-![Obtain the client id, set the client protocol and access type](/img/guides/auth-workos/workos-client-id.png)
-![Set redirect uri](/img/guides/auth-workos/workos-redirect-uri.png)
+![WorkOS Secret Key](/img/guides/auth-workos/workos-secret-key.png)
 
-### Obtain the Client Secret
+### Add your WorkOS credentials into your Supabase Project
 
-This will serve as the `client_secret` when you make API calls to authenticate the user.
-Under the "Credentials" tab, the `Secret` value will be used as the `client secret`.
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Under `External OAuth Providers` turn `WorkOS Enabled` to ON
+- Enter the `Client ID`, `Secret`, and `WorkOS URL` saved in the previous steps
+- Click `Save`
 
 ### Add login code to your client app
 
@@ -75,4 +75,4 @@ async function signout() {
 
 ## Resources
 
-- TODO
+- [WorkOS Documentation](https://workos.com/docs/sso/guide)
