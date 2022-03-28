@@ -1,12 +1,11 @@
-import { FC } from 'react'
 import { useRouter } from 'next/router'
-import ProductEmptyState from './ProductEmptyState'
+import ProductEmptyState from '../../to-be-cleaned/ProductEmptyState'
 
 interface Props {
   message: string
 }
 
-const NoTableState: FC<Props> = ({ message }) => {
+const NoTableState: React.FC<Props> = ({ message }) => {
   const router = useRouter()
   const { ref } = router.query
 
