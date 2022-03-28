@@ -134,11 +134,7 @@ test('Search will trigger a log refresh', async () => {
     },
     { timeout: 1500 }
   )
-<<<<<<< HEAD:studio/tests/pages/projects/LogsPreviewer.test.js
   await screen.findByText(/some-event-id/)
-=======
-  await screen.findByText(/happened/)
->>>>>>> master:studio/tests/pages/projects/logs-preview.test.js
 })
 
 test('poll count for new messages', async () => {
@@ -168,34 +164,9 @@ test('s= query param will populate the search bar', async () => {
   // should populate search input with the search param
   await screen.findByDisplayValue('someSearch')
   expect(get).toHaveBeenCalledWith(expect.stringContaining('someSearch'))
-<<<<<<< HEAD:studio/tests/pages/projects/LogsPreviewer.test.js
 })
 
 test('te= query param will populate the timestamp to input', async () => {
-=======
-})
-
-test('te= query param will populate the timestamp to input', async () => {
-  // get time 20 mins before
-  const newDate = new Date()
-  newDate.setMinutes(new Date().getMinutes() - 20)
-  const isoString = newDate.toISOString()
-  const unixMicro = newDate.getTime() * 1000 //microseconds
-  const router = defaultRouterMock()
-  router.query = { ...router.query, te: unixMicro }
-  useRouter.mockReturnValue(router)
-  render(<LogPage />)
-
-  await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`timestamp_end=${encodeURIComponent(unixMicro)}`)
-    )
-  })
-  userEvent.click(await screen.findByText('Custom'))
-  await screen.findByDisplayValue(isoString)
-})
-test('ts= query param will populate the timestamp from input', async () => {
->>>>>>> master:studio/tests/pages/projects/logs-preview.test.js
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
@@ -214,12 +185,10 @@ test('ts= query param will populate the timestamp from input', async () => {
   userEvent.click(await screen.findByText('Custom'))
   expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=' + unixMicro))
 })
-<<<<<<< HEAD:studio/tests/pages/projects/LogsPreviewer.test.js
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
-  const isoString = newDate.toISOString()
   const unixMicro = newDate.getTime() * 1000 //microseconds
   const router = defaultRouterMock()
   router.query = { ...router.query, ts: unixMicro }
@@ -236,9 +205,6 @@ test('ts= query param will populate the timestamp from input', async () => {
   await screen.findByText(/Apply/)
   expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=' + unixMicro))
 })
-=======
-
->>>>>>> master:studio/tests/pages/projects/logs-preview.test.js
 
 test('load older btn will fetch older logs', async () => {
   get.mockImplementation((url) => {
@@ -313,11 +279,7 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   const router = defaultRouterMock()
   router.query = { ...router.query, s: 'simple-query' }
   useRouter.mockReturnValue(router)
-<<<<<<< HEAD:studio/tests/pages/projects/LogsPreviewer.test.js
   rerender(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
-=======
-  rerender(<LogPage />)
->>>>>>> master:studio/tests/pages/projects/logs-preview.test.js
 
   await screen.findByDisplayValue('simple-query')
 })
