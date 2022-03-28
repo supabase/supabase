@@ -1,7 +1,6 @@
 .code-block {
-  @apply rounded-lg;
-  /* padding-top: 8px !important; */
-  @apply border border-gray-600;
+  @apply rounded-lg overflow-hidden;
+  @apply border border-scale-500;
 }
 
 .code-block::before {

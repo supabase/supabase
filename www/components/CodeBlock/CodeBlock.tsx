@@ -66,7 +66,7 @@ function CodeBlock(props: Props) {
       {!props.hideCopy && props.children ? (
         <div className="absolute right-2 top-2 dark">
           <CopyToClipboard text={props.children}>
-            <Button type="outline" className="dark:bg-dark-800" icon={<IconCopy />}>
+            <Button type="default" icon={<IconCopy />}>
               Copy
             </Button>
           </CopyToClipboard>
