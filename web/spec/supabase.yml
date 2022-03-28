@@ -777,11 +777,11 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    # $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
+      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false. 
     examples:
       - name: Create a new user.
         isSpotlight: true
@@ -791,6 +791,23 @@ pages:
             email: 'user@email.com',
             password: 'password',
             data: { name: 'Yoda' }
+          })
+      - name: Auto-confirm email.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.createUser({
+            email: 'user@email.com',
+            email_confirm: true
+          })
+          ```
+      - name: Auto-confirm phone.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.createUser({
+            phone: '1234567890',
+            phone_confirm: true
           })
           ```
 
@@ -944,7 +961,7 @@ pages:
           ```js
           const { data: user, error } = await supabase.auth.api.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
-            { phone_number: true }
+            { phone_confirm: true }
           )
           ```
 
