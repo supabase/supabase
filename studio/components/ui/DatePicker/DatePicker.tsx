@@ -24,6 +24,7 @@ import DateSplitInput from './DateSplitInput'
 import DividerSlash from './DividerSlash'
 
 import dayjs from 'dayjs'
+import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
 
 var utc = require('dayjs/plugin/utc')
 var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
@@ -32,13 +33,11 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 interface RootProps {
-  onChange?: ({}) => void
-  initialValues?: {
-    to: number
-    from: number
-  }
-  to?: number
-  from?: number
+  onChange?: ({ to, from }: { to: string; from: string }) => void
+  to?: string
+  from?: string
+  triggerButtonType?: ButtonProps['type']
+  triggerButtonClassName?: string
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -51,7 +50,13 @@ const TIME_NOW = format(new Date(), 'HH:mm:ss').split(':')
 const START_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 const END_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
 
-function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
+function _DatePicker({
+  to,
+  from,
+  onChange,
+  triggerButtonType = 'default',
+  triggerButtonClassName = '',
+}: RootProps) {
   const [open, setOpen] = useState<boolean>(false)
 
   const [showTime, setShowTime] = useState<boolean>(true)
@@ -65,10 +70,12 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
   const [startTime, setStartTime] = useState<any>(START_TIME_DEFAULT)
   const [endTime, setEndTime] = useState<any>(END_TIME_DEFAULT)
 
-  if (initialValues) {
-    const from = dayjs(initialValues.from)
-    const to = dayjs(initialValues.to)
-  }
+  useEffect(() => {
+    if (!to || !from) {
+      setAppliedStartDate(null)
+      setAppliedEndDate(null)
+    }
+  }, [to, from])
 
   function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
     const [from, to] = dates
@@ -93,16 +100,6 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
         to: dayjs(to).toISOString(),
       }
     }
-
-    function unixPayload() {
-      return {
-        from: dayjs(from).valueOf(),
-        to: dayjs(to).valueOf(),
-      }
-    }
-
-    // console.log('unixPayload', unixPayload())
-    // console.log('isoPayload', isoPayload())
 
     if (onChange) onChange(isoPayload())
   }
@@ -331,7 +328,12 @@ function _DatePicker({ to, from, onChange, initialValues }: RootProps) {
           </>
         }
       >
-        <Button type="default" as="span" icon={<IconCalendar />}>
+        <Button
+          type={triggerButtonType}
+          as="span"
+          icon={<IconCalendar />}
+          className={triggerButtonClassName}
+        >
           {/* Custom */}
           {appliedStartDate && appliedEndDate ? (
             <>
