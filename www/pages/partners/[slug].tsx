@@ -10,6 +10,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { Partner } from '~/types/partners'
 import Error404 from '../404'
+import Image from 'next/image'
 
 const supabase = createClient(
   'https://obuldanrptloktxcffvn.supabase.co',
@@ -47,7 +48,10 @@ function Partner({ partner }: { partner: Partner }) {
             </Link>
 
             <div className="flex items-center space-x-4">
-              <img
+              <Image
+                layout="fixed"
+                width={56}
+                height={56}
                 className="rounded-full bg-scale-400 w-14 h-14 flex-shrink-f0"
                 src={partner.logo}
                 alt={partner.title}
@@ -89,8 +93,15 @@ function Partner({ partner }: { partner: Partner }) {
                 {partner.images.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
-                      <div className="ml-3 mr-3 cursor-move">
-                        <img src={image} alt={partner.title} />
+                      <div className="relative block ml-3 mr-3 cursor-move">
+                        <Image
+                          layout="responsive"
+                          objectFit="contain"
+                          width={1460}
+                          height={960}
+                          src={image}
+                          alt={partner.title}
+                        />
                       </div>
                     </SwiperSlide>
                   )
