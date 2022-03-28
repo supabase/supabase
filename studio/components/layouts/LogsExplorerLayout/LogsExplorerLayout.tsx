@@ -3,7 +3,6 @@ import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 import { IconList } from '@supabase/ui'
-import FunctionsNav from '../interfaces/Settings/Logs/LogsNav'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
@@ -44,11 +43,8 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
           // weird repetitive styling
           className="
             h-full flex flex-col flex-grow
-
             w-full mx-auto
-
             transition-all
-
             px-5
             lg:px-20
             xl:px-24
