@@ -133,7 +133,7 @@ const Header = ({
   )
 }
 
-const NoData = () => (
+const NoData = ({ title = 'No data to show', message = 'May take 24 hours for data to show' }) => (
   <div
     className="
       h-full w-full
@@ -144,8 +144,8 @@ const NoData = () => (
   >
     <IconBarChart2 className="text-scale-800" />
     <div>
-      <p className="text-scale-1100 text-xs">No data to show</p>
-      <p className="text-scale-900 text-xs">May take 24 hours for data to show</p>
+      <p className="text-scale-1100 text-xs">{title}</p>
+      <p className="text-scale-900 text-xs">{message}</p>
     </div>
   </div>
 )
@@ -177,6 +177,8 @@ export function BarChart({
   minimalHeader,
   minimalChart,
   className = '',
+  noDataTitle,
+  noDataMessage
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
 
@@ -291,7 +293,7 @@ export function BarChart({
               )}
             </>
           ) : (
-            <NoData />
+            <NoData title={noDataTitle} message={noDataMessage}/>
           )}
         </div>
       </div>
