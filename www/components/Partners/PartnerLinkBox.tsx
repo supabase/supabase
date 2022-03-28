@@ -35,7 +35,7 @@ const PartnerLinkBox = ({
       <div className="flex flex-col gap-3">
         <div
           className={`${colors[color]}
-            rounded-md block h-8 w-8
+            rounded-md h-8 w-8
             flex items-center justify-center
             transition-all
             group-hover:scale-110

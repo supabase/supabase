@@ -14,7 +14,7 @@ export default function TileGrid({
       {Object.keys(partnersByCategory).map((category) => (
         <div key={category} id={category.toLowerCase()} className="space-y-8">
           {!hideCategories && <h2 className="h2">{category}</h2>}
-          <div className="grid max-w-lg gap-5 lg:grid-cols-1 xl:grid-cols-3 lg:max-w-none">
+          <div className="grid  gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 lg:max-w-none">
             {partnersByCategory[category].map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
                 <a
@@ -22,7 +22,7 @@ export default function TileGrid({
                 "
                 >
                   <div
-                    className="transition-all
+                    className="
 
                 bg-scale-100 dark:bg-scale-300
                 hover:bg-scale-200 hover:dark:bg-scale-400

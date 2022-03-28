@@ -44,8 +44,8 @@ function ExpertPartnersPage(props: Props) {
   )
   const router = useRouter()
 
-  const meta_title = 'Works With Supabase'
-  const meta_description = `Find Integration Partners and Expert Services that work with Supabase.`
+  const meta_title = 'Find an expert'
+  const meta_description = `Find an expert to help build your next idea.`
 
   return (
     <>
@@ -66,10 +66,8 @@ function ExpertPartnersPage(props: Props) {
       <DefaultLayout>
         <SectionContainer className="space-y-12">
           <div>
-            <h1 className="h1">Find an Expert</h1>
-            <h2 className="text-xl text-scale-900">
-              Extend and automate your workflow by using integrations for your favorite tools.
-            </h2>
+            <h1 className="h1">{meta_title}</h1>
+            <h2 className="text-xl text-scale-900">{meta_description}</h2>
           </div>
           <div className="grid grid-cols-12 lg:gap-16 xl:gap-32">
             <div className="col-span-3">

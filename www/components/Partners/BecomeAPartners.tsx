@@ -68,7 +68,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
 
   return (
     <div className="border-t">
-      <div id="become-a-partner" className="max-w-2xl mx-auto space-y-12 py-12">
+      <div id="become-a-partner" className="max-w-2xl mx-auto space-y-12 py-12 px-6">
         <h2 className="h2">Become a Partner</h2>
 
         <Form initialValues={INITIAL_VALUES} validate={validate} onSubmit={handleFormSubmit}>
