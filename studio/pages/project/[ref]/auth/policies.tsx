@@ -9,7 +9,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import PolicyTableRow from 'components/to-be-cleaned/Auth/PolicyTableRow'
 import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
-import NoTableState from 'components/to-be-cleaned/NoTableState'
+import NoTableState from 'components/ui/States/NoTableState'
 
 const PageContext = createContext(null)
 
