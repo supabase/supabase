@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Partner } from '~/types/partners'
 
@@ -20,7 +21,10 @@ export default function TileGrid({
                       <span className="text-sm text-scale-1100">{p.category}</span>
                       <h3 className="h3">{p.title}</h3>
                     </div>
-                    <img
+                    <Image
+                      layout="fixed"
+                      width={40}
+                      height={40}
                       className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
                       src={p.logo}
                       alt={p.title}
