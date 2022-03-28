@@ -62,7 +62,7 @@ function Partner({ partner }: { partner: Partner }) {
             </div>
 
             <div
-              className="py-6 bg-scale-400"
+              className="py-6 bg-scale-300"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
@@ -93,7 +93,7 @@ function Partner({ partner }: { partner: Partner }) {
                 {partner.images.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
-                      <div className="relative block ml-3 mr-3 cursor-move">
+                      <div className="relative block ml-3 mr-3 cursor-move overflow-hidden rounded-md">
                         <Image
                           layout="responsive"
                           objectFit="contain"
@@ -109,7 +109,7 @@ function Partner({ partner }: { partner: Partner }) {
               </Swiper>
             </div>
 
-            <div className="grid gap-3 lg:grid-cols-4 space-y-16">
+            <div className="grid gap-3 lg:grid-cols-4 space-y-16 lg:space-y-0">
               <div className="lg:col-span-3">
                 <h2
                   className="text-scale-1200"
