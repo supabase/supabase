@@ -5,10 +5,16 @@ import { observer } from 'mobx-react-lite'
 import { Typography, IconAlertCircle, Card, Input } from '@supabase/ui'
 import { withAuth } from 'hooks'
 import CodeEditor from 'components/ui/CodeEditor'
-import { LogsQueryPanel, LogTable, LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
+import {
+  LogsQueryPanel,
+  LogsTableName,
+  LogTable,
+  LogTemplate,
+  TEMPLATES,
+} from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import {LogsExplorerLayout} from 'components/layouts'
+import { LogsExplorerLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 
@@ -52,11 +58,18 @@ export const LogsExplorerPage: NextPage = () => {
     setEditorId(uuidv4())
     changeQuery('')
   }
+  
+  const handleInsertSource = (source: LogsTableName) => {
+    setEditorValue((prev) => prev + source)
+    setEditorId(uuidv4())
+  }
+
   return (
     <LogsExplorerLayout>
       <div className="h-full flex flex-col flex-grow gap-4">
         <div className="border rounded">
           <LogsQueryPanel
+            onSelectSource={handleInsertSource}
             onClear={handleClear}
             onRun={handleRun}
             hasEditorValue={Boolean(editorValue)}
