@@ -1,18 +1,6 @@
-@import 'tailwindcss/base';
-
-/* Write your own custom base styles here */
-
-/* Start purging... */
-@import 'tailwindcss/components';
-/* Stop purging. */
-
-/* Write you own custom component styles here */
-
-/* Start purging... */
-@import 'tailwindcss/utilities';
-/* Stop purging. */
-
-/* Your own custom utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: 'custom-font';
@@ -21,6 +9,7 @@
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'custom-font';
   src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
@@ -29,53 +18,95 @@
   font-style: normal;
 }
 
-/*
-  Typography
-*/
+html {
+  scroll-behavior: smooth;
+}
 
-h1,
+body {
+  @apply bg-scale-200;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
+h6 { */
+/*
+  Typography
+*/
+
+.h1:not(.prose *):not(.overwrite),
+.h2:not(.prose *):not(.overwrite),
+.h3:not(.prose *):not(.overwrite),
+.h4:not(.prose *):not(.overwrite),
+.h5:not(.prose *):not(.overwrite),
+.h6:not(.prose *):not(.overwrite) {
+  @apply text-scale-1200;
   margin-bottom: 16px;
 }
 
-h1,
-h2 {
+.h1:not(.prose *):not(.overwrite) {
+  @apply text-4xl;
+}
+
+.h2:not(.prose *):not(.overwrite) {
+  @apply text-3xl;
+}
+
+.h3:not(.prose *):not(.overwrite) {
+  @apply text-2xl;
+}
+
+.h4:not(.prose *):not(.overwrite) {
+  @apply text-xl;
+}
+
+.h5:not(.prose *):not(.overwrite) {
+  @apply text-xl;
+}
+
+.h1:not(.prose *):not(.overwrite),
+.h2:not(.prose *):not(.overwrite) {
   line-height: 1.2 !important;
 }
 
 @media only screen and (max-width: 960px) {
-  h1 {
+  .h1:not(.prose *):not(.overwrite) {
     font-size: 2.2rem !important;
   }
-  h2 {
+  .h2:not(.prose *):not(.overwrite) {
     font-size: 2rem !important;
   }
 }
 
 @media only screen and (max-width: 720px) {
-  h1 {
+  .h1:not(.prose *):not(.overwrite) {
     font-size: 2rem !important;
   }
-  h2 {
+  .h2:not(.prose *):not(.overwrite) {
     font-size: 1.8rem !important;
   }
 }
 
 @media only screen and (max-width: 520px) {
-  h1 {
+  .h1:not(.prose *):not(.overwrite) {
     font-size: 1.8rem !important;
   }
-  h2 {
+  .h2:not(.prose *):not(.overwrite) {
     font-size: 1.6rem !important;
   }
 }
 
-p {
+.p:not(.prose *):not(.overwrite) {
+  @apply text-scale-1100;
   margin-bottom: 16px;
+}
+
+.small:not(.prose *):not(.overwrite) {
+  @apply text-xs text-scale-900;
 }
 
 .sbui-border-fix select {
@@ -83,22 +114,12 @@ p {
   border-width: 1px;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  @apply bg-white dark:bg-gray-800;
-}
-
 .section--masked {
   /* overflow: hidden; */
 }
 
 ::selection {
-  @apply bg-green-300;
+  background-color: #6ee7b7;
   color: #333 !important;
 }
 
@@ -110,7 +131,7 @@ body {
 }
 
 .section--bg {
-  @apply bg-gray-50 dark:bg-gray-800;
+  @apply bg-scale-100 dark:bg-scale-200;
   position: relative;
   height: 100%;
   width: 100%;
@@ -139,12 +160,12 @@ body {
   @apply border border-gray-50 dark:border-gray-700;
 }
 
-a {
+/* a {
   @apply hover:text-black dark:hover:text-white;
-}
+} */
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-gray-800 text-white dark:bg-gray-600 dark:text-white;
+  @apply bg-gray-800 text-white dark:bg-scale-300 dark:text-white;
   text-shadow: none;
   font-weight: 400;
 }
@@ -158,7 +179,7 @@ a {
   @apply border-gray-900 dark:border-white;
 }
 /* override position of tabs  */
-.dashboard-tabs > div > div > div > div {
+.dashboard-tabs > div > div {
   justify-content: center;
 }
 
@@ -206,7 +227,6 @@ table .thead--plans th {
 .pricing-table__product-row {
   /* @apply py-4; */
   position: sticky;
-  border-collapse: separate;
   top: 0;
   z-index: 5;
 }

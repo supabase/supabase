@@ -1,62 +1,72 @@
-import { Space, Typography } from '@supabase/ui'
 import authors from 'lib/authors.json'
-import React from 'react'
 import Image from 'next/image'
+import React from 'react'
 import PostTypes from '~/types/post'
 
 interface Props {
-  blog: PostTypes
+  post: PostTypes
 }
 
-const BlogListItem = ({ blog }: Props) => {
+const BlogListItem = ({ post }: Props) => {
   // @ts-ignore
-  const author = blog.author ? authors[blog.author] : authors['supabase']
+  const authorArray = post.author && post.author.split(',')
+
+  const author = []
+  if (post.type === 'blog' && post.author) {
+    for (let i = 0; i < authorArray.length; i++) {
+      author.push(
+        // @ts-ignore
+        authors.find((authors: string) => {
+          // @ts-ignore
+          return authors.author_id === authorArray[i]
+        })
+      )
+    }
+  }
 
   return (
-    <div key={blog.slug}>
-      <a href={`/blog/${blog.url}`}>
+    <div>
+      <a href={`/blog/${post.url}`}>
         <div className="inline-block min-w-full group">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
-              <div className="relative overflow-auto w-full h-60 border dark:border-dark shadow-sm rounded-lg mb-4">
+              <div
+                className={`relative overflow-auto w-full h-60 border border-scale-300 shadow-sm rounded-lg mb-4`}
+              >
                 <Image
                   layout="fill"
                   src={
-                    !blog.thumb ? `/images/blog/blog-placeholder.png` : `/images/blog/${blog.thumb}`
+                    !post.thumb
+                      ? `/images/blog/blog-placeholder.png`
+                      : post.type === 'casestudy'
+                      ? post.thumb
+                      : `/images/blog/${post.thumb}`
                   }
                   objectFit="cover"
-                  className="transform duration-100 ease-in scale-100 group-hover:scale-105"
+                  className="duration-100 ease-in transform scale-100 group-hover:scale-105"
                 />
               </div>
 
-              <div>
-                <Typography.Title level={3} className="m-0">
-                  {blog.title}
-                </Typography.Title>
-              </div>
-              <Typography.Text type="secondary" small>
-                {blog.date}
-              </Typography.Text>
-
-              <Typography.Text className="m-0" type="secondary">
-                <p className="text-base mb-0">{blog.description}</p>
-              </Typography.Text>
+              <h3 className="max-w-sm text-xl text-scale-1200">{post.title}</h3>
+              {post.type === 'blog' && post.date && (
+                <p className="text-xs text-scale-1100">{post.date}</p>
+              )}
+              <p className="max-w-sm text-base text-scale-1100">{post.description}</p>
             </div>
-            {author && (
-              <div>
-                <Space size={4}>
-                  {author.author_image_url && (
-                    <img src={author.author_image_url} className="rounded-full w-10" />
-                  )}
-                  <Space direction="vertical" size={0}>
-                    <Typography.Text>{author.author}</Typography.Text>
-                    <Typography.Text type="secondary" small>
-                      {author.position}
-                    </Typography.Text>
-                  </Space>
-                </Space>
-              </div>
-            )}
+            <div className="flex items-center -space-x-2">
+              {author.map((author: any) => {
+                return (
+                  <div>
+                    {author.author_image_url && (
+                      <img
+                        src={author.author_image_url}
+                        className="w-10 rounded-full ring-2 ring-white dark:ring-scale-200"
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </a>

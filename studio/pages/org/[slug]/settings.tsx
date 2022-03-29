@@ -22,7 +22,7 @@ import {
 
 import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore, withAuth } from 'hooks'
-import { post, delete_ } from 'lib/common/fetch'
+import { post, delete_, patch } from 'lib/common/fetch'
 import { AccountLayout } from 'components/layouts'
 import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
 
@@ -203,10 +203,7 @@ const GeneralSettings = observer(() => {
   const BASIC_FIELDS = ['name', 'billing_email']
 
   const handleUpdateOrg = async (model: any) => {
-    const response = await post(
-      `${API_URL}/organizations/${PageState.organization.slug}/update`,
-      model
-    )
+    const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, model)
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -319,7 +316,7 @@ const OrgDeleteModal = observer(() => {
           validateOnBlur
           onSubmit={async (values: any, { setSubmitting }: any) => {
             setSubmitting(true)
-            const response = await delete_(`${API_URL}/organizations/${orgSlug}/remove`)
+            const response = await delete_(`${API_URL}/organizations/${orgSlug}`)
             if (response.error) {
               ui.setNotification({
                 category: 'error',

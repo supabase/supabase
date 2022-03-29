@@ -421,6 +421,10 @@ const Settings = () => {
             'EXTERNAL_GITLAB_ENABLED',
             'EXTERNAL_GITLAB_CLIENT_ID',
             'EXTERNAL_GITLAB_SECRET',
+            'EXTERNAL_KEYCLOAK_ENABLED',
+            'EXTERNAL_KEYCLOAK_CLIENT_ID',
+            'EXTERNAL_KEYCLOAK_SECRET',
+            'EXTERNAL_KEYCLOAK_URL',
             'EXTERNAL_LINKEDIN_ENABLED',
             'EXTERNAL_LINKEDIN_CLIENT_ID',
             'EXTERNAL_LINKEDIN_SECRET',
@@ -439,6 +443,10 @@ const Settings = () => {
             'EXTERNAL_SPOTIFY_ENABLED',
             'EXTERNAL_SPOTIFY_CLIENT_ID',
             'EXTERNAL_SPOTIFY_SECRET',
+            'EXTERNAL_WORKOS_ENABLED',
+            'EXTERNAL_WORKOS_CLIENT_ID',
+            'EXTERNAL_WORKOS_SECRET',
+            'EXTERNAL_WORKOS_URL',
             'EXTERNAL_ZOOM_ENABLED',
             'EXTERNAL_ZOOM_CLIENT_ID',
             'EXTERNAL_ZOOM_SECRET',
@@ -469,6 +477,10 @@ const Settings = () => {
             EXTERNAL_GOOGLE_ENABLED: model.EXTERNAL_GOOGLE_ENABLED,
             EXTERNAL_GOOGLE_CLIENT_ID: model.EXTERNAL_GOOGLE_CLIENT_ID || undefined,
             EXTERNAL_GOOGLE_SECRET: model.EXTERNAL_GOOGLE_SECRET || undefined,
+            EXTERNAL_KEYCLOAK_ENABLED: model.EXTERNAL_KEYCLOAK_ENABLED,
+            EXTERNAL_KEYCLOAK_CLIENT_ID: model.EXTERNAL_KEYCLOAK_CLIENT_ID || undefined,
+            EXTERNAL_KEYCLOAK_SECRET: model.EXTERNAL_KEYCLOAK_SECRET || undefined,
+            EXTERNAL_KEYCLOAK_URL: model.EXTERNAL_KEYCLOAK_URL || undefined,
             EXTERNAL_LINKEDIN_ENABLED: model.EXTERNAL_LINKEDIN_ENABLED,
             EXTERNAL_LINKEDIN_CLIENT_ID: model.EXTERNAL_LINKEDIN_CLIENT_ID || undefined,
             EXTERNAL_LINKEDIN_SECRET: model.EXTERNAL_LINKEDIN_SECRET || undefined,
@@ -487,6 +499,10 @@ const Settings = () => {
             EXTERNAL_SPOTIFY_ENABLED: model.EXTERNAL_SPOTIFY_ENABLED,
             EXTERNAL_SPOTIFY_CLIENT_ID: model.EXTERNAL_SPOTIFY_CLIENT_ID || undefined,
             EXTERNAL_SPOTIFY_SECRET: model.EXTERNAL_SPOTIFY_SECRET || undefined,
+            EXTERNAL_WORKOS_ENABLED: model.EXTERNAL_WORKOS_ENABLED,
+            EXTERNAL_WORKOS_CLIENT_ID: model.EXTERNAL_WORKOS_CLIENT_ID || undefined,
+            EXTERNAL_WORKOS_SECRET: model.EXTERNAL_WORKOS_SECRET || undefined,
+            EXTERNAL_WORKOS_URL: model.EXTERNAL_WORKOS_URL || undefined,
             EXTERNAL_ZOOM_ENABLED: model.EXTERNAL_ZOOM_ENABLED,
             EXTERNAL_ZOOM_CLIENT_ID: model.EXTERNAL_ZOOM_CLIENT_ID || undefined,
             EXTERNAL_ZOOM_SECRET: model.EXTERNAL_ZOOM_SECRET || undefined,
@@ -733,6 +749,40 @@ const Settings = () => {
           )}
           <Divider light />
           <ToggleField
+            name="EXTERNAL_KEYCLOAK_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://www.keycloak.org/"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_KEYCLOAK_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_KEYCLOAK_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+              <AutoField
+                name="EXTERNAL_KEYCLOAK_URL"
+                showInlineError
+                errorMessage="Please enter the Keycloak url."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
             name="EXTERNAL_LINKEDIN_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_LINKEDIN_ENABLED && (
@@ -902,6 +952,40 @@ const Settings = () => {
                 name="EXTERNAL_SPOTIFY_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_WORKOS_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://dashboard.workos.com"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_WORKOS_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_WORKOS_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+              <AutoField
+                name="EXTERNAL_WORKOS_URL"
+                showInlineError
+                errorMessage="Please enter the WorkOS url."
               />
             </>
           )}

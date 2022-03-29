@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, Badge, IconStar } from '@supabase/ui'
+import { Button, Badge, IconStar, IconChevronDown } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -13,6 +13,7 @@ import Developers from '~/components/Nav/Developers'
 import Announcement from '~/components/Nav/Announcement'
 
 import { useTheme } from '~/components/Providers'
+import TextLink from '../TextLink'
 
 const Nav = () => {
   const { basePath } = useRouter()
@@ -71,11 +72,11 @@ const Nav = () => {
                 </Badge>
               )}
             </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-dark-100">{description}</p>
+            <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
           </div>
           {url && (
-            <p className="mt-2 text-sm font-medium text-brand-600 lg:mt-4">
-              Learn more <span aria-hidden="true">&rarr;</span>
+            <p className="mt-2 text-sm font-medium text-brand-900 lg:mt-4">
+              <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />
             </p>
           )}
         </div>
@@ -85,7 +86,7 @@ const Nav = () => {
       <a
         key={`solution_${idx}`}
         href={url}
-        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-dark-600 transition ease-in-out duration-150"
+        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-scale-600 transition ease-in-out duration-150"
       >
         {content}
       </a>
@@ -109,7 +110,7 @@ const Nav = () => {
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="inline-flex items-center justify-center p-2 rounded-md bg-white text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-gray-800 dark:hover:bg-gray-900"
+        className="inline-flex items-center justify-center p-2 rounded-md bg-gray-50 text-scale-900 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300"
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -153,30 +154,27 @@ const Nav = () => {
     <div
       className={
         `
-                  inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700
-                  dark:text-dark-100 cursor-pointer
+        inline-flex items-center 
+        px-1 border-b-2 border-transparent 
+        text-sm 
+        font-medium 
+        transition-colors
+        text-scale-1200 hover:text-brand-900
+        cursor-pointer
                 ` + props.active
       }
       onClick={props.onClick}
     >
       <>
         <span>{props.title}</span>
-        <svg
+        <div
           className={
-            'ml-2 h-5 w-5 text-gray-300 group-hover:text-gray-300 transition ease-in-out duration-150' +
-            (props.active && ' transform rotate-180')
+            'flex items-center justify-center ml-2 h-5 w-5 text-scale-900 group-hover:text-scale-900 transition ease-in-out duration-150' +
+            (props.active && ' transform transition-all duration-100 rotate-180')
           }
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
         >
-          <path
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
+          <IconChevronDown size={14} strokeWidth={2} />
+        </div>
       </>
     </div>
   )
@@ -185,7 +183,8 @@ const Nav = () => {
     <>
       <Announcement />
       <div className="sticky top-0 z-50">
-        <nav className="bg-white dark:bg-gray-800 border-b dark:border-gray-600">
+        <div className="absolute w-full h-full bg-scale-200 top-0 opacity-80"></div>
+        <nav className="backdrop-blur-sm border-b border-scale-400">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
           <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
@@ -221,7 +220,7 @@ const Nav = () => {
                     href="/pricing"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
@@ -231,7 +230,7 @@ const Nav = () => {
                     href="/blog"
                     className={`
                     inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-gray-500 hover:text-gray-700 hover:border-gray-500 p-5
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
                     dark:text-dark-100 dark:hover:border-dark-100
                   `}
                   >
@@ -239,20 +238,43 @@ const Nav = () => {
                   </a>
                 </div>
               </div>
-              <div className="hidden lg:flex items-center sm:space-x-3">
-                <a href="https://github.com/supabase/supabase" target="_blank">
-                  <Button
-                    className="sbui-btn sbui-btn-text sbui-btn--tiny sbui-btn--text-align-center"
-                    icon={<IconStar />}
-                  >
-                    Star us on GitHub
+              <div className="flex items-center gap-2">
+                <Button
+                  as="a"
+                  className="group hidden lg:flex"
+                  // @ts-ignore
+                  href="https://github.com/supabase/supabase"
+                  target="_blank"
+                  type="text"
+                  icon={
+                    <div className="flex items-center justify-center  text-brand-800 w-4 h-4">
+                      <div
+                        className="text-scale-900 flex items-center justify-center w-3 h-3 
+                      
+                      group-hover:w-4  
+                      group-hover:h-4 
+                      group-hover:text-yellow-900 
+                      group-focus:w-4  
+                      group-focus:h-4 
+                      group-focus:text-yellow-900 
+                      
+                      transition-all"
+                      >
+                        <IconStar strokeWidth={2} />
+                      </div>
+                    </div>
+                  }
+                >
+                  Star us on GitHub
+                </Button>
+
+                <a href="https://app.supabase.io/">
+                  <Button type="default" className="hidden lg:block">
+                    Sign in
                   </Button>
                 </a>
                 <a href="https://app.supabase.io/">
-                  <Button type="default">Sign in</Button>
-                </a>
-                <a href="https://app.supabase.io/">
-                  <Button>Start your project</Button>
+                  <Button className="text-white hidden lg:block">Start your project</Button>
                 </a>
               </div>
             </div>
@@ -270,13 +292,13 @@ const Nav = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-dark-700">
+            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-scale-300">
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-gray-700 dark:hover:bg-gray-800"
+                    className="inline-flex items-center justify-center p-2 rounded-md bg-white text-scale-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -302,7 +324,7 @@ const Nav = () => {
                 <div className="pt-2 pb-4 space-y-1">
                   <a
                     href="https://app.supabase.io/"
-                    className="block pl-3 pr-4 text-base font-medium text-gray-600 dark:text-white"
+                    className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white"
                   >
                     Sign in
                   </a>
@@ -310,45 +332,39 @@ const Nav = () => {
                 <div className="pt-2 pb-4 space-y-1">
                   <a
                     href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
-                  >
-                    Product
-                  </a>
-                  <a
-                    href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Developers
                   </a>
                   <a
                     href="/company"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Company
                   </a>
                   <a
                     href="/pricing"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Pricing
                   </a>
                   <a
                     href="https://github.com/supabase/supabase"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     GitHub
                   </a>
                   <a
                     href="/blog"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-dark-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
                   >
                     Blog
                   </a>
                 </div>
                 <div className="p-3">
-                  <p className="mb-6 text-sm text-gray-400">Products available:</p>
+                  <p className="mb-6 text-sm text-scale-900">Products available:</p>
                   {iconSections}
                 </div>
               </div>
