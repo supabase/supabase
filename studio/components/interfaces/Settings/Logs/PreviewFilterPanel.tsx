@@ -112,25 +112,6 @@ const PreviewFilterPanel: FC<Props> = ({
     </Button>
   )
 
-  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    console.log('value', value)
-    if (value !== '' && isNaN(Date.parse(value))) {
-      setTo({ value, error: 'Invalid ISO 8601 timestamp' })
-    } else {
-      setTo({ value, error: '' })
-    }
-  }
-
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (value !== '' && isNaN(Date.parse(value))) {
-      setFrom({ value, error: 'Invalid ISO 8601 timestamp' })
-    } else {
-      setFrom({ value, error: '' })
-    }
-  }
-
   const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
 
   return (
