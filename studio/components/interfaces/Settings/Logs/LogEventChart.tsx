@@ -16,7 +16,6 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
 
   return (
     <BarChart
-      className="py-1 px-2"
       minimalHeader
       minmalChart
       data={aggregated}
@@ -29,7 +28,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       }}
       customDateFormat="MMM D, HH:mm"
       displayDateInUtc
-      noDataMessage={""}
+      noDataMessage={''}
     />
   )
 }
