@@ -1,4 +1,6 @@
 import React from 'react'
+import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
+import LogsDivider from '../Logs.Divider'
 import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
 
 const DatabaseApiSelectionRender = ({ log }: any) => {
@@ -22,7 +24,7 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
 
   return (
     <>
-      <div className="px-5 space-y-2">
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
         <DetailedRow label="Status" value={<ResponseCodeFormatter value={status} />} />
         <DetailedRow label="Method" value={method} />
         <DetailedRow label="Timestamp" value={log.timestamp} />
@@ -31,7 +33,8 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
         {clientInfo && <DetailedRow label="Client" value={clientInfo} />}
         {referer && <DetailedRow label="Referer" value={referer} />}
       </div>
-      <div className="px-5">
+      <LogsDivider />
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
@@ -42,7 +45,8 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
           />
         </pre>
       </div>
-      <div className="px-5">
+      <LogsDivider />
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">
           Response{method ? ` ${method}` : null} body
         </h3>
