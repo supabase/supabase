@@ -102,10 +102,12 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
     )
   }
 
-  value = value.toLowerCase()
+  value = value.toUpperCase()
 
   switch (value) {
-    case 'error':
+    case 'PANIC':
+    case 'FATAL':
+    case 'ERROR':
       return (
         <div className="flex items-center h-full gap-1">
           <div className=" p-0.5 rounded !text-red-900">
@@ -116,9 +118,9 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
 
-    case 'info':
+    case 'INFO':
 
-    case 'debug':
+    case 'DEBUG':
       return (
         <div className="flex items-center h-full gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
@@ -129,7 +131,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
 
-    case 'log':
+    case 'LOG':
       return (
         <div className="flex items-center h-full gap-1">
           <div className=" p-0.5 rounded !text-blue-900">
@@ -140,7 +142,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
 
-    case 'warning':
+    case 'WARNING':
       return (
         <div className="flex items-center h-full gap-1">
           <div className=" p-0.5 rounded !text-amber-900">
@@ -155,12 +157,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
     default:
       return (
         <div className="flex items-center h-full">
-          <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300
-            
-            "
-          >
+          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
             <label className="block font-mono text-sm text-scale-900">{value}</label>
           </div>
         </div>
