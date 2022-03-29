@@ -105,7 +105,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
     })
   }
 
-  const handleSearch: LogSearchCallback = ({ query, to, from, fromMicro, toMicro }) => {
+  const handleSearch: LogSearchCallback = async ({ query, to, from, fromMicro, toMicro }) => {
     let toValue, fromValue
     if (to || toMicro) {
       toValue = toMicro ? toMicro : dayjs(to).valueOf() * 1000
@@ -129,8 +129,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
     })
   }
 
-  console.log('queryType in LogsPreviewr', queryType)
-
+  console.log('queryType in LogsPreviewer', queryType)
   return (
     <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
