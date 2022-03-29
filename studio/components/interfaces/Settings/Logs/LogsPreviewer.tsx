@@ -166,7 +166,9 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && !isLoading ? 'opacity-100 h-48 pt-4 mb-4' : 'opacity-0 h-0')
+          (showChart && !isLoading && logData.length > 0
+            ? 'opacity-100 h-48 pt-4 mb-4'
+            : 'opacity-0 h-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
@@ -182,6 +184,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
+            isLoading={isLoading}
             data={logData}
             queryType={queryType}
             isHistogramShowing={showChart}
