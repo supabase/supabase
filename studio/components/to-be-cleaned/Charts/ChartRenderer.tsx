@@ -175,10 +175,10 @@ export function BarChart({
   label,
   onBarClick,
   minimalHeader,
-  minimalChart,
+  chartSize = 'normal',
   className = '',
   noDataTitle,
-  noDataMessage
+  noDataMessage,
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
 
@@ -203,7 +203,11 @@ export function BarChart({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
-  const chartHeight = minimalChart ? 96 : 160
+  const chartHeight = {
+    tiny: 76,
+    small: 96,
+    normal: 160,
+  }[chartSize as string] as number
 
   return (
     <Loading active={!data}>
@@ -293,7 +297,7 @@ export function BarChart({
               )}
             </>
           ) : (
-            <NoData title={noDataTitle} message={noDataMessage}/>
+            <NoData title={noDataTitle} message={noDataMessage} />
           )}
         </div>
       </div>
