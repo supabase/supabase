@@ -102,6 +102,7 @@ const PreviewFilterPanel: FC<Props> = ({
         </div>
       }
       loading={isLoading}
+      disabled={isLoading}
       onClick={onRefresh}
     >
       Refresh

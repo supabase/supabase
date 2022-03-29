@@ -16,9 +16,10 @@ interface Props {
   log: LogData | null
   onClose: () => void
   queryType?: QueryType
+  isLoading?: boolean
 }
 
-const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
+const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
   const Formatter = () => {
     switch (queryType) {
       case 'api':
@@ -59,13 +60,13 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
       className={[
         'relative h-full flex flex-col flex-grow border border-l',
         'border-panel-border-light dark:border-panel-border-dark',
-        'bg-gray-200',
+        'bg-gray-200 overflow-y-scroll',
       ].join(' ')}
     >
       <div
         className={
-          `transition-all
-          bg-scale-200 absolute w-full h-full text-center flex-col gap-2 flex items-center justify-center ` +
+          `overflow-y-scroll transition-all
+          bg-scale-200 absolute w-full h-full text-center flex-col gap-2 flex items-center justify-center opacity-0 ` +
           (log ? 'opacity-0 z-0' : 'opacity-100 z-10')
         }
       >
@@ -73,7 +74,7 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
           className={
             `transition-all
           duration-500
-          delay-200
+          delay-300
           w-full
           flex
           flex-col
@@ -81,7 +82,8 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
           items-center
           gap-6
           max-w-sm
-          text-center ` + (log ? 'mt-0 opacity-0 scale-95' : 'mt-8 opacity-100 scale-100')
+          text-center scale-95 opacity-0 ` +
+            (log || isLoading ? 'mt-0 opacity-0 scale-95' : 'mt-8 opacity-100 scale-100')
           }
         >
           <div className="relative border border-scale-600 dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
@@ -112,23 +114,21 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType }) => {
           </div>
         </div>
       </div>
-      <div className="flex w-full grow">
+      <div
+        className=" 
+          relative
+          flex-grow
+          h-px
+          bg-scale-300
+        "
+      >
         <div
-          className="
-              flex-grow overflow-y-auto 
-              bg-scale-300
-              space-y-6
-              py-4
-          "
+          className="transition absolute cursor-pointer top-6 right-6 text-scale-900 hover:text-scale-1200"
+          onClick={onClose}
         >
-          <div
-            className="transition absolute cursor-pointer top-5 right-5 text-scale-900 hover:text-scale-1200"
-            onClick={onClose}
-          >
-            <IconX size={14} strokeWidth={2} />
-          </div>
-          <div className="flex flex-col space-y-6">{log && <Formatter />}</div>
+          <IconX size={14} strokeWidth={2} />
         </div>
+        <div className="bg-scale-300 py-8 flex flex-col space-y-6">{log && <Formatter />}</div>
       </div>
     </div>
   )
