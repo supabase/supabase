@@ -51,8 +51,6 @@ const useAggregated = (data: LogData[]) => {
     let truncFunc = truncateToMinute
     let getDiff = getDiffMinute
     let diffMultiplier = diffMultiplierMinute
-    console.log([oldestDayjs.format(),latestDayjs.format()])
-    console.log(oldestDayjs.diff(latestDayjs, 'day', true))
     if (Math.abs(oldestDayjs.diff(latestDayjs, 'day', true)) > 0.25) {
       truncFunc = truncateToHour
       getDiff = getDiffHour
