@@ -8,7 +8,6 @@ export interface Organization {
   projects: any[]
   is_owner?: boolean
   stripe_customer_id?: string
-  stripe_customer_object?: any
   total_free_projects?: number
   total_paid_projects?: number
 }

@@ -128,40 +128,30 @@ function AuthPage() {
                   })}
                 </div>
               </p>
-              <h4>All the social providers</h4>
-              <p>
-                <p className="text-base">
-                  Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
-                  Gitlab, Twitter, Discord, and Bitbucket.
-                </p>
+              <h4 className="h4">All the social providers</h4>
+              <p className="p text-base">
+                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
+                Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p>
-                <p className="mb-4">
-                  <IconLink />
-                </p>
+              <p className="p mb-4">
+                <IconLink />
               </p>
-              <h4>Fully integrated</h4>
-              <p>
-                <p className="text-base">
-                  Incredibly simple Auth, without a single external authentication service. Built-in
-                  Authentication, Authorization, and User Management.
-                </p>
+              <h4 className="h4">Fully integrated</h4>
+              <p className="p text-base">
+                Incredibly simple Auth, without a single external authentication service. Built-in
+                Authentication, Authorization, and User Management.
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p>
-                <p className="mb-4">
-                  <IconShield />
-                </p>
+              <p className="p mb-4">
+                <IconShield />
               </p>
-              <h4>Own your data</h4>
-              <p>
-                <p className="text-base">
-                  User data stored in your Supabase database so you never have to worry about 3rd
-                  party privacy issues. Host your data in 8 different locations.
-                </p>
+              <h4 className="h4">Own your data</h4>
+              <p className="p text-base">
+                User data stored in your Supabase database so you never have to worry about 3rd
+                party privacy issues. Host your data in 8 different locations.
               </p>
             </div>
           </div>
@@ -253,10 +243,10 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
-        <SectionContainer>
+        {/* <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
-              {/* <AuthComponentExample /> */}
+              <AuthComponentExample />
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
               <div className="mb-4 flex items-center space-x-2">
@@ -308,7 +298,7 @@ function AuthPage() {
               </div>
             </div>
           </div>
-        </SectionContainer>
+        </SectionContainer> */}
         <CTABanner />
       </DefaultLayout>
     </>

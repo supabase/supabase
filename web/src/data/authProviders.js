@@ -90,6 +90,14 @@ const authProviders = [
     selfHosted: true,
   },
   {
+    name: 'Keycloak',
+    href: '/docs/guides/auth/auth-keycloak',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
+  {
     name: 'LinkedIn',
     // logo: '/img/libraries/dart-icon.svg',
     href: '/docs/guides/auth/auth-linkedin',

@@ -116,7 +116,6 @@ pages:
   supabase help:
     description: |
       Help provides help for any command in the application.
-
       Simply type supabase help `[path to command]` for full details.
     examples:
       - name: Usage
@@ -243,11 +242,15 @@ pages:
   supabase db push:
     description: |
       Push new migrations to the remote database.
+
+      Flags:
+
+      `--dry-run`: Print the migrations that would be applied, but don't actually apply them.
     examples:
       - name: Usage
         sh: |
           ```sh
-          supabase db push
+          supabase db push [--dry-run]
           ```
 
   supabase migration new:
@@ -262,40 +265,120 @@ pages:
 
   Config reference:
     description: |
-      The config file resides in `supabase/config.json` after you run `supabase init`.
+      The config file resides in `supabase/config.toml` after you run `supabase init`.
 
-      ### `projectId` 
-      
+      ### `project_id`
+
       `required`
 
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
-      ### `ports.api`
-      
-      `required`
+      ### `api.port`
 
-      Host port used for the API URL. Defaults to `54321`.
+      `required`, `default: 54321`
 
-      ### `ports.db`
-      
-      `required`
+      Port to use for the API URL.
 
-      Host port used for the DB URL. Defaults to `54322`.
+      ### `api.schemas`
 
-      ### `ports.studio` 
-      
-      `required`
+      `required`, `default: []`
 
-      Host port used for Supabase Studio. Defaults to `54323`.
+      Schemas to expose in your API. Tables, views and stored procedures in this schema will get API endpoints. `public` and `storage` are always included.
 
-      ### `ports.inbucket` 
-      
-      `optional`
+      ### `api.extra_search_path`
 
-      Host port used for the web interface of Inbucket email testing server. When not specified, emails are automatically confirmed. When specified, emails are not sent to the recipient, but rather monitored and accessible via the web interface.
+      `required`, `default: ["extensions"]`
 
-      ### `dbVersion` 
-      
-      `required`
+      Extra schemas to add to the search_path of every request.
 
-      Server version number used for the database. This needs to match the server version number of the remote database you intend to link to with `supabase db remote set`. You can retrieve it by running `SHOW server_version_num`.
+      ### `api.max_rows`
+
+      `required`, `default: 1000`
+
+      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+
+      ### `db.port`
+
+      `required`, `default: 54322`
+
+      Port to use for the local database URL.
+
+      ### `db.major_version`
+
+      `required`, `default: 14`
+
+      The database major version to use. This has to be the same as your remote database's. Run `SHOW server_version;` on the remote database to check.
+
+      ### `studio.port`
+
+      `required`, `default: 54323`
+
+      Port to use for Supabase Studio.
+
+      ### `inbucket.port`
+
+      `required`, `default: 54324`
+
+      Port to use for the email testing server web interface.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+
+      ### `auth.site_url`
+
+      `required`, `default: "http://localhost:3000"`
+
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+
+      ### `auth.additional_redirect_urls`
+
+      `required`, `default: ["https://localhost:3000"]`
+
+      A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+
+      ### `auth.jwt_expiry`
+
+      `required`, `default: 3600`
+
+      How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
+
+      ### `auth.enable_signup`
+
+      `required`, `default: true`
+
+      Allow/disallow new user signups to your project.
+
+      ### `auth.email.enable_signup`
+
+      `required`, `default: true`
+
+      Allow/disallow new user signups via email to your project.
+
+      ### `auth.email.double_confirm_changes`
+
+      `required`, `default: true`
+
+      If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
+
+      ### `auth.email.enable_confirmations`
+
+      `required`, `default: true`
+
+      If enabled, users need to confirm their email address before signing in.
+
+      ### `auth.external.<provider>.enabled`
+
+      `required`, `default: false`
+
+      Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`, `discord`, `facebook`, `github`, `gitlab`, `google`, `twitch`, `twitter`, `slack`, `spotify`.
+
+      ### `auth.external.<provider>.client_id`
+
+      `required`, `default: ""`
+
+      Client ID for the external OAuth provider.
+
+      ### `auth.external.<provider>.secret`
+
+      `required`, `default: ""`
+
+      Client secret for the external OAuth provider.

@@ -1,6 +1,6 @@
 {
-  "show": false,
-  "text": "Supabase Launch Week III",
-  "cta": "Supabase acquires Logflare",
-  "link": "/blog/2021/12/02/supabase-acquires-logflare"
+  "show": true,
+  "text": "Supabase Launch Week IV",
+  "cta": "New features every day until Friday 1 April",
+  "link": "/blog/2022/03/25/supabase-launch-week-four"
 }

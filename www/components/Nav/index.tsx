@@ -245,7 +245,7 @@ const Nav = () => {
                   // @ts-ignore
                   href="https://github.com/supabase/supabase"
                   target="_blank"
-                  type="default"
+                  type="text"
                   icon={
                     <div className="flex items-center justify-center  text-brand-800 w-4 h-4">
                       <div
@@ -269,12 +269,12 @@ const Nav = () => {
                 </Button>
 
                 <a href="https://app.supabase.io/">
-                  <Button className="text-white hidden lg:block">Start your project</Button>
-                </a>
-                <a href="https://app.supabase.io/">
-                  <Button type="text" className="hidden lg:block">
+                  <Button type="default" className="hidden lg:block">
                     Sign in
                   </Button>
+                </a>
+                <a href="https://app.supabase.io/">
+                  <Button className="text-white hidden lg:block">Start your project</Button>
                 </a>
               </div>
             </div>
