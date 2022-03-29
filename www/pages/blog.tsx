@@ -177,6 +177,7 @@ function FeaturedThumb(blog: PostTypes) {
                       <div className="relative overflow-auto w-10 h-10">
                         <Image
                           src={author.author_image_url}
+                          alt={`${author.author} avatar`}
                           className="rounded-full"
                           layout="fill"
                           objectFit="cover"
