@@ -17,7 +17,7 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
   return (
     <BarChart
       minimalHeader
-      minmalChart
+      chartSize="tiny"
       data={aggregated}
       attribute="count"
       label="Events"
