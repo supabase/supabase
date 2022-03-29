@@ -98,20 +98,21 @@ type Query {
 }
 
 type Mutation {
-	insertIntoAccountCollection(
-		objects: [AccountInsertInput!]!
-	): AccountInsertResponse
+  insertIntoAccountCollection(
+    objects: [AccountInsertInput!]!
+  ): AccountInsertResponse
 
-	updateAccountCollection(
+  updateAccountCollection(
     set: AccountUpdateInput!
     filter: AccountFilter
     atMost: Int! = 1
   ): AccountUpdateResponse!
 
   deleteFromAccountCollection(
-   filter: AccountFilter
+    filter: AccountFilter
     atMost: Int! = 1
   ): AccountDeleteResponse!
+}
 ```
 
 For a complete example with relationships, check out the [reflection docs](https://supabase.github.io/pg_graphql/reflection/).
