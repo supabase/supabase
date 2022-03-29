@@ -4,12 +4,8 @@ import {
   Input,
   Typography,
   IconRefreshCw,
-  IconX,
   IconSearch,
-  IconClock,
-  Popover,
   IconExternalLink,
-  Toggle,
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
@@ -26,11 +22,10 @@ interface Props {
   defaultFromValue?: string
   templates?: any
   isLoading: boolean
-  isCustomQuery: boolean
   newCount: number
   onRefresh?: () => void
   onSearch?: LogSearchCallback
-  onCustomClick?: () => void
+  onExploreClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
   isShowingEventChart: boolean
   onToggleEventChart: () => void
@@ -47,14 +42,13 @@ dayjs.extend(utc)
  */
 const PreviewFilterPanel: FC<Props> = ({
   isLoading,
-  isCustomQuery,
   newCount,
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
   defaultToValue = '',
   defaultFromValue = '',
-  onCustomClick,
+  onExploreClick,
   dispatchWhereFilters,
   whereFilters: filters,
   table,
@@ -83,38 +77,36 @@ const PreviewFilterPanel: FC<Props> = ({
     }
   }, [defaultToValue])
 
-  const RefreshButton = () => {
-    return !isCustomQuery ? (
-      <Button
-        type="default"
-        icon={
-          <div className="relative">
-            {newCount > 0 && (
-              <div
-                className={[
-                  'absolute flex items-center justify-center -top-3 right-3',
-                  'h-4 w-4 z-50',
-                ].join(' ')}
-              >
-                <div className="absolute z-20">
-                  <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
-                    {newCount}
-                  </Typography.Text>
-                </div>
-                <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
-                <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
+  const RefreshButton = () => (
+    <Button
+      type="default"
+      icon={
+        <div className="relative">
+          {newCount > 0 && (
+            <div
+              className={[
+                'absolute flex items-center justify-center -top-3 right-3',
+                'h-4 w-4 z-50',
+              ].join(' ')}
+            >
+              <div className="absolute z-20">
+                <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                  {newCount}
+                </Typography.Text>
               </div>
-            )}
-            <IconRefreshCw size={10} />
-          </div>
-        }
-        loading={isLoading}
-        onClick={onRefresh}
-      >
-        Refresh
-      </Button>
-    ) : null
-  }
+              <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
+              <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
+            </div>
+          )}
+          <IconRefreshCw size={10} />
+        </div>
+      }
+      loading={isLoading}
+      onClick={onRefresh}
+    >
+      Refresh
+    </Button>
+  )
 
   const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -133,14 +125,6 @@ const PreviewFilterPanel: FC<Props> = ({
     } else {
       setFrom({ value, error: '' })
     }
-  }
-
-  const handleReset = async () => {
-    setTo({ value: '', error: '' })
-    setFrom({ value: '', error: '' })
-    const value = dayjs().utc().toISOString()
-    setDefaultTimestamp(value)
-    onSearch({ query: search, to: '', from: '' })
   }
 
   const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
@@ -221,7 +205,7 @@ const PreviewFilterPanel: FC<Props> = ({
           </Button>
         </div>
       </div>
-      <Button type="secondary" onClick={onCustomClick} iconRight={<IconExternalLink size={10} />}>
+      <Button type="secondary" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
         Explore via query
       </Button>
     </div>
