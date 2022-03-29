@@ -134,6 +134,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
   return (
     <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
+        csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
         templates={TEMPLATES.filter(
@@ -192,11 +193,11 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
           />
         </LoadingOpacity>
         {!error && (
-        <div className="p-2">
+          <div className="p-2">
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
-            Load older
-          </Button>
-        </div>
+              Load older
+            </Button>
+          </div>
         )}
         {error && (
           <div className="flex w-full h-full justify-center items-center mx-auto">
