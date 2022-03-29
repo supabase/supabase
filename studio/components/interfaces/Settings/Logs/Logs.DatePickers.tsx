@@ -53,7 +53,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange }) => {
       >
         <Button
           as="span"
-          type={helperValue ? 'alternative' : 'outline'}
+          type={helperValue ? 'secondary' : 'default'}
           icon={<IconClock size={12} />}
           className="rounded-r-none"
         >
@@ -62,7 +62,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange }) => {
       </Dropdown>
       <DatePicker
         triggerButtonClassName="rounded-l-none"
-        triggerButtonType={helperValue ? 'outline' : 'alternative'}
+        triggerButtonType={helperValue ? 'default' : 'secondary'}
         onChange={(value: ToFrom) => {
           setHelperValue('')
           if (onChange) onChange(value)
