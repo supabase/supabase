@@ -87,10 +87,10 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
     setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
 
-  // useEffect(() => {
-  //   // runs when any of the filters change
-  //   handleRefresh()
-  // }, [whereFilters])
+  useEffect(() => {
+    // runs when any of the filters change
+    handleRefresh()
+  }, [whereFilters])
 
   const handleRefresh = () => {
     refresh()
