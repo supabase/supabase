@@ -119,25 +119,32 @@ const PageLayout = () => {
 
   return (
     <FunctionLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 py-2">
         <div className="flex flex-row items-center gap-2">
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={
-              <Dropdown.RadioGroup value={interval} onChange={setInterval}>
-                {CHART_INTERVALS.map((i) => (
-                  <Dropdown.Radio key={i.key} value={i.key}>
-                    {i.label}
-                  </Dropdown.Radio>
-                ))}
-              </Dropdown.RadioGroup>
-            }
-          >
-            <Button as="span" type="default" iconRight={<IconChevronDown />}>
-              {selectedInterval.label}
-            </Button>
-          </Dropdown>
+          <div className="flex items-center">
+            {CHART_INTERVALS.map((item, i) => {
+              const classes = []
+
+              if (i === 0) {
+                classes.push('rounded-tr-none rounded-br-none')
+              } else if (i === CHART_INTERVALS.length - 1) {
+                classes.push('rounded-tl-none rounded-bl-none')
+              } else {
+                classes.push('rounded-none')
+              }
+
+              return (
+                <Button
+                  key={`function-filter-${i}`}
+                  type={interval === item.key ? 'secondary' : 'default'}
+                  onClick={() => setInterval(item.key)}
+                  className={classes.join(' ')}
+                >
+                  {item.label}
+                </Button>
+              )
+            })}
+          </div>
 
           <span className="text-scale-1000 text-xs">
             Statistics for past {selectedInterval.label}
@@ -170,7 +177,7 @@ const PageLayout = () => {
                     />
                   </Panel.Content>
                 </Panel>
-                <Panel key="auth-chart">
+                <Panel key="invocation-chart">
                   <Panel.Content className="space-y-4">
                     <ChartHandler
                       label="Invocations"
@@ -191,6 +198,31 @@ const PageLayout = () => {
                   </Panel.Content>
                 </Panel>
               </div>
+              <Panel key="error-chart">
+                <Panel.Content className="space-y-4">
+                  <ChartHandler
+                    defaultChartStyle="line"
+                    label="Error count"
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'min_execution_time'}
+                    provider="log-stats"
+                    // interval="1d"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    isLoading={!charts.data && !error ? true : false}
+                    highlightedValue={calculateHighlightedValue(
+                      data?.result,
+                      'min_execution_time',
+                      {
+                        sum: true,
+                      }
+                    )}
+                    onBarClick={(v) => handleBarClick(v, '/auth')}
+                  />
+                </Panel.Content>
+              </Panel>
             </>
           )}
         </div>

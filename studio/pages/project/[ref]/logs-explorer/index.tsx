@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconAlertCircle, Card, Input } from '@supabase/ui'
+import { Typography, IconAlertCircle, Card, Input, Alert } from '@supabase/ui'
 import { withAuth } from 'hooks'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
@@ -88,32 +88,12 @@ export const LogsExplorerPage: NextPage = () => {
             />
           </div>
         </div>
-
         <div className="flex flex-col flex-grow relative pb-8">
           <LoadingOpacity active={isLoading}>
             <div className="flex flex-grow h-full">
-              <LogTable data={logData} />
+              <LogTable data={logData} error={error} />
             </div>
           </LoadingOpacity>
-
-          {error && (
-            <div className="flex w-full h-full justify-center items-center mx-auto">
-              <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
-                <div className="flex flex-row gap-x-2 py-2">
-                  <IconAlertCircle size={16} />
-                  <Typography.Text type="secondary">
-                    Sorry! An error occured when fetching data.
-                  </Typography.Text>
-                </div>
-                <Input.TextArea
-                  label="Error Messages"
-                  value={JSON.stringify(error, null, 2)}
-                  borderless
-                  className=" border-t-2 border-scale-800 pt-2 font-mono"
-                />
-              </Card>
-            </div>
-          )}
         </div>
       </div>
     </LogsExplorerLayout>
