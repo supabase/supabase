@@ -45,10 +45,8 @@ const END_DATE_DEFAULT = new Date()
 
 // console.log('START_DATE_DEFAULT', START_DATE_DEFAULT)
 
-const TIME_NOW = format(new Date(), 'HH:mm:ss').split(':')
-
-const START_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
-const END_TIME_DEFAULT = { HH: TIME_NOW[0], mm: TIME_NOW[1], ss: TIME_NOW[2] }
+const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
+const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
 function _DatePicker({
   to,
@@ -89,19 +87,21 @@ function _DatePicker({
     setAppliedStartDate(startDate)
     setAppliedEndDate(endDate)
 
-    const from = `${format(new Date(startDate), 'yyyy-MM-dd')} ${Object.values(startTime).join(
-      ':'
-    )}`
-    const to = `${format(new Date(endDate), 'yyyy-MM-dd')} ${Object.values(endTime).join(':')}`
-
-    function isoPayload() {
-      return {
-        from: dayjs(from).toISOString(),
-        to: dayjs(to).toISOString(),
-      }
+    const payload = {
+      from: dayjs
+        .utc(startDate)
+        .second(startTime.ss)
+        .minute(startTime.mm)
+        .hour(startTime.HH)
+        .toISOString(),
+      to: dayjs
+        .utc(endDate || startDate)
+        .second(endTime.ss)
+        .minute(endTime.mm)
+        .hour(endTime.HH)
+        .toISOString(),
     }
-
-    if (onChange) onChange(isoPayload())
+    if (onChange) onChange(payload)
   }
 
   function handleClear() {
@@ -130,51 +130,6 @@ function _DatePicker({
           <>
             <div className="flex justify-between items-stretch py-2">
               <div className="grow flex flex-col gap-1">
-                {/* <div
-                  className="
-                      flex items-center justify-center gap-0
-                      text-xs text-scale-1100 bg-scale-100 dark:bg-scaleA-300 border border-scale-700 h-7 rounded"
-                >
-                  <input
-                    pattern="[0-9]*"
-                    placeholder="DD"
-                    // type="text"
-                    aria-describedby="DateInput-input-1696-description"
-                    aria-label="Day"
-                    className="w-4 bg-transparent text-scale-1200 text-center"
-                    value={format(new Date(startDate), 'dd')}
-                  />
-                  <DividerSlash />
-                  <input
-                    pattern="[0-9]*"
-                    placeholder="MM"
-                    // type="text"
-                    aria-describedby="DateInput-input-1853-description"
-                    aria-label="Month"
-                    className="w-4 bg-transparent text-scale-1200 text-center"
-                    value={format(new Date(startDate), 'MM')}
-                  />
-                  <DividerSlash />
-                  <input
-                    pattern="[0-9]*"
-                    placeholder="YYYY"
-                    // type="text"
-                    aria-describedby="DateInput-input-1860-description"
-                    aria-label="Year"
-                    className="w-8 bg-transparent text-scale-1200 text-center"
-                    value={format(new Date(startDate), 'yyyy')}
-                  />
-                </div> */}
-
-                {/* <DateSplitInput
-                  type="start"
-                  date={startDate}
-                  setDate={(e) => setStartDate(e)}
-                  startDate={startDate}
-                  endDate={endDate}
-                /> */}
-
-                {/* {showTime && ( */}
                 <TimeSplitInput
                   type="start"
                   startTime={startTime}
@@ -186,7 +141,6 @@ function _DatePicker({
                   startDate={startDate}
                   endDate={endDate}
                 />
-                {/* )} */}
               </div>
               <div
                 className={`
@@ -200,34 +154,6 @@ function _DatePicker({
                 <IconArrowRight strokeWidth={1.5} size={14} />
               </div>
               <div className="grow flex flex-col gap-1">
-                {/* <div
-                  className="
-                      flex items-center justify-center gap-0
-                      text-xs text-scale-1100 bg-scale-100 dark:bg-scaleA-300 border border-scale-700 h-7 rounded"
-                >
-                  <input
-                    className="appearance-none w-4 text-scale-1200 bg-transparent text-center"
-                    value={format(new Date(endDate), 'dd')}
-                  />
-                  <DividerSlash />
-                  <input
-                    className="appearance-none w-4 text-scale-1200 bg-transparent text-center"
-                    value={format(new Date(endDate), 'MM')}
-                  />
-                  <DividerSlash />
-                  <input
-                    className="appearance-none w-8 text-scale-1200 bg-transparent text-center"
-                    value={format(new Date(endDate), 'yyyy')}
-                  />
-                </div> */}
-                {/* <DateSplitInput
-                  type="end"
-                  date={endDate}
-                  setDate={(e) => setEndDate(e)}
-                  startDate={startDate}
-                  endDate={endDate}
-                /> */}
-                {/* {showTime && ( */}
                 <TimeSplitInput
                   type="end"
                   startTime={startTime}
@@ -239,7 +165,6 @@ function _DatePicker({
                   startDate={startDate}
                   endDate={endDate}
                 />
-                {/* )} */}
               </div>
             </div>
           </>
@@ -264,6 +189,7 @@ function _DatePicker({
                 // dateFormat={DEFAULT_DATE_FORMAT}
                 // dateFormat={(locale, date) => dayjs(date).format('MM-YYYY')}
                 inline
+                dayClassName={() => 'cursor-pointer'}
                 renderCustomHeader={({
                   date,
                   decreaseMonth,
@@ -300,22 +226,6 @@ function _DatePicker({
                   </div>
                 )}
               />
-              {/* <div className="flex items-center gap-2  pt-4">
-                <Toggle
-                  size="tiny"
-                  // @ts-ignore
-                  onChange={(bool: boolean) => setShowTime(bool)}
-                />
-                <span className="text-xs text-scale-1100">Show times</span>
-              </div> */}
-              {/* <div className="flex items-center gap-2 text-scale-900 pt-4 mb-4">
-                  <IconGlobe size={14} />
-                  <div className="grow">
-                    <Select size="tiny">
-                      <Select.Option value="GMT">London GMT +0</Select.Option>
-                    </Select>
-                  </div>
-                </div> */}
             </div>
 
             <Popover.Seperator />
@@ -335,11 +245,13 @@ function _DatePicker({
           className={triggerButtonClassName}
         >
           {/* Custom */}
-          {appliedStartDate && appliedEndDate ? (
+          {appliedStartDate && appliedEndDate && appliedStartDate !== appliedEndDate ? (
             <>
               {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
               {format(new Date(appliedEndDate), 'dd MMM')}
             </>
+          ) : appliedStartDate || appliedEndDate ? (
+            format(new Date(appliedStartDate || appliedEndDate), 'dd MMM')
           ) : (
             'Custom'
           )}
