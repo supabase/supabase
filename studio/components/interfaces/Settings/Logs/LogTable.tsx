@@ -39,8 +39,10 @@ const LogTable = ({ data = [], queryType }: Props) => {
   })
   let columns
   if (!queryType) {
+    console.log('no query type')
     columns = DEFAULT_COLUMNS
   } else {
+    console.log('has query type', queryType)
     switch (queryType) {
       case 'api':
         columns = DatabaseApiColumnRender

@@ -96,8 +96,10 @@ export const LogPage: NextPage = () => {
     <LogsExplorerLayout subtitle={<span className="font-mono">{source}</span>}>
       <LogsPreviewer
         projectRef={ref as string}
-        condensedLayout={true}
+        condensedLayout={false}
         tableName={source as LogsTableName}
+        // @ts-ignore
+        queryType={queryType[source]}
       />
     </LogsExplorerLayout>
   )
