@@ -55,9 +55,9 @@ const Index = () => {
               </div>
               <div className="col-span-12 lg:col-span-7 flex items-center">
                 <div className="p-16">
-                  <div>
-                    <h1 className="text-4xl">Supabase logos</h1>
-                    <p className="text-sm">
+                  <div className="space-y-2">
+                    <h1 className="text-4xl text-scale-1200">Supabase logos</h1>
+                    <p className="text-sm text-scale-1100">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.
