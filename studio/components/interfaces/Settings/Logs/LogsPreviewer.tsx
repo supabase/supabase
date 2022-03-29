@@ -160,6 +160,8 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         whereFilters={whereFilters}
         table={table}
         condensedLayout={condensedLayout}
+        isShowingEventChart={showChart}
+        onToggleEventChart={() => setShowChart(!showChart)}
       />
       <div
         className={
