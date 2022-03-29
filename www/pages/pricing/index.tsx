@@ -234,7 +234,7 @@ export default function IndexPage() {
                     <p className="p"> /project /month</p>
 
                     <p className="text-sm p">Perfect for hobby projects and experiments</p>
-
+                    <div className="absolute bottom-0">
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
                         <Button size="medium" type="default">
@@ -242,6 +242,7 @@ export default function IndexPage() {
                         </Button>
                       </a>
                     </Link>
+                    </div>
                   </div>
                 </td>
 
@@ -253,7 +254,7 @@ export default function IndexPage() {
                     <p className="text-sm p">
                       Everything you need to scale your project into production
                     </p>
-
+                    <div className="absolute bottom-0">
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
                         <Button size="medium" type="default">
@@ -261,6 +262,7 @@ export default function IndexPage() {
                         </Button>
                       </a>
                     </Link>
+                    </div>
                   </div>
                 </td>
 
@@ -272,7 +274,6 @@ export default function IndexPage() {
                     <p className="text-sm p">
                       Designated support team, account manager and technical specialist
                     </p>
-
                     <Link href="https://app.supabase.io" as="https://app.supabase.io">
                       <a>
                         <Button size="medium" type="default">
