@@ -40,7 +40,7 @@ const NewAccessTokenButton = observer(() => {
           setIsOpen(!isOpen)
         }}
       >
-        Generate New Token
+        Generate new token
       </Button>
       {newToken && <NewTokenItem data={newToken} />}
       <Modal
