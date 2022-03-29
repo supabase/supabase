@@ -1,4 +1,4 @@
-import { Space, Typography } from '@supabase/ui'
+import { Space } from '@supabase/ui'
 import React from 'react'
 
 interface Props {
@@ -23,7 +23,7 @@ export default function Quote(props: Props) {
             style={{ margin: 0 }}
           />
           <figcaption style={{ marginTop: 0 }}>
-            <Typography.Text>{caption}</Typography.Text>
+            <p>{caption}</p>
           </figcaption>
         </Space>
       </Space>

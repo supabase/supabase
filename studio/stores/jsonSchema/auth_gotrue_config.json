@@ -16,12 +16,14 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_KEYCLOAK_ENABLED",
     "EXTERNAL_LINKEDIN_ENABLED",
     "EXTERNAL_NOTION_ENABLED",
     "EXTERNAL_TWITCH_ENABLED",
     "EXTERNAL_TWITTER_ENABLED",
     "EXTERNAL_SLACK_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
+    "EXTERNAL_WORKOS_ENABLED",
     "EXTERNAL_ZOOM_ENABLED",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
@@ -191,6 +193,22 @@
       "title": "Google secret",
       "type": "string"
     },
+    "EXTERNAL_KEYCLOAK_ENABLED": {
+      "title": "Keycloak enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_KEYCLOAK_CLIENT_ID": {
+      "title": "Keycloak client ID",
+      "type": "string"
+    },
+    "EXTERNAL_KEYCLOAK_SECRET": {
+      "title": "Keycloak secret",
+      "type": "string"
+    },
+    "EXTERNAL_KEYCLOAK_URL": {
+      "title": "Keycloak URL",
+      "type": "string"
+    },
     "EXTERNAL_LINKEDIN_ENABLED": {
       "title": "Linkedin enabled",
       "type": "boolean"
@@ -261,6 +279,22 @@
     },
     "EXTERNAL_SPOTIFY_SECRET": {
       "title": "Spotify secret",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_ENABLED": {
+      "title": "WorkOS enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_WORKOS_CLIENT_ID": {
+      "title": "WorkOS client ID",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_SECRET": {
+      "title": "WorkOS secret",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_URL": {
+      "title": "WorkOS URL",
       "type": "string"
     },
     "EXTERNAL_ZOOM_ENABLED": {
