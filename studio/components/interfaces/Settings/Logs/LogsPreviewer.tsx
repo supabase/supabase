@@ -173,12 +173,14 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          <LogEventChart
-            data={!isLoading ? logData : undefined}
-            onBarClick={(timestampMicro) => {
-              handleSearch({ query: filters.search_query, toMicro: timestampMicro })
-            }}
-          />
+          {showChart && (
+            <LogEventChart
+              data={!isLoading ? logData : undefined}
+              onBarClick={(timestampMicro) => {
+                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
+              }}
+            />
+          )}
         </div>
       </div>
       <div className="flex flex-col flex-grow relative pt-4">
