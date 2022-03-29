@@ -28,7 +28,7 @@ const CSVButton: React.FC<Props> = ({
   }
   const formattedData = useMemo(() => {
     const first = data?.[0]
-    if (!first) return
+    if (!first || !data) return
     const keys = Object.keys(first as any)
     return data.map((datum: any) => {
       return keys.reduce((acc: any, key) => {
