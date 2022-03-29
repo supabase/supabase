@@ -61,10 +61,6 @@ const PreviewFilterPanel: FC<Props> = ({
 }) => {
   const [search, setSearch] = useState('')
 
-  const [to, setTo] = useState({ value: '', error: '' })
-  const [from, setFrom] = useState({ value: '', error: '' })
-  const [defaultTimestamp, setDefaultTimestamp] = useState(dayjs().utc().toISOString())
-
   const hasEdits = search !== defaultSearchValue
 
   // Sync local state with provided default value
@@ -73,12 +69,6 @@ const PreviewFilterPanel: FC<Props> = ({
       setSearch(defaultSearchValue)
     }
   }, [defaultSearchValue])
-
-  useEffect(() => {
-    if (to.value !== defaultToValue) {
-      setTo({ value: defaultToValue, error: '' })
-    }
-  }, [defaultToValue])
 
   const RefreshButton = () => (
     <Button
@@ -112,7 +102,8 @@ const PreviewFilterPanel: FC<Props> = ({
     </Button>
   )
 
-  const handleSearch = () => onSearch({ query: search, to: to.value, from: from.value })
+  const handleSearch = (partial: Partial<{ query: string; to: string; from: string }>) =>
+    onSearch({ query: search, ...partial })
 
   return (
     <div
@@ -124,7 +115,7 @@ const PreviewFilterPanel: FC<Props> = ({
           onSubmit={(e) => {
             // prevent redirection
             e.preventDefault()
-            handleSearch()
+            handleSearch({})
           }}
         >
           <Input
@@ -134,7 +125,7 @@ const PreviewFilterPanel: FC<Props> = ({
             onChange={(e) => setSearch(e.target.value)}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setSearch(e.target.value)
-              handleSearch()
+              handleSearch({query: e.target.value})
             }}
             icon={
               <div className="text-scale-900">
@@ -145,7 +136,7 @@ const PreviewFilterPanel: FC<Props> = ({
             actions={
               hasEdits && (
                 <button
-                  onClick={() => handleSearch()}
+                  onClick={() => handleSearch({})}
                   className="text-scale-1100 hover:text-scale-1200 mx-2"
                 >
                   {'↲'}
@@ -156,10 +147,8 @@ const PreviewFilterPanel: FC<Props> = ({
         </form>
 
         <DatePickers
-          onChange={(e: any) => {
-            setFrom({ value: e.from, error: '' })
-            setTo({ value: e.to, error: '' })
-            handleSearch()
+          onChange={async (e: { to: string; from: string }) => {
+            handleSearch(e)
           }}
           to={defaultToValue}
           from={defaultFromValue}
