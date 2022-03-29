@@ -109,7 +109,7 @@ function _DatePicker({
     setStartDate(START_DATE_DEFAULT)
     setEndDate(END_DATE_DEFAULT)
 
-    setStartTime(START_DATE_DEFAULT)
+    setStartTime(START_TIME_DEFAULT)
     setEndTime(END_TIME_DEFAULT)
 
     setAppliedStartDate(null)
