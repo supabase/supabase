@@ -1,17 +1,17 @@
 [
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week III: Holiday Special",
-    "description": "Santa's little hackers have been hard at work because we've got another five days of launches ready to go.",
-    "imgUrl": "images/blog/launch-week-three/launch-week-three-og.jpg",
-    "logoUrl": "images/blog/launch-week-three/launch-week-three-og.jpg",
+    "title": "Supabase Launch Week IV",
+    "description": "Launch Week 4: One new feature every day for an entire week. Starting Monday 28th March",
+    "imgUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo.png",
+    "logoUrl": "launch-week-4/friday-before/launchweek-4-promo.png",
     "organization": "Supabase",
-    "url": "/blog/2021/11/26/supabase-launch-week-the-trilogy",
+    "url": "/blog/2022/03/25/supabase-launch-week-four",
     "postMeta": {
       "name": "Paul Copplestone",
-      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Nov 26, 2021",
-      "readLength": 2
+      "avatarUrl": "https://github.com/kiwicopple.png",
+      "publishDate": "Mar 25, 2022",
+      "readLength": 4
     },
     "ctaText": "View case study"
   },
@@ -25,7 +25,7 @@
     "url": "/blog/2021/10/28/supabase-series-a",
     "postMeta": {
       "name": "Paul Copplestone",
-      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "avatarUrl": "https://github.com/kiwicopple.png",
       "publishDate": "Oct 28, 2021",
       "readLength": 28
     },
