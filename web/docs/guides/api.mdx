@@ -238,6 +238,12 @@ JS Reference: [select()](/docs/reference/javascript/select),
 
 ### GraphQL API 
 
+:::note 
+
+While pg_graphql is in beta, we have disabled GraphQL auto-refreshing. If you want to refresh your GraphQL introspection, call `select graphql.rebuild_schema();` to rebuild your GraphQL schema.
+
+:::
+
 You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urlql](https://formidable.com/open-source/urql/docs/). 
 
 <Tabs
