@@ -1,5 +1,6 @@
 import { Tabs } from '@supabase/ui'
 import Flag from 'components/ui/Flag/Flag'
+import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 
 const LogsNavigation = () => {
@@ -8,7 +9,7 @@ const LogsNavigation = () => {
   const { ref } = router.query
 
   const indexRoute = 'query'
-
+  const logsSourcesPage = useFlag('logsSourcesPage')
   return (
     <Tabs
       defaultActiveId="1"
@@ -20,9 +21,7 @@ const LogsNavigation = () => {
       }}
     >
       <Tabs.Panel id="query" label="Query" />
-      <Flag name="logsSourcesPage">
-        <Tabs.Panel id="sources" label="Sources" />
-      </Flag>
+      {logsSourcesPage && <Tabs.Panel id="sources" label="Sources" />}
       {/* <Tabs.Panel id="recent" label={'Recent'} /> */}
       <Tabs.Panel id="saved" label="Saved" />
       <Tabs.Panel id="templates" label="Templates" />
