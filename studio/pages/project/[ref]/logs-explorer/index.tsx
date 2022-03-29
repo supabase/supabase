@@ -1,48 +1,120 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconCode, Badge, IconDatabase, Icon, IconCloud } from '@supabase/ui'
+import { Typography, IconAlertCircle, Card, Input } from '@supabase/ui'
 import { withAuth } from 'hooks'
+import CodeEditor from 'components/ui/CodeEditor'
 import {
+  LogsQueryPanel,
   LogsTableName,
-  LOGS_SOURCE_DESCRIPTION,
+  LogTable,
+  LogTemplate,
+  TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
-import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
-import CardButton from 'components/ui/CardButton'
+import { uuidv4 } from 'lib/helpers'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { LogsExplorerLayout } from 'components/layouts'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
-  const { ref } = router.query
-  const sources = Object.values(LogsTableName).sort((a, b) => a - b)
+  const { ref, q } = router.query
+  const [editorId, setEditorId] = useState<string>(uuidv4())
+  const [editorValue, setEditorValue] = useState<string>('')
+
+  const [{ logData, error, isLoading }, { changeQuery, runQuery }] = useLogsQuery(ref as string)
+  useEffect(() => {
+    // on mount, set initial values
+    if (q !== undefined && q !== '') {
+      changeQuery(q as string)
+      runQuery()
+      onSelectTemplate({
+        mode: 'custom',
+        searchString: q as string,
+      })
+    }
+  }, [q])
+
+  const onSelectTemplate = (template: LogTemplate) => {
+    setEditorValue(template.searchString)
+    changeQuery(template.searchString)
+    setEditorId(uuidv4())
+    runQuery()
+  }
+
+  const handleRun = () => {
+    changeQuery(editorValue)
+    runQuery()
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, q: editorValue },
+    })
+  }
+
+  const handleClear = () => {
+    setEditorValue('')
+    setEditorId(uuidv4())
+    changeQuery('')
+  }
+
+  const handleInsertSource = (source: LogsTableName) => {
+    setEditorValue((prev) => prev + source)
+    setEditorId(uuidv4())
+  }
+
   return (
     <LogsExplorerLayout>
-      <div className="grid grid-cols-3 gap-6">
-        {sources.map((source) => (
-          <CardButton
-            title={source}
-            icon={
-              <div
-                className="h-6 w-6 text-scale-100 flex items-center justify-center rounded
-                bg-scale-1200
-                transition-colors
-                duration-400
-                group-hover:bg-brand-900
-                group-hover:text-brand-1200
-              "
-              >
-                <div className="scale-100 group-hover:scale-110">
-                  {source === LogsTableName.POSTGRES && <IconDatabase size={12} strokeWidth={2} />}
-                  {source === LogsTableName.EDGE && <IconCloud size={12} strokeWidth={2} />}
-                  {source === LogsTableName.FUNCTIONS && <IconCode size={12} strokeWidth={2} />}
-                  {source === LogsTableName.FN_EDGE && <IconCode size={12} strokeWidth={2} />}
-                </div>
-              </div>
-            }
-            linkHref={`/project/${ref}/logs-explorer/sources/${source}`}
-            description={LOGS_SOURCE_DESCRIPTION[source]}
+      <div className="h-full flex flex-col flex-grow gap-4">
+        <div className="border rounded">
+          <LogsQueryPanel
+            onSelectSource={handleInsertSource}
+            onClear={handleClear}
+            onRun={handleRun}
+            hasEditorValue={Boolean(editorValue)}
+            templates={TEMPLATES.filter((template) => template.mode === 'custom')}
+            onSelectTemplate={onSelectTemplate}
           />
-        ))}
+
+          <div className="min-h-[7rem] h-48">
+            <ShimmerLine active={isLoading} />
+            <CodeEditor
+              id={editorId}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              onInputRun={handleRun}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col flex-grow relative pb-8">
+          <LoadingOpacity active={isLoading}>
+            <div className="flex flex-grow h-full">
+              <LogTable data={logData} />
+            </div>
+          </LoadingOpacity>
+
+          {error && (
+            <div className="flex w-full h-full justify-center items-center mx-auto">
+              <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
+                <div className="flex flex-row gap-x-2 py-2">
+                  <IconAlertCircle size={16} />
+                  <Typography.Text type="secondary">
+                    Sorry! An error occured when fetching data.
+                  </Typography.Text>
+                </div>
+                <Input.TextArea
+                  label="Error Messages"
+                  value={JSON.stringify(error, null, 2)}
+                  borderless
+                  className=" border-t-2 border-scale-800 pt-2 font-mono"
+                />
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </LogsExplorerLayout>
   )

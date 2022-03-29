@@ -26,6 +26,18 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/replication`,
           items: [],
         },
+        {
+          name: 'API logs',
+          key: 'api-logs',
+          url: `/project/${ref}/database/api-logs`,
+          items: [],
+        },
+        {
+          name: 'Postgres logs',
+          key: 'postgres-logs',
+          url: `/project/${ref}/database/postgres-logs`,
+          items: [],
+        },
       ],
     },
     ...(IS_PLATFORM
