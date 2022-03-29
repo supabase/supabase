@@ -230,7 +230,8 @@ LIMIT 100
 
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
-    'severity.error': `metadataParsed.error_severity = 'ERROR'`,
+    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.log': `metadataParsed.error_severity = 'LOG'`,
   },
   edge_logs: {
@@ -334,7 +335,12 @@ export const FILTER_OPTIONS: FilterOptions = {
         {
           key: 'error',
           label: 'Error',
-          description: 'Show all events that have error severity',
+          description: 'Show all events with ERROR, PANIC, or FATAL',
+        },
+        {
+          key: 'noError',
+          label: 'No Error',
+          description: 'Show all non-error events',
         },
         {
           key: 'log',
