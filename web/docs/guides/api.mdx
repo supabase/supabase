@@ -150,8 +150,9 @@ You are provided with two keys:
 
 ### Accessing the Docs
 
-Supabase generates documentation in the Dashboard which updates as you make database changes. 
+#### REST API
 
+Supabase generates documentation in the Dashboard which updates as you make database changes. 
 Let's view the documentation for a `countries` table which we created in our database.
 
 <Tabs
@@ -174,6 +175,15 @@ values={[
 </TabItem>
 </Tabs>
 
+#### GraphQL 
+
+The GraphQL Endpoint that we provide (`https://<project_ref>.supabase.com/rest/v1`) is compatible with any GraphiQL implementation that can pass an `apikey` header.
+Some suggested applications:
+
+- [paw.cloud](https://paw.cloud)
+- [insomnia.rest](https://insomnia.rest)
+- [postman.com/graphql](https://www.postman.com/graphql/)
+- Self-hosted GraphiQL: GraphiQL can be served through a simple HTML file. See [this discussion](https://github.com/supabase/supabase/discussions/6144) for more details.
 
 ## Using the API
 
