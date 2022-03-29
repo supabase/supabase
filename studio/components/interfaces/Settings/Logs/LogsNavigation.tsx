@@ -14,9 +14,9 @@ const LogsNavigation = () => {
       type="underlined"
       size="medium"
       activeId={!activeRoute ? indexRoute : activeRoute}
-      onChange={(e: string) =>
+      onClick={(e: string) => {
         router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
-      }
+      }}
     >
       <Tabs.Panel id="query" label="Query" />
       <Tabs.Panel id="sources" label="Sources" />

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import { Button, IconDownloadCloud, IconEye, Typography } from '@supabase/ui'
+import { Button, IconDownloadCloud, IconEye, IconEyeOff, Typography } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
@@ -14,6 +14,8 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 interface Props {
   data?: Array<LogData | Object>
   queryType?: QueryType
+  onHistogramToggle?: () => void
+  isHistogramShowing?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -22,7 +24,7 @@ type LogMap = { [id: string]: LogData }
  *
  * When in custom data display mode, the side panel will not open when focusing on logs.
  */
-const LogTable = ({ data = [], queryType }: Props) => {
+const LogTable = ({ data = [], queryType, onHistogramToggle, isHistogramShowing }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
@@ -210,9 +212,15 @@ const LogTable = ({ data = [], queryType }: Props) => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button type="default" icon={<IconEye />}>
-                  Histogram
-                </Button>
+                {onHistogramToggle && (
+                  <Button
+                    type="default"
+                    icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+                    onClick={onHistogramToggle}
+                  >
+                    Histogram
+                  </Button>
+                )}
                 <Button type="default" icon={<IconDownloadCloud />}>
                   Download
                 </Button>

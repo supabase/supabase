@@ -6,8 +6,6 @@ import {
   IconRefreshCw,
   IconSearch,
   IconExternalLink,
-  IconEye,
-  IconEyeOff,
 } from '@supabase/ui'
 import { LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
@@ -27,8 +25,6 @@ interface Props {
   onSearch?: LogSearchCallback
   onExploreClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
-  isShowingEventChart: boolean
-  onToggleEventChart: () => void
   dispatchWhereFilters: (x: any) => void
   whereFilters: any
   table: LogsTableName
@@ -52,8 +48,6 @@ const PreviewFilterPanel: FC<Props> = ({
   dispatchWhereFilters,
   whereFilters: filters,
   table,
-  isShowingEventChart,
-  onToggleEventChart,
   condensedLayout,
 }) => {
   const [search, setSearch] = useState('')
@@ -194,15 +188,6 @@ const PreviewFilterPanel: FC<Props> = ({
                 filtersState={filters}
               />
             ))}
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            type="default"
-            onClick={() => onToggleEventChart()}
-            icon={isShowingEventChart ? <IconEye /> : <IconEyeOff />}
-          >
-            Event chart
-          </Button>
         </div>
       </div>
       <Button type="secondary" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
