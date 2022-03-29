@@ -259,15 +259,19 @@ const LogTable = ({ data = [], queryType }: Props) => {
             }}
             onRowClick={(r) => setFocusedLog(r)}
           />
-          {focusedLog && (
-            <div className="w-1/2 flex flex-col">
-              <LogSelection
-                onClose={() => setFocusedLog(null)}
-                log={focusedLog}
-                queryType={queryType}
-              />
-            </div>
-          )}
+          {/* {focusedLog && ( */}
+          <div
+            className={
+              queryType ? 'w-1/2 flex flex-col' : focusedLog ? 'w-1/2 flex flex-col' : 'w-0 hidden'
+            }
+          >
+            <LogSelection
+              onClose={() => setFocusedLog(null)}
+              log={focusedLog}
+              queryType={queryType}
+            />
+          </div>
+          {/* )} */}
         </div>
       </section>
     </>

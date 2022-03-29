@@ -1,5 +1,7 @@
 import { Alert } from '@supabase/ui'
 import React from 'react'
+import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
+import LogsDivider from '../Logs.Divider'
 import { jsonSyntaxHighlight, SeverityFormatter } from '../LogsFormatters'
 
 const DatabasePostgresSelectionRender = ({ log }: any) => {
@@ -18,7 +20,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
 
   return (
     <>
-      <div className="px-5">
+      <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
 
         <div
@@ -28,21 +30,19 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
           }}
         />
       </div>
-      <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
-      <div className="px-5 space-y-2">
+      <LogsDivider />
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
         <DetailedRow label="Severity" value={<SeverityFormatter value={log.error_severity} />} />
         <DetailedRow label="Postgres Username" value={postgresUsername} />
         <DetailedRow label="Session ID" value={sessionId} />
       </div>
-
       {hint && (
-        <div className="mt-4 px-5">
+        <div className={`mt-4 ${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
           <Alert variant="warning" withIcon title={log?.metadata[0]?.parsed[0]?.hint} />
         </div>
       )}
-
-      <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
-      <div className="px-5">
+      <LogsDivider />
+      <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
         <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div

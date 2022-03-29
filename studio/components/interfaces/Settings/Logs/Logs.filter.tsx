@@ -76,10 +76,10 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
                   }
                 })
 
-                // console.log('payload', payload)
+                console.log('payload', payload)
                 // console.log('submit form ran')
                 dispatchFilters({ ...payload })
-                handleReset()
+                // handleReset()
               }}
             >
               {({ isSubmitting }: { isSubmitting: boolean }) => (
