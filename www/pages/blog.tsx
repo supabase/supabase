@@ -138,7 +138,7 @@ function FeaturedThumb(blog: PostTypes) {
   for (let i = 0; i < authorArray.length; i++) {
     // @ts-ignore
     author.push(
-      authors.find((authors: string) => {
+      authors.find((authors: any) => {
         // @ts-ignore
         return authors.author_id === authorArray[i]
       })

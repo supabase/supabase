@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { Radio } from '@supabase/ui'
+import { getProductPrice } from '../Billing.utils'
 
 interface Props {
   computeSizes: any[]
@@ -17,25 +18,28 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
         </p>
       </div>
       <Radio.Group type="cards" className="billing-compute-radio">
-        {computeSizes.map((option: any) => (
-          <Radio
-            hidden
-            key={option.id}
-            align="vertical"
-            label={option.name}
-            // @ts-ignore
-            description={
-              <div>
-                <p>{option.description}</p>
-                <p>{option.metadata.features}</p>
-              </div>
-            }
-            value={option.id}
-            optionalLabel={<div>${option.prices[0].unit_amount / 100} / month</div>}
-            checked={selectedComputeSize?.id === option.id}
-            onChange={() => onSelectOption(option)}
-          />
-        ))}
+        {computeSizes.map((option: any) => {
+          const defaultPrice = getProductPrice(option)
+          return (
+            <Radio
+              hidden
+              key={option.id}
+              align="vertical"
+              label={option.name}
+              // @ts-ignore
+              description={
+                <div>
+                  <p>{option.description}</p>
+                  <p>{option.metadata.features}</p>
+                </div>
+              }
+              value={option.id}
+              optionalLabel={<div>${defaultPrice.unit_amount / 100} / month</div>}
+              checked={selectedComputeSize?.id === option.id}
+              onChange={() => onSelectOption(option)}
+            />
+          )
+        })}
       </Radio.Group>
     </div>
   )

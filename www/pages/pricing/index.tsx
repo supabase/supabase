@@ -135,7 +135,7 @@ export default function IndexPage() {
                 Predictable pricing, no surprises
               </h2>
               <p className="text-xl text-scale-1100">
-                Start building for free, then scale to millions of users
+                Start building for free, collaborate with a team, then scale to millions of users
               </p>
             </div>
           </div>

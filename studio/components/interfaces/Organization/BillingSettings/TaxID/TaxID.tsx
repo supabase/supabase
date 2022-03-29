@@ -156,21 +156,24 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
             {taxIdValues.length >= 1 ? (
               <div className="w-full space-y-2">
                 {taxIdValues.map((taxId: any, idx: number) => {
+                  const placeholder =
+                    TAX_IDS.find((taxIdOption) => taxId.type === taxIdOption.code)?.placeholder ??
+                    ''
                   return (
                     <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
                       <Select
                         value={taxId.type}
                         onChange={(e: any) => onUpdateTaxId(taxId.id, 'type', e.target.value)}
                       >
-                        {Object.keys(TAX_IDS).map((taxId: string) => (
-                          <Select.Option key={taxId} value={taxId}>
-                            {taxId.replace('_', ' ').toUpperCase()}
+                        {TAX_IDS.map((taxIdOption) => (
+                          <Select.Option key={taxIdOption.code} value={taxIdOption.code}>
+                            {taxIdOption.name}
                           </Select.Option>
                         ))}
                       </Select>
                       <Input
                         value={taxId.value}
-                        placeholder={(TAX_IDS as any)[taxId.type]?.placeholder ?? ''}
+                        placeholder={placeholder}
                         onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
                       />
                       <Button

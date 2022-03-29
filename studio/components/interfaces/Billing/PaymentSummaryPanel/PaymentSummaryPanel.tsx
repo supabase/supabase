@@ -4,6 +4,7 @@ import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle } from '@supabas
 import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
+import { getProductPrice } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
 import InformationBox from 'components/ui/InformationBox'
 
@@ -50,8 +51,6 @@ const PaymentSummaryPanel: FC<Props> = ({
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
 
-  console.log('PaymentSummaryPanel', currentComputeSize, selectedComputeSize)
-
   const isChangingPlan =
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
@@ -86,7 +85,9 @@ const PaymentSummaryPanel: FC<Props> = ({
         {isChangingPlan && (
           <div className="flex items-center justify-between">
             <p className="text-sm">{getPlanName(selectedPlan)}</p>
-            <p className="text-sm">${(selectedPlan.prices[0].unit_amount / 100).toFixed(2)}</p>
+            <p className="text-sm">
+              ${(getProductPrice(selectedPlan).unit_amount / 100).toFixed(2)}
+            </p>
           </div>
         )}
       </div>
@@ -108,7 +109,7 @@ const PaymentSummaryPanel: FC<Props> = ({
               <p
                 className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
               >
-                ${(currentComputeSize.prices[0].unit_amount / 100).toFixed(2)}
+                ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
               </p>
             </div>
           )}
@@ -116,7 +117,7 @@ const PaymentSummaryPanel: FC<Props> = ({
             <div className="flex items-center justify-between">
               <p className="text-sm">{selectedComputeSize.name}</p>
               <p className="text-sm">
-                ${(selectedComputeSize.prices[0].unit_amount / 100).toFixed(2)}
+                ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
               </p>
             </div>
           )}

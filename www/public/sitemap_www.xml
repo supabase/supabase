@@ -49,13 +49,19 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/database</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/database</loc>
+    <loc>https://supabase.com/partners/[slug]</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -550,6 +556,12 @@
 
   <url>
     <loc>https://supabase.com/blog/2022/02/22/supabase-beta-january-2022</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/08/audit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

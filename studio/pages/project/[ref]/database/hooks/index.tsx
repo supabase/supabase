@@ -42,11 +42,13 @@ const HooksPage: FC<any> = () => {
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchTriggers()
-  }, [])
+    if (ui.selectedProject) {
+      fetchHooks()
+    }
+  }, [ui.selectedProject])
 
-  const fetchTriggers = async () => {
-    await meta.hooks.load()
+  const fetchHooks = async () => {
+    meta.hooks.load()
   }
 
   const enableHooksForProject = async () => {
