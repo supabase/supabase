@@ -1,5 +1,4 @@
 import { Tabs } from '@supabase/ui'
-import Flag from 'components/ui/Flag/Flag'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 
