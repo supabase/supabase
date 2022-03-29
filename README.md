@@ -14,8 +14,8 @@
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
   - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
   - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
-- [x] Functions. 
-  - [ ] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
+- [x] Functions.
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [ ] Edge Functions (coming soon).
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
