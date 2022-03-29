@@ -19,6 +19,7 @@ import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './Log
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
+import CSVButton from 'components/ui/CSVButton'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -59,10 +60,8 @@ const LogTable = ({
   })
   let columns
   if (!queryType) {
-    console.log('no query type')
     columns = DEFAULT_COLUMNS
   } else {
-    console.log('has query type', queryType)
     switch (queryType) {
       case 'api':
         columns = DatabaseApiColumnRender
@@ -198,6 +197,7 @@ const LogTable = ({
       return dedupedData
     }
   }, [stringData])
+
   return (
     <>
       <section
@@ -240,9 +240,7 @@ const LogTable = ({
                     Histogram
                   </Button>
                 )}
-                <Button type="default" icon={<IconDownloadCloud />}>
-                  Download
-                </Button>
+                {showDownload && <CSVButton data={data}>Download</CSVButton>}
               </div>
             </div>
           </div>
