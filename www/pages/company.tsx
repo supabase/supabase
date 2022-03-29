@@ -225,7 +225,9 @@ const Community = () => {
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p className="text-sm text-scale-1100">With developer signups from the world's leading brands.</p>
+            <p className="text-sm text-scale-1100">
+              With developer signups from the world's leading brands.
+            </p>
           </div>
 
           <ImageGrid images={CompaniesData} />
