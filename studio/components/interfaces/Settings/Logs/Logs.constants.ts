@@ -279,6 +279,15 @@ export const LOGS_TABLES = {
   fn_edge: LogsTableName.FN_EDGE,
 }
 
+
+export const LOGS_SOURCE_DESCRIPTION = {
+  [LogsTableName.EDGE]: "Logs obtained from the network edge, containing all API requests.",
+  [LogsTableName.POSTGRES]: "Database logs obtained directly from Postgres." ,
+  [LogsTableName.FUNCTIONS]: "Function logs generated from runtime execution.",
+  [LogsTableName.FN_EDGE]: "Function call logs, containing the request and response.",
+}
+
+
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {

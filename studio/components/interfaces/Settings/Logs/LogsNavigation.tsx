@@ -6,7 +6,7 @@ const LogsNavigation = () => {
   const activeRoute = router.pathname.split('/')[4]
   const { ref } = router.query
 
-  const indexRoute = 'query'
+  const indexRoute = 'sources'
 
   return (
     <Tabs
@@ -18,6 +18,7 @@ const LogsNavigation = () => {
         router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
       }
     >
+      <Tabs.Panel id="sources" label="Sources" />
       <Tabs.Panel id="query" label="Query" />
       {/* <Tabs.Panel id="recent" label={'Recent'} /> */}
       <Tabs.Panel id="saved" label="Saved" />
