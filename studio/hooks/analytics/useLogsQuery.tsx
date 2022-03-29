@@ -36,7 +36,7 @@ const useLogsQuery = (
     isValidating: isLoading,
     mutate,
   } = useSWR<Logs>(
-    `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`,
+    params.sql ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}` : null,
     get,
     { revalidateOnFocus: false }
   )
