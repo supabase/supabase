@@ -27,17 +27,6 @@ test.todo('templates')
 //   // expect(mockFn).toBeCalled()
 // })
 
-test('toggle event chart', async () => {
-  const mockFn = jest.fn()
-  const { rerender } = render(
-    <PreviewFilterPanel onToggleEventChart={mockFn} isShowingEventChart={true} />
-  )
-  const toggle = await screen.getByText(/Event chart/)
-  userEvent.click(toggle)
-  expect(mockFn).toBeCalled()
-  rerender(<PreviewFilterPanel isShowingEventChart={false} />)
-})
-
 test('filter input change and submit', async () => {
   const mockFn = jest.fn()
   render(<PreviewFilterPanel onSearch={mockFn} />)
