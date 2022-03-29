@@ -2,10 +2,10 @@ import React from 'react'
 import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
-import { IconList } from '@supabase/ui'
+import { Badge, IconList } from '@supabase/ui'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
-const PageLayout = ({ children }: { children?: React.ReactNode }) => {
+const PageLayout = ({ subtitle, children }: { subtitle?: React.ReactNode; children?: React.ReactNode }) => {
   return (
     <BaseLayout>
       <div className="h-full flex flex-col flex-grow">
@@ -36,6 +36,7 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
               <IconList size={14} strokeWidth={3} />
             </div>
             <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
+            {subtitle && <Badge color="scale">{subtitle}</Badge>}
           </div>
           <LogsNavigation />
         </div>
