@@ -8,13 +8,17 @@
 
 [Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-- [x] Hosted Postgres Database
-- [x] Realtime subscriptions
-- [x] Authentication and authorization
-- [x] Auto-generated APIs
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Auto-generated APIs.
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+- [x] Functions.
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [ ] Edge Functions (coming soon).
+- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
-- [x] Storage
-- [ ] Functions (coming soon)
 
 ## Documentation
 
