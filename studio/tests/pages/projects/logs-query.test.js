@@ -44,7 +44,7 @@ import { useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 
 import { SWRConfig } from 'swr'
-import { LogsExplorerPage as Page } from 'pages/project/[ref]/logs-explorer/query'
+import { LogsExplorerPage as Page } from 'pages/project/[ref]/logs-explorer/index'
 const LogsExplorerPage = (props) => (
   <SWRConfig
     value={{

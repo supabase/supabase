@@ -15,6 +15,7 @@ import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import { LogsFilter } from './Logs.filter'
 import DatePickers from './Logs.DatePickers'
+import CSVButton from 'components/ui/CSVButton'
 
 interface Props {
   defaultSearchValue?: string
@@ -33,6 +34,7 @@ interface Props {
   condensedLayout: Boolean
   isShowingEventChart: boolean
   onToggleEventChart: () => void
+  csvData?: unknown[]
 }
 
 dayjs.extend(utc)
@@ -55,6 +57,7 @@ const PreviewFilterPanel: FC<Props> = ({
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
+  csvData,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -205,6 +208,7 @@ const PreviewFilterPanel: FC<Props> = ({
             Event chart
           </Button>
         </div>
+        <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
       </div>
 
       <Button type="secondary" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
