@@ -11,7 +11,8 @@ date: '2022-03-29'
 toc_depth: 3
 ---
 
-GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql](https://supabase.github.io/pg_graphql/) (beta)`.
+GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, 
+[`pg_graphql](https://supabase.github.io/pg_graphql/) (beta)`.
 
 ![supameme.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/37484f92-884a-4690-8dbd-c878106faad4/supameme.png)
 
@@ -117,25 +118,32 @@ For a complete example with relationships, check out the [reflection docs](https
 
 ## Security
 
-An advantage to embedding GraphQL directly in the database is that we can lean on PostgreSQL’s built-in primitives for authentication and authorization.
+An advantage to embedding GraphQL directly in the database is that we can lean on PostgreSQL's built-in primitives for authentication and authorization.
 
 ### Authentication
 
-The GraphQL types exposed by `pg_graphql` are filtered according to the SQL role’s [INSERT/UPDATE/DELETE permissions](https://www.postgresql.org/docs/current/sql-grant.html). At Supabase, each API request is resolved in the database using the role in the request’s JWT. 
+The GraphQL types exposed by `pg_graphql` are filtered according to the SQL role's [INSERT/UPDATE/DELETE permissions](https://www.postgresql.org/docs/current/sql-grant.html). 
+At Supabase, each API request is resolved in the database using the role in the request's JWT. 
 
-Anonymous users receive the `anon` role, and logged in users get the `authenticated` role. In either case, pg_graphql resolves requests according to the SQL permissions. The [introspection schema](https://graphql.org/learn/introspection/) is similarly filtered to limit exposed types and fields to those that the user has permission to access. That means we can serve multiple GraphQL schemas for users of differing privilege levels from a single endpoint!
+Anonymous users receive the `anon` role, and logged in users get the `authenticated` role. In either case, pg_graphql resolves requests according to the SQL permissions. 
+The [introspection schema](https://graphql.org/learn/introspection/) is similarly filtered to limit exposed types and fields to those that the user has permission to access. 
+That means we can serve multiple GraphQL schemas for users of differing privilege levels from a single endpoint!
 
 ### Authorization
 
-Another nice side effect of making PostgreSQL do the heavy lifting is that GraphQL queries respect your existing [row level security policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) right out-of-the-box. No additional configuration required.
+Another nice side effect of making PostgreSQL do the heavy lifting is that GraphQL queries respect your existing 
+[row level security policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) right out-of-the-box. No additional configuration required.
 
 ## Performance
 
-Each [free tier database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory. To squeeze the most out of that limited hardware we had to make a few significant optimizations:
+Each [free tier database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory. 
+To squeeze the most out of that limited hardware we had to make a few significant optimizations:
 
 **GraphQL queries are always transpiled into exactly one SQL query**
 
-The SQL queries select and aggregate requested data into the shape of the GraphQL JSON response. In addition to solving the [N+1 query problem](https://medium.com/the-marcy-lab-school/what-is-the-n-1-problem-in-graphql-dd4921cb3c1a), a common issue with GraphQL resolvers, GraphQL queries requiring multiple joins typically produce significantly less IO due to reduced data duplication.
+The SQL queries select and aggregate requested data into the shape of the GraphQL JSON response. 
+In addition to solving the [N+1 query problem](https://medium.com/the-marcy-lab-school/what-is-the-n-1-problem-in-graphql-dd4921cb3c1a), a common issue with GraphQL resolvers, 
+GraphQL queries requiring multiple joins typically produce significantly less IO due to reduced data duplication.
 
 For example, when selecting all comments for a blog post:
 
@@ -194,11 +202,13 @@ The difference in payload size is negligible in this case, but as the number of 
 
 After a GraphQL query is transpiled to SQL, it is added to the prepared statement cache so subsequent requests with the same structure (think pagination) can skip the transpilation step.
 
-Using prepared statements also allows PostgreSQL to skip the overhead of computing a query plan. For small, on-index, queries, the query planning step can take several times as long as the query’s execution time, so the saving is significant at scale.
+Using prepared statements also allows PostgreSQL to skip the overhead of computing a query plan. For small, on-index, queries, 
+the query planning step can take several times as long as the query's execution time, so the saving is significant at scale.
 
 **All operations are bulk**
 
-Finally, all reflected query and mutation fields support bulk operations to nudge users towards consuming the API efficiently. Batching similar operations reduces network round-trips and time spent in the database.
+Finally, all reflected query and mutation fields support bulk operations to nudge users towards consuming the API efficiently. 
+Batching similar operations reduces network round-trips and time spent in the database.
 
 **Result**
 
@@ -224,7 +234,7 @@ Or create the extension in your database
 create extension pg_graphql;
 ```
 
-And we’re done!
+And we're done!
 
 The GraphQL endpoint is available at: `https://<project_ref>.supabase.co/graphql/v1`
 
@@ -232,7 +242,8 @@ The GraphQL endpoint is available at: `https://<project_ref>.supabase.co/graphql
 
 ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f07c93ed-3200-423c-bb49-d751c776c75f/Untitled.png)
 
-We’re excited to have worked with [The Guild](https://www.the-guild.dev) to show you [how to use](https://supabase-graphql-example.vercel.app/about) `pg_graphql` and their tools to build a [HackerNews clone](https://supabase-graphql-example.vercel.app/).
+We're excited to have worked with [The Guild](https://www.the-guild.dev) to show you [how to use](https://supabase-graphql-example.vercel.app/about) `pg_graphql` 
+and their tools to build a [HackerNews clone](https://supabase-graphql-example.vercel.app/).
 
 The [demo application](https://supabase-graphql-example.vercel.app/) showcases:
 
@@ -287,7 +298,8 @@ query ProfilesQuery {
 
 Image
 
-This is just the start of what we hope to be a close collaboration with the Guild, whose expertise of the GraphQL ecosystem will guide the development of Supabase’s GraphQL features. The Guild and Supabase share a similar approach to open source - we both favor collaboration and composability, making collaboration easy and productive.
+This is just the start of what we hope to be a close collaboration with the Guild, whose expertise of the GraphQL ecosystem will guide the development of Supabase's GraphQL features.
+ The Guild and Supabase share a similar approach to open source - we both favor collaboration and composability, making collaboration easy and productive.
 
 Be sure to visit [The Guild](https://www.the-guild.dev) and [follow them](https://twitter.com/TheGuildDev) to stay informed of the latest developments in GraphQL. 
 
@@ -302,4 +314,4 @@ Our first general availability release of `pg_graphql` supports:
 
 In the near term, we plan to fully support array and json/b types. Longer term, we intend to support views and custom mutations from user defined functions.
 
-Didn’t see the feature you’re interested in? [Let us know](https://github.com/supabase/pg_graphql/issues)
+Didn't see the feature you're interested in? [Let us know](https://github.com/supabase/pg_graphql/issues)
