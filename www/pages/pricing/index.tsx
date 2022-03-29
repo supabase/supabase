@@ -225,11 +225,11 @@ export default function IndexPage() {
 
         <div className="space-y-8">
           <PricingAddOnTable
-            icon={<ServerIcon className="w-20 h-20 text-scale-800" />}
+            icon={<ServerIcon className="w-8 h-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.database}
           />
           <PricingAddOnTable
-            icon={<SupportIcon className="w-20 h-20 text-scale-800" />}
+            icon={<SupportIcon className="w-8 h-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.support}
           />
         </div>
