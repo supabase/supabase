@@ -6,8 +6,6 @@ export function filterSqlWhereBuilder(
   table: LogsTableName,
   override?: Override
 ) {
-  let count = 0
-
   // remove any filter arrays that are empty
   const filtersSanitized: any = Object.values(filters).filter((x: any) => x && x.length > 0)
 
@@ -21,14 +19,17 @@ export function filterSqlWhereBuilder(
   if (filtersSanitized.length === 0 && !hasOverride) return whereArray
 
   if (hasOverride) {
-    count = +1
-    const sql = `${override?.key}='${override?.value}'`
+    console.log('HAS OVERRIDE')
+    // count = +1
+    const sql = `(${override?.key}='${override?.value}')`
     whereArray.push(sql)
+    if (filtersSanitized.length > 0) whereArray.push('and')
   }
 
   if (filtersSanitized.length === 0) return whereArray
 
   keys.map((x: string, i) => {
+    let count = 0
     // do not parse empty key
     if (!x) return
 

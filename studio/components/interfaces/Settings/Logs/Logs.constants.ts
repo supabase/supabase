@@ -253,6 +253,13 @@ export const SQL_FILTER_TEMPLATES: any = {
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
   },
+  function_logs: {
+    'severity.error': `metadata.level = 'error'`,
+    'severity.notError': `metadata.level != 'error'`,
+    'severity.log': `metadata.level = 'log'`,
+    'severity.info': `metadata.level = 'info'`,
+    'severity.debug': `metadata.level = 'debug'`,
+  },
 }
 
 // export const genDefaultQuery = (table: string, where: string = ''): string => `SELECT
@@ -366,13 +373,8 @@ export const FILTER_OPTIONS: FilterOptions = {
       key: 'product',
       options: [
         {
-          key: 'realtime',
-          label: 'Realtime',
-          description: '',
-        },
-        {
-          key: 'storage',
-          label: 'Storage',
+          key: 'database',
+          label: 'Database',
           description: '',
         },
         {
@@ -381,8 +383,13 @@ export const FILTER_OPTIONS: FilterOptions = {
           description: '',
         },
         {
-          key: 'database',
-          label: 'Database',
+          key: 'storage',
+          label: 'Storage',
+          description: '',
+        },
+        {
+          key: 'realtime',
+          label: 'Realtime',
           description: '',
         },
       ],
@@ -433,4 +440,38 @@ export const FILTER_OPTIONS: FilterOptions = {
       ],
     },
   },
+  // function_logs
+  function_logs: {
+    severity: {
+      label: 'Severity',
+      key: 'severity',
+      options: [
+        {
+          key: 'error',
+          label: 'Error',
+          description: 'Show all events that have error severity',
+        },
+        {
+          key: 'info',
+          label: 'Info',
+          description: 'Show all events that have error severity',
+        },
+        {
+          key: 'debug',
+          label: 'Debug',
+          description: 'Show all events that have error severity',
+        },
+        {
+          key: 'log',
+          label: 'Log',
+          description: 'Show all events that are log severity',
+        },
+      ],
+    },
+  },
+}
+
+export const LOGS_TAILWIND_CLASSES = {
+  log_selection_x_padding: 'px-8',
+  space_y: 'px-6',
 }

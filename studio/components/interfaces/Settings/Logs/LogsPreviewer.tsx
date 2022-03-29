@@ -130,7 +130,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
   }
 
   return (
-    <div className="h-full flex flex-col flex-grow gap-4">
+    <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
@@ -162,7 +162,12 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         table={table}
         condensedLayout={condensedLayout}
       />
-      {showChart && !isLoading ? (
+      <div
+        className={
+          'transition-all duration-500 ' +
+          (showChart && !isLoading ? 'opacity-100 h-48 pt-4 mb-4' : 'opacity-0 h-0')
+        }
+      >
         <div className={condensedLayout ? 'px-4' : ''}>
           <LogEventChart
             data={!isLoading ? logData : undefined}
@@ -171,8 +176,8 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
             }}
           />
         </div>
-      ) : null}
-      <div className="flex flex-col flex-grow relative">
+      </div>
+      <div className="flex flex-col flex-grow relative pt-4">
         {isLoading && <div className="logs-shimmering-loader w-full h-0.5"></div>}
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
