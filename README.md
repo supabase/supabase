@@ -11,7 +11,7 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#restful-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
   - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
   - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
 - [x] Functions. 
