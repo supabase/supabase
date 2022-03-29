@@ -1,8 +1,9 @@
 import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
-import { LogTemplate } from '.'
+import { LogsTableName, LogTemplate } from '.'
 interface Props {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
+  onSelectSource: (source: LogsTableName) => void
   onRun: () => void
   onClear: () => void
   onSave?: () => void
@@ -16,6 +17,7 @@ const LogsQueryPanel: React.FC<Props> = ({
   onRun,
   onClear,
   onSave,
+  onSelectSource,
 }) => (
   <div
     className="
@@ -31,9 +33,9 @@ bg-panel-header-light dark:bg-panel-header-dark
           <Dropdown
             side="bottom"
             align="start"
-            overlay={templates.map((template: LogTemplate) => (
-              <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
-                <Typography.Text>{template.label}</Typography.Text>
+            overlay={Object.values(LogsTableName).map((source) => (
+              <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
+                <Typography.Text>{source}</Typography.Text>
               </Dropdown.Item>
             ))}
           >
