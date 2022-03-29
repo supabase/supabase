@@ -239,12 +239,23 @@ values={[
 <TabItem value="Javascript">
 
 ```javascript
-import { createClient, useQuery } from 'urql';
+import { createClient, useQuery } from 'urql'
 
+// Prepare API key and Authorization header
+const headers = {
+  apikey: <SUPABASE_ANON_KEY>,
+  authorization: `Bearer: ${<SUPABASE_ANON_KEY}`>
+}
+
+// Create GraphQL client
 const client = createClient({
   url: '<SUPABASE_URL>/grapqhl/v1',
+  fetchOptions: function createFetchOptions() { 
+    return { headers }
+  },
 })
 
+// Prepare our GraphQL query
 const TodosQuery = `
   query {
     todos {
@@ -254,10 +265,12 @@ const TodosQuery = `
   }
 `
 
+// Query for the data (React)
 const [result, reexecuteQuery] = useQuery({
   query: TodosQuery,
 })
 
+// Read the result
 const { data, fetching, error } = result
 ```
 
@@ -277,10 +290,6 @@ curl --request POST '<SUPABASE_URL>/grapqhl/v1' \
 
 
 ### Realtime API
-
-
-The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a "publication" 
-called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
 
 By default Realtime is disabled on your database. Let's turn on Realtime for the `todos` table.
 
@@ -348,7 +357,9 @@ const { data: todos, error } = await supabase
 </TabItem>
 </Tabs>
 
-Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
+Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes. 
+The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
+called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
 
 ## API Security
 
