@@ -257,7 +257,7 @@ test('bug: load older btn does not error out when previous page is empty', async
 test('log event chart hide', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await screen.findByText('Events')
-  const toggle = await screen.findByText(/Event chart/)
+  const toggle = await screen.findByText(/Histogram/)
   userEvent.click(toggle)
   await expect(screen.findByText('Events')).rejects.toThrow()
 })

@@ -1,5 +1,5 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import { render,  waitFor, screen } from '@testing-library/react'
+import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 test('can display log data', async () => {
   render(
@@ -54,4 +54,12 @@ test('can display custom columns and headers based on data input', async () => {
   await waitFor(() => screen.getByText(/some_data/))
   await waitFor(() => screen.getByText(/kinda/))
   await waitFor(() => screen.getByText(/123456/))
+})
+
+test('toggle histogram', async () => {
+  const mockFn = jest.fn()
+  render(<LogTable onHistogramToggle={mockFn} isHistogramShowing={true} />)
+  const toggle = await screen.getByText(/Histogram/)
+  userEvent.click(toggle)
+  expect(mockFn).toBeCalled()
 })
