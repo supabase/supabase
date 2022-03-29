@@ -238,10 +238,10 @@ export const SQL_FILTER_TEMPLATES: any = {
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
 
-    'product.database': `request.path LIKE '/rest/%'`,
-    'product.storage': `request.path LIKE '/storage/%'`,
-    'product.auth': `request.path LIKE '/auth/%'`,
-    'product.realtime': `request.path LIKE '/realtime/%'`,
+    'product.database': `request.path like '/rest/%' or request.path like '/graphql/%'`,
+    'product.storage': `request.path like '/storage/%'`,
+    'product.auth': `request.path like '/auth/%'`,
+    'product.realtime': `request.path like '/realtime/%'`,
 
     'method.get': `request.method = 'GET'`,
     'method.post': `request.method = 'POST'`,
