@@ -49,9 +49,12 @@ export const PricingTableRowDesktop = (props: any) => {
 
   return (
     <>
-      <tr className="divide-x dark:divide-scale-400" style={{ borderTop: 'none' }}>
+      <tr
+        className="divide-x divide-scale-600 dark:divide-scale-400 bg-scale-200"
+        style={{ borderTop: 'none' }}
+      >
         <th
-          className="py-3 pl-6 text-sm font-medium text-left pricing-table__product-row bg-scale-50 dark:bg-scale-300 text-scale-1200 dark:text-white"
+          className="py-3 pl-6 sticky z-10 top-[62px] text-sm font-medium bg-scale-200 text-left bg-scale-50 dark:bg-scale-300 text-scale-1200 dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center">
@@ -59,9 +62,9 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 ml-2">{category.title}</h4>
           </div>
         </th>
-        <td className="px-6 py-5 pricing-table__product-row bg-scale-50 dark:bg-scale-300"></td>
-        <td className="px-6 py-5 pricing-table__product-row bg-scale-50 dark:bg-scale-300"></td>
-        <td className="px-6 py-5 pricing-table__product-row bg-scale-50 dark:bg-scale-300"></td>
+        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
+        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
+        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
       </tr>
 
       {category.features.map((feat: any) => {

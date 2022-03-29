@@ -1,17 +1,18 @@
-import { Accordion, Button, Collapsible, IconCheck, IconChevronUp, Typography } from '@supabase/ui'
+import { ServerIcon, SupportIcon } from '@heroicons/react/outline'
+import { Accordion, Button, IconCheck } from '@supabase/ui'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { Fragment, useState } from 'react'
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import { Check, PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
+import PricingAddOnTable from '~/components/PricingAddOnTable'
+import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/PricingTableRow'
 import pricing from '~/data/Pricing.json'
-import pricingFaq from '~/data/PricingFAQ.json'
 import pricingAddOn from '~/data/PricingAddOn.json'
-import classNames from 'classnames'
+import pricingFaq from '~/data/PricingFAQ.json'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -36,7 +37,7 @@ export default function IndexPage() {
         'Standard Support',
       ],
       scale: 'Anything more than the above you must upgrade',
-      shutdown: 'Free projects are shutdown after 7 days of inactivity.',
+      shutdown: 'Free projects are paused after 7 days of inactivity.',
       cta: 'Get Started',
     },
     {
@@ -52,6 +53,7 @@ export default function IndexPage() {
         'Unlimited Realtime Connections',
         '7 Days Backup',
         'High Priority Support',
+        'Compute Add-Ons',
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
@@ -60,14 +62,15 @@ export default function IndexPage() {
     {
       name: 'Enterprise',
       href: 'mailto:support@supabase.io',
-      description: 'Tailored to your business needs.',
+      description: 'For large-scale applications managing serious workloads.',
       features: [
-        'Unlimited Authenticated Users',
-        'Unlimited GB Database',
-        'Unlimited GB Storage',
-        'Unlimited Realtime connections',
-        '30 days Point in Time backup',
-        'Enterprise Support',
+        'Point in time recovery',
+        'Designated Support manager & SLAs',
+        'Enterprise OAuth providers',
+        'SSO/SAML',
+        'SOC2',
+        'Custom contracts & invoicing',
+        'On-premise support',
       ],
       scale: '',
       shutdown: '',
@@ -75,12 +78,6 @@ export default function IndexPage() {
     },
   ]
 
-  const allPlans = [
-    'Custom SMTP server',
-    'OAuth Providers',
-    'Dedicated project instance',
-    'Unlimited API requests',
-  ]
   const MobileHeaders = ({
     // title,
     description,
@@ -96,7 +93,7 @@ export default function IndexPage() {
     showDollarSign?: boolean
   }) => {
     return (
-      <div className="px-4">
+      <div className="px-4 mt-8">
         <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
         <span className="h1">
           {showDollarSign && '$'}
@@ -112,8 +109,6 @@ export default function IndexPage() {
       </div>
     )
   }
-
-  const [isDatabaseAddOnOpen, setIsDatabaseAddOnOpen] = useState(false)
 
   return (
     <DefaultLayout>
@@ -133,7 +128,7 @@ export default function IndexPage() {
       />
 
       <div className="shadow-sm">
-        <div className="py-16 bg-scale-100 lg:py-28">
+        <div className="relative z-10 py-16 shadow-sm bg-scale-100 lg:py-28">
           <div className="px-4 mx-auto text-center max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto space-y-2 lg:max-w-none">
               <h2 className="text-3xl text-scale-1200 md:text-5xl lg:text-6xl">
@@ -155,7 +150,7 @@ export default function IndexPage() {
                 {tiers.map((tier) => (
                   <div
                     key={tier.name}
-                    className="flex flex-col overflow-hidden rounded-lg shadow-lg"
+                    className="flex flex-col overflow-hidden transition duration-500 rounded-lg shadow-lg hover:shadow-xl dark:border border-scale-300 hover:-translate-y-1"
                   >
                     <div className="h-64 px-10 pt-8 bg-white dark:bg-scale-300">
                       <h3
@@ -164,7 +159,7 @@ export default function IndexPage() {
                       >
                         {tier.name}
                       </h3>
-                      <div className="flex items-baseline text-6xl font-extrabold lg:text-4xl xl:text-6xl text-scale-1200">
+                      <div className="flex items-baseline text-5xl font-extrabold lg:text-4xl xl:text-6xl text-scale-1200">
                         {tier.priceMonthly !== undefined ? (
                           <>
                             <span>${tier.priceMonthly}</span>
@@ -220,137 +215,45 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="container relative px-0 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+      <div className="container relative px-4 py-16 mx-auto shadow-sm lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
         <div className="text-center">
           <h2 className="text-3xl text-scale-1200">Add-Ons</h2>
           <p className="mb-16 text-lg text-scale-1100">
-            Level up your database&apos;s performance with Supabase Database add-ons.
+            Level up your Supabase experience with add-ons.
           </p>
         </div>
 
-        <div>
-          <Collapsible open={isDatabaseAddOnOpen} onOpenChange={setIsDatabaseAddOnOpen}>
-            <Collapsible.Trigger asChild>
-              <button
-                className={classNames(
-                  'flex flex-row items-center w-full border rounded-t group text-scale-1200 border-scale-500',
-                  !isDatabaseAddOnOpen && 'rounded-b'
-                )}
-                type="button"
-              >
-                <div className="flex flex-col items-start flex-1 lg:items-center lg:flex-row">
-                  <span className="flex-shrink-0 p-3">See add-on pricing plans</span>
-
-                  <div className="flex items-center justify-between flex-1 lg:border-l border-scale-500">
-                    <div className="grid grid-cols-1 gap-4 p-3 grid-flow-rows lg:grid-cols-2">
-                      <div className="flex items-center space-x-2">
-                        <Check />
-                        <span>Dedicated Postgres Database</span>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Check />
-                        <span>Optimized Database Instances</span>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Check />
-                        <span>Realtime Functionality</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 p-3">
-                  <IconChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
-                </div>
-              </button>
-            </Collapsible.Trigger>
-
-            <Collapsible.Content>
-              <div>
-                <table className="hidden w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:table">
-                  <thead>
-                    <tr className="bg-scale-500">
-                      <th className="p-3 text-left">Plan</th>
-                      <th className="p-3 text-left">Pricing</th>
-                      <th className="p-3 text-left">CPU</th>
-                      <th className="p-3 text-left">Memory</th>
-                      <th className="p-3 text-left">Connections: Direct</th>
-                      <th className="p-3 text-left">Connections: Pooler</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pricingAddOn.database.tiers.map((tier, i) => (
-                      <tr key={i} className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                        <td className="p-3">{tier.plan}</td>
-                        <td className="p-3">{tier.pricing}</td>
-                        <td className="p-3">{tier.cpu}</td>
-                        <td className="p-3">{tier.memory}</td>
-                        <td className="p-3">{tier.directConnections}</td>
-                        <td className="p-3">{tier.poolerConnections}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                <table className="w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:hidden">
-                  <tbody>
-                    {pricingAddOn.database.tiers.map((tier, i) => (
-                      <Fragment key={i}>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">Plan</th>
-                          <td className="px-4 py-3">{tier.plan}</td>
-                        </tr>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">Pricing</th>
-                          <td className="px-4 py-3">{tier.pricing}</td>
-                        </tr>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">CPU</th>
-                          <td className="px-4 py-3">{tier.cpu}</td>
-                        </tr>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">Memory</th>
-                          <td className="px-4 py-3">{tier.memory}</td>
-                        </tr>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">Connections: Direct</th>
-                          <td className="px-4 py-3">{tier.directConnections}</td>
-                        </tr>
-                        <tr className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                          <th className="py-3 pl-4 text-left">Connections: Pooler</th>
-                          <td className="px-4 py-3">{tier.poolerConnections}</td>
-                        </tr>
-                      </Fragment>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Collapsible.Content>
-          </Collapsible>
+        <div className="space-y-8">
+          <PricingAddOnTable
+            icon={<ServerIcon className="w-20 h-20 text-scale-800" />}
+            pricing={pricingAddOn.database}
+          />
+          <PricingAddOnTable
+            icon={<SupportIcon className="w-20 h-20 text-scale-800" />}
+            pricing={pricingAddOn.support}
+          />
         </div>
       </div>
 
       <div className="bg-white dark:bg-scale-100">
-        <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 md:pt-24 lg:pt-24">
+        <div className="container relative px-4 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
           <div className="text-center">
-            <h2 className="text-3xl text-scale-1200">Compare plans</h2>
+            <h2 className="text-3xl text-scale-1200">Compare Plans</h2>
             <p className="mb-16 text-lg text-scale-1100">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
 
-          <div className="container relative px-0 py-4 mx-auto lg:px-16 xl:px-20 sm:py-12 md:py-16 lg:py-20">
+          <div className="mb-16 sm:mb-18 md:mb-24 lg:mb-24">
             {/* <!-- xs to lg --> */}
 
-            <div className=" lg:hidden">
+            <div className="lg:hidden">
               {/* Free - Mobile  */}
 
               <MobileHeaders
                 tier="Free"
                 price={'0'}
-                priceDescription={'/project /month'}
+                priceDescription={'/project/month'}
                 description={'Perfect for hobby projects and experiments'}
               />
 
@@ -369,14 +272,22 @@ export default function IndexPage() {
                 tier={'free'}
                 icon={Solutions['storage'].icon}
               />
-              <PricingTableRowMobile category={pricing.dashboard} tier={'free'} />
-              <PricingTableRowMobile category={pricing.support} tier={'free'} />
+              <PricingTableRowMobile
+                category={pricing.dashboard}
+                tier={'free'}
+                icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.support}
+                tier={'free'}
+                icon={pricing.support.icon}
+              />
 
               {/* Pro - Mobile  */}
               <MobileHeaders
                 tier="Pro"
                 price={'25'}
-                priceDescription={'/project /month + usage costs'}
+                priceDescription={'/project/month + usage costs'}
                 description={'Everything you need to scale your project into production'}
               />
 
@@ -395,8 +306,16 @@ export default function IndexPage() {
                 tier={'pro'}
                 icon={Solutions['storage'].icon}
               />
-              <PricingTableRowMobile category={pricing.dashboard} tier={'pro'} />
-              <PricingTableRowMobile category={pricing.support} tier={'pro'} />
+              <PricingTableRowMobile
+                category={pricing.dashboard}
+                tier={'pro'}
+                icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.support}
+                tier={'pro'}
+                icon={pricing.support.icon}
+              />
 
               {/* Enterprise - Mobile  */}
               <MobileHeaders
@@ -422,68 +341,65 @@ export default function IndexPage() {
                 tier={'enterprise'}
                 icon={Solutions['storage'].icon}
               />
-              <PricingTableRowMobile category={pricing.dashboard} tier={'enterprise'} />
-              <PricingTableRowMobile category={pricing.support} tier={'enterprise'} />
+              <PricingTableRowMobile
+                category={pricing.dashboard}
+                tier={'enterprise'}
+                icon={pricing.dashboard.icon}
+              />
+              <PricingTableRowMobile
+                category={pricing.support}
+                tier={'enterprise'}
+                icon={pricing.support.icon}
+              />
             </div>
 
             {/* <!-- lg+ --> */}
             <div className="hidden lg:block">
               <table className="w-full h-px table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead
-                  className="
-                    thead--plans 
-                    sticky 
-                    z-10 
-                    top-[62px] 
-                    border-b 
-                    border-scale-700 
-                    dark:border-scale-400 
-                    bg-scale-200
-                  "
-                >
+                <thead className="sticky z-10 top-[62px] border-b border-scale-700 dark:border-scale-400 bg-scale-200 dark:bg-scale-300">
                   <tr>
                     <th
-                      className="relative px-6 pb-4 text-sm font-normal text-left text-scale-900"
+                      className="relative px-6 py-4 text-sm font-normal text-left text-scale-1200"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
                       <span>Plans</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
+                        className="absolute bottom-0 left-0 h-0.25 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 pb-4 text-sm font-normal text-left text-scale-1200"
+                      className="w-1/4 px-6 py-4 text-sm font-normal text-left text-scale-1200"
                       scope="col"
                     >
                       <span>Free</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
+                        className="absolute bottom-0 left-0 h-0.25 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 pb-4 text-sm font-normal leading-6 text-left text-scale-1200"
+                      className="w-1/4 px-6 py-4 text-sm font-normal leading-6 text-left text-scale-1200"
                       scope="col"
                     >
                       <span>Pro</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
+                        className="absolute bottom-0 left-0 h-0.25 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 pb-4 text-sm font-normal leading-6 text-left text-scale-1200"
+                      className="w-1/4 px-6 py-4 text-sm font-normal leading-6 text-left text-scale-1200"
                       scope="col"
                     >
                       <span>Enterprise</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full bg-scale-200 dark:bg-scale-300"
+                        className="absolute bottom-0 left-0 h-0.25 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
@@ -501,7 +417,7 @@ export default function IndexPage() {
                     <td className="h-full px-6 py-8 align-top">
                       <div className="relative table h-full">
                         <span className="h1 text-scale-1200">$0</span>
-                        <p className="p"> /project /month</p>
+                        <p className="p">/project/month</p>
 
                         <p className="text-sm p">Perfect for hobby projects and experiments</p>
 
@@ -518,7 +434,7 @@ export default function IndexPage() {
                     <td className="h-full px-6 py-8 align-top">
                       <div className="relative table h-full">
                         <span className="h1 text-scale-1200">$25</span>
-                        <p className="p"> /project /month + usage costs</p>
+                        <p className="p">/project/month + usage costs</p>
 
                         <p className="text-sm p">
                           Everything you need to scale your project into production
@@ -566,8 +482,11 @@ export default function IndexPage() {
                     category={pricing.storage}
                     icon={Solutions['storage'].icon}
                   />
-                  <PricingTableRowDesktop category={pricing.dashboard} />
-                  <PricingTableRowDesktop category={pricing.support} />
+                  <PricingTableRowDesktop
+                    category={pricing.dashboard}
+                    icon={pricing.dashboard.icon}
+                  />
+                  <PricingTableRowDesktop category={pricing.support} icon={pricing.support.icon} />
                 </tbody>
                 <tfoot>
                   <tr className="border-t border-scale-200 dark:border-scale-600">
