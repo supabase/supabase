@@ -1,13 +1,7 @@
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
 import Link from 'next/link'
-import {
-  Button,
-  IconMessageCircle,
-  IconGitHub,
-  Divider,
-  IconMail,
-} from '@supabase/ui'
+import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from '@supabase/ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 // Import Swiper styles if swiper used on page
