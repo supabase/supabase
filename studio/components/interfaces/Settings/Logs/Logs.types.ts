@@ -48,7 +48,7 @@ export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'sql'
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge'
 
 export type Mode = 'simple' | 'custom'
 
