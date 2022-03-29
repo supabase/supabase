@@ -112,5 +112,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/w3b6x9",
     "author_image_url": "https://github.com/w3b6x9.png"
+  },
+  {
+    "author_id": "dthyresson",
+    "author": "David Thyresson",
+    "username": "dthyresson",
+    "position": "Engineering",
+    "author_url": "https://github.com/dthyresson",
+    "author_image_url": "https://github.com/dthyresson.png"
   }
 ]
