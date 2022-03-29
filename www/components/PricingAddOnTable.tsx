@@ -41,11 +41,11 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
             type="button"
           >
             <div className="flex flex-col items-start flex-1 w-full lg:w-auto lg:items-center lg:flex-row">
-              <div className="relative flex items-center self-stretch w-full px-3 py-8 space-x-3 bg-white dark:bg-scale-300 lg:py-0 lg:w-72">
-                <span className="absolute transition-transform duration-500 -left-6 group-hover:translate-x-1">
+              <div className="relative flex items-center self-stretch w-full py-8 pl-4 space-x-3 bg-white dark:bg-scale-300 lg:py-0 lg:w-72">
+                <span className="p-2 transition-transform duration-500 rounded-md shadow-sm group-hover:scale-105 bg-scale-1200 text-scale-100 group-hover:shadow">
                   {icon}
                 </span>
-                <span className="flex-shrink-0 pl-10">
+                <span className="flex-shrink-0">
                   See <strong className="font-medium">{pricing.title}</strong> add-on plans
                 </span>
               </div>
