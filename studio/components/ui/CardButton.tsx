@@ -28,7 +28,9 @@ const CardButton: FC<Props> = ({
   icon,
 }) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>{children}</Link>
+    <Link href={linkHref}>
+      <a>{children}</a>
+    </Link>
   )
   const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
   const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
