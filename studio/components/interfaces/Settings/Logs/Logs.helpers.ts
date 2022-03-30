@@ -4,7 +4,8 @@ import { FilterObject, Override } from './Logs.types'
 export function filterSqlWhereBuilder(
   filters: FilterObject | any,
   table: LogsTableName,
-  override?: Override
+  override?: Override,
+  search?: string
 ) {
   // remove any filter arrays that are empty
   const filtersSanitized: any = Object.values(filters).filter((x: any) => x && x.length > 0)
@@ -14,12 +15,12 @@ export function filterSqlWhereBuilder(
   const hasOverride = override && override.value && override.key
   // build array of where statements
   // first item is `where` if there are any filters
-  let whereArray: string[] = filtersSanitized.length > 0 || hasOverride ? ['where'] : []
+  let whereArray: string[] =
+    (filtersSanitized.length > 0 || hasOverride) && !search ? ['where'] : search ? ['and'] : []
 
   if (filtersSanitized.length === 0 && !hasOverride) return whereArray
 
   if (hasOverride) {
-    console.log('HAS OVERRIDE')
     // count = +1
     const sql = `(${override?.key}='${override?.value}')`
     whereArray.push(sql)
