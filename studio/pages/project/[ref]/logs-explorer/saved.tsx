@@ -1,30 +1,16 @@
 import React, { useEffect } from 'react'
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
+
 import { observer } from 'mobx-react-lite'
-import {
-  IconCode,
-  Badge,
-  IconDatabase,
-  Icon,
-  IconCloud,
-  Loading,
-  IconSearch,
-  Input,
-} from '@supabase/ui'
+import { Loading } from '@supabase/ui'
 import { useStore, withAuth } from 'hooks'
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
-import CardButton from 'components/ui/CardButton'
-import { toJS } from 'mobx'
 
 import Table from 'components/to-be-cleaned/Table'
-import LogsSavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 
 export const LogsExplorerPage: NextPage = () => {
   const { content, ui } = useStore()
-
-  //   if (content.isLoading) return <LogsExplorerLayout />
 
   useEffect(() => {
     content.load()
@@ -45,13 +31,14 @@ export const LogsExplorerPage: NextPage = () => {
     <LogsExplorerLayout>
       <div className="flex flex-col gap-3">
         <Table
+          headTrClasses="expandable-tr"
           head={
             <>
               <Table.th>Name</Table.th>
               <Table.th>Description</Table.th>
-              <Table.th className="hidden 2xl:table-cell">Created</Table.th>
-              <Table.th className="hidden 2xl:table-cell">Last updated</Table.th>
-              <Table.th className="hidden 2xl:table-cell"></Table.th>
+              <Table.th className="">Created</Table.th>
+              <Table.th className="">Last updated</Table.th>
+              <Table.th className=""></Table.th>
             </>
           }
           body={

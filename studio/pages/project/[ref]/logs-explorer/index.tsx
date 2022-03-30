@@ -86,6 +86,7 @@ export const LogsExplorerPage: NextPage = () => {
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             onSave={handleOnSave}
+            isLoading={isLoading}
           />
 
           <div className="min-h-[7rem] h-48">
