@@ -18,9 +18,9 @@ import {
 
 import { withAuth } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
-import FunctionLayout from 'components/interfaces/functions/FunctionLayout'
-import FunctionLogsItem from 'components/interfaces/functions/FunctionLogsItem'
-import { LOGS_DATA } from 'components/interfaces/functions/Functions.data'
+import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
+import FunctionLogsItem from 'components/interfaces/Functions/FunctionLogsItem'
+import { LOGS_DATA } from 'components/interfaces/Functions/Functions.data'
 
 const EmptyFunctions = () => {
   return (
