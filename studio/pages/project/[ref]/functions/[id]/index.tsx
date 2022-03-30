@@ -14,7 +14,7 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
 
-import FunctionLayout from 'components/interfaces/functions/FunctionLayout'
+import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
 
 const CHART_INTERVALS = [
   {
