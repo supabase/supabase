@@ -8,7 +8,7 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import WarningBanner from 'components/ui/WarningBanner'
-import { WARNING_MESSAGE } from './Functions.Constants'
+import { WARNING_MESSAGE } from './Functions.constants'
 
 const PageLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
