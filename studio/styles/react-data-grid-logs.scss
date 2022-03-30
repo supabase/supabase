@@ -30,8 +30,6 @@
   .rdg-cell,
   .rdg-cell span {
     @apply text-scale-1100 font-normal #{!important};
-    border-left: none;
-    border-right: none;
   }
 
   .rdg-cell:first-child {

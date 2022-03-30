@@ -58,6 +58,7 @@ const LogTable = ({
     }
     return { key: v, name: v, resizable: true, formatter, header: v }
   })
+
   let columns
   if (!queryType) {
     columns = DEFAULT_COLUMNS
@@ -255,7 +256,7 @@ const LogTable = ({
             ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'} 
           `}
             rowHeight={40}
-            headerRowHeight={0}
+            headerRowHeight={queryType ? 0 : 28}
             onSelectedCellChange={({ idx, rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
