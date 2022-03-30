@@ -56,7 +56,7 @@ const LogTable = ({
     if (typeof value === 'object') {
       formatter = () => `[Object]`
     }
-    return { key: v, name: v, resizable: true, formatter, header: v }
+    return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
   })
 
   let columns
