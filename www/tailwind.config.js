@@ -82,6 +82,10 @@ module.exports = ui({
               padding: 0,
               marginBottom: '32px',
             },
+            img: {
+              borderRadius: '4px',
+              overflow: 'hidden',
+            },
           },
         },
 
