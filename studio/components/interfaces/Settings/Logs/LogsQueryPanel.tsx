@@ -8,6 +8,7 @@ interface Props {
   onClear: () => void
   onSave?: () => void
   hasEditorValue: boolean
+  isLoading: boolean
 }
 
 const LogsQueryPanel: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const LogsQueryPanel: React.FC<Props> = ({
   onClear,
   onSave,
   onSelectSource,
+  isLoading,
 }) => (
   <div
     className="
@@ -37,7 +39,7 @@ bg-panel-header-light dark:bg-panel-header-dark
               <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
                 <div className="flex flex-col gap-1">
                   <span className="font-mono text-white font-bold">{source}</span>
-                  <span  className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
+                  <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
                 </div>
               </Dropdown.Item>
             ))}
@@ -75,10 +77,11 @@ bg-panel-header-light dark:bg-panel-header-dark
             </div>
 
             <Button
-              type={hasEditorValue ? 'alternative' : 'default'}
+              type={hasEditorValue ? 'primary' : 'alternative'}
               disabled={!hasEditorValue}
               onClick={onRun}
-              icon={<IconPlay />}
+              iconRight={<IconPlay />}
+              loading={isLoading}
             >
               Run
             </Button>
