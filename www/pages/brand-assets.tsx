@@ -48,11 +48,7 @@ const Index = () => {
           <SectionContainer>
             <div className="grid grid-cols-12 border dark:border-gray-600 rounded-lg shadow-small">
               <div className="col-span-12 lg:col-span-5 relative overflow-auto w-full h-60 rounded-lg">
-                <Image
-                  src={`/brand-assets/logo-preview.jpg`}
-                  layout="fill"
-                  objectFit="cover"
-                />
+                <Image src={`/brand-assets/logo-preview.jpg`} layout="fill" objectFit="cover" />
               </div>
               <div className="col-span-12 lg:col-span-7 flex items-center">
                 <div className="p-16">
