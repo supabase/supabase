@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
 
 const FunctionInvocationSelectionRender = ({ log }: any) => {
@@ -31,7 +32,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
 
   return (
     <>
-      <div className="px-5 space-y-2">
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
         <DetailedRow label="Status" value={<ResponseCodeFormatter value={status} />} />
         <DetailedRow label="Method" value={method} />
         <DetailedRow label="Timestamp" value={dayjs(log.timestamp).toISOString()} />
@@ -41,7 +42,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
         <DetailedRow label="Request url" value={requestUrl} />
         <DetailedRow label="Host" value={host} />
       </div>
-      <div className="px-5">
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
@@ -52,7 +53,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
           />
         </pre>
       </div>
-      <div className="px-5">
+      <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">
           Response{method ? ` ${method}` : null} body
         </h3>
