@@ -147,7 +147,7 @@ const EmptyFunctions = () => {
 const FunctionsList = ({ functions }: { functions: Function[] }) => {
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 py-12">
         <div className="flex justify-between items-center">
           <span className="text-sm text-scale-900">{`${functions.length} function${
             functions.length > 1 ? 's' : ''
@@ -250,42 +250,14 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
 }
 
 const PageLayout = () => {
-  const router = useRouter()
-  const { ui, functions } = useStore()
+  const { functions } = useStore()
+  const hasFunctions = functions.list().length > 0
 
-  const project = ui.selectedProject
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ui.selectedProject}/restore`, {})
-    }
-  }, [project])
-
-  useEffect(() => {
-    functions.load()
-  }, [ui.selectedProject])
-
-  if (functions.isLoading)
-    return (
-      <FunctionsLayout>
-        <Loading active={true}>loading</Loading>
-      </FunctionsLayout>
-    )
-
-  if (functions.list().length <= 0) {
-    // if (true) {
-    return (
-      <FunctionsLayout centered={true}>
-        <EmptyFunctions />
-      </FunctionsLayout>
-    )
-  } else {
-    return (
-      <FunctionsLayout>
-        <FunctionsList functions={functions.list()} />
-      </FunctionsLayout>
-    )
-  }
+  return (
+    <FunctionsLayout centered={!hasFunctions}>
+      {hasFunctions ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
+    </FunctionsLayout>
+  )
 }
 
 export default withAuth(observer(PageLayout))
