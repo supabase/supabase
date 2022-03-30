@@ -62,6 +62,7 @@ import { getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { find } from 'lodash'
 beforeEach(() => {
   // reset mocks between tests
   get.mockReset()
@@ -189,6 +190,7 @@ test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
+  const isoString = newDate.toISOString()
   const unixMicro = newDate.getTime() * 1000 //microseconds
   const router = defaultRouterMock()
   router.query = { ...router.query, ts: unixMicro }

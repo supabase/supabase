@@ -67,8 +67,7 @@ function useLogsPreview<Filters>(
 
   useEffect(() => {
     if (filters !== {}) {
-      const generatedSql = genDefaultQuery(table, options.whereStatementFactory(filters))
-      setParams((prev) => ({ ...prev, sql: cleanQuery(generatedSql), rawSql: generatedSql }))
+      refresh()
     }
   }, [JSON.stringify(filters)])
 
@@ -111,10 +110,11 @@ function useLogsPreview<Filters>(
   const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
   const newCount = countData?.result?.[0]?.count ?? 0
 
-  const refresh = () => {
+  const refresh = async () => {
     const generatedSql = genDefaultQuery(table, options.whereStatementFactory(filters))
     setParams((prev) => ({ ...prev, sql: cleanQuery(generatedSql), rawSql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
+    setSize(1)
   }
 
   let error: null | string | object = swrError ? swrError.message : null

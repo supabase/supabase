@@ -44,14 +44,16 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 interface Props {
   projectRef: string
   queryType: QueryType
-  override: Override
+  override?: Override
   condensedLayout?: boolean
+  tableName?: LogsTableName
 }
 export const LogsPreviewer: React.FC<Props> = ({
   projectRef,
   queryType,
   override,
   condensedLayout = false,
+  tableName,
 }) => {
   const router = useRouter()
   const { s, te, ts } = router.query
@@ -60,7 +62,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
 
   console.log('queryType', queryType)
-  const table = LOGS_TABLES[queryType]
+  const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
     { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
