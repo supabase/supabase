@@ -79,9 +79,9 @@ export const generateProductRoutes = (ref: string): Route[] => {
 }
 
 export const generateOtherRoutes = (ref: string) => {
-
+  const logsExplorer = useFlag('logsExplorer')
   return [
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && logsExplorer
       ? [
           {
             key: 'logsExplorer',
