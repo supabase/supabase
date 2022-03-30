@@ -1,11 +1,31 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
-import { withAuth } from 'hooks'
-import { Badge, IconList } from '@supabase/ui'
+import { useStore, withAuth } from 'hooks'
+import { Badge, IconList, Loading } from '@supabase/ui'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
-const PageLayout = ({ subtitle, children }: { subtitle?: React.ReactNode; children?: React.ReactNode }) => {
+const PageLayout = ({
+  subtitle,
+  children,
+}: {
+  subtitle?: React.ReactNode
+  children?: React.ReactNode
+}) => {
+  const { content, ui } = useStore()
+
+  useEffect(() => {
+    content.load()
+  }, [ui.selectedProject])
+
+  if (!content.isInitialized) {
+    return (
+      <BaseLayout>
+        <Loading active={true}>loading</Loading>
+      </BaseLayout>
+    )
+  }
+
   return (
     <BaseLayout>
       <div className="h-full flex flex-col flex-grow">
