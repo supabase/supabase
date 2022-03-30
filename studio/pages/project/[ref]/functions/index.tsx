@@ -25,7 +25,7 @@ const EmptyFunctions = () => {
   }
   const commands: Commands[] = [
     {
-      command: 'supabase init ',
+      command: 'supabase init',
       description: "Needed if the project hasen't been inited before",
       jsx: () => {
         return (
@@ -50,7 +50,7 @@ const EmptyFunctions = () => {
     },
     {
       command: `supabase link --ref ${ref}`,
-      description: `Sets the Supabase project to be associated with your project ${ref}`,
+      description: `Associate the current folder with your Supabase project ${ref}`,
       jsx: () => {
         return (
           <>
@@ -62,7 +62,7 @@ const EmptyFunctions = () => {
     },
     {
       command: 'supabase functions new hello',
-      description: ' creates a function stub at ./functions/hello.ts',
+      description: ' creates a function stub at ./functions/hello/hello.ts',
       jsx: () => {
         return (
           <>
@@ -74,7 +74,7 @@ const EmptyFunctions = () => {
     },
     {
       command: 'supabase functions deploy hello',
-      description: 'Deploys function at ./functions/hello.ts',
+      description: 'Deploys function at ./functions/hello/index.ts',
       jsx: () => {
         return (
           <>
@@ -86,7 +86,7 @@ const EmptyFunctions = () => {
     },
     {
       command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'`,
-      description: 'Deploys function at ./functions/hello.ts',
+      description: 'Invokes the hello function',
       jsx: () => {
         return (
           <>
@@ -95,7 +95,7 @@ const EmptyFunctions = () => {
           </>
         )
       },
-      comment: 'Deploy your function',
+      comment: 'Invoke your function',
     },
   ]
   return (
@@ -123,10 +123,10 @@ const EmptyFunctions = () => {
         <div
           className="
           col-span-7
-      bg-scale-100 dark:bg-scale-300 px-8 py-6 
+      bg-scale-100 dark:bg-scale-300 px-8 py-6
       shadow
-      
-      border rounded 
+
+      border rounded
       space-y-8"
         >
           <div className="flex items-center gap-3">
@@ -186,8 +186,8 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
           <div className="flex flex-col gap-3">
             <div
               className="
-              h-10 w-10 
-              bg-indigo-900 
+              h-10 w-10
+              bg-indigo-900
               bordershadow-indigo-900
               rounded-md
               text-scale-fixed-100
@@ -206,8 +206,8 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
           <div className="flex flex-col gap-3">
             <div
               className="
-              h-10 w-10 
-              bg-indigo-900 
+              h-10 w-10
+              bg-indigo-900
               bordershadow-indigo-900
               rounded-md
               text-scale-fixed-100
@@ -226,8 +226,8 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
           <div className="flex flex-col gap-3">
             <div
               className="
-              h-10 w-10 
-              bg-indigo-900 
+              h-10 w-10
+              bg-indigo-900
               bordershadow-indigo-900
               rounded-md
               text-scale-fixed-100
