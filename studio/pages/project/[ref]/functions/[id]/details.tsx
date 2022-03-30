@@ -28,26 +28,26 @@ const PageLayout = () => {
 
   const managementCommands: any = [
     {
-      command: `supabase functions deploy ${selectedFunction?.name}`,
+      command: `supabase functions deploy ${selectedFunction?.slug}`,
       description: 'This will overwrite the deployed function with your new function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">supabase</span> functions deploy{' '}
-            {selectedFunction?.name}
+            {selectedFunction?.slug}
           </>
         )
       },
       comment: 'Deploy a new version',
     },
     {
-      command: `supabase functions deploy ${selectedFunction?.name}`,
+      command: `supabase functions delete ${selectedFunction?.slug}`,
       description: 'This will remove the function and all the logs associated with it',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">supabase</span> functions delete{' '}
-            {selectedFunction?.name}
+            {selectedFunction?.slug}
           </>
         )
       },
@@ -69,12 +69,12 @@ const PageLayout = () => {
       comment: 'View all secrets',
     },
     {
-      command: `supabase secrets set NAME1=VALUE NAME2=VALUE`,
+      command: `supabase secrets set NAME1=VALUE1 NAME2=VALUE2`,
       description: 'This will set secrets for your project',
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> secrets set NAME=VALUE NAME=VALUE
+            <span className="text-brand-1100">supabase</span> secrets set NAME1=VALUE1 NAME2=VALUE2
           </>
         )
       },
@@ -101,7 +101,7 @@ const PageLayout = () => {
           <div
             className="
           px-12 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
-          
+
           "
           >
             {console.log('inside the render', functions.byId(id))}
@@ -185,8 +185,8 @@ const PageLayout = () => {
         </div>
         <div>
           <div
-            className="px-12 py-8 
-          bg-scale-100 dark:bg-scale-300 border drop-shadow-sm 
+            className="px-12 py-8
+          bg-scale-100 dark:bg-scale-300 border drop-shadow-sm
           rounded
           space-y-6"
           >
