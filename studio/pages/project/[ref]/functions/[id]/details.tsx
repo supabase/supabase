@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 
-import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
+import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -95,7 +95,7 @@ const PageLayout = () => {
   ]
 
   return (
-    <FunctionLayout>
+    <FunctionsLayout>
       <div className="grid gap-y-12 lg:grid-cols-2 lg:gap-x-16">
         <div>
           <div
@@ -203,7 +203,7 @@ const PageLayout = () => {
           </div>
         </div>
       </div>
-    </FunctionLayout>
+    </FunctionsLayout>
   )
 }
 
