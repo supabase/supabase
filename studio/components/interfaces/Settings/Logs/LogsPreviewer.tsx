@@ -129,7 +129,6 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
     })
   }
 
-  console.log('queryType in LogsPreviewer', queryType)
   return (
     <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
