@@ -10,6 +10,14 @@ const LogsNavigation = () => {
   const indexRoute = 'query'
   const logsSourcesPage = useFlag('logsSourcesPage')
   const logsSavedQueries = useFlag('logsSavedQueries')
+
+  const tabs = [
+    { id: 'query', label: 'Query' },
+    logsSourcesPage ? { id: 'sources', label: 'Sources' } : null,
+    logsSavedQueries ? { id: 'saved', label: 'Saved' } : null,
+    { id: 'templates', label: 'Templates' },
+  ].filter(Boolean)
+
   return (
     <Tabs
       defaultActiveId="1"
@@ -20,11 +28,10 @@ const LogsNavigation = () => {
         router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
       }}
     >
-      <Tabs.Panel id="query" label="Query" />
-      {logsSourcesPage && <Tabs.Panel id="sources" label="Sources" />}
-      {/* <Tabs.Panel id="recent" label={'Recent'} /> */}
-      {logsSavedQueries && <Tabs.Panel id="saved" label="Saved" />}
-      <Tabs.Panel id="templates" label="Templates" />
+      {/* TODO: type properly */}
+      {(tabs as any[]).map(({ id, label }) => (
+        <Tabs.Panel id={id} label={label} />
+      ))}
     </Tabs>
   )
 }
