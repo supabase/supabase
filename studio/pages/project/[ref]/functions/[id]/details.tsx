@@ -136,14 +136,14 @@ const PageLayout = () => {
               <div>
                 <span className="block text-scale-900 text-xs mb-1">Endpoint url</span>
                 <Link
-                  href={`https://${ref}.functions.supabase.co/${selectedFunction?.name}`}
+                  href={`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}
                   passHref
                 >
                   <a
                     className="flex items-center gap-2 group text-scale-1100 hover:text-scale-1200"
                     target="_target"
                   >
-                    <span className="underline">{`https://${ref}.functions.supabase.co/${selectedFunction?.name}`}</span>
+                    <span className="underline">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
                     <IconExternalLink size={14} />
                   </a>
                 </Link>
