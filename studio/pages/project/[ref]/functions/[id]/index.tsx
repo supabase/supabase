@@ -82,13 +82,11 @@ const PageLayout = () => {
   const url = `${API_URL}/projects/${ref}/analytics/endpoints/functions.inv-stats`
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-  console.log('selectInterval', selectedInterval)
 
   const { data, error }: any = useSWR(
     `${url}?interval=${selectedInterval.key}&function_id=${id}`,
     get
   )
-  console.log('data', data)
 
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
