@@ -18,7 +18,7 @@ const PageLayout = ({
     content.load()
   }, [ui.selectedProject])
 
-  if (!content.isInitialized) {
+  if (!content.isLoaded) {
     return (
       <BaseLayout>
         <Loading active={true}>loading</Loading>

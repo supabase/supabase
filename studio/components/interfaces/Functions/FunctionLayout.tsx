@@ -20,7 +20,7 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
     functions.load()
   }, [ui.selectedProject])
 
-  if (!functions.list()) {
+  if (!functions.isLoaded) {
     return (
       <BaseLayout>
         <Loading active={true}>loading</Loading>

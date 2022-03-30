@@ -19,7 +19,7 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
     functions.load()
   }, [ui.selectedProject])
 
-  if (!functions.isInitialized) {
+  if (!functions.isLoaded) {
     return (
       <BaseLayout>
         <Loading active={true}>loading</Loading>
