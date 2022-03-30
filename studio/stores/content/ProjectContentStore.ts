@@ -54,7 +54,7 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   get isLoaded() {
-    return this.state !== this.STATES.LOADED
+    return this.state === this.STATES.LOADED
   }
 
   async fetchData() {

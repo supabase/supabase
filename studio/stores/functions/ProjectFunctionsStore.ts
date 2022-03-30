@@ -54,7 +54,7 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
   }
 
   get isLoaded() {
-    return this.state !== this.STATES.LOADED
+    return this.state === this.STATES.LOADED
   }
 
   async fetchData() {
