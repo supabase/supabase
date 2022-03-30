@@ -2,6 +2,7 @@ import React from 'react'
 import DevelopersData from 'data/Developers.json'
 import AnnouncementsData from 'data/Announcements.json'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 type Props = {
   text: string
@@ -68,11 +69,12 @@ const Developers = () => {
                   href={caseStudy.url}
                   className="p-3 flex rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition ease-in-out duration-150 border items-center"
                 >
-                  <div className="hidden sm:block flex-shrink-0">
-                    <img
-                      className="w-32 h-20 object-cover rounded-md"
+                  <div className="hidden sm:block flex-shrink-0 relative overflow-auto w-32 h-20 rounded-md">
+                    <Image
                       src={`${basePath}/${caseStudy.imgUrl}`}
                       alt="caseStudyThumb"
+                      layout="fill"
+                      objectFit="cover"
                     />
                   </div>
                   <div className="min-w-0 flex-1 sm:ml-4">
