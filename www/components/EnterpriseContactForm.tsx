@@ -122,7 +122,9 @@ const EnterpriseContactForm = () => {
             <div>
               <Select label="Country / Main Timezone" id="country" name="country" layout="vertical">
                 {countries.map(({ code, name }) => (
-                  <Select.Option value={code}>{name}</Select.Option>
+                  <Select.Option key={code} value={code}>
+                    {name}
+                  </Select.Option>
                 ))}
               </Select>
             </div>
