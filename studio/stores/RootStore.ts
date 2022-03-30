@@ -52,7 +52,6 @@ export class RootStore implements IRootStore {
         if (selectedProject) {
           // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
-          this.functions = new ProjectFunctionsStore(this, { projectRef: selectedProject.ref })
           this.meta = new MetaStore(this, {
             projectRef: selectedProject.ref,
             connectionString: selectedProject.connectionString ?? '',
@@ -60,7 +59,6 @@ export class RootStore implements IRootStore {
         } else {
           // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: '' })
-          this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
           this.meta = new MetaStore(this, {
             projectRef: '',
             connectionString: '',
@@ -73,6 +71,7 @@ export class RootStore implements IRootStore {
   setProjectRef(value?: string) {
     if (this.ui.selectedProject?.ref === value) return
     this.ui.setProjectRef(value)
+    this.functions.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {
