@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 
-import { IconLogIn } from '../Icon/icons/IconLogIn'
-
 import { DatePicker } from '.'
 import ReactDatePicker from 'react-datepicker'
 
