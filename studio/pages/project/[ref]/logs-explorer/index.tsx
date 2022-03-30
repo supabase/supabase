@@ -143,7 +143,6 @@ export const LogsExplorerPage: NextPage = () => {
               setSubmitting(false)
               setSaveModalOpen(false)
               toast.success(`Saved "${values.name}" log query`)
-              router.push(`/project/${ref}/logs-explorer/saved`)
             } catch (error: any) {
               console.error(error)
               setSubmitting(false)
