@@ -225,7 +225,7 @@ limit 100
 `
 
     default:
-      return `no sql!! `
+      return ""
       break
   }
 }
