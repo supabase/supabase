@@ -11,6 +11,7 @@ import CardButton from 'components/ui/CardButton'
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
   const { ref } = router.query
+  // @ts-ignore
   const sources = Object.values(LogsTableName).sort((a, b) => a - b)
   return (
     <LogsExplorerLayout>

@@ -1,45 +1,20 @@
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 
-// import FunctionLayout from './../interfaces/FunctionLayout'
-
-// const PageLayout = () => {
-//   return <FunctionLayout>Metrics</FunctionLayout>
-// }
-
 import useSWR from 'swr'
 import dayjs from 'dayjs'
-import Link from 'next/link'
-import { FC, useState } from 'react'
+
+import { useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-  IconArchive,
-  IconDatabase,
-  IconKey,
-  IconZap,
-  Typography,
-  Button,
-  Dropdown,
-  IconChevronDown,
-} from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
-import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
-import Table from 'components/to-be-cleaned/Table'
-import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
-import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
-import {
-  EndpointResponse,
-  PathsDatum,
-  StatusCodesDatum,
-} from 'components/interfaces/Home/ChartData.types'
+import { API_URL, DATE_FORMAT } from 'lib/constants'
+
 import FunctionLayout from '../interfaces/FunctionLayout'
-// import { EndpointResponse, PathsDatum, StatusCodesDatum } from ' ChartData.types'
 
 const CHART_INTERVALS = [
   {
@@ -154,6 +129,8 @@ const PageLayout = () => {
               <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-2 lg:gap-8">
                 <Panel key="database-chart">
                   <Panel.Content className="space-y-4">
+                    {/* 
+                    // @ts-ignore */}
                     <ChartHandler
                       label="Execution time"
                       defaultChartStyle="line"
@@ -177,6 +154,8 @@ const PageLayout = () => {
                 </Panel>
                 <Panel key="invocation-chart">
                   <Panel.Content className="space-y-4">
+                    {/* 
+                    // @ts-ignore */}
                     <ChartHandler
                       label="Invocations"
                       startDate={startDate}
@@ -198,6 +177,8 @@ const PageLayout = () => {
               </div>
               <Panel key="error-chart">
                 <Panel.Content className="space-y-4">
+                  {/* 
+                    // @ts-ignore */}
                   <ChartHandler
                     defaultChartStyle="line"
                     label="Error count"
@@ -226,26 +207,6 @@ const PageLayout = () => {
         </div>
       </div>
     </FunctionLayout>
-  )
-}
-// export default ProjectUsage
-
-const PanelHeader = (props: any) => {
-  const Tag = props?.href ? Link : 'div'
-  return (
-    <Tag href={props.href}>
-      <div
-        className={
-          'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-gray-1200' : '')
-        }
-      >
-        <Typography.Text>{props.icon}</Typography.Text>
-        <span className="flex items-center space-x-1">
-          <h4 className="mb-0 text-lg">{props.title}</h4>
-        </span>
-      </div>
-    </Tag>
   )
 }
 

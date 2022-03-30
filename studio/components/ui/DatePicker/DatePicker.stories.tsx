@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 
-import { IconLogIn } from '../Icon/icons/IconLogIn'
-
 import { DatePicker } from '.'
 import ReactDatePicker from 'react-datepicker'
 
@@ -19,7 +17,7 @@ export const Default = (args: any) => (
 export const Simple = () => {
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(null)
-  const onChange = (dates) => {
+  const onChange = (dates: any) => {
     const [start, end] = dates
     setStartDate(start)
     setEndDate(end)
