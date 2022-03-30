@@ -11,6 +11,7 @@ import FunctionInvocationSelectionRender, {
   FunctionInvocationHeaderRender,
 } from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import DefaultSelectionRenderer from './LogSelectionRenderers/DefaultSelectionRenderer'
 
 interface Props {
   log: LogData | null

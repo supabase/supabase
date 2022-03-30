@@ -45,8 +45,14 @@ interface Props {
   projectRef: string
   queryType: QueryType
   override: Override
+  condensedLayout?: boolean
 }
-export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override }) => {
+export const LogsPreviewer: React.FC<Props> = ({
+  projectRef,
+  queryType,
+  override,
+  condensedLayout = false,
+}) => {
   const router = useRouter()
   const { s, te, ts } = router.query
   const [showChart, setShowChart] = useState(true)
