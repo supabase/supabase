@@ -16,6 +16,7 @@ export const LogPage: NextPage = () => {
       <LogsPreviewer
         projectRef={ref as string}
         condensedLayout={true}
+        // @ts-ignore
         tableName={'edge_logs'}
         queryType={'api'}
       />

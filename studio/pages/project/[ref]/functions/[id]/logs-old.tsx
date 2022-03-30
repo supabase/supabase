@@ -170,6 +170,8 @@ const FunctionsList = () => {
 
       <div className="col-span-3 text-sm text-scale-900 w-32">IP Address</div>
       <div className="col-span-7 text-sm text-scale-1200">
+        {/* 
+        // @ts-ignore */}
         <span className="">{LogsData[0].ip_address}</span>
       </div>
 
