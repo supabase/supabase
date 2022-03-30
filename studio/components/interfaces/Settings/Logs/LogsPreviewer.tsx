@@ -66,7 +66,7 @@ export const LogsPreviewer: React.FC<Props> = ({ projectRef, queryType, override
         ? `where REGEXP_CONTAINS(event_message, '${filterObj.search_query}')`
         : ''
     }
-    ${filterSqlWhereBuilder(whereFilters, table, override).join('\n')}`,
+    ${filterSqlWhereBuilder(whereFilters, table, override, filterObj.search_query).join('\n')}`,
   })
 
   useEffect(() => {
