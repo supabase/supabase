@@ -16,7 +16,7 @@ export interface IProjectFunctionsStore {
 
   load: () => void
   list: (filter?: any) => any[]
-  byId: (id?: any) => []
+  byId: (id?: any) => any
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
 }
@@ -99,8 +99,6 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
   }
 
   byId(id: any) {
-    // console.log('this.data', toJS(this.data))
-    // return toJS(this.data).find((x: any) => x.id === id)
     return toJS(this.data)[id]
   }
 

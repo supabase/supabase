@@ -5,7 +5,6 @@ const FunctionsNav = ({ item }) => {
   const router = useRouter()
   const activeRoute = router.pathname.split('/')[5]
   const { ref } = router.query
-  console.log('activeRoute', activeRoute)
 
   return (
     <Tabs

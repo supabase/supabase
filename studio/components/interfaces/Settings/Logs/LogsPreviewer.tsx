@@ -61,7 +61,6 @@ export const LogsPreviewer: React.FC<Props> = ({
 
   const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
 
-  console.log('queryType', queryType)
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
@@ -174,19 +173,17 @@ export const LogsPreviewer: React.FC<Props> = ({
         className={
           'transition-all duration-500 ' +
           (showChart && !isLoading && logData.length > 0
-            ? 'opacity-100 h-48 pt-4 mb-4'
+            ? 'opacity-100 h-24 pt-4 mb-4'
             : 'opacity-0 h-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
-          {showChart && (
-            <LogEventChart
-              data={!isLoading ? logData : undefined}
-              onBarClick={(timestampMicro) => {
-                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
-              }}
-            />
-          )}
+          <LogEventChart
+            data={!isLoading ? logData : undefined}
+            onBarClick={(timestampMicro) => {
+              handleSearch({ query: filters.search_query, toMicro: timestampMicro })
+            }}
+          />
         </div>
       </div>
       <div className="flex flex-col flex-grow relative pt-4">
