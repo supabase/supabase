@@ -165,7 +165,7 @@ h6 { */
 } */
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-gray-800 text-white dark:bg-scale-300 dark:text-white;
+  @apply text-white bg-gray-800 dark:bg-scale-300 dark:text-white;
   text-shadow: none;
   font-weight: 400;
 }
@@ -215,29 +215,6 @@ table {
   margin-top: 1em;
   border-collapse: collapse;
 }
-
-table .thead--plans th {
-  @apply py-4;
-  position: sticky;
-  border-collapse: separate;
-  top: 0;
-  z-index: 5;
-}
-
-.pricing-table__product-row {
-  /* @apply py-4; */
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-
-/* 
-th {
-  border-right: 5px solid red;
-  background: white;
-  background-clip: padding-box;
-}
-*/
 
 .sbui-typography-container thead {
   @apply text-gray-500 dark:text-gray-200;
