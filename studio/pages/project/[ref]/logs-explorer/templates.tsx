@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { IconCode, Badge } from '@supabase/ui'
+import { observer, useStaticRendering } from 'mobx-react-lite'
+import { IconCode, Badge, Collapsible, Button, Popover } from '@supabase/ui'
 import { withAuth } from 'hooks'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
@@ -17,6 +17,7 @@ export const LogsExplorerPage: NextPage = () => {
       <div>
         <div className="grid grid-cols-3 gap-6">
           {TEMPLATES.filter((template) => template.mode === 'custom').map((template) => {
+            const [showPreview, setShowPreview] = useState(false)
             return (
               <CardButton
                 title={template.label}
@@ -35,8 +36,35 @@ export const LogsExplorerPage: NextPage = () => {
                     </div>
                   </div>
                 }
+                containerHeightClassName="h-40"
                 linkHref={`/project/${ref}/logs-explorer?q=${encodeURI(template.searchString)}`}
                 description={template.description}
+                footer={
+                  <div className="flex flex-row justify-end">
+                    <Popover
+                      onOpenChange={setShowPreview}
+                      open={showPreview}
+                      className="rounded-lg bg-scale-100"
+                      size="content"
+                      overlay={
+                        <pre className="rounded-lg whitespace-pre-line bg-scale-100 p-4 text-sm break-words">
+                          {template.searchString}
+                        </pre>
+                      }
+                    >
+                      <Button
+                        type="default"
+                        as="span"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setShowPreview(!showPreview)
+                        }}
+                      >
+                        Preview
+                      </Button>
+                    </Popover>
+                  </div>
+                }
               />
             )
           })}
