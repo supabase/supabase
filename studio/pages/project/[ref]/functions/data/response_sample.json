@@ -1,0 +1,178 @@
+[
+  {
+    "id": "in_1a1a1a1a1a1a1a1a1a1a1a",
+    "object": "1a1a1a1a1a1a1a1a1a1a1a",
+    "account_country": "US",
+    "account_name": "1a1a1a1a1a1a1a1a1a1a1a",
+    "account_tax_ids": null,
+    "amount_due": 0,
+    "amount_paid": 0,
+    "amount_remaining": 0,
+    "application_fee_amount": null,
+    "attempt_count": 0,
+    "attempted": false,
+    "auto_advance": true,
+    "automatic_tax": {
+      "enabled": false,
+      "status": null
+    },
+    "billing_reason": "1a1a1a1a1a1a1a1a1a1a1a",
+    "charge": null,
+    "collection_method": "charge_automatically",
+    "created": 1646526032,
+    "currency": "usd",
+    "custom_fields": [
+      {
+        "name": "Project name",
+        "value": "1a1a1a1a1a1a1a1a1a1a1a"
+      }
+    ],
+    "customer": "cus_in_1a1a1a1a1a1a1a1a1a1a1a",
+    "customer_address": null,
+    "customer_email": "in_1a1a1a1a1a1a1a1a1a1a1a@gmail.com",
+    "customer_name": null,
+    "customer_phone": null,
+    "customer_shipping": null,
+    "customer_tax_exempt": "none",
+    "customer_tax_ids": [],
+    "default_payment_method": null,
+    "default_source": null,
+    "default_tax_rates": [],
+    "description": null,
+    "discount": null,
+    "discounts": [],
+    "due_date": null,
+    "ending_balance": null,
+    "footer": null,
+    "hosted_invoice_url": null,
+    "invoice_pdf": null,
+    "last_finalization_error": null,
+    "lines": {
+      "object": "list",
+      "data": [
+        {
+          "id": "il_in_1a1a1a1a1a1a1a1a1a1a1a",
+          "object": "line_item",
+          "amount": 0,
+          "currency": "usd",
+          "description": "1 × Free tier (at $0.00 / month)",
+          "discount_amounts": [],
+          "discountable": true,
+          "discounts": [],
+          "livemode": true,
+          "metadata": {
+            "project_id": "29167",
+            "project_ref": "1a1a1a1a1a1a1a1a1a1a1a",
+            "project_name": "1a1a1a1a1a1a1a1a1a1a1a",
+            "organization_id": "1a1a1a1a1a1a1a1a1a1a1a",
+            "organization_slug": "1a1a1a1a1a1a1a1a1a1a1a-1a1a1a1a1a1a1a1a1a1a1a-1a1a1a1a1a1a1a1a1a1a1a"
+          },
+          "period": {
+            "end": 1649204401,
+            "start": 1646526001
+          },
+          "plan": {
+            "id": "price_1a1a1a1a1a1a1a1a1a1a1a",
+            "object": "plan",
+            "active": true,
+            "aggregate_usage": null,
+            "amount": 0,
+            "amount_decimal": "0",
+            "billing_scheme": "per_unit",
+            "created": 1615645622,
+            "currency": "usd",
+            "interval": "month",
+            "interval_count": 1,
+            "livemode": true,
+            "metadata": {
+              "price": "0000"
+            },
+            "nickname": null,
+            "product": "prod_1a1a1a1a1a1a1a1a1a1a1a",
+            "tiers_mode": null,
+            "transform_usage": null,
+            "trial_period_days": null,
+            "usage_type": "licensed"
+          },
+          "price": {
+            "id": "price_1a1a1a1a1a1a1a1a1a1a1a",
+            "object": "price",
+            "active": true,
+            "billing_scheme": "per_unit",
+            "created": 1615645622,
+            "currency": "usd",
+            "livemode": true,
+            "lookup_key": null,
+            "metadata": {
+              "price": "0000"
+            },
+            "nickname": null,
+            "product": "prod_1a1a1a1a1a1a1a1a1a1a1a",
+            "recurring": {
+              "aggregate_usage": null,
+              "interval": "month",
+              "interval_count": 1,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "tax_behavior": "unspecified",
+            "tiers_mode": null,
+            "transform_quantity": null,
+            "type": "recurring",
+            "unit_amount": 0,
+            "unit_amount_decimal": "0"
+          },
+          "proration": false,
+          "proration_details": {
+            "credited_items": null
+          },
+          "quantity": 1,
+          "subscription": "sub_1a1a1a1a1a1a1a1a1a1a1a",
+          "subscription_item": "si_1a1a1a1a1a1a1a1a1a1a1a",
+          "tax_amounts": [],
+          "tax_rates": [],
+          "type": "subscription"
+        }
+      ],
+      "has_more": false,
+      "total_count": 1,
+      "url": "/v1/invoices/in_1a1a1a1a1a1a1a1a1a1a1a/lines"
+    },
+    "livemode": true,
+    "metadata": {},
+    "next_payment_attempt": 1646529632,
+    "number": null,
+    "on_behalf_of": null,
+    "paid": false,
+    "paid_out_of_band": false,
+    "payment_intent": null,
+    "payment_settings": {
+      "payment_method_options": null,
+      "payment_method_types": null
+    },
+    "period_end": 1646526001,
+    "period_start": 1644106801,
+    "post_payment_credit_notes_amount": 0,
+    "pre_payment_credit_notes_amount": 0,
+    "quote": null,
+    "receipt_number": null,
+    "starting_balance": 0,
+    "statement_descriptor": null,
+    "status": "draft",
+    "status_transitions": {
+      "finalized_at": null,
+      "marked_uncollectible_at": null,
+      "paid_at": null,
+      "voided_at": null
+    },
+    "subscription": "sub_1a1a1a1a1a1a1a1a1a1a1a",
+    "subtotal": 0,
+    "tax": null,
+    "test_clock": null,
+    "total": 0,
+    "total_discount_amounts": [],
+    "total_tax_amounts": [],
+    "transfer_data": null,
+    "webhooks_delivered_at": null
+  }
+]
