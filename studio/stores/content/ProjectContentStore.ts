@@ -92,7 +92,6 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   list(filter?: any) {
     const arr = Object.values(this.data)
-    console.log('arr', arr)
     if (!!filter) {
       return arr.filter(filter).sort((a, b) => a.name.localeCompare(b.name))
     } else {

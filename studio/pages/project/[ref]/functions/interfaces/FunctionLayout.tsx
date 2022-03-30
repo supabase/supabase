@@ -28,10 +28,7 @@ const PageLayout = ({ children }: { children?: React.ReactNode }) => {
     )
   }
 
-  console.log('has functions')
-
   const item = functions.byId(id)
-  console.log(item)
 
   const name = item?.name || ''
 
