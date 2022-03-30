@@ -188,3 +188,18 @@ div[data-radix-portal]:not(.portal--toast) {
 div.fixed.inset-0 {
   z-index: 11 !important;
 }
+
+.recharts-tooltip-cursor {
+  @apply fill-transparent;
+}
+
+.expandable-tr {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.expanded-row-content {
+  display: grid;
+  grid-column: 1/-1;
+  justify-content: flex-start;
+}
