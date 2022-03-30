@@ -1,21 +1,17 @@
-import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
-
-import FunctionsLayout from '../../../../components/interfaces/functions/FunctionsLayout'
-import { Button, IconBookOpen, IconSearch, IconTerminal, Input, Loading } from '@supabase/ui'
+import Link from 'next/link'
 import { useEffect } from 'react'
-import Table from 'components/to-be-cleaned/Table'
-
-import FunctionsListItem from '../../../../components/interfaces/functions/FunctionsListItem'
 import { useRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { Button, IconBookOpen, IconSearch, IconTerminal, Input, Loading } from '@supabase/ui'
 
+import { useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-
-import CommandRender from '../../../../components/interfaces/functions/CommandRender'
-import Link from 'next/link'
-
-import { Function } from '../../../../components/interfaces/functions/Functions.types'
+import Table from 'components/to-be-cleaned/Table'
+import FunctionsLayout from 'components/interfaces/functions/FunctionsLayout'
+import FunctionsListItem from 'components/interfaces/functions/FunctionsListItem'
+import CommandRender from 'components/interfaces/functions/CommandRender'
+import { Function } from 'components/interfaces/functions/Functions.types'
 
 const EmptyFunctions = () => {
   const router = useRouter()

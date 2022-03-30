@@ -1,16 +1,12 @@
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { withAuth } from 'hooks'
 
-import FunctionLayout from './../interfaces/FunctionLayout'
 import {
   Button,
   Checkbox,
-  Dropdown,
-  IconAlertCircle,
-  IconAlertOctagon,
   IconCalendar,
-  IconCheck,
-  IconCheckCircle,
   IconChevronRight,
   IconExternalLink,
   IconGlobe,
@@ -19,15 +15,12 @@ import {
   Popover,
   SidePanel,
 } from '@supabase/ui'
-import { useState } from 'react'
-import Table from 'components/to-be-cleaned/Table'
-import { memoryUsage } from 'process'
-import FunctionsListItem from './../interfaces/FunctionsListItem'
 
-import LogsData from './../data/logs.json'
-import FunctionLogsItem from '../interfaces/FunctionLogsItem'
-import dayjs from 'dayjs'
-import router, { useRouter } from 'next/router'
+import { withAuth } from 'hooks'
+import Table from 'components/to-be-cleaned/Table'
+import FunctionLayout from 'components/interfaces/functions/FunctionLayout'
+import FunctionLogsItem from 'components/interfaces/functions/FunctionLogsItem'
+import { LOGS_DATA } from 'components/interfaces/functions/Functions.data'
 
 const EmptyFunctions = () => {
   return (
@@ -160,19 +153,19 @@ const FunctionsList = () => {
 
       <div className="col-span-3 text-sm text-scale-900 w-32">ID</div>
       <div className="col-span-7 text-sm text-scale-1200">
-        <span className="">{LogsData[0].id}</span>
+        <span className="">{LOGS_DATA[0].id}</span>
       </div>
 
       <div className="col-span-3 text-sm text-scale-900 w-32">Time</div>
       <div className="col-span-7 text-sm text-scale-1200">
-        <span className="">{dayjs(LogsData[0].created_at).format('DD MMM, YYYY HH:mm')}</span>
+        <span className="">{dayjs(LOGS_DATA[0].created_at).format('DD MMM, YYYY HH:mm')}</span>
       </div>
 
       <div className="col-span-3 text-sm text-scale-900 w-32">IP Address</div>
       <div className="col-span-7 text-sm text-scale-1200">
         {/* 
         // @ts-ignore */}
-        <span className="">{LogsData[0].ip_address}</span>
+        <span className="">{LOGS_DATA[0].ip_address}</span>
       </div>
 
       <div className="col-span-3 text-sm text-scale-900 w-32">API Version</div>
@@ -187,7 +180,7 @@ const FunctionsList = () => {
 
       {/* <div className="col-span-3 text-sm text-scale-900 w-32 grow">User agent</div>
               <div className="col-span-7 flex text-scale-1200">
-                <span className="">{LogsData[0].user_agent}</span>
+                <span className="">{LOGS_DATA[0].user_agent}</span>
               </div> */}
     </div>
   )
@@ -280,8 +273,8 @@ const FunctionsList = () => {
             }
             body={
               <>
-                {LogsData.length > 0 &&
-                  LogsData.map((x: any) => (
+                {LOGS_DATA.length > 0 &&
+                  LOGS_DATA.map((x: any) => (
                     <FunctionLogsItem
                       key={x.id}
                       log={x}
