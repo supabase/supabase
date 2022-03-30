@@ -3,6 +3,7 @@ import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
 import ProjectContentStore, { IProjectContentStore } from './content/ProjectContentStore'
+import ProjectFunctionsStore, { IProjectFunctionsStore } from './functions/ProjectFunctionsStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -13,6 +14,7 @@ configure({
 export interface IRootStore {
   ui: IUiStore
   content: IProjectContentStore
+  functions: IProjectFunctionsStore
   meta: IMetaStore
   app: IAppStore
   setProjectRef: (value?: string) => void
@@ -21,12 +23,15 @@ export interface IRootStore {
 export class RootStore implements IRootStore {
   ui: IUiStore
   content: IProjectContentStore
+  functions: IProjectFunctionsStore
   meta: IMetaStore
   app: IAppStore
 
   constructor() {
     this.ui = new UiStore(this)
+    // @ts-ignore
     this.content = new ProjectContentStore(this, { projectRef: '' })
+    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
       projectRef: '',
       connectionString: '',
@@ -45,13 +50,17 @@ export class RootStore implements IRootStore {
       () => this.ui.selectedProject,
       (selectedProject) => {
         if (selectedProject) {
+          // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
+          this.functions = new ProjectFunctionsStore(this, { projectRef: selectedProject.ref })
           this.meta = new MetaStore(this, {
             projectRef: selectedProject.ref,
             connectionString: selectedProject.connectionString ?? '',
           })
         } else {
+          // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: '' })
+          this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
           this.meta = new MetaStore(this, {
             projectRef: '',
             connectionString: '',

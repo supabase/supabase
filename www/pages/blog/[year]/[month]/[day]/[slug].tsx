@@ -215,7 +215,7 @@ function BlogPostPage(props: any) {
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
-                  <div className="flex">
+                  <div className="flex gap-3">
                     {author.map((author: any) => {
                       return (
                         <div className="mt-6 mb-8 mr-4 lg:mb-0 w-max">

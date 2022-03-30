@@ -5,13 +5,19 @@ import {
   IconSettings,
   IconDatabase,
   IconBarChart,
+  IconList,
+  IconCode,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { Route } from 'components/ui/ui.types'
 
+import { useFlag } from 'hooks'
+
 export const generateProductRoutes = (ref: string): Route[] => {
+  const functionsUi = useFlag('functionsUi')
+
   return [
     {
       key: 'editor',
@@ -59,11 +65,32 @@ export const generateProductRoutes = (ref: string): Route[] => {
       icon: <IconDatabase size={18} strokeWidth={2} />,
       link: `/project/${ref}/database/tables`,
     },
+    ...(IS_PLATFORM && functionsUi
+      ? [
+          {
+            key: 'functions',
+            label: 'Functions',
+            icon: <IconCode size={18} strokeWidth={2} />,
+            link: `/project/${ref}/functions`,
+          },
+        ]
+      : []),
   ]
 }
 
 export const generateOtherRoutes = (ref: string) => {
+  const logsExplorer = useFlag('logsExplorer')
   return [
+    ...(IS_PLATFORM && logsExplorer
+      ? [
+          {
+            key: 'logsExplorer',
+            label: 'Logs Explorer',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link: `/project/${ref}/logs-explorer`,
+          },
+        ]
+      : []),
     ...(IS_PLATFORM
       ? [
           {

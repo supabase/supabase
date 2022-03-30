@@ -16,9 +16,8 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
 
   return (
     <BarChart
-      className="py-1 px-2"
       minimalHeader
-      minmalChart
+      chartSize="tiny"
       data={aggregated}
       attribute="count"
       label="Events"
@@ -29,13 +28,35 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       }}
       customDateFormat="MMM D, HH:mm"
       displayDateInUtc
+      noDataMessage={''}
     />
   )
 }
 
 const useAggregated = (data: LogData[]) => {
   const truncateToMinute = (micro: number) => Math.floor(micro / 1000 / 1000 / 60) * 60
+  const truncateToHour = (micro: number) => Math.floor(micro / 1000 / 1000 / 60 / 60) * 60 * 60
+  const getDiffMinute = (currentTimestamp: number, olderTimestamp: number) =>
+    Math.round((currentTimestamp - olderTimestamp) / 1000 / 60)
+  const getDiffHour = (currentTimestamp: number, olderTimestamp: number) =>
+    Math.round((currentTimestamp - olderTimestamp) / 1000 / 60 / 60)
+  const diffMultiplierMinute = (v: number) => v * 60
+  const diffMultiplierHour = (v: number) => v * 60 * 60
   return useMemo(() => {
+    const oldest = data[data.length - 1]
+    if (!oldest) return
+    const latest = data[0]
+    const oldestDayjs = dayjs(oldest.timestamp / 1000)
+    const latestDayjs = dayjs(latest.timestamp / 1000)
+    let truncFunc = truncateToMinute
+    let getDiff = getDiffMinute
+    let diffMultiplier = diffMultiplierMinute
+    if (Math.abs(oldestDayjs.diff(latestDayjs, 'day', true)) > 0.25) {
+      truncFunc = truncateToHour
+      getDiff = getDiffHour
+      diffMultiplier = diffMultiplierHour
+    }
+
     const countMap = data
       .map((d) => {
         //   truncate to per-minute
@@ -55,12 +76,10 @@ const useAggregated = (data: LogData[]) => {
     if (!oldestEvent) return []
     const currentTimestamp = new Date().getTime()
     const oldestTimestampMicro = oldestEvent.timestamp
-    const latestTimestamp = truncateToMinute(data[0]['timestamp'])
-    const minutesDifference = Math.round(
-      (currentTimestamp - oldestTimestampMicro / 1000) / 1000 / 60
-    )
-    for (const minToAdd of Array.from(Array(minutesDifference).keys())) {
-      const tsToCheck = truncateToMinute(oldestTimestampMicro) + minToAdd * 60
+    const latestTimestamp = truncFunc(data[0]['timestamp'])
+    const diff = getDiff(currentTimestamp, oldestTimestampMicro / 1000)
+    for (const toAdd of Array.from(Array(diff).keys())) {
+      const tsToCheck = truncFunc(oldestTimestampMicro) + diffMultiplier(toAdd)
       if (!(tsToCheck in countMap) && tsToCheck <= latestTimestamp) {
         countMap[tsToCheck] = 0
       }
