@@ -1,21 +1,16 @@
-import { createClient } from '@supabase/supabase-js'
 import { IconChevronLeft, IconExternalLink } from '@supabase/ui'
 import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../404'
-import Image from 'next/image'
-
-const supabase = createClient(
-  'https://obuldanrptloktxcffvn.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzNzY1NjAxNSwiZXhwIjoxOTUzMjMyMDE1fQ.0sfp_Njf7l4g-nOCF5a1TQE11rPqtz8Y10uctIetkBA'
-)
 
 function Partner({ partner }: { partner: Partner }) {
   if (!partner) return <Error404 />
@@ -93,7 +88,7 @@ function Partner({ partner }: { partner: Partner }) {
                 {partner.images.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
-                      <div className="relative block ml-3 mr-3 cursor-move overflow-hidden rounded-md">
+                      <div className="relative block ml-3 mr-3 overflow-hidden rounded-md cursor-move">
                         <Image
                           layout="responsive"
                           objectFit="contain"
@@ -109,7 +104,7 @@ function Partner({ partner }: { partner: Partner }) {
               </Swiper>
             </div>
 
-            <div className="grid gap-3 lg:grid-cols-4 space-y-16 lg:space-y-0">
+            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0">
               <div className="lg:col-span-3">
                 <h2
                   className="text-scale-1200"

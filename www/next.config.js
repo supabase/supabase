@@ -2,7 +2,7 @@ const withMDX = require('@next/mdx')()
 
 module.exports = withMDX({
   basePath: '',
-  pageExtensions: ['js', 'jsx', 'tsx', 'md', 'mdx'],
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 
   trailingSlash: false,
   images: {
