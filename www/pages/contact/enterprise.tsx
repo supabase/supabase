@@ -27,6 +27,8 @@ const EnterpriseContactPage = () => {
       />
 
       <div className="max-w-xl px-4 mx-auto my-16 md:my-20 lg:my-24 xl:my-32">
+        <h2 className="block pb-16 text-center h2">Contact Enterprise Sales</h2>
+
         <EnterpriseContactForm />
       </div>
     </DefaultLayout>
