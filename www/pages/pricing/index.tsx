@@ -127,89 +127,128 @@ export default function IndexPage() {
         }}
       />
 
-      <div className="shadow-sm">
-        <div className="relative z-10 py-16 shadow-sm bg-scale-100 lg:py-28">
+      <div className="">
+        <div className="relative z-10 py-16 shadow-sm lg:py-28">
           <div className="px-4 mx-auto text-center max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto space-y-2 lg:max-w-none">
-              <h2 className="text-3xl text-scale-1200 md:text-5xl lg:text-6xl">
-                Predictable pricing, no surprises
-              </h2>
-              <p className="text-xl text-scale-1100">
+              <h1 className="text-base uppercase font-mono text-brand-900 tracking-widest">
+                Pricing
+              </h1>
+              <h2 className="h1">Predictable pricing, no surprises</h2>
+              <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col pb-12 bg-scale-100 sm:pb-16 lg:pb-24">
-          <div className="relative pt-8">
-            <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" />
+        <div className="flex flex-col max-w-7xl mx-auto">
+          {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
-            <div className="relative z-10 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-              <div className="max-w-md mx-auto space-y-4 lg:max-w-7xl lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
-                {tiers.map((tier) => (
-                  <div
-                    key={tier.name}
-                    className="flex flex-col overflow-hidden transition duration-500 rounded-lg shadow-lg hover:shadow-xl dark:border border-scale-300 hover:-translate-y-1"
-                  >
-                    <div className="h-64 px-10 pt-8 bg-white dark:bg-scale-300">
-                      <h3
-                        className="inline-flex mb-2 text-sm font-normal tracking-wide rounded-full lg:text-xl text-scale-1200"
-                        id="tier-standard"
-                      >
-                        {tier.name}
-                      </h3>
-                      <div className="flex items-baseline text-5xl font-extrabold lg:text-4xl xl:text-6xl text-scale-1200">
-                        {tier.priceMonthly !== undefined ? (
-                          <>
-                            <span>${tier.priceMonthly}</span>
-                            <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
-                          </>
-                        ) : (
-                          <span>Contact Us</span>
-                        )}
-                      </div>
-                      {tier.warning && (
-                        <span className="relative inline-flex px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
-                          {tier.warning}
-                        </span>
+          <div
+            className="relative z-10 px-4 mx-auto w-full sm:px-6 lg:px-8
+          
+            -mt-8
+          "
+          >
+            <div className="max-w-md mx-auto space-y-4 lg:max-w-7xl lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
+              {tiers.map((tier) => (
+                <div
+                  key={tier.name}
+                  className="
+                  border 
+                  flex 
+                  flex-col
+                  overflow-hidden 
+                  rounded 
+                  "
+                >
+                  <div className="h-60 px-8 pt-8 bg-white dark:bg-scale-300">
+                    <h3
+                      className="
+                        inline-flex 
+                        mb-2 
+                        text-sm 
+                        font-normal 
+                        tracking-wide 
+                        rounded-full 
+                        lg:text-xl 
+                        text-scale-1200"
+                      id="tier-standard"
+                    >
+                      {tier.name}
+                    </h3>
+                    <div
+                      className="
+                      flex items-baseline text-5xl 
+                      font-normal 
+                      lg:text-4xl 
+                      xl:text-4xl 
+                      text-scale-1200
+                      
+                      "
+                    >
+                      {tier.priceMonthly !== undefined ? (
+                        <>
+                          <span>${tier.priceMonthly}</span>
+                          <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
+                        </>
+                      ) : (
+                        <span>Contact Us</span>
                       )}
-                      <p className="mt-4 text-lg text-scale-1100">{tier.description}</p>
                     </div>
-
-                    <div className="flex flex-col justify-between flex-1 px-6 pt-6 pb-8 space-y-6 border-t bg-scale-100 dark:border-scale-600 sm:p-10 sm:pt-6">
-                      <div>
-                        <p className="text-scale-900">Included with plan:</p>
-                        <ul role="list" className="divide-y">
-                          {tier.features.map((feature) => (
-                            <li key={feature} className="flex items-center py-2">
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 dark:bg-brand-400 bg-opacity-30">
-                                <IconCheck
-                                  className="w-4 h-4 text-green-800 dark:text-green-900"
-                                  aria-hidden="true"
-                                  strokeWidth={2}
-                                />
-                              </div>
-                              <p className="mb-0 ml-3 text-base text-scale-1100 dark:text-scale-1200">
-                                {feature}
-                              </p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="text-xs text-scale-900">{tier.scale}</p>
-                        <p className="text-xs text-scale-900">{tier.shutdown}</p>
-                      </div>
-                      <a href={tier.href}>
-                        <Button block size="large" className="dark:text-white">
-                          {tier.cta}
-                        </Button>
-                      </a>
-                    </div>
+                    {tier.warning && (
+                      <span className="relative inline-flex px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
+                        {tier.warning}
+                      </span>
+                    )}
+                    <p className="mt-4 text-base text-scale-1100">{tier.description}</p>
                   </div>
-                ))}
-              </div>
+                  <div
+                    className="
+                    flex flex-col justify-between flex-1
+                    
+                    space-y-6 
+                    border-t 
+                    dark:border-scale-400
+                    
+                    bg-scale-100 
+                    dark:bg-scale-300 
+
+                    px-8
+                    py-8
+                  "
+                  >
+                    {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
+                    <ul role="list" className="divide-y dark:divide-scale-400">
+                      {tier.features.map((feature) => (
+                        <li key={feature} className="flex items-center py-2">
+                          {/* <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 dark:bg-brand-400 bg-opacity-30"> */}
+                          <IconCheck
+                            className="w-4 h-4 text-brand-900 "
+                            aria-hidden="true"
+                            strokeWidth={3}
+                          />
+                          {/* </div> */}
+                          <p className="mb-0 ml-3 text-sm text-scale-1100 dark:text-scale-1200">
+                            {feature}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div>
+                      <p className="text-xs text-scale-900">{tier.scale}</p>
+                      <p className="text-xs text-scale-900">{tier.shutdown}</p>
+                    </div>
+                    <a href={tier.href}>
+                      <Button block size="large" className="dark:text-white">
+                        {tier.cta}
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
