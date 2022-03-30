@@ -168,26 +168,28 @@ function FeaturedThumb(blog: PostTypes) {
               <p className="p text-xl">{blog.description}</p>
             </div>
 
-            {author.map((author: any) => {
-              return (
-                <div className="flex space-x-3 items-center">
-                  {author.author_image_url && (
-                    <div className="relative overflow-auto w-10 h-10">
-                      <Image
-                        src={author.author_image_url}
-                        className="rounded-full"
-                        layout="fill"
-                        objectFit="cover"
-                      />
+            <div className="flex flex-col gap-4">
+              {author.map((author: any) => {
+                return (
+                  <div className="flex space-x-3 items-center">
+                    {author.author_image_url && (
+                      <div className="relative overflow-auto w-10 h-10">
+                        <Image
+                          src={author.author_image_url}
+                          className="rounded-full"
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <span className="m-0 text-sm text-scale-1200">{author.author}</span>
+                      <span className="m-0 text-xs text-scale-900">{author.position}</span>
                     </div>
-                  )}
-                  <div className="flex flex-col">
-                    <span className="m-0 text-sm text-scale-1200">{author.author}</span>
-                    <span className="m-0 text-xs text-scale-900">{author.position}</span>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </a>
       </a>

@@ -5,9 +5,17 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 27 Mar 2022 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 28 Mar 2022 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2022/03/29/graphql-now-available</guid>
+  <title>GraphQL is now available in Supabase</title>
+  <link>https://supabase.com/blog/2022/03/29/graphql-now-available</link>
+  <description>GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql (beta).</description>
+  <pubDate>Mon, 28 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2022/03/28/community-day</guid>
   <title>Community Day</title>
