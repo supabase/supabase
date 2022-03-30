@@ -63,7 +63,7 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
           colSpan={5}
         >
           {/* <CodeEditor defaultValue={item.content.sql} language="pgsql" classname /> */}
-          <pre className="text-sm break-words py-4 px-3 ">{item.content.sql}</pre>
+          {expand && <pre className="text-sm break-words py-4 px-3 ">{item.content.sql}</pre>}
         </td>
       </>
     </>
