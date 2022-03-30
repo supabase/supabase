@@ -7,7 +7,7 @@ type TableProps = {
   className?: string
   containerClassName?: string
   borderless?: boolean
-  headerTrClasses?: string
+  headTrClasses?: string
 }
 
 function Table({
