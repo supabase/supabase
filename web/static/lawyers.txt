@@ -307,7 +307,7 @@ License Type
 118  github.com/Masterminds/semver/v3                             v3.1.1                                 MIT
 119  github.com/aymerick/douceur                                  v0.2.0                                 MIT
 120  github.com/badoux/checkmail                                  v0.0.0-20170203135005-d0a759655d62     MIT
-121  github.com/beevik/etree                                      v1.1.0                                 Apache 2.0
+121  github.com/beevik/etree                                      v1.1.0                                 Simplified BSD
 122  github.com/coreos/go-oidc/v3                                 v3.0.0                                 Apache 2.0
 123  github.com/didip/tollbooth/v5                                v5.1.1                                 MIT
 124  github.com/fatih/color                                       v1.10.0                                MIT
