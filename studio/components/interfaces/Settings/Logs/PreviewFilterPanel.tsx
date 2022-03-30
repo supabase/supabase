@@ -163,13 +163,16 @@ const PreviewFilterPanel: FC<Props> = ({
             Object.values(FILTER_OPTIONS[table]).map((x, i: number) => {
               const classes = []
 
-              if (i === 0) {
-                classes.push('rounded-tr-none rounded-br-none')
-              } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
-                classes.push('rounded-tl-none rounded-bl-none')
-              } else {
-                classes.push('rounded-none')
+              if (Object.values(FILTER_OPTIONS[table]).length >= 2) {
+                if (i === 0) {
+                  classes.push('rounded-tr-none rounded-br-none')
+                } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
+                  classes.push('rounded-tl-none rounded-bl-none')
+                } else {
+                  classes.push('rounded-none')
+                }
               }
+
               return (
                 <LogsFilter
                   classes={classes.join(' ')}
