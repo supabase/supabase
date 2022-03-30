@@ -1,19 +1,12 @@
-import { createClient } from '@supabase/supabase-js'
-import { IconArrowRight, IconSearch, Input, Select } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
+import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
-
-const supabase = createClient(
-  'https://obuldanrptloktxcffvn.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzNzY1NjAxNSwiZXhwIjoxOTUzMjMyMDE1fQ.0sfp_Njf7l4g-nOCF5a1TQE11rPqtz8Y10uctIetkBA'
-)
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -75,7 +68,7 @@ function ExpertPartnersPage(props: Props) {
               <div className="space-y-6">
                 {/* Search Bar */}
                 <div className="space-y-4">
-                  <div className="text-sm text-scale-900 mb-2">Explore more</div>
+                  <div className="mb-2 text-sm text-scale-900">Explore more</div>
                   <PartnerLinkBox
                     title="Integrations"
                     color="blue"
@@ -84,7 +77,7 @@ function ExpertPartnersPage(props: Props) {
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
+                        className="w-6 h-6"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -106,7 +99,7 @@ function ExpertPartnersPage(props: Props) {
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
+                        className="w-5 h-5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
