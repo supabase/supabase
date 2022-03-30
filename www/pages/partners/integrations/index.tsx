@@ -1,7 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
-import { IconArrowRight, IconLoader, IconSearch, Input, Select } from '@supabase/ui'
+import { IconLoader, IconSearch, Input } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -9,13 +7,9 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
+import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
-
-const supabase = createClient(
-  'https://obuldanrptloktxcffvn.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzNzY1NjAxNSwiZXhwIjoxOTUzMjMyMDE1fQ.0sfp_Njf7l4g-nOCF5a1TQE11rPqtz8Y10uctIetkBA'
-)
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -121,7 +115,7 @@ function IntegrationPartnersPage(props: Props) {
             <h2 className="text-xl text-scale-900">{meta_description}</h2>
           </div>
           {/* Title */}
-          <div className="grid lg:grid-cols-12 space-y-12 lg:space-y-0 md:gap-8 lg:gap-16 xl:gap-16">
+          <div className="grid space-y-12 lg:grid-cols-12 lg:space-y-0 md:gap-8 lg:gap-16 xl:gap-16">
             <div className="lg:col-span-4 xl:col-span-3">
               {/* Horizontal link menu */}
               <div className="space-y-6">
@@ -144,7 +138,7 @@ function IntegrationPartnersPage(props: Props) {
                   }
                 />
                 <div className="hidden lg:block">
-                  <div className="text-sm text-scale-900 mb-2">Categories</div>
+                  <div className="mb-2 text-sm text-scale-900">Categories</div>
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
@@ -158,7 +152,7 @@ function IntegrationPartnersPage(props: Props) {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="text-sm text-scale-900 mb-2">Explore more</div>
+                  <div className="mb-2 text-sm text-scale-900">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
                     <PartnerLinkBox
                       title="Experts"
@@ -168,7 +162,7 @@ function IntegrationPartnersPage(props: Props) {
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6"
+                          className="w-6 h-6"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -191,7 +185,7 @@ function IntegrationPartnersPage(props: Props) {
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="w-5 h-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
