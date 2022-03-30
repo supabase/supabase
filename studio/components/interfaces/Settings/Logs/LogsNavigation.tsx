@@ -28,7 +28,8 @@ const LogsNavigation = () => {
         router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
       }}
     >
-      {tabs.map(({ id, label }) => (
+      {/* TODO: type properly */}
+      {(tabs as any[]).map(({ id, label }) => (
         <Tabs.Panel id={id} label={label} />
       ))}
     </Tabs>
