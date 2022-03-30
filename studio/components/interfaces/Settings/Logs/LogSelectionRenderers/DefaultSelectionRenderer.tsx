@@ -46,9 +46,9 @@ const DefaultSelectionRenderer = ({ log }: any) => {
 
   return (
     <div className="overflow-hidden overflow-x-auto space-y-6">
-      {Object.entries(log).map(([key, value]) => {
+      {Object.entries(log).map(([key, value], index) => {
         return (
-          <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
+          <div key={`${key}-${index}`} className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
             {value && typeof value === 'object' ? (
               <DetailedJsonRow label={key} value={value} />
             ) : (
