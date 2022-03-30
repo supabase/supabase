@@ -5,6 +5,7 @@ import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
 import { useTheme } from '../Providers'
 import { Badge } from '@supabase/ui'
+import Image from 'next/image'
 
 const Footer = () => {
   const { basePath } = useRouter()
@@ -22,14 +23,15 @@ const Footer = () => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/">
-              <a>
-                <img
-                  className="w-40"
+              <a className="w-40">
+                <Image
                   src={
                     isDarkMode
                       ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                       : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                   }
+                  width={160}
+                  height={30}
                   alt="Supabase"
                 />
               </a>

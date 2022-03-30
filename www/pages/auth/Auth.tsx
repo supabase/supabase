@@ -101,12 +101,13 @@ function AuthPage() {
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
               <p className="mb-4">
-                <div className="flex items-center flex-wrap xl:w-64">
-                  <div className="mb-2 mr-2">
+                <div className="grid grid-rows-2 grid-flow-col gap-2 xl:w-64">
+                  <div className="w-fit flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 32.58 31.77"
                       width={21}
+                      height={21}
                       className="text-gray-800 dark:text-white"
                     >
                       <path
@@ -117,13 +118,15 @@ function AuthPage() {
                   </div>
                   {AuthProviders.map((auth) => {
                     return (
-                      <img
-                        className="mb-2 mr-2"
-                        src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
-                        width={21}
-                        alt={`${auth.name} auth login icon`}
-                        key={auth.name}
-                      />
+                      <div className="w-fit flex items-center">
+                        <Image
+                          src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
+                          alt={`${auth.name} auth login icon`}
+                          key={auth.name}
+                          height={21}
+                          width={21}
+                        />
+                      </div>
                     )
                   })}
                 </div>

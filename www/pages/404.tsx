@@ -31,7 +31,7 @@ const Error404 = () => {
                         ? '/images/supabase-logo-wordmark--dark.svg'
                         : '/images/supabase-logo-wordmark--light.svg'
                     }
-                    alt=""
+                    alt="supabase logo"
                     height={24}
                     width={120}
                   />
