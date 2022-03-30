@@ -26,60 +26,82 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/replication`,
           items: [],
         },
+
       ],
     },
     ...(IS_PLATFORM
       ? [
-          {
-            title: 'Settings',
-            items: [
-              {
-                name: 'Backups',
-                key: 'backups',
-                url: `/project/${ref}/database/backups`,
-                items: [],
-              },
-              {
-                name: 'Connection Pooling',
-                key: 'pooling',
-                url: `/project/${ref}/database/pooling`,
-                items: [],
-              },
-            ],
-          },
-        ]
+        {
+          title: 'Logs',
+          items: [
+            {
+              name: 'API logs',
+              key: 'api-logs',
+              url: `/project/${ref}/database/api-logs`,
+              items: [],
+            },
+            {
+              name: 'Postgres logs',
+              key: 'postgres-logs',
+              url: `/project/${ref}/database/postgres-logs`,
+              items: [],
+            },
+          ],
+        },
+      ]
       : []),
     ...(IS_PLATFORM
       ? [
-          {
-            title: 'Alpha Preview',
-            isPreview: true,
-            items: [
-              {
-                name: 'Triggers',
-                key: 'triggers',
-                url: `/project/${ref}/database/triggers`,
-                items: [],
-              },
-              {
-                name: 'Functions',
-                key: 'functions',
-                url: `/project/${ref}/database/functions`,
-                items: [],
-              },
-              ...(showHooksRoute
-                ? [
-                    {
-                      name: 'Function Hooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/database/hooks`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
+        {
+          title: 'Settings',
+          items: [
+            {
+              name: 'Backups',
+              key: 'backups',
+              url: `/project/${ref}/database/backups`,
+              items: [],
+            },
+            {
+              name: 'Connection Pooling',
+              key: 'pooling',
+              url: `/project/${ref}/database/pooling`,
+              items: [],
+            },
+          ],
+        },
+      ]
+      : []),
+    ...(IS_PLATFORM
+      ? [
+        {
+          title: 'Alpha Preview',
+          isPreview: true,
+          items: [
+            {
+              name: 'Triggers',
+              key: 'triggers',
+              url: `/project/${ref}/database/triggers`,
+              items: [],
+            },
+            {
+              name: 'Functions',
+              key: 'functions',
+              url: `/project/${ref}/database/functions`,
+              items: [],
+            },
+            ...(showHooksRoute
+              ? [
+                {
+                  name: 'Function Hooks',
+                  key: 'hooks',
+                  url: `/project/${ref}/database/hooks`,
+                  items: [],
+                },
+              ]
+              : []),
+          ],
+        },
+      ]
       : []),
   ]
 }

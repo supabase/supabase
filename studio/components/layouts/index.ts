@@ -11,7 +11,7 @@ import AccountLayout from './AccountLayout/AccountLayout'
 import WizardLayout from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
-
+import LogsExplorerLayout from './LogsExplorerLayout/LogsExplorerLayout'
 export {
   AuthLayout,
   DatabaseLayout,
@@ -24,5 +24,7 @@ export {
   WizardLayout,
   VercelIntegrationLayout,
   BillingLayout,
+  LogsExplorerLayout
+
 }
 export default ProjectLayout

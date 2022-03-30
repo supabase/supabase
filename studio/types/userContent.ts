@@ -2,9 +2,9 @@ export interface UserContent {
   id?: string
   name: string
   description?: string
-  type: 'sql' | 'report'
+  type: 'sql' | 'report' | 'log_sql'
   visibility: 'user' | 'project' | 'org' | 'public'
-  content: Dashboards.Content | SqlSnippets.Content
+  content: Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content
   owner_id?: number // user id
   last_updated_by?: number // user id
   inserted_at?: string // '2021-08-26T08:24:52.040695+00:00'
@@ -100,6 +100,28 @@ export namespace Dashboards {
 }
 
 export namespace SqlSnippets {
+  /**
+   * To be stored in the database: public.user_content.content
+   * In this case there is only one thing to store, but it's good to
+   * nest it in an object for future expansion.
+   */
+  export interface Content {
+    // unique id of the sql snippet, possibly to used so snippets can support versioning
+    content_id: string
+
+    // A full SQL query - this will be hashed on the /content endpoint
+    sql: string
+
+    // we can add some versioning to this schema in case we need to change the format.
+    schema_version: string
+
+    // show sql snippet as a favorite.
+    // this could be problematic if sql snippets have visibility that is != 'user'
+    favorite: boolean
+  }
+}
+
+export namespace LogSqlSnippets {
   /**
    * To be stored in the database: public.user_content.content
    * In this case there is only one thing to store, but it's good to
