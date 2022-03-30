@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 import { LOG_TYPE_LABEL_MAPPING } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
+import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 
 /**
  * Placeholder page for logs previewers until we figure out where to slot them
@@ -19,13 +19,13 @@ export const LogPage: NextPage = () => {
   }`
 
   return (
-    <FunctionLayout title={title}>
+    <FunctionsLayout title={title}>
       <LogsPreviewer
         projectRef={ref as string}
         queryType={'fn_edge'}
         override={{ key: 'function_id', value: id }}
       />
-    </FunctionLayout>
+    </FunctionsLayout>
   )
 }
 

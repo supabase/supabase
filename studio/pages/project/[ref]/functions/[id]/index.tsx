@@ -14,7 +14,7 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
 
-import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
+import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 
 const CHART_INTERVALS = [
   {
@@ -91,7 +91,7 @@ const PageLayout = () => {
   }
 
   return (
-    <FunctionLayout>
+    <FunctionsLayout>
       <div className="space-y-6 py-2">
         <div className="flex flex-row items-center gap-2">
           <div className="flex items-center">
@@ -206,7 +206,7 @@ const PageLayout = () => {
           )}
         </div>
       </div>
-    </FunctionLayout>
+    </FunctionsLayout>
   )
 }
 
