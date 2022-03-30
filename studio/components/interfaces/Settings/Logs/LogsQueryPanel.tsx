@@ -65,7 +65,7 @@ bg-panel-header-light dark:bg-panel-header-dark
                 Clear query
               </Button>
               {onSave && (
-                <Button type="default" disabled>
+                <Button type="default" onClick={() => onSave()} disabled={!hasEditorValue}>
                   Save query
                 </Button>
               )}
