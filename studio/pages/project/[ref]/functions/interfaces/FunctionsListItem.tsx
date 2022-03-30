@@ -1,18 +1,10 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  Badge,
-  IconClipboard,
-  IconExternalLink,
-  IconGlobe,
-  Icon_function,
-  Typography,
-} from '@supabase/ui'
+import { IconClipboard, IconGlobe } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { useStore } from 'hooks'
 // import _functionDropdown from './_functionDropdown'
 

@@ -32,6 +32,7 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
   }
 
   baseUrl: string
+  // @ts-ignore
   data: UserContentMap = []
 
   state = this.STATES.INITIAL
