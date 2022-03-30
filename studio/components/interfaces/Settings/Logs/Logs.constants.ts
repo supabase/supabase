@@ -17,13 +17,13 @@ export const TEMPLATES: LogTemplate[] = [
     label: 'Commits By User',
     description: 'Count of commits made by users on the database',
     mode: 'custom',
-    searchString: `SELECT
+    searchString: `select
     p.user_name, count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
   left join unnest(m.parsed) as p on true
 where
-  regexp_contains(event_message, 'commit')
+  regexp_contains(event_message, 'COMMIT')
 group by
   p.user_name
     `,
@@ -33,7 +33,7 @@ group by
     label: 'Metadata IP',
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
-    searchString: `SELECT timestamp, h.x_real_ip
+    searchString: `select timestamp, h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
   left join unnest(m.request) as r on true
@@ -46,7 +46,7 @@ where h.x_real_ip is not null
     label: 'Requests by Country',
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
-    searchString: `SELECT 
+    searchString: `select 
   cf.country, count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
