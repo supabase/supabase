@@ -28,6 +28,7 @@ interface Props {
   isHistogramShowing?: boolean
   isLoading?: boolean
   error?: any
+  showDownload?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -42,6 +43,7 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
+  showDownload,
   error,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
