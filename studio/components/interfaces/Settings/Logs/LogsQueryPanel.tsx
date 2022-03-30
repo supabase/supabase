@@ -1,4 +1,5 @@
 import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
+import Flag from 'components/ui/Flag/Flag'
 import { LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
 interface Props {
   templates?: LogTemplate[]
@@ -70,9 +71,11 @@ bg-panel-header-light dark:bg-panel-header-dark
                 Clear query
               </Button>
               {onSave && (
-                <Button type="default" onClick={() => onSave()} disabled={!hasEditorValue}>
-                  Save query
-                </Button>
+                <Flag name="logsSavedQueries">
+                  <Button type="default" onClick={() => onSave()} disabled={!hasEditorValue}>
+                    Save query
+                  </Button>
+                </Flag>
               )}
             </div>
 
