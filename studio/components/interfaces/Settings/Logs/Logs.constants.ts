@@ -354,7 +354,7 @@ export const FILTER_OPTIONS: FilterOptions = {
   // Edge logs
   edge_logs: {
     status_code: {
-      label: 'Status code',
+      label: 'Status',
       key: 'status_code',
       options: [
         {
@@ -425,7 +425,7 @@ export const FILTER_OPTIONS: FilterOptions = {
   // function_edge_logs
   function_edge_logs: {
     status_code: {
-      label: 'Status code',
+      label: 'Status',
       key: 'status_code',
       options: [
         {

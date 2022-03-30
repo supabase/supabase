@@ -125,7 +125,7 @@ const PreviewFilterPanel: FC<Props> = ({
             onChange={(e) => setSearch(e.target.value)}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setSearch(e.target.value)
-              handleSearch({query: e.target.value})
+              handleSearch({ query: e.target.value })
             }}
             icon={
               <div className="text-scale-900">
@@ -158,16 +158,28 @@ const PreviewFilterPanel: FC<Props> = ({
           <RefreshButton />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {FILTER_OPTIONS[table] &&
-            Object.values(FILTER_OPTIONS[table]).map((x) => (
-              <LogsFilter
-                key={`${x.key}-filter`}
-                options={x}
-                dispatchFilters={dispatchWhereFilters}
-                filtersState={filters}
-              />
-            ))}
+            Object.values(FILTER_OPTIONS[table]).map((x, i: number) => {
+              const classes = []
+
+              if (i === 0) {
+                classes.push('rounded-tr-none rounded-br-none')
+              } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
+                classes.push('rounded-tl-none rounded-bl-none')
+              } else {
+                classes.push('rounded-none')
+              }
+              return (
+                <LogsFilter
+                  classes={classes.join(' ')}
+                  key={`${x.key}-filter`}
+                  options={x}
+                  dispatchFilters={dispatchWhereFilters}
+                  filtersState={filters}
+                />
+              )
+            })}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -175,7 +187,7 @@ const PreviewFilterPanel: FC<Props> = ({
             onClick={() => onToggleEventChart()}
             icon={isShowingEventChart ? <IconEye /> : <IconEyeOff />}
           >
-            Event chart
+            Chart
           </Button>
         </div>
         <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
