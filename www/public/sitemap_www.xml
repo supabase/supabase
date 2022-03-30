@@ -49,6 +49,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/contact/enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -562,6 +568,24 @@
 
   <url>
     <loc>https://supabase.com/blog/2022/03/08/audit</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/25/should-i-open-source-my-company</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/25/supabase-launch-week-four</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/28/community-day</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
