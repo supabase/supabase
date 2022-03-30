@@ -2,7 +2,7 @@ import { Button, Checkbox, Form, Popover } from '@supabase/ui'
 import { pluckObjectFields } from 'lib/helpers'
 import { useState } from 'react'
 
-export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
+export const LogsFilter = ({ options, filtersState, dispatchFilters, classes }: any) => {
   const [open, setOpen] = useState(false)
 
   function handleReset() {
@@ -127,7 +127,12 @@ export const LogsFilter = ({ options, filtersState, dispatchFilters }: any) => {
         showClose
         side="bottom"
       >
-        <Button as="span" type={isActive ? 'secondary' : 'default'} onClick={() => setOpen(!open)}>
+        <Button
+          as="span"
+          type={isActive ? 'secondary' : 'default'}
+          onClick={() => setOpen(!open)}
+          className={classes}
+        >
           {options.label}
         </Button>
       </Popover>
