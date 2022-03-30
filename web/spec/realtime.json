@@ -658,7 +658,7 @@
 								"type": "intrinsic",
 								"name": "any"
 							},
-							"defaultValue": "WebSocket"
+							"defaultValue": "w3cwebsocket"
 						},
 						{
 							"id": 323,
@@ -873,7 +873,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"name": "Error"
+												"name": "ErrorEvent"
 											}
 										}
 									],
@@ -10112,15 +10112,15 @@
 					"sources": [
 						{
 							"fileName": "lib/version.ts",
-							"line": 2,
+							"line": 1,
 							"character": 20
 						}
 					],
 					"type": {
 						"type": "stringLiteral",
-						"value": "0.0.0"
+						"value": "0.0.0-automated"
 					},
-					"defaultValue": "\"0.0.0\""
+					"defaultValue": "\"0.0.0-automated\""
 				}
 			],
 			"groups": [
