@@ -105,7 +105,11 @@ function Database() {
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <div className="w-fit flex items-center">
-                  <Image src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} height={30} />
+                  <Image
+                    src={`${basePath}/images/product/database/postgresql-icon.svg`}
+                    width={30}
+                    height={30}
+                  />
                 </div>
               </div>
               <h4 className="h4">Just Postgres</h4>
