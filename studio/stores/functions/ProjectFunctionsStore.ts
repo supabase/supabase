@@ -14,11 +14,15 @@ export interface IProjectFunctionsStore {
   isLoaded: boolean
   error: any
 
+  baseUrl: string
+  projectRef: string
+
   load: () => void
   list: (filter?: any) => any[]
   byId: (id?: any) => any
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
+  setProjectRef: (ref?: string) => void
 }
 
 export default class ProjectFunctionsStore implements IProjectFunctionsStore {
@@ -32,6 +36,7 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
   }
 
   baseUrl: string
+  projectRef: string
   // @ts-ignore
   data: UserContentMap = []
 
@@ -40,8 +45,9 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
+    this.projectRef = projectRef
     this.rootStore = rootStore
-    this.baseUrl = `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${projectRef}/functions`
+    this.baseUrl = ``
     makeAutoObservable(this)
   }
 
@@ -187,6 +193,13 @@ export default class ProjectFunctionsStore implements IProjectFunctionsStore {
       return { data: true, error: null }
     } catch (error) {
       return { data: false, error }
+    }
+  }
+
+  setProjectRef(ref?: string) {
+    if (ref) {
+      this.projectRef = ref
+      this.baseUrl = `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/projects/${ref}/functions`
     }
   }
 }

@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { withAuth } from 'hooks'
 
-import FunctionLayout from 'components/interfaces/Functions/FunctionLayout'
+import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 
 const PageLayout = () => {
-  return <FunctionLayout>Triggers</FunctionLayout>
+  return <FunctionsLayout>Triggers</FunctionsLayout>
 }
 
 export default withAuth(observer(PageLayout))
