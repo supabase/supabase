@@ -19,12 +19,12 @@ export const TEMPLATES: LogTemplate[] = [
     mode: 'custom',
     searchString: `SELECT
     p.user_name, count(*) as count
-FROM postgres_logs
-  LEFT JOIN UNNEST(metadata) as m ON TRUE
-  LEFT JOIN UNNEST(m.parsed) AS p ON TRUE
-WHERE
-  REGEXP_CONTAINS(event_message, 'COMMIT')
-GROUP BY
+from postgres_logs
+  left join unnest(metadata) as m on true
+  left join unnest(m.parsed) as p on true
+where
+  regexp_contains(event_message, 'commit')
+group by
   p.user_name
     `,
     for: ['database'],
@@ -34,11 +34,11 @@ GROUP BY
     description: 'Print all the IP addresses that used Supabase api',
     mode: 'custom',
     searchString: `SELECT timestamp, h.x_real_ip
-FROM edge_logs
-  LEFT JOIN UNNEST(metadata) as m ON TRUE
-  LEFT JOIN UNNEST(m.request) AS r ON TRUE
-  LEFT JOIN UNNEST(r.headers) AS h ON TRUE
-WHERE h.x_real_ip IS NOT NULL
+from edge_logs
+  left join unnest(metadata) as m on true
+  left join unnest(m.request) as r on true
+  left join unnest(r.headers) as h on true
+where h.x_real_ip is not null
 `,
     for: ['api'],
   },
@@ -47,14 +47,14 @@ WHERE h.x_real_ip IS NOT NULL
     mode: 'custom',
     searchString: `SELECT 
   cf.country, count(*) as count
-FROM edge_logs
-  LEFT JOIN UNNEST(metadata) as m ON TRUE
-  LEFT JOIN UNNEST(m.request) AS r ON TRUE
-  LEFT JOIN UNNEST(r.cf) AS cf ON TRUE
-GROUP BY
+from edge_logs
+  left join unnest(metadata) as m on true
+  left join unnest(m.request) as r on true
+  left join unnest(r.cf) as cf on true
+group by
   cf.country
-ORDER BY
-  count DESC
+order by
+  count desc
 `,
     for: ['api'],
   },
@@ -65,14 +65,14 @@ ORDER BY
   timestamp, 
   event_message,
   r.origin_time
-FROM edge_logs
-  CROSS JOIN unnest(metadata) as m 
-  CROSS JOIN unnest(m.response) as r
-WHERE
+from edge_logs
+  cross join unnest(metadata) as m 
+  cross join unnest(m.response) as r
+where
   r.origin_time > 1000
-ORDER BY
-  timestamp DESC
-LIMIT 100
+order by
+  timestamp desc
+limit 100
 `,
     for: ['api'],
   },
@@ -83,14 +83,14 @@ LIMIT 100
   timestamp, 
   event_message,
   r.status_code
-FROM edge_logs
+from edge_logs
   cross join unnest(metadata) as m 
   cross join unnest(m.response) as r
-WHERE
+where
   r.status_code >= 500
-ORDER BY
+order by
   timestamp desc
-LIMIT 100
+limit 100
 `,
     for: ['api'],
   },
@@ -101,15 +101,15 @@ LIMIT 100
   r.path as path,
   r.search as params,
   count(timestamp) as c
-FROM edge_logs
+from edge_logs
   cross join unnest(metadata) as m 
   cross join unnest(m.request) as r
-GROUP BY 
+group by 
   path,
   params 
-ORDER BY
+order by
   c desc
-LIMIT 100
+limit 100
 `,
     for: ['api'],
   },
@@ -119,14 +119,14 @@ LIMIT 100
     searchString: `SELECT
   timestamp,
   event_message
-FROM edge_logs
+from edge_logs
   cross join unnest(metadata) as m 
   cross join unnest(m.request) as r
-WHERE
+where
   path like '%rest/v1%'
-ORDER BY
+order by
   timestamp desc
-LIMIT 100
+limit 100
 `,
     for: ['api'],
   },
@@ -137,37 +137,37 @@ LIMIT 100
   t.timestamp,
   p.error_severity,
   event_message
-FROM
+from
   postgres_logs as t
     cross join unnest(metadata) as m
     cross join unnest(m.parsed) as p
-WHERE
+where
   p.error_severity in ('ERROR', 'FATAL', 'PANIC')
-ORDER BY
+order by
   timestamp desc
-LIMIT 100
+limit 100
 `,
     for: ['database'],
   },
   {
     label: 'Error Count by User',
     mode: 'custom',
-    searchString: `SELECT
+    searchString: `select
   count(t.timestamp) as count,
   p.user_name,
   p.error_severity
-FROM
+from
   postgres_logs as t
     cross join unnest(metadata) as m
     cross join unnest(m.parsed) as p
-WHERE
+where
   p.error_severity in ('ERROR', 'FATAL', 'PANIC')
-GROUP BY
+group by
   p.user_name,
   p.error_severity
-ORDER BY
+order by
   count desc
-LIMIT 100
+limit 100
 `,
     for: ['database'],
   },
@@ -179,29 +179,25 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-export const genDefaultQuery = (
-  table: LogsTableName,
-  where: string | undefined,
-  idFilter?: string
-) => {
+export const genDefaultQuery = (table: LogsTableName, where: string | undefined) => {
   switch (table) {
     case 'edge_logs':
-      return `SELECT id, timestamp, event_message, metadata, request, response, request.method, request.path, response.status_code
-FROM ${table}
+      return `select id, timestamp, event_message, metadata, request, response, request.method, request.path, response.status_code
+from ${table}
 cross join unnest(metadata) as m
 cross join unnest(m.request) as request
 cross join unnest(m.response) as response
 ${where}
-LIMIT 100
+limit 100
 `
       break
 
     case 'postgres_logs':
-      return `SELECT postgres_logs.timestamp, id, event_message, metadata, metadataParsed.error_severity FROM ${table} 
+      return `select postgres_logs.timestamp, id, event_message, metadata, metadataparsed.error_severity from ${table} 
 cross join unnest(metadata) as m 
-cross join unnest(m.parsed) as metadataParsed 
+cross join unnest(m.parsed) as metadataparsed 
 ${where} 
-LIMIT 100
+limit 100
 `
       break
 
@@ -209,7 +205,7 @@ LIMIT 100
       return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level, metadata from ${table}
 cross join unnest(metadata) as metadata
 ${where}
-LIMIT 100
+limit 100
   `
       break
 
@@ -219,7 +215,7 @@ cross join unnest(metadata) as m
 cross join unnest(m.response) as response
 cross join unnest(m.request) as request
 ${where}
-LIMIT 100
+limit 100
 `
 
     default:
@@ -287,14 +283,12 @@ export const LOGS_TABLES = {
   fn_edge: LogsTableName.FN_EDGE,
 }
 
-
 export const LOGS_SOURCE_DESCRIPTION = {
-  [LogsTableName.EDGE]: "Logs obtained from the network edge, containing all API requests.",
-  [LogsTableName.POSTGRES]: "Database logs obtained directly from Postgres." ,
-  [LogsTableName.FUNCTIONS]: "Function logs generated from runtime execution.",
-  [LogsTableName.FN_EDGE]: "Function call logs, containing the request and response.",
+  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests.',
+  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
+  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
+  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
 }
-
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
