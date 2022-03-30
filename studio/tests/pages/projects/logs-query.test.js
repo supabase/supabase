@@ -40,8 +40,11 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import { useFlag } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
+useStore.mockImplementation(() => ({
+  content: jest.fn(),
+}))
 
 import { SWRConfig } from 'swr'
 import { LogsExplorerPage as Page } from 'pages/project/[ref]/logs-explorer/index'
@@ -77,9 +80,19 @@ test('can display log data', async () => {
       }),
     ],
   })
-  render(<LogsExplorerPage />)
-  fireEvent.click(await screen.findByText(/some-event-happened/))
-  await screen.findByText(/my_key/)
+  const {container} = render(<LogsExplorerPage />)
+  let editor = container.querySelector('.monaco-editor')
+  await waitFor(() => {
+    editor = container.querySelector('.monaco-editor')
+    expect(editor).toBeTruthy()
+  })
+  // type new query
+  userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
+
+  userEvent.click(await screen.findByText(/Run/))
+  const row  = await screen.findByText("some-event-happened")
+  screen.debug()
+  userEvent.click(row)
   await screen.findByText(/something_value/)
 })
 
