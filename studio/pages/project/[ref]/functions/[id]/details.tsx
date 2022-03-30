@@ -196,9 +196,9 @@ const PageLayout = () => {
               </div>
               <h4>Command line access</h4>
             </div>
-            <h5 className="text-sm text-base">Deployment management</h5>
+            <h5 className="text-base">Deployment management</h5>
             <CommandRender commands={managementCommands} />
-            <h5 className="text-sm text-base">Secrets management</h5>
+            <h5 className="text-base">Secrets management</h5>
             <CommandRender commands={secretCommands} />
           </div>
         </div>

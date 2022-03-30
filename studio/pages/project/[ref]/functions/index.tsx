@@ -2,29 +2,16 @@ import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 
 import FunctionsLayout from './interfaces/FunctionsLayout'
-import {
-  Button,
-  IconBookOpen,
-  IconChevronRight,
-  IconClipboard,
-  IconCopy,
-  IconExternalLink,
-  IconGlobe,
-  IconSearch,
-  IconTerminal,
-  Input,
-  Loading,
-} from '@supabase/ui'
-import { useEffect, useState } from 'react'
+import { Button, IconBookOpen, IconSearch, IconTerminal, Input, Loading } from '@supabase/ui'
+import { useEffect } from 'react'
 import Table from 'components/to-be-cleaned/Table'
-import { memoryUsage } from 'process'
+
 import FunctionsListItem from './interfaces/FunctionsListItem'
 import { useRouter } from 'next/router'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectFunctionsStore } from 'stores/projectFunctionsStore'
-import { toJS } from 'mobx'
+
 import CommandRender from './interfaces/CommandRender'
 import Link from 'next/link'
 

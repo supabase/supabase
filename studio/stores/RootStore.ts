@@ -29,6 +29,7 @@ export class RootStore implements IRootStore {
 
   constructor() {
     this.ui = new UiStore(this)
+    // @ts-ignore
     this.content = new ProjectContentStore(this, { projectRef: '' })
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
@@ -49,6 +50,7 @@ export class RootStore implements IRootStore {
       () => this.ui.selectedProject,
       (selectedProject) => {
         if (selectedProject) {
+          // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
           this.functions = new ProjectFunctionsStore(this, { projectRef: selectedProject.ref })
           this.meta = new MetaStore(this, {
@@ -56,6 +58,7 @@ export class RootStore implements IRootStore {
             connectionString: selectedProject.connectionString ?? '',
           })
         } else {
+          // @ts-ignore
           this.content = new ProjectContentStore(this, { projectRef: '' })
           this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
           this.meta = new MetaStore(this, {
