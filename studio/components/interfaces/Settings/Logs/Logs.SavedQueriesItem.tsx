@@ -60,9 +60,10 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
             'bg-scale-100 border-l border-r !pt-0 !pb-0 text-scale-1200 transition-all expanded-row-content ' +
             (expand ? ' h-auto opacity-100' : 'h-0 opacity-0')
           }
+          colSpan={5}
         >
           {/* <CodeEditor defaultValue={item.content.sql} language="pgsql" classname /> */}
-          <pre className="text-sm break-words py-4 px-3">{item.content.sql}</pre>
+          <pre className="text-sm break-words py-4 px-3 ">{item.content.sql}</pre>
         </td>
       </>
     </>
