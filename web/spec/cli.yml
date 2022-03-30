@@ -93,7 +93,6 @@ info:
       - name: 'About'
         items:
           - index
-          - Config reference
       - name: 'Command reference'
         items:
           - supabase help
@@ -117,6 +116,12 @@ info:
           - supabase functions new
           - supabase functions serve
           - supabase migration new
+          - supabase secrets list
+          - supabase secrets set
+          - supabase secrets unset
+      - name: 'Config reference'
+        items:
+          - Config reference
 
 pages:
   supabase help:
