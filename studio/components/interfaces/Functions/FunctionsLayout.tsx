@@ -10,7 +10,7 @@ import Link from 'next/link'
 import WarningBanner from 'components/ui/WarningBanner'
 import { WARNING_MESSAGE } from './Functions.constants'
 
-const PageLayout = ({ children, centered }: { children?: React.ReactNode; centered?: boolean }) => {
+const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
   const router = useRouter()
 
@@ -32,6 +32,9 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
 
   const item = id ? functions.byId(id) : null
   const name = item?.name || ''
+
+  const hasFunctions = functions.list().length > 0
+  const centered = !hasFunctions
 
   return (
     <BaseLayout>
@@ -138,4 +141,4 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
   )
 }
 
-export default withAuth(observer(PageLayout))
+export default withAuth(observer(FunctionsLayout))
