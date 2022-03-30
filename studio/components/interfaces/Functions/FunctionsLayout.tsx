@@ -7,7 +7,7 @@ import FunctionsNav from './FunctionsNav'
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import WarningBanner from 'components/ui/WarningBanner'
-import { WARNING_MESSAGE } from './Functions.Constants'
+import { WARNING_MESSAGE } from './Functions.constants'
 
 const PageLayout = ({ children, centered }: { children?: React.ReactNode; centered?: boolean }) => {
   const { functions, ui } = useStore()
