@@ -8,10 +8,10 @@ import { useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
-import FunctionsLayout from 'components/interfaces/functions/FunctionsLayout'
-import FunctionsListItem from 'components/interfaces/functions/FunctionsListItem'
-import CommandRender from 'components/interfaces/functions/CommandRender'
-import { Function } from 'components/interfaces/functions/Functions.types'
+import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsListItem from 'components/interfaces/Functions/FunctionsListItem'
+import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { Function } from 'components/interfaces/Functions/Functions.types'
 
 const EmptyFunctions = () => {
   const router = useRouter()
