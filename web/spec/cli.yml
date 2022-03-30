@@ -8,6 +8,7 @@ info:
 
     - [x] Running Supabase locally
     - [x] Managing database migrations
+    - [x] Creating and developing Edge Functions
     - [x] Pushing your local changes to production
     - [ ] Manage your Supabase Account
     - [ ] Manage your Supabase Projects
@@ -95,8 +96,11 @@ info:
       - name: 'Command reference'
         items:
           - supabase help
+          - supabase login
+          - supabase link
           - supabase init
           - supabase start
+          - supabase stop
           - supabase db branch list
           - supabase db branch create
           - supabase db branch delete
@@ -107,7 +111,14 @@ info:
           - supabase db remote set
           - supabase db remote commit
           - supabase db push
+          - supabase functions delete
+          - supabase functions deploy
+          - supabase functions new
+          - supabase functions serve
           - supabase migration new
+          - supabase secrets list
+          - supabase secrets set
+          - supabase secrets unset
       - name: 'Config reference'
         items:
           - Config reference
@@ -122,6 +133,33 @@ pages:
         sh: |
           ```sh
           supabase help [command]
+          ```
+
+  supabase login:
+    description: |
+      Authenticate using an access token.
+
+      ### Generating a new access token
+
+      - Navigate to https://app.supabase.io/account/tokens
+      - Generate New Token
+      - Copy newly created token and past
+
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase login
+          ```
+
+  supabase link:
+    description: |
+      Link to a Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase link --ref abcdefghijklmnopqrst
           ```
 
   supabase init:
@@ -142,6 +180,16 @@ pages:
         sh: |
           ```sh
           supabase start
+          ```
+
+  supabase stop:
+    description: |
+      Stop the Supabase local development setup.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase stop
           ```
 
   supabase db branch list:
@@ -253,6 +301,46 @@ pages:
           supabase db push [--dry-run]
           ```
 
+  supabase functions delete:
+    description: |
+      Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions delete <Function name>
+          ```
+
+  supabase functions deploy:
+    description: |
+      Deploy a Function to the linked Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions deploy <Function name>
+          ```
+
+  supabase functions new:
+    description: |
+      Create a new Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions new <Function name>
+          ```
+
+  supabase functions serve:
+    description: |
+      Serve a Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions serve <Function name>
+          ```
+
   supabase migration new:
     description: |
       Create an empty migration.
@@ -261,6 +349,40 @@ pages:
         sh: |
           ```sh
           supabase migration new <migration name>
+          ```
+
+  supabase secrets list:
+    description: |
+      List all secrets in the linked project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets list
+          ```
+
+  supabase secrets set:
+    description: |
+      Set a secret(s) to the linked Supabase project.
+
+      Flags:
+
+      `--from-stdin`: Read secrets in .env format from stdin.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets set [flags] <NAME=VALUE> ...
+          ```
+
+  supabase secrets unset:
+    description: |
+      Unset a secret(s) from the linked Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets unset <NAME> ...
           ```
 
   Config reference:
