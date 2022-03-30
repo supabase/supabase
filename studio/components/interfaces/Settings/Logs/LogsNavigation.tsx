@@ -9,6 +9,7 @@ const LogsNavigation = () => {
 
   const indexRoute = 'query'
   const logsSourcesPage = useFlag('logsSourcesPage')
+  const logsSavedQueries = useFlag('logsSavedQueries')
   return (
     <Tabs
       defaultActiveId="1"
@@ -22,7 +23,7 @@ const LogsNavigation = () => {
       <Tabs.Panel id="query" label="Query" />
       {logsSourcesPage && <Tabs.Panel id="sources" label="Sources" />}
       {/* <Tabs.Panel id="recent" label={'Recent'} /> */}
-      <Tabs.Panel id="saved" label="Saved" />
+      {logsSavedQueries && <Tabs.Panel id="saved" label="Saved" />}
       <Tabs.Panel id="templates" label="Templates" />
     </Tabs>
   )
