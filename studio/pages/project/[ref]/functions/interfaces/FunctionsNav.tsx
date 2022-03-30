@@ -1,6 +1,7 @@
 import { Tabs } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
+// @ts-ignore
 const FunctionsNav = ({ item }) => {
   const router = useRouter()
   const activeRoute = router.pathname.split('/')[5]

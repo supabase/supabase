@@ -134,6 +134,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     }
   }
 
+  // @ts-ignore
   async create(payload: any) {
     try {
       const headers = {
