@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 
-import FunctionLayout from './../interfaces/FunctionLayout'
-import CommandRender from '../interfaces/CommandRender'
+import FunctionLayout from '../../../../../components/interfaces/functions/FunctionLayout'
+import CommandRender from '../../../../../components/interfaces/functions/CommandRender'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toJS } from 'mobx'
