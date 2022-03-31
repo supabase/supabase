@@ -44,26 +44,22 @@ const featureHighlights = [
   {
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '1..8',
   },
   {
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '11..23',
   },
   {
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '28',
   },
   {
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-  },
-  {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-  },
-  {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '31',
   },
 ]
 
@@ -85,9 +81,7 @@ function Database() {
   const meta_title = `${title}`
   const meta_description = subtitle
 
-  const highlightLines = ['1..8', '11..23', '28', '31']
-
-  const [currentSelection, setCurrentSelection] = useState(highlightLines[0])
+  const [currentSelection, setCurrentSelection] = useState(featureHighlights[0].highlightLines)
 
   return (
     <>
@@ -146,34 +140,26 @@ function Database() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
-                  <button
-                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
-                    onClick={() => setCurrentSelection(highlightLines[0])}
-                  >
-                    <div className="text-scale-1200">Title is here</div>
-                    <div className="text-scale-1100">Description in here</div>
-                  </button>
-                  <button
-                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
-                    onClick={() => setCurrentSelection(highlightLines[1])}
-                  >
-                    <div className="text-scale-1200">Title is here</div>
-                    <div className="text-scale-1100">Description in here</div>
-                  </button>
-                  <button
-                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
-                    onClick={() => setCurrentSelection(highlightLines[2])}
-                  >
-                    <div className="text-scale-1200">Title is here</div>
-                    <div className="text-scale-1100">Description in here</div>
-                  </button>
-                  <button
-                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
-                    onClick={() => setCurrentSelection(highlightLines[3])}
-                  >
-                    <div className="text-scale-1200">Title is here</div>
-                    <div className="text-scale-1100">Description in here</div>
-                  </button>
+                  {featureHighlights.map((feat, i) => {
+                    const active = currentSelection == feat.highlightLines
+                    return (
+                      <button
+                        key={`featureHighlighted-${i}`}
+                        className={
+                          'transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-300 hover:boder' +
+                          (active ? ' bg-scale-300' : ' border-transparent')
+                        }
+                        onClick={() => setCurrentSelection(feat.highlightLines)}
+                      >
+                        <div className={' ' + (active ? ' text-scale-1200' : ' text-scale-1100')}>
+                          Title is here
+                        </div>
+                        <div className={active ? ' text-scale-1200' : ' text-scale-900'}>
+                          Description in here
+                        </div>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
               <div className="col-span-7 overflow-hidden">
