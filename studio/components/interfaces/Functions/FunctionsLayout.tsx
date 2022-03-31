@@ -37,17 +37,29 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
     <BaseLayout>
       {centered ? (
         <>
-          <WarningBanner title={WARNING_MESSAGE.title} description={WARNING_MESSAGE.description} />
           <div className="mx-auto max-w-5xl py-24 px-5">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
+            <div
+              className="flex 
+            flex-col 
+            gap-y-4
+            xl:flex-row 
+            item-center 
+            justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
             flex items-center justify-center
           "
-              >
-                <IconCode size={14} strokeWidth={3} />
+                >
+                  <IconCode size={14} strokeWidth={3} />
+                </div>
+                <h1 className="text-2xl text-scale-1200">Functions</h1>
               </div>
-              <h1 className="text-2xl text-scale-1200">Functions</h1>
+              <WarningBanner
+                title={WARNING_MESSAGE.title}
+                description={WARNING_MESSAGE.description}
+              />
             </div>
 
             {children}
