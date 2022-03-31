@@ -40,11 +40,11 @@ import TweetCard from '~/components/TweetCard'
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
 
-const featureHighlights = [
+const featureBlocks = [
   {
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-    highlightLines: '1..8',
+    highlightLines: '8',
   },
   {
     title: 'Title of thing',
@@ -60,6 +60,46 @@ const featureHighlights = [
     title: 'Title of thing',
     description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
     highlightLines: '31',
+  },
+  {
+    title: 'Title of thing',
+    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '31',
+  },
+  {
+    title: 'Title of thing',
+    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    highlightLines: '31',
+  },
+]
+
+const featureHighlights = [
+  {
+    title: 'Run a function from anywhere',
+    description: `It's as easy as running serve()`,
+    highlightLines: '1,5',
+  },
+  {
+    title: 'Set authentication',
+    description: 'Use the JWT token to set the authentication of the user',
+    highlightLines: '15..20',
+  },
+  {
+    title: 'Use anything from Supabase',
+    description:
+      'supabase-js can interact with any part of the Supabase stack from Edge Functions, while respecting auth row level security policies.',
+    highlightLines: '22..27',
+  },
+  {
+    title: 'Use secrets to store senstive keys',
+    description:
+      'Set and edit secrets via the CLI, which can then be accessed via enviroment variables.',
+    highlightLines: '7..13',
+  },
+  {
+    title: 'No limits',
+    description: `You're can empowered to run whatever logic you like using any data from the Supabase database.`,
+    highlightLines: '29..39',
   },
 ]
 
@@ -130,10 +170,10 @@ function Database() {
 
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid grid-cols-12 gap-32">
+            <div className="grid grid-cols-12 gap-32 items-center">
               <div className="flex flex-col col-span-5 gap-8">
                 <div>
-                  <h3 className="h3">Anatomy of the Edge</h3>
+                  <h3 className="h2">Anatomy of the Edge</h3>
                   <p className="p">
                     Create asynchronous tasks within minutes using Supabase Functions with easy
                     access to the rest of the Supabase Ecosystem.
@@ -146,16 +186,32 @@ function Database() {
                       <button
                         key={`featureHighlighted-${i}`}
                         className={
-                          'transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-300 hover:boder' +
-                          (active ? ' bg-scale-300' : ' border-transparent')
+                          'group transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder' +
+                          (active
+                            ? ' bg-white dark:bg-scale-400 border-scale-500'
+                            : ' border-scale-300')
                         }
                         onClick={() => setCurrentSelection(feat.highlightLines)}
                       >
-                        <div className={' ' + (active ? ' text-scale-1200' : ' text-scale-1100')}>
-                          Title is here
+                        <div
+                          className={
+                            'transition-colors ' +
+                            (active
+                              ? ' text-scale-1200'
+                              : ' text-scale-900 group-hover:text-scale-1200')
+                          }
+                        >
+                          {feat.title}
                         </div>
-                        <div className={active ? ' text-scale-1200' : ' text-scale-900'}>
-                          Description in here
+                        <div
+                          className={
+                            'transition-colors text-sm ' +
+                            (active
+                              ? ' text-scale-1100'
+                              : ' text-scale-800 group-hover:text-scale-1100 ')
+                          }
+                        >
+                          {feat.description}
                         </div>
                       </button>
                     )
@@ -165,58 +221,50 @@ function Database() {
               <div className="col-span-7 overflow-hidden">
                 <ScrollableCodeBlock
                   lang="ts"
-                  highlightLines={currentSelection}
+                  highlightLines={currentSelection ? currentSelection : undefined}
                   showToolbar
                   hideCopy
                 >
-                  {`import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
-import { stripe } from "../_utils/stripe.ts";
+                  {`import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
+import Stripe from 'https://esm.sh/stripe?target=deno&no-check'
+import { Customer } from 'types'
 
 serve(async (req) => {
   try {
-    // Get the authorization header from the request.
-    // When you invoke the function via the client library it will automatically pass the authenticated user's JWT.
-    const authHeader = req.headers.get("Authorization")!;
-
-    // Create a Supabase client with the Auth context of the logged in user.
+    // create a supabase client
     const supabaseClient = createClient(
-      // Supabase API URL - env var exported by default.
-      Deno.env.get("SUPABASE_URL") ?? "",
-      // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      // Create client with Auth context of the user that called the function.
-      // This way your row-level-security (RLS) policies are applied.
-      { headers: { Authorization: authHeader } }
-    );
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    )
+    // create a stripe client
+    const stripe = Stripe(Deno.env.get('STRIPE_SECRET_KEY'))
 
+    // Get the authorization header from the request.
+    const authHeader = req.headers.get('Authorization')!
+    // Client now respects auth policies for this user
     supabaseClient.auth.setAuth(authHeader)
+    // set the user profile
+    const user = supabase.auth.user()
 
-    // Check if the user already has a Stripe customer ID in the Database.
+    // Retrieve user metadata that only the user is allowed to select
     const { data, error } = await supabaseClient
-      .from<Customer>("customers")
-      .select("*");
-    console.log(data?.length, data, error);
-    if (error) throw error;
-    if (data?.length === 1) {
-      // Exactly one customer found, return it.
-      const customer = data[0].stripe_customer_id;
-      console.log(\`Found customer id: \${customer}\`);
-      return customer;
-    }
+      .from<Customer>('user_profiles')
+      .select('address, tax, billing_email, phone')
 
-    // Create a PaymentIntent so that the SDK can charge the logged in customer.
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 1099,
-      currency: "usd",
-      customer: customer,
-    });
+    if (error) throw error
 
-    
-    return new Response(JSON.stringify(res), { status: 200 });
+    const customer = await stripe.customers.create({
+      description: 'My First Stripe Customer (created by a Supabase edge function)',
+      phone: data.phone,
+      address: data.address,
+      email: user.email,
+    })
+
+    return new Response(JSON.stringify(customer), { status: 200 })
   } catch (error) {
-    return new Response(JSON.stringify(error), { status: 400 });
+    return new Response(JSON.stringify(error), { status: 400 })
   }
-});`}
+})`}
                 </ScrollableCodeBlock>
               </div>
             </div>
@@ -231,7 +279,7 @@ serve(async (req) => {
             </div>
 
             <div className="grid grid-cols-3 gap-8 rounded">
-              {featureHighlights.map((item) => {
+              {featureBlocks.map((item) => {
                 return (
                   <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
                     <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">

@@ -3,6 +3,7 @@
 }
 
 .code-line {
+  @apply block;
   transition: filter 500ms ease, opacity 500ms ease;
   transition-delay: 200ms;
 }
@@ -38,4 +39,8 @@
 .code-block code::after,
 .code-block code::before {
   content: none !important;
+}
+
+.code-line--flash {
+  @apply animate-flash-code-slow;
 }
