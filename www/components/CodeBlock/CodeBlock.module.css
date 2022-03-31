@@ -1,5 +1,5 @@
 .code-block {
-  @apply rounded-lg overflow-hidden;
+  @apply rounded-lg overflow-auto;
   @apply border border-scale-500;
 }
 

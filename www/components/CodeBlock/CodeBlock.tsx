@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
+import reactSyntaxHighlighter, { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
 import CodeBlockStyles from './CodeBlock.module.css'
 import { Button, IconCopy } from '@supabase/ui'
@@ -18,6 +18,11 @@ interface Props {
   className?: string
   children?: string
   size?: 'small' | 'medium' | 'large'
+  /**
+   * Inline styling
+   * Supports CSS Properties in camelcase
+   */
+  style?: React.CSSProperties | undefined
   /**
    * Lines to be highlighted.
    * Supports individual lines: '14', multiple lines: '14,15', or a range of lines '14..19'
@@ -76,6 +81,7 @@ function CodeBlock(props: Props) {
           lineHeight: large ? 1.2 : 1.2,
           borderTop: '1px solid #393939',
           background: '#181818',
+          ...props.style,
         }}
         showLineNumbers={lang === 'cli' ? false : true}
         lineNumberContainerStyle={{
