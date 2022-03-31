@@ -56,15 +56,11 @@ function CodeBlock(props: Props) {
 
   const lineProps = useCallback(
     (lineNumber: number) => {
-      const shouldHighlightLine = highlightLines.has(lineNumber)
+      const shouldHighlightLine = !shouldHighlightLines || highlightLines.has(lineNumber)
 
-      const transition = `filter 500ms ease, opacity 500ms ease`
+      const style = shouldHighlightLine ? {} : { filter: 'grayscale(75%)', opacity: 0.5 }
 
-      const style = shouldHighlightLine
-        ? { transition }
-        : { transition, filter: 'grayscale(75%)', opacity: 0.5 }
-
-      return { style }
+      return { class: CodeBlockStyles['code-line'], style }
     },
     [highlightLines]
   )
@@ -88,6 +84,8 @@ function CodeBlock(props: Props) {
           paddingTop: '128px',
         }}
         lineNumberStyle={{
+          display: 'inline-flex',
+          justifyContent: 'flex-end',
           minWidth: '48px',
           background: '#1e1e1e',
           paddingLeft: '21px',
@@ -97,7 +95,7 @@ function CodeBlock(props: Props) {
           paddingTop: '4px',
           paddingBottom: '4px',
         }}
-        wrapLines={shouldHighlightLines}
+        wrapLines={true}
         lineProps={lineProps}
       >
         {props.children}
