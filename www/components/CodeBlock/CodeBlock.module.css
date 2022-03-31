@@ -1,6 +1,10 @@
 .code-block {
   @apply overflow-hidden rounded-lg;
-  @apply border border-scale-500;
+  @apply border;
+}
+
+.code-block--show-toolbar {
+  @apply rounded-t-none !important;
 }
 
 .code-line {
