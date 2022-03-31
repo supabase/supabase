@@ -9,7 +9,9 @@ Supabase™ is a trademark of Supabase Inc.
 
 If you're a creator/contributor to one of these packages, thanks!
 
-Last updated: 2022-03-24
+Last updated: 2022-03-29
+
+JavaScript/TypeScript
 
 --  ------------------------------------  ----------------------  --------------------------------------------------------------------  ---------------------------------------------------------------------------------------  -------------------------
  0  lodash@4.17.21                        MIT                     https://github.com/lodash/lodash                                      https://github.com/lodash/lodash/raw/master/LICENSE                                      @supabase/ui
@@ -110,3 +112,298 @@ Last updated: 2022-03-24
 95  stripe@8.145.0                        MIT                     https://github.com/stripe/stripe-node                                 https://github.com/stripe/stripe-node/raw/master/LICENSE                                 stripe-sync-engine
 96  yesql@5.0.0                           ISC                     https://github.com/pihvi/yesql                                        https://github.com/pihvi/yesql                                                           stripe-sync-engine
 --  ------------------------------------  ----------------------  --------------------------------------------------------------------  ---------------------------------------------------------------------------------------  -------------------------
+
+
+Elixir
+
+Id  Name                               Version  License
+--  ---------------------------------  -------  ----------
+ 0  castore                            0.1.11   Apache 2.0
+ 1  certifi                            2.5.3    BSD
+ 2  combine                            0.10.0   MIT
+ 3  connection                         1.1.0    Apache 2.0
+ 4  cowboy                             2.8.0    ISC
+ 5  cowboy_telemetry                   0.3.1    Apache 2.0
+ 6  cowlib                             2.9.1    ISC
+ 7  db_connection                      2.4.1    Apache 2.0
+ 8  decimal                            2.0.0    Apache 2.0
+ 9  ecto                               3.7.1    Apache 2.0
+10  ecto_sql                           3.7.1    Apache 2.0
+11  epgsql                             4.6.0    BSD
+12  file_system                        0.2.10   WTFPL
+13  finch                              0.7.0    MIT
+14  gettext                            0.18.2   Apache 2.0
+15  hackney                            1.17.0   Apache 2.0
+16  httpoison                          1.8.0    MIT
+17  idna                               6.1.1    MIT
+18  jason                              1.2.2    Apache 2.0
+19  joken                              2.3.0    Apache 2.0
+20  jose                               1.11.1   MIT
+21  metrics                            1.0.1    BSD
+22  mime                               1.5.0    Apache 2.0
+23  mimerl                             1.2.0    MIT
+24  mint                               1.3.0    Apache 2.0
+25  nimble_options                     0.3.5    Apache 2.0
+26  nimble_pool                        0.2.4    Apache 2.0
+27  parse_trans                        3.3.1    Apache 2.0
+28  phoenix                            1.5.8    MIT
+29  phoenix_html                       2.14.3   MIT
+30  phoenix_live_reload                1.3.0    MIT
+31  phoenix_pubsub                     2.0.0    MIT
+32  plug                               1.11.0   Apache 2.0
+33  plug_cowboy                        2.4.1    Apache 2.0
+34  plug_crypto                        1.2.1    Apache 2.0
+35  postgrex                           0.15.13  Apache 2.0
+36  prom_ex                            1.3.0    MIT
+37  ranch                              1.7.1    ISC
+38  retry                              0.14.1   Apache 2.0
+39  ssl_verify_fun                     1.1.6    MIT
+40  telemetry                          0.4.2    Apache 2.0
+41  telemetry_metrics                  0.6.1    Apache 2.0
+42  telemetry_metrics_prometheus_core  1.0.1    Apache 2.0
+43  telemetry_poller                   0.5.1    Apache 2.0
+44  timex                              3.6.3    MIT
+45  tzdata                             1.0.5    MIT
+46  unicode_util_compat                0.7.0    Apache 2.0
+47  bunt                               0.2.0    MIT
+48  credo                              1.5.5    MIT
+49  dialyxir                           1.1.0    Apache 2.0
+50  earmark_parser                     1.4.12   Apache 2.0
+51  erlex                              0.2.6    Apache 2.0
+52  ex_doc                             0.24.1   Apache 2.0
+53  file_system                        0.2.10   WTFPL
+54  jason                              1.2.2    Apache 2.0
+55  makeup                             1.0.5    BSD
+56  makeup_elixir                      0.15.1   BSD
+57  makeup_erlang                      0.1.1    BSD
+58  nimble_parsec                      1.1.0    Apache 2.0
+59  warpath                            0.6.0    MIT
+--  ---------------------------------  -------  ----------
+
+Go
+
+ID   Package Link                                                 Version                                
+---  -----------------------------------------------------------  -------------------------------------  
+License Type
+------------------------------------------------------
+  0  github.com/BurntSushi/toml                                   v1.0.0                                 MIT
+  1  github.com/adrg/xdg                                          v0.4.0                                 MIT
+  2  github.com/alecthomas/chroma                                 v0.10.0                                MIT
+  3  github.com/aymerick/douceur                                  v0.2.0                                 MIT
+  4  github.com/charmbracelet/bubbles                             v0.10.3                                MIT
+  5  github.com/charmbracelet/bubbletea                           v0.20.0                                MIT
+  6  github.com/charmbracelet/glamour                             v0.5.0                                 MIT
+  7  github.com/charmbracelet/harmonica                           v0.1.0                                 MIT
+  8  github.com/charmbracelet/lipgloss                            v0.5.0                                 MIT
+  9  github.com/containerd/console                                v1.0.3                                 Apache 2.0
+ 10  github.com/containerd/containerd                             v1.6.2                                 Apache 2.0
+ 11  github.com/dlclark/regexp2                                   v1.4.0                                 MIT
+ 12  github.com/docker/distribution                               v2.8.1                                 Apache 2.0
+ 13  github.com/docker/docker                                     v20.10.14                              Apache 2.0,MIT
+ 14  github.com/docker/go-connections                             v0.4.0                                 Apache 2.0
+ 15  github.com/docker/go-units                                   v0.4.0                                 Apache 2.0
+ 16  github.com/fsnotify/fsnotify                                 v1.5.1                                 New BSD
+ 17  github.com/gogo/protobuf                                     v1.3.2                                 New BSD
+ 18  github.com/golang/protobuf                                   v1.5.2                                 New BSD
+ 19  github.com/gorilla/css                                       v1.0.0                                 New BSD
+ 20  github.com/hashicorp/hcl                                     v1.0.0                                 Mozilla Public License 2.0
+ 21  github.com/jackc/chunkreader/v2                              v2.0.1                                 MIT
+ 22  github.com/jackc/pgconn                                      v1.11.0                                MIT
+ 23  github.com/jackc/pgio                                        v1.0.0                                 MIT
+ 24  github.com/jackc/pgpassfile                                  v1.0.0                                 MIT
+ 25  github.com/jackc/pgproto3/v2                                 v2.2.0                                 MIT
+ 26  github.com/jackc/pgservicefile                               v0.0.0-20200714003250-2b9c44734f2b     MIT
+ 27  github.com/jackc/pgtype                                      v1.10.0                                MIT
+ 28  github.com/jackc/pgx/v4                                      v4.15.0                                MIT
+ 29  github.com/joho/godotenv                                     v1.4.0                                 MIT
+ 30  github.com/lucasb-eyer/go-colorful                           v1.2.0                                 MIT
+ 31  github.com/magiconair/properties                             v1.8.6                                 Simplified BSD
+ 32  github.com/mattn/go-isatty                                   v0.0.14                                MIT
+ 33  github.com/mattn/go-runewidth                                v0.0.13                                MIT
+ 34  github.com/microcosm-cc/bluemonday                           v1.0.18                                New BSD
+ 35  github.com/mitchellh/mapstructure                            v1.4.3                                 MIT
+ 36  github.com/moby/term                                         v0.0.0-20210619224110-3f7ff695adc6     Apache 2.0
+ 37  github.com/morikuni/aec                                      v1.0.0                                 MIT
+ 38  github.com/muesli/ansi                                       v0.0.0-20211031195517-c9f0611b6c70     MIT
+ 39  github.com/muesli/reflow                                     v0.3.0                                 MIT
+ 40  github.com/muesli/termenv                                    v0.11.1-0.20220212125758-44cd13922739  MIT
+ 41  github.com/olekukonko/tablewriter                            v0.0.5                                 MIT
+ 42  github.com/opencontainers/go-digest                          v1.0.0                                 Apache 2.0
+ 43  github.com/opencontainers/image-spec                         v1.0.2                                 Apache 2.0
+ 44  github.com/pelletier/go-toml                                 v1.9.4                                 Apache 2.0
+ 45  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+ 46  github.com/rivo/uniseg                                       v0.2.0                                 MIT
+ 47  github.com/sirupsen/logrus                                   v1.8.1                                 MIT
+ 48  github.com/spf13/afero                                       v1.8.2                                 Apache 2.0
+ 49  github.com/spf13/cast                                        v1.4.1                                 MIT
+ 50  github.com/spf13/cobra                                       v1.4.0                                 Apache 2.0
+ 51  github.com/spf13/jwalterweatherman                           v1.1.0                                 MIT
+ 52  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+ 53  github.com/spf13/viper                                       v1.10.1                                MIT
+ 54  github.com/subosito/gotenv                                   v1.2.0                                 MIT
+ 55  github.com/withfig/autocomplete-tools/packages/cobra         v1.1.3                                 MIT
+ 56  github.com/yuin/goldmark                                     v1.4.11                                MIT
+ 57  github.com/yuin/goldmark-emoji                               v1.0.1                                 MIT
+ 58  golang.org/x/crypto                                          v0.0.0-20220321153916-2c7772ba3064     New BSD
+ 59  golang.org/x/net                                             v0.0.0-20220225172249-27dd8689420f     New BSD
+ 60  golang.org/x/sys                                             v0.0.0-20220319134239-a9b59b0215f8     New BSD
+ 61  golang.org/x/term                                            v0.0.0-20210927222741-03fcf44c2211     New BSD
+ 62  golang.org/x/text                                            v0.3.7                                 New BSD
+ 63  google.golang.org/genproto                                   v0.0.0-20220323144105-ec3c684e5b14     Apache 2.0
+ 64  google.golang.org/grpc                                       v1.45.0                                Apache 2.0
+ 65  google.golang.org/protobuf                                   v1.28.0                                New BSD
+ 66  gopkg.in/ini.v1                                              v1.66.4                                Apache 2.0
+ 67  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+ 68  github.com/aws/aws-sdk-go-v2                                 v1.8.0                                 Apache 2.0,New BSD
+ 69  github.com/aws/aws-sdk-go-v2/config                          v1.6.0                                 Apache 2.0
+ 70  github.com/aws/aws-sdk-go-v2/credentials                     v1.3.2                                 Apache 2.0
+ 71  github.com/aws/aws-sdk-go-v2/feature/ec2/imds                v1.4.0                                 Apache 2.0
+ 72  github.com/aws/aws-sdk-go-v2/internal/ini                    v1.2.0                                 Apache 2.0
+ 73  github.com/aws/aws-sdk-go-v2/service/internal/presigned-url  v1.2.2                                 Apache 2.0
+ 74  github.com/aws/aws-sdk-go-v2/service/secretsmanager          v1.5.0                                 Apache 2.0
+ 75  github.com/aws/aws-sdk-go-v2/service/sso                     v1.3.2                                 Apache 2.0
+ 76  github.com/aws/aws-sdk-go-v2/service/sts                     v1.6.1                                 Apache 2.0
+ 77  github.com/aws/smithy-go                                     v1.7.0                                 Apache 2.0
+ 78  github.com/coreos/go-semver                                  v0.3.0                                 Apache 2.0
+ 79  github.com/coreos/go-systemd/v22                             v22.3.2                                Apache 2.0
+ 80  github.com/fsnotify/fsnotify                                 v1.4.9                                 New BSD
+ 81  github.com/gogo/protobuf                                     v1.3.2                                 New BSD
+ 82  github.com/golang/protobuf                                   v1.5.2                                 New BSD
+ 83  github.com/hashicorp/hcl                                     v1.0.0                                 Mozilla Public License 2.0
+ 84  github.com/magiconair/properties                             v1.8.5                                 Simplified BSD
+ 85  github.com/mitchellh/mapstructure                            v1.4.1                                 MIT
+ 86  github.com/pelletier/go-toml                                 v1.9.3                                 Apache 2.0
+ 87  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+ 88  github.com/spf13/afero                                       v1.6.0                                 Apache 2.0
+ 89  github.com/spf13/cast                                        v1.3.1                                 MIT
+ 90  github.com/spf13/cobra                                       v1.2.1                                 Apache 2.0,GPLv2,GPLv3,LGPL,MIT,New BSD,Simplified BSD
+ 91  github.com/spf13/jwalterweatherman                           v1.1.0                                 MIT
+ 92  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+ 93  github.com/spf13/viper                                       v1.8.1                                 MIT
+ 94  github.com/subosito/gotenv                                   v1.2.0                                 MIT
+ 95  go.etcd.io/etcd/api/v3                                       v3.5.0                                 Apache 2.0
+ 96  go.etcd.io/etcd/client/pkg/v3                                v3.5.0                                 Apache 2.0
+ 97  go.etcd.io/etcd/client/v3                                    v3.5.0                                 Apache 2.0
+ 98  go.uber.org/atomic                                           v1.9.0                                 MIT
+ 99  go.uber.org/multierr                                         v1.7.0                                 MIT
+100  go.uber.org/zap                                              v1.19.0                                MIT
+101  golang.org/x/net                                             v0.0.0-20210405180319-a5a99cb37ef4     New BSD
+102  golang.org/x/sys                                             v0.0.0-20210603081109-ebe580a85c40     New BSD
+103  golang.org/x/text                                            v0.3.5                                 New BSD
+104  google.golang.org/genproto                                   v0.0.0-20210602131652-f16073e35f0c     Apache 2.0
+105  google.golang.org/grpc                                       v1.38.0                                Apache 2.0
+106  google.golang.org/protobuf                                   v1.26.0                                New BSD
+107  gopkg.in/ini.v1                                              v1.62.0                                Apache 2.0
+108  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+109  github.com/coreos/go-oidc                                    v2.2.1                                 Apache 2.0
+110  github.com/kelseyhightower/envconfig                         v1.4.0                                 MIT
+111  github.com/pquerna/cachecontrol                              v0.0.0-20180517163645-1555304b9b35     Apache 2.0
+112  golang.org/x/crypto                                          v0.0.0-20200709230013-948cd5f35899     New BSD
+113  golang.org/x/net                                             v0.0.0-20200707034311-ab3426394381     New BSD
+114  golang.org/x/oauth2                                          v0.0.0-20200107190931-bf48bf16ab8d     New BSD
+115  gopkg.in/square/go-jose.v2                                   v2.5.1                                 Apache 2.0,New BSD
+116  cloud.google.com/go                                          v0.67.0                                Apache 2.0,New BSD
+117  github.com/GoogleCloudPlatform/cloudsql-proxy                v0.0.0-20170623214735-571947b0f240     Apache 2.0
+118  github.com/Masterminds/semver/v3                             v3.1.1                                 MIT
+119  github.com/aymerick/douceur                                  v0.2.0                                 MIT
+120  github.com/badoux/checkmail                                  v0.0.0-20170203135005-d0a759655d62     MIT
+121  github.com/beevik/etree                                      v1.1.0                                 Simplified BSD
+122  github.com/coreos/go-oidc/v3                                 v3.0.0                                 Apache 2.0
+123  github.com/didip/tollbooth/v5                                v5.1.1                                 MIT
+124  github.com/fatih/color                                       v1.10.0                                MIT
+125  github.com/fatih/structs                                     v1.1.0                                 MIT
+126  github.com/go-chi/chi                                        v4.0.2                                 MIT
+127  github.com/go-sql-driver/mysql                               v1.5.0                                 Mozilla Public License 2.0
+128  github.com/gobuffalo/envy                                    v1.9.0                                 MIT
+129  github.com/gobuffalo/fizz                                    v1.13.0                                MIT
+130  github.com/gobuffalo/flect                                   v0.2.2                                 MIT
+131  github.com/gobuffalo/github_flavored_markdown                v1.1.0                                 MIT,Simplified BSD
+132  github.com/gobuffalo/helpers                                 v0.6.1                                 MIT
+133  github.com/gobuffalo/nulls                                   v0.4.0                                 MIT
+134  github.com/gobuffalo/packd                                   v1.0.0                                 MIT
+135  github.com/gobuffalo/plush/v4                                v4.1.0                                 MIT
+136  github.com/gobuffalo/pop/v5                                  v5.3.3                                 MIT
+137  github.com/gobuffalo/tags/v3                                 v3.1.0                                 MIT
+138  github.com/gobuffalo/validate/v3                             v3.3.0                                 MIT
+139  github.com/gofrs/uuid                                        v4.0.0                                 MIT
+140  github.com/golang-jwt/jwt                                    v3.2.1                                 MIT
+141  github.com/golang/groupcache                                 v0.0.0-20200121045136-8c9f03a8e57e     Apache 2.0
+142  github.com/golang/protobuf                                   v1.4.2                                 New BSD
+143  github.com/googleapis/gax-go/v2                              v2.0.5                                 New BSD
+144  github.com/gorilla/context                                   v1.1.1                                 New BSD
+145  github.com/gorilla/css                                       v1.0.0                                 New BSD
+146  github.com/gorilla/securecookie                              v1.1.1                                 New BSD
+147  github.com/gorilla/sessions                                  v1.1.1                                 New BSD
+148  github.com/imdario/mergo                                     v0.0.0-20160216103600-3e95a51e0639     New BSD
+149  github.com/jackc/chunkreader/v2                              v2.0.1                                 MIT
+150  github.com/jackc/pgconn                                      v1.8.0                                 MIT
+151  github.com/jackc/pgio                                        v1.0.0                                 MIT
+152  github.com/jackc/pgpassfile                                  v1.0.0                                 MIT
+153  github.com/jackc/pgproto3/v2                                 v2.0.7                                 MIT
+154  github.com/jackc/pgservicefile                               v0.0.0-20200714003250-2b9c44734f2b     MIT
+155  github.com/jackc/pgtype                                      v1.6.2                                 MIT
+156  github.com/jackc/pgx/v4                                      v4.10.1                                MIT
+157  github.com/jmoiron/sqlx                                      v1.3.1                                 MIT
+158  github.com/joho/godotenv                                     v1.3.0                                 MIT
+159  github.com/jonboulle/clockwork                               v0.2.2                                 Apache 2.0
+160  github.com/kballard/go-shellquote                            v0.0.0-20180428030007-95032a82bc51     MIT
+161  github.com/kelseyhightower/envconfig                         v1.4.0                                 MIT
+162  github.com/lestrrat-go/jwx                                   v0.9.0                                 MIT
+163  github.com/luna-duclos/instrumentedsql                       v1.1.3                                 MIT
+164  github.com/mattermost/xml-roundtrip-validator                v0.1.0                                 Apache 2.0
+165  github.com/mattn/go-colorable                                v0.1.8                                 MIT
+166  github.com/mattn/go-isatty                                   v0.0.12                                MIT
+167  github.com/microcosm-cc/bluemonday                           v1.0.16                                New BSD
+168  github.com/mitchellh/mapstructure                            v1.1.2                                 MIT
+169  github.com/mrjones/oauth                                     v0.0.0-20190623134757-126b35219450     MIT
+170  github.com/netlify/mailme                                    v1.1.1                                 MIT
+171  github.com/netlify/netlify-commons                           v0.32.0                                MIT
+172  github.com/opentracing/opentracing-go                        v1.1.0                                 Apache 2.0
+173  github.com/patrickmn/go-cache                                v2.1.0                                 MIT
+174  github.com/philhofer/fwd                                     v1.0.0                                 MIT
+175  github.com/pkg/errors                                        v0.9.1                                 Simplified BSD
+176  github.com/rogpeppe/go-internal                              v1.8.0                                 New BSD
+177  github.com/rs/cors                                           v1.6.0                                 MIT
+178  github.com/russellhaering/gosaml2                            v0.6.1-0.20210916051624-757d23f1bc28   Apache 2.0
+179  github.com/russellhaering/goxmldsig                          v1.1.1                                 Apache 2.0
+180  github.com/sebest/xff                                        v0.0.0-20160910043805-6c115e0ffa35     MIT
+181  github.com/sergi/go-diff                                     v1.1.0                                 Apache 2.0,MIT
+182  github.com/sethvargo/go-password                             v0.2.0                                 MIT
+183  github.com/sirupsen/logrus                                   v1.7.0                                 MIT
+184  github.com/sourcegraph/annotate                              v0.0.0-20160123013949-f4cad6c6324d     New BSD
+185  github.com/sourcegraph/syntaxhighlight                       v0.0.0-20170531221838-bd320f5d308e     New BSD
+186  github.com/spf13/cobra                                       v1.1.3                                 Apache 2.0,GPLv2,GPLv3,LGPL,MIT,New BSD,Simplified BSD
+187  github.com/spf13/pflag                                       v1.0.5                                 New BSD
+188  github.com/tinylib/msgp                                      v1.1.0                                 MIT
+189  go.opencensus.io                                             v0.22.4                                Apache 2.0
+190  golang.org/x/crypto                                          v0.0.0-20201221181555-eec23a3978ad     New BSD
+191  golang.org/x/net                                             v0.0.0-20220121210141-e204ce36a2ba     New BSD
+192  golang.org/x/oauth2                                          v0.0.0-20200902213428-5d25da1a8d43     New BSD
+193  golang.org/x/sync                                            v0.0.0-20201207232520-09787c993a3a     New BSD
+194  golang.org/x/sys                                             v0.0.0-20211216021012-1d35b9e2eb4e     New BSD
+195  golang.org/x/text                                            v0.3.7                                 New BSD
+196  golang.org/x/time                                            v0.0.0-20200416051211-89c76fbcd5d1     New BSD
+197  golang.org/x/xerrors                                         v0.0.0-20200804184101-5ec99f83aff1     New BSD
+198  google.golang.org/api                                        v0.32.0                                New BSD
+199  google.golang.org/genproto                                   v0.0.0-20200929141702-51c3e5b607fe     Apache 2.0
+200  google.golang.org/grpc                                       v1.32.0                                Apache 2.0
+201  google.golang.org/protobuf                                   v1.25.0                                New BSD
+202  gopkg.in/DataDog/dd-trace-go.v1                              v1.12.1                                New BSD
+203  gopkg.in/gomail.v2                                           v2.0.0-20160411212932-81ebce5c23df     MIT
+204  gopkg.in/square/go-jose.v2                                   v2.5.1                                 Apache 2.0,New BSD
+205  gopkg.in/yaml.v2                                             v2.4.0                                 Apache 2.0,MIT
+206  github.com/aws/aws-sdk-go                                    v1.36.20                               Apache 2.0,New BSD
+207  github.com/beorn7/perks                                      v1.0.1                                 MIT
+208  github.com/cespare/xxhash/v2                                 v2.1.1                                 MIT
+209  github.com/golang/protobuf                                   v1.4.3                                 New BSD
+210  github.com/jmespath/go-jmespath                              v0.4.0                                 Apache 2.0
+211  github.com/matttproud/golang_protobuf_extensions             v1.0.1                                 Apache 2.0
+212  github.com/prometheus/client_golang                          v1.9.0                                 Apache 2.0
+213  github.com/prometheus/client_model                           v0.2.0                                 Apache 2.0
+214  github.com/prometheus/common                                 v0.15.0                                Apache 2.0,New BSD
+215  github.com/prometheus/procfs                                 v0.2.0                                 Apache 2.0
+216  github.com/sirupsen/logrus                                   v1.6.0                                 MIT
+217  golang.org/x/sys                                             v0.0.0-20201214210602-f9fddec55a1e     New BSD
+218  google.golang.org/protobuf                                   v1.23.0                                New BSD
+219  gopkg.in/yaml.v2                                             v2.3.0                                 Apache 2.0,MIT
+---  -----------------------------------------------------------  -------------------------------------  ------------------------------------------------------

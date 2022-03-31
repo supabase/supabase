@@ -106,3 +106,7 @@ typings/
 !docker/.env
 !docker/supabase/.env
 !docker/supabase-traefik/.env
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp

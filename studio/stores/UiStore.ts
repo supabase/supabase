@@ -9,6 +9,7 @@ export interface IUiStore {
   theme: 'dark' | 'light'
   themeOption: 'dark' | 'light' | 'system'
 
+  selectedProjectRef?: string
   isDarkTheme: boolean
   selectedProject?: Project
   selectedOrganization?: Organization

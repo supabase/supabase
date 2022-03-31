@@ -12,9 +12,11 @@ import { API_URL } from 'lib/constants'
 export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
+  isLoaded: boolean
   error: any
 
   load: () => void
+  create: (x: UserContent) => { data: UserContent; error: { error: { message: string } } }
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
@@ -49,6 +51,10 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   get isInitialized() {
     return this.state !== this.STATES.INITIAL
+  }
+
+  get isLoaded() {
+    return this.state === this.STATES.LOADED
   }
 
   async fetchData() {
@@ -110,6 +116,7 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   sqlSnippets(filter?: any) {
+    console.log('i ran')
     let arr = Object.values(this.data)
     if (!!filter) {
       const arr_filtered = arr
@@ -127,6 +134,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     }
   }
 
+  // @ts-ignore
   async create(payload: any) {
     try {
       const headers = {
