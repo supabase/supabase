@@ -28,6 +28,10 @@ export interface CodeBlockProps {
    * Supports individual lines: '14', multiple lines: '14,15', or a range of lines '14..19'
    */
   highlightLines?: string
+  /**
+   * Shows an application toolbar at the top
+   */
+  showToolbar?: boolean
 }
 
 function CodeBlock(props: CodeBlockProps) {
@@ -67,16 +71,29 @@ function CodeBlock(props: CodeBlockProps) {
 
   return (
     <div className="relative">
+      {props.showToolbar && (
+        <div className="bg-scale-1200 dark:bg-scale-200 border border-scale-1200 dark:border-scale-400 border-b-0 h-7 w-full rounded-t-lg flex gap-1.5 items-center px-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
+          </div>
+        </div>
+      )}
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
-        className={CodeBlockStyles['code-block']}
+        className={[
+          CodeBlockStyles['code-block'],
+          props.showToolbar ? CodeBlockStyles['code-block--show-toolbar'] : '',
+          '!bg-scale-1200 dark:!bg-scale-100',
+          'border border-scale-1100 dark:border-scale-400',
+        ].join(' ')}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,
           lineHeight: large ? 1.2 : 1.2,
-          borderTop: '1px solid #393939',
-          background: '#181818',
+
           ...props.style,
         }}
         showLineNumbers={lang === 'cli' ? false : true}
@@ -87,10 +104,10 @@ function CodeBlock(props: CodeBlockProps) {
           display: 'inline-flex',
           justifyContent: 'flex-end',
           minWidth: '48px',
-          background: '#1e1e1e',
+          // background: 'var(--colors-fixed-scale12)',
           paddingLeft: '21px',
           marginRight: '12px',
-          color: '#828282',
+          color: 'var(--colors-fixed-scale7)',
           fontSize: large ? 14 : 12,
           paddingTop: '4px',
           paddingBottom: '4px',
@@ -100,6 +117,7 @@ function CodeBlock(props: CodeBlockProps) {
       >
         {props.children}
       </SyntaxHighlighter>
+
       {!props.hideCopy && props.children ? (
         <div className="absolute right-2 top-2 dark">
           <CopyToClipboard text={props.children}>
