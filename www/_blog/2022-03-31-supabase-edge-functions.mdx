@@ -78,16 +78,24 @@ Delivering a phenomenal Developer Experience is something we care about a lot at
 
 We’ve [extended the Supabase CLI](https://supabase.com/docs/guides/local-development) to optimize the Edge Functions DX along these two dimensions. You get live-reloading, and a local Deno environment that matches the production environment, making for a great local iteration environment.
 
-[CleanShot 2022-03-30.mp4](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/32171070-808e-470d-97fb-f8bab49fa5c4/CleanShot_2022-03-30.mp4)
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source
+    src="/videos/blog/launch-week-4/functions-hot-reloading.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
 
 Once you’ve tested your Function locally (or gone straight to production cos you live _on the edge_ ... get it?) it takes just seconds to deploy a new function and see the logs streaming in your Dashboard—ensuring a tight iteration loop with your production environment.
 
-[logs-polish.mov](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/25f7bf80-9cc6-49d5-8850-f2b05d85292a/logs-polish.mov)
+<video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
+  <source src="/videos/blog/launch-week-4/logs-polish.mov" type="video/mp4" muted playsInline />
+</video>
 
 Our observability pipeline has been built [using Logflare](https://supabase.com/blog/2021/12/02/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/2021/11/30/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
 
-![new —> deploy —> invoke —> logs](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5ffaea23-66c3-4113-b69b-fc77e795025e/functions-new-deploy-invoke-logs.gif)
-
+![new —> deploy —> invoke —> logs](/images/blog/launch-week-4/thursday-functions/functions-new-deploy-invoke-logs.gif)
 new —> deploy —> invoke —> logs
 
 ![new -> deploy](/images/blog/launch-week-4/thursday-functions/new-deploy.gif)
