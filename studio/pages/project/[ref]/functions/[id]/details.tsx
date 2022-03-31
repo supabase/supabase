@@ -108,8 +108,7 @@ const PageLayout: NextPageWithLayout = () => {
     {
       command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
         selectedFunction?.slug
-      }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}'
-      --data '{"name":"Functions"}'`,
+      }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello function',
       jsx: () => {
         return (
