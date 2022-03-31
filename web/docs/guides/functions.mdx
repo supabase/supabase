@@ -21,7 +21,7 @@ const examples = [
 
 :::caution
 
-Edge Functions are Experimental until 1 August 2022. There will breaking changes. Do not use them in Production.
+Edge Functions are Experimental until 1 August 2022. There will be breaking changes. Do not use them in Production.
 
 :::
 
@@ -58,18 +58,12 @@ Learn how to develop Edge Functions in less than 7 minutes:
 
 Follow the steps to prepare your Supabase project on your local machine.
 
-- Install the Supabase CLI. [Installing and Updating Docs](/docs/reference/cli/installing-and-updating).
-- Login to the CLI
-  - Command: `supabase login`
-  - Docs: [`login`](/docs/reference/cli/supabase-login)
-- Initialize Supabase inside your project
-  - Command: `supabase login`
-  - Docs: [Getting Started](/docs/guides/local-development#getting-started)
-- Link to your Remote Project
-  - Command: `supabase link --project-ref your-project-ref`
-  - Docs: `[link](/docs/reference/cli/supabase-link)`
+- Install the Supabase CLI. [Docs](/docs/reference/cli/installing-and-updating).
+- Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/supabase-login).
+- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/local-development#getting-started).
+- Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/supabase-link).
 - Optional
-  - Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
+  - Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
 
 ## Getting Started
 
@@ -91,30 +85,40 @@ This creates a function stub in your `supabase` folder at `./functions/hello-wor
 supabase functions deploy hello-world
 ```
 
-This command bundles and deploys your Edge Function from `./functions/hello-world/index.ts`
+This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform. 
+The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
 - [ ] TODO - output the URL after running deploy
 
 ### Executing Remote Functions
 
-You can execute any Edge Function using curl - just like you executed it locally - except this time we'll switch `[localhost](http://localhost)` with your remote URL.
+You can execute any Edge Function using curl. You can copy the curl command from the Dashboard. It should look like this:
 
-```jsx
-curl --request POST 'https://<project-ref>.functions.supabase.co/functions/v1/hello-world' \
-  --header 'Authorization: Bearer ANON_KEY' \
+```bash
+curl --request POST 'https://hganqyntpokmkeyqbvux.functions.supabase.co/hello-world' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQyMTkzMTk0LCJleHAiOjE5NTc3NjkxOTR9.QNsSlnt6BA4EF1jCwMaCdn0B8AiCr9jhqeMwJvcd3ho' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
 
-NOTE!! Use your PROD keys
+If you receive an error `Invalid JWT`, find the `ANON_KEY` of your project in the Dashboard under `Settings > API`.
+
+After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
 
 ## Debugging your Functions
 
-- Go to the log explorer
+You can debug your deployed Edge Functions using the "Functions" section of the Dashboard. There are two types debugging tools available:
+
+- Invocations: shows the Request and Response for each execution.
+- Logs: shows any platform events, including deployments and errors.
+
+
+![Function invocations.](/img/guides/functions/function-logs.png)
+
 
 ## Developing locally
 
-You can run your Edge Function locally using `[supabase functions serve](/docs/reference/cli/supabase-functions-serve)`:
+You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/supabase-functions-serve):
 
 ```bash
 supabase start # start the supabase stack
@@ -129,19 +133,25 @@ While serving your local Function, you can execute it using curl:
 
 ```bash
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
-  --header 'Authorization: Bearer LOCAL_ANON_KEY' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
 
-- Implementation details
-  - All Edge Functions are `POST` requests.
-  - The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
-  - The Function is proxied through the local API (`http://localhost:54321`)
-
 You should see the response `{ "message":"Hello Functions!" }`.
 
-If you execute Function with a different payload the response will change. Try modifying the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'`.
+<details>
+<summary>Implementation details</summary>
+
+- All Edge Functions are `POST` requests.
+- The `Authorization` header is required. You can use either the `ANON` key, the `SERVICE_ROLE` key, or a logged-in user's JWT.
+- The Function is proxied through the local API (`http://localhost:54321`)
+
+</details>
+<br />
+
+If you execute Function with a different payload the response will change. <br />
+Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again!
 
 ## Secrets and Environment Variables
 
@@ -153,7 +163,7 @@ Deno.env.get(MY_SECRET_NAME)
 
 ### Default secrets
 
-By default, Edge Functions have access to several secrets:
+By default, Edge Functions have access to these secrets:
 
 - `SUPABASE_URL`: The API gateway for your Supabase project.
 - `SUPABASE_ANON_KEY`: The `anon` key for your Supabase API. This is safe to use in a browser when you have [Row Level Security](/docs/guides/auth/row-level-security) enabled.
@@ -179,30 +189,23 @@ Never check your `.env` files into Git!
 Now let's use this function inside our Function. Anywhere in your function, add this line:
 
 ```jsx
-console.log(Deno.env.get(MY_NAME))
+console.log(Deno.env.get('MY_NAME'))
 ```
 
 Now we can invoke our function locally, by serving it with our new `.env.local` file:
 
 ```bash
-# Serve the Function with the env file
 supabase functions serve hello-world --env-file ./supabase/.env.local
-
-# Invoke the function locally
-curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
-  --header 'Authorization: Bearer LOCAL_ANON_KEY' \
-  --header 'Content-Type: application/json' \
-  --data '{ "name":"Functions" }'
 ```
 
-After invoking the function you should see the name “Yoda” output to the terminal.
+When the function starts you should see the name “Yoda” output to the terminal.
 
 ### Production secrets
 
 Let's create a `.env` for production. In this case we'll just use the same as our local secrets:
 
 ```bash
-cp ./supabase/.env.local ./supabase/.env.
+cp ./supabase/.env.local ./supabase/.env
 ```
 
 This creates a new file `./supabase/.env` for storing your production secrets.
@@ -213,20 +216,20 @@ Never check your `.env` files into Git!
 
 :::
 
-Let's push all the secrets from the `.env` file to our remote project using `[secrets set](/docs/reference/cli/supabase-secrets-set)`:
+Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/supabase-secrets-set):
 
 ```bash
 supabase secrets set --env-file ./supabase/.env
 
-# You can also set secrets individually using
-# supabase secrets set MY_NAME=Chewbacca
+# You can also set secrets individually using:
+supabase secrets set MY_NAME=Chewbacca
 ```
 
-Run the curl again - see the result logged on the dashboard
+You don't need to re-deploy after setting your secrets.
 
-To see all the secrets which you have set remotely, use `[secrets list](/docs/reference/cli/supabase-secrets-list)`:
+To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/supabase-secrets-list):
 
-```jsx
+```bash
 supabase secrets list
 ```
 
@@ -249,7 +252,7 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
   </div>
 </div>
 
-## Limitations and Suggestions
+## Suggestions and Limitations
 
 ### Organizing your Edge Functions
 
@@ -258,13 +261,13 @@ We recommend developing “fat functions”. This means that you should develop 
 ```bash
 └── supabase
     ├── functions
-		│   ├── _shared
-    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
-		│ 	│   └── supabaseClient.ts # Supabase client with ANON key
-		│ 	├── function-one # use hyphens to name functions
-		│ 	│ 	└── index.ts
-		│ 	└── function-two
-		│ 			└── index.ts
+    │   ├── _shared
+    │   |   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
+    │ 	│   └── supabaseClient.ts # Supabase client with ANON key
+    │ 	├── function-one # use hyphens to name functions
+    │ 	│ 	└── index.ts
+    │ 	└── function-two
+    │ 			└── index.ts
     ├── migrations
     └── config.toml
 ```
