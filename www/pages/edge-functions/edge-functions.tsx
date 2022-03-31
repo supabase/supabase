@@ -165,6 +165,8 @@ function Database() {
               </div>
               <div className="col-span-7 overflow-hidden">
                 <CodeBlock
+                  showToolbar
+                  hideCopy
                   style={{ maxHeight: '520px' }}
                   className=" translate-y-14"
                 >{`import Container from 'components/Container'

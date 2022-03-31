@@ -28,6 +28,10 @@ interface Props {
    * Supports individual lines: '14', multiple lines: '14,15', or a range of lines '14..19'
    */
   highlightLines?: string
+  /**
+   * Shows an application toolbar at the top
+   */
+  showToolbar?: boolean
 }
 
 function CodeBlock(props: Props) {
@@ -67,16 +71,28 @@ function CodeBlock(props: Props) {
 
   return (
     <div className="relative">
+      {props.showToolbar && (
+        <div className="bg-scale-200 border border-b-0 h-7 w-full rounded-t-lg flex gap-1.5 items-center px-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
+          </div>
+          {/* <span className="text-scale-900 font-mono text-xs">hello.tsx</span> */}
+        </div>
+      )}
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
-        className={CodeBlockStyles['code-block']}
+        className={[
+          CodeBlockStyles['code-block'],
+          props.showToolbar ? CodeBlockStyles['code-block--show-toolbar'] : '',
+        ].join(' ')}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,
           lineHeight: large ? 1.2 : 1.2,
-          borderTop: '1px solid #393939',
-          background: '#181818',
+          background: 'var(--colors-gray1)',
           ...props.style,
         }}
         showLineNumbers={lang === 'cli' ? false : true}
@@ -87,10 +103,10 @@ function CodeBlock(props: Props) {
           display: 'inline-flex',
           justifyContent: 'flex-end',
           minWidth: '48px',
-          background: '#1e1e1e',
+          background: 'var(--colors-scale1)',
           paddingLeft: '21px',
           marginRight: '12px',
-          color: '#828282',
+          color: 'var(--colors-scale8)',
           fontSize: large ? 14 : 12,
           paddingTop: '4px',
           paddingBottom: '4px',
@@ -100,6 +116,7 @@ function CodeBlock(props: Props) {
       >
         {props.children}
       </SyntaxHighlighter>
+
       {!props.hideCopy && props.children ? (
         <div className="absolute right-2 top-2 dark">
           <CopyToClipboard text={props.children}>
