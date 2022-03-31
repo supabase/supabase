@@ -12,16 +12,14 @@ const BlogListItem = ({ post }: Props) => {
   const authorArray = post.author && post.author.split(',')
 
   const author = []
-  if (post.type === 'blog' && post.author) {
-    for (let i = 0; i < authorArray.length; i++) {
-      author.push(
+  for (let i = 0; i < authorArray.length; i++) {
+    author.push(
+      // @ts-ignore
+      authors.find((authors: string) => {
         // @ts-ignore
-        authors.find((authors: string) => {
-          // @ts-ignore
-          return authors.author_id === authorArray[i]
-        })
-      )
-    }
+        return authors.author_id === authorArray[i]
+      })
+    )
   }
 
   return (
@@ -48,9 +46,7 @@ const BlogListItem = ({ post }: Props) => {
               </div>
 
               <h3 className="max-w-sm text-xl text-scale-1200">{post.title}</h3>
-              {post.type === 'blog' && post.date && (
-                <p className="text-xs text-scale-1100">{post.date}</p>
-              )}
+              {post.date && <p className="text-xs text-scale-1100">{post.date}</p>}
               <p className="max-w-sm text-base text-scale-1100">{post.description}</p>
             </div>
             <div className="flex items-center -space-x-2">
