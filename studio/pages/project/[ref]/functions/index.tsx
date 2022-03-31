@@ -12,6 +12,7 @@ import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import FunctionsListItem from 'components/interfaces/Functions/FunctionsListItem'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { Function } from 'components/interfaces/Functions/Functions.types'
+import { NextPageWithLayout } from 'types'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import useSWR from 'swr'
 
@@ -107,13 +108,13 @@ const EmptyFunctions = () => {
   ]
   return (
     <>
-      <div className="grid lg:grid-cols-12 gap-y-12 lg:gap-x-16 max-w-7xl py-12">
-        <div className="space-y-4 col-span-5">
-          <p className="text-scale-1200 text-base max-w-lg">
+      <div className="grid py-12 lg:grid-cols-12 gap-y-12 lg:gap-x-16 max-w-7xl">
+        <div className="col-span-5 space-y-4">
+          <p className="max-w-lg text-base text-scale-1200">
             Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
             management.
           </p>
-          <p className="text-scale-1100 text-sm max-w-lg">
+          <p className="max-w-lg text-sm text-scale-1100">
             No servers to provision, manage, or upgrade Automatically scale based on the load
             Integrated monitoring, logging, and debugging capability Built-in security at role and
             per function level based on the principle of least privilege Key networking capabilities
@@ -209,22 +210,13 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
       </div>
 
       {/* <div
-        className="
-       col-span-2
-        bg-scale-300 rounded px-10 py-8 flex flex-col gap-8"
+        className="flex flex-col col-span-2 gap-8 px-10 py-8 rounded bg-scale-300"
       >
         <h2 className="text-sm text-scale-1100">Function examples</h2>
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 lg:grid-cols-3">
           <div className="flex flex-col gap-3">
             <div
-              className="
-              h-10 w-10
-              bg-indigo-900
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
+              className="flex items-center justify-center w-10 h-10 bg-indigo-900 rounded-md bordershadow-indigo-900 text-scale-fixed-100"
             >
               <IconGlobe />
             </div>
@@ -237,14 +229,7 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
           </div>
           <div className="flex flex-col gap-3">
             <div
-              className="
-              h-10 w-10
-              bg-indigo-900
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
+              className="flex items-center justify-center w-10 h-10 bg-indigo-900 rounded-md bordershadow-indigo-900 text-scale-fixed-100"
             >
               <IconGlobe />
             </div>
@@ -257,14 +242,7 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
           </div>
           <div className="flex flex-col gap-3">
             <div
-              className="
-              h-10 w-10
-              bg-indigo-900
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
+              className="flex items-center justify-center w-10 h-10 bg-indigo-900 rounded-md bordershadow-indigo-900 text-scale-fixed-100"
             >
               <IconGlobe />
             </div>
@@ -281,15 +259,13 @@ const FunctionsList = ({ functions }: { functions: Function[] }) => {
   )
 }
 
-const PageLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const { functions } = useStore()
   const hasFunctions = functions.list().length > 0
 
-  return (
-    <FunctionsLayout centered={!hasFunctions}>
-      {hasFunctions ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
-    </FunctionsLayout>
-  )
+  return hasFunctions ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />
 }
 
-export default withAuth(observer(PageLayout))
+PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+
+export default observer(PageLayout)
