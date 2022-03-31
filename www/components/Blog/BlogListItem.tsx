@@ -1,6 +1,7 @@
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import React from 'react'
+import Author from '~/types/author'
 import PostTypes from '~/types/post'
 
 interface Props {
@@ -8,18 +9,17 @@ interface Props {
 }
 
 const BlogListItem = ({ post }: Props) => {
-  // @ts-ignore
-  const authorArray = post.author && post.author.split(',')
-
+  const authorArray: string[] | undefined = post.author ? post.author.split(',') : []
   const author = []
-  for (let i = 0; i < authorArray.length; i++) {
-    author.push(
-      // @ts-ignore
-      authors.find((authors: string) => {
-        // @ts-ignore
-        return authors.author_id === authorArray[i]
-      })
-    )
+
+  if (authorArray) {
+    for (let i = 0; i < authorArray.length; i++) {
+      author.push(
+        authors.find((authors: Author) => {
+          return authors.author_id === authorArray[i]
+        })
+      )
+    }
   }
 
   return (
