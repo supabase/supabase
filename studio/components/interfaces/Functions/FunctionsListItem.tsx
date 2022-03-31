@@ -28,39 +28,37 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
         router.push(`/project/${ref}/functions/${item.id}`)
       }}
     >
-      <Table.td className="whitespace-nowrap">
+      <Table.td className="">
         <div className="flex items-center gap-2">
           <span className="text-base text-scale-1200">{item.name}</span>
         </div>
       </Table.td>
-      <Table.td className="whitespace-nowrap flex flex-col gap-0">
-        <span className="text-sm text-scale-1100 flex items-center gap-1">
+      <Table.td className="">
+        {/* <span className="text-sm text-scale-1100 flex items-center gap-1">
           <IconGlobe size={14} />
           HTTP Request
-        </span>
-        <span
-          className="text-xs text-scale-900 flex gap-2 items-center
-        font-mono"
-        >
-          {`https://${ref}.supabase.com/functions/${item.name}`}
+        </span> */}
+        <div className="text-xs text-scale-900 flex gap-2 items-center truncate">
+          <span className="font-mono truncate hidden md:inline">{`https://${ref}.supabase.com/functions/${item.name}`}</span>
+          <span className="font-mono truncate md:hidden">{`/${item.name}`}</span>
           <IconClipboard size={12} />
-        </span>
-      </Table.td>
-      <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1100">{item.status}</span>
+        </div>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
         <span className="text-scale-1100">
           {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
         </span>
       </Table.td>
-      <Table.td className="hidden 2xl:table-cell">
+      <Table.td className="hidden lg:table-cell">
         <span className="text-scale-1100">
           {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
         </span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1100">Version {item.version}</span>
+        <span className="text-scale-1100">v{item.version}</span>
+      </Table.td>
+      <Table.td className="2xl:table-cell text-right">
+        <span className="text-scale-1100">{item.status}</span>
       </Table.td>
     </Table.tr>
   )
