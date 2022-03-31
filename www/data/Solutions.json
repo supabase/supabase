@@ -28,6 +28,7 @@
     "icon": "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
     "description": "Write custom code without deploying or scaling servers.",
     "description_short": "",
+    "label": "",
     "url": "/edge-functions"
   }
 }
