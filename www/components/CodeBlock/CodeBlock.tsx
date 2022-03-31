@@ -28,10 +28,7 @@ export interface CodeBlockProps {
    * Supports individual lines: '14', multiple lines: '14,15', or a range of lines '14..19'
    */
   highlightLines?: string
-  /**
-   * Shows an application toolbar at the top
-   */
-  showToolbar?: boolean
+  hideBorder?: boolean
 }
 
 function CodeBlock(props: CodeBlockProps) {
@@ -71,23 +68,13 @@ function CodeBlock(props: CodeBlockProps) {
 
   return (
     <div className="relative">
-      {props.showToolbar && (
-        <div className="bg-scale-1200 dark:bg-scale-200 border border-scale-1200 dark:border-scale-400 border-b-0 h-7 w-full rounded-t-lg flex gap-1.5 items-center px-4">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
-            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
-            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
-          </div>
-        </div>
-      )}
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
         className={[
           CodeBlockStyles['code-block'],
-          props.showToolbar ? CodeBlockStyles['code-block--show-toolbar'] : '',
           '!bg-scale-1200 dark:!bg-scale-100',
-          'border border-scale-1100 dark:border-scale-400',
+          props.hideBorder ? '' : 'rounded-lg border border-scale-1100 dark:border-scale-400',
         ].join(' ')}
         customStyle={{
           padding: 0,
