@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { useProjectSettings, useStore } from 'hooks'
 
 import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
@@ -95,6 +95,33 @@ const PageLayout: NextPageWithLayout = () => {
     },
   ]
 
+  const { services } = useProjectSettings(ref as string | undefined)
+
+  const API_SERVICE_ID = 1
+
+  // Get the API service
+  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
+  const apiKeys = apiService?.service_api_keys ?? []
+  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
+
+  const invokeCommands: any = [
+    {
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
+        anonKey ?? '[YOUR ANON KEY]'
+      }'`,
+      description: 'Invokes the hello function',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
+            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'
+          </>
+        )
+      },
+      comment: 'Invoke your function',
+    },
+  ]
+
   return (
     <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
       <div>
@@ -106,7 +133,7 @@ const PageLayout: NextPageWithLayout = () => {
         >
           <div className="space-y-4 w-full">
             <div className="grid grid-cols-3">
-              <span className="block text-scale-1000 text-sm mb-1">Function name</span>
+              <span className="block text-scale-1000 text-sm mb-1">Function Name</span>
               <div className="text-base text-scale-1200">{selectedFunction?.name}</div>
             </div>
 
@@ -134,21 +161,14 @@ const PageLayout: NextPageWithLayout = () => {
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint url</span>
+            <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint URL</span>
             <div className="col-span-2">
-              <Link
-                href={`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}
-                passHref
-              >
-                <a className="group text-scale-1100 hover:text-scale-1200" target="_target">
-                  <span className="underline break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
-                </a>
-              </Link>
+              <span className="text-scale-1200 break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Created at</span>
+            <span className="block text-scale-1000 text-sm mb-1">Created At</span>
             <div className="text-base text-scale-1200 col-span-2">
               {selectedFunction?.created_at &&
                 dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
@@ -156,7 +176,7 @@ const PageLayout: NextPageWithLayout = () => {
           </div>
 
           <div className="grid grid-cols-3">
-            <span className="block text-scale-1000 text-sm mb-1">Updated at</span>
+            <span className="block text-scale-1000 text-sm mb-1">Updated At</span>
             <div className="text-base text-scale-1200 col-span-2">
               {selectedFunction?.updated_at &&
                 dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
@@ -194,10 +214,11 @@ const PageLayout: NextPageWithLayout = () => {
             </div>
             <h4>Command line access</h4>
           </div>
-          <h4>Command line access</h4>
 
           <h5 className="text-base">Deployment management</h5>
           <CommandRender commands={managementCommands} />
+          <h5 className="text-base">Invoke </h5>
+          <CommandRender commands={invokeCommands} />
           <h5 className="text-base">Secrets management</h5>
           <CommandRender commands={secretCommands} />
         </div>
