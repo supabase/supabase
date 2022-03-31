@@ -1,44 +1,20 @@
-import {
-  Badge,
-  Button,
-  IconArrowUpRight,
-  IconCode,
-  IconFastForward,
-  IconGlobe,
-  IconLock,
-  IconShuffle,
-  IconX,
-  Radio,
-  Space,
-  Tabs,
-} from '@supabase/ui'
+import { Badge, IconCode, IconFastForward, IconGlobe } from '@supabase/ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
-import ExtensionsExamplesData from 'data/products/database/extensions-examples'
-import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
+import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
+import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import TweetCard from '~/components/TweetCard'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -71,11 +47,11 @@ const featureBlocks = [
 ]
 
 const featureHighlights = [
-  {
-    title: 'Run a function from anywhere',
-    description: `It's as easy as running serve()`,
-    highlightLines: '1,5',
-  },
+  // {
+  //   title: 'Run a function from anywhere',
+  //   description: `It's as easy as running serve()`,
+  //   highlightLines: '1,5',
+  // },
   {
     title: 'Set authentication',
     description: 'Use the JWT token to set the authentication of the user',
@@ -197,7 +173,7 @@ function Database() {
             <div className="grid lg:grid-cols-12 gap-6 lg:gap-32 items-center">
               <div className="flex flex-col lg:col-span-5 gap-8">
                 <div>
-                  <h3 className="h2">Anatomy of the Edge</h3>
+                  <h3 className="h3">Anatomy of the Edge</h3>
                   <p className="p">
                     Create asynchronous tasks within minutes using Supabase Functions with easy
                     access to the rest of the Supabase Ecosystem.
@@ -245,7 +221,7 @@ function Database() {
               <div className="lg:col-span-7 overflow-hidden">
                 <ScrollableCodeBlock
                   lang="ts"
-                  highlightLines={currentSelection ? currentSelection : undefined}
+                  highlightLines={currentSelection}
                   showToolbar
                   hideCopy
                 >
@@ -264,7 +240,7 @@ serve(async (req) => {
     const stripe = Stripe(Deno.env.get('STRIPE_SECRET_KEY'))
 
     // Get the authorization header from the request.
-    const authHeader = req.headers.get('Authorization')!
+    const authHeader = req.headers.get('Authorization').replace("Bearer ","")
     // Client now respects auth policies for this user
     supabaseClient.auth.setAuth(authHeader)
     // set the user profile
@@ -295,10 +271,37 @@ serve(async (req) => {
           </div>
         </SectionContainer>
 
+        <SectionContainer>
+          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
+            <div className="grid grid-cols-4 gap-8 rounded">
+              {featureBlocks.map((item) => {
+                return (
+                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
+                    {item.img ? (
+                      <img
+                        src={`/images/product/functions/${item.img}`}
+                        className="w-12 h-12 rounded-md"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
+                        {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
+                      <p className="text-sm text-scale-900">{item.description}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </SectionContainer>
+
         <SectionContainer className="-mb-48">
-          <APISection
+          <FunctionsUsecases
             // @ts-ignore
-            content={ApiExamplesData}
+            content={UseCaseExamples}
             title="Never write an API again"
             text={[
               <p key={0}>
@@ -308,18 +311,18 @@ serve(async (req) => {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="flex col-span-12 mt-0 lg:col-span-6 xl:col-span-12 xl:mb-8">
+                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
                   <p>
                     <p className="m-0 text-scale-1100">Libraries coming soon:</p>
                   </p>
-                  <div className="ml-1 space-x-1">
+                  <div className="space-x-1 ml-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
                     <Badge dot={false}>C#</Badge>
                     <Badge dot={false}>Kotlin</Badge>
                   </div>
                 </div>
-                <div className="hidden col-span-12 lg:col-span-6 xl:col-span-10 xl:block" key={1}>
+                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
                   {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
@@ -334,50 +337,7 @@ serve(async (req) => {
           />
         </SectionContainer>
 
-        <div className="relative">
-          <div className="section--masked">
-            <div className="section--bg-masked">
-              <div className="border-t border-b border-gray-100 section--bg dark:border-gray-600"></div>
-            </div>
-            <div className="pt-12 pb-0 section-container">
-              <FloatingIcons />
-              <div className="overflow-x-hidden">
-                <SectionContainer className="pb-8 mb-0 lg:pt-32">
-                  <GithubExamples />
-                </SectionContainer>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <SectionContainer className="lg:py-48">
-          <div className="grid grid-cols-12 lg:gap-16">
-            <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
-              <h2 className="h3">Extend your database</h2>
-
-              <p className="p">Supabase works natively with Postgres extensions.</p>
-              <p className="p">
-                Choose from a huge collection of Postgres extensions, enabled with a single click.
-              </p>
-
-              <FeatureColumn
-                title="40+ preinstalled extensions"
-                text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
-              />
-              <Link href="/docs/guides/database" passHref>
-                <Button as="a" size="small" type="default" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </Link>
-            </div>
-            <div className="col-span-12 mt-8 lg:mt-0 lg:col-span-6 lg:col-start-7">
-              <SplitCodeBlockCarousel
-                // @ts-ignore
-                content={ExtensionsExamplesData}
-              />
-            </div>
-          </div>
-        </SectionContainer>
+        <CTABanner />
       </DefaultLayout>
     </>
   )
