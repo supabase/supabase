@@ -43,23 +43,26 @@ function CodeBlock(props: Props) {
   // const large = props.size === 'large' ? true : false
   const large = false
 
-  const shouldHighlightLines = Boolean(props.highlightLines)
+  const shouldHighlightLines = props.highlightLines !== undefined
   const highlightLines = useMemo(
     () => new Set(rangeParser(props.highlightLines ?? '')),
     [props.highlightLines]
   )
 
-  const lineProps = useCallback((lineNumber: number) => {
-    const shouldHighlightLine = highlightLines.has(lineNumber)
+  const lineProps = useCallback(
+    (lineNumber: number) => {
+      const shouldHighlightLine = highlightLines.has(lineNumber)
 
-    const transition = `filter 500ms ease, opacity 500ms ease`
+      const transition = `filter 500ms ease, opacity 500ms ease`
 
-    const style = shouldHighlightLine
-      ? { transition }
-      : { transition, filter: 'grayscale(75%)', opacity: 0.5 }
+      const style = shouldHighlightLine
+        ? { transition }
+        : { transition, filter: 'grayscale(75%)', opacity: 0.5 }
 
-    return { style }
-  }, [])
+      return { style }
+    },
+    [highlightLines]
+  )
 
   return (
     <div className="relative">
