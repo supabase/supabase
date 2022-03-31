@@ -6,10 +6,10 @@ import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import rangeParser from 'parse-numeric-range'
 
-import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript'
-import ts from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript'
-import py from 'react-syntax-highlighter/dist/esm/languages/hljs/python'
-import sql from 'react-syntax-highlighter/dist/esm/languages/hljs/sql'
+import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
+import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
+import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 
 interface Props {
   lang: 'js' | 'ts' | 'sql' | 'py'
