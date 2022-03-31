@@ -9,7 +9,7 @@ interface Props {
 
 const BlogListItem = ({ post }: Props) => {
   // @ts-ignore
-  const authorArray = post.author && post.author.split(',')
+  const authorArray = (post.author && post.author.split(',')) || []
 
   const author = []
   for (let i = 0; i < authorArray.length; i++) {
