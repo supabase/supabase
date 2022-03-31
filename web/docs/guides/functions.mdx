@@ -34,12 +34,6 @@ Edge Functions are developed using [Deno](https://deno.com), which offers a few 
 - It is Typescript first and supports WASM.
 - Edge Functions are globally distributed for low-latency.
 
-:::note
-
-For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database, and can be called remotely using the [REST and GraphQL API](/docs/guides/database/functions).
-
-:::
-
 ## Quickstart
 
 Learn how to develop Edge Functions in less than 7 minutes:
@@ -87,15 +81,13 @@ supabase functions deploy hello-world
 This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform. 
 The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
-- [ ] TODO - output the URL after running deploy
-
 ### Executing Remote Functions
 
-You can execute any Edge Function using curl. You can copy the curl command from the Dashboard. It should look like this:
+You can execute Edge Functions using curl. Copy the curl command from the Dashboard. It should look like this:
 
 ```bash
-curl --request POST 'https://hganqyntpokmkeyqbvux.functions.supabase.co/hello-world' \
-  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQyMTkzMTk0LCJleHAiOjE5NTc3NjkxOTR9.QNsSlnt6BA4EF1jCwMaCdn0B8AiCr9jhqeMwJvcd3ho' \
+curl --request POST 'https://<project_ref>.functions.supabase.co/hello-world' \
+  --header 'Authorization: Bearer ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
@@ -252,6 +244,11 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 </div>
 
 ## Suggestions and Limitations
+
+### Database vs Edge Functions 
+
+For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database, 
+and can be called remotely using the [REST and GraphQL API](/docs/guides/database/functions).
 
 ### Organizing your Edge Functions
 
