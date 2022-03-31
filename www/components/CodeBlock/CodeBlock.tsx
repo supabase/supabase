@@ -66,7 +66,7 @@ function CodeBlock(props: CodeBlockProps) {
       return {
         class: classNames(
           CodeBlockStyles['code-line'],
-          shouldHighlightLine && CodeBlockStyles['code-line--flash']
+          shouldHighlightLines && shouldHighlightLine && CodeBlockStyles['code-line--flash']
         ),
         style,
       }
