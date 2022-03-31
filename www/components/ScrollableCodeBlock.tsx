@@ -9,7 +9,7 @@ interface ScrollableCodeBlockProps extends CodeBlockProps {
 
 const MAX_HEIGHT = 520
 const CODE_LINE_HEIGHT = 22
-const TOP_OFFSET = 10
+const TOP_OFFSET = 30
 
 const ScrollableCodeBlock = ({
   highlightLines: highlightLinesRange,
@@ -23,20 +23,17 @@ const ScrollableCodeBlock = ({
   const firstLine = Math.min(...highlightLines)
   const lastLine = Math.max(...highlightLines)
 
-  // const firstLinePosition = Math.max(firstLine * CODE_LINE_HEIGHT - MAX_HEIGHT / 2 + TOP_OFFSET, 0)
   const firstLinePosition = firstLine * CODE_LINE_HEIGHT
-  console.log('firstLinePosition:', firstLinePosition)
   const lastLinePosition = lastLine * CODE_LINE_HEIGHT
-  console.log('lastLinePosition:', lastLinePosition)
 
   const middlePosition = (firstLinePosition + lastLinePosition) / 2
-  console.log('middlePosition:', middlePosition)
+  const position = Math.max(middlePosition - MAX_HEIGHT / 2 + TOP_OFFSET, 0)
 
   return (
     <div className="overflow-hidden" style={{ maxHeight: MAX_HEIGHT }}>
       <div
         className="transition-transform duration-500"
-        style={{ transform: `translate3d(0, -${middlePosition}px, 0)` }}
+        style={{ transform: `translate3d(0, -${position}px, 0)` }}
       >
         <CodeBlock highlightLines={highlightLinesRange} {...props}>
           {children + '\n'.repeat(100)}
