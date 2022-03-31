@@ -99,11 +99,15 @@ pages:
   supabase link:
     description: |
       Link to a Supabase project.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
     examples:
       - name: Usage
         sh: |
           ```sh
-          supabase link --ref abcdefghijklmnopqrst
+          supabase link --project-ref abcdefghijklmnopqrst
           ```
 
   supabase init:
@@ -248,6 +252,10 @@ pages:
   supabase functions delete:
     description: |
       Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
     examples:
       - name: Usage
         sh: |
@@ -258,6 +266,10 @@ pages:
   supabase functions deploy:
     description: |
       Deploy a Function to the linked Supabase project.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
     examples:
       - name: Usage
         sh: |
