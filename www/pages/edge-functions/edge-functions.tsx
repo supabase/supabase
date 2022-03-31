@@ -133,7 +133,7 @@ function Database() {
               />
             </div>,
           ]}
-          documentation_url={'/docs/guides/edge-functions'}
+          documentation_url={'/docs/guides/functions'}
         />
 
         <SectionContainer>
@@ -290,7 +290,7 @@ serve(async (req) => {
                 ></div>
               </div>,
             ]}
-            documentation_link={'/docs/guides/database'}
+            documentation_link={'/docs/guides/functions'}
           />
         </SectionContainer>
 
