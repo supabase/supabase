@@ -398,7 +398,9 @@ pages:
 
   Config reference:
     description: |
-      The config file resides in `supabase/config.toml` after you run `supabase init`.
+      A `config.toml` file is generated after running `supabase init`. 
+      
+      This file is located in the `supabase` folder under `supabase/config.toml`.
 
       ## General
 
