@@ -16,7 +16,7 @@
   - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [ ] Edge Functions (coming soon).
+  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
