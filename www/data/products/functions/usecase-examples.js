@@ -5,6 +5,7 @@ export default [
   {
     lang: 'js',
     title: 'Sending an email',
+    description: 'Send an email via SMTP directly in the function',
     size: 'large',
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
@@ -32,6 +33,7 @@ serve(async (_req) => {
   {
     lang: 'js',
     title: 'Connect to database directly',
+    description: `Connect to your database via pg_bouncer`,
     size: 'large',
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
@@ -51,6 +53,7 @@ serve(async (req: Request) => {
   {
     lang: 'js',
     title: 'Read from storage',
+    description: `Read and write to any of your buckets, while also respecting storage auth policies.`,
     size: 'large',
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
@@ -72,6 +75,7 @@ serve(async (req) => {
   {
     lang: 'js',
     title: 'Read from database',
+    description: `Read, Write, Update, Insert anything on the database`,
     size: 'large',
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";

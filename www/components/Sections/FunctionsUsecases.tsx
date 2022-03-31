@@ -65,7 +65,7 @@ function FunctionsUsecases(props: Props) {
                     (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
                   }
                 >
-                  {/* {feat.description} */}
+                  {feat.description}
                 </div>
               </button>
             )
