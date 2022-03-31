@@ -323,7 +323,7 @@ pages:
 
       Flags:
 
-      `--from-stdin`: Read secrets in .env format from stdin.
+      `--env-file`: Read secrets from a .env file.
     examples:
       - name: Usage
         sh: |
