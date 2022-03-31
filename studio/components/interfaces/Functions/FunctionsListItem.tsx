@@ -30,7 +30,7 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
     >
       <Table.td className="">
         <div className="flex items-center gap-2">
-          <span className="text-base text-scale-1200">{item.name}</span>
+          <span className="text-sm text-scale-1200">{item.name}</span>
         </div>
       </Table.td>
       <Table.td className="">
@@ -41,7 +41,6 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
         <div className="text-xs text-scale-900 flex gap-2 items-center truncate">
           <span className="font-mono truncate hidden md:inline">{`https://${ref}.supabase.com/functions/${item.name}`}</span>
           <span className="font-mono truncate md:hidden">{`/${item.name}`}</span>
-          <IconClipboard size={12} />
         </div>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
