@@ -12,7 +12,7 @@
   <guid>https://supabase.com/blog/2022/03/31/supabase-edge-functions</guid>
   <title>Edge Functions are now available in Supabase</title>
   <link>https://supabase.com/blog/2022/03/31/supabase-edge-functions</link>
-  <description>Today we’re launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they’re located.</description>
+  <description>Today we're launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.</description>
   <pubDate>Wed, 30 Mar 2022 22:00:00 GMT</pubDate>
 </item>
 
