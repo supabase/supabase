@@ -223,13 +223,13 @@ module.exports = ui({
       }),
       keyframes: {
         'flash-code': {
-          '0%': { backgroundColor: 'rgb(125 211 252 / 0.1)' },
+          '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
           '100%': { backgroundColor: 'transparent' },
         },
       },
       animation: {
-        'flash-code': 'flash-code 1s ease',
-        'flash-code-slow': 'flash-code 2s ease',
+        'flash-code': 'flash-code 1s forwards',
+        'flash-code-slow': 'flash-code 2s forwards',
       },
     },
   },
