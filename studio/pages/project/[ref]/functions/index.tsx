@@ -110,7 +110,7 @@ const EmptyFunctions = () => {
           <>
             <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
             .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
-            {`--data '{"name":"Functions"}`}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },
