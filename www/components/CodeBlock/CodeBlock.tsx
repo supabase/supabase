@@ -72,13 +72,12 @@ function CodeBlock(props: Props) {
   return (
     <div className="relative">
       {props.showToolbar && (
-        <div className="bg-scale-200 border border-b-0 h-7 w-full rounded-t-lg flex gap-1.5 items-center px-4">
+        <div className="bg-scale-1200 dark:bg-scale-200 border border-scale-1200 dark:border-scale-400 border-b-0 h-7 w-full rounded-t-lg flex gap-1.5 items-center px-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
-            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
-            <div className="w-2.5 h-2.5 bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
+            <div className="w-2.5 h-2.5 bg-scale-1100 dark:bg-scale-400 rounded-full"></div>
           </div>
-          {/* <span className="text-scale-900 font-mono text-xs">hello.tsx</span> */}
         </div>
       )}
       <SyntaxHighlighter
@@ -87,12 +86,14 @@ function CodeBlock(props: Props) {
         className={[
           CodeBlockStyles['code-block'],
           props.showToolbar ? CodeBlockStyles['code-block--show-toolbar'] : '',
+          '!bg-scale-1200 dark:!bg-scale-100',
+          'border border-scale-1100 dark:border-scale-400',
         ].join(' ')}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,
           lineHeight: large ? 1.2 : 1.2,
-          background: 'var(--colors-gray1)',
+
           ...props.style,
         }}
         showLineNumbers={lang === 'cli' ? false : true}
@@ -103,10 +104,10 @@ function CodeBlock(props: Props) {
           display: 'inline-flex',
           justifyContent: 'flex-end',
           minWidth: '48px',
-          background: 'var(--colors-scale1)',
+          // background: 'var(--colors-fixed-scale12)',
           paddingLeft: '21px',
           marginRight: '12px',
-          color: 'var(--colors-scale8)',
+          color: 'var(--colors-fixed-scale7)',
           fontSize: large ? 14 : 12,
           paddingTop: '4px',
           paddingBottom: '4px',
