@@ -1335,3 +1335,7 @@ h4.method-list-item-label .method-list-item-validation {
 details summary:hover {
   cursor: pointer;
 }
+
+.admonition.admonition-caution .admonition-heading h5 {
+  color: var(--custom-color-orange-800) !important;
+}

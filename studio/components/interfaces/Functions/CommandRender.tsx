@@ -2,14 +2,13 @@ import { IconCheck, IconClipboard } from '@supabase/ui'
 import { useState } from 'react'
 
 const CommandRender = ({ commands }: any) => {
-  console.log('commands', commands)
   return (
     <div className="space-y-4">
       {commands.map((item: any) => {
         const [isCopied, setIsCopied] = useState(false)
         return (
-          <div>
-            <span className="font-mono text-xs text-scale-900">{`> ${item.comment}`}</span>
+          <div className="space-y-1">
+            <span className="font-mono text-sm text-scale-900">{`> ${item.comment}`}</span>
             <div className="flex items-center gap-2">
               <div className="flex gap-2 text-scale-1200 font-mono text-sm font-normal">
                 <span className="text-scale-900">$</span>
@@ -44,7 +43,6 @@ const CommandRender = ({ commands }: any) => {
                 </span>
               </div>
             </div>
-            <span className="text-xs text-scale-900">{item.description}</span>
           </div>
         )
       })}

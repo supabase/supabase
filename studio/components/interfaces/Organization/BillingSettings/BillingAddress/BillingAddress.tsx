@@ -94,9 +94,9 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                         <Select.Option key="empty" value="">
                           ---
                         </Select.Option>
-                        {Object.keys(COUNTRIES).map((code: string) => (
-                          <Select.Option key={code} value={code}>
-                            {(COUNTRIES as any)[code]}
+                        {COUNTRIES.map((country) => (
+                          <Select.Option key={country.code} value={country.code}>
+                            {country.name}
                           </Select.Option>
                         ))}
                       </Select>

@@ -329,7 +329,6 @@ export default function IndexPage() {
                 priceDescription={'/project/month + usage costs'}
                 description={'Everything you need to scale your project into production'}
               />
-
               <PricingTableRowMobile
                 category={pricing.database}
                 tier={'pro'}

@@ -1,6 +1,7 @@
 import authors from 'lib/authors.json'
 import Image from 'next/image'
 import React from 'react'
+import Author from '~/types/author'
 import PostTypes from '~/types/post'
 
 interface Props {
@@ -8,16 +9,13 @@ interface Props {
 }
 
 const BlogListItem = ({ post }: Props) => {
-  // @ts-ignore
-  const authorArray = post.author && post.author.split(',')
-
+  const authorArray: string[] | undefined = post.author ? post.author.split(',') : []
   const author = []
-  if (post.type === 'blog' && post.author) {
+
+  if (authorArray) {
     for (let i = 0; i < authorArray.length; i++) {
       author.push(
-        // @ts-ignore
-        authors.find((authors: string) => {
-          // @ts-ignore
+        authors.find((authors: Author) => {
           return authors.author_id === authorArray[i]
         })
       )
@@ -48,9 +46,7 @@ const BlogListItem = ({ post }: Props) => {
               </div>
 
               <h3 className="max-w-sm text-xl text-scale-1200">{post.title}</h3>
-              {post.type === 'blog' && post.date && (
-                <p className="text-xs text-scale-1100">{post.date}</p>
-              )}
+              {post.date && <p className="text-xs text-scale-1100">{post.date}</p>}
               <p className="max-w-sm text-base text-scale-1100">{post.description}</p>
             </div>
             <div className="flex items-center -space-x-2">
