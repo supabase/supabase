@@ -138,6 +138,9 @@ info:
           - auth.api.inviteUserByEmail()
           - auth.api.sendMobileOTP()
           - auth.api.updateUserById()
+      - name: 'Functions'
+        items:
+          - invoke()
       - name: 'Database'
         items:
           - select()
@@ -964,6 +967,59 @@ pages:
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { phone_confirm: true }
           )
+          ```
+  invoke():
+    title: 'invoke()'
+    description: |
+      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
+
+      :::caution
+
+      Supabase Functions are in Experimental release until 1 August 2022. There will breaking changes. Do not use them in Production.
+
+      :::
+
+      We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
+      There will be breaking changes with no notice.
+
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec. 
+    examples:
+      - name: Basic invocation.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' }
+          })
+          ```
+      - name: Specifying response type.
+        description: |
+          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            responseType: 'text',
+            body: { foo: 'bar' }
+          })
+          ```
+      - name: Parsing custom headers.
+        description: |
+          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            headers: { 
+              Authorization: 'Bearer ${supabase.auth.session()?.access_token}' 
+            },
+            body: { 
+              foo: 'bar' 
+            }
+          })
           ```
 
   select():

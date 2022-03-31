@@ -2,8 +2,8 @@ import React, { FC, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { Loading, Typography } from '@supabase/ui'
 
-import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
+import { useProjectSubscription, useStore } from 'hooks'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { get, post } from 'lib/common/fetch'
 import SparkBar from 'components/ui/SparkBar'
 
@@ -193,45 +193,19 @@ const usageLimits = {
 const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
   const { ui } = useStore()
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
-
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>(null)
-  const [subscription, setSubscription] = useState<any>(null)
+  const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
 
   useEffect(() => {
-    let cancel = false
-
-    /**
-     * Get subscription information to decide
-     */
-    const getSubscription = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const { data, error } = await post(`${API_URL}/stripe/subscription`, {
-          subscription_id: subscription_id,
-        })
-        if (!cancel) setSubscription(data)
-        if (error) throw error
-      } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to get subscription: ${error.message}`,
-        })
-        if (!cancel) setError(error)
-      } finally {
-        if (!cancel) setLoading(false)
-      }
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
+      })
     }
+  }, [error])
 
-    getSubscription()
-
-    return () => {
-      cancel = true
-    }
-  }, [subscription_id])
-
-  const tier = subscription && subscription.tier.unit_amount > 0 ? 'pro' : 'free'
+  const tier =
+    subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO ? 'pro' : 'free'
 
   return (
     <Loading active={loading}>
@@ -296,41 +270,10 @@ export default ProjectUsage
 
 export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filter }) => {
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
+  const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
 
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>(null)
-  const [subscription, setSubscription] = useState<any>(null)
-
-  useEffect(() => {
-    let cancel = false
-
-    /**
-     * Get subscription information to decide
-     */
-    const getSubscription = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const { data, error } = await post(`${API_URL}/stripe/subscription`, {
-          subscription_id: subscription_id,
-        })
-        if (!cancel) setSubscription(data)
-        if (error) throw error
-      } catch (error: any) {
-        if (!cancel) setError(error)
-      } finally {
-        if (!cancel) setLoading(false)
-      }
-    }
-
-    getSubscription()
-
-    return () => {
-      cancel = true
-    }
-  }, [subscription_id])
-
-  const tier = subscription && subscription.tier.unit_amount > 0 ? 'pro' : 'free'
+  const tier =
+    subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO ? 'pro' : 'free'
 
   return (
     <Loading active={loading}>

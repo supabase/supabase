@@ -33,25 +33,8 @@ const CaseStudies = () => {
               url: caseStudy.url.replace('/blog/', ''),
             }}
           />
-          /* <a href={caseStudy.url} key={idx}>
-              <Card
-                key={`caseStudy_${idx}`}
-                hoverable
-                cover={
-                  <img src={`${basePath}/${caseStudy.imgUrl}`} className="object-cover h-64" />
-                }
-                className="bg-scale-400"
-              >
-                <div>
-                  <p className="p">Project example</p>
-                  <h4 className="h5">{caseStudy.title}</h4>
-                </div>
-                <p className="p">{caseStudy.description}</p>
-              </Card>
-            </a> */
         ))}
       </div>
-      {/* <Benchmark /> */}
     </SectionContainer>
   )
 }

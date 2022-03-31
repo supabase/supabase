@@ -1,30 +1,8 @@
 import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
-import Hero from 'components/Hero'
 import Link from 'next/link'
-import {
-  Button,
-  Badge,
-  IconArrowUpRight,
-  IconMessageCircle,
-  IconShuffle,
-  IconX,
-  Space,
-  Tabs,
-  IconGitHub,
-  Divider,
-  IconMail,
-} from '@supabase/ui'
-import Examples from 'data/Examples.json'
-import ExampleCard from 'components/ExampleCard'
-import Features from 'components/Features/index'
-import BuiltExamples from 'components/BuiltWithSupabase/index'
-import MadeForDevelopers from 'components/MadeForDevelopers/index'
-import AdminAccess from 'components/AdminAccess/index'
-import CaseStudies from 'components/CaseStudies/index'
-import CTABanner from 'components/CTABanner/index'
+import { Button, IconMessageCircle, IconGitHub, Divider, IconMail } from '@supabase/ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TwitterSocialProof from '~/components/Sections/TwitterSocialProof'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
@@ -60,15 +38,15 @@ const Index = ({}: Props) => {
         <Container>
           <SectionContainer className="">
             <div className="text-center">
-              <h2>Get Support</h2>
+              <h1 className="text-4xl text-scale-1200">Get Support</h1>
               <p>
-                <p className="lg:text-lg">
+                <p className="lg:text-lg text-scale-1100">
                   Need a bit of help? We're here for you. Check out our current issues, GitHub
                   discussions, or get email support.
                 </p>
               </p>
             </div>
-            <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16">
+            <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16 text-scale-1200">
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
                   className="h-40 bg-white dark:bg-scale-400 

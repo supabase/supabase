@@ -75,7 +75,7 @@ const Header = () => {
           mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24
           text-center"
       >
-        <h1 className="text-5xl">
+        <h1 className="text-5xl text-scale-1200">
           Join one of the world's fastest growing open source communities.
         </h1>
       </div>
@@ -104,7 +104,7 @@ const Team = () => {
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
             <p>
-              <p className="text-lg">
+              <p className="text-lg text-scale-1200">
                 Supabase is fully remote, with a strong affinity for open source maintainers and
                 ex-Founders. Our engineering team is made up of developers from AWS, Google,
                 Palantir, Stripe, and other YC companies.
@@ -217,15 +217,17 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="mb-0 text-4xl">{x.stat}</h1>
-                <p className="text-sm">{x.statLabel}</p>
+                <h1 className="mb-0 text-4xl text-scale-1200">{x.stat}</h1>
+                <p className="text-sm text-scale-1100">{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p className="text-sm">With developer signups from the world's leading brands.</p>
+            <p className="text-sm text-scale-1100">
+              With developer signups from the world's leading brands.
+            </p>
           </div>
 
           <ImageGrid images={CompaniesData} />
@@ -282,7 +284,7 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <h2>Individual investors</h2>
+      <h2 className="text-2xl text-scale-1200">Individual investors</h2>
       <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
         {InvestorData.filter((x) => x.lead === false)
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -292,8 +294,8 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h1 className="mb-0 text-base">{x.name}</h1>
-                  <p className="mb-0 text-xs">{x.title}</p>
+                  <h1 className="mb-0 text-base text-scale-1200">{x.name}</h1>
+                  <p className="mb-0 text-xs text-scale-1000">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -315,8 +317,8 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <p>{x.type.toUpperCase()}</p>
-                  <h3>{x.title}</h3>
+                  <h1 className="text-xl text-scale-1200">{x.type.toUpperCase()}</h1>
+                  <p className="text-base text-scale-1100">{x.title}</p>
                 </div>
               </Space>
             </Card>
@@ -329,8 +331,8 @@ const Press = () => {
             <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
               <Space className="justify-between h-40" direction="vertical">
                 <div>
-                  <p>{x.type.toUpperCase()}</p>
-                  <h3>{x.title}</h3>
+                  <h1 className="text-xl text-scale-1200">{x.type.toUpperCase()}</h1>
+                  <p className="text-base text-scale-1100">{x.title}</p>
                 </div>
               </Space>
             </Card>
