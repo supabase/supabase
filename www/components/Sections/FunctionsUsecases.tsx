@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // Import Swiper React components
-import { Button, IconArrowUpRight, Tabs } from '@supabase/ui'
+import { Button, IconArrowUpRight } from '@supabase/ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import CodeBlock from '../CodeBlock/CodeBlock'
 import Link from 'next/link'
@@ -65,11 +65,22 @@ function FunctionsUsecases(props: Props) {
                     (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
                   }
                 >
+                  {/* 
+                  // @ts-ignore */}
                   {feat.description}
                 </div>
               </button>
             )
           })}
+          {props.documentation_link && (
+            <Link href={props.documentation_link} as={props.documentation_link}>
+              <a>
+                <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
+                  Explore documentation
+                </Button>
+              </a>
+            </Link>
+          )}
         </div>
       </div>
       <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
