@@ -1,22 +1,35 @@
 .code-block {
-  @apply rounded-lg overflow-hidden;
-  @apply border border-scale-500;
+  @apply overflow-hidden;
 }
 
-.code-block::before {
-  content: '';
-  background: #1e1e1e;
-  height: 10px;
-  width: 48px;
-  display: block;
+.code-line {
+  @apply block;
+  transition: filter 500ms ease, opacity 500ms ease;
+  transition-delay: 200ms;
 }
 
-.code-block::after {
-  content: '';
-  background: #1e1e1e;
-  height: 12px;
-  width: 48px;
-  display: block;
+.code-block .code-line:first-of-type {
+  @apply flex items-end h-8;
+}
+
+.code-block .code-line:first-of-type :global(.linenumber) {
+  @apply items-end self-stretch;
+}
+
+.code-block .code-line:first-of-type > :global(*:not(.linenumber)) {
+  @apply pb-1;
+}
+
+.code-block .code-line:last-of-type {
+  @apply flex items-start h-8;
+}
+
+.code-block .code-line:last-of-type :global(.linenumber) {
+  @apply items-start self-stretch;
+}
+
+.code-block .code-line:last-of-type > :global(*:not(.linenumber)) {
+  @apply pt-1;
 }
 
 .code-block code .linenumber {
@@ -26,4 +39,8 @@
 .code-block code::after,
 .code-block code::before {
   content: none !important;
+}
+
+.code-line--flash {
+  @apply animate-flash-code-slow;
 }
