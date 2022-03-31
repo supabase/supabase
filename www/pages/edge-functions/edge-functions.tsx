@@ -177,7 +177,12 @@ function Database() {
                 </div>
               </div>
               <div className="col-span-7 overflow-hidden">
-                <ScrollableCodeBlock lang="ts" highlightLines={currentSelection}>
+                <ScrollableCodeBlock
+                  lang="ts"
+                  highlightLines={currentSelection}
+                  showToolbar
+                  hideCopy
+                >
                   {`import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
 import { stripe } from "../_utils/stripe.ts";
 
