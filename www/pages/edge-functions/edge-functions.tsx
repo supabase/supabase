@@ -94,7 +94,7 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://supabase.com/edge-functions`,
           images: [
             {
               url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
@@ -133,7 +133,7 @@ function Database() {
               />
             </div>,
           ]}
-          documentation_url={'/docs/guides/database'}
+          documentation_url={'/docs/guides/edge-functions'}
         />
 
         <SectionContainer>
