@@ -13,6 +13,7 @@ module.exports = withMDX({
       'images.unsplash.com',
       'supabase.com',
       'obuldanrptloktxcffvn.supabase.co',
+      'avatars.githubusercontent.com',
     ],
   },
   async headers() {
