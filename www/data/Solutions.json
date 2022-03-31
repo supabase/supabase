@@ -24,7 +24,7 @@
     "url": "/storage"
   },
   "edge-functions": {
-    "name": "Functions",
+    "name": "Edge Functions",
     "icon": "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
     "description": "Write custom code and cron jobs without deploying or scaling servers.",
     "description_short": "",
