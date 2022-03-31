@@ -312,6 +312,11 @@ export default function IndexPage() {
                 icon={Solutions['storage'].icon}
               />
               <PricingTableRowMobile
+                category={pricing['edge-functions']}
+                tier={'free'}
+                icon={Solutions['edge-functions'].icon}
+              />
+              <PricingTableRowMobile
                 category={pricing.dashboard}
                 tier={'free'}
                 icon={pricing.dashboard.icon}
@@ -343,6 +348,11 @@ export default function IndexPage() {
                 category={pricing.storage}
                 tier={'pro'}
                 icon={Solutions['storage'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing['edge-functions']}
+                tier={'pro'}
+                icon={Solutions['edge-functions'].icon}
               />
               <PricingTableRowMobile
                 category={pricing.dashboard}
@@ -378,6 +388,11 @@ export default function IndexPage() {
                 category={pricing.storage}
                 tier={'enterprise'}
                 icon={Solutions['storage'].icon}
+              />
+              <PricingTableRowMobile
+                category={pricing['edge-functions']}
+                tier={'enterprise'}
+                icon={Solutions['edge-functions'].icon}
               />
               <PricingTableRowMobile
                 category={pricing.dashboard}
@@ -519,6 +534,10 @@ export default function IndexPage() {
                   <PricingTableRowDesktop
                     category={pricing.storage}
                     icon={Solutions['storage'].icon}
+                  />
+                  <PricingTableRowDesktop
+                    category={pricing['edge-functions']}
+                    icon={Solutions['edge-functions'].icon}
                   />
                   <PricingTableRowDesktop
                     category={pricing.dashboard}
