@@ -88,7 +88,7 @@ const EmptyFunctions = () => {
       comment: 'Create a function',
     },
     {
-      command: 'supabase functions deploy hello',
+      command: `supabase functions deploy hello --project-ref ${ref}`,
       description: 'Deploys function at ./functions/hello/index.ts',
       jsx: () => {
         return (
