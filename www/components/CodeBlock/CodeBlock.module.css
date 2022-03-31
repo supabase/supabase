@@ -1,6 +1,5 @@
 .code-block {
   @apply overflow-hidden rounded-lg;
-  @apply border;
 }
 
 .code-block--show-toolbar {
