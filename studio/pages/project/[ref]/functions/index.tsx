@@ -147,12 +147,11 @@ const EmptyFunctions = () => {
 const FunctionsList = ({ functions }: { functions: Function[] }) => {
   return (
     <>
-      <div className="flex flex-col gap-3 py-12">
+      <div className="flex flex-col gap-3 py-6">
         <div className="flex justify-between items-center">
           <span className="text-sm text-scale-900">{`${functions.length} function${
             functions.length > 1 ? 's' : ''
           } deployed`}</span>
-          <Input icon={<IconSearch size={14} />} size="tiny" />
         </div>
         <div>
           <Table
