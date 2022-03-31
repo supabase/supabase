@@ -28,23 +28,21 @@ const PageLayout = ({
 
   return (
     <BaseLayout>
-      <div className="h-full flex flex-col flex-grow">
+      <div className="h-full flex flex-col flex-grow py-6">
         <div
           className="
-            pt-10
-            pb-2
             w-full mx-auto
 
             transition-all
+            flex flex-col
 
             px-5
-            lg:px-20
+            lg:px-16
             xl:px-24
             1xl:px-28
             2xl:px-32
 
-            flex flex-col
-            gap-8
+            gap-4
         "
         >
           <div className="flex items-center gap-3">
@@ -66,11 +64,14 @@ const PageLayout = ({
             h-full flex flex-col flex-grow
             w-full mx-auto
             transition-all
+           
             px-5
-            lg:px-20
+            lg:px-16
             xl:px-24
             1xl:px-28
             2xl:px-32
+
+            gap-4
         "
         >
           {children}

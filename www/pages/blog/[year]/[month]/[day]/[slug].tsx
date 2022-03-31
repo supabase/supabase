@@ -104,10 +104,6 @@ function BlogPostPage(props: any) {
 
   const { basePath } = useRouter()
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(`https://supabase.com/blog/${props.blog.slug}`)
-  }
-
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
