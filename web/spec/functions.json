@@ -47,7 +47,7 @@
 								},
 								{
 									"id": 5,
-									"name": "headers",
+									"name": "__namedParameters",
 									"kind": 32768,
 									"kindString": "Parameter",
 									"flags": {},
@@ -59,99 +59,127 @@
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
-											"indexSignature": {
-												"id": 7,
-												"name": "__index",
-												"kind": 8192,
-												"kindString": "Index signature",
-												"flags": {},
-												"parameters": [
-													{
-														"id": 8,
-														"name": "key",
-														"kind": 32768,
-														"flags": {},
-														"type": {
-															"type": "intrinsic",
-															"name": "string"
+											"children": [
+												{
+													"id": 8,
+													"name": "customFetch",
+													"kind": 1024,
+													"kindString": "Property",
+													"flags": {
+														"isOptional": true
+													},
+													"sources": [
+														{
+															"fileName": "src/index.ts",
+															"line": 16,
+															"character": 6
+														}
+													],
+													"type": {
+														"type": "reflection",
+														"declaration": {
+															"id": 9,
+															"name": "__type",
+															"kind": 65536,
+															"kindString": "Type literal",
+															"flags": {},
+															"signatures": [
+																{
+																	"id": 10,
+																	"name": "__type",
+																	"kind": 4096,
+																	"kindString": "Call signature",
+																	"flags": {},
+																	"parameters": [
+																		{
+																			"id": 11,
+																			"name": "input",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {},
+																			"type": {
+																				"type": "reference",
+																				"qualifiedName": "RequestInfo",
+																				"package": "typescript",
+																				"name": "RequestInfo"
+																			}
+																		},
+																		{
+																			"id": 12,
+																			"name": "init",
+																			"kind": 32768,
+																			"kindString": "Parameter",
+																			"flags": {
+																				"isOptional": true
+																			},
+																			"type": {
+																				"type": "reference",
+																				"qualifiedName": "RequestInit",
+																				"package": "typescript",
+																				"name": "RequestInit"
+																			}
+																		}
+																	],
+																	"type": {
+																		"type": "reference",
+																		"typeArguments": [
+																			{
+																				"type": "reference",
+																				"qualifiedName": "Response",
+																				"package": "typescript",
+																				"name": "Response"
+																			}
+																		],
+																		"qualifiedName": "Promise",
+																		"package": "typescript",
+																		"name": "Promise"
+																	}
+																}
+															]
 														}
 													}
-												],
-												"type": {
-													"type": "intrinsic",
-													"name": "string"
-												}
-											}
-										}
-									}
-								},
-								{
-									"id": 9,
-									"name": "customFetch",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {
-										"isOptional": true
-									},
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 10,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
+												},
 												{
-													"id": 11,
-													"name": "__type",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
+													"id": 7,
+													"name": "headers",
+													"kind": 1024,
+													"kindString": "Property",
+													"flags": {
+														"isOptional": true
+													},
+													"sources": [
 														{
-															"id": 12,
-															"name": "input",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {},
-															"type": {
-																"type": "reference",
-																"qualifiedName": "RequestInfo",
-																"package": "typescript",
-																"name": "RequestInfo"
-															}
-														},
-														{
-															"id": 13,
-															"name": "init",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isOptional": true
-															},
-															"type": {
-																"type": "reference",
-																"qualifiedName": "RequestInit",
-																"package": "typescript",
-																"name": "RequestInit"
-															}
+															"fileName": "src/index.ts",
+															"line": 15,
+															"character": 6
 														}
 													],
 													"type": {
 														"type": "reference",
 														"typeArguments": [
 															{
-																"type": "reference",
-																"qualifiedName": "Response",
-																"package": "typescript",
-																"name": "Response"
+																"type": "intrinsic",
+																"name": "string"
+															},
+															{
+																"type": "intrinsic",
+																"name": "string"
 															}
 														],
-														"qualifiedName": "Promise",
+														"qualifiedName": "Record",
 														"package": "typescript",
-														"name": "Promise"
+														"name": "Record"
 													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Properties",
+													"kind": 1024,
+													"children": [
+														8,
+														7
+													]
 												}
 											]
 										}
@@ -167,7 +195,7 @@
 					]
 				},
 				{
-					"id": 19,
+					"id": 15,
 					"name": "fetch",
 					"kind": 1024,
 					"kindString": "Property",
@@ -184,21 +212,21 @@
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 20,
+							"id": 16,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 21,
+									"id": 17,
 									"name": "__type",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 22,
+											"id": 18,
 											"name": "input",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -211,7 +239,7 @@
 											}
 										},
 										{
-											"id": 23,
+											"id": 19,
 											"name": "init",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -246,7 +274,7 @@
 					}
 				},
 				{
-					"id": 15,
+					"id": 14,
 					"name": "headers",
 					"kind": 1024,
 					"kindString": "Property",
@@ -261,41 +289,24 @@
 						}
 					],
 					"type": {
-						"type": "reflection",
-						"declaration": {
-							"id": 16,
-							"name": "__type",
-							"kind": 65536,
-							"kindString": "Type literal",
-							"flags": {},
-							"indexSignature": {
-								"id": 17,
-								"name": "__index",
-								"kind": 8192,
-								"kindString": "Index signature",
-								"flags": {},
-								"parameters": [
-									{
-										"id": 18,
-										"name": "key",
-										"kind": 32768,
-										"flags": {},
-										"type": {
-											"type": "intrinsic",
-											"name": "string"
-										}
-									}
-								],
-								"type": {
-									"type": "intrinsic",
-									"name": "string"
-								}
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "intrinsic",
+								"name": "string"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
 							}
-						}
+						],
+						"qualifiedName": "Record",
+						"package": "typescript",
+						"name": "Record"
 					}
 				},
 				{
-					"id": 14,
+					"id": 13,
 					"name": "url",
 					"kind": 1024,
 					"kindString": "Property",
@@ -315,7 +326,7 @@
 					}
 				},
 				{
-					"id": 27,
+					"id": 23,
 					"name": "invoke",
 					"kind": 2048,
 					"kindString": "Method",
@@ -323,13 +334,13 @@
 					"sources": [
 						{
 							"fileName": "src/index.ts",
-							"line": 32,
+							"line": 40,
 							"character": 8
 						}
 					],
 					"signatures": [
 						{
-							"id": 28,
+							"id": 24,
 							"name": "invoke",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -337,9 +348,22 @@
 							"comment": {
 								"shortText": "Invokes a function"
 							},
+							"typeParameter": [
+								{
+									"id": 25,
+									"name": "T",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {},
+									"default": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							],
 							"parameters": [
 								{
-									"id": 29,
+									"id": 26,
 									"name": "functionName",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -353,7 +377,7 @@
 									}
 								},
 								{
-									"id": 30,
+									"id": 27,
 									"name": "invokeOptions",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -373,82 +397,128 @@
 								"type": "reference",
 								"typeArguments": [
 									{
-										"type": "reflection",
-										"declaration": {
-											"id": 31,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"children": [
-												{
-													"id": 32,
-													"name": "data",
-													"kind": 1024,
-													"kindString": "Property",
+										"type": "union",
+										"types": [
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 28,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
 													"flags": {},
-													"sources": [
+													"children": [
 														{
-															"fileName": "src/index.ts",
-															"line": 35,
-															"character": 15
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
-																"type": "literal",
-																"value": null
-															},
-															{
-																"type": "intrinsic",
-																"name": "string"
+															"id": 29,
+															"name": "data",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {},
+															"sources": [
+																{
+																	"fileName": "src/index.ts",
+																	"line": 43,
+																	"character": 15
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 25,
+																"name": "T"
 															}
-														]
-													}
-												},
-												{
-													"id": 33,
-													"name": "error",
-													"kind": 1024,
-													"kindString": "Property",
-													"flags": {},
-													"sources": [
+														},
 														{
-															"fileName": "src/index.ts",
-															"line": 35,
-															"character": 36
-														}
-													],
-													"type": {
-														"type": "union",
-														"types": [
-															{
+															"id": 30,
+															"name": "error",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {},
+															"sources": [
+																{
+																	"fileName": "src/index.ts",
+																	"line": 43,
+																	"character": 24
+																}
+															],
+															"type": {
 																"type": "literal",
 																"value": null
-															},
-															{
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Properties",
+															"kind": 1024,
+															"children": [
+																29,
+																30
+															]
+														}
+													]
+												}
+											},
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 31,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 32,
+															"name": "data",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {},
+															"sources": [
+																{
+																	"fileName": "src/index.ts",
+																	"line": 43,
+																	"character": 42
+																}
+															],
+															"type": {
+																"type": "literal",
+																"value": null
+															}
+														},
+														{
+															"id": 33,
+															"name": "error",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {},
+															"sources": [
+																{
+																	"fileName": "src/index.ts",
+																	"line": 43,
+																	"character": 54
+																}
+															],
+															"type": {
 																"type": "reference",
 																"qualifiedName": "Error",
 																"package": "typescript",
 																"name": "Error"
 															}
-														]
-													}
-												}
-											],
-											"groups": [
-												{
-													"title": "Properties",
-													"kind": 1024,
-													"children": [
-														32,
-														33
+														}
+													],
+													"groups": [
+														{
+															"title": "Properties",
+															"kind": 1024,
+															"children": [
+																32,
+																33
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										]
 									}
 								],
 								"qualifiedName": "Promise",
@@ -459,7 +529,7 @@
 					]
 				},
 				{
-					"id": 24,
+					"id": 20,
 					"name": "setAuth",
 					"kind": 2048,
 					"kindString": "Method",
@@ -467,13 +537,13 @@
 					"sources": [
 						{
 							"fileName": "src/index.ts",
-							"line": 20,
+							"line": 28,
 							"character": 2
 						}
 					],
 					"signatures": [
 						{
-							"id": 25,
+							"id": 21,
 							"name": "setAuth",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -489,7 +559,7 @@
 							},
 							"parameters": [
 								{
-									"id": 26,
+									"id": 22,
 									"name": "token",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -520,17 +590,17 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						19,
 						15,
-						14
+						14,
+						13
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						27,
-						24
+						23,
+						20
 					]
 				}
 			],
