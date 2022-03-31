@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -147,7 +148,7 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="cursor-pointer w-full">
-      <a href={`/blog/${blog.url}`}>
+      <Link href={`/blog/${blog.url}`}>
         <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           <div className="relative overflow-auto w-full h-96 border rounded-lg">
             <Image
@@ -168,7 +169,7 @@ function FeaturedThumb(blog: PostTypes) {
               <p className="p text-xl">{blog.description}</p>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-rows-4 grid-flow-col gap-4 w-max">
               {author.map((author: any) => {
                 return (
                   <div className="flex space-x-3 items-center">
@@ -176,6 +177,7 @@ function FeaturedThumb(blog: PostTypes) {
                       <div className="relative overflow-auto w-10 h-10">
                         <Image
                           src={author.author_image_url}
+                          alt={`${author.author} avatar`}
                           className="rounded-full"
                           layout="fill"
                           objectFit="cover"
@@ -192,7 +194,7 @@ function FeaturedThumb(blog: PostTypes) {
             </div>
           </div>
         </a>
-      </a>
+      </Link>
     </div>
   )
 }
