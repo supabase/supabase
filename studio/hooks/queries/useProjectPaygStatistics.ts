@@ -37,7 +37,7 @@ export function useProjectPaygStatistics(ref?: string, tierProdId?: string) {
   const anyError = data?.error || error
 
   return {
-    paygStats: anyError ? undefined : getPaygStats(data.data),
+    paygStats: anyError ? undefined : getPaygStats(data?.data),
     error: anyError,
     isLoading: !anyError && !data,
     isError: !!anyError,
