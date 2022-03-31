@@ -55,19 +55,25 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/edge-functions/edge-functions</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/storage</loc>
+    <loc>https://supabase.com/partners/[slug]</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/[slug]</loc>
+    <loc>https://supabase.com/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -586,6 +592,24 @@
 
   <url>
     <loc>https://supabase.com/blog/2022/03/28/community-day</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/29/graphql-now-available</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/30/supabase-enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/2022/03/31/supabase-edge-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
