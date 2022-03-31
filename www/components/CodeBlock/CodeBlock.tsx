@@ -1,20 +1,28 @@
+import { useCallback, useMemo } from 'react'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from 'data/CodeEditorTheme'
 import CodeBlockStyles from './CodeBlock.module.css'
 import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
+import rangeParser from 'parse-numeric-range'
 
-import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
-import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
-import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript'
+import ts from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript'
+import py from 'react-syntax-highlighter/dist/esm/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/esm/languages/hljs/sql'
 
 interface Props {
-  lang: 'js' | 'sql' | 'py'
+  lang: 'js' | 'ts' | 'sql' | 'py'
   startingLineNumber?: number
   hideCopy?: boolean
   className?: string
   children?: string
   size?: 'small' | 'medium' | 'large'
+  /**
+   * Lines to be highlighted.
+   * Supports individual lines: '14', multiple lines: '14,15', or a range of lines '14..19'
+   */
+  highlightLines?: string
 }
 
 function CodeBlock(props: Props) {
@@ -25,13 +33,33 @@ function CodeBlock(props: Props) {
     : 'js'
   // force jsx to be js highlighted
   if (lang === 'jsx') lang = 'js'
+  if (lang === 'tsx') lang = 'ts'
 
   SyntaxHighlighter.registerLanguage('js', js)
+  SyntaxHighlighter.registerLanguage('ts', ts)
   SyntaxHighlighter.registerLanguage('py', py)
   SyntaxHighlighter.registerLanguage('sql', sql)
 
   // const large = props.size === 'large' ? true : false
   const large = false
+
+  const shouldHighlightLines = Boolean(props.highlightLines)
+  const highlightLines = useMemo(
+    () => new Set(rangeParser(props.highlightLines ?? '')),
+    [props.highlightLines]
+  )
+
+  const lineProps = useCallback((lineNumber: number) => {
+    const shouldHighlightLine = highlightLines.has(lineNumber)
+
+    const transition = `filter 500ms ease, opacity 500ms ease`
+
+    const style = shouldHighlightLine
+      ? { transition }
+      : { transition, filter: 'grayscale(75%)', opacity: 0.5 }
+
+    return { style }
+  }, [])
 
   return (
     <div className="relative">
@@ -60,6 +88,8 @@ function CodeBlock(props: Props) {
           paddingTop: '4px',
           paddingBottom: '4px',
         }}
+        wrapLines={shouldHighlightLines}
+        lineProps={lineProps}
       >
         {props.children}
       </SyntaxHighlighter>
