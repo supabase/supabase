@@ -103,13 +103,14 @@ const EmptyFunctions = () => {
     {
       command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
-      }'`,
+      }' --data '{"name":"Functions"}`,
       description: 'Invokes the hello function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'
+            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            {`--data '{"name":"Functions"}`}
           </>
         )
       },
