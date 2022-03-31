@@ -8,7 +8,7 @@
 
 The function examples are located in [`./supabase/functions`](./supabase/functions):
 
-- Retrieve data from an authenticated user via RLS: [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts)
+- [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts): Retrieve data from an authenticated user via RLS
 
 ## Develop locally
 
@@ -22,7 +22,7 @@ The function examples are located in [`./supabase/functions`](./supabase/functio
   - Navigate to https://app.supabase.io/account/tokens
   - Click "Generate New Token"
   - Copy newly created token
-  - run `supabase login`
+  - Run `supabase login`
   - Input your token when prompted
 - Link your project
   - Within your project root run `supabase link --project-ref your-project-ref`
