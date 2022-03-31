@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import { withAuth } from 'hooks'
 
 import useSWR from 'swr'
 import dayjs from 'dayjs'
@@ -15,6 +14,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
 
 import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import { NextPageWithLayout } from 'types'
 
 const CHART_INTERVALS = [
   {
@@ -49,7 +49,7 @@ function calculateHighlightedValue(array: any, attribute: string, options?: { su
   }
 }
 
-const PageLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const [interval, setInterval] = useState<string>('15min')
   const router = useRouter()
   const { ref, id } = router.query
@@ -91,123 +91,120 @@ const PageLayout = () => {
   }
 
   return (
-    <FunctionsLayout>
-      <div className="space-y-6 py-2">
-        <div className="flex flex-row items-center gap-2">
-          <div className="flex items-center">
-            {CHART_INTERVALS.map((item, i) => {
-              const classes = []
+    <div className="py-2 space-y-6">
+      <div className="flex flex-row items-center gap-2">
+        <div className="flex items-center">
+          {CHART_INTERVALS.map((item, i) => {
+            const classes = []
 
-              if (i === 0) {
-                classes.push('rounded-tr-none rounded-br-none')
-              } else if (i === CHART_INTERVALS.length - 1) {
-                classes.push('rounded-tl-none rounded-bl-none')
-              } else {
-                classes.push('rounded-none')
-              }
+            if (i === 0) {
+              classes.push('rounded-tr-none rounded-br-none')
+            } else if (i === CHART_INTERVALS.length - 1) {
+              classes.push('rounded-tl-none rounded-bl-none')
+            } else {
+              classes.push('rounded-none')
+            }
 
-              return (
-                <Button
-                  key={`function-filter-${i}`}
-                  type={interval === item.key ? 'secondary' : 'default'}
-                  onClick={() => setInterval(item.key)}
-                  className={classes.join(' ')}
-                >
-                  {item.label}
-                </Button>
-              )
-            })}
-          </div>
-
-          <span className="text-scale-1000 text-xs">
-            Statistics for past {selectedInterval.label}
-          </span>
+            return (
+              <Button
+                key={`function-filter-${i}`}
+                type={interval === item.key ? 'secondary' : 'default'}
+                onClick={() => setInterval(item.key)}
+                className={classes.join(' ')}
+              >
+                {item.label}
+              </Button>
+            )
+          })}
         </div>
-        <div className="">
-          {startDate && endDate && (
-            <>
-              <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-2 lg:gap-8">
-                <Panel key="database-chart">
-                  <Panel.Content className="space-y-4">
-                    {/* 
-                    // @ts-ignore */}
-                    <ChartHandler
-                      label="Execution time"
-                      defaultChartStyle="line"
-                      startDate={startDate}
-                      endDate={endDate}
-                      attribute={'avg_execution_time'}
-                      provider="log-stats"
-                      // interval="1d"
-                      hideChartType
-                      customDateFormat={datetimeFormat}
-                      data={charts}
-                      format="ms"
-                      isLoading={!charts.data && !error ? true : false}
-                      highlightedValue={calculateHighlightedValue(
-                        data?.result,
-                        'avg_execution_time'
-                      )}
-                      // onBarClick={(v) => handleBarClick(v, '/rest')}
-                    />
-                  </Panel.Content>
-                </Panel>
-                <Panel key="invocation-chart">
-                  <Panel.Content className="space-y-4">
-                    {/* 
-                    // @ts-ignore */}
-                    <ChartHandler
-                      label="Invocations"
-                      startDate={startDate}
-                      endDate={endDate}
-                      attribute={'count'}
-                      provider="log-stats"
-                      // interval="1d"
-                      hideChartType
-                      customDateFormat={datetimeFormat}
-                      data={charts}
-                      isLoading={!charts.data && !error ? true : false}
-                      highlightedValue={calculateHighlightedValue(data?.result, 'count', {
-                        sum: true,
-                      })}
-                      onBarClick={(v) => handleBarClick(v, '/auth')}
-                    />
-                  </Panel.Content>
-                </Panel>
-              </div>
-              <Panel key="error-chart">
+
+        <span className="text-xs text-scale-1000">
+          Statistics for past {selectedInterval.label}
+        </span>
+      </div>
+      <div className="">
+        {startDate && endDate && (
+          <>
+            <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-2 lg:gap-8">
+              <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   {/* 
                     // @ts-ignore */}
                   <ChartHandler
+                    label="Execution time"
                     defaultChartStyle="line"
-                    label="Error count"
                     startDate={startDate}
                     endDate={endDate}
-                    attribute={'min_execution_time'}
+                    attribute={'avg_execution_time'}
+                    provider="log-stats"
+                    // interval="1d"
+                    hideChartType
+                    customDateFormat={datetimeFormat}
+                    data={charts}
+                    format="ms"
+                    isLoading={!charts.data && !error ? true : false}
+                    highlightedValue={calculateHighlightedValue(data?.result, 'avg_execution_time')}
+                    // onBarClick={(v) => handleBarClick(v, '/rest')}
+                  />
+                </Panel.Content>
+              </Panel>
+              <Panel key="invocation-chart">
+                <Panel.Content className="space-y-4">
+                  {/* 
+                    {/* 
+                  {/* 
+                    // @ts-ignore */}
+                  <ChartHandler
+                    label="Invocations"
+                    startDate={startDate}
+                    endDate={endDate}
+                    attribute={'count'}
                     provider="log-stats"
                     // interval="1d"
                     hideChartType
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts.data && !error ? true : false}
-                    highlightedValue={calculateHighlightedValue(
-                      data?.result,
-                      'min_execution_time',
-                      {
-                        sum: true,
-                      }
-                    )}
+                    highlightedValue={calculateHighlightedValue(data?.result, 'count', {
+                      sum: true,
+                    })}
                     onBarClick={(v) => handleBarClick(v, '/auth')}
                   />
                 </Panel.Content>
               </Panel>
-            </>
-          )}
-        </div>
+            </div>
+            <Panel key="error-chart">
+              <Panel.Content className="space-y-4">
+                {/* 
+                  {/* 
+                {/* 
+                    // @ts-ignore */}
+                <ChartHandler
+                  defaultChartStyle="line"
+                  label="Error count"
+                  startDate={startDate}
+                  endDate={endDate}
+                  attribute={'min_execution_time'}
+                  provider="log-stats"
+                  // interval="1d"
+                  hideChartType
+                  customDateFormat={datetimeFormat}
+                  data={charts}
+                  isLoading={!charts.data && !error ? true : false}
+                  highlightedValue={calculateHighlightedValue(data?.result, 'min_execution_time', {
+                    sum: true,
+                  })}
+                  onBarClick={(v) => handleBarClick(v, '/auth')}
+                />
+              </Panel.Content>
+            </Panel>
+          </>
+        )}
       </div>
-    </FunctionsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(PageLayout))
+PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+
+export default observer(PageLayout)
