@@ -206,12 +206,9 @@ const ProUpgrade: FC<Props> = ({
                   {projectRegion !== 'af-south-1' && (
                     <>
                       <Divider light />
-                      <div className="flex items-center space-x-2">
-                        <h4 className="text-lg">Extend your project with add-ons</h4>
-                        <Badge color="green">Optional</Badge>
-                      </div>
                       <ComputeSizeSelection
                         computeSizes={computeSizes || []}
+                        currentComputeSize={currentComputeSize}
                         selectedComputeSize={selectedComputeSize}
                         onSelectOption={onSelectComputeSizeOption}
                       />
