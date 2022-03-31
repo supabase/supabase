@@ -1,14 +1,11 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect } from 'react'
 import { IconChevronRight, IconLoader } from '@supabase/ui'
 
-import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
+import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/to-be-cleaned/Panel'
-import { StripeSubscription } from 'components/interfaces/Billing'
 
 dayjs.extend(utc)
 
@@ -18,35 +15,19 @@ interface ProjectSummaryProps {
 
 const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
   const { ui } = useStore()
-
-  const [loading, setLoading] = useState(false)
-  const [subscription, setSubscription] = useState<StripeSubscription>()
+  const { subscription, isLoading: loading, error } = useProjectSubscription(project.ref)
 
   const currentPeriodStart = subscription?.billing?.current_period_start ?? 0
   const currentPeriodEnd = subscription?.billing?.current_period_end ?? 0
 
   useEffect(() => {
-    getSubscription()
-  }, [])
-
-  const getSubscription = async () => {
-    try {
-      setLoading(true)
-      const { data: subscription, error }: { data: StripeSubscription; error: any } = await post(
-        `${API_URL}/stripe/subscription`,
-        { subscription_id: project.subscription_id }
-      )
-      if (error) throw error
-      setSubscription(subscription)
-    } catch (error: any) {
+    if (error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to get project subscription: ${error.message}`,
+        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
       })
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [error])
 
   return (
     <div className="w-full px-6 py-3 flex items-center">
