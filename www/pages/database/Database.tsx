@@ -236,7 +236,7 @@ function Database() {
               <div className="grid grid-cols-12" key={0}>
                 <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
                   <p>
-                    <p className="m-0">Libraries coming soon:</p>
+                    <p className="m-0 text-scale-1100">Libraries coming soon:</p>
                   </p>
                   <div className="space-x-1 ml-1">
                     <Badge dot={false}>Python</Badge>

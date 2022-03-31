@@ -28,6 +28,7 @@ export const PRICING_TIER_LABELS = {
 export const PRICING_TIER_PRODUCT_IDS = {
   FREE: 'tier_free',
   PRO: 'tier_pro',
+  PAYG: 'tier_payg',
 }
 
 export const PRICING_TIER_FREE_KEY = 'FREE'
