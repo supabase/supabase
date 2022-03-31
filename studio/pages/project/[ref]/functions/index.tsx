@@ -12,10 +12,16 @@ import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import FunctionsListItem from 'components/interfaces/Functions/FunctionsListItem'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { Function } from 'components/interfaces/Functions/Functions.types'
+import { useAccessTokens } from 'hooks/queries/useAccessTokens'
+import useSWR from 'swr'
+
+import { get } from 'lib/common/fetch'
 
 const EmptyFunctions = () => {
   const router = useRouter()
   const { ref } = router.query
+
+  const { tokens, isLoading } = useAccessTokens()
 
   interface Commands {
     command: string
@@ -24,42 +30,42 @@ const EmptyFunctions = () => {
     comment?: string
   }
   const commands: Commands[] = [
-    {
-      command: 'supabase init',
-      description: "Needed if the project hasen't been inited before",
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> init
-          </>
-        )
-      },
-      comment: 'Initialize Supabase locally',
-    },
-    {
-      command: 'supabase login',
-      description: "Writes the user's API token to disk",
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> login
-          </>
-        )
-      },
-      comment: 'Login using your access token',
-    },
-    {
-      command: `supabase link --ref ${ref}`,
-      description: `Associate the current folder with your Supabase project ${ref}`,
-      jsx: () => {
-        return (
-          <>
-            <span className="text-brand-1100">supabase</span> link --ref {ref}
-          </>
-        )
-      },
-      comment: 'Link this project',
-    },
+    // {
+    //   command: 'supabase init',
+    //   description: "Needed if the project hasen't been inited before",
+    //   jsx: () => {
+    //     return (
+    //       <>
+    //         <span className="text-brand-1100">supabase</span> init
+    //       </>
+    //     )
+    //   },
+    //   comment: 'Initialize Supabase locally',
+    // },
+    // {
+    //   command: 'supabase login',
+    //   description: "Writes the user's API token to disk",
+    //   jsx: () => {
+    //     return (
+    //       <>
+    //         <span className="text-brand-1100">supabase</span> login
+    //       </>
+    //     )
+    //   },
+    //   comment: 'Login using your access token',
+    // },
+    // {
+    //   command: `supabase link --ref ${ref}`,
+    //   description: `Associate the current folder with your Supabase project ${ref}`,
+    //   jsx: () => {
+    //     return (
+    //       <>
+    //         <span className="text-brand-1100">supabase</span> link --ref {ref}
+    //       </>
+    //     )
+    //   },
+    //   comment: 'Link this project',
+    // },
     {
       command: 'supabase functions new hello',
       description: ' creates a function stub at ./functions/hello/hello.ts',
@@ -78,7 +84,8 @@ const EmptyFunctions = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions deploy hello
+            <span className="text-brand-1100">supabase</span> functions deploy hello --project-ref{' '}
+            {ref}
           </>
         )
       },
@@ -123,21 +130,47 @@ const EmptyFunctions = () => {
         <div
           className="
           col-span-7
-      bg-scale-100 dark:bg-scale-300 px-8 py-6
+      bg-scale-100 dark:bg-scale-300
       shadow
-
       border rounded
-      space-y-8"
+      "
         >
-          <div className="flex items-center gap-3">
-            <div className="border p-2 flex items-center justify-center w-8 h-8 bg-scale-100 rounded">
-              <IconTerminal strokeWidth={2} />
+          <div className="px-8 py-6 space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="border p-2 flex items-center justify-center w-8 h-8 bg-scale-100 rounded">
+                <IconTerminal strokeWidth={2} />
+              </div>
+              <h4>Terminal instructions</h4>
             </div>
-            <h4>Terminal instructions</h4>
+            <div className="space-y-4">
+              <CommandRender commands={commands} />
+            </div>
           </div>
-          <div className="space-y-4">
-            <CommandRender commands={commands} />
-          </div>
+          {tokens && tokens.length == 0 ? (
+            <div className="px-8 border-t py-6 space-y-3">
+              <div>
+                <h3 className="text-base text-scale-1200">
+                  You may need to create an access token
+                </h3>
+                <p className="text-sm text-scale-1100">
+                  You can create a secure access token in your account section
+                </p>
+              </div>
+              <Button type="default" onClick={() => router.push('/account/tokens')}>
+                Access tokens
+              </Button>
+            </div>
+          ) : null}
+          {/* <div className="px-8 border-t py-6">
+            <Input
+              value={ref}
+              readOnly
+              copy
+              size="small"
+              label="Project ref"
+              descriptionText="You may need this reference when deploying a function"
+            />
+          </div> */}
         </div>
       </div>
     </>
@@ -252,9 +285,22 @@ const PageLayout = () => {
   const { functions } = useStore()
   const hasFunctions = functions.list().length > 0
 
+  const router = useRouter()
+  const { ref } = router.query
+
+  const {
+    data,
+    error,
+    mutate: mutateSettings,
+  }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
+  const { data: config, mutate: mutateConfig }: any = useSWR(
+    `${API_URL}/projects/${ref}/config?app=postgrest`,
+    get
+  )
+
   return (
-    <FunctionsLayout centered={!hasFunctions}>
-      {hasFunctions ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
+    <FunctionsLayout centered={true}>
+      {false ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
     </FunctionsLayout>
   )
 }
