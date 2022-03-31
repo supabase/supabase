@@ -285,22 +285,9 @@ const PageLayout = () => {
   const { functions } = useStore()
   const hasFunctions = functions.list().length > 0
 
-  const router = useRouter()
-  const { ref } = router.query
-
-  const {
-    data,
-    error,
-    mutate: mutateSettings,
-  }: any = useSWR(`${API_URL}/props/project/${ref}/settings`, get)
-  const { data: config, mutate: mutateConfig }: any = useSWR(
-    `${API_URL}/projects/${ref}/config?app=postgrest`,
-    get
-  )
-
   return (
-    <FunctionsLayout centered={true}>
-      {false ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
+    <FunctionsLayout centered={!hasFunctions}>
+      {hasFunctions ? <FunctionsList functions={functions.list()} /> : <EmptyFunctions />}
     </FunctionsLayout>
   )
 }
