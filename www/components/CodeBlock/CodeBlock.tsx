@@ -6,6 +6,8 @@ import { Button, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import rangeParser from 'parse-numeric-range'
 
+import classNames from 'classnames'
+
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
@@ -61,7 +63,13 @@ function CodeBlock(props: CodeBlockProps) {
 
       const style = shouldHighlightLine ? {} : { filter: 'grayscale(75%)', opacity: 0.5 }
 
-      return { class: CodeBlockStyles['code-line'], style }
+      return {
+        class: classNames(
+          CodeBlockStyles['code-line'],
+          shouldHighlightLine && CodeBlockStyles['code-line--flash']
+        ),
+        style,
+      }
     },
     [highlightLines]
   )
