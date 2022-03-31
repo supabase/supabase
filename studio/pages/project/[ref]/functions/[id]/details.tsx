@@ -101,7 +101,7 @@ const PageLayout: NextPageWithLayout = () => {
         <div
           className="
         px-10 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
-
+        space-y-6
         "
         >
           <div className="space-y-4 w-full">
@@ -129,9 +129,7 @@ const PageLayout: NextPageWithLayout = () => {
                     </div>
                   </div>
                 </div>
-                <span className="text-sm text-scale-900">This function is running correctly</span>
               </div>
-              <span className="text-xs text-scale-900">This function is running correctly</span>
             </div>
           </div>
 
@@ -164,23 +162,22 @@ const PageLayout: NextPageWithLayout = () => {
                 dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-3">
-          <span className="block text-scale-1000 text-sm mb-1">Version</span>
-          <div className="text-base text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
-        </div>
-
-        <div className="grid grid-cols-3">
-          <span className="block text-scale-1000 text-sm mb-1">Regions</span>
-          <div className="flex flex-col gap-1 col-span-2">
-            <div className="text-base text-scale-1200 flex items-center gap-2">
-              <IconGlobe />
-              <span>Earth</span>
-            </div>
-            <span className="text-sm text-scale-1000">All functions are deployed globally</span>
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Version</span>
+            <div className="text-base text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
           </div>
-          <span className="text-xs text-scale-900">Supabase functions run on the edge</span>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Regions</span>
+            <div className="flex flex-col gap-1 col-span-2">
+              <div className="text-base text-scale-1200 flex items-center gap-2">
+                <IconGlobe />
+                <span>Earth</span>
+              </div>
+              <span className="text-sm text-scale-1000">All functions are deployed globally</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -198,11 +195,12 @@ const PageLayout: NextPageWithLayout = () => {
             <h4>Command line access</h4>
           </div>
           <h4>Command line access</h4>
+
+          <h5 className="text-base">Deployment management</h5>
+          <CommandRender commands={managementCommands} />
+          <h5 className="text-base">Secrets management</h5>
+          <CommandRender commands={secretCommands} />
         </div>
-        <h5 className="text-base">Deployment management</h5>
-        <CommandRender commands={managementCommands} />
-        <h5 className="text-base">Secrets management</h5>
-        <CommandRender commands={secretCommands} />
       </div>
     </div>
   )

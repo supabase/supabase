@@ -25,7 +25,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   if (!functions.isLoaded) {
     return (
       <BaseLayout>
-        <Loading active={true}>loading</Loading>
+        <Loading active={true}>{''}</Loading>
       </BaseLayout>
     )
   }
@@ -59,10 +59,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                 </div>
                 <h1 className="text-2xl text-scale-1200">Functions</h1>
               </div>
-              <WarningBanner
-                title={WARNING_MESSAGE.title}
-                description={WARNING_MESSAGE.description}
-              />
+              <WarningBanner title={WARNING_MESSAGE.title} />
             </div>
 
             {children}
@@ -136,10 +133,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                 )}
               </div>
               <div>
-                <WarningBanner
-                  title={WARNING_MESSAGE.title}
-                  description={WARNING_MESSAGE.description}
-                />
+                <WarningBanner title={WARNING_MESSAGE.title} />
               </div>
             </div>
             {item && <FunctionsNav item={item} />}
