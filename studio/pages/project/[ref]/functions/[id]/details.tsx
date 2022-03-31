@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
+import { useProjectSettings, useStore } from 'hooks'
 
 import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
@@ -9,8 +9,9 @@ import { toJS } from 'mobx'
 import { IconExternalLink, IconGlobe, IconTerminal, Loading } from '@supabase/ui'
 import Link from 'next/link'
 import dayjs from 'dayjs'
+import { NextPageWithLayout } from 'types'
 
-const PageLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id } = router.query
 
@@ -94,119 +95,139 @@ const PageLayout = () => {
     },
   ]
 
+  const { services } = useProjectSettings(ref as string | undefined)
+
+  const API_SERVICE_ID = 1
+
+  // Get the API service
+  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
+  const apiKeys = apiService?.service_api_keys ?? []
+  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
+
+  const invokeCommands: any = [
+    {
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
+        selectedFunction?.slug
+      }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}'`,
+      description: 'Invokes the hello function',
+      jsx: () => {
+        return (
+          <>
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
+            .functions.supabase.co/{selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON
+            KEY]'
+          </>
+        )
+      },
+      comment: 'Invoke your function',
+    },
+  ]
+
   return (
-    <FunctionsLayout>
-      <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
-        <div>
-          <div
-            className="
-          px-10 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
+    <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
+      <div>
+        <div
+          className="
+        px-10 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
+        space-y-6
+        "
+        >
+          <div className="space-y-4 w-full">
+            <div className="grid grid-cols-3">
+              <span className="block text-scale-1000 text-sm mb-1">Function Name</span>
+              <div className="text-base text-scale-1200">{selectedFunction?.name}</div>
+            </div>
 
-          "
-          >
-            <div className="space-y-4 w-full">
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Function name</span>
-                <div className="text-base text-scale-1200">{selectedFunction?.name}</div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Status</span>
-                <div className="flex flex-col gap-2 col-span-2">
-                  <div className="flex">
-                    <div
-                      className="
-                      text-base bg-brand-300 dark:bg-brand-100 px-3 py-0.5 rounded-full lowercasefirst-letter
-                      flex flex-row items-center gap-3 lowercase text-brand-900
-                "
-                    >
-                      {selectedFunction?.status}
-                      <div className="relative w-2 h-2">
-                        <span className="flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-800 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-900"></span>
-                        </span>
-                      </div>
+            <div className="grid grid-cols-3">
+              <span className="block text-scale-1000 text-sm mb-1">Status</span>
+              <div className="flex flex-col gap-2 col-span-2">
+                <div className="flex">
+                  <div
+                    className="
+                    text-base bg-brand-300 dark:bg-brand-100 px-3 py-0.5 rounded-full lowercasefirst-letter
+                    flex flex-row items-center gap-3 lowercase text-brand-900
+              "
+                  >
+                    {selectedFunction?.status}
+                    <div className="relative w-2 h-2">
+                      <span className="flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-800 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-900"></span>
+                      </span>
                     </div>
                   </div>
-                  <span className="text-sm text-scale-900">This function is running correctly</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint url</span>
-                <div className="col-span-2">
-                  <Link
-                    href={`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}
-                    passHref
-                  >
-                    <a className="group text-scale-1100 hover:text-scale-1200" target="_target">
-                      <span className="underline break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
-                    </a>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Created at</span>
-                <div className="text-base text-scale-1200 col-span-2">
-                  {selectedFunction?.created_at &&
-                    dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Updated at</span>
-                <div className="text-base text-scale-1200 col-span-2">
-                  {selectedFunction?.updated_at &&
-                    dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Version</span>
-                <div className="text-base text-scale-1200 col-span-2">
-                  v{selectedFunction?.version}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3">
-                <span className="block text-scale-1000 text-sm mb-1">Regions</span>
-                <div className="flex flex-col gap-1 col-span-2">
-                  <div className="text-base text-scale-1200 flex items-center gap-2">
-                    <IconGlobe />
-                    <span>Earth</span>
-                  </div>
-                  <span className="text-sm text-scale-1000">
-                    All functions are deployed globally
-                  </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div>
-          <div
-            className="px-10 py-8
-          bg-scale-100 dark:bg-scale-300 border drop-shadow-sm
-          rounded
-          space-y-6"
-          >
-            <div className="flex items-center gap-3">
-              <div className="border p-2 flex items-center justify-center w-8 h-8 text-scale-100 dark:text-scale-1200 bg-scale-1200 dark:bg-scale-100 rounded">
-                <IconTerminal strokeWidth={2} />
-              </div>
-              <h4>Command line access</h4>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint URL</span>
+            <div className="col-span-2">
+              <span className="text-scale-1200 break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
             </div>
-            <h5 className="text-base">Deployment management</h5>
-            <CommandRender commands={managementCommands} />
-            <h5 className="text-base">Secrets management</h5>
-            <CommandRender commands={secretCommands} />
+          </div>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Created At</span>
+            <div className="text-base text-scale-1200 col-span-2">
+              {selectedFunction?.created_at &&
+                dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Updated At</span>
+            <div className="text-base text-scale-1200 col-span-2">
+              {selectedFunction?.updated_at &&
+                dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Version</span>
+            <div className="text-base text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
+          </div>
+
+          <div className="grid grid-cols-3">
+            <span className="block text-scale-1000 text-sm mb-1">Regions</span>
+            <div className="flex flex-col gap-1 col-span-2">
+              <div className="text-base text-scale-1200 flex items-center gap-2">
+                <IconGlobe />
+                <span>Earth</span>
+              </div>
+              <span className="text-sm text-scale-1000">All functions are deployed globally</span>
+            </div>
           </div>
         </div>
       </div>
-    </FunctionsLayout>
+
+      <div>
+        <div
+          className="px-10 py-8
+        bg-scale-100 dark:bg-scale-300 border drop-shadow-sm
+        rounded
+        space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <div className="border p-2 flex items-center justify-center w-8 h-8 text-scale-100 dark:text-scale-1200 bg-scale-1200 dark:bg-scale-100 rounded">
+              <IconTerminal strokeWidth={2} />
+            </div>
+            <h4>Command line access</h4>
+          </div>
+
+          <h5 className="text-base">Deployment management</h5>
+          <CommandRender commands={managementCommands} />
+          <h5 className="text-base">Invoke </h5>
+          <CommandRender commands={invokeCommands} />
+          <h5 className="text-base">Secrets management</h5>
+          <CommandRender commands={secretCommands} />
+        </div>
+      </div>
+    </div>
   )
 }
 
-export default withAuth(observer(PageLayout))
+PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+
+export default observer(PageLayout)
