@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, IconBookOpen, IconSearch, IconTerminal, Input, Loading } from '@supabase/ui'
 
-import { useStore, withAuth } from 'hooks'
+import { useProjectSettings, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import Table from 'components/to-be-cleaned/Table'
@@ -23,6 +23,14 @@ const EmptyFunctions = () => {
   const { ref } = router.query
 
   const { tokens, isLoading } = useAccessTokens()
+  const { services } = useProjectSettings(ref as string | undefined)
+
+  const API_SERVICE_ID = 1
+
+  // Get the API service
+  const apiService = (services ?? []).find((x: any) => x.app.id == API_SERVICE_ID)
+  const apiKeys = apiService?.service_api_keys ?? []
+  const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
 
   interface Commands {
     command: string
@@ -93,7 +101,9 @@ const EmptyFunctions = () => {
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'`,
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
+        anonKey ?? '[YOUR ANON KEY]'
+      }'`,
       description: 'Invokes the hello function',
       jsx: () => {
         return (
