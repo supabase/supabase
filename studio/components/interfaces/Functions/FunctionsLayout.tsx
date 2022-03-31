@@ -10,7 +10,7 @@ import Link from 'next/link'
 import WarningBanner from 'components/ui/WarningBanner'
 import { WARNING_MESSAGE } from './Functions.constants'
 
-const PageLayout = ({ children, centered }: { children?: React.ReactNode; centered?: boolean }) => {
+const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
   const router = useRouter()
 
@@ -25,13 +25,16 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
   if (!functions.isLoaded) {
     return (
       <BaseLayout>
-        <Loading active={true}>loading</Loading>
+        <Loading active={true}>{''}</Loading>
       </BaseLayout>
     )
   }
 
   const item = id ? functions.byId(id) : null
   const name = item?.name || ''
+
+  const hasFunctions = functions.list().length > 0
+  const centered = !hasFunctions
 
   return (
     <BaseLayout>
@@ -56,10 +59,7 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
                 </div>
                 <h1 className="text-2xl text-scale-1200">Functions</h1>
               </div>
-              <WarningBanner
-                title={WARNING_MESSAGE.title}
-                description={WARNING_MESSAGE.description}
-              />
+              <WarningBanner title={WARNING_MESSAGE.title} />
             </div>
 
             {children}
@@ -133,10 +133,7 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
                 )}
               </div>
               <div>
-                <WarningBanner
-                  title={WARNING_MESSAGE.title}
-                  description={WARNING_MESSAGE.description}
-                />
+                <WarningBanner title={WARNING_MESSAGE.title} />
               </div>
             </div>
             {item && <FunctionsNav item={item} />}
@@ -167,4 +164,4 @@ const PageLayout = ({ children, centered }: { children?: React.ReactNode; center
   )
 }
 
-export default withAuth(observer(PageLayout))
+export default withAuth(observer(FunctionsLayout))

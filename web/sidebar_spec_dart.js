@@ -14,6 +14,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Functions',
+      items: ['reference/dart/invoke'],
+      collapsed: true,
+    },
+    {
+      type: 'category',
       label: 'Database',
       items: ['reference/dart/select', 'reference/dart/insert', 'reference/dart/update', 'reference/dart/upsert', 'reference/dart/delete', 'reference/dart/rpc'],
       collapsed: true,
