@@ -12,7 +12,7 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
   return (
     <div className="space-y-4">
       <div>
-        <p>Compute size</p>
+        <p>Database Add-ons</p>
         <p className="text-sm text-scale-1100">
           Choose the database instance size that best fits your needs
         </p>
