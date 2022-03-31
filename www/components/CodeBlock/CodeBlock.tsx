@@ -11,7 +11,7 @@ import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 
-interface Props {
+export interface CodeBlockProps {
   lang: 'js' | 'ts' | 'sql' | 'py'
   startingLineNumber?: number
   hideCopy?: boolean
@@ -30,7 +30,7 @@ interface Props {
   highlightLines?: string
 }
 
-function CodeBlock(props: Props) {
+function CodeBlock(props: CodeBlockProps) {
   let lang = props.lang
     ? props.lang
     : props.className
