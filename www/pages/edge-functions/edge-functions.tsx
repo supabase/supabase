@@ -133,7 +133,7 @@ function Database() {
               />
             </div>,
           ]}
-          documentation_url={'/docs/guides/edge-functions'}
+          documentation_url={'/docs/guides/functions'}
         />
 
         <SectionContainer>
@@ -142,16 +142,10 @@ function Database() {
               {featureBlocks.map((item) => {
                 return (
                   <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
-                    {item.img ? (
-                      <img
-                        src={`/images/product/functions/${item.img}`}
-                        className="w-12 h-12 rounded-md"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
-                        {item.icon ? item.icon : <IconCode strokeWidth={2} />}
-                      </div>
-                    )}
+                    <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
+                      {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                    </div>
+
                     <div>
                       <h3 className="text-lg text-scale-1200">{item.title}</h3>
                       <p className="text-sm text-scale-900">{item.description}</p>
@@ -266,33 +260,6 @@ serve(async (req) => {
           </div>
         </SectionContainer>
 
-        <SectionContainer>
-          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid grid-cols-4 gap-8 rounded">
-              {featureBlocks.map((item) => {
-                return (
-                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
-                    {item.img ? (
-                      <img
-                        src={`/images/product/functions/${item.img}`}
-                        className="w-12 h-12 rounded-md"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
-                        {item.icon ? item.icon : <IconCode strokeWidth={2} />}
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
-                      <p className="text-sm text-scale-900">{item.description}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </SectionContainer>
-
         <SectionContainer className="-mb-16">
           <FunctionsUsecases
             // @ts-ignore
@@ -323,7 +290,7 @@ serve(async (req) => {
                 ></div>
               </div>,
             ]}
-            documentation_link={'/docs/guides/database'}
+            documentation_link={'/docs/guides/functions'}
           />
         </SectionContainer>
 
