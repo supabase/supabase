@@ -53,7 +53,9 @@ const AccessTokenList = observer(() => {
                 {tokens?.map((x: AccessToken) => {
                   return (
                     <Table.tr key={x.token_alias}>
-                      <Table.td>{x.token_alias}</Table.td>
+                      <Table.td>
+                        <span className="font-mono">{x.token_alias}</span>
+                      </Table.td>
                       <Table.td>{x.name}</Table.td>
                       <Table.td>
                         <Typography.Text>{new Date(x.created_at).toLocaleString()}</Typography.Text>
