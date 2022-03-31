@@ -113,6 +113,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Functions',
+      collapsed: false,
+      items: ['guides/functions'],
+    },
+    {
+      type: 'category',
       label: 'Auth',
       collapsed: false,
       items: [
