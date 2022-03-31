@@ -132,7 +132,7 @@ const PageLayout = () => {
                     {/* 
                     // @ts-ignore */}
                     <ChartHandler
-                      label="Execution time"
+                      label="Execution time average"
                       defaultChartStyle="line"
                       startDate={startDate}
                       endDate={endDate}
@@ -157,7 +157,7 @@ const PageLayout = () => {
                     {/* 
                     // @ts-ignore */}
                     <ChartHandler
-                      label="Invocations"
+                      label="Total Invocations"
                       startDate={startDate}
                       endDate={endDate}
                       attribute={'count'}
@@ -181,24 +181,21 @@ const PageLayout = () => {
                     // @ts-ignore */}
                   <ChartHandler
                     defaultChartStyle="line"
-                    label="Error count"
+                    label="Errors"
                     startDate={startDate}
                     endDate={endDate}
-                    attribute={'min_execution_time'}
+                    attribute={'error_count'}
                     provider="log-stats"
                     // interval="1d"
                     hideChartType
                     customDateFormat={datetimeFormat}
                     data={charts}
                     isLoading={!charts.data && !error ? true : false}
-                    highlightedValue={calculateHighlightedValue(
-                      data?.result,
-                      'min_execution_time',
-                      {
-                        sum: true,
-                      }
-                    )}
+                    highlightedValue={calculateHighlightedValue(data?.result, 'error_count', {
+                      sum: true,
+                    })}
                     onBarClick={(v) => handleBarClick(v, '/auth')}
+                    color={'var(--colors-red9)'}
                   />
                 </Panel.Content>
               </Panel>
