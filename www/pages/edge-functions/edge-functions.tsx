@@ -31,6 +31,7 @@ import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
+import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
@@ -84,6 +85,10 @@ function Database() {
   const meta_title = `${title}`
   const meta_description = subtitle
 
+  const highlightLines = ['1..8', '11..24', '28', '31']
+
+  const [currentSelection, setCurrentSelection] = useState(highlightLines[0])
+
   return (
     <>
       <NextSeo
@@ -107,7 +112,7 @@ function Database() {
           h1={[<span key={'database-h1'}>{title}</span>]}
           subheader={[subtitle, 'PostgreSQL is one of the worlds most scalable databases.']}
           image={[
-            <div className="w-full header--light block" key="light">
+            <div className="block w-full header--light" key="light">
               <Image
                 src={`${basePath}/images/product/database/header--light-2.png`}
                 alt="database header"
@@ -116,7 +121,7 @@ function Database() {
                 height="1116"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block" key="dark">
+            <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/database/header--dark-2.png`}
                 alt="database header"
@@ -130,86 +135,105 @@ function Database() {
         />
 
         <SectionContainer>
-          <div
-            className="mb-10 lg:mb-0 col-span-12 lg:col-span-3
-          space-y-12
-          "
-          >
+          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
             <div className="grid grid-cols-12 gap-32">
-              <div className="col-span-5 flex flex-col gap-8">
+              <div className="flex flex-col col-span-5 gap-8">
                 <div>
-                  <h3 className="h3">Anotomy of the Edge</h3>
+                  <h3 className="h3">Anatomy of the Edge</h3>
                   <p className="p">
                     Create asynchronous tasks within minutes using Supabase Functions with easy
                     access to the rest of the Supabase Ecosystem.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
-                  <button className="border rounded-md bg-scale-200 text-left px-6 py-4">
+                  <button
+                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
+                    onClick={() => setCurrentSelection(highlightLines[0])}
+                  >
                     <div className="text-scale-1200">Title is here</div>
                     <div className="text-scale-1100">Description in here</div>
                   </button>
-                  <button className="border rounded-md bg-scale-200 text-left px-6 py-4">
+                  <button
+                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
+                    onClick={() => setCurrentSelection(highlightLines[1])}
+                  >
                     <div className="text-scale-1200">Title is here</div>
                     <div className="text-scale-1100">Description in here</div>
                   </button>
-                  <button className="border rounded-md bg-scale-200 text-left px-6 py-4">
+                  <button
+                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
+                    onClick={() => setCurrentSelection(highlightLines[2])}
+                  >
                     <div className="text-scale-1200">Title is here</div>
                     <div className="text-scale-1100">Description in here</div>
                   </button>
-                  <button className="border rounded-md bg-scale-200 text-left px-6 py-4">
+                  <button
+                    className="px-6 py-4 text-left border rounded-md bg-scale-200"
+                    onClick={() => setCurrentSelection(highlightLines[3])}
+                  >
                     <div className="text-scale-1200">Title is here</div>
                     <div className="text-scale-1100">Description in here</div>
                   </button>
                 </div>
               </div>
               <div className="col-span-7 overflow-hidden">
-                <CodeBlock
-                  style={{ maxHeight: '520px' }}
-                  className=" translate-y-14"
-                >{`import Container from 'components/Container'
-import Layout from '~/components/Layouts/Default'
-import Hero from 'components/Hero'
+                <ScrollableCodeBlock lang="ts" highlightLines={currentSelection}>
+                  {`import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
+import { stripe } from "../_utils/stripe.ts";
 
-import Features from 'components/Features/index'
-import BuiltExamples from 'components/BuiltWithSupabase/index'
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
+serve(async (req) => {
+  try {
+    // Get the authorization header from the request.
+    // When you invoke the function via the client library it will automatically pass the authenticated user's JWT.
+    const authHeader = req.headers.get("Authorization")!;
 
-type Props = {}
+    // Create a Supabase client with the Auth context of the logged in user.
+    const supabaseClient = createClient(
+      // Supabase API URL - env var exported by default.
+      Deno.env.get("SUPABASE_URL") ?? "",
+      // Supabase API ANON KEY - env var exported by default.
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      // Create client with Auth context of the user that called the function.
+      // This way your row-level-security (RLS) policies are applied.
+      { headers: { Authorization: authHeader } }
+    );
 
-const Index = ({}: Props) => {
-  return (
-    <>
-      <Layout>
-        <Container>
-          <Hero />
-          <Features />
-          <TwitterSocialSection />
-          <BuiltExamples />
-          <MadeForDevelopers />
-          <AdminAccess />
-          <CaseStudies />
-          <CTABanner />
-        </Container>
-      </Layout>
-    </>
-  )
-}
+    supabaseClient.auth.setAuth(authHeader)
 
-export default Index
-`}</CodeBlock>
+    // Check if the user already has a Stripe customer ID in the Database.
+    const { data, error } = await supabaseClient
+      .from<Customer>("customers")
+      .select("*");
+    console.log(data?.length, data, error);
+    if (error) throw error;
+    if (data?.length === 1) {
+      // Exactly one customer found, return it.
+      const customer = data[0].stripe_customer_id;
+      console.log(\`Found customer id: \${customer}\`);
+      return customer;
+    }
+
+    // Create a PaymentIntent so that the SDK can charge the logged in customer.
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 1099,
+      currency: "usd",
+      customer: customer,
+    });
+
+    
+    return new Response(JSON.stringify(res), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify(error), { status: 400 });
+  }
+});`}
+                </ScrollableCodeBlock>
               </div>
             </div>
           </div>
         </SectionContainer>
 
         <SectionContainer>
-          <div
-            className="mb-10 lg:mb-0 col-span-12 lg:col-span-3
-          space-y-12
-          "
-          >
+          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
             <div className="text-center">
               <h3 className="h2">This is a title</h3>
               <p className="p">This is a title</p>
@@ -218,17 +242,8 @@ export default Index
             <div className="grid grid-cols-3 gap-8 rounded">
               {featureHighlights.map((item) => {
                 return (
-                  <div
-                    className="group px-8 py-6 bg-scale-100 border dark:bg-scale-300 rounded 
-            flex flex-col gap-4"
-                  >
-                    <div
-                      className="
-                    h-12 w-12 bg-scale-300 border dark:bg-scale-500 rounded-md text-scale-1200 flex items-center justify-center
-                    transition-all
-                    group-hover:text-brand-900 group-hover:scale-105
-                    "
-                    >
+                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
+                    <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
                       <IconCode strokeWidth={2} />
                     </div>
                     <div>
@@ -244,20 +259,20 @@ export default Index
 
         <SectionContainer>
           <div className="grid grid-cols-12">
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <div className="mb-4 flex items-center space-x-2">
+            <div className="col-span-12 mb-10 lg:mb-0 lg:col-span-3">
+              <div className="flex items-center mb-4 space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
               </div>
               <h4 className="h4">Just Postgres</h4>
               <p className="p">Every Supabase project is a dedicated Postgres database.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 100% portable. Bring your existing Postgres database, or migrate away at any time.
               </p>
             </div>
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <div className="mb-4 flex items-center space-x-2">
+            <div className="col-span-12 mb-10 lg:mb-0 lg:col-span-3 lg:col-start-5">
+              <div className="flex items-center mb-4 space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -265,13 +280,13 @@ export default Index
 
               <h4 className="h4">Built-in Auth</h4>
               <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 Integrated with JWT authentication which controls exactly what your users can
                 access.
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="flex items-center mb-4 space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
@@ -279,7 +294,7 @@ export default Index
 
               <h4 className="h4">Realtime enabled</h4>
               <p className="p">Data-change listeners over websockets.</p>
-              <p className="p text-sm">
+              <p className="text-sm p">
                 Subscribe and react to database changes, milliseconds after they happen.
               </p>
             </div>
@@ -378,18 +393,18 @@ export default Index
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
+                <div className="flex col-span-12 mt-0 lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
                     <p className="m-0 text-scale-1100">Libraries coming soon:</p>
                   </p>
-                  <div className="space-x-1 ml-1">
+                  <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
                     <Badge dot={false}>C#</Badge>
                     <Badge dot={false}>Kotlin</Badge>
                   </div>
                 </div>
-                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
+                <div className="hidden col-span-12 lg:col-span-6 xl:col-span-10 xl:block" key={1}>
                   {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
@@ -407,12 +422,12 @@ export default Index
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="border-t border-b border-gray-100 section--bg dark:border-gray-600"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="pt-12 pb-0 section-container">
               <FloatingIcons />
               <div className="overflow-x-hidden">
-                <SectionContainer className="mb-0 pb-8 lg:pt-32">
+                <SectionContainer className="pb-8 mb-0 lg:pt-32">
                   <GithubExamples />
                 </SectionContainer>
               </div>
@@ -422,7 +437,7 @@ export default Index
 
         <SectionContainer className="lg:py-48">
           <div className="grid grid-cols-12 lg:gap-16">
-            <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
+            <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
               <h2 className="h3">Extend your database</h2>
 
               <p className="p">Supabase works natively with Postgres extensions.</p>
@@ -440,7 +455,7 @@ export default Index
                 </Button>
               </Link>
             </div>
-            <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
+            <div className="col-span-12 mt-8 lg:mt-0 lg:col-span-6 lg:col-start-7">
               <SplitCodeBlockCarousel
                 // @ts-ignore
                 content={ExtensionsExamplesData}
