@@ -132,7 +132,7 @@ const EmptyFunctions = () => {
             for hybrid and multi-cloud scenarios
           </p>
           <div className="flex gap-2">
-            <Link passHref href="https://supabase.com/docs/functions">
+            <Link passHref href="https://supabase.com/docs/guides/functions">
               <Button as="a" type="default" iconRight={<IconBookOpen />}>
                 Documentation
               </Button>
