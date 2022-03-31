@@ -65,7 +65,6 @@ module.exports = {
         'guides/with-redwoodjs',
         'guides/with-svelte',
         'guides/with-vue-3',
-        'guides/with-nuxt-3'
       ],
     },
     {
