@@ -96,88 +96,90 @@ const PageLayout = () => {
 
   return (
     <FunctionsLayout>
-      <div className="grid gap-y-12 lg:grid-cols-2 lg:gap-x-16">
+      <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
         <div>
           <div
             className="
-          px-12 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
+          px-10 py-8 bg-scale-100 dark:bg-scale-300 rounded border drop-shadow-sm
 
           "
           >
-            {console.log('inside the render', functions.byId(id))}
-            <div>{selectedFunction?.createdAt}</div>
-
-            <div className="space-y-4">
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Function name</span>
-                <div className="text-base text-scale-1100">{selectedFunction?.name}</div>
+            <div className="space-y-4 w-full">
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Function name</span>
+                <div className="text-base text-scale-1200">{selectedFunction?.name}</div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Status</span>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="text-base bg-brand-300 dark:bg-brand-100 px-3 py-0.5 rounded-full lowercasefirst-letter:
-                flex items-center gap-3 lowercase text-brand-900
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Status</span>
+                <div className="flex flex-col gap-2 col-span-2">
+                  <div className="flex">
+                    <div
+                      className="
+                      text-base bg-brand-300 dark:bg-brand-100 px-3 py-0.5 rounded-full lowercasefirst-letter
+                      flex flex-row items-center gap-3 lowercase text-brand-900
                 "
-                  >
-                    {selectedFunction?.status}
-                    <div className="relative w-2 h-2">
-                      <span className="flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-800 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-900"></span>
-                      </span>
+                    >
+                      {selectedFunction?.status}
+                      <div className="relative w-2 h-2">
+                        <span className="flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-800 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-900"></span>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <span className="text-xs text-scale-900">This function is running correctly</span>
+                  <span className="text-sm text-scale-900">This function is running correctly</span>
                 </div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Endpoint url</span>
-                <Link
-                  href={`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}
-                  passHref
-                >
-                  <a
-                    className="flex items-center gap-2 group text-scale-1100 hover:text-scale-1200"
-                    target="_target"
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint url</span>
+                <div className="col-span-2">
+                  <Link
+                    href={`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}
+                    passHref
                   >
-                    <span className="underline">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
-                    <IconExternalLink size={14} />
-                  </a>
-                </Link>
+                    <a className="group text-scale-1100 hover:text-scale-1200" target="_target">
+                      <span className="underline break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
+                    </a>
+                  </Link>
+                </div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Created at</span>
-                <div className="text-base text-scale-1100">
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Created at</span>
+                <div className="text-base text-scale-1200 col-span-2">
                   {selectedFunction?.created_at &&
                     dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
                 </div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Updated at</span>
-                <div className="text-base text-scale-1100">
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Updated at</span>
+                <div className="text-base text-scale-1200 col-span-2">
                   {selectedFunction?.updated_at &&
                     dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
                 </div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Version</span>
-                <div className="text-base text-scale-1100">v {selectedFunction?.version}</div>
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Version</span>
+                <div className="text-base text-scale-1200 col-span-2">
+                  v{selectedFunction?.version}
+                </div>
               </div>
 
-              <div>
-                <span className="block text-scale-900 text-xs mb-1">Regions</span>
-                <div className="flex items-center gap-3">
-                  <div className="text-base text-scale-1100 flex items-center gap-2">
+              <div className="grid grid-cols-3">
+                <span className="block text-scale-1000 text-sm mb-1">Regions</span>
+                <div className="flex flex-col gap-1 col-span-2">
+                  <div className="text-base text-scale-1200 flex items-center gap-2">
                     <IconGlobe />
                     <span>Earth</span>
                   </div>
-                  <span className="text-xs text-scale-900">Supabase functions run on the edge</span>
+                  <span className="text-sm text-scale-1000">
+                    All functions are deployed globally
+                  </span>
                 </div>
               </div>
             </div>
@@ -185,7 +187,7 @@ const PageLayout = () => {
         </div>
         <div>
           <div
-            className="px-12 py-8
+            className="px-10 py-8
           bg-scale-100 dark:bg-scale-300 border drop-shadow-sm
           rounded
           space-y-6"
