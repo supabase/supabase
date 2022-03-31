@@ -66,12 +66,7 @@ function Database() {
         <ProductHeader
           icon={Solutions['edge-functions'].icon}
           title={Solutions['edge-functions'].name}
-          h1={[
-            <span key={'database-h1'}>
-              Open Source SQL Database
-              <br /> (without the hassle)
-            </span>,
-          ]}
+          h1={[<span key={'database-h1'}>{title}</span>]}
           subheader={[subtitle, 'PostgreSQL is one of the worlds most scalable databases.']}
           image={[
             <div className="w-full header--light block" key="light">
