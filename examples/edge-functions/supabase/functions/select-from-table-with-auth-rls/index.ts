@@ -5,18 +5,19 @@
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@^1.33.2'
 
+const supabase = createClient(
+  // Supabase API URL - env var exported by default when deployed.
+  Deno.env.get('SUPABASE_URL') ?? '',
+  // Supabase API ANON KEY - env var exported by default when deployed.
+  Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+)
+
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
 
 serve(async (req: Request) => {
-  const supabase = createClient(
-    // Supabase API URL - env var exported by default when deployed.
-    Deno.env.get('SUPABASE_URL') ?? '',
-    // Supabase API ANON KEY - env var exported by default when deployed.
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    // Create client with Auth context of the user that called the function.
-    // This way your row-level-security (RLS) policies are applied.
-    { headers: { Authorization: req.headers.get('Authorization') ?? '' } }
-  )
+  // Set the Auth context of the user that called the function.
+  // This way your row-level-security (RLS) policies are applied.
+  supabase.auth.setAuth(req.headers.get('Authorization')!.split('Bearer ')[1])
 
   const { data, error } = await supabase.from('users').select('*')
   console.log({ data, error })
