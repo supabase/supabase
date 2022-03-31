@@ -106,15 +106,16 @@ const PageLayout: NextPageWithLayout = () => {
 
   const invokeCommands: any = [
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
-        anonKey ?? '[YOUR ANON KEY]'
-      }'`,
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
+        selectedFunction?.slug
+      }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}'`,
       description: 'Invokes the hello function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'
+            .functions.supabase.co/{selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON
+            KEY]'
           </>
         )
       },
