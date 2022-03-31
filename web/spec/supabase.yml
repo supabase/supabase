@@ -971,11 +971,11 @@ pages:
   invoke():
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
+      Invokes a Supabase Function.
 
       :::caution
 
-      Supabase Functions are in Experimental release until 1 August 2022. There will breaking changes. Do not use them in Production.
+      Edge Functions are Experimental until 1 August 2022. There will breaking changes. Do not use them in Production.
 
       :::
 
