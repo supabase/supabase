@@ -1,13 +1,10 @@
 .code-block {
-  @apply overflow-hidden rounded-lg;
-}
-
-.code-block--show-toolbar {
-  @apply rounded-t-none !important;
+  @apply overflow-hidden;
 }
 
 .code-line {
   transition: filter 500ms ease, opacity 500ms ease;
+  transition-delay: 200ms;
 }
 
 .code-block .code-line:first-of-type {

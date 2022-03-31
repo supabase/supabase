@@ -85,7 +85,7 @@ function Database() {
   const meta_title = `${title}`
   const meta_description = subtitle
 
-  const highlightLines = ['1..8', '11..23', '28', '31']
+  const highlightLines = ['1..8', '11..21', '28', '31']
 
   const [currentSelection, setCurrentSelection] = useState(highlightLines[0])
 
