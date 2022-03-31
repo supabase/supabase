@@ -1,13 +1,10 @@
-import { Badge, IconCode, IconFastForward, IconGlobe } from '@supabase/ui'
-// data
-import ApiExamplesData from 'data/products/database/api-examples'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from '@supabase/ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-// Import Swiper styles
 import 'swiper/swiper.min.css'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -16,42 +13,35 @@ import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
-// install Swiper's Controller component
-// SwiperCore.use([Controller])
-
 const featureBlocks = [
   {
     title: 'Instant deployment',
     description: 'Deploy Edge Functions in seconds',
     highlightLines: '8',
-    icon: <IconFastForward />,
+    icon: <IconFastForward strokeWidth={1.5} />,
   },
   {
     title: 'Global',
     description: 'Deployed to 29 regions worldwide',
     highlightLines: '8',
-    icon: <IconGlobe />,
+    icon: <IconGlobe strokeWidth={1.5} />,
   },
   {
     title: 'Typescript ready',
     description: 'TypeScript, WASM, ES Modules',
     highlightLines: '8',
-    img: 'typescript.svg',
+    icon: <IconCode strokeWidth={1.5} />,
   },
   {
     title: 'Async triggers',
     description: 'Invoke Edge Functions based on any event in your database',
     highlightLines: '28',
+    icon: <IconRefreshCcw strokeWidth={1.5} />,
     badge: 'Coming soon',
   },
 ]
 
 const featureHighlights = [
-  // {
-  //   title: 'Run a function from anywhere',
-  //   description: `It's as easy as running serve()`,
-  //   highlightLines: '1,5',
-  // },
   {
     title: 'Set authentication',
     description: 'Use the JWT token to set the authentication of the user',
@@ -71,7 +61,7 @@ const featureHighlights = [
   },
   {
     title: 'No limits',
-    description: `You're can empowered to run whatever logic you like using any data from the Supabase database.`,
+    description: `You're empowered to run any logic you like using any data from the Supabase database.`,
     highlightLines: '29..39',
   },
 ]
@@ -116,12 +106,17 @@ function Database() {
         <ProductHeader
           icon={Solutions['edge-functions'].icon}
           title={Solutions['edge-functions'].name}
-          h1={[<span key={'database-h1'}>{title}</span>]}
+          h1={[
+            <span key={'database-h1'}>
+              Serverless Edge Functions
+              <br /> that automatically scale
+            </span>,
+          ]}
           subheader={[subtitle, 'PostgreSQL is one of the worlds most scalable databases.']}
           image={[
             <div className="block w-full header--light" key="light">
               <Image
-                src={`${basePath}/images/product/database/header--light-2.png`}
+                src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
@@ -130,7 +125,7 @@ function Database() {
             </div>,
             <div className="w-full mr-0 header--dark dark:block" key="dark">
               <Image
-                src={`${basePath}/images/product/database/header--dark-2.png`}
+                src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
                 layout="responsive"
                 width="1680"
@@ -143,7 +138,7 @@ function Database() {
 
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid grid-cols-4 gap-8 rounded">
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8 rounded">
               {featureBlocks.map((item) => {
                 return (
                   <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
@@ -173,10 +168,10 @@ function Database() {
             <div className="grid lg:grid-cols-12 gap-6 lg:gap-32 items-center">
               <div className="flex flex-col lg:col-span-5 gap-8">
                 <div>
-                  <h3 className="h3">Anatomy of the Edge</h3>
+                  <h3 className="h3">Anatomy of an Edge Function</h3>
                   <p className="p">
-                    Create asynchronous tasks within minutes using Supabase Functions with easy
-                    access to the rest of the Supabase Ecosystem.
+                    Asynchronous tasks within minutes using Supabase Functions with simple
+                    authenticated access to the rest of the Supabase Ecosystem.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -298,15 +293,15 @@ serve(async (req) => {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="-mb-48">
+        <SectionContainer className="-mb-16">
           <FunctionsUsecases
             // @ts-ignore
             content={UseCaseExamples}
-            title="Never write an API again"
+            title="Use functions for every server side function"
             text={[
               <p key={0}>
-                We introspect your database and provide instant APIs. Focus on building your
-                product, while Supabase handles the CRUD.
+                Edge Functions are perfect for running code for sensitive use cases or interacting
+                with 3rd party services.
               </p>,
             ]}
             footer={[
@@ -322,15 +317,10 @@ serve(async (req) => {
                     <Badge dot={false}>Kotlin</Badge>
                   </div>
                 </div>
-                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
-                  {/* <TweetCard
-                    handle="@eunjae_lee"
-                    img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
-                    quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
-          in it. Whereas they provide a good abstraction overall, they also provide a raw access to
-          the database."
-                  /> */}
-                </div>
+                <div
+                  className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block"
+                  key={1}
+                ></div>
               </div>,
             ]}
             documentation_link={'/docs/guides/database'}

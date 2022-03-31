@@ -71,17 +71,6 @@ function FunctionsUsecases(props: Props) {
             )
           })}
         </div>
-
-        {props.documentation_link && (
-          <Link href={props.documentation_link} as={props.documentation_link}>
-            <a>
-              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Explore documentation
-              </Button>
-            </a>
-          </Link>
-        )}
-        {props.footer && <div className="py-8">{props.footer}</div>}
       </div>
       <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
         <div className="overflow-hidden">
