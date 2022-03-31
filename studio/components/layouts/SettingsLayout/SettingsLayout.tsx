@@ -19,15 +19,11 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
-  const logType = router.query.type
-
-  const pageKey = !isUndefined(logType) ? `logs-${logType}` : page
-
   return (
     <BaseLayout
       title={title || 'Settings'}
       product="Settings"
-      productMenu={<ProductMenu page={pageKey} menu={generateSettingsMenu(projectRef)} />}
+      productMenu={<ProductMenu page={page} menu={generateSettingsMenu(projectRef)} />}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}

@@ -1,19 +1,38 @@
 ---
 id: logs
-title: Log Browser
+title: Logging
 description: Getting started with Supabase Platform Log Browser
 ---
 
 The Supabase Platform provides a log browser that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
 
-The features discussed in this article are only available through the Supabase platform and are not available on self-hosted.
+:::note
 
-The log browser can be accessed through:
+The features discussed in this article are only available through the Supabase Platform and are not available on self-hosted. 
 
-- `Project Overview > Settings > API`
-- `Project Overview > Settings > Database`
+:::
+
+## Log Explorer
 
 ![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
+
+The log browser can be accessed in the sidebar under `Log Explorer`. The Log Explorer is for exploring all the logs within your project and is not specific to any product.
+
+## Product Logs
+
+As well as a Log Explorer, Supabase provides a logging interface specific to each product.
+
+### API Logs 
+
+![API Logs](/img/guides/platform/logs/logs-api.png)
+
+The API Logs can be found under `Database > API Logs`. These show all network requests for the REST and GraphQL [API](/docs/guides/api).
+
+### Postgres Logs
+
+![Postgres Logs](/img/guides/platform/logs/logs-database.png)
+
+The Postgres Logs can be found under `Database > Postgres Logs`. These show all queries and activity for your [Database](/docs/guides/database).
 
 ## Basic Querying Features
 
@@ -28,9 +47,7 @@ To access advanced querying features, you will need to enable **custom queries**
 
 ![Enabling query mode](/img/guides/platform/logs/query-mode.png)
 
-
-
-`SELECT` queries allow complex and powerful aggregated result sets, letting you to perform in-depth analysis of your log data.
+`select` queries allow complex and powerful aggregated result sets, letting you to perform in-depth analysis of your log data.
 
 For example, you may enter the following into the API logs dashboard to query for each user's IP address:
 
@@ -55,14 +72,14 @@ The table references are as follows:
 
 Note that cross-table joining is currently not supported.
 
-#### Unnesting Arrays
+### Unnesting Arrays
 
 In the above example, in order to query the metadata field, we need to unnest the field and add it as a join. Wehn we click on an individual log, we can see that log metadata is stored as an array of objects. 
 
 In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
 
 
-#### Functions
+### Functions
 
 You may have also noticed from the above examples that we are able to use certain SQL functions within our queries. The querying engine currently supported is BigQuery, hence you may use [any valid BigQuery function](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators) within your query. 
 
@@ -71,7 +88,7 @@ You may have also noticed from the above examples that we are able to use certai
 
 Each log timestamp is stored as a `TIMESTAMP` data type. In order to utilize the `timestamp` field in a query, you would need to use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
 
-### Template Queries
+## Template Queries
 
 Templates are available to help shorten the time needed to craft these queries. There are examples for each complexity level, which can serve as a foundation for your custom queries.
 
