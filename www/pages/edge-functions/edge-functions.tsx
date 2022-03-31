@@ -3,6 +3,9 @@ import {
   Button,
   IconArrowUpRight,
   IconCode,
+  IconFastForward,
+  IconGlobe,
+  IconLock,
   IconShuffle,
   IconX,
   Radio,
@@ -42,34 +45,28 @@ import TweetCard from '~/components/TweetCard'
 
 const featureBlocks = [
   {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    title: 'Instant deployment',
+    description: 'Deploy Edge Functions in seconds',
     highlightLines: '8',
+    icon: <IconFastForward />,
   },
   {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-    highlightLines: '11..23',
+    title: 'Global',
+    description: 'Deployed to 29 regions worldwide',
+    highlightLines: '8',
+    icon: <IconGlobe />,
   },
   {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
+    title: 'Typescript ready',
+    description: 'TypeScript, WASM, ES Modules',
+    highlightLines: '8',
+    img: 'typescript.svg',
+  },
+  {
+    title: 'Async triggers',
+    description: 'Invoke Edge Functions based on any event in your database',
     highlightLines: '28',
-  },
-  {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-    highlightLines: '31',
-  },
-  {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-    highlightLines: '31',
-  },
-  {
-    title: 'Title of thing',
-    description: 'Title of thing adasd adsdsdasdasd dsadasda adsdds',
-    highlightLines: '31',
+    badge: 'Coming soon',
   },
 ]
 
@@ -170,8 +167,35 @@ function Database() {
 
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid grid-cols-12 gap-32 items-center">
-              <div className="flex flex-col col-span-5 gap-8">
+            <div className="grid grid-cols-4 gap-8 rounded">
+              {featureBlocks.map((item) => {
+                return (
+                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
+                    {item.img ? (
+                      <img
+                        src={`/images/product/functions/${item.img}`}
+                        className="w-12 h-12 rounded-md"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
+                        {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
+                      <p className="text-sm text-scale-900">{item.description}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
+            <div className="grid lg:grid-cols-12 gap-6 lg:gap-32 items-center">
+              <div className="flex flex-col lg:col-span-5 gap-8">
                 <div>
                   <h3 className="h2">Anatomy of the Edge</h3>
                   <p className="p">
@@ -218,7 +242,7 @@ function Database() {
                   })}
                 </div>
               </div>
-              <div className="col-span-7 overflow-hidden">
+              <div className="lg:col-span-7 overflow-hidden">
                 <ScrollableCodeBlock
                   lang="ts"
                   highlightLines={currentSelection ? currentSelection : undefined}
@@ -270,154 +294,6 @@ serve(async (req) => {
             </div>
           </div>
         </SectionContainer>
-
-        <SectionContainer>
-          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="text-center">
-              <h3 className="h2">This is a title</h3>
-              <p className="p">This is a title</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-8 rounded">
-              {featureBlocks.map((item) => {
-                return (
-                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
-                    <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
-                      <IconCode strokeWidth={2} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
-                      <p className="text-sm text-scale-900">{item.description}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="grid grid-cols-12">
-            <div className="col-span-12 mb-10 lg:mb-0 lg:col-span-3">
-              <div className="flex items-center mb-4 space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
-                <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
-              </div>
-              <h4 className="h4">Just Postgres</h4>
-              <p className="p">Every Supabase project is a dedicated Postgres database.</p>
-              <p className="text-sm p">
-                100% portable. Bring your existing Postgres database, or migrate away at any time.
-              </p>
-            </div>
-            <div className="col-span-12 mb-10 lg:mb-0 lg:col-span-3 lg:col-start-5">
-              <div className="flex items-center mb-4 space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
-                <ProductIcon icon={Solutions['authentication'].icon} />
-              </div>
-
-              <h4 className="h4">Built-in Auth</h4>
-              <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
-              <p className="text-sm p">
-                Integrated with JWT authentication which controls exactly what your users can
-                access.
-              </p>
-            </div>
-            <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="flex items-center mb-4 space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
-                <IconX />
-                <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
-              </div>
-
-              <h4 className="h4">Realtime enabled</h4>
-              <p className="p">Data-change listeners over websockets.</p>
-              <p className="text-sm p">
-                Subscribe and react to database changes, milliseconds after they happen.
-              </p>
-            </div>
-          </div>
-        </SectionContainer>
-
-        {/* <SectionContainer>÷ */}
-        <SectionContainer className="text-center md:pb-0 lg:pb-0">
-          <div className="grid grid-cols-12">
-            <div className="col-span-12 lg:col-span-8 lg:col-start-3">
-              <h2 className="h3">Easy to use dashboard</h2>
-
-              <p className="p">
-                The simplicity of a Table Editor, or the power of a SQL editor. Your choice.
-              </p>
-            </div>
-          </div>
-        </SectionContainer>
-        <div className="grid">
-          <div className={'dashboard-tabs sbui-tabs--underline-alt'}>
-            <Tabs
-              size="xlarge"
-              activeId={dashboardSwiperActiveIndex.toString()}
-              onChange={(e: string) => handleDashboardSwiperNav(Number(e))}
-              type="underlined"
-              tabBarStyle={{
-                marginBottom: 0,
-                // borderBottom: '1px solid #dedede',
-              }}
-              // block
-            >
-              <Tabs.Panel id="0" label="Table editor">
-                <span></span>
-              </Tabs.Panel>
-              <Tabs.Panel id="1" label="SQL editor">
-                <span></span>
-              </Tabs.Panel>
-            </Tabs>
-          </div>
-        </div>
-
-        <Swiper
-          // @ts-ignore
-          onSwiper={setDashboardSwiper}
-          style={{ overflow: 'hidden' }}
-          initialSlide={0}
-          spaceBetween={0}
-          slidesPerView={1}
-          speed={300}
-          allowTouchMove={false}
-        >
-          <div className="grid grid-cols-12">
-            <SwiperSlide key={0}>
-              <SectionContainer className="pt-16 pb-0">
-                <ImageCarousel
-                  content={TableViewCarouselData}
-                  footer={[
-                    <TweetCard
-                      handle="@Elsolo244"
-                      key="@Elsolo244"
-                      img_url={`${basePath}/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg`}
-                      quote="Where has @supabase been all my life? 😍"
-                    />,
-                  ]}
-                />
-              </SectionContainer>
-            </SwiperSlide>
-            <SwiperSlide key={1}>
-              <SectionContainer className="pt-16 pb-0">
-                <ImageCarousel
-                  content={SqlViewCarouselData}
-                  footer={[
-                    <TweetCard
-                      handle="@jim_bisenius"
-                      key="@jim_bisenius"
-                      img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
-                      quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!"
-                    />,
-                  ]}
-                />
-              </SectionContainer>
-            </SwiperSlide>
-          </div>
-        </Swiper>
 
         <SectionContainer className="-mb-48">
           <APISection
