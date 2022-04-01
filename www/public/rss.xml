@@ -17,6 +17,22 @@
 </item>
 
 <item>
+  <guid>https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features</guid>
+  <title>Supabase Realtime, with Multiplayer Features</title>
+  <link>https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features</link>
+  <description>Today we're announced Realtime, with multiplayer features. Realtime enables broadcast, presence, and listening to database changes delivered over WebSockets.</description>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/04/01/hackathon-bring-the-func</guid>
+  <title>Hackathon: Bring the Func(🕺)</title>
+  <link>https://supabase.com/blog/2022/04/01/hackathon-bring-the-func</link>
+  <description>Build open-source projects with our latest features, win limited edition swag and plant a tree!</description>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
   <guid>https://supabase.com/blog/2022/03/31/supabase-edge-functions</guid>
   <title>Edge Functions are now available in Supabase</title>
   <link>https://supabase.com/blog/2022/03/31/supabase-edge-functions</link>
