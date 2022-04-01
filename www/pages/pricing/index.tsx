@@ -45,7 +45,8 @@ export default function IndexPage() {
     {
       name: 'Pro',
       href: '#',
-      priceMonthly: 'From 25',
+      from: true,
+      priceMonthly: 25,
       warning: '+ additional use',
       description: 'For production applications with the option to scale.',
       features: [
@@ -197,7 +198,10 @@ export default function IndexPage() {
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-end gap-2">
+                          {tier.from && (
+                            <span className="text-base xl:text-xl font-medium">From</span>
+                          )}
                           <div>
                             <span>${tier.priceMonthly}</span>
                             <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
@@ -227,6 +231,8 @@ export default function IndexPage() {
 
                     px-8
                     py-6
+
+                    h-full
                   "
                   >
                     {tier.preface && <p className="text-base text-scale-1200">{tier.preface}</p>}
@@ -248,18 +254,20 @@ export default function IndexPage() {
                       ))}
                     </ul>
 
-                    <div className="space-y-2">
-                      {tier.additional && (
-                        <p className="text-base text-scale-1200">{tier.additional}</p>
-                      )}
-                      {tier.scale && <p className="text-xs text-scale-900">{tier.scale}</p>}
-                      {tier.shutdown && <p className="text-xs text-scale-900">{tier.shutdown}</p>}
+                    <div className="flex flex-col gap-6">
+                      <div className="space-y-2">
+                        {tier.additional && (
+                          <p className="text-base text-scale-1200">{tier.additional}</p>
+                        )}
+                        {tier.scale && <p className="text-xs text-scale-900">{tier.scale}</p>}
+                        {tier.shutdown && <p className="text-xs text-scale-900">{tier.shutdown}</p>}
+                      </div>
+                      <a href={tier.href}>
+                        <Button block size="large" className="dark:text-white">
+                          {tier.cta}
+                        </Button>
+                      </a>
                     </div>
-                    <a href={tier.href}>
-                      <Button block size="large" className="dark:text-white">
-                        {tier.cta}
-                      </Button>
-                    </a>
                   </div>
                 </div>
               ))}
