@@ -26,15 +26,19 @@ export default function IndexPage() {
       name: 'Free',
       href: '#',
       priceMonthly: 0,
-      warning: 'Limit of 2 free projects per user',
-      description: 'Perfect for hobby projects and experiments.',
+      warning: 'Limit of 2 free projects',
+      description: 'Perfect for passion projects & simple websites.',
       features: [
-        '10K Authenticated Users',
-        '500MB Database',
-        '1GB Storage',
-        '25 Realtime Connections',
-        '1 Day Backup',
-        'Standard Support',
+        '500MB database & 1GB file storage',
+        '2GB bandwidth',
+        '50MB file uploads',
+        'Social OAuth providers',
+        '2000 monthly active auth users',
+        '500K edge function invocations & 100 runtime hours',
+        'Daily backups',
+        '1-day log retention',
+        'Paused after 1-week of inactivity',
+        'Community support',
       ],
       scale: 'Anything more than the above you must upgrade',
       shutdown: 'Free projects are paused after 7 days of inactivity.',
@@ -45,18 +49,24 @@ export default function IndexPage() {
       href: '#',
       priceMonthly: 25,
       warning: '+ usage costs',
-      description: 'Everything you need to scale your project into production.',
+      description: 'For production applications and projects that are scaling.',
       features: [
-        '100K Authenticated Users',
-        '8GB Database',
-        '50GB Storage',
-        'Unlimited Realtime Connections',
-        '7 Days Backup',
-        'High Priority Support',
-        'Compute Add-Ons',
+        '8GB database & 100GB file storage',
+        '50GB bandwith',
+        'Up to 3GB file uploads',
+        '10,000 monthly active auth users',
+        'Social OAuth providers',
+        '2 million edge function invocations and 1000 runtime hours',
+        'Spend caps',
+        'Compute booster packs',
+        'Daily backups',
+        '7-day log retention',
+        'No project pausing',
+        'Email support',
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
+      additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
     {
@@ -64,13 +74,14 @@ export default function IndexPage() {
       href: '/contact/enterprise',
       description: 'For large-scale applications managing serious workloads.',
       features: [
-        'Point in time recovery',
-        'Designated Support manager & SLAs',
-        'Enterprise OAuth providers',
-        'SSO/SAML',
-        'SOC2',
-        'Custom contracts & invoicing',
-        'On-premise support',
+        `Point in time recovery`,
+        `Designated Support manager & SLAs`,
+        `Enterprise OAuth providers`,
+        `SSO/ SAML`,
+        `SOC2`,
+        `Custom contracts & invoicing`,
+        `On-premise support`,
+        `24×7×365 premium enterprise support`,
       ],
       scale: '',
       shutdown: '',
@@ -163,7 +174,7 @@ export default function IndexPage() {
                   rounded 
                   "
                 >
-                  <div className="h-60 px-8 pt-8 bg-white dark:bg-scale-300">
+                  <div className="h-44 px-8 pt-6 bg-white dark:bg-scale-300">
                     <h3
                       className="
                         inline-flex 
@@ -189,20 +200,22 @@ export default function IndexPage() {
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
-                        <>
-                          <span>${tier.priceMonthly}</span>
-                          <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
-                        </>
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <span>${tier.priceMonthly}</span>
+                            <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
+                          </div>
+                          {tier.warning && (
+                            <div className="px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
+                              {tier.warning}
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span>Contact Us</span>
                       )}
                     </div>
-                    {tier.warning && (
-                      <span className="relative inline-flex px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
-                        {tier.warning}
-                      </span>
-                    )}
-                    <p className="mt-4 text-base text-scale-1100">{tier.description}</p>
+                    <p className="mt-4 text-sm text-scale-1100">{tier.description}</p>
                   </div>
                   <div
                     className="
@@ -216,7 +229,7 @@ export default function IndexPage() {
                     dark:bg-scale-300 
 
                     px-8
-                    py-8
+                    py-6
                   "
                   >
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
@@ -237,9 +250,12 @@ export default function IndexPage() {
                       ))}
                     </ul>
 
-                    <div>
-                      <p className="text-xs text-scale-900">{tier.scale}</p>
-                      <p className="text-xs text-scale-900">{tier.shutdown}</p>
+                    <div className="space-y-2">
+                      {tier.additional && (
+                        <p className="text-base text-scale-1200">{tier.additional}</p>
+                      )}
+                      {tier.scale && <p className="text-xs text-scale-900">{tier.scale}</p>}
+                      {tier.shutdown && <p className="text-xs text-scale-900">{tier.shutdown}</p>}
                     </div>
                     <a href={tier.href}>
                       <Button block size="large" className="dark:text-white">
