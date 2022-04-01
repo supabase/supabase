@@ -92,24 +92,29 @@ export default function IndexPage() {
     price,
     tier,
     showDollarSign = true,
+    from = false,
   }: {
     description: string
     priceDescription: string
     price: string
     tier: string
     showDollarSign?: boolean
+    from?: boolean
   }) => {
     return (
       <div className="px-4 mt-8">
         <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
-        <span className="h1">
-          {showDollarSign && '$'}
-          {price}
-        </span>
-        <p className="p">{priceDescription}</p>
+        <div className="flex gap-2 items-baseline">
+          {from && <span className="text-base text-scale-1200">From</span>}
+          <span className="h1">
+            {showDollarSign && '$'}
+            {price}
+          </span>
+          <p className="p">{priceDescription}</p>
+        </div>
         <p className="p">{description}</p>
         <Link href="https://app.supabase.io" passHref>
-          <Button as="a" type="default" size="medium" block>
+          <Button as="a" size="medium" block>
             Get started
           </Button>
         </Link>
@@ -312,7 +317,7 @@ export default function IndexPage() {
               <MobileHeaders
                 tier="Free"
                 price={'0'}
-                priceDescription={'/project/month'}
+                priceDescription={'/mo'}
                 description={'Perfect for hobby projects and experiments'}
               />
 
@@ -350,8 +355,9 @@ export default function IndexPage() {
               {/* Pro - Mobile  */}
               <MobileHeaders
                 tier="Pro"
+                from={true}
                 price={'25'}
-                priceDescription={'/project/month + usage costs'}
+                priceDescription={'/mo + additional use'}
                 description={'Everything you need to scale your project into production'}
               />
               <PricingTableRowMobile
