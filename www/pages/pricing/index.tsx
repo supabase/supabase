@@ -26,37 +26,43 @@ export default function IndexPage() {
       name: 'Free',
       href: '#',
       priceMonthly: 0,
-      warning: 'Limit of 2 free projects per user',
-      description: 'Perfect for hobby projects and experiments.',
+      warning: 'Limit of 2 free projects',
+      description: 'Perfect for passion projects & simple websites.',
       features: [
-        '10K Authenticated Users',
-        '500MB Database',
-        '1GB Storage',
-        '25 Realtime Connections',
-        '1 Day Backup',
-        'Standard Support',
+        'Up to 500MB database & 1GB file storage',
+        'Up to 2GB bandwidth',
+        'Up to 50MB file uploads',
+        'Social OAuth providers',
+        'Up to 500K Edge Function invocations',
+        '1-day log retention',
+        'Community support',
       ],
-      scale: 'Anything more than the above you must upgrade',
-      shutdown: 'Free projects are paused after 7 days of inactivity.',
+      additional: 'Free projects are paused after 1 week of inactivity.',
+
       cta: 'Get Started',
     },
     {
       name: 'Pro',
       href: '#',
+      from: true,
       priceMonthly: 25,
-      warning: '+ usage costs',
-      description: 'Everything you need to scale your project into production.',
+      warning: '+ additional use',
+      description: 'For production applications with the option to scale.',
       features: [
-        '100K Authenticated Users',
-        '8GB Database',
-        '50GB Storage',
-        'Unlimited Realtime Connections',
-        '7 Days Backup',
-        'High Priority Support',
-        'Compute Add-Ons',
+        '8GB database & 100GB file storage',
+        '50GB bandwith',
+        '3GB file uploads',
+        'Social OAuth providers',
+        '2M Edge Function invocations',
+        'Daily backups',
+        '7-day log retention',
+        'No project pausing',
+        'Email support',
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
+      preface: 'Everything below included in the base plan',
+      additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
     {
@@ -64,13 +70,14 @@ export default function IndexPage() {
       href: '/contact/enterprise',
       description: 'For large-scale applications managing serious workloads.',
       features: [
-        'Point in time recovery',
-        'Designated Support manager & SLAs',
-        'Enterprise OAuth providers',
-        'SSO/SAML',
-        'SOC2',
-        'Custom contracts & invoicing',
-        'On-premise support',
+        `Point in time recovery`,
+        `Designated Support manager & SLAs`,
+        `Enterprise OAuth providers`,
+        `SSO/ SAML`,
+        `SOC2`,
+        `Custom contracts & invoicing`,
+        `On-premise support`,
+        `24×7×365 premium enterprise support`,
       ],
       scale: '',
       shutdown: '',
@@ -85,24 +92,29 @@ export default function IndexPage() {
     price,
     tier,
     showDollarSign = true,
+    from = false,
   }: {
     description: string
     priceDescription: string
     price: string
     tier: string
     showDollarSign?: boolean
+    from?: boolean
   }) => {
     return (
       <div className="px-4 mt-8">
         <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
-        <span className="h1">
-          {showDollarSign && '$'}
-          {price}
-        </span>
-        <p className="p">{priceDescription}</p>
+        <div className="flex gap-2 items-baseline">
+          {from && <span className="text-base text-scale-1200">From</span>}
+          <span className="h1">
+            {showDollarSign && '$'}
+            {price}
+          </span>
+          <p className="p">{priceDescription}</p>
+        </div>
         <p className="p">{description}</p>
         <Link href="https://app.supabase.io" passHref>
-          <Button as="a" type="default" size="medium" block>
+          <Button as="a" size="medium" block>
             Get started
           </Button>
         </Link>
@@ -163,7 +175,7 @@ export default function IndexPage() {
                   rounded 
                   "
                 >
-                  <div className="h-60 px-8 pt-8 bg-white dark:bg-scale-300">
+                  <div className="h-48 px-8 pt-6 bg-white dark:bg-scale-300">
                     <h3
                       className="
                         inline-flex 
@@ -189,19 +201,24 @@ export default function IndexPage() {
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
-                        <>
-                          <span>${tier.priceMonthly}</span>
-                          <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
-                        </>
+                        <div className="flex items-end gap-2">
+                          {tier.from && (
+                            <span className="text-base xl:text-xl font-medium">From</span>
+                          )}
+                          <div>
+                            <span>${tier.priceMonthly}</span>
+                            <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
+                          </div>
+                          {tier.warning && (
+                            <div className="px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
+                              {tier.warning}
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span>Contact Us</span>
                       )}
                     </div>
-                    {tier.warning && (
-                      <span className="relative inline-flex px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
-                        {tier.warning}
-                      </span>
-                    )}
                     <p className="mt-4 text-base text-scale-1100">{tier.description}</p>
                   </div>
                   <div
@@ -216,9 +233,12 @@ export default function IndexPage() {
                     dark:bg-scale-300 
 
                     px-8
-                    py-8
+                    py-6
+
+                    h-full
                   "
                   >
+                    {tier.preface && <p className="text-base text-scale-1200">{tier.preface}</p>}
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                     <ul role="list" className="divide-y dark:divide-scale-400">
                       {tier.features.map((feature) => (
@@ -237,15 +257,20 @@ export default function IndexPage() {
                       ))}
                     </ul>
 
-                    <div>
-                      <p className="text-xs text-scale-900">{tier.scale}</p>
-                      <p className="text-xs text-scale-900">{tier.shutdown}</p>
+                    <div className="flex flex-col gap-6">
+                      <div className="space-y-2">
+                        {tier.additional && (
+                          <p className="text-base text-scale-1200">{tier.additional}</p>
+                        )}
+                        {tier.scale && <p className="text-xs text-scale-900">{tier.scale}</p>}
+                        {tier.shutdown && <p className="text-xs text-scale-900">{tier.shutdown}</p>}
+                      </div>
+                      <a href={tier.href}>
+                        <Button block size="large" className="dark:text-white">
+                          {tier.cta}
+                        </Button>
+                      </a>
                     </div>
-                    <a href={tier.href}>
-                      <Button block size="large" className="dark:text-white">
-                        {tier.cta}
-                      </Button>
-                    </a>
                   </div>
                 </div>
               ))}
@@ -274,7 +299,7 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-scale-100">
+      <div className="bg-scale-200">
         <div className="container relative px-4 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
           <div className="text-center">
             <h2 className="text-3xl text-scale-1200">Compare Plans</h2>
@@ -292,7 +317,7 @@ export default function IndexPage() {
               <MobileHeaders
                 tier="Free"
                 price={'0'}
-                priceDescription={'/project/month'}
+                priceDescription={'/mo'}
                 description={'Perfect for hobby projects and experiments'}
               />
 
@@ -330,8 +355,9 @@ export default function IndexPage() {
               {/* Pro - Mobile  */}
               <MobileHeaders
                 tier="Pro"
+                from={true}
                 price={'25'}
-                priceDescription={'/project/month + usage costs'}
+                priceDescription={'/mo + additional use'}
                 description={'Everything you need to scale your project into production'}
               />
               <PricingTableRowMobile
@@ -585,51 +611,47 @@ export default function IndexPage() {
               </table>
             </div>
           </div>
-
-          <div className="border-t dark:border-scale-600">
-            <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
-              <h2 className="h3">Frequently asked questions</h2>
-              <p className="max-w-sm mb-4 text-base p">
+        </div>
+        <div className="border-t">
+          <div className="lg:grid-cols-2 gap-y-10 gap-x-10 max-w-5xl mx-auto">
+            <div className="px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+              <h2 className="h3 text-center">Frequently asked questions</h2>
+              <p className="p text-center">
                 Can&apos;t find the answer to your question, ask someone in the community either on
                 our Discord or GitHub.
               </p>
-              <Link href="https://discord.supabase.com">
-                <a>
-                  <Button type="default" className="mr-2" size="small">
-                    Discord
-                  </Button>
-                </a>
-              </Link>
-              <Link href="https://github.com/supabase/supabase/discussions">
-                <a>
-                  <Button size="small" className="text-white">
-                    GitHub
-                  </Button>
-                </a>
-              </Link>
+              <div className="p text-center">
+                <Link href="https://discord.supabase.com">
+                  <a>
+                    <Button type="default" className="mr-2" size="small">
+                      Discord
+                    </Button>
+                  </a>
+                </Link>
+                <Link href="https://github.com/supabase/supabase/discussions">
+                  <a>
+                    <Button type="default" size="small" className="text-white">
+                      GitHub
+                    </Button>
+                  </a>
+                </Link>
+              </div>
               <div className="mt-16">
                 {/* @ts-ignore */}
-                {/* <Accordion type="bordered"> */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
+                <Accordion
+                  type="bordered"
+                  openBehaviour="multiple"
+                  size="medium"
+                  className="text-scale-900 dark:text-white"
+                >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <div key={i}>
-                        {/* @ts-ignore */}
-                        <Accordion
-                          type="bordered"
-                          openBehaviour="multiple"
-                          size="medium"
-                          className="text-scale-900 dark:text-white"
-                        >
-                          <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
-                            <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                          </Accordion.Item>
-                        </Accordion>
-                      </div>
+                      <Accordion.Item key={i} header={faq.question} id={`faq--${i.toString()}`}>
+                        <ReactMarkdown className="text-scale-1100">{faq.answer}</ReactMarkdown>
+                      </Accordion.Item>
                     )
                   })}
-                </div>
-                {/* </Accordion> */}
+                </Accordion>
               </div>
             </div>
           </div>
