@@ -11,7 +11,7 @@ date: '2022-04-01'
 toc_depth: 3
 ---
 
-Today is the 1st of April, or April Fool’s Day, but I like to think of today as Supabase Realtime Day where we announce and demo the next version of Realtime.
+Today is the 1st of April, or April Fool's Day, but I like to think of today as Supabase Realtime Day where we announce and demo the next version of Realtime.
 
 Here's the next version of Realtime, with multiplayer features.
 
@@ -25,9 +25,9 @@ Here's the next version of Realtime, with multiplayer features.
   allowFullScreen
 ></iframe>
 
-We’ve made quite a few iterations on Realtime in the past. The first major version of Realtime listened to a single database by streaming changes from PostgreSQL’s Write-Ahead Log and sending them to clients via WebSockets. The second major version introduced better security via WALRUS (Write Ahead Log Realtime Unified Security) which adheres to a database’s RLS policies to determine authorized clients. However, this version continues to be single tenant as it can only poll one database at a time.
+We've made quite a few iterations on Realtime in the past. The first major version of Realtime listened to a single database by streaming changes from PostgreSQL's Write-Ahead Log and sending them to clients via WebSockets. The second major version introduced better security via WALRUS (Write Ahead Log Realtime Unified Security) which adheres to a database's RLS policies to determine authorized clients. However, this version continues to be single tenant as it can only poll one database at a time.
 
-The next and third major version, announced today on new Supabase Realtime Day, introduces multi-tenancy to listen to many databases. Additionally, this new version introduces a distributed cluster of nodes, which introduces better resource utilization, fault-tolerance, and lower latencies that directly translates to better performance for developers. We’re fortunate to have built Realtime on Elixir and Phoenix, as the language and framework are great for concurrency, distributed computing, and WebSockets. We’ll continue to support the existing Realtime feature of listening to database changes, but now we’re also introducing the ability for developers to use WebSockets to build multiplayer games, collaborative apps, and support a wide array of use cases.
+The next and third major version, announced today on new Supabase Realtime Day, introduces multi-tenancy to listen to many databases. Additionally, this new version introduces a distributed cluster of nodes, which introduces better resource utilization, fault-tolerance, and lower latencies that directly translates to better performance for developers. We're fortunate to have built Realtime on Elixir and Phoenix, as the language and framework are great for concurrency, distributed computing, and WebSockets. We'll continue to support the existing Realtime feature of listening to database changes, but now we're also introducing the ability for developers to use WebSockets to build multiplayer games, collaborative apps, and support a wide array of use cases.
 
 ## New Features
 
@@ -35,7 +35,7 @@ The next and third major version, announced today on new Supabase Realtime Day, 
 
 ![realtime-multiplayer-presence.png](/images/blog/launch-week-4/friday-realtime/realtime-multiplayer-presence.png)
 
-Presence is great for showing when your users are online. When a user connects or disconnects (even accidentally!), the server automatically detects this and let’s everyone else know.
+Presence is great for showing when your users are online. When a user connects or disconnects (even accidentally!), the server automatically detects this and let's everyone else know.
 Presence is powered by [CRDTs](https://crdt.tech/) (Conflict-free Replicated Data Type) on a distributed cluster useful for storing synced data across nodes
 
 
@@ -48,7 +48,7 @@ In Realtime, connected users communicate with other subscribing & publishing to 
 
 ### Extensions
 
-In this version of Realtime we’re re-architecting the way that we listen to PostgreSQL databases by opening the WebSocket functionality for general use.
+In this version of Realtime we're re-architecting the way that we listen to PostgreSQL databases by opening the WebSocket functionality for general use.
 Instead of only using WebSockets to broadcast database changes, we are now moving the PostgreSQL listener to an “extension” architecture. This opens up numerous new ways of extending the server. 
 Here are just a few that we've heard:
 
