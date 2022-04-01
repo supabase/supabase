@@ -29,36 +29,39 @@ export default function IndexPage() {
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
       features: [
-        '500MB database & 1GB file storage',
-        '2GB bandwidth',
-        '50MB file uploads',
+        'Up to 500MB database & 1GB file storage',
+        'Up to 2GB bandwidth',
+        'Up to 50MB file uploads',
         'Social OAuth providers',
-        '2000 monthly active auth users',
-        '500K edge function invocations & 100 runtime hours',
-        'Daily backups',
+        'Up to 2000 monthly active auth users',
+        'Up to 500K Edge Function invocations',
+        // 'Daily backups',
         '1-day log retention',
-        'Paused after 1-week of inactivity',
+        // 'Paused after 1-week of inactivity',
         'Community support',
       ],
-      scale: 'Anything more than the above you must upgrade',
-      shutdown: 'Free projects are paused after 7 days of inactivity.',
+      // scale: 'Anything more than the above you must upgrade',
+      // shutdown: 'Free projects are paused after 7 days of inactivity.',
+      additional: 'Free projects are paused after 1 week of inactivity.',
+
       cta: 'Get Started',
     },
     {
       name: 'Pro',
       href: '#',
-      priceMonthly: 25,
-      warning: '+ usage costs',
-      description: 'For production applications and projects that are scaling.',
+      priceMonthly: 'From 25',
+      warning: '+ additional use',
+      // description: 'For production applications with options to scale.',
+      description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
         '50GB bandwith',
-        'Up to 3GB file uploads',
-        '10,000 monthly active auth users',
+        '3GB file uploads',
         'Social OAuth providers',
-        '2 million edge function invocations and 1000 runtime hours',
-        'Spend caps',
-        'Compute booster packs',
+        '10,000 monthly active auth users',
+        '2M Edge Function invocations',
+        // 'Spend caps',
+        // 'Compute booster packs',
         'Daily backups',
         '7-day log retention',
         'No project pausing',
@@ -66,6 +69,7 @@ export default function IndexPage() {
       ],
       scale: 'Additional fees apply for usage and storage beyond the limits above.',
       shutdown: '',
+      preface: 'Everything below included in the base plan',
       additional: 'Need more? Turn off your spend cap to Pay As You Grow ',
       cta: 'Get Started',
     },
@@ -174,7 +178,7 @@ export default function IndexPage() {
                   rounded 
                   "
                 >
-                  <div className="h-44 px-8 pt-6 bg-white dark:bg-scale-300">
+                  <div className="h-48 px-8 pt-6 bg-white dark:bg-scale-300">
                     <h3
                       className="
                         inline-flex 
@@ -215,7 +219,7 @@ export default function IndexPage() {
                         <span>Contact Us</span>
                       )}
                     </div>
-                    <p className="mt-4 text-sm text-scale-1100">{tier.description}</p>
+                    <p className="mt-4 text-base text-scale-1100">{tier.description}</p>
                   </div>
                   <div
                     className="
@@ -232,6 +236,7 @@ export default function IndexPage() {
                     py-6
                   "
                   >
+                    {tier.preface && <p className="text-base text-scale-1200">{tier.preface}</p>}
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                     <ul role="list" className="divide-y dark:divide-scale-400">
                       {tier.features.map((feature) => (
