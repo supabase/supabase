@@ -128,7 +128,7 @@ const PageLayout: NextPageWithLayout = () => {
             <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-2 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
-                  {/* 
+                  {/*
                     // @ts-ignore */}
                   <ChartHandler
                     label="Execution time"
@@ -150,9 +150,9 @@ const PageLayout: NextPageWithLayout = () => {
               </Panel>
               <Panel key="invocation-chart">
                 <Panel.Content className="space-y-4">
-                  {/* 
-                    {/* 
-                  {/* 
+                  {/*
+                    {/*
+                  {/*
                     // @ts-ignore */}
                   <ChartHandler
                     label="Invocations"
@@ -173,12 +173,8 @@ const PageLayout: NextPageWithLayout = () => {
                 </Panel.Content>
               </Panel>
             </div>
-            <Panel key="error-chart">
+            {/* <Panel key="error-chart">
               <Panel.Content className="space-y-4">
-                {/* 
-                  {/* 
-                {/* 
-                    // @ts-ignore */}
                 <ChartHandler
                   defaultChartStyle="line"
                   label="Error count"
@@ -197,7 +193,7 @@ const PageLayout: NextPageWithLayout = () => {
                   onBarClick={(v) => handleBarClick(v, '/auth')}
                 />
               </Panel.Content>
-            </Panel>
+            </Panel> */}
           </>
         )}
       </div>
