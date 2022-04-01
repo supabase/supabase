@@ -78,14 +78,7 @@
           "enterprise": "Unlimited"
         }
       },
-      {
-        "title": "Monthly Active Users",
-        "tiers": {
-          "free": "10,000 Users",
-          "pro": "100,000 Users",
-          "enterprise": "Unlimited"
-        }
-      },
+
       {
         "title": "Social OAuth providers",
         "tiers": {
