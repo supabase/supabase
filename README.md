@@ -20,6 +20,8 @@
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/www/public/images/github/supabase-dashboard.png)
+
 ## Documentation
 
 For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
