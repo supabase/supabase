@@ -11,7 +11,9 @@ date: '2022-04-01'
 toc_depth: 3
 ---
 
-Today is the 1st of April, or April Fool’s Day, but I like to think of today as Supabase Realtime Day where we announce and demo the next iteration of Realtime.
+Today is the 1st of April, or April Fool’s Day, but I like to think of today as Supabase Realtime Day where we announce and demo the next version of Realtime.
+
+Here's the next version of Realtime, with multiplayer features.
 
 <iframe
   className="w-full video-with-border"
@@ -23,10 +25,44 @@ Today is the 1st of April, or April Fool’s Day, but I like to think of today a
   allowFullScreen
 ></iframe>
 
+## New Features
+
 ### Presence
 
 ![realtime-multiplayer-presence.png](/images/blog/launch-week-4/friday-realtime/realtime-multiplayer-presence.png)
 
+- CRDT (Conflict-free Replicated Data Type) on a distributed cluster useful for storing synced data across nodes
+- Showing when users are online
+- When a user disconnects (even accidentally!), the server automatically detects this and let’s everyone else know
+
 ### Broadcast
 
 ![realtime-multiplayer-broadcast.png](/images/blog/launch-week-4/friday-realtime/realtime-multiplayer-broadcast.png)
+
+- Clients can communicate with other clients by subscribing/publishing to topics
+- Great for ephemeral events like cursor movements
+
+### Extensions
+- We’re re-architecting the way that we listen to PostgreSQL databases to open up WebSocket functionality for general use
+  - Instead of only using WebSockets to broadcast database changes, we are now moving the PostgreSQL listener to an “extension” architecture
+- Ideas
+  - Developer can listen to multiple PostgreSQL databases at the same time
+    - Listen to database changes from other databases
+  - Finance: Listen to stock market events and broadcast them
+  - Web3: Listen to blockchain events and broadcast them
+  - A server clock which broadcasts a timer to every connected client (e.g. auction sites)
+
+## Demo
+
+[multiplayer.dev](https://multiplayer.dev)
+
+- Built with Phoenix Web Framework, Next.js, and the next version of Supabase Realtime
+- Deployed on a [Fly.io](https://fly.io) cluster of 20 nodes distributed around the world
+
+## Roadmap
+
+- Continue development and perform benchmarks of the next version of Supabase Realtime
+- Invite developers and other interested parties from the waitlist to use the new version
+  - You can sign up for the waitlist at [multiplayer.dev](https://multiplayer.dev)
+
+You can follow development in our [open source repository on GitHub](https://github.com/supabase/realtime/tree/multiplayer).
