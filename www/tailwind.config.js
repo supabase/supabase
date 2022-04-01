@@ -82,7 +82,8 @@ module.exports = ui({
               padding: 0,
               marginBottom: '32px',
             },
-            img: {
+            'p img': {
+              border: '1px solid var(--colors-scale4)',
               borderRadius: '4px',
               overflow: 'hidden',
             },
