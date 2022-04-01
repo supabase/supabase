@@ -1451,7 +1451,7 @@ pages:
             .subscribe()
           ```
       - name: Listening to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match. Only filtering by a single column and only using the `eq` operator is available now. Keep in mind, Supabase would not send an update event if `{col}` changed from `{val}` to `{val2}`.
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match. Only filtering by a single column and only using `eq`, `neq`, `lt`, `lte`, `gt`, `gte` operators is available now. Keep in mind, Supabase would not send an update event if `{col}` changed from `{val}` to `{val2}`.
         js: |
           ```js
           const mySubscription = supabase
