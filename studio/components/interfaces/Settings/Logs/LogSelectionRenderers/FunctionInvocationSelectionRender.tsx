@@ -1,15 +1,16 @@
 import dayjs from 'dayjs'
+import { filterFunctionsRequestResponse } from 'lib/logs'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
 
 const FunctionInvocationSelectionRender = ({ log }: any) => {
-  const functionId = log.metadata
   const request = log?.request
   const response = log?.response
   const method = log?.method
   const status = log?.status_code
-  const requestUrl = request?.url
-  const host = request?.host
+  const requestUrl = new URL(request?.url)
+  const executionTimeMs = log?.execution_time_ms
+  const timestamp = dayjs(log.timestamp / 1000)
 
   const DetailedRow = ({
     label,
@@ -35,12 +36,11 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
         <DetailedRow label="Status" value={<ResponseCodeFormatter value={status} />} />
         <DetailedRow label="Method" value={method} />
-        <DetailedRow label="Timestamp" value={dayjs(log.timestamp).toISOString()} />
+        <DetailedRow label="Timestamp" value={dayjs(timestamp).format('DD MMM, YYYY HH:mm')} />
+        <DetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
         <DetailedRow label="Deployment ID" value={log.deployment_id} />
-        <DetailedRow label="Function ID" value={log.function_id} />
         <DetailedRow label="Log ID" value={log.id} />
-        <DetailedRow label="Request url" value={requestUrl} />
-        <DetailedRow label="Host" value={host} />
+        <DetailedRow label="Request Path" value={requestUrl.pathname + requestUrl.search} />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Request body</h3>
@@ -48,7 +48,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
-              __html: request ? jsonSyntaxHighlight(request) : '',
+              __html: request ? jsonSyntaxHighlight(filterFunctionsRequestResponse(request)) : '',
             }}
           />
         </pre>
@@ -60,7 +60,7 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             dangerouslySetInnerHTML={{
-              __html: response ? jsonSyntaxHighlight(response) : '',
+              __html: response ? jsonSyntaxHighlight(filterFunctionsRequestResponse(response)) : '',
             }}
           />
         </pre>
