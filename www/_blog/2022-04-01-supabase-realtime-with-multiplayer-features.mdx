@@ -25,6 +25,10 @@ Here's the next version of Realtime, with multiplayer features.
   allowFullScreen
 ></iframe>
 
+We’ve made quite a few iterations on Realtime in the past. The first major version of Realtime listened to a single database by streaming changes from PostgreSQL’s Write-Ahead Log and sending them to clients via WebSockets. The second major version introduced better security via WALRUS (Write Ahead Log Realtime Unified Security) which adheres to a database’s RLS policies to determine authorized clients. However, this version continues to be single tenant as it can only poll one database at a time.
+
+The next and third major version, announced today on new Supabase Realtime Day, introduces multi-tenancy to listen to many databases. Additionally, this new version introduces a distributed cluster of nodes, which introduces better resource utilization, fault-tolerance, and lower latencies that directly translates to better performance for developers. We’re fortunate to have built Realtime on Elixir and Phoenix, as the language and framework are great for concurrency, distributed computing, and WebSockets. We’ll continue to support the existing Realtime feature of listening to database changes, but now we’re also introducing the ability for developers to use WebSockets to build multiplayer games, collaborative apps, and support a wide array of use cases.
+
 ## New Features
 
 ### Presence
