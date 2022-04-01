@@ -296,7 +296,7 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-scale-100">
+      <div className="bg-scale-200">
         <div className="container relative px-4 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
           <div className="text-center">
             <h2 className="text-3xl text-scale-1200">Compare Plans</h2>
@@ -607,52 +607,51 @@ export default function IndexPage() {
               </table>
             </div>
           </div>
-
-          <div className="border-t dark:border-scale-600">
-            <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
-              <h2 className="h3">Frequently asked questions</h2>
-              <p className="max-w-sm mb-4 text-base p">
-                Can&apos;t find the answer to your question, ask someone in the community either on
-                our Discord or GitHub.
-              </p>
-              <Link href="https://discord.supabase.com">
-                <a>
-                  <Button type="default" className="mr-2" size="small">
-                    Discord
-                  </Button>
-                </a>
-              </Link>
-              <Link href="https://github.com/supabase/supabase/discussions">
-                <a>
-                  <Button size="small" className="text-white">
-                    GitHub
-                  </Button>
-                </a>
-              </Link>
-              <div className="mt-16">
-                {/* @ts-ignore */}
-                {/* <Accordion type="bordered"> */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
-                  {pricingFaq.map((faq, i) => {
-                    return (
-                      <div key={i}>
-                        {/* @ts-ignore */}
-                        <Accordion
-                          type="bordered"
-                          openBehaviour="multiple"
-                          size="medium"
-                          className="text-scale-900 dark:text-white"
-                        >
-                          <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
-                            <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                          </Accordion.Item>
-                        </Accordion>
-                      </div>
-                    )
-                  })}
-                </div>
-                {/* </Accordion> */}
+        </div>
+        <div className="border-t">
+          <div className="container relative px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+            <h2 className="h3">Frequently asked questions</h2>
+            <p className="max-w-sm mb-4 text-base p">
+              Can&apos;t find the answer to your question, ask someone in the community either on
+              our Discord or GitHub.
+            </p>
+            <Link href="https://discord.supabase.com">
+              <a>
+                <Button type="default" className="mr-2" size="small">
+                  Discord
+                </Button>
+              </a>
+            </Link>
+            <Link href="https://github.com/supabase/supabase/discussions">
+              <a>
+                <Button size="small" className="text-white">
+                  GitHub
+                </Button>
+              </a>
+            </Link>
+            <div className="mt-16">
+              {/* @ts-ignore */}
+              {/* <Accordion type="bordered"> */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 gap-x-10">
+                {pricingFaq.map((faq, i) => {
+                  return (
+                    <div key={i}>
+                      {/* @ts-ignore */}
+                      <Accordion
+                        type="bordered"
+                        openBehaviour="multiple"
+                        size="medium"
+                        className="text-scale-900 dark:text-white"
+                      >
+                        <Accordion.Item header={faq.question} id={`faq--${i.toString()}`}>
+                          <ReactMarkdown>{faq.answer}</ReactMarkdown>
+                        </Accordion.Item>
+                      </Accordion>
+                    </div>
+                  )
+                })}
               </div>
+              {/* </Accordion> */}
             </div>
           </div>
         </div>
