@@ -97,7 +97,7 @@ services:
 
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/rpc/graphql"
+    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
     url: http://rest:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
