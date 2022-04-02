@@ -91,7 +91,7 @@ const PageLayout: NextPageWithLayout = () => {
           </>
         )
       },
-      comment: 'Set secrets for your project',
+      comment: 'Unset secrets for your project',
     },
   ]
 
