@@ -59,7 +59,7 @@
 					"target": 305
 				},
 				{
-					"id": 1044,
+					"id": 1153,
 					"name": "Transformers",
 					"kind": 4,
 					"kindString": "Namespace",
@@ -68,7 +68,7 @@
 					},
 					"children": [
 						{
-							"id": 1045,
+							"id": 1154,
 							"name": "PostgresTypes",
 							"kind": 8,
 							"kindString": "Enumeration",
@@ -80,7 +80,7 @@
 							},
 							"children": [
 								{
-									"id": 1046,
+									"id": 1155,
 									"name": "abstime",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -97,7 +97,7 @@
 									"defaultValue": "\"abstime\""
 								},
 								{
-									"id": 1047,
+									"id": 1156,
 									"name": "bool",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -114,7 +114,7 @@
 									"defaultValue": "\"bool\""
 								},
 								{
-									"id": 1048,
+									"id": 1157,
 									"name": "date",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -131,7 +131,7 @@
 									"defaultValue": "\"date\""
 								},
 								{
-									"id": 1049,
+									"id": 1158,
 									"name": "daterange",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -148,7 +148,7 @@
 									"defaultValue": "\"daterange\""
 								},
 								{
-									"id": 1050,
+									"id": 1159,
 									"name": "float4",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -165,7 +165,7 @@
 									"defaultValue": "\"float4\""
 								},
 								{
-									"id": 1051,
+									"id": 1160,
 									"name": "float8",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -182,7 +182,7 @@
 									"defaultValue": "\"float8\""
 								},
 								{
-									"id": 1052,
+									"id": 1161,
 									"name": "int2",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -199,7 +199,7 @@
 									"defaultValue": "\"int2\""
 								},
 								{
-									"id": 1053,
+									"id": 1162,
 									"name": "int4",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -216,7 +216,7 @@
 									"defaultValue": "\"int4\""
 								},
 								{
-									"id": 1054,
+									"id": 1163,
 									"name": "int4range",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -233,7 +233,7 @@
 									"defaultValue": "\"int4range\""
 								},
 								{
-									"id": 1055,
+									"id": 1164,
 									"name": "int8",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -250,7 +250,7 @@
 									"defaultValue": "\"int8\""
 								},
 								{
-									"id": 1056,
+									"id": 1165,
 									"name": "int8range",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -267,7 +267,7 @@
 									"defaultValue": "\"int8range\""
 								},
 								{
-									"id": 1057,
+									"id": 1166,
 									"name": "json",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -284,7 +284,7 @@
 									"defaultValue": "\"json\""
 								},
 								{
-									"id": 1058,
+									"id": 1167,
 									"name": "jsonb",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -301,7 +301,7 @@
 									"defaultValue": "\"jsonb\""
 								},
 								{
-									"id": 1059,
+									"id": 1168,
 									"name": "money",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -318,7 +318,7 @@
 									"defaultValue": "\"money\""
 								},
 								{
-									"id": 1060,
+									"id": 1169,
 									"name": "numeric",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -335,7 +335,7 @@
 									"defaultValue": "\"numeric\""
 								},
 								{
-									"id": 1061,
+									"id": 1170,
 									"name": "oid",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -352,7 +352,7 @@
 									"defaultValue": "\"oid\""
 								},
 								{
-									"id": 1062,
+									"id": 1171,
 									"name": "reltime",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -369,7 +369,7 @@
 									"defaultValue": "\"reltime\""
 								},
 								{
-									"id": 1063,
+									"id": 1172,
 									"name": "text",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -386,7 +386,7 @@
 									"defaultValue": "\"text\""
 								},
 								{
-									"id": 1064,
+									"id": 1173,
 									"name": "time",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -403,7 +403,7 @@
 									"defaultValue": "\"time\""
 								},
 								{
-									"id": 1065,
+									"id": 1174,
 									"name": "timestamp",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -420,7 +420,7 @@
 									"defaultValue": "\"timestamp\""
 								},
 								{
-									"id": 1066,
+									"id": 1175,
 									"name": "timestamptz",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -437,7 +437,7 @@
 									"defaultValue": "\"timestamptz\""
 								},
 								{
-									"id": 1067,
+									"id": 1176,
 									"name": "timetz",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -454,7 +454,7 @@
 									"defaultValue": "\"timetz\""
 								},
 								{
-									"id": 1068,
+									"id": 1177,
 									"name": "tsrange",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -471,7 +471,7 @@
 									"defaultValue": "\"tsrange\""
 								},
 								{
-									"id": 1069,
+									"id": 1178,
 									"name": "tstzrange",
 									"kind": 16,
 									"kindString": "Enumeration member",
@@ -493,30 +493,30 @@
 									"title": "Enumeration members",
 									"kind": 16,
 									"children": [
-										1046,
-										1047,
-										1048,
-										1049,
-										1050,
-										1051,
-										1052,
-										1053,
-										1054,
-										1055,
-										1056,
-										1057,
-										1058,
-										1059,
-										1060,
-										1061,
-										1062,
-										1063,
-										1064,
-										1065,
-										1066,
-										1067,
-										1068,
-										1069
+										1155,
+										1156,
+										1157,
+										1158,
+										1159,
+										1160,
+										1161,
+										1162,
+										1163,
+										1164,
+										1165,
+										1166,
+										1167,
+										1168,
+										1169,
+										1170,
+										1171,
+										1172,
+										1173,
+										1174,
+										1175,
+										1176,
+										1177,
+										1178
 									]
 								}
 							],
@@ -529,7 +529,7 @@
 							]
 						},
 						{
-							"id": 1083,
+							"id": 1192,
 							"name": "convertCell",
 							"kind": 64,
 							"kindString": "Function",
@@ -545,7 +545,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1084,
+									"id": 1193,
 									"name": "convertCell",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -571,7 +571,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1085,
+											"id": 1194,
 											"name": "type",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -587,7 +587,7 @@
 											}
 										},
 										{
-											"id": 1086,
+											"id": 1195,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -612,7 +612,7 @@
 							]
 						},
 						{
-							"id": 1070,
+							"id": 1179,
 							"name": "convertChangeData",
 							"kind": 64,
 							"kindString": "Function",
@@ -628,7 +628,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1071,
+									"id": 1180,
 									"name": "convertChangeData",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -646,7 +646,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1072,
+											"id": 1181,
 											"name": "columns",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -661,7 +661,7 @@
 											}
 										},
 										{
-											"id": 1073,
+											"id": 1182,
 											"name": "record",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -677,7 +677,7 @@
 											}
 										},
 										{
-											"id": 1074,
+											"id": 1183,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -691,7 +691,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 1075,
+													"id": 1184,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -700,7 +700,7 @@
 													},
 													"children": [
 														{
-															"id": 1076,
+															"id": 1185,
 															"name": "skipTypes",
 															"kind": 1024,
 															"kindString": "Property",
@@ -732,7 +732,7 @@
 															"title": "Properties",
 															"kind": 1024,
 															"children": [
-																1076
+																1185
 															]
 														}
 													]
@@ -750,7 +750,7 @@
 							]
 						},
 						{
-							"id": 1077,
+							"id": 1186,
 							"name": "convertColumn",
 							"kind": 64,
 							"kindString": "Function",
@@ -766,7 +766,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1078,
+									"id": 1187,
 									"name": "convertColumn",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -789,7 +789,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1079,
+											"id": 1188,
 											"name": "columnName",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -805,7 +805,7 @@
 											}
 										},
 										{
-											"id": 1080,
+											"id": 1189,
 											"name": "columns",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -820,7 +820,7 @@
 											}
 										},
 										{
-											"id": 1081,
+											"id": 1190,
 											"name": "record",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -838,7 +838,7 @@
 											}
 										},
 										{
-											"id": 1082,
+											"id": 1191,
 											"name": "skipTypes",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -867,7 +867,7 @@
 							]
 						},
 						{
-							"id": 1096,
+							"id": 1205,
 							"name": "toArray",
 							"kind": 64,
 							"kindString": "Function",
@@ -883,7 +883,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1097,
+									"id": 1206,
 									"name": "toArray",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -909,7 +909,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1098,
+											"id": 1207,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -924,7 +924,7 @@
 											}
 										},
 										{
-											"id": 1099,
+											"id": 1208,
 											"name": "type",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -947,7 +947,7 @@
 							]
 						},
 						{
-							"id": 1087,
+							"id": 1196,
 							"name": "toBoolean",
 							"kind": 64,
 							"kindString": "Function",
@@ -963,7 +963,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1088,
+									"id": 1197,
 									"name": "toBoolean",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -972,7 +972,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1089,
+											"id": 1198,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -997,7 +997,7 @@
 							]
 						},
 						{
-							"id": 1093,
+							"id": 1202,
 							"name": "toJson",
 							"kind": 64,
 							"kindString": "Function",
@@ -1013,7 +1013,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1094,
+									"id": 1203,
 									"name": "toJson",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1022,7 +1022,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1095,
+											"id": 1204,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1047,7 +1047,7 @@
 							]
 						},
 						{
-							"id": 1090,
+							"id": 1199,
 							"name": "toNumber",
 							"kind": 64,
 							"kindString": "Function",
@@ -1063,7 +1063,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1091,
+									"id": 1200,
 									"name": "toNumber",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1072,7 +1072,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1092,
+											"id": 1201,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1097,7 +1097,7 @@
 							]
 						},
 						{
-							"id": 1100,
+							"id": 1209,
 							"name": "toTimestampString",
 							"kind": 64,
 							"kindString": "Function",
@@ -1113,7 +1113,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1101,
+									"id": 1210,
 									"name": "toTimestampString",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1131,7 +1131,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1102,
+											"id": 1211,
 											"name": "value",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1161,21 +1161,21 @@
 							"title": "Enumerations",
 							"kind": 8,
 							"children": [
-								1045
+								1154
 							]
 						},
 						{
 							"title": "Functions",
 							"kind": 64,
 							"children": [
-								1083,
-								1070,
-								1077,
-								1096,
-								1087,
-								1093,
-								1090,
-								1100
+								1192,
+								1179,
+								1186,
+								1205,
+								1196,
+								1202,
+								1199,
+								1209
 							]
 						}
 					],
@@ -9690,6 +9690,1743 @@
 					]
 				},
 				{
+					"id": 996,
+					"name": "RealtimeChannel",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {
+						"isExternal": true
+					},
+					"children": [
+						{
+							"id": 998,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 20,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 999,
+									"name": "new RealtimeChannel",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1000,
+											"name": "topic",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 1001,
+											"name": "params",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 1002,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExternal": true
+													},
+													"indexSignature": {
+														"id": 1003,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 1004,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "unknown"
+														}
+													}
+												}
+											}
+										},
+										{
+											"id": 1005,
+											"name": "socket",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reference",
+												"id": 791,
+												"qualifiedName": "RealtimeClient",
+												"package": "@supabase/realtime-js",
+												"name": "default"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 996,
+										"qualifiedName": "RealtimeChannel",
+										"package": "@supabase/realtime-js",
+										"name": "default"
+									}
+								}
+							]
+						},
+						{
+							"id": 1012,
+							"name": "bindings",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 12,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "intrinsic",
+									"name": "any"
+								}
+							}
+						},
+						{
+							"id": 1016,
+							"name": "joinPush",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 16,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"qualifiedName": "Push",
+								"package": "@supabase/realtime-js",
+								"name": "default"
+							}
+						},
+						{
+							"id": 1015,
+							"name": "joinedOnce",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 15,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 1007,
+							"name": "params",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 8,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 1008,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExternal": true
+									},
+									"indexSignature": {
+										"id": 1009,
+										"name": "__index",
+										"kind": 8192,
+										"kindString": "Index signature",
+										"flags": {
+											"isExternal": true
+										},
+										"parameters": [
+											{
+												"id": 1010,
+												"name": "key",
+												"kind": 32768,
+												"flags": {
+													"isExternal": true
+												},
+												"type": {
+													"type": "intrinsic",
+													"name": "string"
+												}
+											}
+										],
+										"type": {
+											"type": "intrinsic",
+											"name": "unknown"
+										}
+									}
+								}
+							}
+						},
+						{
+							"id": 1019,
+							"name": "presence",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 19,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1102,
+								"qualifiedName": "RealtimePresence",
+								"package": "@supabase/realtime-js",
+								"name": "default"
+							}
+						},
+						{
+							"id": 1018,
+							"name": "pushBuffer",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 18,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"qualifiedName": "Push",
+									"package": "@supabase/realtime-js",
+									"name": "default"
+								}
+							}
+						},
+						{
+							"id": 1017,
+							"name": "rejoinTimer",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 17,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"qualifiedName": "Timer",
+								"package": "@supabase/realtime-js",
+								"name": "default"
+							}
+						},
+						{
+							"id": 1011,
+							"name": "socket",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 11,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 791,
+								"qualifiedName": "RealtimeClient",
+								"package": "@supabase/realtime-js",
+								"name": "default"
+							}
+						},
+						{
+							"id": 1014,
+							"name": "state",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 14,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "reference",
+								"qualifiedName": "CHANNEL_STATES",
+								"package": "@supabase/realtime-js",
+								"name": "CHANNEL_STATES"
+							}
+						},
+						{
+							"id": 1013,
+							"name": "timeout",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 13,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 1006,
+							"name": "topic",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 7,
+									"character": 4
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 997,
+							"name": "isEqual",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isStatic": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 70,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 1048,
+							"name": "canPush",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 34,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1049,
+									"name": "canPush",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1092,
+							"name": "isClosed",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 65,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1093,
+									"name": "isClosed",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1094,
+							"name": "isErrored",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 66,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1095,
+									"name": "isErrored",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1096,
+							"name": "isJoined",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 67,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1097,
+									"name": "isJoined",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1098,
+							"name": "isJoining",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 68,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1099,
+									"name": "isJoining",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1100,
+							"name": "isLeaving",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 69,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1101,
+									"name": "isLeaving",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1069,
+							"name": "isMember",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 56,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1070,
+									"name": "isMember",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1071,
+											"name": "topic",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							]
+						},
+						{
+							"id": 1072,
+							"name": "joinRef",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 57,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1073,
+									"name": "joinRef",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							]
+						},
+						{
+							"id": 1020,
+							"name": "list",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 23,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1021,
+									"name": "list",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "intrinsic",
+											"name": "any"
+										}
+									}
+								}
+							]
+						},
+						{
+							"id": 1041,
+							"name": "off",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 31,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1042,
+									"name": "off",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1043,
+											"name": "type",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 1044,
+											"name": "eventFilter",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 1045,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExternal": true
+													},
+													"indexSignature": {
+														"id": 1046,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 1047,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "any"
+														}
+													}
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1033,
+							"name": "on",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 28,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1034,
+									"name": "on",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1035,
+											"name": "type",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 1036,
+											"name": "eventFilter",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 1037,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExternal": true
+													},
+													"indexSignature": {
+														"id": 1038,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 1039,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "string"
+														}
+													}
+												}
+											}
+										},
+										{
+											"id": 1040,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "reference",
+												"qualifiedName": "Function",
+												"package": "typescript",
+												"name": "Function"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1027,
+							"name": "onClose",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 26,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1028,
+									"name": "onClose",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1029,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reference",
+												"qualifiedName": "Function",
+												"package": "typescript",
+												"name": "Function"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1030,
+							"name": "onError",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 27,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1031,
+									"name": "onError",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1032,
+											"name": "callback",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reference",
+												"qualifiedName": "Function",
+												"package": "typescript",
+												"name": "Function"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1064,
+							"name": "onMessage",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 55,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1065,
+									"name": "onMessage",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"comment": {
+										"shortText": "Overridable message hook",
+										"text": "Receives all events for specialized message handling before dispatching to the channel callbacks.\nMust return the payload, modified or unmodified.\n"
+									},
+									"parameters": [
+										{
+											"id": 1066,
+											"name": "event",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 1067,
+											"name": "payload",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										},
+										{
+											"id": 1068,
+											"name": "ref",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							]
+						},
+						{
+							"id": 1050,
+							"name": "push",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 35,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1051,
+									"name": "push",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1052,
+											"name": "event",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reference",
+												"qualifiedName": "CHANNEL_EVENTS",
+												"package": "@supabase/realtime-js",
+												"name": "CHANNEL_EVENTS"
+											}
+										},
+										{
+											"id": 1053,
+											"name": "payload",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										},
+										{
+											"id": 1054,
+											"name": "timeout",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Push",
+										"package": "@supabase/realtime-js",
+										"name": "default"
+									}
+								}
+							]
+						},
+						{
+							"id": 1074,
+							"name": "rejoin",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 58,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1075,
+									"name": "rejoin",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1076,
+											"name": "timeout",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1022,
+							"name": "rejoinUntilConnected",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 24,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1023,
+									"name": "rejoinUntilConnected",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1089,
+							"name": "replyEventName",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 64,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1090,
+									"name": "replyEventName",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1091,
+											"name": "ref",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							]
+						},
+						{
+							"id": 1082,
+							"name": "send",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 60,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1083,
+									"name": "send",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1084,
+											"name": "payload",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 1085,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExternal": true
+													},
+													"children": [
+														{
+															"id": 1086,
+															"name": "type",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {
+																"isExternal": true
+															},
+															"sources": [
+																{
+																	"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+																	"line": 61,
+																	"character": 8
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Properties",
+															"kind": 1024,
+															"children": [
+																1086
+															]
+														}
+													],
+													"indexSignature": {
+														"id": 1087,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 1088,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "any"
+														}
+													}
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "unknown"
+											}
+										],
+										"qualifiedName": "Promise",
+										"package": "typescript",
+										"name": "Promise"
+									}
+								}
+							]
+						},
+						{
+							"id": 1024,
+							"name": "subscribe",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 25,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1025,
+									"name": "subscribe",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1026,
+											"name": "timeout",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Push",
+										"package": "@supabase/realtime-js",
+										"name": "default"
+									}
+								}
+							]
+						},
+						{
+							"id": 1077,
+							"name": "trigger",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 59,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1078,
+									"name": "trigger",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1079,
+											"name": "type",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 1080,
+											"name": "payload",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										},
+										{
+											"id": 1081,
+											"name": "ref",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						},
+						{
+							"id": 1061,
+							"name": "unsubscribe",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 48,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1062,
+									"name": "unsubscribe",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"comment": {
+										"shortText": "Leaves the channel",
+										"text": "Unsubscribes from server events, and instructs channel to terminate on server.\nTriggers onClose() hooks.\n\nTo receive leave acknowledgements, use the a `receive` hook to bind to the server ack, ie:\nchannel.unsubscribe().receive(\"ok\", () => alert(\"left!\") )\n"
+									},
+									"parameters": [
+										{
+											"id": 1063,
+											"name": "timeout",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true,
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Push",
+										"package": "@supabase/realtime-js",
+										"name": "default"
+									}
+								}
+							]
+						},
+						{
+							"id": 1055,
+							"name": "updateJoinPayload",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+									"line": 36,
+									"character": 4
+								}
+							],
+							"signatures": [
+								{
+									"id": 1056,
+									"name": "updateJoinPayload",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {
+										"isExternal": true
+									},
+									"parameters": [
+										{
+											"id": 1057,
+											"name": "payload",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isExternal": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 1058,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExternal": true
+													},
+													"indexSignature": {
+														"id": 1059,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 1060,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "unknown"
+														}
+													}
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								998
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								1012,
+								1016,
+								1015,
+								1007,
+								1019,
+								1018,
+								1017,
+								1011,
+								1014,
+								1013,
+								1006,
+								997
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								1048,
+								1092,
+								1094,
+								1096,
+								1098,
+								1100,
+								1069,
+								1072,
+								1020,
+								1041,
+								1033,
+								1027,
+								1030,
+								1064,
+								1050,
+								1074,
+								1022,
+								1089,
+								1082,
+								1024,
+								1077,
+								1061,
+								1055
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.d.ts",
+							"line": 6,
+							"character": 21
+						}
+					]
+				},
+				{
 					"id": 791,
 					"name": "RealtimeClient",
 					"kind": 128,
@@ -9709,7 +11446,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 72,
+									"line": 73,
 									"character": 4
 								}
 							],
@@ -9753,7 +11490,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 889,
+												"id": 891,
 												"qualifiedName": "Options",
 												"package": "@supabase/realtime-js",
 												"name": "Options"
@@ -9771,8 +11508,50 @@
 							]
 						},
 						{
-							"id": 886,
+							"id": 888,
 							"name": "_appendParams",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 162,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 889,
+							"name": "_flushSendBuffer",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 163,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 885,
+							"name": "_onConnClose",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -9792,8 +11571,8 @@
 							}
 						},
 						{
-							"id": 887,
-							"name": "_flushSendBuffer",
+							"id": 886,
+							"name": "_onConnError",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -9813,92 +11592,8 @@
 							}
 						},
 						{
-							"id": 883,
-							"name": "_onConnClose",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isPrivate": true,
-								"isExternal": true
-							},
-							"sources": [
-								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 156,
-									"character": 12
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "any"
-							}
-						},
-						{
 							"id": 884,
-							"name": "_onConnError",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isPrivate": true,
-								"isExternal": true
-							},
-							"sources": [
-								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 157,
-									"character": 12
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "any"
-							}
-						},
-						{
-							"id": 882,
 							"name": "_onConnOpen",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isPrivate": true,
-								"isExternal": true
-							},
-							"sources": [
-								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 155,
-									"character": 12
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "any"
-							}
-						},
-						{
-							"id": 888,
-							"name": "_sendHeartbeat",
-							"kind": 1024,
-							"kindString": "Property",
-							"flags": {
-								"isPrivate": true,
-								"isExternal": true
-							},
-							"sources": [
-								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 161,
-									"character": 12
-								}
-							],
-							"type": {
-								"type": "intrinsic",
-								"name": "any"
-							}
-						},
-						{
-							"id": 885,
-							"name": "_triggerChanError",
 							"kind": 1024,
 							"kindString": "Property",
 							"flags": {
@@ -9918,6 +11613,48 @@
 							}
 						},
 						{
+							"id": 890,
+							"name": "_sendHeartbeat",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 164,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 887,
+							"name": "_triggerChanError",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 161,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
 							"id": 796,
 							"name": "accessToken",
 							"kind": 1024,
@@ -9928,7 +11665,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 27,
+									"line": 28,
 									"character": 4
 								}
 							],
@@ -9957,18 +11694,30 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 28,
+									"line": 29,
 									"character": 4
 								}
 							],
 							"type": {
 								"type": "array",
 								"elementType": {
-									"type": "reference",
-									"id": 907,
-									"qualifiedName": "RealtimeSubscription",
-									"package": "@supabase/realtime-js",
-									"name": "default"
+									"type": "union",
+									"types": [
+										{
+											"type": "reference",
+											"id": 909,
+											"qualifiedName": "RealtimeSubscription",
+											"package": "@supabase/realtime-js",
+											"name": "default"
+										},
+										{
+											"type": "reference",
+											"id": 996,
+											"qualifiedName": "RealtimeChannel",
+											"package": "@supabase/realtime-js",
+											"name": "default"
+										}
+									]
 								}
 							}
 						},
@@ -9983,7 +11732,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 48,
+									"line": 49,
 									"character": 4
 								}
 							],
@@ -10014,7 +11763,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 46,
+									"line": 47,
 									"character": 4
 								}
 							],
@@ -10036,7 +11785,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 45,
+									"line": 46,
 									"character": 4
 								}
 							],
@@ -10058,7 +11807,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 29,
+									"line": 30,
 									"character": 4
 								}
 							],
@@ -10079,7 +11828,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 30,
+									"line": 31,
 									"character": 4
 								}
 							],
@@ -10134,7 +11883,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 38,
+									"line": 39,
 									"character": 4
 								}
 							],
@@ -10154,7 +11903,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 40,
+									"line": 41,
 									"character": 4
 								}
 							],
@@ -10185,7 +11934,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 44,
+									"line": 45,
 									"character": 4
 								}
 							],
@@ -10207,7 +11956,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 39,
+									"line": 40,
 									"character": 4
 								}
 							],
@@ -10228,7 +11977,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 33,
+									"line": 34,
 									"character": 4
 								}
 							],
@@ -10283,7 +12032,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 41,
+									"line": 42,
 									"character": 4
 								}
 							],
@@ -10312,7 +12061,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 47,
+									"line": 48,
 									"character": 4
 								}
 							],
@@ -10334,7 +12083,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 43,
+									"line": 44,
 									"character": 4
 								}
 							],
@@ -10356,7 +12105,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 42,
+									"line": 43,
 									"character": 4
 								}
 							],
@@ -10376,7 +12125,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 49,
+									"line": 50,
 									"character": 4
 								}
 							],
@@ -10401,7 +12150,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 50,
+									"line": 51,
 									"character": 4
 								}
 							],
@@ -10423,7 +12172,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 51,
+									"line": 52,
 									"character": 4
 								}
 							],
@@ -10449,7 +12198,7 @@
 											"sources": [
 												{
 													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 53,
+													"line": 54,
 													"character": 8
 												}
 											],
@@ -10474,7 +12223,7 @@
 											"sources": [
 												{
 													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 54,
+													"line": 55,
 													"character": 8
 												}
 											],
@@ -10499,7 +12248,7 @@
 											"sources": [
 												{
 													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 55,
+													"line": 56,
 													"character": 8
 												}
 											],
@@ -10524,7 +12273,7 @@
 											"sources": [
 												{
 													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 52,
+													"line": 53,
 													"character": 8
 												}
 											],
@@ -10565,7 +12314,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 36,
+									"line": 37,
 									"character": 4
 								}
 							],
@@ -10585,7 +12334,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 37,
+									"line": 38,
 									"character": 4
 								}
 							],
@@ -10605,7 +12354,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 137,
+									"line": 138,
 									"character": 4
 								}
 							],
@@ -10650,17 +12399,56 @@
 													"kindString": "Type literal",
 													"flags": {
 														"isExternal": true
+													},
+													"indexSignature": {
+														"id": 866,
+														"name": "__index",
+														"kind": 8192,
+														"kindString": "Index signature",
+														"flags": {
+															"isExternal": true
+														},
+														"parameters": [
+															{
+																"id": 867,
+																"name": "key",
+																"kind": 32768,
+																"flags": {
+																	"isExternal": true
+																},
+																"type": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														],
+														"type": {
+															"type": "intrinsic",
+															"name": "any"
+														}
 													}
 												}
 											}
 										}
 									],
 									"type": {
-										"type": "reference",
-										"id": 907,
-										"qualifiedName": "RealtimeSubscription",
-										"package": "@supabase/realtime-js",
-										"name": "default"
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"id": 909,
+												"qualifiedName": "RealtimeSubscription",
+												"package": "@supabase/realtime-js",
+												"name": "default"
+											},
+											{
+												"type": "reference",
+												"id": 996,
+												"qualifiedName": "RealtimeChannel",
+												"package": "@supabase/realtime-js",
+												"name": "default"
+											}
+										]
 									}
 								}
 							]
@@ -10676,7 +12464,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 76,
+									"line": 77,
 									"character": 4
 								}
 							],
@@ -10710,7 +12498,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 126,
+									"line": 127,
 									"character": 4
 								}
 							],
@@ -10761,7 +12549,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 83,
+									"line": 84,
 									"character": 4
 								}
 							],
@@ -10838,7 +12626,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-																	"line": 85,
+																	"line": 86,
 																	"character": 8
 																}
 															],
@@ -10858,7 +12646,7 @@
 															"sources": [
 																{
 																	"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-																	"line": 84,
+																	"line": 85,
 																	"character": 8
 																}
 															],
@@ -10900,7 +12688,7 @@
 							]
 						},
 						{
-							"id": 872,
+							"id": 874,
 							"name": "endPointURL",
 							"kind": 2048,
 							"kindString": "Method",
@@ -10910,13 +12698,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 143,
+									"line": 146,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 873,
+									"id": 875,
 									"name": "endPointURL",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -10944,7 +12732,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 130,
+									"line": 131,
 									"character": 4
 								}
 							],
@@ -10968,7 +12756,7 @@
 							]
 						},
 						{
-							"id": 879,
+							"id": 881,
 							"name": "leaveOpenTopic",
 							"kind": 2048,
 							"kindString": "Method",
@@ -10978,13 +12766,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 154,
+									"line": 157,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 880,
+									"id": 882,
 									"name": "leaveOpenTopic",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -10993,7 +12781,7 @@
 									},
 									"parameters": [
 										{
-											"id": 881,
+											"id": 883,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11024,7 +12812,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 90,
+									"line": 91,
 									"character": 4
 								}
 							],
@@ -11090,7 +12878,7 @@
 							]
 						},
 						{
-							"id": 874,
+							"id": 876,
 							"name": "makeRef",
 							"kind": 2048,
 							"kindString": "Method",
@@ -11100,13 +12888,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 147,
+									"line": 150,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 875,
+									"id": 877,
 									"name": "makeRef",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -11134,7 +12922,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 106,
+									"line": 107,
 									"character": 4
 								}
 							],
@@ -11184,7 +12972,7 @@
 							]
 						},
 						{
-							"id": 869,
+							"id": 871,
 							"name": "onConnMessage",
 							"kind": 2048,
 							"kindString": "Method",
@@ -11194,13 +12982,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 139,
+									"line": 142,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 870,
+									"id": 872,
 									"name": "onConnMessage",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -11209,7 +12997,7 @@
 									},
 									"parameters": [
 										{
-											"id": 871,
+											"id": 873,
 											"name": "rawMessage",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11240,7 +13028,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 114,
+									"line": 115,
 									"character": 4
 								}
 							],
@@ -11300,7 +13088,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 122,
+									"line": 123,
 									"character": 4
 								}
 							],
@@ -11360,7 +13148,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 98,
+									"line": 99,
 									"character": 4
 								}
 							],
@@ -11410,7 +13198,7 @@
 							]
 						},
 						{
-							"id": 866,
+							"id": 868,
 							"name": "push",
 							"kind": 2048,
 							"kindString": "Method",
@@ -11420,13 +13208,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 138,
+									"line": 141,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 867,
+									"id": 869,
 									"name": "push",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -11435,7 +13223,7 @@
 									},
 									"parameters": [
 										{
-											"id": 868,
+											"id": 870,
 											"name": "data",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11468,7 +13256,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 136,
+									"line": 137,
 									"character": 4
 								}
 							],
@@ -11497,11 +13285,23 @@
 												"shortText": "An open subscription.\n"
 											},
 											"type": {
-												"type": "reference",
-												"id": 907,
-												"qualifiedName": "RealtimeSubscription",
-												"package": "@supabase/realtime-js",
-												"name": "default"
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"id": 909,
+														"qualifiedName": "RealtimeSubscription",
+														"package": "@supabase/realtime-js",
+														"name": "default"
+													},
+													{
+														"type": "reference",
+														"id": 996,
+														"qualifiedName": "RealtimeChannel",
+														"package": "@supabase/realtime-js",
+														"name": "default"
+													}
+												]
 											}
 										}
 									],
@@ -11513,7 +13313,7 @@
 							]
 						},
 						{
-							"id": 876,
+							"id": 878,
 							"name": "setAuth",
 							"kind": 2048,
 							"kindString": "Method",
@@ -11523,13 +13323,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 153,
+									"line": 156,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 877,
+									"id": 879,
 									"name": "setAuth",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -11541,7 +13341,7 @@
 									},
 									"parameters": [
 										{
-											"id": 878,
+											"id": 880,
 											"name": "token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11586,13 +13386,13 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								886,
-								887,
-								883,
-								884,
-								882,
 								888,
+								889,
 								885,
+								886,
+								884,
+								890,
+								887,
 								796,
 								797,
 								819,
@@ -11624,32 +13424,32 @@
 								828,
 								854,
 								830,
-								872,
-								856,
-								879,
-								837,
 								874,
+								856,
+								881,
+								837,
+								876,
 								845,
-								869,
+								871,
 								848,
 								851,
 								842,
-								866,
+								868,
 								858,
-								876
+								878
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-							"line": 26,
+							"line": 27,
 							"character": 21
 						}
 					]
 				},
 				{
-					"id": 994,
+					"id": 1102,
 					"name": "RealtimePresence",
 					"kind": 128,
 					"kindString": "Class",
@@ -11658,7 +13458,7 @@
 					},
 					"children": [
 						{
-							"id": 1014,
+							"id": 1123,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -11674,7 +13474,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1015,
+									"id": 1124,
 									"name": "new RealtimePresence",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -11686,7 +13486,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1016,
+											"id": 1125,
 											"name": "channel",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11698,14 +13498,14 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 907,
-												"qualifiedName": "RealtimeSubscription",
+												"id": 996,
+												"qualifiedName": "RealtimeChannel",
 												"package": "@supabase/realtime-js",
 												"name": "default"
 											}
 										},
 										{
-											"id": 1017,
+											"id": 1126,
 											"name": "opts",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -11726,7 +13526,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 994,
+										"id": 1102,
 										"qualifiedName": "RealtimePresence",
 										"package": "@supabase/realtime-js",
 										"name": "default"
@@ -11735,7 +13535,7 @@
 							]
 						},
 						{
-							"id": 1022,
+							"id": 1131,
 							"name": "caller",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11752,7 +13552,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 1023,
+									"id": 1132,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -11761,7 +13561,7 @@
 									},
 									"children": [
 										{
-											"id": 1024,
+											"id": 1133,
 											"name": "onJoin",
 											"kind": 1024,
 											"kindString": "Property",
@@ -11783,7 +13583,7 @@
 											}
 										},
 										{
-											"id": 1025,
+											"id": 1134,
 											"name": "onLeave",
 											"kind": 1024,
 											"kindString": "Property",
@@ -11805,7 +13605,7 @@
 											}
 										},
 										{
-											"id": 1026,
+											"id": 1135,
 											"name": "onSync",
 											"kind": 2048,
 											"kindString": "Method",
@@ -11821,7 +13621,7 @@
 											],
 											"signatures": [
 												{
-													"id": 1027,
+													"id": 1136,
 													"name": "onSync",
 													"kind": 4096,
 													"kindString": "Call signature",
@@ -11841,15 +13641,15 @@
 											"title": "Properties",
 											"kind": 1024,
 											"children": [
-												1024,
-												1025
+												1133,
+												1134
 											]
 										},
 										{
 											"title": "Methods",
 											"kind": 2048,
 											"children": [
-												1026
+												1135
 											]
 										}
 									]
@@ -11857,7 +13657,7 @@
 							}
 						},
 						{
-							"id": 1018,
+							"id": 1127,
 							"name": "channel",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11873,14 +13673,14 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 907,
-								"qualifiedName": "RealtimeSubscription",
+								"id": 996,
+								"qualifiedName": "RealtimeChannel",
 								"package": "@supabase/realtime-js",
 								"name": "default"
 							}
 						},
 						{
-							"id": 1043,
+							"id": 1152,
 							"name": "inPendingSyncState",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11891,7 +13691,7 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
-									"line": 89,
+									"line": 90,
 									"character": 12
 								}
 							],
@@ -11901,7 +13701,7 @@
 							}
 						},
 						{
-							"id": 1021,
+							"id": 1130,
 							"name": "joinRef",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11930,7 +13730,7 @@
 							}
 						},
 						{
-							"id": 1020,
+							"id": 1129,
 							"name": "pendingDiffs",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11955,7 +13755,7 @@
 							}
 						},
 						{
-							"id": 1019,
+							"id": 1128,
 							"name": "state",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11977,7 +13777,29 @@
 							}
 						},
 						{
-							"id": 1012,
+							"id": 1122,
+							"name": "cloneDeep",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isPrivate": true,
+								"isStatic": true,
+								"isExternal": true
+							},
+							"sources": [
+								{
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
+									"line": 85,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						},
+						{
+							"id": 1120,
 							"name": "map",
 							"kind": 1024,
 							"kindString": "Property",
@@ -11999,7 +13821,7 @@
 							}
 						},
 						{
-							"id": 1013,
+							"id": 1121,
 							"name": "transformState",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12030,7 +13852,7 @@
 							}
 						},
 						{
-							"id": 1039,
+							"id": 1148,
 							"name": "list",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12040,13 +13862,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
-									"line": 88,
+									"line": 89,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 1040,
+									"id": 1149,
 									"name": "list",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12055,7 +13877,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 1041,
+											"id": 1150,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -12070,7 +13892,7 @@
 									],
 									"parameters": [
 										{
-											"id": 1042,
+											"id": 1151,
 											"name": "by",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12083,7 +13905,7 @@
 												"typeArguments": [
 													{
 														"type": "reference",
-														"id": 1041,
+														"id": 1150,
 														"qualifiedName": "T",
 														"package": "@supabase/realtime-js",
 														"name": "T"
@@ -12099,7 +13921,7 @@
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 1041,
+											"id": 1150,
 											"qualifiedName": "T",
 											"package": "@supabase/realtime-js",
 											"name": "T"
@@ -12109,7 +13931,7 @@
 							]
 						},
 						{
-							"id": 1028,
+							"id": 1137,
 							"name": "onJoin",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12119,13 +13941,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
-									"line": 85,
+									"line": 86,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 1029,
+									"id": 1138,
 									"name": "onJoin",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12134,7 +13956,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1030,
+											"id": 1139,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12157,7 +13979,7 @@
 							]
 						},
 						{
-							"id": 1031,
+							"id": 1140,
 							"name": "onLeave",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12167,13 +13989,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
-									"line": 86,
+									"line": 87,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 1032,
+									"id": 1141,
 									"name": "onLeave",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12182,7 +14004,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1033,
+											"id": 1142,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12205,7 +14027,7 @@
 							]
 						},
 						{
-							"id": 1034,
+							"id": 1143,
 							"name": "onSync",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12215,13 +14037,13 @@
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
-									"line": 87,
+									"line": 88,
 									"character": 4
 								}
 							],
 							"signatures": [
 								{
-									"id": 1035,
+									"id": 1144,
 									"name": "onSync",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12230,7 +14052,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1036,
+											"id": 1145,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12240,7 +14062,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 1037,
+													"id": 1146,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -12249,7 +14071,7 @@
 													},
 													"signatures": [
 														{
-															"id": 1038,
+															"id": 1147,
 															"name": "__type",
 															"kind": 4096,
 															"kindString": "Call signature",
@@ -12274,7 +14096,7 @@
 							]
 						},
 						{
-							"id": 1007,
+							"id": 1115,
 							"name": "list",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12291,7 +14113,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1008,
+									"id": 1116,
 									"name": "list",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12303,7 +14125,7 @@
 									},
 									"typeParameter": [
 										{
-											"id": 1009,
+											"id": 1117,
 											"name": "T",
 											"kind": 131072,
 											"kindString": "Type parameter",
@@ -12318,7 +14140,7 @@
 									],
 									"parameters": [
 										{
-											"id": 1010,
+											"id": 1118,
 											"name": "presences",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12333,7 +14155,7 @@
 											}
 										},
 										{
-											"id": 1011,
+											"id": 1119,
 											"name": "chooser",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12352,7 +14174,7 @@
 														"typeArguments": [
 															{
 																"type": "reference",
-																"id": 1009,
+																"id": 1117,
 																"qualifiedName": "T",
 																"package": "@supabase/realtime-js",
 																"name": "T"
@@ -12370,7 +14192,7 @@
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 1009,
+											"id": 1117,
 											"qualifiedName": "T",
 											"package": "@supabase/realtime-js",
 											"name": "T"
@@ -12380,7 +14202,7 @@
 							]
 						},
 						{
-							"id": 1001,
+							"id": 1109,
 							"name": "syncDiff",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12397,7 +14219,7 @@
 							],
 							"signatures": [
 								{
-									"id": 1002,
+									"id": 1110,
 									"name": "syncDiff",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12409,7 +14231,7 @@
 									},
 									"parameters": [
 										{
-											"id": 1003,
+											"id": 1111,
 											"name": "state",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12424,7 +14246,7 @@
 											}
 										},
 										{
-											"id": 1004,
+											"id": 1112,
 											"name": "diff",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12450,7 +14272,7 @@
 											}
 										},
 										{
-											"id": 1005,
+											"id": 1113,
 											"name": "onJoin",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12465,7 +14287,7 @@
 											}
 										},
 										{
-											"id": 1006,
+											"id": 1114,
 											"name": "onLeave",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12490,7 +14312,7 @@
 							]
 						},
 						{
-							"id": 995,
+							"id": 1103,
 							"name": "syncState",
 							"kind": 2048,
 							"kindString": "Method",
@@ -12507,7 +14329,7 @@
 							],
 							"signatures": [
 								{
-									"id": 996,
+									"id": 1104,
 									"name": "syncState",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -12519,7 +14341,7 @@
 									},
 									"parameters": [
 										{
-											"id": 997,
+											"id": 1105,
 											"name": "currentState",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12534,7 +14356,7 @@
 											}
 										},
 										{
-											"id": 998,
+											"id": 1106,
 											"name": "newState",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12560,7 +14382,7 @@
 											}
 										},
 										{
-											"id": 999,
+											"id": 1107,
 											"name": "onJoin",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12575,7 +14397,7 @@
 											}
 										},
 										{
-											"id": 1000,
+											"id": 1108,
 											"name": "onLeave",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12605,34 +14427,35 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								1014
+								1123
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								1022,
-								1018,
-								1043,
-								1021,
-								1020,
-								1019,
-								1012,
-								1013
+								1131,
+								1127,
+								1152,
+								1130,
+								1129,
+								1128,
+								1122,
+								1120,
+								1121
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								1039,
-								1028,
-								1031,
-								1034,
-								1007,
-								1001,
-								995
+								1148,
+								1137,
+								1140,
+								1143,
+								1115,
+								1109,
+								1103
 							]
 						}
 					],
@@ -12645,7 +14468,7 @@
 					]
 				},
 				{
-					"id": 907,
+					"id": 909,
 					"name": "RealtimeSubscription",
 					"kind": 128,
 					"kindString": "Class",
@@ -12654,7 +14477,7 @@
 					},
 					"children": [
 						{
-							"id": 908,
+							"id": 910,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -12670,7 +14493,7 @@
 							],
 							"signatures": [
 								{
-									"id": 909,
+									"id": 911,
 									"name": "new RealtimeSubscription",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -12679,7 +14502,7 @@
 									},
 									"parameters": [
 										{
-											"id": 910,
+											"id": 912,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12692,7 +14515,7 @@
 											}
 										},
 										{
-											"id": 911,
+											"id": 913,
 											"name": "params",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12702,7 +14525,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 912,
+													"id": 914,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -12710,7 +14533,7 @@
 														"isExternal": true
 													},
 													"indexSignature": {
-														"id": 913,
+														"id": 915,
 														"name": "__index",
 														"kind": 8192,
 														"kindString": "Index signature",
@@ -12719,7 +14542,7 @@
 														},
 														"parameters": [
 															{
-																"id": 914,
+																"id": 916,
 																"name": "key",
 																"kind": 32768,
 																"flags": {
@@ -12740,7 +14563,7 @@
 											}
 										},
 										{
-											"id": 915,
+											"id": 917,
 											"name": "socket",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -12758,7 +14581,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 907,
+										"id": 909,
 										"qualifiedName": "RealtimeSubscription",
 										"package": "@supabase/realtime-js",
 										"name": "default"
@@ -12767,7 +14590,7 @@
 							]
 						},
 						{
-							"id": 922,
+							"id": 924,
 							"name": "bindings",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12790,7 +14613,7 @@
 							}
 						},
 						{
-							"id": 926,
+							"id": 928,
 							"name": "joinPush",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12812,7 +14635,7 @@
 							}
 						},
 						{
-							"id": 925,
+							"id": 927,
 							"name": "joinedOnce",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12832,7 +14655,7 @@
 							}
 						},
 						{
-							"id": 917,
+							"id": 919,
 							"name": "params",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12849,7 +14672,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 918,
+									"id": 920,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -12857,7 +14680,7 @@
 										"isExternal": true
 									},
 									"indexSignature": {
-										"id": 919,
+										"id": 921,
 										"name": "__index",
 										"kind": 8192,
 										"kindString": "Index signature",
@@ -12866,7 +14689,7 @@
 										},
 										"parameters": [
 											{
-												"id": 920,
+												"id": 922,
 												"name": "key",
 												"kind": 32768,
 												"flags": {
@@ -12887,7 +14710,7 @@
 							}
 						},
 						{
-							"id": 928,
+							"id": 930,
 							"name": "pushBuffer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12912,7 +14735,7 @@
 							}
 						},
 						{
-							"id": 927,
+							"id": 929,
 							"name": "rejoinTimer",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12934,7 +14757,7 @@
 							}
 						},
 						{
-							"id": 921,
+							"id": 923,
 							"name": "socket",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12957,7 +14780,7 @@
 							}
 						},
 						{
-							"id": 924,
+							"id": 926,
 							"name": "state",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12979,7 +14802,7 @@
 							}
 						},
 						{
-							"id": 923,
+							"id": 925,
 							"name": "timeout",
 							"kind": 1024,
 							"kindString": "Property",
@@ -12999,7 +14822,7 @@
 							}
 						},
 						{
-							"id": 916,
+							"id": 918,
 							"name": "topic",
 							"kind": 1024,
 							"kindString": "Property",
@@ -13019,7 +14842,7 @@
 							}
 						},
 						{
-							"id": 947,
+							"id": 949,
 							"name": "canPush",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13035,7 +14858,7 @@
 							],
 							"signatures": [
 								{
-									"id": 948,
+									"id": 950,
 									"name": "canPush",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13050,7 +14873,7 @@
 							]
 						},
 						{
-							"id": 984,
+							"id": 986,
 							"name": "isClosed",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13066,7 +14889,7 @@
 							],
 							"signatures": [
 								{
-									"id": 985,
+									"id": 987,
 									"name": "isClosed",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13081,7 +14904,7 @@
 							]
 						},
 						{
-							"id": 986,
+							"id": 988,
 							"name": "isErrored",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13097,7 +14920,7 @@
 							],
 							"signatures": [
 								{
-									"id": 987,
+									"id": 989,
 									"name": "isErrored",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13112,7 +14935,7 @@
 							]
 						},
 						{
-							"id": 988,
+							"id": 990,
 							"name": "isJoined",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13128,7 +14951,7 @@
 							],
 							"signatures": [
 								{
-									"id": 989,
+									"id": 991,
 									"name": "isJoined",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13143,7 +14966,7 @@
 							]
 						},
 						{
-							"id": 990,
+							"id": 992,
 							"name": "isJoining",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13159,7 +14982,7 @@
 							],
 							"signatures": [
 								{
-									"id": 991,
+									"id": 993,
 									"name": "isJoining",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13174,7 +14997,7 @@
 							]
 						},
 						{
-							"id": 992,
+							"id": 994,
 							"name": "isLeaving",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13190,7 +15013,7 @@
 							],
 							"signatures": [
 								{
-									"id": 993,
+									"id": 995,
 									"name": "isLeaving",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13205,7 +15028,7 @@
 							]
 						},
 						{
-							"id": 968,
+							"id": 970,
 							"name": "isMember",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13221,7 +15044,7 @@
 							],
 							"signatures": [
 								{
-									"id": 969,
+									"id": 971,
 									"name": "isMember",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13230,7 +15053,7 @@
 									},
 									"parameters": [
 										{
-											"id": 970,
+											"id": 972,
 											"name": "topic",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13251,7 +15074,7 @@
 							]
 						},
 						{
-							"id": 971,
+							"id": 973,
 							"name": "joinRef",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13267,7 +15090,7 @@
 							],
 							"signatures": [
 								{
-									"id": 972,
+									"id": 974,
 									"name": "joinRef",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13282,7 +15105,7 @@
 							]
 						},
 						{
-							"id": 944,
+							"id": 946,
 							"name": "off",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13298,7 +15121,7 @@
 							],
 							"signatures": [
 								{
-									"id": 945,
+									"id": 947,
 									"name": "off",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13307,7 +15130,7 @@
 									},
 									"parameters": [
 										{
-											"id": 946,
+											"id": 948,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13328,7 +15151,7 @@
 							]
 						},
 						{
-							"id": 940,
+							"id": 942,
 							"name": "on",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13344,7 +15167,7 @@
 							],
 							"signatures": [
 								{
-									"id": 941,
+									"id": 943,
 									"name": "on",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13353,7 +15176,7 @@
 									},
 									"parameters": [
 										{
-											"id": 942,
+											"id": 944,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13366,7 +15189,7 @@
 											}
 										},
 										{
-											"id": 943,
+											"id": 945,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13389,7 +15212,7 @@
 							]
 						},
 						{
-							"id": 934,
+							"id": 936,
 							"name": "onClose",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13405,7 +15228,7 @@
 							],
 							"signatures": [
 								{
-									"id": 935,
+									"id": 937,
 									"name": "onClose",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13414,7 +15237,7 @@
 									},
 									"parameters": [
 										{
-											"id": 936,
+											"id": 938,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13437,7 +15260,7 @@
 							]
 						},
 						{
-							"id": 937,
+							"id": 939,
 							"name": "onError",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13453,7 +15276,7 @@
 							],
 							"signatures": [
 								{
-									"id": 938,
+									"id": 940,
 									"name": "onError",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13462,7 +15285,7 @@
 									},
 									"parameters": [
 										{
-											"id": 939,
+											"id": 941,
 											"name": "callback",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13485,7 +15308,7 @@
 							]
 						},
 						{
-							"id": 963,
+							"id": 965,
 							"name": "onMessage",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13501,7 +15324,7 @@
 							],
 							"signatures": [
 								{
-									"id": 964,
+									"id": 966,
 									"name": "onMessage",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13514,7 +15337,7 @@
 									},
 									"parameters": [
 										{
-											"id": 965,
+											"id": 967,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13527,7 +15350,7 @@
 											}
 										},
 										{
-											"id": 966,
+											"id": 968,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13540,7 +15363,7 @@
 											}
 										},
 										{
-											"id": 967,
+											"id": 969,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13562,7 +15385,7 @@
 							]
 						},
 						{
-							"id": 949,
+							"id": 951,
 							"name": "push",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13578,7 +15401,7 @@
 							],
 							"signatures": [
 								{
-									"id": 950,
+									"id": 952,
 									"name": "push",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13587,7 +15410,7 @@
 									},
 									"parameters": [
 										{
-											"id": 951,
+											"id": 953,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13602,7 +15425,7 @@
 											}
 										},
 										{
-											"id": 952,
+											"id": 954,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13615,7 +15438,7 @@
 											}
 										},
 										{
-											"id": 953,
+											"id": 955,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13639,7 +15462,7 @@
 							]
 						},
 						{
-							"id": 973,
+							"id": 975,
 							"name": "rejoin",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13655,7 +15478,7 @@
 							],
 							"signatures": [
 								{
-									"id": 974,
+									"id": 976,
 									"name": "rejoin",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13664,7 +15487,7 @@
 									},
 									"parameters": [
 										{
-											"id": 975,
+											"id": 977,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13686,7 +15509,7 @@
 							]
 						},
 						{
-							"id": 929,
+							"id": 931,
 							"name": "rejoinUntilConnected",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13702,7 +15525,7 @@
 							],
 							"signatures": [
 								{
-									"id": 930,
+									"id": 932,
 									"name": "rejoinUntilConnected",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13717,7 +15540,7 @@
 							]
 						},
 						{
-							"id": 981,
+							"id": 983,
 							"name": "replyEventName",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13733,7 +15556,7 @@
 							],
 							"signatures": [
 								{
-									"id": 982,
+									"id": 984,
 									"name": "replyEventName",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13742,7 +15565,7 @@
 									},
 									"parameters": [
 										{
-											"id": 983,
+											"id": 985,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13763,7 +15586,7 @@
 							]
 						},
 						{
-							"id": 931,
+							"id": 933,
 							"name": "subscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13779,7 +15602,7 @@
 							],
 							"signatures": [
 								{
-									"id": 932,
+									"id": 934,
 									"name": "subscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13788,7 +15611,7 @@
 									},
 									"parameters": [
 										{
-											"id": 933,
+											"id": 935,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13812,7 +15635,7 @@
 							]
 						},
 						{
-							"id": 976,
+							"id": 978,
 							"name": "trigger",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13828,7 +15651,7 @@
 							],
 							"signatures": [
 								{
-									"id": 977,
+									"id": 979,
 									"name": "trigger",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13837,7 +15660,7 @@
 									},
 									"parameters": [
 										{
-											"id": 978,
+											"id": 980,
 											"name": "event",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13850,7 +15673,7 @@
 											}
 										},
 										{
-											"id": 979,
+											"id": 981,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13864,7 +15687,7 @@
 											}
 										},
 										{
-											"id": 980,
+											"id": 982,
 											"name": "ref",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13886,7 +15709,7 @@
 							]
 						},
 						{
-							"id": 960,
+							"id": 962,
 							"name": "unsubscribe",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13902,7 +15725,7 @@
 							],
 							"signatures": [
 								{
-									"id": 961,
+									"id": 963,
 									"name": "unsubscribe",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13915,7 +15738,7 @@
 									},
 									"parameters": [
 										{
-											"id": 962,
+											"id": 964,
 											"name": "timeout",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13939,7 +15762,7 @@
 							]
 						},
 						{
-							"id": 954,
+							"id": 956,
 							"name": "updateJoinPayload",
 							"kind": 2048,
 							"kindString": "Method",
@@ -13955,7 +15778,7 @@
 							],
 							"signatures": [
 								{
-									"id": 955,
+									"id": 957,
 									"name": "updateJoinPayload",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -13964,7 +15787,7 @@
 									},
 									"parameters": [
 										{
-											"id": 956,
+											"id": 958,
 											"name": "payload",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -13974,7 +15797,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 957,
+													"id": 959,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -13982,7 +15805,7 @@
 														"isExternal": true
 													},
 													"indexSignature": {
-														"id": 958,
+														"id": 960,
 														"name": "__index",
 														"kind": 8192,
 														"kindString": "Index signature",
@@ -13991,7 +15814,7 @@
 														},
 														"parameters": [
 															{
-																"id": 959,
+																"id": 961,
 																"name": "key",
 																"kind": 32768,
 																"flags": {
@@ -14025,50 +15848,50 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								908
+								910
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								922,
-								926,
-								925,
-								917,
+								924,
 								928,
 								927,
-								921,
-								924,
+								919,
+								930,
+								929,
 								923,
-								916
+								926,
+								925,
+								918
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								947,
-								984,
+								949,
 								986,
 								988,
 								990,
 								992,
-								968,
-								971,
-								944,
-								940,
-								934,
-								937,
-								963,
-								949,
+								994,
+								970,
 								973,
-								929,
-								981,
+								946,
+								942,
+								936,
+								939,
+								965,
+								951,
+								975,
 								931,
-								976,
-								960,
-								954
+								983,
+								933,
+								978,
+								962,
+								956
 							]
 						}
 					],
@@ -14649,7 +16472,7 @@
 											"flags": {},
 											"type": {
 												"type": "reference",
-												"id": 907,
+												"id": 909,
 												"qualifiedName": "RealtimeSubscription",
 												"package": "@supabase/realtime-js",
 												"name": "default"
@@ -14896,7 +16719,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 889,
+												"id": 891,
 												"qualifiedName": "Options",
 												"package": "@supabase/realtime-js",
 												"name": "Options"
@@ -15066,7 +16889,7 @@
 											"flags": {},
 											"type": {
 												"type": "reference",
-												"id": 907,
+												"id": 909,
 												"qualifiedName": "RealtimeSubscription",
 												"package": "@supabase/realtime-js",
 												"name": "default"
@@ -15228,7 +17051,7 @@
 										"type": "array",
 										"elementType": {
 											"type": "reference",
-											"id": 907,
+											"id": 909,
 											"qualifiedName": "RealtimeSubscription",
 											"package": "@supabase/realtime-js",
 											"name": "default"
@@ -15311,7 +17134,7 @@
 																				],
 																				"type": {
 																					"type": "reference",
-																					"id": 907,
+																					"id": 909,
 																					"qualifiedName": "RealtimeSubscription",
 																					"package": "@supabase/realtime-js",
 																					"name": "default"
@@ -15416,7 +17239,7 @@
 											},
 											"type": {
 												"type": "reference",
-												"id": 907,
+												"id": 909,
 												"qualifiedName": "RealtimeSubscription",
 												"package": "@supabase/realtime-js",
 												"name": "default"
@@ -18544,7 +20367,7 @@
 					}
 				},
 				{
-					"id": 889,
+					"id": 891,
 					"name": "RealtimeClientOptions",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -18554,14 +20377,14 @@
 					"sources": [
 						{
 							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-							"line": 4,
+							"line": 5,
 							"character": 20
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 890,
+							"id": 892,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
@@ -18570,245 +20393,8 @@
 							},
 							"children": [
 								{
-									"id": 897,
-									"name": "decode",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 11,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "reference",
-										"qualifiedName": "Function",
-										"package": "typescript",
-										"name": "Function"
-									}
-								},
-								{
-									"id": 896,
-									"name": "encode",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 10,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "reference",
-										"qualifiedName": "Function",
-										"package": "typescript",
-										"name": "Function"
-									}
-								},
-								{
 									"id": 899,
-									"name": "headers",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 13,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 900,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {
-												"isExternal": true
-											},
-											"sources": [
-												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 13,
-													"character": 14
-												}
-											],
-											"indexSignature": {
-												"id": 901,
-												"name": "__index",
-												"kind": 8192,
-												"kindString": "Index signature",
-												"flags": {
-													"isExternal": true
-												},
-												"parameters": [
-													{
-														"id": 902,
-														"name": "key",
-														"kind": 32768,
-														"flags": {
-															"isExternal": true
-														},
-														"type": {
-															"type": "intrinsic",
-															"name": "string"
-														}
-													}
-												],
-												"type": {
-													"type": "intrinsic",
-													"name": "string"
-												}
-											}
-										}
-									}
-								},
-								{
-									"id": 893,
-									"name": "heartbeatIntervalMs",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 7,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "number"
-									}
-								},
-								{
-									"id": 895,
-									"name": "logger",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 9,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "reference",
-										"qualifiedName": "Function",
-										"package": "typescript",
-										"name": "Function"
-									}
-								},
-								{
-									"id": 894,
-									"name": "longpollerTimeout",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 8,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "number"
-									}
-								},
-								{
-									"id": 903,
-									"name": "params",
-									"kind": 1024,
-									"kindString": "Property",
-									"flags": {
-										"isExternal": true,
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 16,
-											"character": 4
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 904,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {
-												"isExternal": true
-											},
-											"sources": [
-												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-													"line": 16,
-													"character": 13
-												}
-											],
-											"indexSignature": {
-												"id": 905,
-												"name": "__index",
-												"kind": 8192,
-												"kindString": "Index signature",
-												"flags": {
-													"isExternal": true
-												},
-												"parameters": [
-													{
-														"id": 906,
-														"name": "key",
-														"kind": 32768,
-														"flags": {
-															"isExternal": true
-														},
-														"type": {
-															"type": "intrinsic",
-															"name": "string"
-														}
-													}
-												],
-												"type": {
-													"type": "intrinsic",
-													"name": "string"
-												}
-											}
-										}
-									}
-								},
-								{
-									"id": 898,
-									"name": "reconnectAfterMs",
+									"name": "decode",
 									"kind": 1024,
 									"kindString": "Property",
 									"flags": {
@@ -18830,7 +20416,244 @@
 									}
 								},
 								{
-									"id": 892,
+									"id": 898,
+									"name": "encode",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 11,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Function",
+										"package": "typescript",
+										"name": "Function"
+									}
+								},
+								{
+									"id": 901,
+									"name": "headers",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 14,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 902,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExternal": true
+											},
+											"sources": [
+												{
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 14,
+													"character": 14
+												}
+											],
+											"indexSignature": {
+												"id": 903,
+												"name": "__index",
+												"kind": 8192,
+												"kindString": "Index signature",
+												"flags": {
+													"isExternal": true
+												},
+												"parameters": [
+													{
+														"id": 904,
+														"name": "key",
+														"kind": 32768,
+														"flags": {
+															"isExternal": true
+														},
+														"type": {
+															"type": "intrinsic",
+															"name": "string"
+														}
+													}
+												],
+												"type": {
+													"type": "intrinsic",
+													"name": "string"
+												}
+											}
+										}
+									}
+								},
+								{
+									"id": 895,
+									"name": "heartbeatIntervalMs",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 8,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 897,
+									"name": "logger",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 10,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Function",
+										"package": "typescript",
+										"name": "Function"
+									}
+								},
+								{
+									"id": 896,
+									"name": "longpollerTimeout",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 9,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 905,
+									"name": "params",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 17,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 906,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExternal": true
+											},
+											"sources": [
+												{
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 17,
+													"character": 13
+												}
+											],
+											"indexSignature": {
+												"id": 907,
+												"name": "__index",
+												"kind": 8192,
+												"kindString": "Index signature",
+												"flags": {
+													"isExternal": true
+												},
+												"parameters": [
+													{
+														"id": 908,
+														"name": "key",
+														"kind": 32768,
+														"flags": {
+															"isExternal": true
+														},
+														"type": {
+															"type": "intrinsic",
+															"name": "string"
+														}
+													}
+												],
+												"type": {
+													"type": "intrinsic",
+													"name": "string"
+												}
+											}
+										}
+									}
+								},
+								{
+									"id": 900,
+									"name": "reconnectAfterMs",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 13,
+											"character": 4
+										}
+									],
+									"type": {
+										"type": "reference",
+										"qualifiedName": "Function",
+										"package": "typescript",
+										"name": "Function"
+									}
+								},
+								{
+									"id": 894,
 									"name": "timeout",
 									"kind": 1024,
 									"kindString": "Property",
@@ -18841,7 +20664,7 @@
 									"sources": [
 										{
 											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 6,
+											"line": 7,
 											"character": 4
 										}
 									],
@@ -18851,7 +20674,7 @@
 									}
 								},
 								{
-									"id": 891,
+									"id": 893,
 									"name": "transport",
 									"kind": 1024,
 									"kindString": "Property",
@@ -18862,7 +20685,7 @@
 									"sources": [
 										{
 											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-											"line": 5,
+											"line": 6,
 											"character": 4
 										}
 									],
@@ -18879,23 +20702,23 @@
 									"title": "Properties",
 									"kind": 1024,
 									"children": [
+										899,
+										898,
+										901,
+										895,
 										897,
 										896,
-										899,
-										893,
-										895,
+										905,
+										900,
 										894,
-										903,
-										898,
-										892,
-										891
+										893
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
-									"line": 4,
+									"line": 5,
 									"character": 30
 								}
 							]
@@ -19022,7 +20845,7 @@
 					"title": "Namespaces",
 					"kind": 4,
 					"children": [
-						1044
+						1153
 					]
 				},
 				{
@@ -19031,9 +20854,10 @@
 					"children": [
 						339,
 						589,
+						996,
 						791,
-						994,
-						907,
+						1102,
+						909,
 						212
 					]
 				},
@@ -19067,7 +20891,7 @@
 						200,
 						202,
 						717,
-						889,
+						891,
 						772
 					]
 				},
@@ -21655,7 +23479,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"id": 907,
+								"id": 909,
 								"qualifiedName": "RealtimeSubscription",
 								"package": "@supabase/realtime-js",
 								"name": "default"
@@ -21899,7 +23723,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 907,
+										"id": 909,
 										"qualifiedName": "RealtimeSubscription",
 										"package": "@supabase/realtime-js",
 										"name": "default"
@@ -22865,7 +24689,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 889,
+										"id": 891,
 										"qualifiedName": "Options",
 										"package": "@supabase/realtime-js",
 										"name": "RealtimeClientOptions"

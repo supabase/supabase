@@ -10,7 +10,7 @@ info:
       <tr>
         <th>Language</th>
         <th>Client</th>
-        <th colspan="4">Feature-Clients (bundled in Supabase client)</th>
+        <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
       </tr>
       <tr>
         <th></th>
@@ -19,8 +19,9 @@ info:
         <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
         <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
         <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+        <th><a href="https://github.com/supabase/edge-functions" target="_blank" rel="noopener noreferrer">Edge Functions</a></th>
       </tr>
-      <th colspan="6">⚡️ Official ⚡️</th>
+      <th colspan="7">⚡️ Official ⚡️</th>
       <tr>
         <td>JavaScript (TypeScript)</td>
         <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -28,23 +29,29 @@ info:
         <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
         <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
         <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+        <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
       </tr>
-      <th colspan="6">💚 Community 💚</th>
+      <th colspan="7">💚 Community 💚</th>
       <tr>
         <td>C#</td>
         <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
         <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
         <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
         <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
+        <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
         <td>-</td>
       </tr>
       <tr>
         <td>Dart (Flutter)</td>
-        <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
-        <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-        <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
-        <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-        <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+        <td>
+          <a href="https://github.com/supabase-community/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a><br />
+          <a href="https://github.com/supabase-community/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a>
+        </td>
+        <td><a href="https://github.com/supabase-community/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
+        <td><a href="https://github.com/supabase-community/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
+        <td><a href="https://github.com/supabase-community/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
+        <td><a href="https://github.com/supabase-community/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+        <td><a href="https://github.com/supabase-community/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
       </tr>
       <tr>
         <td>Go</td>
@@ -53,12 +60,14 @@ info:
         <td>-</td>
         <td>-</td>
         <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
+        <td>-</td>
       </tr>
       <tr>
         <td>Java</td>
         <td>-</td>
         <td>-</td>
         <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
+        <td>-</td>
         <td>-</td>
         <td>-</td>
       </tr>
@@ -69,6 +78,7 @@ info:
         <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
         <td>-</td>
         <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>Python</td>
@@ -76,12 +86,14 @@ info:
         <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
         <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
         <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
+        <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
         <td>-</td>
       </tr>
       <tr>
         <td>Ruby</td>
         <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
         <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
+        <td>-</td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
@@ -93,6 +105,7 @@ info:
         <td>-</td>
         <td>-</td>
         <td>-</td>
+        <td>-</td>
       </tr>
       <tr>
         <td>Swift</td>
@@ -101,6 +114,7 @@ info:
         <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
         <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
         <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
+        <td>-</td>
       </tr>
     </table>
 
@@ -373,7 +387,7 @@ pages:
         res.status(200).json(allOnlineUsers);
       };
       ```
-      
+
       For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
 
 
@@ -784,7 +798,7 @@ pages:
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
-      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false. 
+      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
     examples:
       - name: Create a new user.
         isSpotlight: true
@@ -985,14 +999,14 @@ pages:
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
-      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec. 
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
     examples:
       - name: Basic invocation.
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            body: { foo: 'bar' }
+            body: JSON.stringify({ foo: 'bar' })
           })
           ```
       - name: Specifying response type.
@@ -1003,22 +1017,20 @@ pages:
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
             responseType: 'text',
-            body: { foo: 'bar' }
+            body: JSON.stringify({ foo: 'bar' })
           })
           ```
       - name: Parsing custom headers.
         description: |
-          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
             headers: { 
-              Authorization: 'Bearer ${supabase.auth.session()?.access_token}' 
+              "my-custom-header": 'my-custom-header-value' 
             },
-            body: { 
-              foo: 'bar' 
-            }
+            body: JSON.stringify({ foo: 'bar' })
           })
           ```
 
@@ -1061,10 +1073,10 @@ pages:
             `)
           ```
         note: |
-         What about join tables
-         If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
-         you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
-         For more details, [follow the link](https://postgrest.org/en/v9.0/api.html#embedding-through-join-tables).
+          What about join tables
+          If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
+          you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
+          For more details, [follow the link](https://postgrest.org/en/v9.0/api.html#embedding-through-join-tables).
       - name: Query the same foreign table multiple times
         description: |
           Sometimes you will need to query the same foreign table twice. 
