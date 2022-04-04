@@ -4,7 +4,7 @@
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@^1.33.2'
-import { corsHeaders } from './_utils/cors.ts'
+import { corsHeaders } from '../_shared/cors.ts'
 
 const supabase = createClient(
   // Supabase API URL - env var exported by default when deployed.
