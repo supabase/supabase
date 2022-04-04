@@ -7,15 +7,7 @@
       <language>en</language>
       <lastBuildDate>Thu, 31 Mar 2022 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
-
-<item>
-  <guid>https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features</guid>
-  <title>Supabase Realtime, with Multiplayer Features</title>
-  <link>https://supabase.com/blog/2022/03/31/supabase-realtime-with-multiplayer-features</link>
-  <description>Today we're announcing the next version of Supabase Realtime with broadcast, presence, and extensions over WebSockets.</description>
-  <pubDate>Fri, 01 Apr 2022 22:00:00 GMT</pubDate>
-</item>
-
+      
 <item>
   <guid>https://supabase.com/blog/2022/04/01/supabrew</guid>
   <title>Supabrew - Never Code Thirsty</title>
