@@ -91,7 +91,6 @@ test('can display log data', async () => {
 
   userEvent.click(await screen.findByText(/Run/))
   const row  = await screen.findByText("some-event-happened")
-  screen.debug()
   userEvent.click(row)
   await screen.findByText(/something_value/)
 })
