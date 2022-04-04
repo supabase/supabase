@@ -275,9 +275,13 @@ const client = createClient({
 // Prepare our GraphQL query
 const TodosQuery = `
   query {
-    todos {
-      id
-      title
+    todosCollection {
+      edges {
+        node {
+          id
+          title
+        }
+      }
     }
   }
 `
