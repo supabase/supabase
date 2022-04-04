@@ -6,13 +6,10 @@ import { createClient } from '@supabase/supabase-js'
 import { functionsList } from './functionsList'
 
 const { Title, Text, Link } = Typography
-// const supabase = createClient(
-//   'http://localhost:54321',
-//   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs'
-// )
 const supabase = createClient(
-  'https://gvkuljvaukfrwmrythfi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2a3VsanZhdWtmcndtcnl0aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDg1NTA4MjQsImV4cCI6MTk2NDEyNjgyNH0.SJpObtyvXNXiVXFBtNED8K7dry5pnaHN7tswyYGQU00'
+  process.env.REACT_APP_SUPABASE_URL ?? 'http://localhost:54321',
+  process.env.REACT_APP_SUPABASE_ANON_KEY ??
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs'
 )
 const sampleObject = { name: 'world' }
 
@@ -43,6 +40,10 @@ function App() {
             </Select.Option>
           ))}
         </Select>
+        <Text>
+          Note: when using locally, this selection doesn't have any effect and the function that's
+          currently being served via the CLI is called instead.
+        </Text>
         <Title level={4}>Body</Title>
         <JSONInput
           onChange={({ jsObject }) => setRequestJson(jsObject)}
