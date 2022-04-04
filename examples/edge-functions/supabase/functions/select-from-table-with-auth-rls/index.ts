@@ -4,6 +4,7 @@
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@^1.33.2'
+import { corsHeaders } from './_utils/cors.ts'
 
 const supabase = createClient(
   // Supabase API URL - env var exported by default when deployed.
@@ -15,15 +16,19 @@ const supabase = createClient(
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
 
 serve(async (req: Request) => {
+  // This is needed if you're planning to invoke your function from a browser.
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
   // Set the Auth context of the user that called the function.
   // This way your row-level-security (RLS) policies are applied.
-  supabase.auth.setAuth(req.headers.get('Authorization')!.split('Bearer ')[1])
+  supabase.auth.setAuth(req.headers.get('Authorization')!.replace('Bearer ', ''))
 
   const { data, error } = await supabase.from('users').select('*')
   console.log({ data, error })
 
   return new Response(JSON.stringify({ data, error }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 })
 
