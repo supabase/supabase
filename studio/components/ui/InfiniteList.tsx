@@ -53,6 +53,7 @@ const InfiniteList = ({
 
   // Every row is loaded except for our loading indicator row
   const isItemLoaded = (index: number) => {
+    // return !hasNextPage || !!items[index]
     return !hasNextPage || index < items.length
   }
 
