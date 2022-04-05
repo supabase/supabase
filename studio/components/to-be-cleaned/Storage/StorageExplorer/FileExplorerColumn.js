@@ -240,7 +240,11 @@ const FileExplorerColumn = ({
           onSelectItemMove,
         }}
         ItemComponent={FileExplorerRow}
-        getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+        getItemSize={(index) => {
+          if (index !== 0 && index === columnItems.length) return 85
+          return 37
+        }}
+        // Scaffold props for infinite loading
         hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
         isLoadingNextPage={column.isLoadingMoreItems}
         onLoadNextPage={() => onColumnLoadMore(index, column)}
