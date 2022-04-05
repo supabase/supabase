@@ -52,11 +52,14 @@ const BlogListItem = ({ post }: Props) => {
             <div className="flex items-center -space-x-2">
               {author.map((author: any) => {
                 return (
-                  <div>
+                  <div className="w-10 rounded-full ring-2 ring-white dark:ring-scale-200">
                     {author.author_image_url && (
-                      <img
+                      <Image
                         src={author.author_image_url}
-                        className="w-10 rounded-full ring-2 ring-white dark:ring-scale-200"
+                        className="rounded-full border dark:border-dark"
+                        width="100%"
+                        height="100%"
+                        layout="responsive"
                       />
                     )}
                   </div>

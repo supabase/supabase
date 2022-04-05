@@ -7,6 +7,7 @@ module.exports = withMDX({
   trailingSlash: false,
   images: {
     domains: [
+      'avatars.githubusercontent.com',
       'github.com',
       'ca.slack-edge.com',
       'res.cloudinary.com',
