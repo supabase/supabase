@@ -924,29 +924,28 @@ class StorageExplorerStore {
 
   /* Folders CRUD */
 
-  fetchFolderContents = async (folderId, folderName, index, searchString = '') => {
+  fetchFolderContents = async (folderId, folderName, index, showLoading = true) => {
     this.abortApiCalls()
 
-    this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
-    this.pushColumnAtIndex(
-      { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
-      index
-    )
+    if (showLoading) {
+      this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
+      this.pushColumnAtIndex(
+        { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
+        index
+      )
+    }
 
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
-    const options = {
-      limit: LIMIT,
-      offset: OFFSET,
-      search: searchString,
-      sortBy: { column: this.sortBy, order: 'asc' },
-    }
+    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: 'asc' } }
     const parameters = { signal: this.abortController.signal }
 
     const { data: items, error } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(prefix, options, parameters)
 
-    this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+    if (showLoading) {
+      this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+    }
 
     if (!error) {
       const formattedItems = this.formatFolderItems(items)
@@ -963,14 +962,15 @@ class StorageExplorerStore {
     }
   }
 
-  fetchMoreFolderContents = async (index, column, searchString = '') => {
+  fetchMoreFolderContents = async (index, column) => {
     this.setColumnIsLoadingMore(index)
 
+    // [Joshen] Bug on the backend that sorting will not be respected
+    // when we fetch more contents, but its okay, not blocking frontend
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
     const options = {
       limit: LIMIT,
       offset: column.items.length,
-      search: searchString,
       sortBy: { column: this.sortBy, order: 'asc' },
     }
     const parameters = { signal: this.abortController.signal }

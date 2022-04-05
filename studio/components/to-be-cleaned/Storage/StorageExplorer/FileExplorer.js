@@ -12,6 +12,8 @@ const FileExplorer = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
+  isSearching = false,
+  itemSearchString = '',
   onCheckItem = () => {},
   onSelectItemDelete = () => {},
   onSelectItemRename = () => {},
@@ -106,6 +108,8 @@ const FileExplorer = ({
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
+              isSearching={isSearching}
+              itemSearchString={itemSearchString}
               onCheckItem={onCheckItem}
               onSelectFile={onSelectFile}
               onRenameFile={onRenameFile}
