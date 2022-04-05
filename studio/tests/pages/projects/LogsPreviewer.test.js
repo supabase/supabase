@@ -312,12 +312,12 @@ test('filters accept ', async () => {
     <LogsPreviewer
       projectRef="123"
       tableName={LogsTableName.FUNCTIONS}
-      override={{ key: 'mykey', value: 'myvalue' }}
+      filterOverride={{ 'my.nestedkey': 'myvalue' }}
     />
   )
 
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('mykey'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
     expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
   })
 })
