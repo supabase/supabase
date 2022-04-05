@@ -31,7 +31,6 @@ const FileExplorer = ({
   onSelectCreateFolder = () => {},
   onChangeView = () => {},
   onChangeSortBy = () => {},
-  onColumnLoadMore = () => {},
 }) => {
   const fileExplorerRef = useRef(null)
 
@@ -94,7 +93,6 @@ const FileExplorer = ({
               onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
             />
           ))}
         </div>
@@ -124,7 +122,6 @@ const FileExplorer = ({
               onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-              onColumnLoadMore={onColumnLoadMore}
             />
           )}
         </>
