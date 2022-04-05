@@ -65,6 +65,28 @@ export interface FilterObject {
   te?: string
 }
 
+
+export interface FilterSet {
+  label: string
+  key: string
+  options: FilterOption[]
+}
+export interface FilterOption {
+  key: string
+  label: string
+  description?: string
+}
+
+export type FilterTableSet = {
+  [table: string]: {
+    [filterName: string]: FilterSet
+  }
+}
+
+export interface Filters {
+  [key: string]: string | string[] | boolean | undefined | Filters
+}
+
 export type Override = {
   key: string
   value: string | string[] | undefined
