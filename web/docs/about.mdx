@@ -6,11 +6,13 @@ slug: /
 hide_table_of_contents: true
 ---
 
+import ThemedImage from '@theme/ThemedImage'
 import AngularLogo from '@site/static/img/libraries/angular-icon.svg'
 import ExpoLogo from '@site/static/img/libraries/expo-icon.svg'
 import DartLogo from '@site/static/img/libraries/dart-icon.svg'
 import JavascriptLogo from '@site/static/img/libraries/javascript-icon.svg'
-import NextjsLogo from '@site/static/img/libraries/nextjs-icon.svg'
+import NextjsDarkLogo from '@site/static/img/libraries/nextjs-dark-icon.svg'
+import NextjsLightLogo from '@site/static/img/libraries/nextjs-light-icon.svg'
 import ReactLogo from '@site/static/img/libraries/react-icon.svg'
 import RedwoodJsLogo from '@site/static/img/libraries/redwoodjs-icon.svg'
 import SvelteLogo from '@site/static/img/libraries/svelte-icon.svg'
@@ -37,7 +39,15 @@ const frameworks = [
     logo: JavascriptLogo,
     href: 'https://github.com/supabase/supabase/tree/master/examples/javascript-auth',
   },
-  { name: 'Next.js', logo: NextjsLogo, href: '/docs/guides/with-nextjs' },
+  {
+    name: 'Next.js',
+    themed: true,
+    logo: {
+      dark: '/img/libraries/nextjs-dark-icon.svg',
+      light: '/img/libraries/nextjs-light-icon.svg',
+    },
+    href: '/docs/guides/with-nextjs',
+  },
   { name: 'React', logo: ReactLogo, href: '/docs/guides/with-react' },
   { name: 'RedwoodJS', logo: RedwoodJsLogo, href: '/docs/guides/with-redwoodjs' },
   { name: 'Svelte', logo: SvelteLogo, href: '/docs/guides/with-svelte' },
@@ -101,8 +111,18 @@ Supabase is just Postgres, which makes it compatible with a large number of tool
       <div key={x.name} class="col col--3">
         <Link class="card" to={x.href}>
           <div class="card__body" style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-            {x.logo && (
+            {x.logo && !x.themed ? (
               <x.logo width="20" alt={x.name} style={{ display: 'block', maxHeight: 20 }} />
+            ) : (
+              <ThemedImage
+                style={{ display: 'block', maxHeight: 20 }}
+                alt={x.name}
+                width="20"
+                sources={{
+                  light: useBaseUrl(x.logo.light),
+                  dark: useBaseUrl(x.logo.dark),
+                }}
+              />
             )}
             <p>{x.name}</p>
           </div>
