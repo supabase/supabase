@@ -56,6 +56,8 @@ const FileExplorerColumn = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
+  isSearching = false,
+  itemSearchString = '',
   onCheckItem = () => {},
   onSelectItemDelete = () => {},
   onSelectItemRename = () => {},
@@ -92,7 +94,12 @@ const FileExplorerColumn = ({
     (item) => item.type === STORAGE_ROW_TYPES.FILE
   )
 
-  const columnItems = column.items
+  const columnItems = isSearching
+    ? column.items.filter((item) =>
+        item.name.toLowerCase().includes(itemSearchString.toLowerCase())
+      )
+    : column.items
+
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const { show } = useContextMenu()
@@ -201,7 +208,8 @@ const FileExplorerColumn = ({
         <div
           className={`
             ${fullWidth ? 'w-full' : 'w-64 border-r border-gray-500'}
-            flex-shrink-0 overflow-auto flex flex-col space-y-1 my-1
+            ${view === STORAGE_VIEWS.COLUMNS ? 'my-1' : 'mb-1'}
+            flex-shrink-0 overflow-auto flex flex-col space-y-1
           `}
         >
           <ShimmeringLoader />
@@ -237,6 +245,11 @@ const FileExplorerColumn = ({
         isLoadingNextPage={column.isLoadingMoreItems}
         onLoadNextPage={() => onColumnLoadMore(index, column)}
       />
+
+      {/* Search empty state */}
+      {isSearching && columnItems.length === 0 && column.items.length > 0 && (
+        <div className="text-sm mx-3 my-2 opacity-50">No results found based on your search</div>
+      )}
 
       {/* Drag drop upload CTA for when column is empty */}
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
