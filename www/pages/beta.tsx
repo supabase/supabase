@@ -8,6 +8,7 @@ import { APP_NAME, DESCRIPTION } from 'lib/constants'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import Layout from '~/components/Layouts/Default'
@@ -1000,7 +1001,7 @@ const Beta = (props: Props) => {
           <div className="flex items-center justify-between px-5 py-5 shadow-lg xl:px-20 bg-scale-1200 dark:bg-scale-300">
             <Link href="/">
               <a>
-                <img className="h-5" src={`${basePath}/images/logo-dark.png`} />
+                <Image src={`${basePath}/images/logo-dark.png`} height={20} width={20} />
               </a>
             </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />

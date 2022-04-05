@@ -14,6 +14,7 @@ import Announcement from '~/components/Nav/Announcement'
 
 import { useTheme } from '~/components/Providers'
 import TextLink from '../TextLink'
+import Image from 'next/image'
 
 const Nav = () => {
   const { basePath } = useRouter()
@@ -192,14 +193,15 @@ const Nav = () => {
               <div className="flex items-center">
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/" as="/">
-                    <a>
-                      <img
-                        className="block h-6 w-auto"
+                    <a className="block h-6 w-auto">
+                      <Image
                         src={
                           isDarkMode
                             ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
                             : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
                         }
+                        width={124}
+                        height={24}
                         alt="Logo"
                       />
                     </a>
