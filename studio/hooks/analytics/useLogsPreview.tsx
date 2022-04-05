@@ -83,7 +83,7 @@ function useLogsPreview(
     isValidating,
     size,
     setSize,
-  } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false })
+  } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false, dedupingInterval: 3000 })
   let logData: LogData[] = []
 
   const countUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
@@ -94,7 +94,11 @@ function useLogsPreview(
     } as any
   )}`
 
-  const { data: countData } = useSWR<Count>(countUrl, get, { refreshInterval: 5000 })
+  const { data: countData } = useSWR<Count>(countUrl, get, {
+    revalidateOnFocus: false,
+    dedupingInterval: 5000,
+    refreshInterval: 5000,
+  })
   const newCount = countData?.result?.[0]?.count ?? 0
 
   const refresh = async () => {
