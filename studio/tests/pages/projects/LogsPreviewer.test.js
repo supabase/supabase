@@ -307,7 +307,7 @@ test('filters alter generated query', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
   })
 })
-test('filters accept ', async () => {
+test('filters accept filterOverride', async () => {
   render(
     <LogsPreviewer
       projectRef="123"
