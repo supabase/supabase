@@ -133,7 +133,7 @@ const Header = ({
   )
 }
 
-const NoData = () => (
+const NoData = ({ title = 'No data to show', message = 'May take 24 hours for data to show' }) => (
   <div
     className="
       h-full w-full
@@ -144,8 +144,8 @@ const NoData = () => (
   >
     <IconBarChart2 className="text-scale-800" />
     <div>
-      <p className="text-scale-1100 text-xs">No data to show</p>
-      <p className="text-scale-900 text-xs">May take 24 hours for data to show</p>
+      <p className="text-scale-1100 text-xs">{title}</p>
+      <p className="text-scale-900 text-xs">{message}</p>
     </div>
   </div>
 )
@@ -175,8 +175,10 @@ export function BarChart({
   label,
   onBarClick,
   minimalHeader,
-  minimalChart,
+  chartSize = 'normal',
   className = '',
+  noDataTitle,
+  noDataMessage,
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
 
@@ -201,7 +203,11 @@ export function BarChart({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
-  const chartHeight = minimalChart ? 96 : 160
+  const chartHeight = {
+    tiny: 76,
+    small: 96,
+    normal: 160,
+  }[chartSize as string] as number
 
   return (
     <Loading active={!data}>
@@ -291,7 +297,7 @@ export function BarChart({
               )}
             </>
           ) : (
-            <NoData />
+            <NoData title={noDataTitle} message={noDataMessage} />
           )}
         </div>
       </div>

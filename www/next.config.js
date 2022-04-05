@@ -2,11 +2,19 @@ const withMDX = require('@next/mdx')()
 
 module.exports = withMDX({
   basePath: '',
-  pageExtensions: ['js', 'jsx', 'tsx', 'md', 'mdx'],
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 
   trailingSlash: false,
   images: {
-    domains: ['github.com', 'ca.slack-edge.com', 'res.cloudinary.com', 'images.unsplash.com'],
+    domains: [
+      'github.com',
+      'ca.slack-edge.com',
+      'res.cloudinary.com',
+      'images.unsplash.com',
+      'supabase.com',
+      'obuldanrptloktxcffvn.supabase.co',
+      'avatars.githubusercontent.com',
+    ],
   },
   async headers() {
     return [
@@ -634,6 +642,11 @@ module.exports = withMDX({
         permanent: true,
         source: '/guides/auth',
         destination: '/guides/auth/intro',
+      },
+      {
+        permanent: false,
+        source: '/partners',
+        destination: '/partners/integrations',
       },
     ]
   },

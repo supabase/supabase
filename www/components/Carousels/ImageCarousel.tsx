@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Tabs, Typography, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
+import { Tabs, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
 import { useState } from 'react'
 
 // Import Swiper React components
@@ -11,6 +11,7 @@ import 'swiper/swiper.min.css'
 import ImageCarouselStyles from './ImageCarousel.module.css'
 import Link from 'next/link'
 import Image from 'next/image'
+import TextLink from '../TextLink'
 
 interface Content {
   title: string
@@ -48,20 +49,20 @@ function ImageCarousel(props: ImageCarouselProps) {
 
   const details = (
     <div className="h-64 bg-white">
-      <Typography.Text>
+      <p>
         <span className="block text-white mb-8">Allow fetch something</span>
-      </Typography.Text>
-      <Typography.Text type="secondary">
+      </p>
+      <p>
         <p>
           This would only allow the authenticated user access to a folder that is named after their
           own account UID. This is useful for things like profile images.
         </p>
-      </Typography.Text>
-      <Typography.Text>
+      </p>
+      <p>
         <Button type="outline" size="small" icon={<IconCornerRightUp />}>
           View documentation
         </Button>
-      </Typography.Text>
+      </p>
     </div>
   )
 
@@ -133,17 +134,14 @@ function ImageCarousel(props: ImageCarouselProps) {
           </div>
         </div>
       </div>
-      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-5 xl:col-start-8">
         <div className={`sbui-tabs--underline-alt ${props.altTabView ? 'block' : 'hidden'} mb-3`}>
           <Tabs
             scrollable
             type="underlined"
             size="small"
-            // @ts-ignore
             activeId={imageSwiperActiveIndex.toString()}
-            // @ts-ignore
             onChange={(id: string) => handleImageSwiperNav(Number(id))}
-            block
           >
             {props.content.map((content: Content, i: number) => {
               return (
@@ -151,9 +149,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                   label={content.label ? content.label : content.title}
                   id={i.toString()}
                   key={i}
-                >
-                  <span></span>
-                </Tabs.Panel>
+                />
               )
             })}
           </Tabs>
@@ -168,29 +164,13 @@ function ImageCarousel(props: ImageCarouselProps) {
         >
           {props.content.map((content, i) => {
             return (
-              <SwiperSlide key={i}>
-                <div className="bg-white dark:bg-gray-800 p-px">
-                  <Typography.Title level={4}>{content.title}</Typography.Title>
-                  <Typography.Text>
-                    <p className="text-base">{content.text}</p>
-                  </Typography.Text>
-                  {content.url && (
-                    <Typography.Text>
-                      <Link href={content.url} as={content.url}>
-                        <a>
-                          <Button
-                            className="mb-8"
-                            type="outline"
-                            size="small"
-                            icon={<IconArrowUpRight />}
-                          >
-                            {content.cta ? content.cta : 'View documentation'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Typography.Text>
-                  )}
-                </div>
+              <SwiperSlide key={i} className="py-4">
+                <h4 className="text-xl text-scale-1200 mb-4">{content.title}</h4>
+                <p className="p text-base">{content.text}</p>
+                <TextLink
+                  label={content.cta ? content.cta : 'View documentation'}
+                  url={content.url}
+                />
               </SwiperSlide>
             )
           })}

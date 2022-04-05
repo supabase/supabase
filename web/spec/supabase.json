@@ -89,7 +89,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 5,
 											"character": 4
 										}
@@ -106,7 +106,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 6,
 											"character": 4
 										}
@@ -123,7 +123,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 7,
 											"character": 4
 										}
@@ -140,7 +140,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 8,
 											"character": 4
 										}
@@ -157,7 +157,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 9,
 											"character": 4
 										}
@@ -174,7 +174,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 10,
 											"character": 4
 										}
@@ -191,7 +191,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 11,
 											"character": 4
 										}
@@ -208,7 +208,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 12,
 											"character": 4
 										}
@@ -225,7 +225,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 13,
 											"character": 4
 										}
@@ -242,7 +242,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 14,
 											"character": 4
 										}
@@ -259,7 +259,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 15,
 											"character": 4
 										}
@@ -276,7 +276,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 16,
 											"character": 4
 										}
@@ -293,7 +293,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 17,
 											"character": 4
 										}
@@ -310,7 +310,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 18,
 											"character": 4
 										}
@@ -327,7 +327,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 19,
 											"character": 4
 										}
@@ -344,7 +344,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 20,
 											"character": 4
 										}
@@ -361,7 +361,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 21,
 											"character": 4
 										}
@@ -378,7 +378,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 22,
 											"character": 4
 										}
@@ -395,7 +395,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 23,
 											"character": 4
 										}
@@ -412,7 +412,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 24,
 											"character": 4
 										}
@@ -429,7 +429,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 25,
 											"character": 4
 										}
@@ -446,7 +446,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 26,
 											"character": 4
 										}
@@ -463,7 +463,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 27,
 											"character": 4
 										}
@@ -480,7 +480,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 											"line": 28,
 											"character": 4
 										}
@@ -522,7 +522,7 @@
 							],
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 4,
 									"character": 20
 								}
@@ -538,7 +538,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 84,
 									"character": 21
 								}
@@ -621,7 +621,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 53,
 									"character": 21
 								}
@@ -713,7 +713,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+																	"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 																	"line": 54,
 																	"character": 4
 																}
@@ -759,7 +759,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 70,
 									"character": 21
 								}
@@ -876,7 +876,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 98,
 									"character": 21
 								}
@@ -956,7 +956,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 85,
 									"character": 21
 								}
@@ -1006,7 +1006,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 87,
 									"character": 21
 								}
@@ -1056,7 +1056,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 86,
 									"character": 21
 								}
@@ -1106,7 +1106,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 									"line": 106,
 									"character": 21
 								}
@@ -1181,7 +1181,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/realtime-js/dist/main/lib/transformers.d.ts",
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/lib/transformers.d.ts",
 							"line": 4,
 							"character": 0
 						}
@@ -1206,7 +1206,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 11,
 									"character": 4
 								}
@@ -1251,7 +1251,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 16,
 																	"character": 8
 																}
@@ -1275,7 +1275,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 17,
 																	"character": 8
 																}
@@ -1362,7 +1362,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 13,
 																	"character": 8
 																}
@@ -1417,7 +1417,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 12,
 																	"character": 8
 																}
@@ -1475,7 +1475,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 24,
 									"character": 12
 								}
@@ -1496,7 +1496,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 25,
 									"character": 12
 								}
@@ -1517,7 +1517,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 9,
 									"character": 14
 								}
@@ -1541,7 +1541,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 10,
 									"character": 14
 								}
@@ -1628,7 +1628,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 6,
 									"character": 14
 								}
@@ -1684,7 +1684,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 5,
 									"character": 14
 								}
@@ -1704,7 +1704,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 238,
 									"character": 4
 								}
@@ -1770,7 +1770,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 240,
 																			"character": 8
 																		}
@@ -1790,7 +1790,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 241,
 																			"character": 8
 																		}
@@ -1813,7 +1813,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 239,
 																			"character": 8
 																		}
@@ -1858,7 +1858,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 244,
 																			"character": 8
 																		}
@@ -1881,7 +1881,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 245,
 																			"character": 8
 																		}
@@ -1901,7 +1901,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 243,
 																			"character": 8
 																		}
@@ -1948,7 +1948,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 205,
 									"character": 4
 								}
@@ -2032,7 +2032,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 206,
 																	"character": 8
 																}
@@ -2073,7 +2073,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 302,
 									"character": 4
 								}
@@ -2133,7 +2133,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 304,
 																	"character": 8
 																}
@@ -2165,7 +2165,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 305,
 																	"character": 8
 																}
@@ -2197,7 +2197,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 303,
 																	"character": 8
 																}
@@ -2251,7 +2251,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 223,
 									"character": 4
 								}
@@ -2349,7 +2349,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 225,
 																	"character": 8
 																}
@@ -2370,7 +2370,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 224,
 																	"character": 8
 																}
@@ -2391,7 +2391,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 226,
 																	"character": 8
 																}
@@ -2441,7 +2441,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 228,
 																	"character": 8
 																}
@@ -2480,7 +2480,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 229,
 																	"character": 8
 																}
@@ -2533,7 +2533,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 214,
 									"character": 4
 								}
@@ -2605,7 +2605,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 32,
 									"character": 4
 								}
@@ -2672,7 +2672,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 33,
 																	"character": 8
 																}
@@ -2693,7 +2693,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 34,
 																	"character": 8
 																}
@@ -2735,7 +2735,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 316,
 									"character": 4
 								}
@@ -2795,7 +2795,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 318,
 																	"character": 8
 																}
@@ -2827,7 +2827,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 319,
 																	"character": 8
 																}
@@ -2859,7 +2859,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 317,
 																	"character": 8
 																}
@@ -2913,7 +2913,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 277,
 									"character": 4
 								}
@@ -2983,7 +2983,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 280,
 																	"character": 8
 																}
@@ -3015,7 +3015,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 281,
 																	"character": 8
 																}
@@ -3047,7 +3047,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 278,
 																	"character": 8
 																}
@@ -3076,7 +3076,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 279,
 																	"character": 8
 																}
@@ -3131,7 +3131,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 266,
 									"character": 4
 								}
@@ -3193,7 +3193,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 267,
 																			"character": 8
 																		}
@@ -3213,7 +3213,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 268,
 																			"character": 8
 																		}
@@ -3260,7 +3260,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 270,
 																			"character": 8
 																		}
@@ -3283,7 +3283,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 271,
 																			"character": 8
 																		}
@@ -3326,7 +3326,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 165,
 									"character": 4
 								}
@@ -3391,7 +3391,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 167,
 																	"character": 8
 																}
@@ -3412,7 +3412,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 166,
 																	"character": 8
 																}
@@ -3461,7 +3461,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 169,
 																	"character": 8
 																}
@@ -3493,7 +3493,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 170,
 																	"character": 8
 																}
@@ -3546,7 +3546,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 252,
 									"character": 4
 								}
@@ -3591,7 +3591,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 253,
 																			"character": 8
 																		}
@@ -3611,7 +3611,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 254,
 																			"character": 8
 																		}
@@ -3658,7 +3658,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 256,
 																			"character": 8
 																		}
@@ -3684,7 +3684,7 @@
 																	},
 																	"sources": [
 																		{
-																			"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																			"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																			"line": 257,
 																			"character": 8
 																		}
@@ -3727,7 +3727,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 188,
 									"character": 4
 								}
@@ -3786,7 +3786,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 189,
 																	"character": 8
 																}
@@ -3818,7 +3818,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 190,
 																	"character": 8
 																}
@@ -3871,7 +3871,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 177,
 									"character": 4
 								}
@@ -3936,7 +3936,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 179,
 																	"character": 8
 																}
@@ -3957,7 +3957,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 178,
 																	"character": 8
 																}
@@ -4006,7 +4006,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 181,
 																	"character": 8
 																}
@@ -4043,7 +4043,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 182,
 																	"character": 8
 																}
@@ -4096,7 +4096,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 106,
 									"character": 4
 								}
@@ -4161,7 +4161,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 109,
 																	"character": 8
 																}
@@ -4182,7 +4182,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 108,
 																	"character": 8
 																}
@@ -4203,7 +4203,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 107,
 																	"character": 8
 																}
@@ -4253,7 +4253,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 111,
 																	"character": 8
 																}
@@ -4290,7 +4290,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 112,
 																	"character": 8
 																}
@@ -4343,7 +4343,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 119,
 									"character": 4
 								}
@@ -4408,7 +4408,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 121,
 																	"character": 8
 																}
@@ -4429,7 +4429,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 120,
 																	"character": 8
 																}
@@ -4478,7 +4478,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 123,
 																	"character": 8
 																}
@@ -4515,7 +4515,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 124,
 																	"character": 8
 																}
@@ -4568,7 +4568,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 198,
 									"character": 4
 								}
@@ -4636,7 +4636,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 60,
 									"character": 4
 								}
@@ -4717,7 +4717,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 61,
 																	"character": 8
 																}
@@ -4765,7 +4765,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 63,
 																	"character": 8
 																}
@@ -4797,7 +4797,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 64,
 																	"character": 8
 																}
@@ -4850,7 +4850,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 96,
 									"character": 4
 								}
@@ -4909,7 +4909,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 97,
 																	"character": 8
 																}
@@ -4941,7 +4941,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 98,
 																	"character": 8
 																}
@@ -4994,7 +4994,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 84,
 									"character": 4
 								}
@@ -5069,7 +5069,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 85,
 																	"character": 8
 																}
@@ -5101,7 +5101,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 86,
 																	"character": 8
 																}
@@ -5154,7 +5154,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 130,
 									"character": 4
 								}
@@ -5213,7 +5213,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 131,
 																	"character": 8
 																}
@@ -5265,7 +5265,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 46,
 									"character": 4
 								}
@@ -5347,7 +5347,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 49,
 																	"character": 8
 																}
@@ -5368,7 +5368,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 48,
 																	"character": 8
 																}
@@ -5389,7 +5389,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 47,
 																	"character": 8
 																}
@@ -5439,7 +5439,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 51,
 																	"character": 8
 																}
@@ -5478,7 +5478,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 52,
 																	"character": 8
 																}
@@ -5531,7 +5531,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 72,
 									"character": 4
 								}
@@ -5612,7 +5612,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 74,
 																	"character": 8
 																}
@@ -5633,7 +5633,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 73,
 																	"character": 8
 																}
@@ -5682,7 +5682,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 76,
 																	"character": 8
 																}
@@ -5721,7 +5721,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 77,
 																	"character": 8
 																}
@@ -5774,7 +5774,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 326,
 									"character": 4
 								}
@@ -5852,7 +5852,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 328,
 																	"character": 8
 																}
@@ -5884,7 +5884,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 329,
 																	"character": 8
 																}
@@ -5916,7 +5916,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 327,
 																	"character": 8
 																}
@@ -5970,7 +5970,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 290,
 									"character": 4
 								}
@@ -6045,7 +6045,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 292,
 																	"character": 8
 																}
@@ -6077,7 +6077,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 293,
 																	"character": 8
 																}
@@ -6109,7 +6109,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 291,
 																	"character": 8
 																}
@@ -6163,7 +6163,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 139,
 									"character": 4
 								}
@@ -6249,7 +6249,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 140,
 																	"character": 8
 																}
@@ -6297,7 +6297,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 142,
 																	"character": 8
 																}
@@ -6336,7 +6336,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 143,
 																	"character": 8
 																}
@@ -6389,7 +6389,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 									"line": 153,
 									"character": 4
 								}
@@ -6454,7 +6454,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 154,
 																	"character": 8
 																}
@@ -6502,7 +6502,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 156,
 																	"character": 8
 																}
@@ -6541,7 +6541,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 																	"line": 157,
 																	"character": 8
 																}
@@ -6640,7 +6640,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueApi.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueApi.d.ts",
 							"line": 4,
 							"character": 21
 						}
@@ -6665,7 +6665,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 42,
 									"character": 4
 								}
@@ -6716,7 +6716,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 48,
 																	"character": 8
 																}
@@ -6738,7 +6738,7 @@
 															"comment": {},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 52,
 																	"character": 8
 																}
@@ -6765,7 +6765,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 47,
 																	"character": 8
 																}
@@ -6786,7 +6786,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 53,
 																	"character": 8
 																}
@@ -6879,7 +6879,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 44,
 																	"character": 8
 																}
@@ -6938,7 +6938,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 50,
 																	"character": 8
 																}
@@ -6997,7 +6997,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 51,
 																	"character": 8
 																}
@@ -7021,7 +7021,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 49,
 																	"character": 8
 																}
@@ -7045,7 +7045,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 43,
 																	"character": 8
 																}
@@ -7098,8 +7098,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 191,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 192,
 									"character": 12
 								}
 							],
@@ -7119,8 +7119,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 177,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 178,
 									"character": 12
 								}
 							],
@@ -7140,8 +7140,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 180,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 181,
 									"character": 12
 								}
 							],
@@ -7161,8 +7161,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 178,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 179,
 									"character": 12
 								}
 							],
@@ -7182,8 +7182,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 179,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 180,
 									"character": 12
 								}
 							],
@@ -7206,8 +7206,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 208,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 209,
 									"character": 12
 								}
 							],
@@ -7227,8 +7227,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 192,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 193,
 									"character": 12
 								}
 							],
@@ -7248,8 +7248,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 198,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 199,
 									"character": 12
 								}
 							],
@@ -7272,8 +7272,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 190,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 191,
 									"character": 12
 								}
 							],
@@ -7296,8 +7296,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 185,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 186,
 									"character": 12
 								}
 							],
@@ -7317,8 +7317,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 199,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 200,
 									"character": 12
 								}
 							],
@@ -7341,8 +7341,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 197,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 198,
 									"character": 12
 								}
 							],
@@ -7372,8 +7372,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 204,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 205,
 									"character": 12
 								}
 							],
@@ -7395,7 +7395,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 15,
 									"character": 4
 								}
@@ -7419,7 +7419,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 24,
 									"character": 14
 								}
@@ -7443,7 +7443,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 23,
 									"character": 14
 								}
@@ -7479,7 +7479,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 19,
 									"character": 14
 								}
@@ -7512,7 +7512,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 26,
 									"character": 14
 								}
@@ -7568,7 +7568,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 27,
 									"character": 14
 								}
@@ -7589,7 +7589,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 25,
 									"character": 14
 								}
@@ -7611,7 +7611,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 29,
 									"character": 14
 								}
@@ -7634,7 +7634,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 28,
 									"character": 14
 								}
@@ -7669,8 +7669,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 154,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 155,
 									"character": 4
 								}
 							],
@@ -7721,8 +7721,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 155,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 156,
 																	"character": 8
 																}
 															],
@@ -7769,8 +7769,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 157,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 158,
 																	"character": 8
 																}
 															],
@@ -7801,8 +7801,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 158,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 159,
 																	"character": 8
 																}
 															],
@@ -7854,8 +7854,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 173,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 174,
 									"character": 4
 								}
 							],
@@ -7974,8 +7974,8 @@
 													},
 													"sources": [
 														{
-															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 174,
+															"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+															"line": 175,
 															"character": 8
 														}
 													],
@@ -8006,8 +8006,8 @@
 													},
 													"sources": [
 														{
-															"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-															"line": 175,
+															"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+															"line": 176,
 															"character": 8
 														}
 													],
@@ -8054,8 +8054,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 124,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 125,
 									"character": 4
 								}
 							],
@@ -8095,8 +8095,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 125,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 126,
 																	"character": 8
 																}
 															],
@@ -8127,8 +8127,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 127,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 128,
 																	"character": 8
 																}
 															],
@@ -8159,8 +8159,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 126,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 127,
 																	"character": 8
 																}
 															],
@@ -8213,8 +8213,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 120,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 121,
 									"character": 4
 								}
 							],
@@ -8259,8 +8259,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 149,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 150,
 									"character": 4
 								}
 							],
@@ -8314,8 +8314,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 141,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 142,
 									"character": 4
 								}
 							],
@@ -8373,8 +8373,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 143,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 144,
 																	"character": 8
 																}
 															],
@@ -8405,8 +8405,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 142,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 143,
 																	"character": 8
 																}
 															],
@@ -8458,8 +8458,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 84,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 85,
 									"character": 4
 								}
 							],
@@ -8523,8 +8523,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 88,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 89,
 																	"character": 8
 																}
 															],
@@ -8544,8 +8544,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 85,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 86,
 																	"character": 8
 																}
 															],
@@ -8565,8 +8565,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 87,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 88,
 																	"character": 8
 																}
 															],
@@ -8586,8 +8586,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 86,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 87,
 																	"character": 8
 																}
 															],
@@ -8637,8 +8637,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 94,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 95,
 																	"character": 8
 																}
 															],
@@ -8670,8 +8670,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 92,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 93,
 																	"character": 8
 																}
 															],
@@ -8693,8 +8693,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 90,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 91,
 																	"character": 8
 																}
 															],
@@ -8726,8 +8726,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 93,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 94,
 																	"character": 8
 																}
 															],
@@ -8755,8 +8755,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 91,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 92,
 																	"character": 8
 																}
 															],
@@ -8811,8 +8811,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 166,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 167,
 									"character": 4
 								}
 							],
@@ -8853,8 +8853,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 167,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 168,
 																	"character": 8
 																}
 															],
@@ -8905,7 +8905,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 64,
 									"character": 4
 								}
@@ -8970,7 +8970,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 67,
 																	"character": 8
 																}
@@ -8991,7 +8991,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 66,
 																	"character": 8
 																}
@@ -9012,7 +9012,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 65,
 																	"character": 8
 																}
@@ -9062,7 +9062,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 71,
 																	"character": 8
 																}
@@ -9094,7 +9094,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 70,
 																	"character": 8
 																}
@@ -9126,7 +9126,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 																	"line": 69,
 																	"character": 8
 																}
@@ -9180,8 +9180,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 132,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 133,
 									"character": 4
 								}
 							],
@@ -9239,8 +9239,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 133,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 134,
 																	"character": 8
 																}
 															],
@@ -9271,8 +9271,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 135,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 136,
 																	"character": 8
 																}
 															],
@@ -9303,8 +9303,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 134,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 135,
 																	"character": 8
 																}
 															],
@@ -9357,8 +9357,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 116,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 117,
 									"character": 4
 								}
 							],
@@ -9404,8 +9404,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-									"line": 104,
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+									"line": 105,
 									"character": 4
 								}
 							],
@@ -9469,8 +9469,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 105,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 106,
 																	"character": 8
 																}
 															],
@@ -9517,8 +9517,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 109,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 110,
 																	"character": 8
 																}
 															],
@@ -9549,8 +9549,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 108,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 109,
 																	"character": 8
 																}
 															],
@@ -9581,8 +9581,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
-																	"line": 107,
+																	"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
+																	"line": 108,
 																	"character": 8
 																}
 															],
@@ -9683,7 +9683,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 							"line": 10,
 							"character": 21
 						}
@@ -9708,8 +9708,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 73,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 72,
 									"character": 4
 								}
 							],
@@ -9781,8 +9781,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 160,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 159,
 									"character": 12
 								}
 							],
@@ -9802,8 +9802,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 161,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 160,
 									"character": 12
 								}
 							],
@@ -9823,8 +9823,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 157,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 156,
 									"character": 12
 								}
 							],
@@ -9844,8 +9844,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 158,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 157,
 									"character": 12
 								}
 							],
@@ -9865,8 +9865,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 156,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 155,
 									"character": 12
 								}
 							],
@@ -9886,8 +9886,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 162,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 161,
 									"character": 12
 								}
 							],
@@ -9907,8 +9907,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 159,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 158,
 									"character": 12
 								}
 							],
@@ -9927,8 +9927,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 28,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 27,
 									"character": 4
 								}
 							],
@@ -9956,8 +9956,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 29,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 28,
 									"character": 4
 								}
 							],
@@ -9982,8 +9982,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 49,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 48,
 									"character": 4
 								}
 							],
@@ -9996,9 +9996,9 @@
 									},
 									{
 										"type": "reference",
-										"qualifiedName": "w3cwebsocket",
-										"package": "@types/websocket",
-										"name": "w3cwebsocket"
+										"qualifiedName": "WebSocket",
+										"package": "typescript",
+										"name": "WebSocket"
 									}
 								]
 							}
@@ -10013,8 +10013,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 47,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 46,
 									"character": 4
 								}
 							],
@@ -10035,8 +10035,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 46,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 45,
 									"character": 4
 								}
 							],
@@ -10057,8 +10057,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 30,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 29,
 									"character": 4
 								}
 							],
@@ -10078,8 +10078,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 31,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 30,
 									"character": 4
 								}
 							],
@@ -10133,8 +10133,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 39,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 38,
 									"character": 4
 								}
 							],
@@ -10153,8 +10153,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 41,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 40,
 									"character": 4
 								}
 							],
@@ -10184,8 +10184,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 45,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 44,
 									"character": 4
 								}
 							],
@@ -10206,8 +10206,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 40,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 39,
 									"character": 4
 								}
 							],
@@ -10227,8 +10227,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 34,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 33,
 									"character": 4
 								}
 							],
@@ -10282,8 +10282,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 42,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 41,
 									"character": 4
 								}
 							],
@@ -10311,8 +10311,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 48,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 47,
 									"character": 4
 								}
 							],
@@ -10333,8 +10333,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 44,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 43,
 									"character": 4
 								}
 							],
@@ -10355,8 +10355,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 43,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 42,
 									"character": 4
 								}
 							],
@@ -10375,8 +10375,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 50,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 49,
 									"character": 4
 								}
 							],
@@ -10400,8 +10400,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 51,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 50,
 									"character": 4
 								}
 							],
@@ -10422,8 +10422,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 52,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 51,
 									"character": 4
 								}
 							],
@@ -10448,8 +10448,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 54,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 53,
 													"character": 8
 												}
 											],
@@ -10473,8 +10473,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 55,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 54,
 													"character": 8
 												}
 											],
@@ -10498,8 +10498,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 56,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 55,
 													"character": 8
 												}
 											],
@@ -10523,8 +10523,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 53,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 52,
 													"character": 8
 												}
 											],
@@ -10564,8 +10564,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 37,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 36,
 									"character": 4
 								}
 							],
@@ -10584,8 +10584,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 38,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 37,
 									"character": 4
 								}
 							],
@@ -10604,8 +10604,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 138,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 137,
 									"character": 4
 								}
 							],
@@ -10675,8 +10675,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 77,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 76,
 									"character": 4
 								}
 							],
@@ -10709,8 +10709,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 127,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 126,
 									"character": 4
 								}
 							],
@@ -10760,8 +10760,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 84,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 83,
 									"character": 4
 								}
 							],
@@ -10837,8 +10837,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-																	"line": 86,
+																	"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+																	"line": 85,
 																	"character": 8
 																}
 															],
@@ -10857,8 +10857,8 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-																	"line": 85,
+																	"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+																	"line": 84,
 																	"character": 8
 																}
 															],
@@ -10909,8 +10909,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 144,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 143,
 									"character": 4
 								}
 							],
@@ -10943,8 +10943,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 131,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 130,
 									"character": 4
 								}
 							],
@@ -10977,8 +10977,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 155,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 154,
 									"character": 4
 								}
 							],
@@ -11023,8 +11023,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 91,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 90,
 									"character": 4
 								}
 							],
@@ -11099,8 +11099,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 148,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 147,
 									"character": 4
 								}
 							],
@@ -11133,8 +11133,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 107,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 106,
 									"character": 4
 								}
 							],
@@ -11193,8 +11193,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 140,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 139,
 									"character": 4
 								}
 							],
@@ -11239,8 +11239,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 115,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 114,
 									"character": 4
 								}
 							],
@@ -11299,8 +11299,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 123,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 122,
 									"character": 4
 								}
 							],
@@ -11359,8 +11359,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 99,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 98,
 									"character": 4
 								}
 							],
@@ -11419,8 +11419,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 139,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 138,
 									"character": 4
 								}
 							],
@@ -11467,8 +11467,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 137,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 136,
 									"character": 4
 								}
 							],
@@ -11522,8 +11522,8 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 154,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 153,
 									"character": 4
 								}
 							],
@@ -11642,8 +11642,8 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-							"line": 27,
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+							"line": 26,
 							"character": 21
 						}
 					]
@@ -11667,7 +11667,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 42,
 									"character": 4
 								}
@@ -11744,7 +11744,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 31,
 									"character": 4
 								}
@@ -11770,7 +11770,7 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 													"line": 32,
 													"character": 8
 												}
@@ -11792,7 +11792,7 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 													"line": 33,
 													"character": 8
 												}
@@ -11814,7 +11814,7 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 													"line": 34,
 													"character": 8
 												}
@@ -11866,7 +11866,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 27,
 									"character": 4
 								}
@@ -11890,7 +11890,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 89,
 									"character": 12
 								}
@@ -11910,7 +11910,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 30,
 									"character": 4
 								}
@@ -11939,7 +11939,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 29,
 									"character": 4
 								}
@@ -11964,7 +11964,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 28,
 									"character": 4
 								}
@@ -11988,7 +11988,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 62,
 									"character": 19
 								}
@@ -12019,7 +12019,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 84,
 									"character": 19
 								}
@@ -12039,7 +12039,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 88,
 									"character": 4
 								}
@@ -12118,7 +12118,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 85,
 									"character": 4
 								}
@@ -12166,7 +12166,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 86,
 									"character": 4
 								}
@@ -12214,7 +12214,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 87,
 									"character": 4
 								}
@@ -12284,7 +12284,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 61,
 									"character": 11
 								}
@@ -12390,7 +12390,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 57,
 									"character": 11
 								}
@@ -12500,7 +12500,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 									"line": 49,
 									"character": 11
 								}
@@ -12638,7 +12638,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimePresence.d.ts",
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimePresence.d.ts",
 							"line": 26,
 							"character": 21
 						}
@@ -12663,7 +12663,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 18,
 									"character": 4
 								}
@@ -12776,7 +12776,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 11,
 									"character": 4
 								}
@@ -12799,7 +12799,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 15,
 									"character": 4
 								}
@@ -12821,7 +12821,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 14,
 									"character": 4
 								}
@@ -12841,7 +12841,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 7,
 									"character": 4
 								}
@@ -12896,7 +12896,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 17,
 									"character": 4
 								}
@@ -12921,7 +12921,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 16,
 									"character": 4
 								}
@@ -12943,7 +12943,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 10,
 									"character": 4
 								}
@@ -12966,7 +12966,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 13,
 									"character": 4
 								}
@@ -12988,7 +12988,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 12,
 									"character": 4
 								}
@@ -13008,7 +13008,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 6,
 									"character": 4
 								}
@@ -13028,7 +13028,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 27,
 									"character": 4
 								}
@@ -13059,7 +13059,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 54,
 									"character": 4
 								}
@@ -13090,7 +13090,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 55,
 									"character": 4
 								}
@@ -13121,7 +13121,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 56,
 									"character": 4
 								}
@@ -13152,7 +13152,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 57,
 									"character": 4
 								}
@@ -13183,7 +13183,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 58,
 									"character": 4
 								}
@@ -13214,7 +13214,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 49,
 									"character": 4
 								}
@@ -13260,7 +13260,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 50,
 									"character": 4
 								}
@@ -13291,7 +13291,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 26,
 									"character": 4
 								}
@@ -13337,7 +13337,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 25,
 									"character": 4
 								}
@@ -13398,7 +13398,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 23,
 									"character": 4
 								}
@@ -13446,7 +13446,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 24,
 									"character": 4
 								}
@@ -13494,7 +13494,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 48,
 									"character": 4
 								}
@@ -13571,7 +13571,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 28,
 									"character": 4
 								}
@@ -13648,7 +13648,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 51,
 									"character": 4
 								}
@@ -13695,7 +13695,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 21,
 									"character": 4
 								}
@@ -13726,7 +13726,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 53,
 									"character": 4
 								}
@@ -13772,7 +13772,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 22,
 									"character": 4
 								}
@@ -13821,7 +13821,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 52,
 									"character": 4
 								}
@@ -13895,7 +13895,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 41,
 									"character": 4
 								}
@@ -13948,7 +13948,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 									"line": 29,
 									"character": 4
 								}
@@ -14074,7 +14074,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeSubscription.d.ts",
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeSubscription.d.ts",
 							"line": 5,
 							"character": 21
 						}
@@ -14595,7 +14595,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 113,
+									"line": 116,
 									"character": 6
 								}
 							],
@@ -14611,9 +14611,9 @@
 									},
 									"type": {
 										"type": "reference",
-										"qualifiedName": "SupabaseStorageClient",
+										"qualifiedName": "StorageClient",
 										"package": "@supabase/storage-js",
-										"name": "SupabaseStorageClient"
+										"name": "StorageClient"
 									}
 								}
 							]
@@ -14629,7 +14629,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 191,
+									"line": 194,
 									"character": 16
 								}
 							],
@@ -14677,7 +14677,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 193,
+																	"line": 196,
 																	"character": 15
 																}
 															],
@@ -14728,7 +14728,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 264,
+									"line": 267,
 									"character": 10
 								}
 							],
@@ -14758,7 +14758,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 306,
+									"line": 309,
 									"character": 10
 								}
 							],
@@ -14843,7 +14843,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 255,
+									"line": 258,
 									"character": 10
 								}
 							],
@@ -14874,7 +14874,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 248,
+									"line": 251,
 									"character": 10
 								}
 							],
@@ -14924,7 +14924,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 225,
+									"line": 228,
 									"character": 10
 								}
 							],
@@ -14967,7 +14967,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 299,
+									"line": 302,
 									"character": 10
 								}
 							],
@@ -15008,7 +15008,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 272,
+									"line": 275,
 									"character": 10
 								}
 							],
@@ -15046,7 +15046,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 206,
+									"line": 209,
 									"character": 10
 								}
 							],
@@ -15094,7 +15094,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 208,
+																	"line": 211,
 																	"character": 15
 																}
 															],
@@ -15143,7 +15143,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 122,
+									"line": 125,
 									"character": 2
 								}
 							],
@@ -15210,7 +15210,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 221,
+									"line": 224,
 									"character": 2
 								}
 							],
@@ -15246,7 +15246,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 159,
+									"line": 162,
 									"character": 8
 								}
 							],
@@ -15283,7 +15283,7 @@
 																"sources": [
 																	{
 																		"fileName": "src/SupabaseClient.ts",
-																		"line": 160,
+																		"line": 163,
 																		"character": 6
 																	}
 																],
@@ -15305,7 +15305,7 @@
 																				"sources": [
 																					{
 																						"fileName": "src/SupabaseClient.ts",
-																						"line": 160,
+																						"line": 163,
 																						"character": 14
 																					}
 																				],
@@ -15339,7 +15339,7 @@
 																"sources": [
 																	{
 																		"fileName": "src/SupabaseClient.ts",
-																		"line": 160,
+																		"line": 163,
 																		"character": 52
 																	}
 																],
@@ -15390,7 +15390,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 179,
+									"line": 182,
 									"character": 8
 								}
 							],
@@ -15444,7 +15444,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 181,
+																	"line": 184,
 																	"character": 15
 																}
 															],
@@ -15466,7 +15466,7 @@
 																			"sources": [
 																				{
 																					"fileName": "src/SupabaseClient.ts",
-																					"line": 181,
+																					"line": 184,
 																					"character": 23
 																				}
 																			],
@@ -15497,7 +15497,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 181,
+																	"line": 184,
 																	"character": 52
 																}
 															],
@@ -15547,7 +15547,7 @@
 							"sources": [
 								{
 									"fileName": "src/SupabaseClient.ts",
-									"line": 143,
+									"line": 146,
 									"character": 2
 								}
 							],
@@ -15631,7 +15631,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 149,
+																	"line": 152,
 																	"character": 25
 																}
 															],
@@ -15668,7 +15668,7 @@
 															"sources": [
 																{
 																	"fileName": "src/SupabaseClient.ts",
-																	"line": 149,
+																	"line": 152,
 																	"character": 9
 																}
 															],
@@ -15800,7 +15800,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 101,
 									"character": 4
 								}
@@ -15824,7 +15824,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 78,
 									"character": 4
 								}
@@ -15853,7 +15853,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 62,
 									"character": 4
 								}
@@ -15882,7 +15882,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 74,
 									"character": 4
 								}
@@ -15912,7 +15912,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 107,
 									"character": 4
 								}
@@ -15936,7 +15936,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 70,
 									"character": 4
 								}
@@ -15965,7 +15965,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 66,
 									"character": 4
 								}
@@ -15995,7 +15995,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 113,
 									"character": 4
 								}
@@ -16020,7 +16020,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 92,
 									"character": 4
 								}
@@ -16050,7 +16050,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 80,
 							"character": 17
 						}
@@ -16084,7 +16084,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 4,
 									"character": 4
 								}
@@ -16104,7 +16104,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 5,
 									"character": 4
 								}
@@ -16127,7 +16127,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 3,
 							"character": 17
 						}
@@ -16152,7 +16152,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 9,
 									"character": 4
 								}
@@ -16176,7 +16176,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 17,
 									"character": 4
 								}
@@ -16200,7 +16200,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 13,
 									"character": 4
 								}
@@ -16221,7 +16221,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 8,
 									"character": 4
 								}
@@ -16251,7 +16251,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 18,
 									"character": 4
 								}
@@ -16271,7 +16271,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 19,
 									"character": 4
 								}
@@ -16291,7 +16291,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 20,
 									"character": 4
 								}
@@ -16331,7 +16331,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 7,
 							"character": 17
 						}
@@ -16357,7 +16357,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 46,
 									"character": 4
 								}
@@ -16377,7 +16377,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 35,
 									"character": 4
 								}
@@ -16404,7 +16404,7 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+													"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 													"line": 36,
 													"character": 8
 												}
@@ -16464,7 +16464,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 42,
 									"character": 4
 								}
@@ -16485,7 +16485,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 43,
 									"character": 4
 								}
@@ -16506,7 +16506,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 50,
 									"character": 4
 								}
@@ -16526,7 +16526,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 49,
 									"character": 4
 								}
@@ -16547,7 +16547,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 47,
 									"character": 4
 								}
@@ -16568,7 +16568,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 51,
 									"character": 4
 								}
@@ -16588,7 +16588,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 34,
 									"character": 4
 								}
@@ -16609,7 +16609,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 56,
 									"character": 4
 								}
@@ -16636,7 +16636,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 45,
 									"character": 4
 								}
@@ -16657,7 +16657,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 53,
 									"character": 4
 								}
@@ -16678,7 +16678,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 48,
 									"character": 4
 								}
@@ -16699,7 +16699,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 52,
 									"character": 4
 								}
@@ -16720,7 +16720,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 44,
 									"character": 4
 								}
@@ -16741,7 +16741,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 54,
 									"character": 4
 								}
@@ -16762,7 +16762,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 55,
 									"character": 4
 								}
@@ -16782,7 +16782,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 39,
 									"character": 4
 								}
@@ -16856,7 +16856,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 33,
 							"character": 17
 						}
@@ -16882,7 +16882,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 132,
 									"character": 4
 								}
@@ -16903,7 +16903,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 131,
 									"character": 4
 								}
@@ -16924,7 +16924,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 130,
 									"character": 4
 								}
@@ -16945,7 +16945,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 133,
 									"character": 4
 								}
@@ -16966,7 +16966,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 134,
 									"character": 4
 								}
@@ -16992,7 +16992,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 129,
 							"character": 17
 						}
@@ -17018,7 +17018,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 163,
 									"character": 4
 								}
@@ -17038,7 +17038,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 160,
 									"character": 4
 								}
@@ -17059,7 +17059,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 164,
 									"character": 4
 								}
@@ -17079,7 +17079,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 161,
 									"character": 4
 								}
@@ -17100,7 +17100,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 162,
 									"character": 4
 								}
@@ -17129,7 +17129,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 159,
 							"character": 17
 						}
@@ -17157,7 +17157,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 119,
 									"character": 4
 								}
@@ -17177,7 +17177,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 123,
 									"character": 4
 								}
@@ -17254,7 +17254,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 127,
 									"character": 4
 								}
@@ -17298,7 +17298,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 115,
 							"character": 17
 						}
@@ -17327,7 +17327,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 78,
 									"character": 4
 								}
@@ -17351,7 +17351,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 62,
 									"character": 4
 								}
@@ -17375,7 +17375,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 74,
 									"character": 4
 								}
@@ -17399,7 +17399,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 70,
 									"character": 4
 								}
@@ -17423,7 +17423,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 66,
 									"character": 4
 								}
@@ -17449,7 +17449,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 58,
 							"character": 17
 						}
@@ -17482,7 +17482,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 137,
 									"character": 4
 								}
@@ -17503,7 +17503,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 142,
 									"character": 4
 								}
@@ -17527,7 +17527,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 139,
 									"character": 4
 								}
@@ -17548,7 +17548,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 138,
 									"character": 4
 								}
@@ -17569,7 +17569,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 141,
 									"character": 4
 								}
@@ -17593,7 +17593,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 140,
 									"character": 4
 								}
@@ -17620,7 +17620,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 136,
 							"character": 17
 						}
@@ -17645,7 +17645,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 29,
 									"character": 4
 								}
@@ -17665,7 +17665,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 23,
 									"character": 4
 								}
@@ -17685,7 +17685,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 25,
 									"character": 4
 								}
@@ -17740,7 +17740,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 30,
 									"character": 4
 								}
@@ -17760,7 +17760,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 28,
 									"character": 4
 								}
@@ -17781,7 +17781,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 31,
 									"character": 4
 								}
@@ -17801,7 +17801,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 24,
 									"character": 4
 								}
@@ -17829,7 +17829,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 22,
 							"character": 17
 						}
@@ -17854,7 +17854,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 152,
 									"character": 4
 								}
@@ -17875,7 +17875,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 153,
 									"character": 4
 								}
@@ -17895,7 +17895,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 154,
 									"character": 4
 								}
@@ -17915,7 +17915,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 155,
 									"character": 4
 								}
@@ -17943,7 +17943,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 151,
 							"character": 17
 						}
@@ -17969,7 +17969,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 146,
 									"character": 4
 								}
@@ -17989,7 +17989,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 147,
 									"character": 4
 								}
@@ -18009,7 +18009,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 148,
 									"character": 4
 								}
@@ -18030,7 +18030,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 									"line": 149,
 									"character": 4
 								}
@@ -18055,7 +18055,7 @@
 					],
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 145,
 							"character": 17
 						}
@@ -18071,7 +18071,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 2,
 							"character": 20
 						}
@@ -18116,7 +18116,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 158,
 							"character": 20
 						}
@@ -18157,7 +18157,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 157,
 							"character": 20
 						}
@@ -18181,7 +18181,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 							"line": 7,
 							"character": 20
 						}
@@ -18207,7 +18207,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+											"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 											"line": 11,
 											"character": 4
 										}
@@ -18227,7 +18227,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+											"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 											"line": 9,
 											"character": 4
 										}
@@ -18247,7 +18247,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+											"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 											"line": 10,
 											"character": 4
 										}
@@ -18267,7 +18267,7 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+											"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 											"line": 8,
 											"character": 4
 										}
@@ -18292,7 +18292,7 @@
 							],
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 7,
 									"character": 37
 								}
@@ -18310,7 +18310,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 							"line": 41,
 							"character": 20
 						}
@@ -18362,7 +18362,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 							"line": 34,
 							"character": 20
 						}
@@ -18415,7 +18415,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 							"line": 40,
 							"character": 20
 						}
@@ -18468,7 +18468,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 1,
 							"character": 20
 						}
@@ -18553,8 +18553,8 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-							"line": 5,
+							"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+							"line": 4,
 							"character": 20
 						}
 					],
@@ -18580,8 +18580,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 12,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 11,
 											"character": 4
 										}
 									],
@@ -18603,8 +18603,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 11,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 10,
 											"character": 4
 										}
 									],
@@ -18626,8 +18626,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 14,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 13,
 											"character": 4
 										}
 									],
@@ -18643,8 +18643,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 14,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 13,
 													"character": 14
 												}
 											],
@@ -18689,8 +18689,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 8,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 7,
 											"character": 4
 										}
 									],
@@ -18710,8 +18710,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 10,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 9,
 											"character": 4
 										}
 									],
@@ -18733,8 +18733,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 9,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 8,
 											"character": 4
 										}
 									],
@@ -18754,8 +18754,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 17,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 16,
 											"character": 4
 										}
 									],
@@ -18771,8 +18771,8 @@
 											},
 											"sources": [
 												{
-													"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-													"line": 17,
+													"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+													"line": 16,
 													"character": 13
 												}
 											],
@@ -18817,8 +18817,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 13,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 12,
 											"character": 4
 										}
 									],
@@ -18840,8 +18840,8 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 7,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 6,
 											"character": 4
 										}
 									],
@@ -18861,15 +18861,15 @@
 									},
 									"sources": [
 										{
-											"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-											"line": 6,
+											"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+											"line": 5,
 											"character": 4
 										}
 									],
 									"type": {
 										"type": "reference",
-										"qualifiedName": "w3cwebsocket",
-										"package": "@types/websocket",
+										"qualifiedName": "WebSocket",
+										"package": "typescript",
 										"name": "WebSocket"
 									}
 								}
@@ -18894,8 +18894,8 @@
 							],
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/realtime-js/dist/main/RealtimeClient.d.ts",
-									"line": 5,
+									"fileName": "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.d.ts",
+									"line": 4,
 									"character": 30
 								}
 							]
@@ -18912,7 +18912,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "node_modules/@supabase/gotrue-js/dist/main/lib/types.d.ts",
+							"fileName": "node_modules/@supabase/gotrue-js/dist/module/lib/types.d.ts",
 							"line": 144,
 							"character": 20
 						}
@@ -19503,7 +19503,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 49,
 									"character": 14
 								}
@@ -19558,7 +19558,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 52,
 									"character": 14
 								}
@@ -19642,7 +19642,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 45,
 									"character": 14
 								}
@@ -19696,7 +19696,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 43,
 									"character": 14
 								}
@@ -19743,7 +19743,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 48,
 									"character": 14
 								}
@@ -19768,7 +19768,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 50,
 									"character": 14
 								}
@@ -19794,7 +19794,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 51,
 									"character": 14
 								}
@@ -19821,7 +19821,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 44,
 									"character": 14
 								}
@@ -19847,7 +19847,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 									"line": 75,
 									"character": 4
 								}
@@ -19896,7 +19896,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 77,
 																	"character": 8
 																}
@@ -19934,7 +19934,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 76,
 																	"character": 8
 																}
@@ -20002,7 +20002,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 									"line": 30,
 									"character": 4
 								}
@@ -20097,7 +20097,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 32,
 																	"character": 8
 																}
@@ -20135,7 +20135,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 31,
 																	"character": 8
 																}
@@ -20278,7 +20278,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 41,
 																	"character": 8
 																}
@@ -20316,7 +20316,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 39,
 																	"character": 8
 																}
@@ -20337,7 +20337,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 40,
 																	"character": 8
 																}
@@ -20367,7 +20367,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 38,
 																	"character": 8
 																}
@@ -20530,7 +20530,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 									"line": 19,
 									"character": 4
 								}
@@ -20596,7 +20596,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 21,
 																	"character": 8
 																}
@@ -20634,7 +20634,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 20,
 																	"character": 8
 																}
@@ -20693,7 +20693,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 61,
 									"character": 4
 								}
@@ -20973,7 +20973,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/types.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/types.d.ts",
 									"line": 60,
 									"character": 4
 								}
@@ -21040,7 +21040,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 									"line": 65,
 									"character": 4
 								}
@@ -21114,7 +21114,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 67,
 																	"character": 8
 																}
@@ -21152,7 +21152,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 66,
 																	"character": 8
 																}
@@ -21220,7 +21220,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+									"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 									"line": 52,
 									"character": 4
 								}
@@ -21315,7 +21315,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 55,
 																	"character": 8
 																}
@@ -21353,7 +21353,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 56,
 																	"character": 8
 																}
@@ -21374,7 +21374,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 53,
 																	"character": 8
 																}
@@ -21395,7 +21395,7 @@
 															},
 															"sources": [
 																{
-																	"fileName": "node_modules/@supabase/postgrest-js/dist/main/lib/PostgrestQueryBuilder.d.ts",
+																	"fileName": "node_modules/@supabase/postgrest-js/dist/module/lib/PostgrestQueryBuilder.d.ts",
 																	"line": 54,
 																	"character": 8
 																}
@@ -22202,7 +22202,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 48,
 									"character": 8
 								}
@@ -22227,7 +22227,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 52,
 									"character": 8
 								}
@@ -22255,7 +22255,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 47,
 									"character": 8
 								}
@@ -22280,7 +22280,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 53,
 									"character": 8
 								}
@@ -22364,7 +22364,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 44,
 									"character": 8
 								}
@@ -22418,7 +22418,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 50,
 									"character": 8
 								}
@@ -22478,7 +22478,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 51,
 									"character": 8
 								}
@@ -22503,7 +22503,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 49,
 									"character": 8
 								}
@@ -22528,7 +22528,7 @@
 							},
 							"sources": [
 								{
-									"fileName": "node_modules/@supabase/gotrue-js/dist/main/GoTrueClient.d.ts",
+									"fileName": "node_modules/@supabase/gotrue-js/dist/module/GoTrueClient.d.ts",
 									"line": 43,
 									"character": 8
 								}

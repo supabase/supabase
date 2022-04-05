@@ -8,23 +8,30 @@
 
 [Supabase](https://supabase.com) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
-- [x] Postgres 数据库托管
-- [x] 实时订阅
-- [x] 身份验证和授权
-- [x] 自动生成的 API
-- [x] 仪表盘
-- [x] 存储
-- [ ] 函数（即将推出）
+- [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
+- [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
+- [x] 自动生成的 API。
+  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api)
+- [x] 函数。
+  - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
+  - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
+- [x] 文件存储。[文档](https://supabase.com/docs/guides/storage)
+- [x] 仪表盘。
 
 ## 文档
 
 完整的文档，请访问 [supabase.io/docs](https://supabase.com/docs)
 
+了解如何贡献，请访问[入门](./DEVELOPERS.md)
+
 ## 社区与支持
 
 - [社区论坛](https://github.com/supabase/supabase/discussions)。适用于：帮助建立和讨论数据库的最佳实践。
 - [GitHub Issues](https://github.com/supabase/supabase/issues)。适用于：你在使用 Supabase 时遇到的 bug 和错误。
-- [电子邮件支持](https://supabase.com/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
+- [邮件支持](https://supabase.com/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
+- [Discord](https://discord.supabase.com)。适用于：分享你的应用程序以及在社区一起玩起来。
 
 ## 状态
 
@@ -45,7 +52,8 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。我们仍在优化本地开发体验，这和平台稳定性一起作为我们当前的核心目标。
+Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。
+你也可以[自托管](https://supabase.com/docs/guides/self-hosting)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
@@ -102,13 +110,13 @@ Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并�
     <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
   </tr>
   <tr>
     <td>Dart (Flutter)</td>
     <td><a href="https://github.com/supabase/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
+    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
     <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
   </tr>

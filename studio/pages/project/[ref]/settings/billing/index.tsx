@@ -2,27 +2,12 @@ import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Typography, Loading, IconArrowRight } from '@supabase/ui'
-import { get as _get, maxBy } from 'lodash'
-import { Dictionary } from '@supabase/grid'
 
-import { useStore, withAuth } from 'hooks'
-import { post, get } from 'lib/common/fetch'
-import {
-  API_URL,
-  DATE_FORMAT,
-  STRIPE_PRODUCT_IDS,
-  TIME_PERIODS_REPORTS,
-  TIME_PERIODS_BILLING,
-} from 'lib/constants'
+import { useProjectPaygStatistics, useProjectSubscription, useStore, withAuth } from 'hooks'
+import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
-import {
-  PAYGUsage,
-  Subscription,
-  StripeSubscription,
-  chargeableProducts,
-  Invoices,
-} from 'components/interfaces/Billing'
+import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
 
 import ProjectUsage from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
@@ -50,66 +35,25 @@ type SettingsProps = {
 }
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref
-
-  const [loading, setLoading] = useState<boolean>(true)
-  const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [paygStats, setPaygStats] = useState<Dictionary<number>>()
+  const {
+    subscription,
+    isLoading: loading,
+    error,
+  } = useProjectSubscription(ui.selectedProject?.ref)
+  const { paygStats } = useProjectPaygStatistics(
+    ui.selectedProject?.ref,
+    subscription?.tier?.supabase_prod_id
+  )
   const [dateRange, setDateRange] = useState<any>()
 
   useEffect(() => {
-    if (projectRef) {
-      getSubscription()
-    }
-  }, [projectRef])
-
-  const getSubscription = async () => {
-    try {
-      setLoading(true)
-      const { data: subscription, error }: { data: StripeSubscription; error: any } = await post(
-        `${API_URL}/stripe/subscription`,
-        {
-          subscription_id: project.subscription_id,
-        }
-      )
-      if (error) throw error
-      setSubscription(subscription)
-
-      if (subscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG) {
-        fetchPaygStatistics()
-      }
-    } catch (error: any) {
+    if (error) {
       ui.setNotification({
-        error,
         category: 'error',
-        message: `Failed to get subscription: ${error.message}`,
+        message: `Failed to get project subscription: ${error?.message ?? 'unknown'}`,
       })
-    } finally {
-      setLoading(false)
     }
-  }
-
-  const fetchPaygStatistics = async () => {
-    const startDate = dayjs().utc().startOf('month').format(DATE_FORMAT)
-    const endDate = dayjs().utc().endOf('month').format(DATE_FORMAT)
-    const attributes =
-      'total_db_size_bytes,total_db_egress_bytes,total_storage_size_bytes,total_storage_egress'
-    const url = `${API_URL}/projects/${
-      project.ref
-    }/daily-stats?attribute=${attributes}&startDate=${encodeURIComponent(
-      startDate
-    )}&endDate=${encodeURIComponent(endDate)}&interval='1d'`
-
-    const { data } = await get(url)
-
-    const paygStats: any = {}
-    chargeableProducts.forEach((product: any) => {
-      product.features.forEach((feature: any) => {
-        paygStats[feature.attribute] = _get(maxBy(data, feature.attribute), feature.attribute)
-      })
-    })
-    setPaygStats(paygStats)
-  }
+  }, [error])
 
   if (!subscription) {
     return <LoadingUI />

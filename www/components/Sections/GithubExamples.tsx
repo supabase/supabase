@@ -7,15 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Navigation, Pagination } from 'swiper'
 
 import Link from 'next/link'
-import {
-  Button,
-  Typography,
-  IconGitHub,
-  IconArrowLeft,
-  IconArrowRight,
-  Space,
-  IconBookOpen,
-} from '@supabase/ui'
+import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from '@supabase/ui'
 
 import Examples from '../../data/Examples.json'
 import ExampleCard from '../ExampleCard'
@@ -34,36 +26,28 @@ function GithubExamples() {
     <>
       <div className="grid grid-cols-12">
         <div className="col-span-12 text-center">
-          <Typography.Title level={2}>
-            Community driven examples, libraries and guides
-          </Typography.Title>
-          <Typography.Text className="block mb-6">
-            <p className="text-base lg:text-lg">
-              Supported by a network of early advocates, contributors, and champions.
-            </p>
-          </Typography.Text>
-          <div className="flex space-y-1.5 flex-col lg:space-y-0 lg:space-x-1.5 lg:flex-row justify-center">
+          <h2 className="h3">Community driven examples, libraries and guides</h2>
+          <p className="p ">
+            Supported by a network of early advocates, contributors, and champions.
+          </p>
+          <div className="flex items-center gap-2 justify-center py-4">
             <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
-              <a>
-                <Button type="default" icon={<IconBookOpen />}>
-                  View guides
-                </Button>
-              </a>
+              <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
+                View guides
+              </Button>
             </Link>
             <Link href="/docs/guides/examples" as="/docs/guides/examples">
-              <a>
-                <Button type="default">View all examples</Button>
-              </a>
+              <Button size="small" as="a" type="default">
+                View all examples
+              </Button>
             </Link>
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
             >
-              <a>
-                <Button type="default" icon={<IconGitHub />}>
-                  Official GitHub library
-                </Button>
-              </a>
+              <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
+                Official GitHub library
+              </Button>
             </Link>
           </div>
         </div>
@@ -117,14 +101,14 @@ function GithubExamples() {
             })}
             <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
               <div ref={prevRef} className="cursor-pointer ml-4">
-                <Typography.Text>
+                <p>
                   <IconArrowLeft />
-                </Typography.Text>
+                </p>
               </div>
               <div ref={nextRef} className="cursor-pointer mr-4">
-                <Typography.Text>
+                <p>
                   <IconArrowRight />
-                </Typography.Text>
+                </p>
               </div>
             </div>
           </Swiper>
