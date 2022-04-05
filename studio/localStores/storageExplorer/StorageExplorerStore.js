@@ -275,8 +275,12 @@ class StorageExplorerStore {
   addNewFolder = async (folderName, columnIndex) => {
     const autofix = false
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
+
     if (isNull(formattedName)) {
       return
+    }
+    if (formattedName.includes('/') || formattedName.includes('\\')) {
+      return toast.error('Folder names should not have forward or back slashes.')
     }
     if (formattedName.length === 0) {
       return this.removeTempRows(columnIndex)

@@ -2,6 +2,7 @@ TEAM
 
 Supabase is 100% remote.
 
+Alaister Young
 Angelico de los Reyes
 Amy Q
 Ant Wilson

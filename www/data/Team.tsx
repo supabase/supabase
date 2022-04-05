@@ -1,6 +1,3 @@
-import { Card, Space, Typography } from '@supabase/ui'
-import DeveloperSignups from 'data/DeveloperSignups'
-
 type TeamMember = {
   name: string
   img: string

@@ -1,279 +1,428 @@
+// List of available Tax IDs as reflected in Stripe's web portal
+// This was manually ported over so there may be a chance of mistakes
+// Last updated as of 29th March 2022.
+// The code may not necessarily match with the name (ref SE_VAT)
 // https://stripe.com/docs/api/customer_tax_ids/create
-export const TAX_IDS = {
-  ae_trn: {
+interface TaxId {
+  name: string
+  code: string
+  country: string
+  placeholder: string
+}
+
+export const TAX_IDS: TaxId[] = [
+  {
+    name: 'AE TRN',
+    code: 'ae_trn',
     country: 'United Arab Emirates',
     placeholder: '123456789012345',
   },
-  at_vat: {
+  {
+    name: 'AT VAT',
+    code: 'eu_vat',
     country: 'Austria',
     placeholder: 'ATU12345678',
   },
-  au_abn: {
+  {
+    name: 'AU ABN',
+    code: 'au_abn',
     country: 'Australia',
     placeholder: '12345678912',
   },
-  au_arn: {
+  {
+    name: 'AU ARN',
+    code: 'au_arn',
     country: 'Australia',
     placeholder: '123456789123',
   },
-  be_vat: {
+  {
+    name: 'BE VAT',
+    code: 'eu_vat',
     country: 'Belgium',
     placeholder: 'BE0123456789',
   },
-  bg_vat: {
+  {
+    name: 'BG VAT',
+    code: 'eu_vat',
     country: 'Bulgaria',
     placeholder: 'BG0123456789',
   },
-  br_cnpj: {
+  {
+    name: 'BR CNPJ',
+    code: 'br_cnpj',
     country: 'Brazil',
     placeholder: '01.234.456/5432-10',
   },
-  br_cpf: {
+  {
+    name: 'BR CPF',
+    code: 'br_cpf',
     country: 'Brazil',
     placeholder: '123.456.789-87',
   },
-  ca_bn: {
+  {
+    name: 'CA BN',
+    code: 'ca_bn',
     country: 'Canada',
     placeholder: '123456789',
   },
-  ca_gst_hst: {
+  {
+    name: 'CA GST/HST',
+    code: 'ca_gst_hst',
     country: 'Canada',
     placeholder: '123456789RT0002',
   },
-  ca_pst_bc: {
+  {
+    name: 'CA PST-BC',
+    code: 'ca_pst_bc',
     country: 'Canada',
     placeholder: 'PST-1234-5678',
   },
-  ca_pst_mb: {
+  {
+    name: 'CA PST-MB',
+    code: 'ca_pst_mb',
     country: 'Canada',
     placeholder: '123456-7',
   },
-  ca_pst_sk: {
+  {
+    name: 'CA PST-SK',
+    code: 'ca_pst_mb',
     country: 'Canada',
     placeholder: '1234567',
   },
-  ca_qst: {
+  {
+    name: 'CA QST',
+    code: 'ca_qst',
     country: 'Canada',
     placeholder: '1234567890TQ1234',
   },
-  ch_vat: {
+  {
+    name: 'CH VAT',
+    code: 'ch_vat',
     country: 'Switzerland',
     placeholder: 'CHE-123.456.789 MWST',
   },
-  cl_tin: {
+  {
+    name: 'CL TIN',
+    code: 'cl_tin',
     country: 'Chile',
     placeholder: '12.345.678-K',
   },
-  cy_vat: {
+  {
+    name: 'CY VAT',
+    code: 'cy_vat',
     country: 'Cyprus',
     placeholder: 'CY12345678Z',
   },
-  cz_vat: {
+  {
+    name: 'CZ VAT',
+    code: 'eu_vat',
     country: 'Czech Republic',
     placeholder: 'CZ1234567890',
   },
-  de_vat: {
+  {
+    name: 'DE VAT',
+    code: 'eu_vat',
     country: 'Germany',
     placeholder: 'DE123456789',
   },
-  dk_vat: {
+  {
+    name: 'DK VAT',
+    code: 'eu_vat',
     country: 'Denmark',
     placeholder: 'DK12345678',
   },
-  ee_vat: {
+  {
+    name: 'EE VAT',
+    code: 'eu_vat',
     country: 'Estonia',
     placeholder: 'EE123456789',
   },
-  es_cif: {
+  {
+    name: 'ES CIF',
+    code: 'es_cif',
     country: 'Spain',
     placeholder: 'A12345678',
   },
-  es_vat: {
+  {
+    name: 'ES VAT',
+    code: 'eu_vat',
     country: 'Spain',
     placeholder: 'ESA1234567Z',
   },
-  fi_vat: {
+  {
+    name: 'FI VAT',
+    code: 'eu_vat',
     country: 'Finland',
     placeholder: 'FI12345678',
   },
-  fr_vat: {
+  {
+    name: 'FR VAT',
+    code: 'eu_vat',
     country: 'France',
     placeholder: 'FRAB123456789',
   },
-  gb_vat: {
+  {
+    name: 'GB VAT',
+    code: 'eu_vat',
     country: 'United Kingdom',
     placeholder: 'GB123456789',
   },
-  ge_vat: {
+  {
+    name: 'GE VAT',
+    code: 'ge_vat',
     country: 'Georgia',
     placeholder: '123456789',
   },
-  gr_vat: {
+  {
+    name: 'GR VAT',
+    code: 'eu_vat',
     country: 'Greece',
     placeholder: 'EL123456789',
   },
-  hk_br: {
+  {
+    name: 'HK BR',
+    code: 'hk_br',
     country: 'Hong Kong SAR China',
     placeholder: '12345678',
   },
-  hr_vat: {
+  {
+    name: 'HR VAT',
+    code: 'hr_vat',
     country: 'Croatia',
     placeholder: 'HR12345678912',
   },
-  hu_vat: {
+  {
+    name: 'HU VAT',
+    code: 'eu_vat',
     country: 'Hungary',
     placeholder: 'HU12345678912',
   },
-  id_npwp: {
+  {
+    name: 'ID NPWP',
+    code: 'id_npwp',
     country: 'Indonesia',
     placeholder: '12.345.678.9-012.345',
   },
-  ie_vat: {
+  {
+    name: 'IE VAT',
+    code: 'eu_vat',
     country: 'Ireland',
     placeholder: 'IE12345678AB',
   },
-  il_vat: {
+  {
+    name: 'IL VAT',
+    code: 'il_vat',
     country: 'Israel',
     placeholder: '000012345',
   },
-  in_gst: {
+  {
+    name: 'IN GST',
+    code: 'in_gst',
     country: 'India',
     placeholder: '12ABCDE3456FGZH',
   },
-  is_vat: {
+  {
+    name: 'IS VAT',
+    code: 'is_vat',
     country: 'Iceland',
     placeholder: '123456',
   },
-  it_vat: {
+  {
+    name: 'IT VAT',
+    code: 'eu_vat',
     country: 'Italy',
     placeholder: 'IT12345678912',
   },
-  jp_cn: {
+  {
+    name: 'JP CN',
+    code: 'jp_cn',
     country: 'Japan',
     placeholder: '1234567891234',
   },
-  jp_rn: {
+  {
+    name: 'JP RN',
+    code: 'jp_rn',
     country: 'Japan',
     placeholder: '12345',
   },
-  kr_brn: {
+  {
+    name: 'KR BRN',
+    code: 'kr_brn',
     country: 'Korea',
     placeholder: '123-45-67890',
   },
-  li_uid: {
+  {
+    name: 'LI UID',
+    code: 'li_uid',
     country: 'Liechtenstein',
     placeholder: 'CHE123456789',
   },
-  lt_vat: {
+  {
+    name: 'LT VAT',
+    code: 'eu_vat',
     country: 'Lithuania',
     placeholder: 'LT123456789123',
   },
-  lu_vat: {
+  {
+    name: 'LU VAT',
+    code: 'eu_vat',
     country: 'Luxembourg',
     placeholder: 'LU12345678',
   },
-  lv_vat: {
+  {
+    name: 'LV VAT',
+    code: 'eu_vat',
     country: 'Latvia',
     placeholder: 'LV12345678912',
   },
-  mt_vat: {
+  {
+    name: 'MT VAT',
+    code: 'eu_vat',
     country: 'Malta',
     placeholder: 'MT12345678',
   },
-  mx_rfc: {
+  {
+    name: 'MX RFC',
+    code: 'mx_rfc',
     country: 'Mexico',
     placeholder: 'ABC010203AB9',
   },
-  my_frp: {
+  {
+    name: 'MY FRP',
+    code: 'my_frp',
     country: 'Malaysia',
     placeholder: '12345678',
   },
-  my_itn: {
+  {
+    name: 'MY ITN',
+    code: 'my_itn',
     country: 'Malaysia',
     placeholder: 'C 1234567890',
   },
-  my_sst: {
+  {
+    name: 'MY SST',
+    code: 'my_sst',
     country: 'Malaysia',
     placeholder: 'A12-3456-78912345',
   },
-  nl_vat: {
+  {
+    name: 'NL VAT',
+    code: 'eu_vat',
     country: 'Netherlands',
     placeholder: 'NL123456789B12',
   },
-  no_vat: {
+  {
+    name: 'NO VAT',
+    code: 'no_vat',
     country: 'Norway',
     placeholder: '123456789MVA',
   },
-  nz_gst: {
+  {
+    name: 'NZ GST',
+    code: 'nz_gst',
     country: 'New Zealand',
     placeholder: '123456789',
   },
-  pl_vat: {
+  {
+    name: 'PL VAT',
+    code: 'eu_vat',
     country: 'Poland',
     placeholder: 'PL1234567890',
   },
-  pt_vat: {
+  {
+    name: 'PT VAT',
+    code: 'eu_vat',
     country: 'Portugal',
     placeholder: 'PT123456789',
   },
-  ro_vat: {
+  {
+    name: 'RO VAT',
+    code: 'eu_vat',
     country: 'Romania',
     placeholder: 'RO1234567891',
   },
-  ru_inn: {
+  {
+    name: 'RU INN',
+    code: 'ru_inn',
     country: 'Russia',
     placeholder: '1234567891',
   },
-  ru_kpp: {
+  {
+    name: 'RU KPP',
+    code: 'ru_kpp',
     country: 'Russia',
     placeholder: '123456789',
   },
-  sa_vat: {
+  {
+    name: 'SA VAT',
+    code: 'sa_vat',
     country: 'Saudi Arabia',
     placeholder: '123456789012345',
   },
-  se_vat: {
+  {
+    name: 'SE VAT',
+    code: 'eu_vat',
     country: 'Sweden',
     placeholder: 'SE123456789123',
   },
-  sg_gst: {
+  {
+    name: 'SG GST',
+    code: 'sg_gst',
     country: 'Singapore',
     placeholder: 'M12345678X',
   },
-  sg_uen: {
+  {
+    name: 'SG UEN',
+    code: 'sg_uen',
     country: 'Singapore',
     placeholder: '123456789F',
   },
-  si_vat: {
+  {
+    name: 'SI VAT',
+    code: 'eu_vat',
     country: 'Slovenia',
     placeholder: 'SI12345678',
   },
-  sk_vat: {
+  {
+    name: 'SK VAT',
+    code: 'eu_vat',
     country: 'Slovakia',
     placeholder: 'SK1234567891',
   },
-  th_vat: {
+  {
+    name: 'TH VAT',
+    code: 'th_vat',
     country: 'Thailand',
     placeholder: '1234567891234',
   },
-  tw_vat: {
+  {
+    name: 'TW VAT',
+    code: 'tw_vat',
     country: 'Taiwan',
     placeholder: '12345678',
   },
-  ua_vat: {
+  {
+    name: 'UA VAT',
+    code: 'ua_vat',
     country: 'Ukraine',
     placeholder: '123456789',
   },
-  us_ein: {
+  {
+    name: 'US EIN',
+    code: 'us_ein',
     country: 'United States',
     placeholder: '12-3456789',
   },
-  xi_vat: {
+  {
+    name: 'XI VAT',
+    code: 'xi_vat',
     country: 'United Kingdom',
     placeholder: 'XI123456789',
   },
-  za_vat: {
+  {
+    name: 'ZA VAT',
+    code: 'za_vat',
     country: 'South Africa',
     placeholder: '4123456789',
   },
-}
+]

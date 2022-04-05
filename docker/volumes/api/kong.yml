@@ -95,6 +95,32 @@ services:
             - admin
             - anon
 
+  ## Secure GraphQL routes
+  - name: graphql-v1
+    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/rpc/graphql"
+    url: http://rest:3000/rpc/graphql
+    routes:
+      - name: graphql-v1-all
+        strip_path: true
+        paths:
+          - /graphql/v1
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: true
+      - name: request-transformer
+        config:
+          add: 
+            headers:
+              - Content-Profile:graphql_public
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
+            - anon
+
   ## Secure Realtime routes
   - name: realtime-v1
     _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"

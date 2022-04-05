@@ -132,7 +132,7 @@ const CodeExamples = () => {
       <div className="grid grid-cols-12 gap-2 xl:gap-8">
         <div className="col-span-12 text-center lg:col-span-3 lg:hidden">{<TabNav />}</div>
         <div className="col-span-12 lg:col-span-9">
-          <div className="rounded-md rounded-b-lg bg-dark-600 dark:bg-dark-700">
+          <div className="rounded-md rounded-b-lg bg-dark-600 dark:bg-scale-300">
             <div className="p-2 pl-5 flex justify-between items-center">
               <p className="text-sm truncate mr-2 sm:text-base text-dark-100">
                 {exampleList[example].description}
