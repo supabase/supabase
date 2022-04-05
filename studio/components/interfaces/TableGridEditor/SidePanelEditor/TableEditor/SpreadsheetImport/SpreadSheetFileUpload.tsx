@@ -46,7 +46,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
       </div>
       {!uploadedFile ? (
         <div
-          className={`flex items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-48 ${
+          className={`cursor-pointer flex items-center justify-center border dark:border-gray-500 border-dashed rounded-md h-48 ${
             isDraggedOver ? 'bg-gray-500' : ''
           }`}
           onDragOver={onDragOver}
@@ -55,7 +55,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
           <Typography.Text>
-            Drag and drop, or <span className="text-green-500 cursor-pointer">browse</span> your
+            Drag and drop, or <span className="text-green-1000">browse</span> your
             files
           </Typography.Text>
         </div>
