@@ -807,7 +807,7 @@ pages:
           const { data: user, error } = await supabase.auth.api.createUser({
             email: 'user@email.com',
             password: 'password',
-            data: { name: 'Yoda' }
+            user_metadata: { name: 'Yoda' }
           })
           ```
       - name: Auto-confirm email.
