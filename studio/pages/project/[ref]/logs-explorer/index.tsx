@@ -139,7 +139,6 @@ export const LogsExplorerPage: NextPage = () => {
             try {
               const { data: query, error } = await content.create(payload)
               if (error) throw error
-              console.log(query)
               setSubmitting(false)
               setSaveModalOpen(false)
               toast.success(`Saved "${values.name}" log query`)
