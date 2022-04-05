@@ -192,9 +192,6 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-And one optional step is to update the CSS file `src/theme/variables.scss` to customize the look of your app.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/angular-supa/supabase-angular-user-management/main/src/styles.css).
-
 ### Set up a Login route
 
 Let's set up a React component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
