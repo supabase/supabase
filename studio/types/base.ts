@@ -20,9 +20,12 @@ export interface Project {
   organization_id: number
   cloud_provider: string
   region: string
-  connectionString: string
   inserted_at: string
   subscription_id: string
+
+  // only available after projects.fetchDetail
+  kpsVersion?: string
+  connectionString?: string
 
   // Possibly deprecated, just double check
   subscription_tier?: string

@@ -1,4 +1,5 @@
 import { configure, reaction } from 'mobx'
+import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
@@ -70,6 +71,14 @@ export class RootStore implements IRootStore {
 
   setProjectRef(value?: string) {
     if (this.ui.selectedProject?.ref === value) return
+    if (value) {
+      // fetch project detail when connectionString is not available
+      const found = this.app.projects.find((x: Project) => x.ref == value)
+      if (!found || !found.connectionString) {
+        this.app.projects.fetchDetail(value)
+      }
+    }
+
     this.ui.setProjectRef(value)
     this.functions.setProjectRef(value)
   }
