@@ -3,15 +3,8 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@^1.33.2'
+import { supabaseClient } from '../_shared/supabaseClient.ts'
 import { corsHeaders } from '../_shared/cors.ts'
-
-const supabase = createClient(
-  // Supabase API URL - env var exported by default when deployed.
-  Deno.env.get('SUPABASE_URL') ?? '',
-  // Supabase API ANON KEY - env var exported by default when deployed.
-  Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-)
 
 console.log(`Function "select-from-table-with-auth-rls" up and running!`)
 
@@ -20,16 +13,25 @@ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-  // Set the Auth context of the user that called the function.
-  // This way your row-level-security (RLS) policies are applied.
-  supabase.auth.setAuth(req.headers.get('Authorization')!.replace('Bearer ', ''))
 
-  const { data, error } = await supabase.from('users').select('*')
-  console.log({ data, error })
+  try {
+    // Set the Auth context of the user that called the function.
+    // This way your row-level-security (RLS) policies are applied.
+    supabaseClient.auth.setAuth(req.headers.get('Authorization')!.replace('Bearer ', ''))
 
-  return new Response(JSON.stringify({ data, error }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  })
+    const { data, error } = await supabaseClient.from('users').select('*')
+    console.log({ data, error })
+
+    return new Response(JSON.stringify({ data, error }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    })
+  }
 })
 
 // To invoke:
