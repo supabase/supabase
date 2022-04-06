@@ -1001,7 +1001,7 @@ const Beta = (props: Props) => {
           <div className="flex items-center justify-between px-5 py-5 shadow-lg xl:px-20 bg-scale-1200 dark:bg-scale-300">
             <Link href="/">
               <a>
-                <Image src={`${basePath}/images/logo-dark.png`} height={20} width={20} />
+                <Image src={`${basePath}/images/logo-dark.png`} height={24} width={120} />
               </a>
             </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
