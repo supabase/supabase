@@ -45,7 +45,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
 const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
     const keys = Object.keys(filters)
     const filterTemplates = SQL_FILTER_TEMPLATES[table]
-    const _resolveTemplateToStatement = (dotKey: string) => {
+    const _resolveTemplateToStatement = (dotKey: string): string | null => {
         const template = filterTemplates[dotKey]
         const value = get(filters, dotKey)
         if (value !== undefined && typeof template === 'function') {
@@ -58,6 +58,8 @@ const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
             } else {
                 return `${dotKey} = ${value}`
             }
+        } else if (value === undefined && typeof template === 'function') {
+            return null
         } else {
             return template
         }
@@ -66,10 +68,11 @@ const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
     const statement = keys.map(rootKey => {
         if (typeof filters[rootKey] === 'object') {
             // join all statements with an OR
-            const nestedStatement = getDotKeys(filters[rootKey] as Filters, rootKey).map(_resolveTemplateToStatement).join(" or ")
+            const nestedStatement = getDotKeys(filters[rootKey] as Filters, rootKey).map(_resolveTemplateToStatement).filter(Boolean).join(" or ")
             return `(${nestedStatement})`
         } else {
             const nestedStatement = _resolveTemplateToStatement(rootKey)
+            if (nestedStatement === null) return null
             return `(${nestedStatement})`
         }
 
