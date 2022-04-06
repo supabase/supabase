@@ -39,6 +39,7 @@ const LogsFilterPopover: React.FC<Props> = ({
       onOpenChange={handleToggle}
       overlay={
         <Form
+          className="w-full"
           initialValues={filters}
           onSubmit={(values, { setSubmitting }) => {
             setSubmitting(true)
