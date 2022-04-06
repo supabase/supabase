@@ -8,13 +8,26 @@
 
 The function examples are located in [`./supabase/functions`](./supabase/functions):
 
-- [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts): Retrieve data from an authenticated user via RLS
+- [`browser-with-cors`](./supabase/functions/browser-with-cors/index.ts): Handle CORS headers for function invocations from browser environments.
+- [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts): Retrieve data from an authenticated user via RLS.
 
 ## Develop locally
 
 - Run `supabase start` (make sure your Docker daemon is running.)
 - Run `supabase functions serve your-function-name`
-- Run the CURL command in the example function, or use the [invoke method](https://supabase.com/docs/reference/javascript/invoke) on the Supabase client.
+- Run the CURL command in the example function, or use the [invoke method](https://supabase.com/docs/reference/javascript/invoke) on the Supabase client or use the test client [app](./app/).
+
+## Test
+
+This example includes a create-react-app in the [`./app/`](./app/) directory which you can use as a sort of postman to make test requests both locally and to your deployed functions.
+
+### Test locally
+
+- `cd app`
+- `npm install`
+- `npm start`
+
+Note: when testing locally, the select dropdown doesn't have any effect, and invoke simply calls whatever function is currently served by the CLI.
 
 ## Deploy
 
@@ -32,6 +45,16 @@ The function examples are located in [`./supabase/functions`](./supabase/functio
 - Deploy the function
   - Within your project root run `supabase functions deploy payment-sheet`
 - In youre [`./app/.env`](./app/.env) file remove the `SUPA_FUNCTION_LOCALHOST` variable and restart your Expo app.
+
+### Test deployed functions
+
+This example includes a create-react-app in the [`./app/`](./app/) directory which you can use as a sort of postman to make test requests both locally and to your deployed functions.
+
+- `cd app`
+- `cp .env.example .env`
+- Fill in your env vars from https://app.supabase.io/project/_/settings/api
+- `npm install`
+- `npm start`
 
 ## 👁⚡️👁
 

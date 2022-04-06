@@ -159,7 +159,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             : ''
         }
         onExploreClick={() => {
-          router.push(`/project/${projectRef}/logs-explorer?q=${params.rawSql}`)
+          router.push(`/project/${projectRef}/logs-explorer?q=${encodeURIComponent(params.rawSql)}`)
         }}
         onSelectTemplate={onSelectTemplate}
         dispatchWhereFilters={dispatchWhereFilters}

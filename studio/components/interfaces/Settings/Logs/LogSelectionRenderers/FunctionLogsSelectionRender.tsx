@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
-import { jsonSyntaxHighlight, ResponseCodeFormatter, SeverityFormatter } from '../LogsFormatters'
+import { jsonSyntaxHighlight, SeverityFormatter } from '../LogsFormatters'
 
 const FunctionLogsSelectionRender = ({ log }: any) => {
-  const request = log?.request
+  const timestamp = dayjs(log.timestamp / 1000)
 
   const DetailedRow = ({
     label,
@@ -40,10 +40,9 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
         <DetailedRow label="Severity" value={<SeverityFormatter value={log.metadata.level} />} />
         <DetailedRow label="Log ID" value={log.id} />
         <DetailedRow label="Deployment version" value={log?.metadata?.version} />
-        <DetailedRow label="Timestamp" value={dayjs(log.timestamp).toISOString()} />
+        <DetailedRow label="Timestamp" value={timestamp.format('DD MMM, YYYY HH:mm')} />
         <DetailedRow label="Execution ID" value={log.metadata.execution_id} />
         <DetailedRow label="Deployment ID" value={log.metadata.deployment_id} />
-        <DetailedRow label="Function ID" value={log.metadata.function_id} />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>

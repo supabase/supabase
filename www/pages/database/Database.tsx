@@ -104,7 +104,13 @@ function Database() {
               <div className="mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
-                <img src={`${basePath}/images/product/database/postgresql-icon.svg`} width={30} />
+                <div className="w-fit flex items-center">
+                  <Image
+                    src={`${basePath}/images/product/database/postgresql-icon.svg`}
+                    width={30}
+                    height={30}
+                  />
+                </div>
               </div>
               <h4 className="h4">Just Postgres</h4>
               <p className="p">Every Supabase project is a dedicated Postgres database.</p>

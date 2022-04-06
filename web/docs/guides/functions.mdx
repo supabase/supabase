@@ -13,9 +13,19 @@ const examples = [
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions',
   },
   {
-    name: 'With Stripe',
+    name: 'With CORS headers',
+    description: 'Send CORS headers for invoking from the browser.',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/browser-with-cors/index.ts',
+  },
+  {
+    name: 'React Native with Stripe',
     description: 'Full example for using Supabase and Stripe, with Expo.',
     href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
+  },
+  {
+    name: 'Flutter with Stripe',
+    description: 'Full example for using Supabase and Stripe, with Flutter.',
+    href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
   },
 ]
 
@@ -42,7 +52,7 @@ Learn how to develop Edge Functions in less than 7 minutes:
   className="w-full video-with-border"
   width="640"
   height="385"
-  src="https://www.youtube-nocookie.com/embed/9TK6oTzibmk"
+  src="https://www.youtube-nocookie.com/embed/rzglqRdZUQE"
   frameBorder="1"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
@@ -78,7 +88,7 @@ This creates a function stub in your `supabase` folder at `./functions/hello-wor
 supabase functions deploy hello-world
 ```
 
-This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform. 
+This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform.
 The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
 ### Executing Remote Functions
@@ -103,9 +113,7 @@ You can debug your deployed Edge Functions using the "Functions" section of the 
 - Invocations: shows the Request and Response for each execution.
 - Logs: shows any platform events, including deployments and errors.
 
-
 ![Function invocations.](/img/guides/functions/function-logs.png)
-
 
 ## Developing locally
 
@@ -245,9 +253,9 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 
 ## Suggestions and Limitations
 
-### Database vs Edge Functions 
+### Database vs Edge Functions
 
-For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database, 
+For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database,
 and can be called remotely using the [REST and GraphQL API](/docs/guides/database/functions).
 
 ### Organizing your Edge Functions

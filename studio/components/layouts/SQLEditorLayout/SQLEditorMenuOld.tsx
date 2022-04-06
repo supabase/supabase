@@ -40,6 +40,7 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
       name={name}
       action={active && <DropdownMenu tabInfo={tabInfo} />}
       onClick={() => sqlEditorStore.selectTab(id)}
+      textClassName="w-44"
     />
   )
 })
