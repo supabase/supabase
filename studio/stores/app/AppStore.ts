@@ -6,10 +6,10 @@ import { API_URL } from 'lib/constants'
 import { IRootStore } from '../RootStore'
 import DatabaseStore, { IDatabaseStore } from './DatabaseStore'
 import OrganizationStore from './OrganizationStore'
-import ProjectStore from './ProjectStore'
+import ProjectStore, { IProjectStore } from './ProjectStore'
 
 export interface IAppStore {
-  projects: ProjectStore
+  projects: IProjectStore
   organizations: OrganizationStore
   database: IDatabaseStore
   onProjectUpdated: (project: any) => void
@@ -43,12 +43,11 @@ export default class AppStore implements IAppStore {
         project.services?.length > 0
           ? project.services[0]?.infrastructure[0]?.app_versions?.version
           : undefined
-      const clone: any = cloneDeep((this.projects.data as any)[project.id])
+      const clone = cloneDeep(this.projects.data[project.id])
       clone.kpsVersion = kpsVersion
       clone.name = project.name
       clone.status = project.status
-      clone.services = project.services
-      ;(this.projects.data as any)[project.id] = clone
+      this.projects.data[project.id] = clone
     }
   }
 
