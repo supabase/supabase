@@ -1,6 +1,20 @@
 Pricing Changelog
 
 
+### 31 March 2022
+----
+
+Edge Functions pricing announced
+
+
+### 29 March 2022
+----
+
+— Enterprise pricing plan announced
+
+— Pay as you go plan now the same as the Pro plan
+
+
 27 August 2021
 ----
 
@@ -19,3 +33,5 @@ Pricing Changelog
 ----
 
 Released our Beta pricing.
+
+

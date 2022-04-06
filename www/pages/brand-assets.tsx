@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
 
 const Index = () => {
   // base path for images
@@ -46,12 +47,8 @@ const Index = () => {
           </SectionContainer>
           <SectionContainer>
             <div className="grid grid-cols-12 border dark:border-gray-600 rounded-lg shadow-small">
-              <div className="col-span-12 lg:col-span-5">
-                <img
-                  src={`/brand-assets/logo-preview.jpg`}
-                  width="100%"
-                  className="object-cover h-full rounded-l-lg"
-                />
+              <div className="col-span-12 lg:col-span-5 relative overflow-auto w-full h-60 rounded-lg">
+                <Image src={`/brand-assets/logo-preview.jpg`} layout="fill" objectFit="cover" />
               </div>
               <div className="col-span-12 lg:col-span-7 flex items-center">
                 <div className="p-16">

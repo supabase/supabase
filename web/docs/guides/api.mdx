@@ -133,7 +133,7 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 The REST API and the GraphQL API are both accessible through this URL: 
 
 - REST: `https://<project_ref>.supabase.com/rest/v1`
-- GraphQL: `https://<project_ref>.supabase.com/rest/v1`
+- GraphQL: `https://<project_ref>.supabase.com/graphql/v1`
 
 Both of these routes require the `anon` key to be passed through an `apikey` header.
 
@@ -244,7 +244,7 @@ While pg_graphql is in beta, we have disabled GraphQL auto-refreshing. If you wa
 
 :::
 
-You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urlql](https://formidable.com/open-source/urql/docs/). 
+You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/). 
 
 <Tabs
 defaultValue="Javascript"
@@ -275,9 +275,13 @@ const client = createClient({
 // Prepare our GraphQL query
 const TodosQuery = `
   query {
-    todos {
-      id
-      title
+    todosCollection {
+      edges {
+        node {
+          id
+          title
+        }
+      }
     }
   }
 `

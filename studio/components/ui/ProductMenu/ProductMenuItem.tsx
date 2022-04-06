@@ -10,6 +10,7 @@ interface Props {
   url?: string
   target?: '_blank' | '_self'
   onClick?: () => void
+  textClassName?: string
 }
 
 const ProductMenuItem: FC<Props> = ({
@@ -20,11 +21,14 @@ const ProductMenuItem: FC<Props> = ({
   url = '',
   target = '_self',
   onClick,
+  textClassName = '',
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
       <div className="flex w-full justify-between">
-        <Typography.Text className="truncate flex items-center">{name}</Typography.Text>
+        <span className={'truncate flex items-center ' + textClassName}>
+          {name}
+        </span>
         {action}
       </div>
     </Menu.Item>

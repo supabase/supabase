@@ -79,14 +79,6 @@
         }
       },
       {
-        "title": "Monthly Active Users",
-        "tiers": {
-          "free": "10,000 Users",
-          "pro": "100,000 Users",
-          "enterprise": "Unlimited"
-        }
-      },
-      {
         "title": "Social OAuth providers",
         "tiers": {
           "free": true,
@@ -180,6 +172,44 @@
           "free": "Up to 50MB",
           "pro": "Up to 5GB",
           "enterprise": "Unlimited"
+        }
+      }
+    ]
+  },
+  "edge-functions": {
+    "title": "Edge Functions",
+    "icon": "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+    "features": [
+      {
+        "title": "Runtime hours",
+        "tiers": {
+          "free": "100 hours",
+          "pro": "1,000 hours",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Invocations",
+        "tiers": {
+          "free": "500K",
+          "pro": "2 Million",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Script size",
+        "tiers": {
+          "free": "1 mb",
+          "pro": "10 mb",
+          "enterprise": "unlimited"
+        }
+      },
+      {
+        "title": "Number of functions",
+        "tiers": {
+          "free": "10",
+          "pro": "100",
+          "enterprise": "unlimited"
         }
       }
     ]

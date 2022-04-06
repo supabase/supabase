@@ -10937,8 +10937,9 @@
 						}
 					],
 					"type": {
-						"type": "literal",
-						"value": "sms"
+						"type": "reference",
+						"id": 556,
+						"name": "MobileOTPType"
 					}
 				}
 			],
@@ -11058,8 +11059,17 @@
 				}
 			],
 			"type": {
-				"type": "literal",
-				"value": "sms"
+				"type": "union",
+				"types": [
+					{
+						"type": "literal",
+						"value": "sms"
+					},
+					{
+						"type": "literal",
+						"value": "phone_change"
+					}
+				]
 			}
 		},
 		{
