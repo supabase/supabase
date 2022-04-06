@@ -36,7 +36,6 @@ const Hero = () => {
                           Postgres Database, Authentication, instant APIs, Realtime subscriptions
                           and Storage.
                         </p>
-                        <p className="p text-base">Serverless functions coming soon</p>
                       </div>
                     </div>
                     <div className="flex gap-2 items-center">
