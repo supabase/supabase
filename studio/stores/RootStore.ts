@@ -69,10 +69,17 @@ export class RootStore implements IRootStore {
     )
   }
 
+  /**
+   * Set selected project reference
+   *
+   * This method will also trigger project detail loading when it's not available
+   */
   setProjectRef(value?: string) {
     if (this.ui.selectedProject?.ref === value) return
     if (value) {
-      // fetch project detail when connectionString is not available
+      // fetch project detail when
+      // - project not found yet. projectStore is loading
+      // - connectionString is not available. projectStore loaded
       const found = this.app.projects.find((x: Project) => x.ref == value)
       if (!found || !found.connectionString) {
         this.app.projects.fetchDetail(value)
