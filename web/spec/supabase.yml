@@ -1828,6 +1828,19 @@ pages:
               sortBy: { column: 'name', order: 'asc' },
             })
           ```
+      - name: Search files in a bucket
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+              search: 'jon'
+            })
+          ```
 
   Using Modifiers:
     description: |

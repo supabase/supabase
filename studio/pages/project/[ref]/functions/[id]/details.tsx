@@ -83,7 +83,7 @@ const PageLayout: NextPageWithLayout = () => {
     },
     {
       command: `supabase secrets unset NAME1 NAME2 `,
-      description: 'This will deleet secrets for your project',
+      description: 'This will delete secrets for your project',
       jsx: () => {
         return (
           <>
@@ -91,7 +91,7 @@ const PageLayout: NextPageWithLayout = () => {
           </>
         )
       },
-      comment: 'Set secrets for your project',
+      comment: 'Unset secrets for your project',
     },
   ]
 
