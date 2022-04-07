@@ -422,19 +422,14 @@ If they detect any keys with service_role privileges being pushed to GitHub, the
 
 ### Safeguards towards accidental deletes and updates
 
-For new projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
+For all projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
 This ensures that any `delete()` or `update()` would fail if there are no accompanying filters provided.
-This can be disabled by running the following query on the SQL editor on the dashboard:
-
+To confirm that safeupdate is enabled for queries going through the API of your project, the following query could be run:
 ```sql
-alter role "authenticator"
-set "session_preload_libraries" to default;
+select usename,useconfig from pg_shadow where usename = 'authenticator' ;
 ```
 
-To reenable it :
-```sql
-alter role "authenticator" 
-set "session_preload_libraries" = 'safeupdate';
+The expected value for `useconfig` should be:
 ```
-The above can also be run to enable it for existing projects. Settings are applied immediately and as such no restarts are needed after running any of the two.
-
+["session_preload_libraries=supautils, safeupdate"]
+```
