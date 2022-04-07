@@ -100,7 +100,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <p className="mb-4 lg:h-12">
+              <p className="mb-4 -mt-[1.9rem]">
                 <div className="grid grid-rows-2 grid-flow-col gap-2 xl:w-64">
                   <div className="w-fit flex items-center">
                     <svg
@@ -138,7 +138,7 @@ function AuthPage() {
               </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <p className="p mb-4 lg:h-12">
+              <p className="p mb-4">
                 <IconLink />
               </p>
               <h4 className="h4">Fully integrated</h4>
@@ -148,7 +148,7 @@ function AuthPage() {
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p className="p mb-4 lg:h-12">
+              <p className="p mb-4">
                 <IconShield />
               </p>
               <h4 className="h4">Own your data</h4>
