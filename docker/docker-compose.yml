@@ -85,7 +85,7 @@ services:
     restart: unless-stopped
     environment:
       PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
-      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_SCHEMAS: public,storage, graphql_public
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
@@ -151,7 +151,7 @@ services:
 
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0
+    image: supabase/postgres:14.1.0.19
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     restart: unless-stopped
     ports:

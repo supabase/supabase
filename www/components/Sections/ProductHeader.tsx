@@ -1,4 +1,4 @@
-import { Button, IconBookOpen, IconKey, Space, Typography } from '@supabase/ui'
+import { Button, IconBookOpen } from '@supabase/ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 
@@ -16,41 +16,44 @@ interface Types {
 const ProductHeader = (props: Types) => (
   <div className="container mx-auto px-6 sm:px-16 xl:px-20 relative pt-16 lg:pt-32 pb-0">
     <div className="grid grid-cols-12">
-      <div className="col-span-12 lg:col-span-5">
-        {props.icon || props.title ? (
-          <div className="flex flex-row mb-4 item-center">
-            {props.icon && <ProductIcon icon={props.icon} />}
-            {props.title && (
-              <Typography.Title level={4} className="ml-3" key={`product-name-${props.title}`}>
-                {props.title}
-              </Typography.Title>
-            )}
-          </div>
-        ) : null}
-        <Typography.Title level={1} key={`h1`}>
-          {props.h1}
-        </Typography.Title>
-        {props.subheader && (
-          <Typography.Text>
-            {props.subheader.map((subheader, i) => {
+      <div className="col-span-12 lg:col-span-5 space-y-8">
+        <div>
+          {props.icon || props.title ? (
+            <div className="flex mb-4 items-center gap-3">
+              {props.icon && <ProductIcon icon={props.icon} />}
+              {props.title && (
+                <span className="text-scale-1200" key={`product-name-${props.title}`}>
+                  {props.title}
+                </span>
+              )}
+            </div>
+          ) : null}
+          <h1 className="h1" key={`h1`}>
+            {props.h1}
+          </h1>
+        </div>
+        <div>
+          {props.subheader &&
+            props.subheader.map((subheader, i) => {
               return (
-                <p className="lg:text-lg" key={i}>
+                <p className="p lg:text-lg" key={i}>
                   {subheader}
                 </p>
               )
             })}
-          </Typography.Text>
-        )}
-        <div className="mt-12 flex flex-row md:flex-row md:items-center">
+        </div>
+        <div className="flex flex-row md:flex-row md:items-center">
           <Link href="https://app.supabase.io/" as="https://app.supabase.io/">
             <a>
-              <Button size="medium">Start a project</Button>
+              <Button size="medium" className="text-white">
+                Start a project
+              </Button>
             </a>
           </Link>
           {props.documentation_url && (
             <Link href={props.documentation_url} as={props.documentation_url}>
               <a className="ml-2">
-                <Button type="text" size="medium" icon={<IconBookOpen />}>
+                <Button type="default" size="medium" icon={<IconBookOpen />}>
                   See documentation
                 </Button>
               </a>

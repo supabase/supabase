@@ -113,6 +113,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Functions',
+      collapsed: false,
+      items: ['guides/functions'],
+    },
+    {
+      type: 'category',
       label: 'Auth',
       collapsed: false,
       items: [
@@ -132,16 +138,18 @@ module.exports = {
             'guides/auth/auth-github',
             'guides/auth/auth-gitlab',
             'guides/auth/auth-google',
+            'guides/auth/auth-keycloak',
             'guides/auth/auth-linkedin',
             'guides/auth/auth-notion',
             'guides/auth/auth-slack',
             'guides/auth/auth-spotify',
             'guides/auth/auth-twitch',
             'guides/auth/auth-twitter',
+            'guides/auth/auth-workos',
+            'guides/auth/auth-zoom',
             'guides/auth/auth-twilio',
             'guides/auth/auth-vonage',
             'guides/auth/auth-messagebird',
-            'guides/auth/auth-zoom',
           ],
         },
         {

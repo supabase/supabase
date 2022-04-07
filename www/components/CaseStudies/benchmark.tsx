@@ -1,4 +1,4 @@
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 const Benchmark = () => {
@@ -18,17 +18,17 @@ const Benchmark = () => {
             alt="Benchmark illustration"
           />
           <div className="px-12 py-5 lg:px-0 lg:py-0">
-            <Typography.Title level={4}>
+            <h4>
               <span className="text-white">Built for speed and reliability</span>
-            </Typography.Title>
-            <Typography.Text type="secondary">
+            </h4>
+            <p>
               <span className="block text-gray-300">
                 Supabase outperforms equivalent systems by more than 300%.
               </span>
               <span className="block text-gray-300">
                 Sign up for our public benchmark release and we'll send it to your inbox.
               </span>
-            </Typography.Text>
+            </p>
           </div>
         </div>
         <div className="pb-12 px-12 col-span-1 lg:pb-0 lg:px-0 lg:col-span-2 rounded-r-md">

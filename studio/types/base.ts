@@ -8,7 +8,6 @@ export interface Organization {
   projects: any[]
   is_owner?: boolean
   stripe_customer_id?: string
-  stripe_customer_object?: any
   total_free_projects?: number
   total_paid_projects?: number
 }
@@ -21,9 +20,12 @@ export interface Project {
   organization_id: number
   cloud_provider: string
   region: string
-  connectionString: string
   inserted_at: string
   subscription_id: string
+
+  // only available after projects.fetchDetail
+  kpsVersion?: string
+  connectionString?: string
 
   // Possibly deprecated, just double check
   subscription_tier?: string

@@ -6,7 +6,7 @@ export const formatComputeSizes = (computeSizes: any[]) => {
 
   const microOption = {
     id: '',
-    name: 'Optimized database instance [Micro]',
+    name: 'Micro Add-on',
     description: 'Basic set up to get started',
     metadata: {
       default_price_id: undefined,

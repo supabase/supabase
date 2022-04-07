@@ -7,9 +7,12 @@ import 'styles/toast.scss'
 import 'styles/code.scss'
 import 'styles/monaco.scss'
 import 'styles/contextMenu.scss'
+import 'styles/react-data-grid-logs.scss'
+import 'styles/date-picker.scss'
 
 import Head from 'next/head'
-import type { AppProps } from 'next/app'
+import { AppPropsWithLayout } from 'types'
+
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { RootStore } from 'stores'
@@ -21,7 +24,7 @@ import { PortalToast, GoTrueWrapper, RouteValidationWrapper } from 'components/i
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [rootStore] = useState(() => new RootStore())
   const router = useRouter()
 
@@ -36,6 +39,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [])
 
+  const getLayout = Component.getLayout ?? ((page) => page)
+
   return (
     <StoreProvider rootStore={rootStore}>
       <FlagProvider>
@@ -47,7 +52,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <GoTrueWrapper>
           <PageTelemetry>
             <RouteValidationWrapper>
-              <Component {...pageProps} />
+              {getLayout(<Component {...pageProps} />)}
             </RouteValidationWrapper>
           </PageTelemetry>
         </GoTrueWrapper>

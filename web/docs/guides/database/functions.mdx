@@ -1,6 +1,6 @@
 ---
 id: functions
-title: Functions
+title: Database Functions
 description: Creating and using Postgres functions.
 ---
 
@@ -10,6 +10,12 @@ import TabItem from '@theme/TabItem';
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html). 
 These functions live inside your database, and they can be [used with the API](/docs/reference/javascript/rpc).
+
+## Database vs Edge Functions
+
+For data-intensive operations we recommend using Database Functions, which are executed within your database, and can be called remotely using the REST and GraphQL API.
+
+If you are looking for Typescript Functions which are globally deployed, check out [Edge Functions](/docs/guides/functions).
 
 ## Quick demo
 

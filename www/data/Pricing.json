@@ -29,20 +29,11 @@
         }
       },
       {
-        "title": "Optimized database instances",
-        "tooltip": "Why? Unique workload requirements, heavy reads and writes, compliance",
-        "tiers": {
-          "free": false,
-          "pro": false,
-          "enterprise": "Starting from $50/month"
-        }
-      },
-      {
         "title": "Database space",
         "tiers": {
           "free": "Up to 500 MB",
-          "pro": "Up to 8 GB",
-          "enterprise": "$0.125 per GB"
+          "pro": "8 GB included, then $0.125 per GB",
+          "enterprise": "Unlimited"
         }
       },
       {
@@ -68,8 +59,8 @@
         "tooltip": "Good news, only download operations are counted towards the limit",
         "tiers": {
           "free": "Up to 2GB",
-          "pro": "Up to 50GB",
-          "enterprise": "$0.09 per GB"
+          "pro": "50GB included, then $0.09 per GB",
+          "enterprise": "Unlimited"
         }
       }
     ]
@@ -79,10 +70,11 @@
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
     "features": [
       {
-        "title": "Users",
+        "title": "Total Users",
+        "tooltip": "The maximum number of users your project can have",
         "tiers": {
-          "free": "10,000 Users",
-          "pro": "100,000 Users",
+          "free": "Unlimited",
+          "pro": "Unlimited",
           "enterprise": "Unlimited"
         }
       },
@@ -125,19 +117,36 @@
           "pro": "7 days",
           "enterprise": true
         }
+      },
+      {
+        "title": "Custom SMTP",
+        "tiers": {
+          "free": true,
+          "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Supabase Auth emails",
+        "tooltip": "Rate limits do not apply to Custom SMTP",
+        "tiers": {
+          "free": "30 / hour",
+          "pro": "100 / hour",
+          "enterprise": "Contact Us"
+        }
       }
     ]
   },
   "storage": {
-    "title": "Object storage",
+    "title": "Storage",
     "icon": "M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4",
     "features": [
       {
         "title": "Storage total",
         "tiers": {
           "free": "Up to 1 GB",
-          "pro": "Up to 100 GB",
-          "enterprise": "$0.021 per GB"
+          "pro": "100 GB included, then $0.021 per GB",
+          "enterprise": "Unlimited"
         }
       },
       {
@@ -145,8 +154,8 @@
         "tooltip": "Good news, only download operations are counted towards the limit",
         "tiers": {
           "free": "Up to 2 GB",
-          "pro": "Up to 200 GB",
-          "enterprise": "$0.09 per GB"
+          "pro": "200 GB included, then $0.09 per GB",
+          "enterprise": "Unlimited"
         }
       },
       {
@@ -156,12 +165,58 @@
           "pro": true,
           "enterprise": true
         }
+      },
+      {
+        "title": "Max file upload size",
+        "tiers": {
+          "free": "Up to 50MB",
+          "pro": "Up to 5GB",
+          "enterprise": "Unlimited"
+        }
+      }
+    ]
+  },
+  "edge-functions": {
+    "title": "Edge Functions",
+    "icon": "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+    "features": [
+      {
+        "title": "Runtime hours",
+        "tiers": {
+          "free": "100 hours",
+          "pro": "1,000 hours",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Invocations",
+        "tiers": {
+          "free": "500K",
+          "pro": "2 Million",
+          "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "Script size",
+        "tiers": {
+          "free": "1 mb",
+          "pro": "10 mb",
+          "enterprise": "unlimited"
+        }
+      },
+      {
+        "title": "Number of functions",
+        "tiers": {
+          "free": "10",
+          "pro": "100",
+          "enterprise": "unlimited"
+        }
       }
     ]
   },
   "dashboard": {
     "title": "Dashboard",
-    "icon": "",
+    "icon": "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
     "features": [
       {
         "title": "Team members",
@@ -191,7 +246,7 @@
   },
   "support": {
     "title": "Support and Compliance",
-    "icon": "",
+    "icon": "M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z",
     "features": [
       {
         "title": "Community support",
@@ -206,6 +261,14 @@
         "tiers": {
           "free": false,
           "pro": true,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Email support SLA",
+        "tiers": {
+          "free": false,
+          "pro": false,
           "enterprise": true
         }
       },
@@ -242,11 +305,43 @@
         }
       },
       {
+        "title": "Metrics endpoint",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
         "title": "SOC2",
         "tiers": {
           "free": false,
           "pro": false,
           "enterprise": "Coming soon"
+        }
+      },
+      {
+        "title": "SSO",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": "Contact Us"
+        }
+      },
+      {
+        "title": "99.9% SLA",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "On Boarding Support",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
         }
       }
     ]

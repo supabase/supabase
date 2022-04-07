@@ -30,6 +30,9 @@ info:
           - auth.update()
           - auth.onAuthStateChange()
           - Reset Password (Email)
+      - name: 'Functions'
+        items:
+          - invoke()
       - name: 'Database'
         items:
           - select()
@@ -361,6 +364,60 @@ pages:
           );
 
           final error = res.error;
+          ```
+  invoke():
+    title: 'invoke()'
+    description: |
+      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
+
+      :::caution
+
+      Supabase Functions are in Experimental release until 1 August 2022. There will breaking changes. Do not use them in Production.
+
+      :::
+
+      We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
+      There will be breaking changes with no notice.
+
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+    examples:
+      - name: Basic invocation.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'});
+          final data = res.data;
+          final error = res.error;
+          ```
+      - name: Specifying response type.
+        description: |
+          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            responseType: ResponseType.text,
+          );
+          final data = res.data;
+          final error = res.error;
+          ```
+      - name: Parsing custom headers.
+        description: |
+          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            headers: {
+              'Authorization': 'Bearer ${supabase.auth.session()?.access_token}'
+            },
+          );
           ```
   select():
     description: |
@@ -1220,7 +1277,7 @@ pages:
         .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
         .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
         .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
-        ```  
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1257,15 +1314,15 @@ pages:
     description: |
       Finds all rows which doesn't satisfy the filter.
     notes: |
-          - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
-            ```dart
-            .not('name','eq','Paris')
-            .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
-            .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-            .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-            .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
-            ```
+        ```dart
+        .not('name','eq','Paris')
+        .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+        .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+        .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true

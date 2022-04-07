@@ -13,6 +13,7 @@ interface Props {
   imgAlt?: string
   onClick?: () => void
   icon?: React.ReactNode
+  containerHeightClassName?: string
 }
 
 const CardButton: FC<Props> = ({
@@ -26,9 +27,12 @@ const CardButton: FC<Props> = ({
   imgAlt,
   onClick,
   icon,
+  containerHeightClassName="h-32"
 }) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>{children}</Link>
+    <Link href={linkHref}>
+      <a>{children}</a>
+    </Link>
   )
   const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
   const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
@@ -42,8 +46,9 @@ const CardButton: FC<Props> = ({
     'group relative text-left',
     'bg-panel-header-light dark:bg-panel-header-dark',
     'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row h-32',
+    'rounded-md py-4 px-6 flex flex-row',
     'transition ease-in-out duration-150',
+    containerHeightClassName
   ]
 
   if (isLink) {
