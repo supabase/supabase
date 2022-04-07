@@ -1,15 +1,9 @@
-import { Typography } from '@supabase/ui'
-
 function FeatureColumn({ icon, title, text }: any) {
   return (
     <>
-      <Typography.Text>
-        <p>{icon}</p>
-      </Typography.Text>
-      <Typography.Title level={4}>{title}</Typography.Title>
-      <Typography.Text>
-        <p>{text}</p>
-      </Typography.Text>
+      {icon && <div className="mb-2">{icon}</div>}
+      <h4 className="text-base text-scale-1200 mb-4">{title}</h4>
+      <p className="p">{text}</p>
     </>
   )
 }

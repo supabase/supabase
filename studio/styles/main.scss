@@ -192,3 +192,14 @@ div.fixed.inset-0 {
 .recharts-tooltip-cursor {
   @apply fill-transparent;
 }
+
+.expandable-tr {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.expanded-row-content {
+  display: grid;
+  grid-column: 1/-1;
+  justify-content: flex-start;
+}

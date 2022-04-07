@@ -5,14 +5,70 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 24 Mar 2022 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 31 Mar 2022 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
-  <guid>https://supabase.com/blog/2022/03/25/supabase-launch-week-three</guid>
+  <guid>https://supabase.com/blog/2022/04/01/supabrew</guid>
+  <title>Supabrew - Never Code Thirsty</title>
+  <link>https://supabase.com/blog/2022/04/01/supabrew</link>
+  <description>A light and refreshing non-alcoholic beer for devs.</description>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features</guid>
+  <title>Supabase Realtime, with Multiplayer Features</title>
+  <link>https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features</link>
+  <description>Today we're announced Realtime, with multiplayer features. Realtime enables broadcast, presence, and listening to database changes delivered over WebSockets.</description>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/04/01/hackathon-bring-the-func</guid>
+  <title>Hackathon: Bring the Func(🕺)</title>
+  <link>https://supabase.com/blog/2022/04/01/hackathon-bring-the-func</link>
+  <description>Build open-source projects with our latest features, win limited edition swag and plant a tree!</description>
+  <pubDate>Thu, 31 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/03/31/supabase-edge-functions</guid>
+  <title>Edge Functions are now available in Supabase</title>
+  <link>https://supabase.com/blog/2022/03/31/supabase-edge-functions</link>
+  <description>Today we're launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.</description>
+  <pubDate>Wed, 30 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/03/30/supabase-enterprise</guid>
+  <title>Introducing Supabase Enterprise</title>
+  <link>https://supabase.com/blog/2022/03/30/supabase-enterprise</link>
+  <description>Today we are releasing Supabase Enterprise, a suite of features to scale your project.</description>
+  <pubDate>Tue, 29 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/03/29/graphql-now-available</guid>
+  <title>GraphQL is now available in Supabase</title>
+  <link>https://supabase.com/blog/2022/03/29/graphql-now-available</link>
+  <description>GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql (beta).</description>
+  <pubDate>Mon, 28 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/03/28/community-day</guid>
+  <title>Community Day</title>
+  <link>https://supabase.com/blog/2022/03/28/community-day</link>
+  <description>Kicking off Launch Week IV with contributors, partners, and friends.</description>
+  <pubDate>Sun, 27 Mar 2022 22:00:00 GMT</pubDate>
+</item>
+
+<item>
+  <guid>https://supabase.com/blog/2022/03/25/supabase-launch-week-four</guid>
   <title>Supabase Launch Week IV</title>
-  <link>https://supabase.com/blog/2022/03/25/supabase-launch-week-three</link>
-  <description>TODO.</description>
+  <link>https://supabase.com/blog/2022/03/25/supabase-launch-week-four</link>
+  <description>Launch Week 4: One new feature every day for an entire week. Starting Monday 28th March.</description>
   <pubDate>Thu, 24 Mar 2022 23:00:00 GMT</pubDate>
 </item>
 

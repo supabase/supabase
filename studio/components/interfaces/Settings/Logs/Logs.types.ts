@@ -21,10 +21,12 @@ export interface LogData {
   timestamp: number
   event_message: string
   metadata: Metadata
+  [other: string]: unknown
 }
 
 export interface LogTemplate {
   label?: string
+  description?: string
   mode: 'custom' | 'simple'
   for?: string[]
   searchString: string
@@ -44,3 +46,26 @@ type LFResponse<T> = {
 export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
+
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge'
+
+export type Mode = 'simple' | 'custom'
+
+export type Table = 'edge_logs' | 'postgres_logs'
+
+export interface FilterObject {
+  // severity?: string[]
+  // status_code?: string[]
+
+  // `q` for the editor query.
+  q?: string
+  // `s` for search query.
+  s?: string
+  // `te` for timestamp start value.
+  te?: string
+}
+
+export type Override = {
+  key: string
+  value: string | string[] | undefined
+}

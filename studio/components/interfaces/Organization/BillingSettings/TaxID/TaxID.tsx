@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Input, Button, IconLoader, IconPlus, Select, IconX } from '@supabase/ui'
+import { Input, Button, IconPlus, Select, IconX } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
@@ -26,7 +26,15 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   const [errors, setErrors] = useState<string[]>([])
   const [taxIdValues, setTaxIdValues] = useState(taxIds)
   const formattedTaxIds = taxIds.map((taxId: any) => {
-    return { id: taxId.id, type: taxId.type, value: taxId.value }
+    return {
+      id: taxId.id,
+      type: taxId.type,
+      value: taxId.value,
+      name:
+        taxId.type === 'eu_vat'
+          ? `${taxId.country} VAT`
+          : TAX_IDS.find((option) => option.code === taxId.type)?.name ?? '',
+    }
   })
 
   useEffect(() => {
@@ -43,7 +51,12 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   const onUpdateTaxId = (id: string, key: string, value: string) => {
     const updatedTaxIds = taxIdValues.map((taxId: any) => {
       if (taxId.id === id) {
-        return { ...taxId, [key]: value }
+        if (key === 'name') {
+          const selectedTaxIdOption = TAX_IDS.find((option) => option.name === value)
+          return { ...taxId, [key]: value, type: selectedTaxIdOption?.code }
+        } else {
+          return { ...taxId, [key]: value }
+        }
       }
       return taxId
     })
@@ -51,7 +64,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }
 
   const onAddNewTaxId = () => {
-    const newTaxId = { id: uuidv4(), type: 'ae_trn', value: '' }
+    const newTaxId = { id: uuidv4(), type: TAX_IDS[0].code, value: '', name: TAX_IDS[0].name }
     const updatedTaxIds = taxIdValues.concat([newTaxId])
     setTaxIdValues(updatedTaxIds)
   }
@@ -156,21 +169,22 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
             {taxIdValues.length >= 1 ? (
               <div className="w-full space-y-2">
                 {taxIdValues.map((taxId: any, idx: number) => {
+                  const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
                   return (
                     <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
                       <Select
-                        value={taxId.type}
-                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'type', e.target.value)}
+                        value={selectedTaxId?.name}
+                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e.target.value)}
                       >
-                        {Object.keys(TAX_IDS).map((taxId: string) => (
-                          <Select.Option key={taxId} value={taxId}>
-                            {taxId.replace('_', ' ').toUpperCase()}
+                        {TAX_IDS.map((option) => (
+                          <Select.Option key={option.name} value={option.name}>
+                            {option.name}
                           </Select.Option>
                         ))}
                       </Select>
                       <Input
                         value={taxId.value}
-                        placeholder={(TAX_IDS as any)[taxId.type]?.placeholder ?? ''}
+                        placeholder={selectedTaxId?.placeholder ?? ''}
                         onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
                       />
                       <Button

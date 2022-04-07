@@ -8,6 +8,7 @@ info:
 
     - [x] Running Supabase locally
     - [x] Managing database migrations
+    - [x] Creating and developing Edge Functions
     - [x] Pushing your local changes to production
     - [ ] Manage your Supabase Account
     - [ ] Manage your Supabase Projects
@@ -22,61 +23,6 @@ info:
 
     Follow the [Local Development guide](/docs/guides/local-development) for a quick overview of the CLI functionality.
 
-    ## Installing the CLI
-
-    ### macOS
-
-    Available via [Homebrew](https://brew.sh). To install:
-
-    ```sh
-    brew install supabase/tap/supabase
-    ```
-
-    To upgrade:
-
-    ```sh
-    brew upgrade supabase
-    ```
-
-    ### Windows
-
-    Available via [Scoop](https://scoop.sh). To install:
-
-    ```powershell
-    scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-    scoop install supabase
-    ```
-
-    To upgrade:
-
-    ```powershell
-    scoop update supabase
-    ```
-
-    ### Linux
-
-    Available via [Homebrew](https://brew.sh) and Linux packages.
-
-    #### via Homebrew
-
-    To install:
-
-    ```sh
-    brew install supabase/tap/supabase
-    ```
-
-    To upgrade:
-
-    ```sh
-    brew upgrade supabase
-    ```
-
-    #### via Linux packages
-
-    Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
-    To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager 
-    and run `sudo apk add --allow-untrusted <...>.apk`/`sudo dpkg -i <...>.deb`/`sudo rpm -i <...>.rpm` respectively.
-
     ## Support
 
     Report issues to our [issue tracker](https://github.com/supabase/cli/issues).
@@ -89,14 +35,19 @@ info:
   docs:
     path: reference/cli/
     sidebar:
-      - name: 'About'
+      - name: 'Getting Started'
         items:
           - index
+          - Installing and Updating
+          - Config reference
       - name: 'Command reference'
         items:
           - supabase help
+          - supabase login
+          - supabase link
           - supabase init
           - supabase start
+          - supabase stop
           - supabase db branch list
           - supabase db branch create
           - supabase db branch delete
@@ -107,22 +58,56 @@ info:
           - supabase db remote set
           - supabase db remote commit
           - supabase db push
+          - supabase functions delete
+          - supabase functions deploy
+          - supabase functions new
+          - supabase functions serve
           - supabase migration new
-      - name: 'Config reference'
-        items:
-          - Config reference
+          - supabase secrets list
+          - supabase secrets set
+          - supabase secrets unset
 
 pages:
   supabase help:
     description: |
       Help provides help for any command in the application.
-
       Simply type supabase help `[path to command]` for full details.
     examples:
       - name: Usage
         sh: |
           ```sh
           supabase help [command]
+          ```
+
+  supabase login:
+    description: |
+      Authenticate using an access token.
+
+      ### Generating a new access token
+
+      - Navigate to https://app.supabase.io/account/tokens
+      - Generate New Token
+      - Copy newly created token and past
+
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase login
+          ```
+
+  supabase link:
+    description: |
+      Link to a Supabase project.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase link --project-ref abcdefghijklmnopqrst
           ```
 
   supabase init:
@@ -143,6 +128,16 @@ pages:
         sh: |
           ```sh
           supabase start
+          ```
+
+  supabase stop:
+    description: |
+      Stop the Supabase local development setup.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase stop
           ```
 
   supabase db branch list:
@@ -243,11 +238,63 @@ pages:
   supabase db push:
     description: |
       Push new migrations to the remote database.
+
+      Flags:
+
+      `--dry-run`: Print the migrations that would be applied, but don't actually apply them.
     examples:
       - name: Usage
         sh: |
           ```sh
-          supabase db push
+          supabase db push [--dry-run]
+          ```
+
+  supabase functions delete:
+    description: |
+      Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions delete <Function name>
+          ```
+
+  supabase functions deploy:
+    description: |
+      Deploy a Function to the linked Supabase project.
+
+      Flags:
+
+      `--project-ref`: Project ref of the Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions deploy <Function name>
+          ```
+
+  supabase functions new:
+    description: |
+      Create a new Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions new <Function name>
+          ```
+
+  supabase functions serve:
+    description: |
+      Serve a Function locally.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase functions serve <Function name>
           ```
 
   supabase migration new:
@@ -260,42 +307,250 @@ pages:
           supabase migration new <migration name>
           ```
 
+  supabase secrets list:
+    description: |
+      List all secrets in the linked project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets list
+          ```
+
+  supabase secrets set:
+    description: |
+      Set a secret(s) to the linked Supabase project.
+
+      Flags:
+
+      `--env-file`: Read secrets from a .env file.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets set [flags] <NAME=VALUE> ...
+          ```
+
+  supabase secrets unset:
+    description: |
+      Unset a secret(s) from the linked Supabase project.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase secrets unset <NAME> ...
+          ```
+
+  Installing and Updating:
+    description: |
+      ## macOS
+
+      ### Installing
+
+      Available via [Homebrew](https://brew.sh). To install:
+
+      ```sh
+      brew install supabase/tap/supabase
+      ```
+
+      ### Upgrading
+
+      To upgrade:
+
+      ```sh
+      brew upgrade supabase
+      ```
+
+      ## Windows
+
+      ### Installing
+
+      Available via [Scoop](https://scoop.sh). To install:
+
+      ```powershell
+      scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+      scoop install supabase
+      ```
+
+      ### Upgrading
+
+      To upgrade:
+
+      ```powershell
+      scoop update supabase
+      ```
+
+      ## Linux
+
+      ### Homebrew
+
+      Available via [Homebrew](https://brew.sh) and Linux packages.
+
+      To install:
+
+      ```sh
+      brew install supabase/tap/supabase
+      ```
+
+      To upgrade:
+
+      ```sh
+      brew upgrade supabase
+      ```
+
+      ### Linux packages
+
+      Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
+      To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager 
+      and run one of the following:
+      
+      - `sudo apk add --allow-untrusted <...>.apk`
+      - `sudo dpkg -i <...>.deb`
+      - `sudo rpm -i <...>.rpm`
+
   Config reference:
     description: |
-      The config file resides in `supabase/config.json` after you run `supabase init`.
-
-      ### `projectId` 
+      A `config.toml` file is generated after running `supabase init`. 
       
+      This file is located in the `supabase` folder under `supabase/config.toml`.
+
+      ## General
+
+      ### `project_id`
+
       `required`
 
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
-      ### `ports.api`
+      ## API 
+
+      ### `api.port`
+
+      `required | default: 54321`
+
+      Port to use for the API URL.
+
+      ### `api.schemas`
+
+      `required | default: []`
+
+      Schemas to expose in your API. Tables, views and stored procedures in this schema will get API endpoints. `public` and `storage` are always included.
+
+      ### `api.extra_search_path`
+
+      `required | default: ["extensions"]`
+
+      Extra schemas to add to the search_path of every request.
+
+      ### `api.max_rows`
+
+      `required | default: 1000`
+
+      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+
+      ## Database 
+
+      ### `db.port`
+
+      `required | default: 54322`
+
+      Port to use for the local database URL.
+
+      ### `db.major_version`
+
+      `required | default: 14`
+
+      The database major version to use. This has to be the same as your remote database's. Run `SHOW server_version;` on the remote database to check.
+
+      ## Dashboard 
+
+      ### `studio.port`
+
+      `required | default: 54323`
+
+      Port to use for Supabase Studio.
+
+      ## Local Development 
+
+      ### `inbucket.port`
+
+      `required | default: 54324`
+
+      Port to use for the email testing server web interface.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+
+      ## Auth 
+
+      ### `auth.site_url`
+
+      `required | default: "http://localhost:3000"`
+
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+
+      ### `auth.additional_redirect_urls`
+
+      `required | default: ["https://localhost:3000"]`
+
+      A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+
+      ### `auth.jwt_expiry`
+
+      `required | default: 3600`
+
+      How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
+
+      ### `auth.enable_signup`
+
+      `required | default: true`
+
+      Allow/disallow new user signups to your project.
+
+      ### `auth.email.enable_signup`
+
+      `required | default: true`
+
+      Allow/disallow new user signups via email to your project.
+
+      ### `auth.email.double_confirm_changes`
+
+      `required | default: true`
+
+      If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
+
+      ### `auth.email.enable_confirmations`
+
+      `required | default: true`
+
+      If enabled, users need to confirm their email address before signing in.
+
+      ### `auth.external.<provider>.enabled`
+
+      `required | default: false`
+
+      Use an external OAuth provider. The full list of providers are: 
       
-      `required`
+      - `apple`
+      - `azure`
+      - `bitbucket`
+      - `discord`
+      - `facebook`
+      - `github`
+      - `gitlab`
+      - `google`
+      - `twitch`
+      - `twitter`
+      - `slack`
+      - `spotify`
 
-      Host port used for the API URL. Defaults to `54321`.
+      ### `auth.external.<provider>.client_id`
 
-      ### `ports.db`
-      
-      `required`
+      `required | default: ""`
 
-      Host port used for the DB URL. Defaults to `54322`.
+      Client ID for the external OAuth provider.
 
-      ### `ports.studio` 
-      
-      `required`
+      ### `auth.external.<provider>.secret`
 
-      Host port used for Supabase Studio. Defaults to `54323`.
+      `required | default: ""`
 
-      ### `ports.inbucket` 
-      
-      `optional`
-
-      Host port used for the web interface of Inbucket email testing server. When not specified, emails are automatically confirmed. When specified, emails are not sent to the recipient, but rather monitored and accessible via the web interface.
-
-      ### `dbVersion` 
-      
-      `required`
-
-      Server version number used for the database. This needs to match the server version number of the remote database you intend to link to with `supabase db remote set`. You can retrieve it by running `SHOW server_version_num`.
+      Client secret for the external OAuth provider.

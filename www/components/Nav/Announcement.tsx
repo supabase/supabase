@@ -44,8 +44,8 @@ const Announcement = () => {
         className="
           relative
           cursor-pointer
-          bg-gradient-to-r from-green-400 to-green-600
-          hover:from-green-500 hover:to-green-700        
+          bg-gradient-to-r from-green-900 to-green-1000
+          hover:from-green-1000 hover:to-green-1100        
           text-white 
           flex flex-row space-x-3
         "
@@ -53,7 +53,7 @@ const Announcement = () => {
         <div
           className="
             flex items-center justify-center p-3 mx-auto text-sm lg:container lg:px-16 xl:px-20 font-medium 
-            lg:divide-x divide-green-400
+            lg:divide-x divide-white
           "
         >
           <span className="px-3 hidden lg:block">{announcement.text}</span>
