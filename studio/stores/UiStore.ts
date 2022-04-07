@@ -43,12 +43,19 @@ export default class UiStore implements IUiStore {
     })
   }
 
+  /**
+   * we use this getter to check for project ready.
+   * Only return selectedProject when it has full detail
+   * like connectionString prop
+   *
+   * @returns Project or undefined
+   */
   get selectedProject() {
     if (this.selectedProjectRef) {
       const found = this.rootStore.app.projects.find(
         (x: Project) => x.ref == this.selectedProjectRef
       )
-      return found
+      return !!found?.connectionString ? found : undefined
     }
     return undefined
   }
