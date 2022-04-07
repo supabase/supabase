@@ -6,7 +6,6 @@ import {
   Dropdown,
   Menu,
   Input,
-  Typography,
   IconSearch,
   IconPlus,
   IconX,
@@ -217,7 +216,7 @@ const SideBarContent = observer(() => {
         {(sqlEditorStore?.tabs ?? []).length === 0 ? (
           <div className="my-4 px-7 flex items-center space-x-2">
             <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-            <p>Loading SQL snippets</p>
+            <p className="text-sm">Loading SQL snippets</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -263,7 +262,7 @@ const SideBarContent = observer(() => {
                 )}
                 {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
                   <div className="px-4">
-                    <Typography.Text type="secondary">No queries found</Typography.Text>
+                    <p className="text-sm">No queries found</p>
                   </div>
                 )}
               </div>
