@@ -44,7 +44,7 @@ export default class AppStore implements IAppStore {
           ? project.services[0]?.infrastructure[0]?.app_versions?.version
           : undefined
       const clone = cloneDeep(this.projects.data[project.id])
-      clone.kpsVersion = kpsVersion
+      clone.kpsVersion = kpsVersion ?? clone.kpsVersion
       clone.name = project.name
       clone.status = project.status
       this.projects.data[project.id] = clone
