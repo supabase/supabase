@@ -81,7 +81,6 @@ BEGIN
             returns jsonb
             language sql
         as $$
-            -- This changed
             select graphql.resolve(
                 query := query,
                 variables := coalesce(variables, '{}'),
@@ -160,5 +159,4 @@ EXECUTE PROCEDURE extensions.set_graphql_placeholder();
 COMMENT ON FUNCTION extensions.set_graphql_placeholder IS 'Reintroduces placeholder function for graphql_public.graphql';
 
 drop extension if exists pg_graphql;
--- Avoids limitation of only being able to load the extension via dashboard
 create extension if not exists pg_graphql;
