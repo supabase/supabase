@@ -93,13 +93,22 @@ function useLogsPreview(
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false, dedupingInterval: 3000 })
   let logData: LogData[] = []
 
-  const countUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-    {
-      ...params,
-      sql: genCountQuery(table),
-      period_start: String(latestRefresh),
-    } as any
-  )}`
+  const countUrl = () => {
+    
+    // check that SQL is ready for the count request
+    if(!params.sql || !params.rawSql) {
+      // return empty url to restrict unnecessary requests to api
+      return ''
+    }
+
+    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
+      {
+        ...params,
+        sql: genCountQuery(table),
+        period_start: String(latestRefresh),
+      } as any
+    )}`
+  }
 
   const { data: countData } = useSWR<Count>(countUrl, get, {
     revalidateOnFocus: false,
