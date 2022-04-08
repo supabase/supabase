@@ -61,6 +61,13 @@ function useLogsPreview(
   // handle url generation for log pagination
   const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
     let queryParams
+
+    // check that SQL is ready for the logs request
+    if(!params.sql || !params.rawSql) {
+      // return empty url to restrict unnecessary requests to api
+      return ''
+    }
+
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
