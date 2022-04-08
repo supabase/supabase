@@ -52,7 +52,7 @@ const coolGray = {
 
 module.exports = ui({
   darkMode: 'class', // or 'media' or 'class'
-  purge: [
+  content: [
     // purge styles from app
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
