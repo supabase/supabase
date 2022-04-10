@@ -32,8 +32,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
    * @returns a boolean
    */
   function isExceptUrl() {
-    const found = excemptUrls.includes(router?.pathname)
-    return found
+    return excemptUrls.includes(router?.pathname)
   }
 
   useEffect(() => {
