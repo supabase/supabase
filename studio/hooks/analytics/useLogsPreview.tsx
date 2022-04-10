@@ -64,8 +64,9 @@ function useLogsPreview(
 
     // check that SQL is ready for the logs request
     if(!params.sql || !params.rawSql) {
-      // return empty url to restrict unnecessary requests to api
-      return ''
+      // return null to restrict unnecessary requests to api
+      // https://swr.vercel.app/docs/conditional-fetching#conditional
+      return null
     }
 
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
@@ -97,8 +98,9 @@ function useLogsPreview(
     
     // check that SQL is ready for the count request
     if(!params.sql || !params.rawSql) {
-      // return empty url to restrict unnecessary requests to api
-      return ''
+      // return null to restrict unnecessary requests to api
+      // https://swr.vercel.app/docs/conditional-fetching#conditional
+      return null
     }
 
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
