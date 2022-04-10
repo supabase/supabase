@@ -62,7 +62,7 @@ function useLogsPreview(
   const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
     let queryParams
 
-    // check that SQL is ready for the logs request
+    // cancel request if no sql provided
     if(!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
@@ -96,7 +96,7 @@ function useLogsPreview(
 
   const countUrl = () => {
     
-    // check that SQL is ready for the count request
+    // cancel request if no sql provided
     if(!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
