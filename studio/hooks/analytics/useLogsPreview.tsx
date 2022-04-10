@@ -63,7 +63,7 @@ function useLogsPreview(
     let queryParams
 
     // check that SQL is ready for the logs request
-    if(!params.sql || !params.rawSql) {
+    if(!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
       return null
@@ -97,7 +97,7 @@ function useLogsPreview(
   const countUrl = () => {
     
     // check that SQL is ready for the count request
-    if(!params.sql || !params.rawSql) {
+    if(!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
       return null
