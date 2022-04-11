@@ -159,7 +159,7 @@ function Database() {
 
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid lg:grid-cols-12 gap-6 lg:gap-32 items-center">
+            <div className="grid lg:grid-cols-12 gap-6 lg:gap-16 items-center">
               <div className="flex flex-col lg:col-span-5 gap-8">
                 <div>
                   <h3 className="h3">Anatomy of an Edge Function</h3>
