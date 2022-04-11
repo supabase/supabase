@@ -182,7 +182,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs'],
+      items: ['guides/platform/logs', 'going-into-prod'],
     },
     {
       type: 'category',
@@ -213,7 +213,6 @@ module.exports = {
       collapsed: false,
       items: [
         'faq',
-        'going-into-prod',
         'handbook/contributing',
         'handbook/supasquad',
         'company/terms',
