@@ -12,7 +12,7 @@ export interface Organization {
   total_paid_projects?: number
 }
 
-export interface Project {
+export interface ProjectBase {
   id: number
   ref: string
   name: string
@@ -22,7 +22,9 @@ export interface Project {
   region: string
   inserted_at: string
   subscription_id: string
+}
 
+export interface Project extends ProjectBase {
   // only available after projects.fetchDetail
   kpsVersion?: string
   connectionString?: string
