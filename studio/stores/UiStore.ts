@@ -1,6 +1,6 @@
 import { uuidv4 } from 'lib/helpers'
 import { action, makeAutoObservable } from 'mobx'
-import { Project, Notification, User, Organization } from 'types'
+import { Project, Notification, User, Organization, ProjectBase } from 'types'
 import { IRootStore } from './RootStore'
 import Telemetry from 'lib/telemetry'
 
@@ -12,6 +12,7 @@ export interface IUiStore {
   selectedProjectRef?: string
   isDarkTheme: boolean
   selectedProject?: Project
+  selectedProjectBaseInfo?: ProjectBase
   selectedOrganization?: Organization
   notification?: Notification
   profile?: User
@@ -56,6 +57,18 @@ export default class UiStore implements IUiStore {
         (x: Project) => x.ref == this.selectedProjectRef
       )
       return !!found?.connectionString ? found : undefined
+    }
+    return undefined
+  }
+
+  /**
+   * Get selected project base info.
+   *
+   * @return ProjectBase or undefined
+   */
+  get selectedProjectBaseInfo(): ProjectBase | undefined {
+    if (this.selectedProjectRef) {
+      return this.rootStore.app.projects.find((x: Project) => x.ref == this.selectedProjectRef)
     }
     return undefined
   }
