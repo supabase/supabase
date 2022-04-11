@@ -151,7 +151,7 @@ services:
 
   db:
     container_name: supabase-db
-    image: supabase/postgres:14.1.0.19
+    image: supabase/postgres:14.1.0.21
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     restart: unless-stopped
     ports:
