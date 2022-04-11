@@ -14,7 +14,9 @@
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
-  "dependencies": {},
+  "dependencies": {
+    "prettier": "^2.6.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
