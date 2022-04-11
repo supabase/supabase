@@ -9,14 +9,12 @@ import {
   SeverityFormatter,
   ResponseCodeFormatter,
   HeaderFormmater,
-  jsonSyntaxHighlight,
 } from './LogsFormatters'
 
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
-import { copyToClipboard } from 'lib/helpers'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -317,34 +315,16 @@ const LogTable = ({
                           withIcon
                           className="w-1/2"
                         >
-                          {typeof error === 'string' && (
-                            <Input.TextArea
-                              size="small"
-                              value={error}
-                              borderless
-                              className="font-mono w-full mt-4"
-                              copy
-                              rows={12}
-                            />
-                          )}
-                          {typeof error === 'object' && (
-                            <>
-                              <pre
-                                className="font-mono w-full mt-4 bg-red-300 rounded p-2"
-                                dangerouslySetInnerHTML={{
-                                  __html: jsonSyntaxHighlight(error),
-                                }}
-                              />
-
-                              <Button
-                                onClick={() => copyToClipboard(JSON.stringify(error, null, 2))}
-                                type="default"
-                                className="mt-2"
-                              >
-                                Copy
-                              </Button>
-                            </>
-                          )}
+                          <Input.TextArea
+                            size="small"
+                            value={
+                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
+                            }
+                            borderless
+                            className="font-mono w-full mt-4 text-xs"
+                            copy
+                            rows={12}
+                          />
                         </Alert>
                       </div>
                     )}
