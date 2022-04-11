@@ -27,7 +27,13 @@ import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS = [
-  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
+  {
+    key: 'minutely',
+    label: '60 minutes',
+    startValue: 1,
+    startUnit: 'hour',
+    format: 'MMM D, h:mma',
+  },
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
@@ -37,7 +43,6 @@ interface Props {
 
 const ProjectUsage: FC<Props> = ({ project }) => {
   const logsUsageCodesPaths = useFlag('logsUsageCodesPaths')
-  const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
@@ -59,9 +64,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     get
   )
 
-  const selectedInterval = logsUsageChartIntervals
-    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-    : CHART_INTERVALS[2]
+  const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
     .format(DATE_FORMAT)
@@ -85,25 +88,23 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row items-center gap-2">
-        {logsUsageChartIntervals && (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={
-              <Dropdown.RadioGroup value={interval} onChange={setInterval}>
-                {CHART_INTERVALS.map((i) => (
-                  <Dropdown.Radio key={i.key} value={i.key}>
-                    {i.label}
-                  </Dropdown.Radio>
-                ))}
-              </Dropdown.RadioGroup>
-            }
-          >
-            <Button as="span" type="default" iconRight={<IconChevronDown />}>
-              {selectedInterval.label}
-            </Button>
-          </Dropdown>
-        )}
+        <Dropdown
+          side="bottom"
+          align="start"
+          overlay={
+            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+              {CHART_INTERVALS.map((i) => (
+                <Dropdown.Radio key={i.key} value={i.key}>
+                  {i.label}
+                </Dropdown.Radio>
+              ))}
+            </Dropdown.RadioGroup>
+          }
+        >
+          <Button as="span" type="default" iconRight={<IconChevronDown />}>
+            {selectedInterval.label}
+          </Button>
+        </Dropdown>
         <span className="text-scale-1000 text-xs">
           Statistics for past {selectedInterval.label}
         </span>
