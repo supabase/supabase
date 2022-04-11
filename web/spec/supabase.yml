@@ -394,14 +394,20 @@ pages:
       ### Update types automatically with GitHub Actions
 
       One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
+      Supabase offers a Swagger OpenAPI specification for the REST data endpoint which you can retrieve definitions for.
 
-      Add a script to your package.json to generate the types:
+      The following script can be run in your terminal to test this.
+      ```
+      npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
+      ```
+
+      For the GitHub action, add a script to your package.json to generate the types:
 
       ```
-      "update-types": "npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts"
+      "update-types": "npx openapi-typescript \"${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}\" --version=2 --output types/database/index.ts"
       ```
 
-      In your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action. If there is a change to your definitions, this script will commit the change to your repo.
+      Then in your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action along with the environment variables. If there is a change to your definitions, this script will commit the change to your repo. ([Reference Article](https://blog.esteetey.dev/how-to-create-and-test-a-github-action-that-generates-types-from-supabase-database#heading-how-to-create-the-github-workflow))
 
       ```yml
       name: Update database types
@@ -414,6 +420,9 @@ pages:
       jobs:
         update:
           runs-on: ubuntu-latest
+          env:
+            SUPABASE_URL: ${{secrets.SUPABASE_URL}}
+            SUPABASE_ANON_KEY: ${{secrets.SUPABASE_URL}}
           steps:
             - uses: actions/checkout@v2
               with:
@@ -440,6 +449,27 @@ pages:
               with:
                 github_token: ${{ secrets.GITHUB_TOKEN }}
                 branch: ${{ github.ref }}
+      ```
+
+      Alternatively, you can also try out a GitHub action created by a community member, [@lyqht](https://github.com/lyqht). Here's a [reference project workflow using it](https://github.com/lyqht/Billy/actions/workflows/update-types.yml), and this is how you can use it.
+      ```
+      name: Update database types
+
+      on:
+        schedule:
+          - cron: '*/5 * * * *'
+        workflow_dispatch:
+
+      jobs:
+        update:
+          runs-on: ubuntu-latest
+          steps:
+          - name: Generate Supabase Database types
+            uses: lyqht/generate-supabase-db-types-github-action@v0.0.2
+            with:
+                SUPABASE_URL: ${{secrets.SUPABASE_URL }}
+                SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+                OUTPUT_PATH: src/types/supabase.ts
       ```
 
   auth.signUp():
