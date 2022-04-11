@@ -33,8 +33,10 @@ const TestConnection: FC<Props> = ({ project, children }) => {
         <BuildingState project={project} />
       ) : (
         <div className="w-full h-full m-4 flex flex-col items-center justify-center">
-          <p>{`Invalid project status: ${project.status}`}</p>
-          <p>Try refreshing your browser, or reach out to us at support@supabase.io</p>
+          <p className="text-scale-1100">{`Invalid project status: ${project.status}`}</p>
+          <p className="text-scale-1100">
+            Try refreshing your browser, or reach out to us at support@supabase.io
+          </p>
         </div>
       )}
     </>
