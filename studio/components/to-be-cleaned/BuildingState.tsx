@@ -10,7 +10,7 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { Project } from 'types'
@@ -26,7 +26,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
     const projectStatus = await get(`${API_URL}/projects/${project.ref}/status`)
     if (projectStatus && !projectStatus.error) {
       const { status } = projectStatus
-      if (status === 'ACTIVE_HEALTHY') {
+      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         const res = await get(`${API_URL}/props/project/${project.ref}/connection-string`)
         if (res && res.connectionString) {
           app.onProjectConnectionStringUpdated(project.id, res.connectionString)
@@ -55,7 +55,9 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>
-                  {project.status === 'RESTORING' ? 'Restoring project' : 'Setting up project'}
+                  {project.status === PROJECT_STATUS.RESTORING
+                    ? 'Restoring project'
+                    : 'Setting up project'}
                 </span>
               </div>
             </Badge>
