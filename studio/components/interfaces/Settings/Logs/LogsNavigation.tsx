@@ -2,6 +2,10 @@ import { Tabs } from '@supabase/ui'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 
+interface TabItem {
+  label: string
+  id: string
+}
 const LogsNavigation = () => {
   const router = useRouter()
   const activeRoute = router.pathname.split('/')[4]
@@ -16,7 +20,7 @@ const LogsNavigation = () => {
     logsSourcesPage ? { id: 'sources', label: 'Sources' } : null,
     logsSavedQueries ? { id: 'saved', label: 'Saved' } : null,
     { id: 'templates', label: 'Templates' },
-  ].filter(Boolean)
+  ].filter(Boolean) as TabItem[]
 
   return (
     <Tabs
@@ -28,9 +32,8 @@ const LogsNavigation = () => {
         router.push(`/project/${ref}/logs-explorer/${e === indexRoute ? '' : e}`)
       }}
     >
-      {/* TODO: type properly */}
-      {(tabs as any[]).map(({ id, label }) => (
-        <Tabs.Panel id={id} label={label} />
+      {tabs.map((item) => (
+        <Tabs.Panel key={item.id} id={item.id} label={item.label} />
       ))}
     </Tabs>
   )
