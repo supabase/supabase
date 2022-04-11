@@ -14,15 +14,22 @@ Self-hosting Supabase is free. If you wish to use our cloud-platform, we provide
 
 ### How do I host Supabase?
 
-You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker) to build Supabase on your own environment, and find detailed instructions [here](/docs/guides/hosting/overview). Supabase is an amalgamation of five open source tools (and growing). Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support indirectly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are third-party tools (like [Kong](https://github.com/Kong/kong)). All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. 
+You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker), and find detailed instructions [here](/docs/guides/hosting/overview). 
+
+Supabase is an amalgamation open source tools. Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support directly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are third-party tools (like [Kong](https://github.com/Kong/kong)). 
+
+All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. This is one of the requirements to be considered for the Supabase stack.
 
 ### How can you be a Firebase alternative if you're built with a relational database?
 
-We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted and it has phenomenal scalability. Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. Also, we're sure that once you start using Postgres, you'll love it more than any other database.
+We started Supabase because we love the functionality of Firebase, but we personally experienced the scaling issues that many others experienced. We chose Postgres because it's well-trusted, with phenomenal scalability. 
+
+Our goal is to make Postgres as easy to use as Firebase, so that you no longer have to choose between usability and scalability. 
+We're sure that once you start using Postgres, you'll love it more than any other database.
 
 ### Do you support `[some other database]`?
 
-At the moment, we only support PostgreSQL. It's unlikely we'll ever move away from Postgres; however, you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
+We only support PostgreSQL. It's unlikely we'll ever move away from Postgres; however, you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
 
 ### Do you have a library for `[some other language]`?
 
