@@ -6,7 +6,7 @@
 	"originalName": "",
 	"children": [
 		{
-			"id": 311,
+			"id": 312,
 			"name": "\"StorageClient\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -16,7 +16,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/StorageClient.ts",
 			"children": [
 				{
-					"id": 312,
+					"id": 313,
 					"name": "StorageClient",
 					"kind": 128,
 					"kindString": "Class",
@@ -25,7 +25,7 @@
 					},
 					"children": [
 						{
-							"id": 313,
+							"id": 314,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -34,7 +34,7 @@
 							},
 							"signatures": [
 								{
-									"id": 314,
+									"id": 315,
 									"name": "new StorageClient",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -43,7 +43,7 @@
 									},
 									"parameters": [
 										{
-											"id": 315,
+											"id": 316,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -56,7 +56,7 @@
 											}
 										},
 										{
-											"id": 316,
+											"id": 317,
 											"name": "headers",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -66,7 +66,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 317,
+													"id": 318,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -75,7 +75,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 318,
+															"id": 319,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -84,7 +84,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 319,
+																	"id": 320,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -115,7 +115,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 320,
+											"id": 321,
 											"name": "fetch",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -132,12 +132,12 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 312,
+										"id": 313,
 										"name": "StorageClient"
 									},
 									"overwrites": {
 										"type": "reference",
-										"id": 113,
+										"id": 114,
 										"name": "StorageBucketApi.__constructor"
 									}
 								}
@@ -151,12 +151,12 @@
 							],
 							"overwrites": {
 								"type": "reference",
-								"id": 113,
+								"id": 114,
 								"name": "StorageBucketApi.__constructor"
 							}
 						},
 						{
-							"id": 329,
+							"id": 330,
 							"name": "fetch",
 							"kind": 1024,
 							"kindString": "Property",
@@ -178,12 +178,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 112,
+								"id": 113,
 								"name": "StorageBucketApi.fetch"
 							}
 						},
 						{
-							"id": 325,
+							"id": 326,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -201,7 +201,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 326,
+									"id": 327,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -210,7 +210,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 327,
+											"id": 328,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -219,7 +219,7 @@
 											},
 											"parameters": [
 												{
-													"id": 328,
+													"id": 329,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -249,12 +249,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 108,
+								"id": 109,
 								"name": "StorageBucketApi.headers"
 							}
 						},
 						{
-							"id": 324,
+							"id": 325,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -275,12 +275,12 @@
 							},
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 107,
+								"id": 108,
 								"name": "StorageBucketApi.url"
 							}
 						},
 						{
-							"id": 341,
+							"id": 342,
 							"name": "createBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -289,7 +289,7 @@
 							},
 							"signatures": [
 								{
-									"id": 342,
+									"id": 343,
 									"name": "createBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -302,7 +302,7 @@
 									},
 									"parameters": [
 										{
-											"id": 343,
+											"id": 344,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -318,7 +318,7 @@
 											}
 										},
 										{
-											"id": 344,
+											"id": 345,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -328,7 +328,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 345,
+													"id": 346,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -337,7 +337,7 @@
 													},
 													"children": [
 														{
-															"id": 346,
+															"id": 347,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -362,7 +362,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																346
+																347
 															]
 														}
 													],
@@ -384,7 +384,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 347,
+													"id": 348,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -393,7 +393,7 @@
 													},
 													"children": [
 														{
-															"id": 348,
+															"id": 349,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -422,7 +422,7 @@
 															}
 														},
 														{
-															"id": 349,
+															"id": 350,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -456,8 +456,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																348,
-																349
+																349,
+																350
 															]
 														}
 													],
@@ -475,7 +475,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 132,
+										"id": 133,
 										"name": "StorageBucketApi.createBucket"
 									}
 								}
@@ -489,12 +489,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 132,
+								"id": 133,
 								"name": "StorageBucketApi.createBucket"
 							}
 						},
 						{
-							"id": 369,
+							"id": 370,
 							"name": "deleteBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -503,7 +503,7 @@
 							},
 							"signatures": [
 								{
-									"id": 370,
+									"id": 371,
 									"name": "deleteBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -515,7 +515,7 @@
 									},
 									"parameters": [
 										{
-											"id": 371,
+											"id": 372,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -537,7 +537,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 372,
+													"id": 373,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -546,7 +546,7 @@
 													},
 													"children": [
 														{
-															"id": 373,
+															"id": 374,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -566,7 +566,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 374,
+																			"id": 375,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -575,7 +575,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 375,
+																					"id": 376,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -600,7 +600,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						375
+																						376
 																					]
 																				}
 																			],
@@ -621,7 +621,7 @@
 															}
 														},
 														{
-															"id": 376,
+															"id": 377,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -655,8 +655,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																373,
-																376
+																374,
+																377
 															]
 														}
 													],
@@ -674,7 +674,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 160,
+										"id": 161,
 										"name": "StorageBucketApi.deleteBucket"
 									}
 								}
@@ -688,12 +688,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 160,
+								"id": 161,
 								"name": "StorageBucketApi.deleteBucket"
 							}
 						},
 						{
-							"id": 361,
+							"id": 362,
 							"name": "emptyBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -702,7 +702,7 @@
 							},
 							"signatures": [
 								{
-									"id": 362,
+									"id": 363,
 									"name": "emptyBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -714,7 +714,7 @@
 									},
 									"parameters": [
 										{
-											"id": 363,
+											"id": 364,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -736,7 +736,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 364,
+													"id": 365,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -745,7 +745,7 @@
 													},
 													"children": [
 														{
-															"id": 365,
+															"id": 366,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -765,7 +765,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 366,
+																			"id": 367,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -774,7 +774,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 367,
+																					"id": 368,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -799,7 +799,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						367
+																						368
 																					]
 																				}
 																			],
@@ -820,7 +820,7 @@
 															}
 														},
 														{
-															"id": 368,
+															"id": 369,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -854,8 +854,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																365,
-																368
+																366,
+																369
 															]
 														}
 													],
@@ -873,7 +873,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 152,
+										"id": 153,
 										"name": "StorageBucketApi.emptyBucket"
 									}
 								}
@@ -887,12 +887,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 152,
+								"id": 153,
 								"name": "StorageBucketApi.emptyBucket"
 							}
 						},
 						{
-							"id": 321,
+							"id": 322,
 							"name": "from",
 							"kind": 2048,
 							"kindString": "Method",
@@ -901,7 +901,7 @@
 							},
 							"signatures": [
 								{
-									"id": 322,
+									"id": 323,
 									"name": "from",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -913,7 +913,7 @@
 									},
 									"parameters": [
 										{
-											"id": 323,
+											"id": 324,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -931,7 +931,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 169,
+										"id": 170,
 										"name": "StorageFileApi"
 									}
 								}
@@ -945,7 +945,7 @@
 							]
 						},
 						{
-							"id": 335,
+							"id": 336,
 							"name": "getBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -954,7 +954,7 @@
 							},
 							"signatures": [
 								{
-									"id": 336,
+									"id": 337,
 									"name": "getBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -966,7 +966,7 @@
 									},
 									"parameters": [
 										{
-											"id": 337,
+											"id": 338,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -988,7 +988,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 338,
+													"id": 339,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -997,7 +997,7 @@
 													},
 													"children": [
 														{
-															"id": 339,
+															"id": 340,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1027,7 +1027,7 @@
 															}
 														},
 														{
-															"id": 340,
+															"id": 341,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1061,8 +1061,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																339,
-																340
+																340,
+																341
 															]
 														}
 													],
@@ -1080,7 +1080,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 126,
+										"id": 127,
 										"name": "StorageBucketApi.getBucket"
 									}
 								}
@@ -1094,12 +1094,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 126,
+								"id": 127,
 								"name": "StorageBucketApi.getBucket"
 							}
 						},
 						{
-							"id": 330,
+							"id": 331,
 							"name": "listBuckets",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1108,7 +1108,7 @@
 							},
 							"signatures": [
 								{
-									"id": 331,
+									"id": 332,
 									"name": "listBuckets",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1116,7 +1116,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Retrieves the details of all Storage buckets within an existing product."
+										"shortText": "Retrieves the details of all Storage buckets within an existing project."
 									},
 									"type": {
 										"type": "reference",
@@ -1124,7 +1124,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 332,
+													"id": 333,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1133,7 +1133,7 @@
 													},
 													"children": [
 														{
-															"id": 333,
+															"id": 334,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1166,7 +1166,7 @@
 															}
 														},
 														{
-															"id": 334,
+															"id": 335,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1200,8 +1200,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																333,
-																334
+																334,
+																335
 															]
 														}
 													],
@@ -1219,7 +1219,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 121,
+										"id": 122,
 										"name": "StorageBucketApi.listBuckets"
 									}
 								}
@@ -1233,12 +1233,12 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 121,
+								"id": 122,
 								"name": "StorageBucketApi.listBuckets"
 							}
 						},
 						{
-							"id": 350,
+							"id": 351,
 							"name": "updateBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1247,7 +1247,7 @@
 							},
 							"signatures": [
 								{
-									"id": 351,
+									"id": 352,
 									"name": "updateBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1259,7 +1259,7 @@
 									},
 									"parameters": [
 										{
-											"id": 352,
+											"id": 353,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1275,7 +1275,7 @@
 											}
 										},
 										{
-											"id": 353,
+											"id": 354,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1285,7 +1285,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 354,
+													"id": 355,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1294,7 +1294,7 @@
 													},
 													"children": [
 														{
-															"id": 355,
+															"id": 356,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1319,7 +1319,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																355
+																356
 															]
 														}
 													],
@@ -1340,7 +1340,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 356,
+													"id": 357,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1349,7 +1349,7 @@
 													},
 													"children": [
 														{
-															"id": 357,
+															"id": 358,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1369,7 +1369,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 358,
+																			"id": 359,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -1378,7 +1378,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 359,
+																					"id": 360,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -1403,7 +1403,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						359
+																						360
 																					]
 																				}
 																			],
@@ -1424,7 +1424,7 @@
 															}
 														},
 														{
-															"id": 360,
+															"id": 361,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1458,8 +1458,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																357,
-																360
+																358,
+																361
 															]
 														}
 													],
@@ -1477,7 +1477,7 @@
 									},
 									"inheritedFrom": {
 										"type": "reference",
-										"id": 141,
+										"id": 142,
 										"name": "StorageBucketApi.updateBucket"
 									}
 								}
@@ -1491,7 +1491,7 @@
 							],
 							"inheritedFrom": {
 								"type": "reference",
-								"id": 141,
+								"id": 142,
 								"name": "StorageBucketApi.updateBucket"
 							}
 						}
@@ -1501,29 +1501,29 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								313
+								314
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								329,
-								325,
-								324
+								330,
+								326,
+								325
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								341,
-								369,
-								361,
-								321,
-								335,
-								330,
-								350
+								342,
+								370,
+								362,
+								322,
+								336,
+								331,
+								351
 							]
 						}
 					],
@@ -1537,7 +1537,7 @@
 					"extendedTypes": [
 						{
 							"type": "reference",
-							"id": 106,
+							"id": 107,
 							"name": "StorageBucketApi"
 						}
 					]
@@ -1548,7 +1548,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						312
+						313
 					]
 				}
 			],
@@ -1561,7 +1561,7 @@
 			]
 		},
 		{
-			"id": 377,
+			"id": 378,
 			"name": "\"index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1571,7 +1571,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/index.ts",
 			"children": [
 				{
-					"id": 380,
+					"id": 381,
 					"name": "Bucket",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1581,7 +1581,7 @@
 					"target": 74
 				},
 				{
-					"id": 381,
+					"id": 382,
 					"name": "FileObject",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1591,7 +1591,7 @@
 					"target": 81
 				},
 				{
-					"id": 383,
+					"id": 384,
 					"name": "FileOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1601,17 +1601,17 @@
 					"target": 95
 				},
 				{
-					"id": 385,
+					"id": 386,
 					"name": "Metadata",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 103
+					"target": 104
 				},
 				{
-					"id": 384,
+					"id": 385,
 					"name": "SearchOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1621,7 +1621,7 @@
 					"target": 99
 				},
 				{
-					"id": 382,
+					"id": 383,
 					"name": "SortBy",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -1631,24 +1631,24 @@
 					"target": 92
 				},
 				{
-					"id": 378,
+					"id": 379,
 					"name": "StorageClient",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 312
+					"target": 313
 				},
 				{
-					"id": 379,
+					"id": 380,
 					"name": "SupabaseStorageClient",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 312
+					"target": 313
 				}
 			],
 			"groups": [
@@ -1656,14 +1656,14 @@
 					"title": "References",
 					"kind": 16777216,
 					"children": [
-						380,
 						381,
-						383,
-						385,
-						384,
 						382,
-						378,
-						379
+						384,
+						386,
+						385,
+						383,
+						379,
+						380
 					]
 				}
 			],
@@ -1676,7 +1676,7 @@
 			]
 		},
 		{
-			"id": 105,
+			"id": 106,
 			"name": "\"lib/StorageBucketApi\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -1686,7 +1686,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/lib/StorageBucketApi.ts",
 			"children": [
 				{
-					"id": 106,
+					"id": 107,
 					"name": "StorageBucketApi",
 					"kind": 128,
 					"kindString": "Class",
@@ -1695,7 +1695,7 @@
 					},
 					"children": [
 						{
-							"id": 113,
+							"id": 114,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -1704,7 +1704,7 @@
 							},
 							"signatures": [
 								{
-									"id": 114,
+									"id": 115,
 									"name": "new StorageBucketApi",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -1713,7 +1713,7 @@
 									},
 									"parameters": [
 										{
-											"id": 115,
+											"id": 116,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1726,7 +1726,7 @@
 											}
 										},
 										{
-											"id": 116,
+											"id": 117,
 											"name": "headers",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1736,7 +1736,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 117,
+													"id": 118,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1745,7 +1745,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 118,
+															"id": 119,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -1754,7 +1754,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 119,
+																	"id": 120,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -1785,7 +1785,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 120,
+											"id": 121,
 											"name": "fetch",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1802,7 +1802,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 106,
+										"id": 107,
 										"name": "StorageBucketApi"
 									}
 								}
@@ -1816,7 +1816,7 @@
 							]
 						},
 						{
-							"id": 112,
+							"id": 113,
 							"name": "fetch",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1838,7 +1838,7 @@
 							}
 						},
 						{
-							"id": 108,
+							"id": 109,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1856,7 +1856,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 109,
+									"id": 110,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -1865,7 +1865,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 110,
+											"id": 111,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -1874,7 +1874,7 @@
 											},
 											"parameters": [
 												{
-													"id": 111,
+													"id": 112,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -1904,7 +1904,7 @@
 							}
 						},
 						{
-							"id": 107,
+							"id": 108,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -1925,7 +1925,7 @@
 							}
 						},
 						{
-							"id": 132,
+							"id": 133,
 							"name": "createBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -1934,7 +1934,7 @@
 							},
 							"signatures": [
 								{
-									"id": 133,
+									"id": 134,
 									"name": "createBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1947,7 +1947,7 @@
 									},
 									"parameters": [
 										{
-											"id": 134,
+											"id": 135,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1963,7 +1963,7 @@
 											}
 										},
 										{
-											"id": 135,
+											"id": 136,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1973,7 +1973,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 136,
+													"id": 137,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -1982,7 +1982,7 @@
 													},
 													"children": [
 														{
-															"id": 137,
+															"id": 138,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2007,7 +2007,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																137
+																138
 															]
 														}
 													],
@@ -2029,7 +2029,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 138,
+													"id": 139,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2038,7 +2038,7 @@
 													},
 													"children": [
 														{
-															"id": 139,
+															"id": 140,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2067,7 +2067,7 @@
 															}
 														},
 														{
-															"id": 140,
+															"id": 141,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2101,8 +2101,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																139,
-																140
+																140,
+																141
 															]
 														}
 													],
@@ -2129,7 +2129,7 @@
 							]
 						},
 						{
-							"id": 160,
+							"id": 161,
 							"name": "deleteBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2138,7 +2138,7 @@
 							},
 							"signatures": [
 								{
-									"id": 161,
+									"id": 162,
 									"name": "deleteBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2150,7 +2150,7 @@
 									},
 									"parameters": [
 										{
-											"id": 162,
+											"id": 163,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2172,7 +2172,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 163,
+													"id": 164,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2181,7 +2181,7 @@
 													},
 													"children": [
 														{
-															"id": 164,
+															"id": 165,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2201,7 +2201,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 165,
+																			"id": 166,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -2210,7 +2210,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 166,
+																					"id": 167,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -2235,7 +2235,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						166
+																						167
 																					]
 																				}
 																			],
@@ -2256,7 +2256,7 @@
 															}
 														},
 														{
-															"id": 167,
+															"id": 168,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2290,8 +2290,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																164,
-																167
+																165,
+																168
 															]
 														}
 													],
@@ -2318,7 +2318,7 @@
 							]
 						},
 						{
-							"id": 152,
+							"id": 153,
 							"name": "emptyBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2327,7 +2327,7 @@
 							},
 							"signatures": [
 								{
-									"id": 153,
+									"id": 154,
 									"name": "emptyBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2339,7 +2339,7 @@
 									},
 									"parameters": [
 										{
-											"id": 154,
+											"id": 155,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2361,7 +2361,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 155,
+													"id": 156,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2370,7 +2370,7 @@
 													},
 													"children": [
 														{
-															"id": 156,
+															"id": 157,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2390,7 +2390,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 157,
+																			"id": 158,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -2399,7 +2399,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 158,
+																					"id": 159,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -2424,7 +2424,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						158
+																						159
 																					]
 																				}
 																			],
@@ -2445,7 +2445,7 @@
 															}
 														},
 														{
-															"id": 159,
+															"id": 160,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2479,8 +2479,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																156,
-																159
+																157,
+																160
 															]
 														}
 													],
@@ -2507,7 +2507,7 @@
 							]
 						},
 						{
-							"id": 126,
+							"id": 127,
 							"name": "getBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2516,7 +2516,7 @@
 							},
 							"signatures": [
 								{
-									"id": 127,
+									"id": 128,
 									"name": "getBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2528,7 +2528,7 @@
 									},
 									"parameters": [
 										{
-											"id": 128,
+											"id": 129,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2550,7 +2550,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 129,
+													"id": 130,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2559,7 +2559,7 @@
 													},
 													"children": [
 														{
-															"id": 130,
+															"id": 131,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2589,7 +2589,7 @@
 															}
 														},
 														{
-															"id": 131,
+															"id": 132,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2623,8 +2623,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																130,
-																131
+																131,
+																132
 															]
 														}
 													],
@@ -2651,7 +2651,7 @@
 							]
 						},
 						{
-							"id": 121,
+							"id": 122,
 							"name": "listBuckets",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2660,7 +2660,7 @@
 							},
 							"signatures": [
 								{
-									"id": 122,
+									"id": 123,
 									"name": "listBuckets",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2668,7 +2668,7 @@
 										"isExported": true
 									},
 									"comment": {
-										"shortText": "Retrieves the details of all Storage buckets within an existing product."
+										"shortText": "Retrieves the details of all Storage buckets within an existing project."
 									},
 									"type": {
 										"type": "reference",
@@ -2676,7 +2676,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 123,
+													"id": 124,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2685,7 +2685,7 @@
 													},
 													"children": [
 														{
-															"id": 124,
+															"id": 125,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2718,7 +2718,7 @@
 															}
 														},
 														{
-															"id": 125,
+															"id": 126,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2752,8 +2752,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																124,
-																125
+																125,
+																126
 															]
 														}
 													],
@@ -2780,7 +2780,7 @@
 							]
 						},
 						{
-							"id": 141,
+							"id": 142,
 							"name": "updateBucket",
 							"kind": 2048,
 							"kindString": "Method",
@@ -2789,7 +2789,7 @@
 							},
 							"signatures": [
 								{
-									"id": 142,
+									"id": 143,
 									"name": "updateBucket",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2801,7 +2801,7 @@
 									},
 									"parameters": [
 										{
-											"id": 143,
+											"id": 144,
 											"name": "id",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2817,7 +2817,7 @@
 											}
 										},
 										{
-											"id": 144,
+											"id": 145,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2827,7 +2827,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 145,
+													"id": 146,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2836,7 +2836,7 @@
 													},
 													"children": [
 														{
-															"id": 146,
+															"id": 147,
 															"name": "public",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2861,7 +2861,7 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																146
+																147
 															]
 														}
 													],
@@ -2882,7 +2882,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 147,
+													"id": 148,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -2891,7 +2891,7 @@
 													},
 													"children": [
 														{
-															"id": 148,
+															"id": 149,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2911,7 +2911,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 149,
+																			"id": 150,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -2920,7 +2920,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 150,
+																					"id": 151,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -2945,7 +2945,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						150
+																						151
 																					]
 																				}
 																			],
@@ -2966,7 +2966,7 @@
 															}
 														},
 														{
-															"id": 151,
+															"id": 152,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3000,8 +3000,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																148,
-																151
+																149,
+																152
 															]
 														}
 													],
@@ -3033,28 +3033,28 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								113
+								114
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								112,
-								108,
-								107
+								113,
+								109,
+								108
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								132,
-								160,
-								152,
-								126,
-								121,
-								141
+								133,
+								161,
+								153,
+								127,
+								122,
+								142
 							]
 						}
 					],
@@ -3068,7 +3068,7 @@
 					"extendedBy": [
 						{
 							"type": "reference",
-							"id": 312,
+							"id": 313,
 							"name": "StorageClient"
 						}
 					]
@@ -3079,7 +3079,7 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						106
+						107
 					]
 				}
 			],
@@ -3092,7 +3092,7 @@
 			]
 		},
 		{
-			"id": 168,
+			"id": 169,
 			"name": "\"lib/StorageFileApi\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -3102,7 +3102,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/lib/StorageFileApi.ts",
 			"children": [
 				{
-					"id": 169,
+					"id": 170,
 					"name": "StorageFileApi",
 					"kind": 128,
 					"kindString": "Class",
@@ -3111,7 +3111,7 @@
 					},
 					"children": [
 						{
-							"id": 177,
+							"id": 178,
 							"name": "constructor",
 							"kind": 512,
 							"kindString": "Constructor",
@@ -3120,7 +3120,7 @@
 							},
 							"signatures": [
 								{
-									"id": 178,
+									"id": 179,
 									"name": "new StorageFileApi",
 									"kind": 16384,
 									"kindString": "Constructor signature",
@@ -3129,7 +3129,7 @@
 									},
 									"parameters": [
 										{
-											"id": 179,
+											"id": 180,
 											"name": "url",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3142,7 +3142,7 @@
 											}
 										},
 										{
-											"id": 180,
+											"id": 181,
 											"name": "headers",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3152,7 +3152,7 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 181,
+													"id": 182,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3161,7 +3161,7 @@
 													},
 													"indexSignature": [
 														{
-															"id": 182,
+															"id": 183,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
@@ -3170,7 +3170,7 @@
 															},
 															"parameters": [
 																{
-																	"id": 183,
+																	"id": 184,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -3201,7 +3201,7 @@
 											"defaultValue": "{}"
 										},
 										{
-											"id": 184,
+											"id": 185,
 											"name": "bucketId",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3224,7 +3224,7 @@
 											}
 										},
 										{
-											"id": 185,
+											"id": 186,
 											"name": "fetch",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3241,7 +3241,7 @@
 									],
 									"type": {
 										"type": "reference",
-										"id": 169,
+										"id": 170,
 										"name": "StorageFileApi"
 									}
 								}
@@ -3255,7 +3255,7 @@
 							]
 						},
 						{
-							"id": 175,
+							"id": 176,
 							"name": "bucketId",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3286,7 +3286,7 @@
 							}
 						},
 						{
-							"id": 176,
+							"id": 177,
 							"name": "fetch",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3308,7 +3308,7 @@
 							}
 						},
 						{
-							"id": 171,
+							"id": 172,
 							"name": "headers",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3326,7 +3326,7 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 172,
+									"id": 173,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
@@ -3335,7 +3335,7 @@
 									},
 									"indexSignature": [
 										{
-											"id": 173,
+											"id": 174,
 											"name": "__index",
 											"kind": 8192,
 											"kindString": "Index signature",
@@ -3344,7 +3344,7 @@
 											},
 											"parameters": [
 												{
-													"id": 174,
+													"id": 175,
 													"name": "key",
 													"kind": 32768,
 													"kindString": "Parameter",
@@ -3374,7 +3374,7 @@
 							}
 						},
 						{
-							"id": 170,
+							"id": 171,
 							"name": "url",
 							"kind": 1024,
 							"kindString": "Property",
@@ -3395,7 +3395,7 @@
 							}
 						},
 						{
-							"id": 285,
+							"id": 286,
 							"name": "_getFinalPath",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3404,7 +3404,7 @@
 							},
 							"signatures": [
 								{
-									"id": 286,
+									"id": 287,
 									"name": "_getFinalPath",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3413,7 +3413,7 @@
 									},
 									"parameters": [
 										{
-											"id": 287,
+											"id": 288,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3441,7 +3441,7 @@
 							]
 						},
 						{
-							"id": 288,
+							"id": 289,
 							"name": "_removeEmptyFolders",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3450,7 +3450,7 @@
 							},
 							"signatures": [
 								{
-									"id": 289,
+									"id": 290,
 									"name": "_removeEmptyFolders",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3459,7 +3459,7 @@
 									},
 									"parameters": [
 										{
-											"id": 290,
+											"id": 291,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3487,7 +3487,7 @@
 							]
 						},
 						{
-							"id": 226,
+							"id": 227,
 							"name": "copy",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3496,7 +3496,7 @@
 							},
 							"signatures": [
 								{
-									"id": 227,
+									"id": 228,
 									"name": "copy",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3508,7 +3508,7 @@
 									},
 									"parameters": [
 										{
-											"id": 228,
+											"id": 229,
 											"name": "fromPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3524,7 +3524,7 @@
 											}
 										},
 										{
-											"id": 229,
+											"id": 230,
 											"name": "toPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3546,7 +3546,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 230,
+													"id": 231,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3555,7 +3555,7 @@
 													},
 													"children": [
 														{
-															"id": 231,
+															"id": 232,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3575,7 +3575,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 232,
+																			"id": 233,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -3584,7 +3584,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 233,
+																					"id": 234,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -3609,7 +3609,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						233
+																						234
 																					]
 																				}
 																			],
@@ -3630,7 +3630,7 @@
 															}
 														},
 														{
-															"id": 234,
+															"id": 235,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3664,8 +3664,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																231,
-																234
+																232,
+																235
 															]
 														}
 													],
@@ -3692,7 +3692,7 @@
 							]
 						},
 						{
-							"id": 235,
+							"id": 236,
 							"name": "createSignedUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3701,7 +3701,7 @@
 							},
 							"signatures": [
 								{
-									"id": 236,
+									"id": 237,
 									"name": "createSignedUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3713,7 +3713,7 @@
 									},
 									"parameters": [
 										{
-											"id": 237,
+											"id": 238,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3729,7 +3729,7 @@
 											}
 										},
 										{
-											"id": 238,
+											"id": 239,
 											"name": "expiresIn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3751,7 +3751,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 239,
+													"id": 240,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3760,7 +3760,7 @@
 													},
 													"children": [
 														{
-															"id": 240,
+															"id": 241,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3780,7 +3780,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 241,
+																			"id": 242,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -3789,7 +3789,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 242,
+																					"id": 243,
 																					"name": "signedURL",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -3814,7 +3814,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						242
+																						243
 																					]
 																				}
 																			],
@@ -3835,7 +3835,7 @@
 															}
 														},
 														{
-															"id": 243,
+															"id": 244,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3864,7 +3864,7 @@
 															}
 														},
 														{
-															"id": 244,
+															"id": 245,
 															"name": "signedURL",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3898,9 +3898,9 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																240,
-																243,
-																244
+																241,
+																244,
+																245
 															]
 														}
 													],
@@ -3927,7 +3927,7 @@
 							]
 						},
 						{
-							"id": 245,
+							"id": 246,
 							"name": "createSignedUrls",
 							"kind": 2048,
 							"kindString": "Method",
@@ -3936,7 +3936,7 @@
 							},
 							"signatures": [
 								{
-									"id": 246,
+									"id": 247,
 									"name": "createSignedUrls",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3948,7 +3948,7 @@
 									},
 									"parameters": [
 										{
-											"id": 247,
+											"id": 248,
 											"name": "paths",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3967,7 +3967,7 @@
 											}
 										},
 										{
-											"id": 248,
+											"id": 249,
 											"name": "expiresIn",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3989,7 +3989,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 249,
+													"id": 250,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -3998,7 +3998,7 @@
 													},
 													"children": [
 														{
-															"id": 250,
+															"id": 251,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4020,7 +4020,7 @@
 																		"elementType": {
 																			"type": "reflection",
 																			"declaration": {
-																				"id": 251,
+																				"id": 252,
 																				"name": "__type",
 																				"kind": 65536,
 																				"kindString": "Type literal",
@@ -4029,7 +4029,7 @@
 																				},
 																				"children": [
 																					{
-																						"id": 252,
+																						"id": 253,
 																						"name": "error",
 																						"kind": 32,
 																						"kindString": "Variable",
@@ -4058,7 +4058,7 @@
 																						}
 																					},
 																					{
-																						"id": 253,
+																						"id": 254,
 																						"name": "path",
 																						"kind": 32,
 																						"kindString": "Variable",
@@ -4087,7 +4087,7 @@
 																						}
 																					},
 																					{
-																						"id": 254,
+																						"id": 255,
 																						"name": "signedURL",
 																						"kind": 32,
 																						"kindString": "Variable",
@@ -4112,9 +4112,9 @@
 																						"title": "Variables",
 																						"kind": 32,
 																						"children": [
-																							252,
 																							253,
-																							254
+																							254,
+																							255
 																						]
 																					}
 																				],
@@ -4136,7 +4136,7 @@
 															}
 														},
 														{
-															"id": 255,
+															"id": 256,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4170,8 +4170,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																250,
-																255
+																251,
+																256
 															]
 														}
 													],
@@ -4198,7 +4198,7 @@
 							]
 						},
 						{
-							"id": 256,
+							"id": 257,
 							"name": "download",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4207,7 +4207,7 @@
 							},
 							"signatures": [
 								{
-									"id": 257,
+									"id": 258,
 									"name": "download",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4219,7 +4219,7 @@
 									},
 									"parameters": [
 										{
-											"id": 258,
+											"id": 259,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4241,7 +4241,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 259,
+													"id": 260,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4250,7 +4250,7 @@
 													},
 													"children": [
 														{
-															"id": 260,
+															"id": 261,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4279,7 +4279,7 @@
 															}
 														},
 														{
-															"id": 261,
+															"id": 262,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4313,8 +4313,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																260,
-																261
+																261,
+																262
 															]
 														}
 													],
@@ -4341,7 +4341,7 @@
 							]
 						},
 						{
-							"id": 262,
+							"id": 263,
 							"name": "getPublicUrl",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4350,7 +4350,7 @@
 							},
 							"signatures": [
 								{
-									"id": 263,
+									"id": 264,
 									"name": "getPublicUrl",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4362,7 +4362,7 @@
 									},
 									"parameters": [
 										{
-											"id": 264,
+											"id": 265,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4381,7 +4381,7 @@
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 265,
+											"id": 266,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
@@ -4390,7 +4390,7 @@
 											},
 											"children": [
 												{
-													"id": 266,
+													"id": 267,
 													"name": "data",
 													"kind": 32,
 													"kindString": "Variable",
@@ -4410,7 +4410,7 @@
 															{
 																"type": "reflection",
 																"declaration": {
-																	"id": 267,
+																	"id": 268,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
@@ -4419,7 +4419,7 @@
 																	},
 																	"children": [
 																		{
-																			"id": 268,
+																			"id": 269,
 																			"name": "publicURL",
 																			"kind": 32,
 																			"kindString": "Variable",
@@ -4444,7 +4444,7 @@
 																			"title": "Variables",
 																			"kind": 32,
 																			"children": [
-																				268
+																				269
 																			]
 																		}
 																	],
@@ -4465,7 +4465,7 @@
 													}
 												},
 												{
-													"id": 269,
+													"id": 270,
 													"name": "error",
 													"kind": 32,
 													"kindString": "Variable",
@@ -4494,7 +4494,7 @@
 													}
 												},
 												{
-													"id": 270,
+													"id": 271,
 													"name": "publicURL",
 													"kind": 32,
 													"kindString": "Variable",
@@ -4528,9 +4528,9 @@
 													"title": "Variables",
 													"kind": 32,
 													"children": [
-														266,
-														269,
-														270
+														267,
+														270,
+														271
 													]
 												}
 											],
@@ -4554,7 +4554,7 @@
 							]
 						},
 						{
-							"id": 277,
+							"id": 278,
 							"name": "list",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4563,7 +4563,7 @@
 							},
 							"signatures": [
 								{
-									"id": 278,
+									"id": 279,
 									"name": "list",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4575,7 +4575,7 @@
 									},
 									"parameters": [
 										{
-											"id": 279,
+											"id": 280,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4601,7 +4601,7 @@
 											}
 										},
 										{
-											"id": 280,
+											"id": 281,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4619,7 +4619,7 @@
 											}
 										},
 										{
-											"id": 281,
+											"id": 282,
 											"name": "parameters",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4643,7 +4643,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 282,
+													"id": 283,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4652,7 +4652,7 @@
 													},
 													"children": [
 														{
-															"id": 283,
+															"id": 284,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4685,7 +4685,7 @@
 															}
 														},
 														{
-															"id": 284,
+															"id": 285,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4719,8 +4719,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																283,
-																284
+																284,
+																285
 															]
 														}
 													],
@@ -4747,7 +4747,7 @@
 							]
 						},
 						{
-							"id": 217,
+							"id": 218,
 							"name": "move",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4756,7 +4756,7 @@
 							},
 							"signatures": [
 								{
-									"id": 218,
+									"id": 219,
 									"name": "move",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4768,7 +4768,7 @@
 									},
 									"parameters": [
 										{
-											"id": 219,
+											"id": 220,
 											"name": "fromPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4784,7 +4784,7 @@
 											}
 										},
 										{
-											"id": 220,
+											"id": 221,
 											"name": "toPath",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4806,7 +4806,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 221,
+													"id": 222,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -4815,7 +4815,7 @@
 													},
 													"children": [
 														{
-															"id": 222,
+															"id": 223,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4835,7 +4835,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 223,
+																			"id": 224,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -4844,7 +4844,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 224,
+																					"id": 225,
 																					"name": "message",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -4869,7 +4869,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						224
+																						225
 																					]
 																				}
 																			],
@@ -4890,7 +4890,7 @@
 															}
 														},
 														{
-															"id": 225,
+															"id": 226,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -4924,8 +4924,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																222,
-																225
+																223,
+																226
 															]
 														}
 													],
@@ -4952,7 +4952,7 @@
 							]
 						},
 						{
-							"id": 271,
+							"id": 272,
 							"name": "remove",
 							"kind": 2048,
 							"kindString": "Method",
@@ -4961,7 +4961,7 @@
 							},
 							"signatures": [
 								{
-									"id": 272,
+									"id": 273,
 									"name": "remove",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -4973,7 +4973,7 @@
 									},
 									"parameters": [
 										{
-											"id": 273,
+											"id": 274,
 											"name": "paths",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -4998,7 +4998,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 274,
+													"id": 275,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5007,7 +5007,7 @@
 													},
 													"children": [
 														{
-															"id": 275,
+															"id": 276,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5040,7 +5040,7 @@
 															}
 														},
 														{
-															"id": 276,
+															"id": 277,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5074,8 +5074,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																275,
-																276
+																276,
+																277
 															]
 														}
 													],
@@ -5102,7 +5102,7 @@
 							]
 						},
 						{
-							"id": 207,
+							"id": 208,
 							"name": "update",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5111,7 +5111,7 @@
 							},
 							"signatures": [
 								{
-									"id": 208,
+									"id": 209,
 									"name": "update",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5123,7 +5123,7 @@
 									},
 									"parameters": [
 										{
-											"id": 209,
+											"id": 210,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5139,7 +5139,7 @@
 											}
 										},
 										{
-											"id": 210,
+											"id": 211,
 											"name": "fileBody",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5202,7 +5202,7 @@
 											}
 										},
 										{
-											"id": 211,
+											"id": 212,
 											"name": "fileOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5226,7 +5226,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 212,
+													"id": 213,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5235,7 +5235,7 @@
 													},
 													"children": [
 														{
-															"id": 213,
+															"id": 214,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5255,7 +5255,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 214,
+																			"id": 215,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -5264,7 +5264,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 215,
+																					"id": 216,
 																					"name": "Key",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -5289,7 +5289,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						215
+																						216
 																					]
 																				}
 																			],
@@ -5310,7 +5310,7 @@
 															}
 														},
 														{
-															"id": 216,
+															"id": 217,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5344,8 +5344,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																213,
-																216
+																214,
+																217
 															]
 														}
 													],
@@ -5372,7 +5372,7 @@
 							]
 						},
 						{
-							"id": 197,
+							"id": 198,
 							"name": "upload",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5381,7 +5381,7 @@
 							},
 							"signatures": [
 								{
-									"id": 198,
+									"id": 199,
 									"name": "upload",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5393,7 +5393,7 @@
 									},
 									"parameters": [
 										{
-											"id": 199,
+											"id": 200,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5409,7 +5409,7 @@
 											}
 										},
 										{
-											"id": 200,
+											"id": 201,
 											"name": "fileBody",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5472,7 +5472,7 @@
 											}
 										},
 										{
-											"id": 201,
+											"id": 202,
 											"name": "fileOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5496,7 +5496,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 202,
+													"id": 203,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5505,7 +5505,7 @@
 													},
 													"children": [
 														{
-															"id": 203,
+															"id": 204,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5525,7 +5525,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 204,
+																			"id": 205,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -5534,7 +5534,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 205,
+																					"id": 206,
 																					"name": "Key",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -5559,7 +5559,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						205
+																						206
 																					]
 																				}
 																			],
@@ -5580,7 +5580,7 @@
 															}
 														},
 														{
-															"id": 206,
+															"id": 207,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5614,8 +5614,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																203,
-																206
+																204,
+																207
 															]
 														}
 													],
@@ -5642,7 +5642,7 @@
 							]
 						},
 						{
-							"id": 186,
+							"id": 187,
 							"name": "uploadOrUpdate",
 							"kind": 2048,
 							"kindString": "Method",
@@ -5652,7 +5652,7 @@
 							},
 							"signatures": [
 								{
-									"id": 187,
+									"id": 188,
 									"name": "uploadOrUpdate",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -5664,7 +5664,7 @@
 									},
 									"parameters": [
 										{
-											"id": 188,
+											"id": 189,
 											"name": "method",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5689,7 +5689,7 @@
 											}
 										},
 										{
-											"id": 189,
+											"id": 190,
 											"name": "path",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5705,7 +5705,7 @@
 											}
 										},
 										{
-											"id": 190,
+											"id": 191,
 											"name": "fileBody",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5768,7 +5768,7 @@
 											}
 										},
 										{
-											"id": 191,
+											"id": 192,
 											"name": "fileOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -5792,7 +5792,7 @@
 											{
 												"type": "reflection",
 												"declaration": {
-													"id": 192,
+													"id": 193,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
@@ -5801,7 +5801,7 @@
 													},
 													"children": [
 														{
-															"id": 193,
+															"id": 194,
 															"name": "data",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5821,7 +5821,7 @@
 																	{
 																		"type": "reflection",
 																		"declaration": {
-																			"id": 194,
+																			"id": 195,
 																			"name": "__type",
 																			"kind": 65536,
 																			"kindString": "Type literal",
@@ -5830,7 +5830,7 @@
 																			},
 																			"children": [
 																				{
-																					"id": 195,
+																					"id": 196,
 																					"name": "Key",
 																					"kind": 32,
 																					"kindString": "Variable",
@@ -5855,7 +5855,7 @@
 																					"title": "Variables",
 																					"kind": 32,
 																					"children": [
-																						195
+																						196
 																					]
 																				}
 																			],
@@ -5876,7 +5876,7 @@
 															}
 														},
 														{
-															"id": 196,
+															"id": 197,
 															"name": "error",
 															"kind": 32,
 															"kindString": "Variable",
@@ -5910,8 +5910,8 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																193,
-																196
+																194,
+																197
 															]
 														}
 													],
@@ -5943,36 +5943,36 @@
 							"title": "Constructors",
 							"kind": 512,
 							"children": [
-								177
+								178
 							]
 						},
 						{
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								175,
 								176,
-								171,
-								170
+								177,
+								172,
+								171
 							]
 						},
 						{
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								285,
-								288,
-								226,
-								235,
-								245,
-								256,
-								262,
-								277,
-								217,
-								271,
-								207,
-								197,
-								186
+								286,
+								289,
+								227,
+								236,
+								246,
+								257,
+								263,
+								278,
+								218,
+								272,
+								208,
+								198,
+								187
 							]
 						}
 					],
@@ -5985,7 +5985,7 @@
 					]
 				},
 				{
-					"id": 297,
+					"id": 298,
 					"name": "DEFAULT_FILE_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -5994,7 +5994,7 @@
 					},
 					"children": [
 						{
-							"id": 298,
+							"id": 299,
 							"name": "cacheControl",
 							"kind": 32,
 							"kindString": "Variable",
@@ -6013,7 +6013,7 @@
 							"defaultValue": "\"3600\""
 						},
 						{
-							"id": 299,
+							"id": 300,
 							"name": "contentType",
 							"kind": 32,
 							"kindString": "Variable",
@@ -6032,7 +6032,7 @@
 							"defaultValue": "\"text/plain;charset=UTF-8\""
 						},
 						{
-							"id": 300,
+							"id": 301,
 							"name": "upsert",
 							"kind": 32,
 							"kindString": "Variable",
@@ -6056,9 +6056,9 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								298,
 								299,
-								300
+								300,
+								301
 							]
 						}
 					],
@@ -6075,7 +6075,7 @@
 					}
 				},
 				{
-					"id": 291,
+					"id": 292,
 					"name": "DEFAULT_SEARCH_OPTIONS",
 					"kind": 2097152,
 					"kindString": "Object literal",
@@ -6084,7 +6084,7 @@
 					},
 					"children": [
 						{
-							"id": 292,
+							"id": 293,
 							"name": "limit",
 							"kind": 32,
 							"kindString": "Variable",
@@ -6103,7 +6103,7 @@
 							"defaultValue": "100"
 						},
 						{
-							"id": 293,
+							"id": 294,
 							"name": "offset",
 							"kind": 32,
 							"kindString": "Variable",
@@ -6122,14 +6122,14 @@
 							"defaultValue": "0"
 						},
 						{
-							"id": 294,
+							"id": 295,
 							"name": "sortBy",
 							"kind": 2097152,
 							"kindString": "Object literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 295,
+									"id": 296,
 									"name": "column",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6148,7 +6148,7 @@
 									"defaultValue": "\"name\""
 								},
 								{
-									"id": 296,
+									"id": 297,
 									"name": "order",
 									"kind": 32,
 									"kindString": "Variable",
@@ -6172,8 +6172,8 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										295,
-										296
+										296,
+										297
 									]
 								}
 							],
@@ -6195,15 +6195,15 @@
 							"title": "Variables",
 							"kind": 32,
 							"children": [
-								292,
-								293
+								293,
+								294
 							]
 						},
 						{
 							"title": "Object literals",
 							"kind": 2097152,
 							"children": [
-								294
+								295
 							]
 						}
 					],
@@ -6225,15 +6225,15 @@
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						169
+						170
 					]
 				},
 				{
 					"title": "Object literals",
 					"kind": 2097152,
 					"children": [
-						297,
-						291
+						298,
+						292
 					]
 				}
 			],
@@ -7485,7 +7485,7 @@
 			]
 		},
 		{
-			"id": 301,
+			"id": 302,
 			"name": "\"lib/index\"",
 			"kind": 1,
 			"kindString": "Module",
@@ -7495,7 +7495,7 @@
 			"originalName": "/home/runner/work/storage-js/storage-js/src/lib/index.ts",
 			"children": [
 				{
-					"id": 304,
+					"id": 305,
 					"name": "Bucket",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7505,7 +7505,7 @@
 					"target": 74
 				},
 				{
-					"id": 310,
+					"id": 311,
 					"name": "DEFAULT_HEADERS",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7515,7 +7515,7 @@
 					"target": 4
 				},
 				{
-					"id": 305,
+					"id": 306,
 					"name": "FileObject",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7525,7 +7525,7 @@
 					"target": 81
 				},
 				{
-					"id": 307,
+					"id": 308,
 					"name": "FileOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7535,17 +7535,17 @@
 					"target": 95
 				},
 				{
-					"id": 309,
+					"id": 310,
 					"name": "Metadata",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 103
+					"target": 104
 				},
 				{
-					"id": 308,
+					"id": 309,
 					"name": "SearchOptions",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7555,7 +7555,7 @@
 					"target": 99
 				},
 				{
-					"id": 306,
+					"id": 307,
 					"name": "SortBy",
 					"kind": 16777216,
 					"kindString": "Reference",
@@ -7565,24 +7565,24 @@
 					"target": 92
 				},
 				{
-					"id": 302,
+					"id": 303,
 					"name": "StorageBucketApi",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 106
+					"target": 107
 				},
 				{
-					"id": 303,
+					"id": 304,
 					"name": "StorageFileApi",
 					"kind": 16777216,
 					"kindString": "Reference",
 					"flags": {
 						"isExported": true
 					},
-					"target": 169
+					"target": 170
 				}
 			],
 			"groups": [
@@ -7590,15 +7590,15 @@
 					"title": "References",
 					"kind": 16777216,
 					"children": [
-						304,
-						310,
 						305,
-						307,
-						309,
-						308,
+						311,
 						306,
-						302,
-						303
+						308,
+						310,
+						309,
+						307,
+						303,
+						304
 					]
 				}
 			],
@@ -8127,7 +8127,7 @@
 					]
 				},
 				{
-					"id": 103,
+					"id": 104,
 					"name": "Metadata",
 					"kind": 256,
 					"kindString": "Interface",
@@ -8136,7 +8136,7 @@
 					},
 					"children": [
 						{
-							"id": 104,
+							"id": 105,
 							"name": "name",
 							"kind": 1024,
 							"kindString": "Property",
@@ -8146,7 +8146,7 @@
 							"sources": [
 								{
 									"fileName": "lib/types.ts",
-									"line": 46,
+									"line": 49,
 									"character": 6
 								}
 							],
@@ -8161,14 +8161,14 @@
 							"title": "Properties",
 							"kind": 1024,
 							"children": [
-								104
+								105
 							]
 						}
 					],
 					"sources": [
 						{
 							"fileName": "lib/types.ts",
-							"line": 45,
+							"line": 48,
 							"character": 25
 						}
 					]
@@ -8249,6 +8249,39 @@
 							}
 						},
 						{
+							"id": 103,
+							"name": "search",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The search string to filter files by."
+							},
+							"sources": [
+								{
+									"fileName": "lib/types.ts",
+									"line": 44,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
 							"id": 102,
 							"name": "sortBy",
 							"kind": 1024,
@@ -8281,6 +8314,7 @@
 							"children": [
 								100,
 								101,
+								103,
 								102
 							]
 						}
@@ -8390,7 +8424,7 @@
 						74,
 						81,
 						95,
-						103,
+						104,
 						99,
 						92
 					]
@@ -8460,14 +8494,14 @@
 			"title": "Modules",
 			"kind": 1,
 			"children": [
-				311,
-				377,
-				105,
-				168,
+				312,
+				378,
+				106,
+				169,
 				3,
 				6,
 				68,
-				301,
+				302,
 				73,
 				1
 			]
