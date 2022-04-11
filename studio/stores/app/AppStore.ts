@@ -14,6 +14,8 @@ export interface IAppStore {
   database: IDatabaseStore
   onProjectUpdated: (project: any) => void
   onProjectDeleted: (project: any) => void
+  onProjectConnectionStringUpdated: (projectId: number, value: string) => void
+  onProjectStatusUpdated: (projectId: number, value: string) => void
   onOrgAdded: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
@@ -39,12 +41,7 @@ export default class AppStore implements IAppStore {
 
   onProjectUpdated(project: any) {
     if (project && project.id) {
-      const kpsVersion =
-        project.services?.length > 0
-          ? project.services[0]?.infrastructure[0]?.app_versions?.version
-          : undefined
       const clone = cloneDeep(this.projects.data[project.id])
-      clone.kpsVersion = kpsVersion
       clone.name = project.name
       clone.status = project.status
       this.projects.data[project.id] = clone
@@ -58,6 +55,18 @@ export default class AppStore implements IAppStore {
       localStorage.removeItem(`supabase_${project.ref}`)
       delete this.projects.data[project.id]
     }
+  }
+
+  onProjectConnectionStringUpdated(projectId: number, value: string) {
+    const clone = cloneDeep(this.projects.data[projectId])
+    clone.connectionString = value
+    this.projects.data[projectId] = clone
+  }
+
+  onProjectStatusUpdated(projectId: number, value: string) {
+    const clone = cloneDeep(this.projects.data[projectId])
+    clone.status = value
+    this.projects.data[projectId] = clone
   }
 
   onOrgUpdated(updatedOrg: Organization) {

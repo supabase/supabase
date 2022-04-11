@@ -74,7 +74,7 @@ const Home: NextPage = () => {
   }
 
   const onRestoreProject = async (project: Project) => {
-    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.COMING_UP })
+    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
     await post(`${API_URL}/projects/${project.ref}/restore`, {})
     router.push(`/project/${project.ref}`)
   }
