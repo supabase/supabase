@@ -16,7 +16,7 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       queryType={'functions'}
-      override={{ key: 'metadata.function_id', value: id }}
+      filterOverride={{ 'metadata.function_id': id }}
     />
   )
 }
