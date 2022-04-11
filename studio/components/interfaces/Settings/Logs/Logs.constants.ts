@@ -1,4 +1,4 @@
-import { LogTemplate } from '.'
+import { FilterTableSet, LogTemplate } from '.'
 
 export const TEMPLATES: LogTemplate[] = [
   {
@@ -185,58 +185,21 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-export const genDefaultQuery = (table: LogsTableName, where: string | undefined) => {
-  switch (table) {
-    case 'edge_logs':
-      return `select id, timestamp, event_message, metadata, request, response, request.method, request.path, response.status_code
-from ${table}
-cross join unnest(metadata) as m
-cross join unnest(m.request) as request
-cross join unnest(m.response) as response
-${where}
-limit 100
-`
-      break
 
-    case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, metadata, metadataparsed.error_severity from ${table} 
-cross join unnest(metadata) as m 
-cross join unnest(m.parsed) as metadataparsed 
-${where} 
-limit 100
-`
-      break
 
-    case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level, metadata from ${table}
-cross join unnest(metadata) as metadata
-${where}
-limit 100
-  `
-      break
-
-    case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
-cross join unnest(metadata) as m
-cross join unnest(m.response) as response
-cross join unnest(m.request) as request
-${where}
-limit 100
-`
-
-    default:
-      return ""
-      break
-  }
+const _SQL_FILTER_COMMON = {
+  'search_query': (value: string) => `regexp_contains(event_message, '${value}')`
 }
 
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
+    ..._SQL_FILTER_COMMON,
     'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.log': `metadataParsed.error_severity = 'LOG'`,
   },
   edge_logs: {
+    ..._SQL_FILTER_COMMON,
     'status_code.error': `response.status_code between 500 and 599`,
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
@@ -252,11 +215,13 @@ export const SQL_FILTER_TEMPLATES: any = {
     'method.options': `request.method = 'OPTIONS'`,
   },
   function_edge_logs: {
+    ..._SQL_FILTER_COMMON,
     'status_code.error': `response.status_code between 500 and 599`,
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
   },
   function_logs: {
+    ..._SQL_FILTER_COMMON,
     'severity.error': `metadata.level = 'error'`,
     'severity.notError': `metadata.level != 'error'`,
     'severity.log': `metadata.level = 'log'`,
@@ -265,12 +230,6 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
 }
 
-// export const genDefaultQuery = (table: string, where: string = ''): string => `SELECT
-//   id, timestamp, event_message, metadata
-// FROM
-//   ${table}${where ? ' WHERE\n  ' + where : ''}
-// LIMIT 100
-// `
 // export const cleanQuery = (str: string) => str.replaceAll(/\n/g, ' ')
 export const cleanQuery = (str: string) => str.replace(/\n/g, ' ')
 // .replace(/\n.*\-\-.*(\n)?$?/, "")
@@ -309,23 +268,7 @@ export const genQueryParams = (params: { [k: string]: string }) => {
   const qs = new URLSearchParams(params).toString()
   return qs
 }
-
-interface Filter {
-  label: string
-  key: string
-  options: {
-    key: string
-    label: string
-    description?: string
-  }[]
-}
-type FilterOptions = {
-  [table: string]: {
-    [filterName: string]: Filter
-  }
-}
-
-export const FILTER_OPTIONS: FilterOptions = {
+export const FILTER_OPTIONS: FilterTableSet = {
   // Postgres logs
   postgres_logs: {
     severity: {

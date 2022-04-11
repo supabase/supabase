@@ -3,7 +3,7 @@ const svgToDataUri = require('mini-svg-data-uri')
 
 module.exports = ui({
   mode: 'JIT',
-  purge: [
+  content: [
     './components/**/*.tsx',
     './pages/**/*.tsx',
     './_blog/*.mdx',

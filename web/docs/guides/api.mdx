@@ -54,11 +54,6 @@ GraphQL is in Beta, and may have breaking changes. It is only available on self-
 :::
 
 GraphQL in Supabase works through [pg_graphql](/blog/2021/12/03/pg-graphql), an open source PostgreSQL extension for GraphQL. 
-To get started with GraphQL you must enable the `pg_graphql` extension in your project.
-
-<video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-enable-graphql.mp4" type="video/mp4" muted playsInline />
-</video>
 
 ### Realtime API
 
@@ -240,7 +235,8 @@ JS Reference: [select()](/docs/reference/javascript/select),
 
 :::note 
 
-While pg_graphql is in beta, we have disabled GraphQL auto-refreshing. If you want to refresh your GraphQL introspection, call `select graphql.rebuild_schema();` to rebuild your GraphQL schema.
+To rebuild your GraphQL schema from the SQL schema, call `select graphql.rebuild_schema();`.
+Be sure to rebuild the GraphQL schema after altering the SQL schema.
 
 :::
 
@@ -426,19 +422,14 @@ If they detect any keys with service_role privileges being pushed to GitHub, the
 
 ### Safeguards towards accidental deletes and updates
 
-For new projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
+For all projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
 This ensures that any `delete()` or `update()` would fail if there are no accompanying filters provided.
-This can be disabled by running the following query on the SQL editor on the dashboard:
-
+To confirm that safeupdate is enabled for queries going through the API of your project, the following query could be run:
 ```sql
-alter role "authenticator"
-set "session_preload_libraries" to default;
+select usename,useconfig from pg_shadow where usename = 'authenticator' ;
 ```
 
-To reenable it :
-```sql
-alter role "authenticator" 
-set "session_preload_libraries" = 'safeupdate';
+The expected value for `useconfig` should be:
 ```
-The above can also be run to enable it for existing projects. Settings are applied immediately and as such no restarts are needed after running any of the two.
-
+["session_preload_libraries=supautils, safeupdate"]
+```

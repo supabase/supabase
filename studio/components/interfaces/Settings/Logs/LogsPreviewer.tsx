@@ -1,14 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import { useRouter } from 'next/router'
-import {
-  Typography,
-  IconLoader,
-  IconAlertCircle,
-  IconRewind,
-  Button,
-  Card,
-  Input,
-} from '@supabase/ui'
+import { Typography, IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
 
 import {
   LogTable,
@@ -16,10 +8,10 @@ import {
   TEMPLATES,
   LogSearchCallback,
   LogsTableName,
-  filterSqlWhereBuilder,
-  filterReducer,
   QueryType,
   LogEventChart,
+  FilterObject,
+  Filters,
 } from 'components/interfaces/Settings/Logs'
 import dayjs from 'dayjs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
@@ -27,7 +19,6 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 
 import { LOGS_TABLES } from './Logs.constants'
 import { Override } from './Logs.types'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 
@@ -44,14 +35,14 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 interface Props {
   projectRef: string
   queryType: QueryType
-  override?: Override
+  filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
 }
 export const LogsPreviewer: React.FC<Props> = ({
   projectRef,
   queryType,
-  override,
+  filterOverride,
   condensedLayout = false,
   tableName,
 }) => {
@@ -59,22 +50,12 @@ export const LogsPreviewer: React.FC<Props> = ({
   const { s, te, ts } = router.query
   const [showChart, setShowChart] = useState(true)
 
-  const [whereFilters, dispatchWhereFilters] = useReducer(filterReducer, {})
-
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
     { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
     { loadOlder, setFilters, refresh, setTo, setFrom },
-  ] = useLogsPreview(projectRef as string, table, {
-    initialFilters: { search_query: s as string },
-    whereStatementFactory: (filterObj) => `${
-      filterObj.search_query
-        ? `where REGEXP_CONTAINS(event_message, '${filterObj.search_query}')`
-        : ''
-    }
-    ${filterSqlWhereBuilder(whereFilters, table, override, filterObj.search_query).join('\n')}`,
-  })
+  ] = useLogsPreview(projectRef as string, table, filterOverride)
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
@@ -91,13 +72,8 @@ export const LogsPreviewer: React.FC<Props> = ({
   }, [s, te, ts])
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setFilters((prev) => ({ ...prev, search_query: template.searchString }))
+    setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
   }
-
-  useEffect(() => {
-    // runs when any of the filters change
-    handleRefresh()
-  }, [whereFilters])
 
   const handleRefresh = () => {
     refresh()
@@ -135,7 +111,6 @@ export const LogsPreviewer: React.FC<Props> = ({
       },
     })
   }
-
   return (
     <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
@@ -147,7 +122,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         )}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
-        defaultSearchValue={filters.search_query}
+        defaultSearchValue={filters.search_query as string}
         defaultToValue={
           params.timestamp_end ? dayjs(Number(params.timestamp_end) / 1000).toISOString() : ''
         }
@@ -162,8 +137,8 @@ export const LogsPreviewer: React.FC<Props> = ({
           router.push(`/project/${projectRef}/logs-explorer?q=${encodeURIComponent(params.rawSql)}`)
         }}
         onSelectTemplate={onSelectTemplate}
-        dispatchWhereFilters={dispatchWhereFilters}
-        whereFilters={whereFilters}
+        filters={filters}
+        onFiltersChange={setFilters}
         table={table}
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
@@ -182,7 +157,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             <LogEventChart
               data={!isLoading ? logData : undefined}
               onBarClick={(timestampMicro) => {
-                handleSearch({ query: filters.search_query, toMicro: timestampMicro })
+                handleSearch({ query: filters.search_query as string, toMicro: timestampMicro })
               }}
             />
           )}

@@ -292,3 +292,32 @@ test("bug: nav to explorer preserves newlines", async ()=>{
   userEvent.click(await screen.findByText(/Explore/))
   await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent("\n")))
 }
+test('filters alter generated query', async () => {
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  userEvent.click(await screen.findByRole('button', { name: 'Status' }))
+  userEvent.click(await screen.findByText(/500 error codes/))
+  userEvent.click(await screen.findByText(/200 codes/))
+  userEvent.click(await screen.findByText(/Save/))
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('500'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('200'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('where'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('and'))
+  })
+})
+test('filters accept filterOverride', async () => {
+  render(
+    <LogsPreviewer
+      projectRef="123"
+      tableName={LogsTableName.FUNCTIONS}
+      filterOverride={{ 'my.nestedkey': 'myvalue' }}
+    />
+  )
+
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('my.nestedkey'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('myvalue'))
+  })
+})

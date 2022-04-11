@@ -9,11 +9,11 @@ import {
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
-import { LogSearchCallback, LogTemplate } from '.'
+import { Filters, LogSearchCallback, LogTemplate } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
-import { LogsFilter } from './Logs.filter'
+import LogsFilterPopover from './LogsFilterPopover'
 import DatePickers from './Logs.DatePickers'
 import CSVButton from 'components/ui/CSVButton'
 
@@ -28,13 +28,13 @@ interface Props {
   onSearch?: LogSearchCallback
   onExploreClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
-  dispatchWhereFilters: (x: any) => void
-  whereFilters: any
   table: LogsTableName
   condensedLayout: Boolean
   isShowingEventChart: boolean
   onToggleEventChart: () => void
   csvData?: unknown[]
+  onFiltersChange: (filters: Filters) => void
+  filters: Filters
 }
 
 dayjs.extend(utc)
@@ -51,13 +51,13 @@ const PreviewFilterPanel: FC<Props> = ({
   defaultToValue = '',
   defaultFromValue = '',
   onExploreClick,
-  dispatchWhereFilters,
-  whereFilters: filters,
-  table,
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
   csvData,
+  onFiltersChange,
+  filters,
+  table,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -174,12 +174,12 @@ const PreviewFilterPanel: FC<Props> = ({
               }
 
               return (
-                <LogsFilter
-                  classes={classes.join(' ')}
+                <LogsFilterPopover
+                  buttonClassName={classes.join(' ')}
                   key={`${x.key}-filter`}
                   options={x}
-                  dispatchFilters={dispatchWhereFilters}
-                  filtersState={filters}
+                  onFiltersChange={onFiltersChange}
+                  filters={filters}
                 />
               )
             })}

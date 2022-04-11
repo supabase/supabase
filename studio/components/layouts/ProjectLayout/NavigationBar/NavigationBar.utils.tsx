@@ -82,12 +82,11 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
 }
 
 export const generateOtherRoutes = (ref: string, project?: ProjectBase) => {
-  const logsExplorer = useFlag('logsExplorer')
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
   return [
-    ...(IS_PLATFORM && logsExplorer
+    ...(IS_PLATFORM
       ? [
           {
             key: 'logsExplorer',
