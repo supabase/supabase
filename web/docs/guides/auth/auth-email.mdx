@@ -87,9 +87,9 @@ async function signInWithEmail() {
 <TabItem value="dart">
 
 ```dart
-function SignInWithEmail() {
+Future<void> signInWithEmail() async {
   await supabase.auth.signIn(
-    email: 'example@email.com',
+    email: 'example@email.com', 
     password: 'example-password'
   );
 }
@@ -120,8 +120,8 @@ async function signOut() {
 <TabItem value="dart">
 
 ```dart
-function SignOut() {
-  await supabase.auth.signOut();
+Future<void> signOut() async {
+   await supabase.auth.signOut();
 }
 ```
 
