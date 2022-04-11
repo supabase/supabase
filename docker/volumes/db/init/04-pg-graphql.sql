@@ -17,13 +17,19 @@ as $$
 
         IF server_version >= 14 THEN
             RETURN jsonb_build_object(
-                'data', null::jsonb,
-                'errors', array['pg_graphql extension is not enabled.']
+                'errors', jsonb_build_array(
+                    jsonb_build_object(
+                        'message', 'pg_graphql extension is not enabled.'
+                    )
+                )
             );
         ELSE
    	        RETURN jsonb_build_object(
-                'data', null::jsonb,
-                'errors', array['pg_graphql is only available on projects running Postgres 14 onwards.']
+                'errors', jsonb_build_array(
+                    jsonb_build_object(
+                        'message', 'pg_graphql is only available on projects running Postgres 14 onwards.'
+                    )
+                )
             );
         END IF;
     END;
@@ -42,13 +48,13 @@ alter default privileges for user supabase_admin in schema graphql_public grant 
     on functions to postgres, anon, authenticated, service_role;
 
 -- Trigger upon enabling pg_graphql
-CREATE OR REPLACE FUNCTION extensions.grant_pg_graphql_access()
-RETURNS event_trigger
-LANGUAGE plpgsql
+create or replace function extensions.grant_pg_graphql_access()
+    returns event_trigger
+    language plpgsql
 AS $func$
-    DECLARE
+DECLARE
     func_is_graphql_resolve bool;
-    BEGIN
+BEGIN
     func_is_graphql_resolve = (
         SELECT n.proname = 'resolve'
         FROM pg_event_trigger_ddl_commands() AS ev
@@ -65,23 +71,29 @@ AS $func$
         alter default privileges in schema graphql grant all on functions to postgres, anon, authenticated, service_role;
         alter default privileges in schema graphql grant all on sequences to postgres, anon, authenticated, service_role;
 
+        -- Update public wrapper to pass all arguments through to the pg_graphql resolve func
         create or replace function graphql_public.graphql(
             "operationName" text default null,
             query text default null,
             variables jsonb default null,
-            extensions jsonb default null 
+            extensions jsonb default null
         )
             returns jsonb
             language sql
         as $$
-            SELECT graphql.resolve(query, coalesce(variables, '{}'));
+            select graphql.resolve(
+                query := query,
+                variables := coalesce(variables, '{}'),
+                "operationName" := "operationName",
+                extensions := extensions
+            );
         $$;
 
         grant select on graphql.field, graphql.type, graphql.enum_value to postgres, anon, authenticated, service_role;
         grant execute on function graphql.resolve to postgres, anon, authenticated, service_role;
     END IF;
 
-    END;
+END;
 $func$;
 
 CREATE EVENT TRIGGER issue_pg_graphql_access ON ddl_command_end WHEN TAG in ('CREATE FUNCTION')
@@ -120,13 +132,19 @@ AS $func$
 
                 IF server_version >= 14 THEN
                     RETURN jsonb_build_object(
-                        'data', null::jsonb,
-                        'errors', array['pg_graphql extension is not enabled.']
+                        'errors', jsonb_build_array(
+                            jsonb_build_object(
+                                'message', 'pg_graphql extension is not enabled.'
+                            )
+                        )
                     );
                 ELSE
                     RETURN jsonb_build_object(
-                        'data', null::jsonb,
-                        'errors', array['pg_graphql is only available on projects running Postgres 14 onwards.']
+                        'errors', jsonb_build_array(
+                            jsonb_build_object(
+                                'message', 'pg_graphql is only available on projects running Postgres 14 onwards.'
+                            )
+                        )
                     );
                 END IF;
             END;
@@ -139,3 +157,6 @@ $func$;
 CREATE EVENT TRIGGER issue_graphql_placeholder ON sql_drop WHEN TAG in ('DROP EXTENSION')
 EXECUTE PROCEDURE extensions.set_graphql_placeholder();
 COMMENT ON FUNCTION extensions.set_graphql_placeholder IS 'Reintroduces placeholder function for graphql_public.graphql';
+
+drop extension if exists pg_graphql;
+create extension if not exists pg_graphql;

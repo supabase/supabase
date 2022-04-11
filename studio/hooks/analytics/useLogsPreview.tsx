@@ -61,6 +61,14 @@ function useLogsPreview(
   // handle url generation for log pagination
   const getKeyLogs: SWRInfiniteKeyLoader = (_pageIndex: number, prevPageData: Logs) => {
     let queryParams
+
+    // cancel request if no sql provided
+    if(!params.sql) {
+      // return null to restrict unnecessary requests to api
+      // https://swr.vercel.app/docs/conditional-fetching#conditional
+      return null
+    }
+
     // if prev page data is 100 items, could possibly have more records that are not yet fetched within this interval
     if (prevPageData === null) {
       // reduce interval window limit by using the timestamp of the last log
@@ -86,13 +94,23 @@ function useLogsPreview(
   } = useSWRInfinite<Logs>(getKeyLogs, get, { revalidateOnFocus: false, dedupingInterval: 3000 })
   let logData: LogData[] = []
 
-  const countUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-    {
-      ...params,
-      sql: genCountQuery(table),
-      period_start: String(latestRefresh),
-    } as any
-  )}`
+  const countUrl = () => {
+    
+    // cancel request if no sql provided
+    if(!params.sql) {
+      // return null to restrict unnecessary requests to api
+      // https://swr.vercel.app/docs/conditional-fetching#conditional
+      return null
+    }
+
+    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
+      {
+        ...params,
+        sql: genCountQuery(table),
+        period_start: String(latestRefresh),
+      } as any
+    )}`
+  }
 
   const { data: countData } = useSWR<Count>(countUrl, get, {
     revalidateOnFocus: false,
