@@ -88,9 +88,10 @@ async function signInWithEmail() {
 
 ```dart
 Future<void> signInWithEmail() async {
-  await supabase.auth
-      .signIn(email: 'example@email.com', 
-      password: 'example-password');
+  await supabase.auth.signIn(
+    email: 'example@email.com', 
+    password: 'example-password'
+  );
 }
 ```
 
