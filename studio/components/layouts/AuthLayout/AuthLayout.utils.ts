@@ -9,6 +9,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
         { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
+        { name: 'Atuh Logs', key: 'templates', url: `/project/${ref}/auth/auth-logs`, items: [] },
       ],
     },
     ...(IS_PLATFORM

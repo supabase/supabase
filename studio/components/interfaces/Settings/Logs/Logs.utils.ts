@@ -148,7 +148,10 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     default:
-      return ''
+      return `select id, ${table}.timestamp, event_message, metadata from ${table}
+  ${where}
+  limit 100          
+  `
       break
   }
 }
