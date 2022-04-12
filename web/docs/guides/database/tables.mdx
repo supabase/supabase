@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
 Tables are where you store your data. 
 
 
-Tables are similar to excel spreadsheets. They contain columns & rows of data. 
+Tables are similar to excel spreadsheets. They contain columns and rows. 
 For example, this table has 3 "columns" (`id`, `name`, `description`) and 4 "rows" of data:
 
 | `id`    | `name` | `description` |
@@ -26,14 +26,13 @@ There are a few important differences from a spreadsheet, but it's a good starti
 ## Creating Tables
 
 
-A table is represented as a two dimensional grid of columns and rows. You must define the "data type" for a column when it is created. 
-
+When creating a table, it's best practice to add columns at the same time. 
 
 ![Tables and columns](/img/guides/database/tables-columns.png)
 
-It's best practice to add columns to a table at the same time that you create it. You can add and remove columns at any time after creating a table.
+You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table. 
 
-Supabase provides several options for creating tables. You can use the Table Editor or create them directly using SQL. 
+Supabase provides several options for creating tables. You can use the Dashboard or create them directly using SQL. 
 We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database 
 and run the SQL queries yourself.
 
@@ -41,10 +40,15 @@ and run the SQL queries yourself.
 <Tabs
 defaultValue="UI"
 values={[
-  {label: 'UI', value: 'UI'},
+  {label: 'Dashboard', value: 'UI'},
   {label: 'SQL', value: 'SQL'},
 ]}>
 <TabItem value="UI">
+
+
+<video width="99%" muted playsInline controls="true">
+<source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
+</video>
 
 ```sh
 1. Go to the "Table editor" section.
@@ -55,10 +59,6 @@ values={[
 6. Enter the column name "task" and make the type "text".
 7. Click "Save".
 ```
-
-<video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
-</video>
 
 </TabItem>
 <TabItem value="SQL">
@@ -138,6 +138,8 @@ if the default types don't fit your needs.
 
 
 </details>
+
+<br />
 
 You can "cast" columns from one type to another, however there can be some incompatibilities between types. 
 For example, if you cast a `timestamp` to a `date`, you will lose all the time information that was previously saved.
@@ -281,7 +283,7 @@ For example if you had the following situations:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'UI', value: 'UI'},
+  {label: 'Dashboard', value: 'UI'},
 ]}>
 <TabItem value="SQL">
 
