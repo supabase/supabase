@@ -21,7 +21,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = {
     id: 1,
     ref: 'default',
-    name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
+    name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
     organization_id: 1,
     cloud_provider: 'localhost',
     status: 'ACTIVE_HEALTHY',
