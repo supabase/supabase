@@ -1,18 +1,17 @@
-import type { Config } from '@jest/types';
+import type { Config } from '@jest/types'
 
 const config: Config.InitialOptions = {
   preset: 'ts-jest',
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
-  moduleFileExtensions: ['ts', 'js', 'cjs', 'json', 'node',],
+  moduleFileExtensions: ['ts', 'js', 'cjs', 'json', 'node'],
   // globalSetup: './test/hooks.ts',
   // globalTeardown: './teardown.js',
-  setupFilesAfterEnv: [
-    './jest-custom-reporter.ts',
-  ],
-  // setupFilesAfterEnv: ['jest-allure2-adapter/dist/setup-default',],
-  testTimeout: 25000,
+  setupFiles: ['<rootDir>/.jest/jest-env.js'],
+  setupFilesAfterEnv: ['<rootDir>/.jest/jest-custom-reporter.ts'],
+  testRunner: 'jest-jasmine2',
+  testTimeout: 5000,
   // testEnvironmentOptions: {
   //   jiraUrl: ""
   // },
@@ -24,5 +23,5 @@ const config: Config.InitialOptions = {
       statements: 0,
     },
   },
-};
-export default config;
+}
+export default config
