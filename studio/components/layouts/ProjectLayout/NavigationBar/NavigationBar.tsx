@@ -16,10 +16,11 @@ const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
   const { ui } = useStore()
   const projectRef = ui.selectedProjectRef as string
+  const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const activeRoute = router.pathname.split('/')[3]
-  const productRoutes = generateProductRoutes(projectRef)
-  const otherRoutes = generateOtherRoutes(projectRef)
+  const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
+  const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
 
   return (
     <div

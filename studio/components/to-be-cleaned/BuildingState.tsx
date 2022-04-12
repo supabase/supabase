@@ -1,6 +1,5 @@
-import * as React from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { FC, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, IconArrowRight, IconLoader, Button } from '@supabase/ui'
 import {
@@ -11,33 +10,34 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
+import { Project } from 'types'
 
-type ProjectBuildingState = {} & any
-const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
-  const { ui, app } = useStore()
-  const project: any = ui.selectedProject
-
-  const router = useRouter()
-  const { ref } = router.query
-  const checkServerInterval = React.useRef<number>()
+type ProjectBuildingState = { project: Project }
+const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
+  const { app } = useStore()
+  const checkServerInterval = useRef<number>()
 
   async function checkServer() {
-    const response = await get(`${API_URL}/props/project/${ref}`)
-    if (response && response.project) {
-      const { project } = response
-      if (project.status === 'ACTIVE_HEALTHY') {
-        const res = await get(`${API_URL}/props/project/${ref}/connection-string`)
-        if (res && res.connectionString) project.connectionString = res.connectionString
-        app.onProjectUpdated(project)
+    if (!project) return
+
+    const projectStatus = await get(`${API_URL}/projects/${project.ref}/status`)
+    if (projectStatus && !projectStatus.error) {
+      const { status } = projectStatus
+      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+        const res = await get(`${API_URL}/props/project/${project.ref}/connection-string`)
+        if (res && res.connectionString) {
+          app.onProjectConnectionStringUpdated(project.id, res.connectionString)
+        }
+        app.onProjectStatusUpdated(project.id, status)
         clearInterval(checkServerInterval.current)
       }
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     // check server status every 2s
     checkServerInterval.current = window.setInterval(checkServer, 2000)
     return () => {
@@ -50,11 +50,15 @@ const ProjectBuildingState: React.FC<ProjectBuildingState> = () => {
       <div className="flex flex-col space-y-16 mx-6">
         <div className=" flex flex-col gap-4">
           <div className="space-x-3 flex items-center">
-            <h1 className="text-scale-1200 text-3xl">{project.name}</h1>
+            <h1 className="text-scale-1200 text-3xl">{project?.name}</h1>
             <Badge color="brand">
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
-                <span>Setting up project</span>
+                <span>
+                  {project.status === PROJECT_STATUS.RESTORING
+                    ? 'Restoring project'
+                    : 'Setting up project'}
+                </span>
               </div>
             </Badge>
           </div>
