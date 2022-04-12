@@ -63,6 +63,7 @@ module.exports = {
         'guides/with-nextjs',
         'guides/with-react',
         'guides/with-redwoodjs',
+        'guides/with-solidjs',
         'guides/with-svelte',
         'guides/with-vue-3',
       ],
