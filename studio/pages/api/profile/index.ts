@@ -29,14 +29,14 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     organizations: [
       {
         id: 1,
-        name: 'Default Organization' || process.env.DEFAULT_ORGANIZATION_NAME,
+        name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
         projects: [
           {
             id: 1,
             ref: 'default',
-            name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
+            name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
             organization_id: 1,
             cloud_provider: 'localhost',
             status: 'ACTIVE_HEALTHY',

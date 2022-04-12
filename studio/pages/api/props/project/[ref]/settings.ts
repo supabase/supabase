@@ -30,7 +30,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       id: 1,
       inserted_at: undefined,
       jwt_secret: '-',
-      name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
+      name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
       ref: 'default',
       region: 'ap-southeast-1',
       status: 'ACTIVE_HEALTHY',

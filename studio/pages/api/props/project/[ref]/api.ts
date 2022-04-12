@@ -28,7 +28,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       db_user: 'postgres',
       id: 1,
       inserted_at: undefined,
-      name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
+      name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
       ref: 'default',
       status: 'ACTIVE_HEALTHY',
       services: [

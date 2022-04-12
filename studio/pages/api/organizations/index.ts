@@ -21,7 +21,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = [
     {
       id: 1,
-      name: 'Default Organization' || process.env.DEFAULT_ORGANIZATION_NAME,
+      name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
       slug: 'default-org-slug',
       billing_email: 'billing@supabase.co',
     },
