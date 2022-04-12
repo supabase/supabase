@@ -63,7 +63,7 @@ function useLogsPreview(
     let queryParams
 
     // cancel request if no sql provided
-    if(!params.sql) {
+    if (!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
       return null
@@ -95,21 +95,18 @@ function useLogsPreview(
   let logData: LogData[] = []
 
   const countUrl = () => {
-    
     // cancel request if no sql provided
-    if(!params.sql) {
+    if (!params.sql) {
       // return null to restrict unnecessary requests to api
       // https://swr.vercel.app/docs/conditional-fetching#conditional
       return null
     }
 
-    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-      {
-        ...params,
-        sql: genCountQuery(table),
-        period_start: String(latestRefresh),
-      } as any
-    )}`
+    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+      ...params,
+      sql: genCountQuery(table),
+      period_start: String(latestRefresh),
+    } as any)}`
   }
 
   const { data: countData } = useSWR<Count>(countUrl, get, {
