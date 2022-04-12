@@ -20,7 +20,11 @@ function ExampleCard(props: any) {
           <h4 className="h6">{props.title}</h4>
           <p className="p text-sm">{props.description}</p>
           <div>
-            <img src={props.author_img} className="inline w-6 rounded-full border-scale-500" />
+            <img
+              src={props.author_img}
+              alt={props.author + ' GitHub profile picture'}
+              className="inline w-6 rounded-full border-scale-500"
+            />
             <span className="text-sm ml-2 text-scale-1200">{props.author}</span>
           </div>
         </div>
