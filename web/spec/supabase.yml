@@ -396,7 +396,7 @@ pages:
       One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
       Supabase offers a Swagger OpenAPI specification for the REST data endpoint which you can use to generate definitions.
 
-      The following script can be run in your terminal to test this.
+      The following script can be run in your terminal to produce the file `types/database/index.ts`.
       ```
       npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
       ```
