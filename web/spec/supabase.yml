@@ -394,7 +394,7 @@ pages:
       ### Update types automatically with GitHub Actions
 
       One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
-      Supabase offers a Swagger OpenAPI specification for the REST data endpoint which you can retrieve definitions for.
+      Supabase offers a Swagger OpenAPI specification for the REST data endpoint which you can use to generate definitions.
 
       The following script can be run in your terminal to test this.
       ```
