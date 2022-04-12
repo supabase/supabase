@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import apiWrapper from 'lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -29,7 +30,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       id: 1,
       inserted_at: undefined,
       jwt_secret: '-',
-      name: 'Default Project',
+      name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
       ref: 'default',
       region: 'ap-southeast-1',
       status: 'ACTIVE_HEALTHY',
