@@ -451,26 +451,7 @@ pages:
                 branch: ${{ github.ref }}
       ```
 
-      Alternatively, you can also try out a GitHub action created by a community member, [@lyqht](https://github.com/lyqht). Here's a [reference project workflow using it](https://github.com/lyqht/Billy/actions/workflows/update-types.yml), and this is how you can use it.
-      ```
-      name: Update database types
-
-      on:
-        schedule:
-          - cron: '*/5 * * * *'
-        workflow_dispatch:
-
-      jobs:
-        update:
-          runs-on: ubuntu-latest
-          steps:
-          - name: Generate Supabase Database types
-            uses: lyqht/generate-supabase-db-types-github-action@v0.0.2
-            with:
-                SUPABASE_URL: ${{secrets.SUPABASE_URL }}
-                SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-                OUTPUT_PATH: src/types/supabase.ts
-      ```
+      Alternatively, you can also try out a GitHub action created by a community member at https://github.com/lyqht/generate-supabase-db-types-github-action.
 
   auth.signUp():
     title: 'signUp()'
