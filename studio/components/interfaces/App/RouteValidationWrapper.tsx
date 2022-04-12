@@ -42,8 +42,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
     if (orgsInitialized && orgSlug) {
       // Check validity of organization that user is trying to access
       const organizations = app.organizations.list()
-      const organizationSlugs = organizations.map((org: Organization) => org.slug)
-      const isValidOrg = organizationSlugs.includes(orgSlug as string)
+      const isValidOrg = organizations.some((org: Organization) => org.slug === orgSlug)
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
@@ -60,8 +59,7 @@ const RouteValidationWrapper: FC = ({ children }) => {
     if (projectsInitialized && projectRef) {
       // Check validity of project that the user is trying to access
       const projects = app.projects.list()
-      const projectRefs = projects.map((project: Project) => project.ref)
-      const isValidProject = projectRefs.includes(projectRef as string)
+      const isValidProject = projects.some((project: Project) => project.ref === projectRef)
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })

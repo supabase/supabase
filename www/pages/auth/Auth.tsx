@@ -100,7 +100,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <p className="mb-4">
+              <p className="mb-4 -mt-[1.9rem]">
                 <div className="grid grid-rows-2 grid-flow-col gap-2 xl:w-64">
                   <div className="w-fit flex items-center">
                     <svg
@@ -132,7 +132,7 @@ function AuthPage() {
                 </div>
               </p>
               <h4 className="h4">All the social providers</h4>
-              <p className="p text-base text-scale-1100">
+              <p className="p text-base">
                 Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
                 Gitlab, Twitter, Discord, and many more.
               </p>
