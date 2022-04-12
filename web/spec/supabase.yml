@@ -407,7 +407,7 @@ pages:
       "update-types": "npx openapi-typescript \"${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}\" --version=2 --output types/database/index.ts"
       ```
 
-      Then in your repo, create the file `.github/workflows/update-types.yml`. Add the following snippet into this file to define the action along with the environment variables. If there is a change to your definitions, this script will commit the change to your repo. ([Reference Article](https://blog.esteetey.dev/how-to-create-and-test-a-github-action-that-generates-types-from-supabase-database#heading-how-to-create-the-github-workflow))
+      You can use GitHub actions to generate this file automatically. Create a file `.github/workflows/update-types.yml` and add the following snippet into this file to define the action along with the environment variables. If there is a change to your definitions, this script will commit the change to your repo.
 
       ```yml
       name: Update database types
