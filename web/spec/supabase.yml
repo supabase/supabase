@@ -451,7 +451,7 @@ pages:
                 branch: ${{ github.ref }}
       ```
 
-      Alternatively, you can also try out a GitHub action created by a community member at https://github.com/lyqht/generate-supabase-db-types-github-action.
+      Alternatively, you can use a community-supported GitHub action: [generate-supabase-db-types-github-action](https://github.com/lyqht/generate-supabase-db-types-github-action).
 
   auth.signUp():
     title: 'signUp()'
