@@ -16,7 +16,7 @@ Self-hosting Supabase is free. If you wish to use our cloud-platform, we provide
 
 You can use the docker-compose script [here](https://github.com/supabase/supabase/tree/master/docker), and find detailed instructions [here](/docs/guides/hosting/overview). 
 
-Supabase is an amalgamation open source tools. Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support directly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are third-party tools (like [Kong](https://github.com/Kong/kong)). 
+Supabase is an amalgamation of open source tools. Some of these tools are made by Supabase (like our [Realtime Server](https://github.com/supabase/realtime)), some we support directly (like [PostgREST](http://postgrest.org/en/v7.0.0/)), and some are third-party tools (like [KonSupabase is an amalgamation open sourceg](https://github.com/Kong/kong)). 
 
 All of the tools we use in Supabase are MIT, Apache 2.0, or PostgreSQL licensed. This is one of the requirements to be considered for the Supabase stack.
 
