@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+
 import { IS_PLATFORM } from 'lib/constants'
-import { createEncryptedDbConnectionString } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
+import { createEncryptedDbConnectionString } from 'lib/api/apiHelpers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -28,14 +29,14 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     organizations: [
       {
         id: 1,
-        name: 'Default Organization',
+        name: 'Default Organization' || process.env.DEFAULT_ORGANIZATION_NAME,
         slug: 'default-org-slug',
         billing_email: 'billing@supabase.co',
         projects: [
           {
             id: 1,
             ref: 'default',
-            name: 'Default Project',
+            name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
             organization_id: 1,
             cloud_provider: 'localhost',
             status: 'ACTIVE_HEALTHY',

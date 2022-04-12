@@ -1,5 +1,6 @@
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import apiWrapper from 'lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -20,7 +21,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = {
     id: 1,
     ref: 'default',
-    name: 'Default Project',
+    name: 'Default Project' || process.env.DEFAULT_PROJECT_NAME,
     organization_id: 1,
     cloud_provider: 'localhost',
     status: 'ACTIVE_HEALTHY',

@@ -73,6 +73,13 @@ npm install
 npm run dev
 ```
 
+If you would like to configure different defaults for "Default Organization" and "Default Project", you will need to update the `.env` in the studio folder with the corresponding values.
+
+```
+DEFAULT_ORGANIZATION_NAME=
+DEFAULT_PROJECT_NAME=
+```
+
 ## UI Testing Notes
 
 ### `<Popover>` vs `<Dropdown>`
