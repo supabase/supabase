@@ -401,7 +401,7 @@ pages:
       npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
       ```
 
-      For the GitHub action, add a script to your package.json to generate the types:
+      You can add this script to your `package.json` and run it using `npm run update-types`:
 
       ```
       "update-types": "npx openapi-typescript \"${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}\" --version=2 --output types/database/index.ts"
