@@ -16,8 +16,8 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
   const DetailedRow = ({ label, value }: { label: string; value: string | React.ReactNode }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
-        <span className="text-scale-1200 text-base col-span-8">{value}</span>
+        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+        <span className="text-scale-1200 text-base col-span-8 whitespace-pre-wrap">{value}</span>
       </div>
     )
   }
