@@ -37,7 +37,7 @@ const Subscription: FC<Props> = ({
   const { ui } = useStore()
   const isOrgOwner = ui.selectedOrganization?.is_owner
 
-  const nativeBilling = useFlag('nativeBilling')
+  // const nativeBilling = useFlag('nativeBilling')
   const subscriptionStats = useSubscriptionStats()
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
@@ -65,28 +65,28 @@ const Subscription: FC<Props> = ({
               </p>
               <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            {nativeBilling ? (
-              <div className="flex flex-col items-end space-y-2">
-                <Button
-                  disabled={!isOrgOwner}
-                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
-                  type="primary"
-                >
-                  Change subscription
-                </Button>
-                {!isOrgOwner && (
-                  <p className="text-sm text-scale-1100">
-                    Only the organization owner can amend subscriptions
-                  </p>
-                )}
-              </div>
-            ) : (
+            {/* {nativeBilling ? ( */}
+            <div className="flex flex-col items-end space-y-2">
+              <Button
+                disabled={!isOrgOwner}
+                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                type="primary"
+              >
+                Change subscription
+              </Button>
+              {!isOrgOwner && (
+                <p className="text-sm text-scale-1100">
+                  Only the organization owner can amend subscriptions
+                </p>
+              )}
+            </div>
+            {/* ) : (
               <UpgradeButton
                 paid={paid}
                 projectRef={project.ref}
                 subscriptionStats={subscriptionStats}
               />
-            )}
+            )} */}
           </div>
           {paid && (
             <div className="px-6 pt-4">

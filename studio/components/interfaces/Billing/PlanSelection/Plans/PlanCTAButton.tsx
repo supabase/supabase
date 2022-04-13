@@ -59,7 +59,13 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
 
   return (
     <div className="flex items-center justify-center">
-      <Button disabled={disabled} type={type} onClick={() => onSelectPlan(plan)}>
+      <Button
+        disabled={disabled}
+        type={type}
+        onClick={() => onSelectPlan(plan)}
+        block
+        size="medium"
+      >
         {ctaText}
       </Button>
     </div>

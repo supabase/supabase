@@ -21,6 +21,12 @@ export default function IndexPage() {
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing tiers, with no hidden pricing. We have generous free tiers for those getting started, and Pay As You Go for those scaling up.'
 
+  /**
+   * @mildtomato same plan metadata is also in /studio dashboard
+   * would be good if this constant was shared across apps
+   *
+   * https://github.com/supabase/supabase/blob/master/www/pages/pricing/index.tsx
+   */
   const tiers = [
     {
       name: 'Free',
