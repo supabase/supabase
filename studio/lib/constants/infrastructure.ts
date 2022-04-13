@@ -105,10 +105,10 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
 }
 
-export const STRIPE_PRODUCT_IDS = {
-  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID,
-  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID,
-  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID,
+export const STRIPE_PRODUCT_IDS: { [x: string]: string } = {
+  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID || 'prod_Ip4vqwv3EJ7Mi0',
+  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID || 'prod_IsRLOp58Z7V4XN',
+  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID || 'prod_JlTbw91xcM6NY4',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
