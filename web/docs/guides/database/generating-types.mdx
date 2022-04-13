@@ -1,0 +1,71 @@
+---
+id: generating-types
+title: "Generating Types with GitHub Action"
+description: How to generate Supabase types
+---
+
+## Update types automatically with GitHub Actions
+
+One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
+Supabase offers a Swagger OpenAPI specification for the REST data endpoint which you can use to generate definitions.
+
+The following script can be run in your terminal to produce the file `types/database/index.ts`.
+```
+npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
+```
+
+You can add this script to your `package.json` and run it using `npm run update-types`:
+
+```
+"update-types": "npx openapi-typescript \"${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}\" --version=2 --output types/database/index.ts"
+```
+
+You can use GitHub actions to generate this file automatically. Create a file `.github/workflows/update-types.yml` and add the following snippet into this file to define the action along with the environment variables. If there is a change to your definitions, this script will commit the change to your repo.
+
+```yml
+name: Update database types
+
+on:
+  schedule:
+    # sets the action to run daily. You can modify this to run the action more or less frequently
+    - cron: '0 0 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{secrets.SUPABASE_URL}}
+      SUPABASE_ANON_KEY: ${{secrets.SUPABASE_URL}}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 14
+      - run: npm run update-types
+      - name: check for file changes
+        id: git_status
+        run: |
+          echo "::set-output name=status::$(git status -s)"
+      - name: Commit files
+        if: ${{contains(steps.git_status.outputs.status, ' ')}}
+        run: |
+          git add types/database/index.ts
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Update database types" -a
+      - name: Push changes
+        if: ${{contains(steps.git_status.outputs.status, ' ')}}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+```
+
+Alternatively, you can use a community-supported GitHub action: [generate-supabase-db-types-github-action](https://github.com/lyqht/generate-supabase-db-types-github-action).
+
+## Resources
+
+- [How to create and test a GitHub Action that generates Supabase database types](https://blog.esteetey.dev/how-to-create-and-test-a-github-action-that-generates-types-from-supabase-database)
