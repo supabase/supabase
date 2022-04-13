@@ -23,8 +23,8 @@ const FunctionInvocationSelectionRender = ({ log }: any) => {
   }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
-        <span className={`text-scale-1200 text-sm col-span-8 ${code && 'text-xs font-mono'}`}>
+        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+        <span className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${code && 'text-xs font-mono'}`}>
           {value}
         </span>
       </div>
