@@ -204,23 +204,20 @@ const LogTable = ({
   return (
     <>
       <section
-        className={'flex flex-1 flex-col  ' + (!queryType ? 'shadow-lg' : '')}
+        className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
         {!queryType && (
           <div>
             <div
               className="
-        w-full bg-scale-100 dark:bg-scale-300 
-
-       rounded-tl rounded-tr
-       border-t
-       border-l
-       border-r
-
-
-        flex items-center justify-between
-        px-5 py-2
+            w-full bg-scale-100 dark:bg-scale-300 
+            rounded-tl rounded-tr
+            border-t
+            border-l
+            border-r
+            flex items-center justify-between
+            px-5 py-2
       "
             >
               <div className="flex items-center gap-2">
@@ -249,7 +246,7 @@ const LogTable = ({
           </div>
         )}
         <div
-          className={'flex flex-row flex-grow h-full ' + (!queryType ? 'border-l border-r' : '')}
+          className={'flex flex-row h-full ' + (!queryType ? 'border-l border-r' : '')}
         >
           <DataGrid
             style={{ height: '100%' }}
