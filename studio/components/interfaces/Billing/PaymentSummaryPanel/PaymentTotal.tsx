@@ -71,7 +71,7 @@ const PaymentTotal: FC<Props> = ({
                   {amountDueImmediately < 0 ? (
                     <p className="text-sm text-scale-1100">
                       A total of ${Math.abs(amountDueImmediately).toFixed(2)} will be returned on{' '}
-                      <span className="font-bold text-green-1100">
+                      <span className="text-brand-900">
                         {billingDate.toLocaleDateString('en-US', {
                           day: 'numeric',
                           month: 'long',
@@ -84,7 +84,7 @@ const PaymentTotal: FC<Props> = ({
                     <p className="text-sm text-scale-1100">
                       This amount {!isSpendCapEnabled && !isBillingToday && '+ usage fees '}will be
                       charged on{' '}
-                      <span className="font-bold text-green-1100">
+                      <span className="text-brand-900">
                         {billingDate.toLocaleDateString('en-US', {
                           day: 'numeric',
                           month: 'long',
