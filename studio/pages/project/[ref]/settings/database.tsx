@@ -465,7 +465,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
                     disabled
                     value={
                       `user=${connectionInfo.db_user} password=[YOUR-PASSWORD]` +
-                      `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
+                      ` host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
                       ` database=${connectionInfo.db_name}`
                     }
                   />
