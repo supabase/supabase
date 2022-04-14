@@ -22,5 +22,4 @@ test('run and clear', async () => {
   const clear = await screen.findByText(/Clear/)
   userEvent.click(clear)
   expect(mockClear).toBeCalled()
-  
 })

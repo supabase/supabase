@@ -22,32 +22,42 @@ import toast from 'react-hot-toast'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
-  const { ref, q } = router.query
+  const { ref, q, ite, its } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
 
   const { content } = useStore()
 
-  const [{ logData, error, isLoading }, { changeQuery, runQuery }] = useLogsQuery(ref as string)
+  const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
+    useLogsQuery(ref as string)
 
   useEffect(() => {
     // on mount, set initial values
-    if (q !== undefined && q !== '') {
-      changeQuery(q as string)
-      runQuery()
+    if (q) {
       onSelectTemplate({
         mode: 'custom',
         searchString: q as string,
       })
     }
-  }, [q])
+    if (its || ite) {
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: (its || '') as string,
+        iso_timestamp_end: (ite || '') as string,
+      }))
+    }
+  }, [])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
     changeQuery(template.searchString)
     setEditorId(uuidv4())
     runQuery()
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, q: template.searchString },
+    })
   }
 
   const handleRun = () => {
@@ -74,11 +84,26 @@ export const LogsExplorerPage: NextPage = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
+  const handleDateChange = ({ to, from }: { to: string; from: string }) => {
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: from,
+      iso_timestamp_end: to,
+    }))
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, its: from, ite: to },
+    })
+  }
+
   return (
     <LogsExplorerLayout>
       <div className="h-full flex flex-col flex-grow gap-4">
         <div className="border rounded">
           <LogsQueryPanel
+            defaultFrom={params.iso_timestamp_start!}
+            defaultTo={params.iso_timestamp_end!}
+            onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
             onRun={handleRun}
