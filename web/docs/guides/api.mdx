@@ -339,13 +339,13 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-alter publication supabase_realtime add table products;
+alter publication supabase_realtime add table todos;
 ```
 
 </TabItem>
 </Tabs>
 
-Now we can listen to any new data that is inserted into the `todo` table:
+Now we can listen to any new data that is inserted into the `todos` table:
 
 <Tabs
 defaultValue="Javascript"
@@ -367,7 +367,7 @@ const handleInserts = (payload) => {
 // Listen to unserts
 const { data: todos, error } = await supabase
   .from('todos')
-  .in('INSERT', handleUpdates)
+  .on('INSERT', handleUpdates)
   .subscribe()
 ```
 
