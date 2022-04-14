@@ -1,17 +1,25 @@
 interface Metadata {
   [key: string]: string | number | Object | Object[]
 }
-export type LogSearchCallback = (filters: { query: string; to?: string; from?: string; fromMicro?: number, toMicro?: number }) => void
+export type LogSearchCallback = (filters: {
+  query: string
+  to?: string
+  from?: string
+  fromMicro?: number
+  toMicro?: number
+}) => void
 
 export interface LogsEndpointParams {
   // project ref
   project: string
-  // micro unix timestamp
+  // depreacted, micro unix timestamp
   timestamp_start?: string
-  // micro timestamp
   timestamp_end?: string
+  // deprecated, iso timestamps
   period_start?: string
   period_end?: string
+  iso_timestamp_start?: string
+  iso_timestamp_end?: string
   sql: string
   rawSql: string
 }
@@ -64,7 +72,6 @@ export interface FilterObject {
   // `te` for timestamp start value.
   te?: string
 }
-
 
 export interface FilterSet {
   label: string

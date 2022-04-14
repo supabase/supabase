@@ -5,6 +5,7 @@ import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite/dist/infinite
 import { API_URL } from 'lib/constants'
 import useSWR, { mutate } from 'swr'
 import { get } from 'lib/common/fetch'
+import dayjs from 'dayjs'
 interface Data {
   params: LogsEndpointParams
   isLoading: boolean
@@ -14,6 +15,7 @@ interface Data {
 interface Handlers {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
+  setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
 
 const useLogsQuery = (
@@ -24,8 +26,8 @@ const useLogsQuery = (
     project: projectRef,
     sql: '',
     rawSql: '',
-    // timestamp_start: '',
-    // timestamp_end: '',
+    iso_timestamp_start: '',
+    iso_timestamp_end: '',
     ...initialParams,
   })
 
@@ -36,7 +38,9 @@ const useLogsQuery = (
     isValidating: isLoading,
     mutate,
   } = useSWR<Logs>(
-    params.sql ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}` : null,
+    params.sql
+      ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`
+      : null,
     get,
     { revalidateOnFocus: false }
   )
@@ -51,7 +55,7 @@ const useLogsQuery = (
 
   return [
     { params, isLoading, logData: data?.result ? data?.result : [], error },
-    { changeQuery, runQuery: () => mutate() },
+    { changeQuery, runQuery: () => mutate(), setParams },
   ]
 }
 export default useLogsQuery

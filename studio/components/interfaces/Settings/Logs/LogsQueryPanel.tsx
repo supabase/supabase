@@ -1,6 +1,8 @@
 import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
 import Flag from 'components/ui/Flag/Flag'
+import dayjs from 'dayjs'
 import { LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
+import DatePickers from './Logs.DatePickers'
 interface Props {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
@@ -10,6 +12,9 @@ interface Props {
   onSave?: () => void
   hasEditorValue: boolean
   isLoading: boolean
+  onDateChange: (time: { to: string; from: string }) => void
+  defaultTo: string
+  defaultFrom: string
 }
 
 const LogsQueryPanel: React.FC<Props> = ({
@@ -21,6 +26,9 @@ const LogsQueryPanel: React.FC<Props> = ({
   onSave,
   onSelectSource,
   isLoading,
+  defaultFrom,
+  defaultTo,
+  onDateChange,
 }) => (
   <div
     className="
@@ -63,6 +71,29 @@ bg-panel-header-light dark:bg-panel-header-dark
               Templates
             </Button>
           </Dropdown>
+          <DatePickers
+            changeOnMount
+            to={defaultTo}
+            from={defaultFrom}
+            onChange={onDateChange}
+            helpers={[
+              {
+                text: 'Last day',
+                calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+                calcTo: () => '',
+              },
+              {
+                text: 'Last 3 days',
+                calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
+                calcTo: () => '',
+              },
+              {
+                text: 'Last 7 days',
+                calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+                calcTo: () => '',
+              },
+            ]}
+          />
         </div>
         <div>
           <div className="flex items-center gap-4">
