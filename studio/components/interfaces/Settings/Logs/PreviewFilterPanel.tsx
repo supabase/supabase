@@ -9,7 +9,7 @@ import {
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
-import { Filters, LogSearchCallback, LogTemplate } from '.'
+import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
@@ -152,6 +152,7 @@ const PreviewFilterPanel: FC<Props> = ({
           }}
           to={defaultToValue}
           from={defaultFromValue}
+          helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
 
         <div>

@@ -17,7 +17,7 @@ import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { LogsExplorerLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { LogSqlSnippets, UserContent } from 'types'
+import { UserContent } from 'types'
 import toast from 'react-hot-toast'
 
 export const LogsExplorerPage: NextPage = () => {
@@ -30,7 +30,10 @@ export const LogsExplorerPage: NextPage = () => {
   const { content } = useStore()
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
-    useLogsQuery(ref as string)
+    useLogsQuery(ref as string, {
+      iso_timestamp_start: (its || '') as string,
+      iso_timestamp_end: (ite || '') as string,
+    })
 
   useEffect(() => {
     // on mount, set initial values
@@ -40,20 +43,12 @@ export const LogsExplorerPage: NextPage = () => {
         searchString: q as string,
       })
     }
-    if (its || ite) {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: (its || '') as string,
-        iso_timestamp_end: (ite || '') as string,
-      }))
-    }
   }, [])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
     changeQuery(template.searchString)
     setEditorId(uuidv4())
-    runQuery()
     router.push({
       pathname: router.pathname,
       query: { ...router.query, q: template.searchString },
@@ -84,7 +79,7 @@ export const LogsExplorerPage: NextPage = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: { to: string; from: string }) => {
+  const handleDateChange = ({ to = '', from = '' }: { to: string; from: string }) => {
     setParams((prev) => ({
       ...prev,
       iso_timestamp_start: from,
@@ -101,8 +96,8 @@ export const LogsExplorerPage: NextPage = () => {
       <div className="h-full flex flex-col flex-grow gap-4">
         <div className="border rounded">
           <LogsQueryPanel
-            defaultFrom={params.iso_timestamp_start!}
-            defaultTo={params.iso_timestamp_end!}
+            defaultFrom={params.iso_timestamp_start || ''}
+            defaultTo={params.iso_timestamp_end || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
