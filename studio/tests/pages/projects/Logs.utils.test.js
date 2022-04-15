@@ -1,6 +1,20 @@
-import { genDefaultQuery, LogsTableName } from 'components/interfaces/Settings/Logs'
+import {
+  genDefaultQuery,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+} from 'components/interfaces/Settings/Logs'
 
 describe.each(Object.values(LogsTableName))('%s', (table) => {
+  const templates = SQL_FILTER_TEMPLATES[table]
+  const stringTemplateKey = Object.keys(templates).find((key) => {
+    if (typeof templates[key] === 'string' && key.split('.').length === 2) {
+      return true
+    } else {
+      false
+    }
+  })
+  const [root, child] = (stringTemplateKey || '').split('.')
+  console.log(stringTemplateKey, templates[stringTemplateKey])
   describe.each([
     { filter: { search_query: '' } },
     { filter: { search_query: undefined } },
@@ -27,15 +41,27 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
       filter: { 'override.nested': 'something' },
       contains: ['override.nested', 'something'],
     },
-  ])('generates sql for filter $filter', ({ filter, contains = [] }) => {
+    // check for when string templates are set to false.
+    ...(stringTemplateKey
+      ? [
+          {
+            filter: { [root]: { [child]: false } },
+            excludes: [root, child, stringTemplateKey, templates[stringTemplateKey], '()'],
+          },
+        ]
+      : []),
+  ])('generates sql for filter $filter', ({ filter, contains = [], excludes = [] }) => {
     test('generates query correctly', async () => {
       const generated = genDefaultQuery(table, filter)
       //   should not contain functions
       expect(generated).not.toMatch(/function[ A-Za-z_-]+\(.+\).+\{.+return.+\}/)
       expect(generated).not.toMatch(/\=\>|\$\{.+\}/)
       expect(generated).not.toContain('return')
-
+      if (stringTemplateKey) {
+        console.log(generated)
+      }
       contains.forEach((str) => expect(generated).toContain(str))
+      excludes.forEach((str) => expect(generated).not.toContain(str))
     })
   })
 })
