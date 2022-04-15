@@ -48,7 +48,7 @@ function TwitterSocialProof() {
                 GitHub discussions
               </Button>
             </Link>
-            <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
+            <Link href={'https://discord.supabase.com/'} passHref>
               <Button
                 as="a"
                 type="default"
