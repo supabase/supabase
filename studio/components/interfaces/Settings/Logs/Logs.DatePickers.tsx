@@ -1,49 +1,19 @@
 import { Button, Dropdown, IconClock } from '@supabase/ui'
 import { DatePicker } from 'components/ui/DatePicker'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { DatetimeHelper, getDefaultHelper } from '.'
 
 type ToFrom = { to: string; from: string }
 interface Props {
   to: string
   from: string
   onChange: ({ to, from }: ToFrom) => void
-  helpers?: Helper[]
-  changeOnMount?: boolean
+  helpers: DatetimeHelper[]
 }
-interface Helper {
-  text: string
-  calcTo: () => string
-  calcFrom: () => string
-}
-
-const DEFAULT_HELPERS: Helper[] = [
-  {
-    text: 'Last hour',
-    calcTo: () => new Date(new Date().getTime() - 60 * 60 * 1000).toISOString(),
-    calcFrom: () => '',
-  },
-  {
-    text: 'Last 3 hours',
-    calcTo: () => new Date(new Date().getTime() - 3 * 60 * 60 * 1000).toISOString(),
-    calcFrom: () => '',
-  },
-  {
-    text: 'Last day',
-    calcTo: () => new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString(),
-    calcFrom: () => '',
-  },
-]
-
-const DatePickers: React.FC<Props> = ({
-  to,
-  from,
-  onChange,
-  helpers = DEFAULT_HELPERS,
-  changeOnMount = false,
-}) => {
-  const defaultHelper = helpers[0]
+const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
+  const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
-  const selectedHelper = helpers.find((h) => h.text === helperValue)
+  // const selectedHelper = helpers.find((h) => h.text === helperValue)
   const handleHelperChange = (newValue: string) => {
     setHelperValue(newValue)
     const selectedHelper = helpers.find((h) => h.text === newValue)
@@ -51,12 +21,21 @@ const DatePickers: React.FC<Props> = ({
       onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
     }
   }
-  // trigger change if flag is provided
-  useEffect(() => {
-    if (changeOnMount) {
-      handleHelperChange(helperValue)
+
+  const selectedHelper = helpers.find((helper) => {
+    if (to === helper.calcTo() && from === helper.calcFrom()) {
+      return true
+    } else if (helper.text === helperValue) {
+      return true
+    } else {
+      return false
     }
-  }, [])
+  })
+  useEffect(() => {
+    if (selectedHelper && helperValue !== selectedHelper.text) {
+      setHelperValue(selectedHelper.text)
+    }
+  }, [selectedHelper])
 
   return (
     <div className="flex items-center">
@@ -82,12 +61,12 @@ const DatePickers: React.FC<Props> = ({
           icon={<IconClock size={12} />}
           className="rounded-r-none"
         >
-          {selectedHelper?.text  || defaultHelper.text}
+          {selectedHelper?.text || defaultHelper.text}
         </Button>
       </Dropdown>
       <DatePicker
         triggerButtonClassName="rounded-l-none"
-        triggerButtonType={helperValue ? 'default' : 'secondary'}
+        triggerButtonType={selectedHelper ? 'default' : 'secondary'}
         onChange={(value: ToFrom) => {
           setHelperValue('')
           if (onChange) onChange(value)

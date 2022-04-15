@@ -12,16 +12,10 @@ export type LogSearchCallback = (filters: {
 export interface LogsEndpointParams {
   // project ref
   project: string
-  // depreacted, micro unix timestamp
-  timestamp_start?: string
-  timestamp_end?: string
-  // deprecated, iso timestamps
-  period_start?: string
-  period_end?: string
   iso_timestamp_start?: string
   iso_timestamp_end?: string
-  sql: string
-  rawSql: string
+  sql?: string
+  rawSql?: string
 }
 
 export interface LogData {
@@ -97,4 +91,11 @@ export interface Filters {
 export type Override = {
   key: string
   value: string | string[] | undefined
+}
+
+export interface DatetimeHelper {
+  text: string
+  calcTo: () => string
+  calcFrom: () => string
+  default?: boolean
 }

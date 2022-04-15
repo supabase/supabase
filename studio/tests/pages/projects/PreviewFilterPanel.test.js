@@ -50,10 +50,10 @@ test('Manual refresh', async () => {
 })
 test('Datepicker dropdown', async () => {
   render(<PreviewFilterPanel />)
-  clickDropdown(await screen.findByText(/Last hour/))
+  clickDropdown(await screen.findByText(/Last day/))
   userEvent.click(await screen.findByText(/Last 3 hours/))
   await screen.findByText(/Last 3 hours/)
-  await expect(screen.findByText(/Last hour/)).rejects.toThrow()
+  await expect(screen.findByText(/Last day/)).rejects.toThrow()
 })
 
 test.todo('timestamp to/from filter default value')
