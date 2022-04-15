@@ -1,5 +1,13 @@
-import { get } from 'lodash'
 import { Filters, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import dayjs from 'dayjs'
+import { get } from 'lodash'
+
+/**
+ * Convert a micro timestamp from number/string to iso timestamp
+ */
+export const unixMicroToIsoTimestamp = (unix: string | number): string => {
+  return dayjs.unix(Number(unix) / 1000).toISOString()
+}
 
 /**
  * Recursively retrieve all nested object key paths.

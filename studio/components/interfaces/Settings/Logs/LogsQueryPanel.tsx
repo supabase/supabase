@@ -1,7 +1,7 @@
 import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
 import Flag from 'components/ui/Flag/Flag'
 import dayjs from 'dayjs'
-import { LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
+import { EXPLORER_DATEPICKER_HELPERS, LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
 import DatePickers from './Logs.DatePickers'
 interface Props {
   templates?: LogTemplate[]
@@ -72,27 +72,10 @@ bg-panel-header-light dark:bg-panel-header-dark
             </Button>
           </Dropdown>
           <DatePickers
-            changeOnMount
             to={defaultTo}
             from={defaultFrom}
             onChange={onDateChange}
-            helpers={[
-              {
-                text: 'Last day',
-                calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-                calcTo: () => '',
-              },
-              {
-                text: 'Last 3 days',
-                calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
-                calcTo: () => '',
-              },
-              {
-                text: 'Last 7 days',
-                calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-                calcTo: () => '',
-              },
-            ]}
+            helpers={EXPLORER_DATEPICKER_HELPERS}
           />
         </div>
         <div>
