@@ -82,7 +82,7 @@ function StoragePage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="mb-4 flex items-center space-x-2 p">
                 <ProductIcon icon={Solutions['storage'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
