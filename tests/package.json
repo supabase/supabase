@@ -12,6 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",
+    "@supabase/supabase-js": "^1.34.1",
     "@testdeck/jest": "^0.2.0",
     "@types/jest": "^27.4.0",
     "@typescript-eslint/eslint-plugin": "^5.10.0",

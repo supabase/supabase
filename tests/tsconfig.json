@@ -6,10 +6,7 @@
     "inlineSources": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": [
-      "es6",
-      "DOM"
-    ],
+    "lib": ["es6", "DOM"],
     "removeComments": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -20,18 +17,13 @@
     "declaration": true,
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "node_modules/*",
-        "./types/*"
-      ]
+      "*": ["node_modules/*", "./types/*"]
     },
     "typeRoots": [
       "./node_modules/@types/",
       "./node_modules/allure2-js-commons/dist/declarations/**/"
     ]
   },
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "compileOnSave": false
 }
