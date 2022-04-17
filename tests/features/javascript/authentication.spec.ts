@@ -1,41 +1,15 @@
 import { suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
-import postgres from 'postgres'
-import crossFetch from 'cross-fetch'
 
-import {
-  ApiError,
-  createClient,
-  Session,
-  SupabaseClient,
-  SupabaseClientOptions,
-  User,
-} from '@supabase/supabase-js'
+import { ApiError, Session, SupabaseClient, User, UserAttributes } from '@supabase/supabase-js'
 
 import { FEATURE } from '../templates/enums'
 import { description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'
+import { Hooks } from './hooks'
 
 @suite('authentication')
-class Authentication {
-  private static sql = postgres({
-    host: process.env.SUPABASE_DB_HOST,
-    port: parseInt(process.env.SUPABASE_DB_PORT),
-    database: 'postgres',
-    username: 'postgres',
-    password: 'postgres',
-  })
-
-  @step('terminate sql connection')
-  static async after(): Promise<any> {
-    try {
-      Authentication.sql.end({ timeout: 100 })
-      return Promise.resolve(null)
-    } catch (err) {
-      return Promise.reject(err)
-    }
-  }
-
+class Authentication extends Hooks {
   @feature(FEATURE.AUTHENTICATION)
   @severity(Severity.BLOCKER)
   @description('When user sign up then corresponding user in auth schema should be created')
@@ -50,10 +24,10 @@ class Authentication {
     }
     const { user, session, error: signUpError } = await this.signUp(supabase, fakeUser)
 
+    expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
     expect(session).toBeDefined()
-    expect(signUpError).toBeNull()
 
     const [createdUser] = await this.selectUser(user)
     expect(createdUser.email).toEqual(fakeUser.email.toLowerCase())
@@ -72,11 +46,16 @@ class Authentication {
       password: faker.internet.password(),
       username: faker.internet.userName(),
     }
-    const { user, error: signUpError } = await this.signUp(supabase, fakeUser)
+    const {
+      user,
+      session: emptySession,
+      error: signUpError,
+    } = await this.signUp(supabase, fakeUser)
 
+    expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
-    expect(signUpError).toBeNull()
+    expect(emptySession).toBeNull()
 
     // check if user is not signed in cause he has not confirmed his email
     const { error: errorInsertFailed } = await this.insertProfile(supabase, user, fakeUser)
@@ -88,11 +67,12 @@ class Authentication {
     const verifyResponse = await this.verify(token)
     expect(verifyResponse.ok).toBeTruthy()
 
-    const { error: signInError } = await supabase.auth.signIn({
+    const { session, error: signInError } = await supabase.auth.signIn({
       email: fakeUser.email,
       password: fakeUser.password,
     })
     expect(signInError).toBeNull()
+    expect(session).toBeDefined()
 
     // check if user is signed in
     const { data: profile, error: errorInsert } = await this.insertProfile(supabase, user, fakeUser)
@@ -122,10 +102,10 @@ class Authentication {
     }
     const { user, session, error: signUpError } = await this.signUpByPhone(supabase, fakeUser)
 
+    expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.phone).toEqual(fakeUser.phone)
     expect(session).toBeDefined()
-    expect(signUpError).toBeNull()
 
     // check if user is signed in
     const { data: profile, error: errorInsert } = await this.insertProfile(supabase, user, fakeUser)
@@ -159,10 +139,10 @@ class Authentication {
       password: fakeUser.password,
     })
 
+    expect(signInError).toBeNull()
+    expect(session).toBeDefined()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
-    expect(session).toBeDefined()
-    expect(signInError).toBeNull()
 
     // check if user is signed in correctly and rls is working
     const { data: profileInserted, error: errorInsert } = await this.insertProfile(
@@ -216,89 +196,76 @@ class Authentication {
     })
   }
 
-  // steps
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.NORMAL)
+  @description('When user is signed in then he should be able update himself in auth schema')
+  @test.skip
+  async 'update user'() {
+    // create user
+    const fakeUser = await this.createUser()
 
-  @step('Create Supabase client')
-  private createSupaClient(
-    url: string,
-    key: string,
-    options: SupabaseClientOptions = {}
-  ): SupabaseClient {
-    return createClient(url, key, options)
-  }
-
-  @step('Create a valid user')
-  private async createUser(data: object = {}): Promise<{
-    email: string
-    password: string
-    username: string
-  }> {
+    // sign in as user
     const supabase = this.createSupaClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY_ANON)
-
-    const fakeUser = {
-      email: faker.internet.exampleEmail(),
-      password: faker.internet.password(),
-      username: faker.internet.userName(),
-    }
-    const { user, error: signUpError } = await this.signUp(supabase, fakeUser, {
-      data: data,
+    await supabase.auth.signIn({
+      email: fakeUser.email,
+      password: fakeUser.password,
     })
-    expect(signUpError).toBeNull()
 
-    const [{ confirmation_token: token }] = await this.getConfirmationToken(user)
+    // get signed in user data
+    const user = this.getUser(supabase)
 
-    await this.verify(token)
+    // update user
+    // todo update params
+    const {
+      user: updUser,
+      data: updUserData,
+      error: updUserError,
+    } = await this.updateUser(supabase, {})
 
-    return fakeUser
+    // todo check if returned user is updated
+
+    const updatedUser = this.getUser(supabase)
+
+    // todo check if user is updated
+
+    const userFromApi = this.getUserFromApi(supabase)
+
+    // todo check if user is updated on backend
   }
 
-  @step((token: string) => `verify with token ${token}`)
-  private async verify(token: string): Promise<Response> {
-    return crossFetch(`${process.env.SUPABASE_GOTRUE}/verify`, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'signup',
-        token: token,
-      }),
-    })
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.NORMAL)
+  @description('When user changes session then he still should be correctly logined')
+  @test.skip
+  async 'set session'() {
+    // todo
   }
 
-  @step((user: User) => `get confirmation token for user ${user.id}`)
-  private async getConfirmationToken(user: User): Promise<[{ confirmation_token: any }]> {
-    return Authentication.sql`
-      select confirmation_token 
-      from auth.users
-      where id = ${user.id}
-    `
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.NORMAL)
+  @description('When user changes auth then all new requests should have new JWT')
+  @test.skip
+  async 'set auth'() {
+    // todo
   }
 
-  @step('I sign up with a valid email and password')
-  private async signUp(
-    supabase: SupabaseClient,
-    {
-      email = faker.internet.exampleEmail(),
-      password = faker.internet.password(),
-    }: {
-      email?: string
-      password?: string
-    } = {},
-    options: {
-      redirectTo?: string
-      data?: object
-    } = {}
-  ): Promise<{
-    user: User
-    session: Session
-    error: ApiError
-  }> {
-    return supabase.auth.signUp(
-      {
-        email: email,
-        password: password,
-      },
-      options
-    )
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.NORMAL)
+  @description('When user refreshes session then user and session have to be updated')
+  @test.skip
+  async 'refresh session'() {
+    // todo
   }
+
+  @feature(FEATURE.AUTHENTICATION)
+  @severity(Severity.NORMAL)
+  @description('When user subscribes on auth changes then user has to receive auth updates')
+  @test.skip
+  async 'on auth state changed'() {
+    // todo
+  }
+
+  // steps
 
   @step('I sign up with a valid email and password')
   private async signUpByPhone(
@@ -328,16 +295,6 @@ class Authentication {
     )
   }
 
-  @step('Check if I am being able to log out')
-  private signOut(supabase: SupabaseClient): { error: any } | PromiseLike<{ error: any }> {
-    return supabase.auth.signOut()
-  }
-
-  @step('Get user data, if there is a logged in user')
-  private getUser(supabase: SupabaseClient) {
-    return supabase.auth.user()
-  }
-
   @step('Check if I am logged in by checking if I can insert my profile')
   private async insertProfile(
     supabase: SupabaseClient,
@@ -360,14 +317,15 @@ class Authentication {
     return supabase.from('profiles').select().maybeSingle()
   }
 
-  @step((user: User) => `Get user by ID (${user.id}) from Supabase auth schema`)
-  private async selectUser(user: User): Promise<[{ email: string }]> {
-    return Authentication.sql`
-        select
-        email
-      from auth.users
-      where
-        id = ${user.id}
-    `
+  @step('Update user info')
+  private async updateUser(
+    supabase: SupabaseClient,
+    attr: UserAttributes
+  ): Promise<{
+    data: User
+    user: User
+    error: ApiError
+  }> {
+    return supabase.auth.update(attr)
   }
 }
