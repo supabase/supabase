@@ -83,8 +83,8 @@ export const LogsPreviewer: React.FC<Props> = ({
     })
   }
 
-  const handleSearch: LogSearchCallback = async ({ query = '', to = '', from = '' }) => {
-    setParams((prev) => ({ ...prev, iso_timestamp_start: from, iso_timestamp_end: to }))
+  const handleSearch: LogSearchCallback = async ({ query = '', to, from }) => {
+    setParams((prev) => ({ ...prev, iso_timestamp_start: from || '', iso_timestamp_end: to || '' }))
     setFilters((prev) => ({ ...prev, search_query: query }))
     router.push({
       pathname: router.pathname,
@@ -141,7 +141,7 @@ export const LogsPreviewer: React.FC<Props> = ({
               data={!isLoading ? logData : undefined}
               onBarClick={(timestampMicro) => {
                 const to = unixMicroToIsoTimestamp(timestampMicro)
-                handleSearch({ query: filters.search_query as string, to })
+                handleSearch({ query: filters.search_query as string, to, from: null })
               }}
             />
           )}
