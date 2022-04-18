@@ -7,12 +7,11 @@ import { Dictionary } from '@supabase/grid'
 
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { useStore, useFlag, useSubscriptionStats } from 'hooks'
+import { useStore, useSubscriptionStats } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
-import UpgradeButton from './UpgradeButton'
 
 interface Props {
   project: any
@@ -80,13 +79,6 @@ const Subscription: FC<Props> = ({
                 </p>
               )}
             </div>
-            {/* ) : (
-              <UpgradeButton
-                paid={paid}
-                projectRef={project.ref}
-                subscriptionStats={subscriptionStats}
-              />
-            )} */}
           </div>
           {paid && (
             <div className="px-6 pt-4">

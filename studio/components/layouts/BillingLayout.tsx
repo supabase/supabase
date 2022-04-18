@@ -15,7 +15,7 @@ const BillingLayout: FC<Props> = ({ children }) => {
     <BaseLayout hideHeader hideIconBar>
       <div className="flex flex-col h-full w-full">
         {/* Header */}
-        <div className="h-16 py-2 border-b dark:border-dark flex items-center space-x-3 px-5">
+        <div className="py-4 border-b dark:border-dark flex items-center space-x-3 px-5">
           <Link href={`/project/${ui.selectedProject?.ref}/settings/billing`} passHref>
             <a className="transition-colors text-scale-900 hover:text-scale-1200">
               <IconX size={16} strokeWidth={1.5} />
