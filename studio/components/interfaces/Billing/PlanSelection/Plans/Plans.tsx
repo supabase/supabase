@@ -49,26 +49,16 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
           (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PRO) ||
           (plan.id === STRIPE_PRODUCT_IDS.PRO && currentPlan?.prod_id === STRIPE_PRODUCT_IDS.PAYG)
 
-        const pointers = plan.metadata.features.split('\\n').map((x: string) => x.trim())
-
-        console.log('STRIPE_PRODUCT_IDS', STRIPE_PRODUCT_IDS)
-        console.log('plans', plans)
-
-        // return null
-
         return (
-          <div
-            key={PRICING_META[plan.id].name}
-            className="
-            relative 
-                  "
-          >
-            <div className="absolute overflow-hidden w-full h-full left-0 bottom-0 opacity-50">
-              {plan.id === STRIPE_PRODUCT_IDS.PRO && <AnimatedGradientBackground />}
-            </div>
-            <div className="flex flex-col rounded border overflow-hidden">
+          <div key={PRICING_META[plan.id].name} className="relative h-full">
+            {plan.id === STRIPE_PRODUCT_IDS.PRO && (
+              <div className="absolute overflow-hidden w-full h-full left-0 bottom-0 opacity-50">
+                <AnimatedGradientBackground />
+              </div>
+            )}
+            <div className="flex flex-col rounded border overflow-hidden h-full">
               {isCurrentPlan && <CurrentSubscriptionBanner />}
-              <div className="h-64 px-8 pt-6 bg-white dark:bg-scale-300">
+              <div className="px-8 py-6 bg-white dark:bg-scale-300">
                 <span
                   className="inline-flex text-cd font-normal tracking-wide rounded-full text-base text-scale-1200"
                   id="tier-standard"
@@ -76,12 +66,12 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
                   {PRICING_META[plan.id].name}
                 </span>
                 <div className="flex items-baseline mt-2">
-                  <div className="flex flex-col">
+                  <div className="flex space-x-2">
                     {PRICING_META[plan.id].priceMonthly !== undefined ? (
                       <>
                         <div className="flex items-end gap-1">
                           {PRICING_META[plan.id].from && (
-                            <span className="text-base font-medium text-scale-900">From</span>
+                            <span className="text-base font-medium text-scale-1200">From</span>
                           )}
                           <div>
                             <span className="text-2xl">${PRICING_META[plan.id].priceMonthly}</span>
@@ -111,24 +101,12 @@ const Plans: FC<Props> = ({ plans, currentPlan, onSelectPlan }) => {
                 <p className="text-sm text-scale-1100">{PRICING_META[plan.id].description}</p>
               </div>
               <div
-                className="
-                    flex-col justify-between flex-1
-                    
-                    space-y-6 
-                    border-t 
-                    dark:border-scale-400
-                    
-                    bg-scale-100 
-                    dark:bg-scale-300 
-
-                    px-8
-                    py-6
-
-                    h-full
-
-                    hidden
-                    lg:flex
-                  "
+                className={[
+                  'flex-col justify-between flex-1',
+                  'space-y-6 border-t dark:border-scale-400',
+                  'bg-scale-100 dark:bg-scale-300',
+                  'px-8 py-6 h-full hidden lg:flex',
+                ].join(' ')}
               >
                 {PRICING_META[plan.id].preface && (
                   <p className="text-sm text-scale-1200">{PRICING_META[plan.id].preface}</p>
