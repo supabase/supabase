@@ -4,19 +4,13 @@ title: Logging
 description: Getting started with Supabase Platform Log Browser
 ---
 
-The Supabase Platform provides a log browser that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
+The Supabase Platform provides a log explorer that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
 
 :::note
 
 The features discussed in this article are only available through the Supabase Platform and are not available on self-hosted. 
 
 :::
-
-## Log Explorer
-
-![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
-
-The log browser can be accessed in the sidebar under `Log Explorer`. The Log Explorer is for exploring all the logs within your project and is not specific to any product.
 
 ## Product Logs
 
@@ -34,22 +28,16 @@ The API Logs can be found under `Database > API Logs`. These show all network re
 
 The Postgres Logs can be found under `Database > Postgres Logs`. These show all queries and activity for your [Database](/docs/guides/database).
 
-## Basic Querying Features
 
-- Simple regex-based search on the event message.
-- Timestamp filtering to a point in time, through an ISO-8601 string in UTC timezone.
+## Log Explorer
 
-![Basic features](/img/guides/platform/logs/basic-features.png)
+![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
 
-## Advanced Querying Features
+The log browser can be accessed in the sidebar under **Logs Explorer**. The **Logs Explorer** is for querying and aggregating project logs across products using SQL `SELECT` queries.
 
-To access advanced querying features, you will need to enable **custom queries**. Doing so will display an SQL editor that allows you to craft your queries.
 
-![Enabling query mode](/img/guides/platform/logs/query-mode.png)
-
-`select` queries allow complex and powerful aggregated result sets, letting you to perform in-depth analysis of your log data.
-
-For example, you may enter the following into the API logs dashboard to query for each user's IP address:
+### Example
+For example, you may enter the following into the SQL editor to query for each user's IP address:
 
 ```sql
 SELECT timestamp, h.x_real_ip
@@ -63,21 +51,19 @@ WHERE h.x_real_ip IS NOT NULL
 ![SELECT query example](/img/guides/platform/logs/select-query.png)
 
 
-You may notice that the table name reference, `edge_logs`, is required in order to formulate the SELECT query. Likewise, when querying the database logs, you would need to provide a table name reference as well.
-
-The table references are as follows:
-
-- API Edge - `edge_logs`
-- Database - `postgres_logs`
-
-Note that cross-table joining is currently not supported.
+The list of supported product sources can be found under the **Sources** dropdown.
 
 ### Unnesting Arrays
 
-In the above example, in order to query the metadata field, we need to unnest the field and add it as a join. Wehn we click on an individual log, we can see that log metadata is stored as an array of objects. 
+To query the metadata in the above example, you can unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects. 
 
 In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
 
+:::caution
+
+Large projects may run into a `400 ORDER BY` memory limit error when querying with many unnested rows across large date ranges. If experiencing this error, consider reducing the number of unnested joins, or by reducing the queried date range.
+
+:::
 
 ### Functions
 
@@ -86,11 +72,14 @@ You may have also noticed from the above examples that we are able to use certai
 
 #### Timestamp Behavior
 
-Each log timestamp is stored as a `TIMESTAMP` data type. In order to utilize the `timestamp` field in a query, you would need to use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
+Each log entry is stored with a `timestamp`. In order to utilize the `timestamp` field in a query, you can use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
 
-## Template Queries
+:::note
 
-Templates are available to help shorten the time needed to craft these queries. There are examples for each complexity level, which can serve as a foundation for your custom queries.
+In the Log Explorer, timestamps are rendered as unix microsecond timestamps. SQL queries, however, should always use the `TIMESTAMP` data type. If you are using a unix timestamp value in a query, cast the value to a `TIMESTAMP` data type.
 
+:::
 
-![Templates](/img/guides/platform/logs/templates.png)
+## Templates
+
+Templates are available to help craft you log queries. Templates are available under the **Templates** tab, or under the **Templates** Dropdown in the **Query** tab.
