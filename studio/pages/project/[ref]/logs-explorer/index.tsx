@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconAlertCircle, Card, Input, Alert, Modal, Form, Button } from '@supabase/ui'
+import { Input, Modal, Form, Button } from '@supabase/ui'
 import { useStore, withAuth } from 'hooks'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
+  DatePickerToFrom,
   LogsQueryPanel,
   LogsTableName,
   LogTable,
@@ -79,15 +80,15 @@ export const LogsExplorerPage: NextPage = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to = '', from = '' }: { to: string; from: string }) => {
+  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
     setParams((prev) => ({
       ...prev,
-      iso_timestamp_start: from,
-      iso_timestamp_end: to,
+      iso_timestamp_start: from || '',
+      iso_timestamp_end: to || '',
     }))
     router.push({
       pathname: router.pathname,
-      query: { ...router.query, its: from, ite: to },
+      query: { ...router.query, its: from || '', ite: to || '' },
     })
   }
 

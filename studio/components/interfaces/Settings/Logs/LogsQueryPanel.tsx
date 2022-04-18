@@ -1,6 +1,5 @@
 import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
 import Flag from 'components/ui/Flag/Flag'
-import dayjs from 'dayjs'
 import { EXPLORER_DATEPICKER_HELPERS, LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
 import DatePickers from './Logs.DatePickers'
 interface Props {
@@ -12,7 +11,7 @@ interface Props {
   onSave?: () => void
   hasEditorValue: boolean
   isLoading: boolean
-  onDateChange: (time: { to: string; from: string }) => void
+  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
   defaultTo: string
   defaultFrom: string
 }
