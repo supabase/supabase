@@ -1,11 +1,16 @@
 # Developing Supabase
 
-* [Development Setup](#Development-Setup)
-* [Installing Dependencies](#Installing-Dependencies)
-* [Building Supabase](#Building-Supabase)
-* [Start a Development Server](#Start-a-Development-Server)
-* [Finally](#Finally)
-* [Community Channels](#Community-Channels)
+- [Development Setup](#development-setup)
+  - [Installing Dependencies](#installing-dependencies)
+  - [Forking Supabase on GitHub](#forking-supabase-on-github)
+- [Building Supabase](#building-supabase)
+  - [Choosing Directory](#choosing-directory)
+- [Start a Development Server](#start-a-development-server)
+  - [Supabase Website Development Server](#supabase-website-development-server)
+  - [Supabase Docs Development Server](#supabase-docs-development-server)
+  - [Supabase Studio Development Server](#supabase-studio-development-server)
+- [Finally](#finally)
+- [Community Channels](#community-channels)
 
 ## Development Setup
 
@@ -20,7 +25,7 @@ machine:
 
 * [Node.js v16.x (LTS)](http://nodejs.org)
 
-* [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+* [npm](https://www.npmjs.com/) version 7+.
 
 ### Forking Supabase on GitHub
 
