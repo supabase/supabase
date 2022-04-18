@@ -1,10 +1,8 @@
 import { useProfile, useStore } from 'hooks'
 import { ComponentType, useEffect, useState } from 'react'
-import { flatten, isUndefined } from 'lodash'
 import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
 import Connecting from 'components/ui/Loading'
-import { Project } from 'types'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -79,7 +77,7 @@ export function withAuth(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/' : !isUndefined(ref) ? `/project/${ref}` : '/'
+  return IS_PLATFORM ? '/' : ref !== undefined ? `/project/${ref}` : '/'
 }
 
 function checkRedirectTo(
