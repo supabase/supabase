@@ -207,20 +207,15 @@ const ProUpgrade: FC<Props> = ({
                       onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                     />
                   </div>
-                  {}
-                  {nativeBilling && (
+                  {nativeBilling && projectRegion !== 'af-south-1' && (
                     <>
-                      {projectRegion !== 'af-south-1' && (
-                        <>
-                          <Divider light />
-                          <ComputeSizeSelection
-                            computeSizes={computeSizes || []}
-                            currentComputeSize={currentComputeSize}
-                            selectedComputeSize={selectedComputeSize}
-                            onSelectOption={onSelectComputeSizeOption}
-                          />
-                        </>
-                      )}
+                      <Divider light />
+                      <ComputeSizeSelection
+                        computeSizes={computeSizes || []}
+                        currentComputeSize={currentComputeSize}
+                        selectedComputeSize={selectedComputeSize}
+                        onSelectOption={onSelectComputeSizeOption}
+                      />
                     </>
                   )}
                 </div>

@@ -64,7 +64,6 @@ const Subscription: FC<Props> = ({
               </p>
               <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            {/* {nativeBilling ? ( */}
             <div className="flex flex-col items-end space-y-2">
               <Button
                 disabled={!isOrgOwner}
