@@ -386,7 +386,7 @@ import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import Account from './Account'
 
-export default () => {
+export default function App() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
@@ -420,6 +420,7 @@ And then open the browser to [localhost:3000](http://localhost:3000) and you sho
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Add @reach/visually-hidden
+
 The upload widget uses one additional npm library. You can install it like so: `npm install @reach/visually-hidden`.
 
 ### Create an upload widget
@@ -431,7 +432,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import VisuallyHidden from '@reach/visually-hidden'
 
-export default ({ url, size, onUpload }) => {
+export default function Avatar({ url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
 
