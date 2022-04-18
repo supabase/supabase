@@ -84,7 +84,7 @@ When simulating clicks on these components, do the following:
 import userEvent from '@testing-library/user-event'
 userEvent.click('Hello world')
 
-// for Popovers
+// for Dropdowns
 import clickDropdown from 'tests/helpers'
 clickDropdown('Hello world')
 ```

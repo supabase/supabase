@@ -89,7 +89,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   final storageResponse = await client
       .storage
       .createBucket('avatars');
@@ -143,7 +143,7 @@ const { data, error } = await supabase.storage
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   // Create file `example.txt` and upload it in `public` bucket
   final file = File('example.txt');
   file.writeAsStringSync('File content');
@@ -198,7 +198,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 ```dart
 void main() async {
   final client = SupabaseClient('supabaseUrl', 'supabaseKey');
-  
+
   final storageResponse = await client
       .storage
       .from('public')
@@ -302,9 +302,27 @@ For example, if your file is stored in `public/subfolder/avatar.png` it would re
 
 ## Accessing objects
 
-For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method which calls the `/object/sign/` API.
 
-For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally.
+For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. 
+Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method 
+which calls the `/object/sign/` API.
+
+For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) 
+helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally.
+
+
+<details> 
+<summary>Advanced: reverse proxy</summary>
+The URLs returned are proxied through the API Proxy. They are suffixed by <code>/storage/v1</code>. 
+
+For example, on the hosted Platform they will be 
+
+<code>https://[project_ref].supabase.co/storage/v1/object/public/[id]</code>
+
+You can access the storage API directly with the same endpoint. See the <a href="https://supabase.github.io/storage-api">API docs</a> for a full list of operations available.
+
+</details>
+
 
 ---
 
@@ -348,6 +366,13 @@ create policy "Individual user Access"
 on storage.objects for select
 using ( auth.uid() = owner );
 ```
+
+## Resources
+
+- Find the API server on GitHub: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
+- Find the Swagger API Docs online: [supabase.github.io/storage-api](https://supabase.github.io/storage-api)
+- Official client libraries documentation: [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket).
+- Community libraries: [github.com/supabase-community](https://github.com/supabase-community)
 
 ## Next steps
 
