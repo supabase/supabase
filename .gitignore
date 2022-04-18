@@ -11,6 +11,9 @@ allure-report
 .nyc_output
 *.log
 
+# turbo
+.turbo
+
 # Logs
 *.log
 npm-debug.log*
