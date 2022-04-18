@@ -1,13 +1,13 @@
-import { Button, Dropdown, IconClock } from '@supabase/ui'
+import { Alert, Button, Dropdown, IconClock } from '@supabase/ui'
 import { DatePicker } from 'components/ui/DatePicker'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { DatetimeHelper, getDefaultHelper } from '.'
 
-type ToFrom = { to: string; from: string }
 interface Props {
   to: string
   from: string
-  onChange: ({ to, from }: ToFrom) => void
+  onChange: React.ComponentProps<typeof DatePicker>["onChange"]
   helpers: DatetimeHelper[]
 }
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
@@ -67,12 +67,21 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}
-        onChange={(value: ToFrom) => {
+        onChange={(value) => {
           setHelperValue('')
           if (onChange) onChange(value)
         }}
         to={!helperValue ? to : undefined}
         from={!helperValue ? from : undefined}
+        renderFooter={({ to, from }) => {
+          if (to && from && Math.abs(dayjs(from).diff(dayjs(to), 'day')) > 50) {
+            return (
+              <Alert title="Large date range detected" variant="warning" className="mx-3 pl-2 pr-2 pt-2 pb-2">
+                Large ranges may result in memory errors for big projects.
+              </Alert>
+            )
+          }
+        }}
       />
     </div>
   )
