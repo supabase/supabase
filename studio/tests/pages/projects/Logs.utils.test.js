@@ -46,7 +46,7 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
       ? [
           {
             filter: { [root]: { [child]: false } },
-            excludes: [root, child, stringTemplateKey, templates[stringTemplateKey], '()'],
+            excludes: [templates[stringTemplateKey], '()'],
           },
         ]
       : []),
@@ -57,9 +57,6 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
       expect(generated).not.toMatch(/function[ A-Za-z_-]+\(.+\).+\{.+return.+\}/)
       expect(generated).not.toMatch(/\=\>|\$\{.+\}/)
       expect(generated).not.toContain('return')
-      if (stringTemplateKey) {
-        console.log(generated)
-      }
       contains.forEach((str) => expect(generated).toContain(str))
       excludes.forEach((str) => expect(generated).not.toContain(str))
     })
