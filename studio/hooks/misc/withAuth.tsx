@@ -1,10 +1,8 @@
 import { useProfile, useStore } from 'hooks'
-import { ComponentType, useEffect, useState } from 'react'
-import { flatten, isUndefined } from 'lodash'
+import { ComponentType, useEffect } from 'react'
 import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
 import Connecting from 'components/ui/Loading'
-import { Project } from 'types'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -18,7 +16,6 @@ export function withAuth(
   return (props: any) => {
     const router = useRouter()
     const rootStore = useStore()
-    const [isConnecting, setConnecting] = useState(true)
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
@@ -35,6 +32,7 @@ export function withAuth(
     const isRedirecting =
       isAccessingBlockedPage ||
       checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
+    const isConnecting = !isLoading && !isRedirecting && router.isReady ? false : true
 
     useEffect(() => {
       // this should run before redirecting
@@ -66,12 +64,6 @@ export function withAuth(
       }
     }, [isLoading, router.isReady, ref, slug])
 
-    useEffect(() => {
-      if (!isLoading && !isRedirecting && router.isReady) {
-        setConnecting(false)
-      }
-    }, [isLoading, isRedirecting, router.isReady])
-
     if (isConnecting) return <Connecting />
 
     return <WrappedComponent {...props} />
@@ -79,7 +71,7 @@ export function withAuth(
 }
 
 function defaultRedirectTo(ref: string | string[] | undefined) {
-  return IS_PLATFORM ? '/' : !isUndefined(ref) ? `/project/${ref}` : '/'
+  return IS_PLATFORM ? '/' : ref !== undefined ? `/project/${ref}` : '/'
 }
 
 function checkRedirectTo(
