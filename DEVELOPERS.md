@@ -11,6 +11,7 @@
   - [Supabase Studio Development Server](#supabase-studio-development-server)
 - [Finally](#finally)
 - [Community Channels](#community-channels)
+- [Monorepo](#monorepo)
 
 ## Development Setup
 
@@ -165,3 +166,12 @@ Did you have an issue, like a merge conflict, or don't know how to open a pull r
 ## Community Channels
 
 Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+
+
+## Monorepo
+
+This is a monorepo, using Turborepo. You must be using NPM 7 or higher.
+
+- Install a package: `npm install <package name> -w=<workspace to install in>`. eg:
+  - `npm install @supabase/ui -w ui`: installs into `./packages/ui`
+  - `npm install @supabase/ui -w docs`: installs into `./packages/docs`
