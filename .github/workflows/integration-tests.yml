@@ -67,7 +67,7 @@ jobs:
         if: always()
         with:
           github_repo: test-reports
-          allure_results: allure-results
+          allure_results: tests/allure-results
           allure_history: allure-history
           subfolder: supabase-integration
           keep_reports: 50
