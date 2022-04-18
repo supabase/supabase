@@ -2,8 +2,8 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { FC, ReactNode } from 'react'
 import { Project } from 'types'
-import BuildingState from 'components/to-be-cleaned/BuildingState'
 import { PROJECT_STATUS } from 'lib/constants'
+import BuildingState from './BuildingState'
 
 interface Props {
   project: Project
