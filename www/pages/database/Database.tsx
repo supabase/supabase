@@ -101,7 +101,7 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="mb-4 flex items-center space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <div className="w-fit flex items-center">
@@ -119,7 +119,7 @@ function Database() {
               </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="mb-4 flex items-center space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -133,7 +133,7 @@ function Database() {
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="mb-4 flex items-center space-x-2">
+              <div className="mb-4 flex items-center space-x-2 p">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
