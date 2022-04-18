@@ -1,7 +1,14 @@
 import { FC } from 'react'
-import { Listbox, IconLoader, Button, IconPlus, IconAlertCircle } from '@supabase/ui'
+import {
+  Listbox,
+  IconLoader,
+  Button,
+  IconPlus,
+  IconAlertCircle,
+  IconCreditCard,
+} from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice } from '../Billing.utils'
@@ -48,6 +55,11 @@ const PaymentSummaryPanel: FC<Props> = ({
   onConfirmPayment,
   isSubmitting,
 }) => {
+  /**
+   * Feature flags
+   */
+  const nativeBilling = useFlag('nativeBilling')
+
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
 
@@ -66,14 +78,14 @@ const PaymentSummaryPanel: FC<Props> = ({
 
   return (
     <div
-      className="bg-scale-300 w-full px-20 py-10 space-y-8"
+      className="bg-panel-body-light dark:bg-panel-body-dark w-full px-6 lg:px-12 py-10 space-y-8 border-l"
       style={{ height: 'calc(100vh - 49.5px)' }}
     >
       <p>Payment Summary</p>
 
       {/* Subscription details */}
       <div className="space-y-1">
-        <p className="text-sm">Selected subscription</p>
+        <p className="text-sm text-scale-1100">Selected subscription</p>
         <div className="flex items-center justify-between">
           <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
             {getPlanName(currentPlan)}
@@ -93,46 +105,54 @@ const PaymentSummaryPanel: FC<Props> = ({
       </div>
 
       {/* Add on details */}
-      {projectRegion !== 'af-south-1' && (
-        <div className="space-y-1">
-          <p className="text-sm">Selected add-ons</p>
-          {currentComputeSize === undefined && selectedComputeSize === undefined && (
-            <p className="text-scale-1100 text-sm">No add-ons selected</p>
-          )}
-          {currentComputeSize !== undefined && (
-            <div className="flex items-center justify-between">
-              <p
-                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
-              >
-                {currentComputeSize.name}
-              </p>
-              <p
-                className={`${isChangingComputeSize ? 'text-scale-1100 line-through' : ''} text-sm`}
-              >
-                ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
-              </p>
+      {nativeBilling && (
+        <>
+          {projectRegion !== 'af-south-1' && (
+            <div className="space-y-1">
+              <p className="text-sm">Selected add-ons</p>
+              {currentComputeSize === undefined && selectedComputeSize === undefined && (
+                <p className="text-scale-1100 text-sm">No add-ons selected</p>
+              )}
+              {currentComputeSize !== undefined && (
+                <div className="flex items-center justify-between">
+                  <p
+                    className={`${
+                      isChangingComputeSize ? 'text-scale-1100 line-through' : ''
+                    } text-sm`}
+                  >
+                    {currentComputeSize.name}
+                  </p>
+                  <p
+                    className={`${
+                      isChangingComputeSize ? 'text-scale-1100 line-through' : ''
+                    } text-sm`}
+                  >
+                    ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
+                  </p>
+                </div>
+              )}
+              {isChangingComputeSize && (
+                <div className="flex items-center justify-between">
+                  <p className="text-sm">{selectedComputeSize.name}</p>
+                  <p className="text-sm">
+                    ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
+                  </p>
+                </div>
+              )}
+              {isChangingComputeSize && (
+                <div className="!mt-4">
+                  <InformationBox
+                    hideCollapse
+                    defaultVisibility
+                    icon={<IconAlertCircle strokeWidth={2} />}
+                    title="Changing your compute size"
+                    description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
+                  />
+                </div>
+              )}
             </div>
           )}
-          {isChangingComputeSize && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm">{selectedComputeSize.name}</p>
-              <p className="text-sm">
-                ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
-              </p>
-            </div>
-          )}
-          {isChangingComputeSize && (
-            <div className="!mt-4">
-              <InformationBox
-                hideCollapse
-                defaultVisibility
-                icon={<IconAlertCircle strokeWidth={2} />}
-                title="Changing your compute size"
-                description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
-              />
-            </div>
-          )}
-        </div>
+        </>
       )}
 
       <div className="h-px w-full bg-scale-600" />
@@ -152,12 +172,12 @@ const PaymentSummaryPanel: FC<Props> = ({
             <p className="text-sm text-scale-1100">Retrieving payment methods</p>
           </div>
         ) : paymentMethods.length === 0 ? (
-          <div className="flex items-center justify-between rounded-md px-4 py-2 bg-scale-400 border border-scale-700">
-            <div className="flex items-center space-x-4">
-              <IconAlertCircle size={16} />
-              <p className="text-scale-1100 text-sm">No saved payment methods</p>
+          <div className="flex items-center justify-between rounded-md px-4 py-2 bg-scale-100 border border-dashed">
+            <div className="flex items-center space-x-4 text-scale-1100">
+              <IconAlertCircle size={16} strokeWidth={1.5} />
+              <p className="text-sm">No saved payment methods</p>
             </div>
-            <Button type="default" icon={<IconPlus />} onClick={onSelectAddNewPaymentMethod}>
+            <Button type="default" icon={<IconCreditCard />} onClick={onSelectAddNewPaymentMethod}>
               Add new
             </Button>
           </div>
@@ -204,6 +224,8 @@ const PaymentSummaryPanel: FC<Props> = ({
           loading={isSubmitting}
           disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
           onClick={() => onConfirmPayment()}
+          block
+          size="medium"
         >
           Confirm payment
         </Button>

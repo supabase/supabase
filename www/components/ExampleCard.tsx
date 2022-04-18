@@ -56,7 +56,7 @@ function ExampleCard(props: any) {
           <div className="flex gap-2 items-center mt-3">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
-                <img src="https://vercel.com/button" />
+                <img className="h-6" src="https://vercel.com/button" />
               </a>
             )}
             {props.demo_url && (

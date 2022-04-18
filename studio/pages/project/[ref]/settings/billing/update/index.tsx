@@ -106,7 +106,7 @@ const BillingUpdate: NextPage = () => {
 
   return (
     <BillingLayout>
-      <div className="mx-auto max-w-5xl my-10">
+      <div className="mx-auto max-w-6xl my-10 px-6">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={products?.tiers ?? []}
