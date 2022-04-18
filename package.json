@@ -38,6 +38,7 @@
     "prettier": "^2.5.1",
     "ts-jest": "^27.0.7",
     "ts-node": "^9.1.1",
+    "turbo": "latest",
     "typescript": "^4.5.2"
   },
   "repository": {
