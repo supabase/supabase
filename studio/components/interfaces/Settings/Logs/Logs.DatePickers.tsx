@@ -74,9 +74,9 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
         to={!helperValue ? to : undefined}
         from={!helperValue ? from : undefined}
         renderFooter={({ to, from }) => {
-          if (to && from && Math.abs(dayjs(from).diff(dayjs(to), 'day')) > 50) {
+          if (to && from && Math.abs(dayjs(from).diff(dayjs(to), 'day')) > 4) {
             return (
-              <Alert title="Large date range detected" variant="warning" className="mx-3 pl-2 pr-2 pt-2 pb-2">
+              <Alert title={""} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
                 Large ranges may result in memory errors for big projects.
               </Alert>
             )
