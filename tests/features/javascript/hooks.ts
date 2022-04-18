@@ -18,7 +18,7 @@ export abstract class Hooks {
     port: parseInt(process.env.SUPABASE_DB_PORT),
     database: 'postgres',
     username: 'postgres',
-    password: 'postgres',
+    password: process.env.SUPABASE_DB_PASS,
   })
 
   @step('terminate sql connection')
