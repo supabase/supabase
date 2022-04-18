@@ -16,8 +16,12 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
   }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
-        <span className={`text-scale-1200 text-sm col-span-8 ${code && 'text-xs font-mono'}`}>
+        <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+        <span
+          className={`text-scale-1200 text-sm col-span-8 whitespace-pre-wrap ${
+            code && 'text-xs font-mono'
+          }`}
+        >
           {value}
         </span>
       </div>
@@ -28,12 +32,9 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
-        <div
-          className="text-xs text-wrap font-mono text-scale-1200 mt-2"
-          dangerouslySetInnerHTML={{
-            __html: log.event_message,
-          }}
-        />
+        <div className="text-xs text-wrap font-mono text-scale-1200 mt-2 whitespace-pre-wrap overflow-x-auto">
+          {log.event_message}
+        </div>
       </div>
       <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>

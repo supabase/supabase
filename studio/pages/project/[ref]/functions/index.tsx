@@ -76,40 +76,40 @@ const EmptyFunctions = () => {
     //   comment: 'Link this project',
     // },
     {
-      command: 'supabase functions new hello',
-      description: ' creates a function stub at ./functions/hello/hello.ts',
+      command: 'supabase functions new hello-world',
+      description: ' creates a function stub at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions new hello
+            <span className="text-brand-1100">supabase</span> functions new hello-world
           </>
         )
       },
       comment: 'Create a function',
     },
     {
-      command: `supabase functions deploy hello --project-ref ${ref}`,
-      description: 'Deploys function at ./functions/hello/index.ts',
+      command: `supabase functions deploy hello-world --project-ref ${ref}`,
+      description: 'Deploys function at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions deploy hello --project-ref{' '}
-            {ref}
+            <span className="text-brand-1100">supabase</span> functions deploy hello-world
+            --project-ref {ref}
           </>
         )
       },
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
-      description: 'Invokes the hello function',
+      description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            .functions.supabase.co/hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
             {`--data '{"name":"Functions"}'`}
           </>
         )

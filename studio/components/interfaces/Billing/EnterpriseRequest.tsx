@@ -7,6 +7,7 @@ import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { UpdateSuccess } from '.'
+import BackButton from 'components/ui/BackButton'
 
 interface Props {
   onSelectBack: () => void
@@ -21,7 +22,9 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
   const [isSuccessful, setIsSuccessful] = useState(false)
 
   const initialValues = {
-    name: `${profile?.first_name} ${profile?.last_name}`,
+    name: `${profile?.first_name ? profile?.first_name : ''} ${
+      profile?.last_name ? profile.last_name : ''
+    }`,
     email: profile?.primary_email,
     company: '',
     message: '',
@@ -81,43 +84,37 @@ const EnterpriseRequest: FC<Props> = ({ onSelectBack }) => {
       enterTo="transform opacity-100 translate-x-0"
     >
       <div className="space-y-8 w-4/5">
-        <div className="relative">
-          <div className="absolute top-[2px] -left-24">
-            <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
-              Back
-            </Button>
-          </div>
-          <div className="space-y-1">
-            <h4 className="text-lg">Customised plans tailored for your business needs</h4>
-            <p className="text-scale-1100">
-              Let us know a few details and we’ll be in contact with you!
-            </p>
-          </div>
-          <Form
-            validateOnBlur
-            initialValues={initialValues}
-            validate={onValidate}
-            onSubmit={onSubmit}
-          >
-            {({ isSubmitting }: { isSubmitting: boolean }) => (
-              <div className="space-y-12 py-16">
-                <div className="space-y-4 w-3/5">
-                  <Input layout="horizontal" label="Name" id="name" name="name" />
-                  <Input layout="horizontal" label="Email" id="email" name="email" />
-                  <Input layout="horizontal" label="Company" id="company" name="company" />
-                </div>
-                <Input.TextArea
-                  id="message"
-                  name="message"
-                  label="Let us know what you intend to use Supabase for"
-                />
-                <Button htmlType="submit" loading={isSubmitting}>
-                  Submit request
-                </Button>
-              </div>
-            )}
-          </Form>
+        <BackButton onClick={() => onSelectBack()} />
+        <div className="space-y-1">
+          <h4 className="text-lg">Customised plans tailored for your business needs</h4>
+          <p className="text-scale-1100">
+            Let us know a few details and our team will get back to you as soon as possible.
+          </p>
         </div>
+        <Form
+          validateOnBlur
+          initialValues={initialValues}
+          validate={onValidate}
+          onSubmit={onSubmit}
+        >
+          {({ isSubmitting }: { isSubmitting: boolean }) => (
+            <div className="space-y-12">
+              <div className="space-y-4 w-3/5">
+                <Input layout="horizontal" label="Name" id="name" name="name" />
+                <Input layout="horizontal" label="Email" id="email" name="email" />
+                <Input layout="horizontal" label="Company" id="company" name="company" />
+              </div>
+              <Input.TextArea
+                id="message"
+                name="message"
+                label="Let us know what you intend to use Supabase for"
+              />
+              <Button htmlType="submit" loading={isSubmitting}>
+                Submit request
+              </Button>
+            </div>
+          )}
+        </Form>
       </div>
     </Transition>
   )

@@ -54,9 +54,9 @@ const featureHighlights = [
     highlightLines: '22..27',
   },
   {
-    title: 'Use secrets to store senstive keys',
+    title: 'Use secrets to store sensitive keys',
     description:
-      'Set and edit secrets via the CLI, which can then be accessed via enviroment variables.',
+      'Set and edit secrets via the CLI, which can then be accessed via environment variables.',
     highlightLines: '7..13',
   },
   {
@@ -175,7 +175,7 @@ function Database() {
                       <button
                         key={`featureHighlighted-${i}`}
                         className={
-                          'group transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder' +
+                          'group transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:border' +
                           (active
                             ? ' bg-white dark:bg-scale-400 border-scale-500'
                             : ' border-scale-300')

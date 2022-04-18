@@ -204,23 +204,20 @@ const LogTable = ({
   return (
     <>
       <section
-        className={'flex flex-1 flex-col  ' + (!queryType ? 'shadow-lg' : '')}
+        className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
         {!queryType && (
           <div>
             <div
               className="
-        w-full bg-scale-100 dark:bg-scale-300 
-
-       rounded-tl rounded-tr
-       border-t
-       border-l
-       border-r
-
-
-        flex items-center justify-between
-        px-5 py-2
+            w-full bg-scale-100 dark:bg-scale-300 
+            rounded-tl rounded-tr
+            border-t
+            border-l
+            border-r
+            flex items-center justify-between
+            px-5 py-2
       "
             >
               <div className="flex items-center gap-2">
@@ -248,9 +245,7 @@ const LogTable = ({
             </div>
           </div>
         )}
-        <div
-          className={'flex flex-row flex-grow h-full ' + (!queryType ? 'border-l border-r' : '')}
-        >
+        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
@@ -268,22 +263,11 @@ const LogTable = ({
                 <>
                   <div className="py-4 w-full h-full flex-col space-y-12">
                     <div
-                      className={`transition-all
-                      duration-500
-                      delay-200
-                      
-                      flex
-                      flex-col
-                      items-center
-                  
-                      gap-6
-                      text-center
-                      mt-16
-                      opacity-100 
-                      scale-100
-                      
-                      justify-center
-                    `}
+                      className={[
+                        'transition-all duration-500 delay-200',
+                        'flex flex-col items-center gap-6 text-center',
+                        'mt-16 opacity-100 scale-100 justify-center',
+                      ].join(' ')}
                     >
                       <div className="flex flex-col gap-1">
                         <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>

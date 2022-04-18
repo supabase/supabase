@@ -27,13 +27,20 @@ You can use these simple questions to determine which connection method to use:
 - Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? If yes, use a connection pool.
 
 
-## HTTP API
+## API
 
-Supabase provides an auto-updating API. This is the easiest way to get started if you are managing data (fetching, inserting, updating). 
+Supabase provides an auto-updating [API](/docs/guides/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). 
 
 
-You cannot manage the database schema 
-via the API (for security reasons). To do that you can use the dashboard or connect directly to your database.
+### Interfaces 
+
+We provides several types of API to suit your preferences and use-case:
+
+- [REST](/docs/guides/api#rest-api): interact with your database through a REST interface.
+- [GraphQL](/docs/guides/api#graphql-api): interact with your database through a GraphQL interface.
+- [Realtime](/docs/guides/api#realtime-api): listen to database changes over websockets.
+
+You cannot manage the database schema via the API (for security reasons). To do that you can use the dashboard or connect directly to your database.
 
 ### Finding your API URL
 
@@ -98,7 +105,7 @@ When a client makes a request, PgBouncer "allocates" an available connection to 
 When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
 
-![Connection pooling](/img/guides/connection-pool.png)
+![Connection pooling](/img/guides/database/connection-pool.png)
 
 
 ### Pool modes
