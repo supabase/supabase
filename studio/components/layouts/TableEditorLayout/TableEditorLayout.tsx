@@ -36,6 +36,7 @@ const TableEditorLayout: FC<Props> = ({
     if (ui.selectedProject) {
       meta.schemas.load()
       meta.tables.load()
+      meta.types.load()
     }
   }, [ui.selectedProject])
 

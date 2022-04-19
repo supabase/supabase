@@ -11,8 +11,9 @@ import {
   IconSettings,
   Button,
 } from '@supabase/ui'
+import { PostgresType } from '@supabase/postgres-meta'
 
-import { ColumnField, EnumType } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
@@ -38,7 +39,7 @@ import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constant
 
 interface Props {
   column: ColumnField
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   isNewRecord: boolean
   hasImportContent: boolean
   dragHandleProps?: any
@@ -49,7 +50,7 @@ interface Props {
 
 const Column: FC<Props> = ({
   column = {} as ColumnField,
-  enumTypes = [] as EnumType[],
+  enumTypes = [] as PostgresType[],
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
