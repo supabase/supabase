@@ -22,7 +22,6 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
-import SidePanelEditor from '..'
 
 interface Props {
   table?: PostgresTable
