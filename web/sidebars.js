@@ -109,7 +109,7 @@ module.exports = {
       type: 'category',
       label: 'APIs',
       collapsed: false,
-      items: ['guides/api', 'guides/database/generating-types'],
+      items: ['guides/api', 'guides/api/generating-types'],
     },
     {
       type: 'category',
