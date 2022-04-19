@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { last } from 'lodash'
-import { Typography, IconHome, IconChevronRight } from '@supabase/ui'
+import { IconHome, IconChevronRight } from '@supabase/ui'
 
 interface Props {
   breadcrumbs: string[]
@@ -10,17 +10,15 @@ interface Props {
 const DrilldownBreadCrumbs: FC<Props> = ({ breadcrumbs = [], onSelectBreadcrumb = () => {} }) => {
   return (
     <div className="flex items-center space-x-2">
-      <Typography>
-        <IconHome size={16} strokeWidth={2} />
-      </Typography>
+      <IconHome size={16} strokeWidth={2} />
       {breadcrumbs.length > 0 &&
         breadcrumbs.map((crumb) => (
           <div className="flex items-center space-x-2" key={crumb}>
             <IconChevronRight size={16} strokeWidth={2} />
             {crumb === last(breadcrumbs) ? (
-              <Typography.Text>{crumb}</Typography.Text>
+              <p className="text-xs font-mono">{crumb}</p>
             ) : (
-              <Typography.Text>
+              <p className="text-xs font-mono">
                 <div
                   className="cursor-pointer"
                   onClick={() =>
@@ -29,7 +27,7 @@ const DrilldownBreadCrumbs: FC<Props> = ({ breadcrumbs = [], onSelectBreadcrumb 
                 >
                   {crumb}
                 </div>
-              </Typography.Text>
+              </p>
             )}
           </div>
         ))}
