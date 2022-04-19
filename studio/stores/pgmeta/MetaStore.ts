@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk, maxBy } from 'lodash'
+import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from '@supabase/grid'
 import {
   PostgresColumn,
@@ -38,6 +38,7 @@ import PublicationStore, { IPublicationStore } from './PublicationStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
+import TypesStore from './TypesStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
@@ -57,6 +58,7 @@ export interface IMetaStore {
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
   publications: IPublicationStore
+  types: IPostgresMetaInterface<any>
 
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
@@ -113,6 +115,7 @@ export default class MetaStore implements IMetaStore {
   functions: FunctionsStore
   extensions: ExtensionsStore
   publications: PublicationStore
+  types: TypesStore
 
   connectionString?: string
   baseUrl: string
@@ -155,6 +158,7 @@ export default class MetaStore implements IMetaStore {
       identifier: 'name',
     })
     this.publications = new PublicationStore(rootStore, `${this.baseUrl}/publications`, headers)
+    this.types = new TypesStore(rootStore, `${this.baseUrl}/types`, headers)
 
     makeObservable(this, {
       excludedSchemas: observable,
