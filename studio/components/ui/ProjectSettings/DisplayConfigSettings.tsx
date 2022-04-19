@@ -27,7 +27,7 @@ const DisplayConfigSettings = () => {
   // Get the API service
   const jwtSecret = project?.jwt_secret ?? ''
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_API_SERVICE_ID)
-  const apiConfig = apiService?.app_config
+  const apiConfig = apiService?.app_config ?? {}
 
   return (
     <ConfigContentWrapper>
