@@ -56,20 +56,22 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
       onCancel={closePanel}
       customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
     >
-      <TwoOptionToggle
-        options={['view', 'edit']}
-        activeOption={view}
-        borderOverride="border-gray-500"
-        onClickOption={onToggleClick}
-      />
+      <SidePanel.Content>
+        <TwoOptionToggle
+          options={['view', 'edit']}
+          activeOption={view}
+          borderOverride="border-gray-500"
+          onClickOption={onToggleClick}
+        />
 
-      <div className="flex-auto flex flex-col mt-4">
-        {view === 'edit' ? (
-          <Editor column={column} value={jsonStr} onChange={onInputChange} />
-        ) : (
-          <Viewer column={column} value={jsonStr} />
-        )}
-      </div>
+        <div className="flex-auto flex flex-col mt-4 space-y-2">
+          {view === 'edit' ? (
+            <Editor column={column} value={jsonStr} onChange={onInputChange} />
+          ) : (
+            <Viewer column={column} value={jsonStr} />
+          )}
+        </div>
+      </SidePanel.Content>
     </SidePanel>
   )
 }
