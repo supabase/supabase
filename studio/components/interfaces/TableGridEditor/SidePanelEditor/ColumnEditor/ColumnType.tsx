@@ -1,11 +1,12 @@
 import React, { FC } from 'react'
 import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight } from '@supabase/ui'
+import { PostgresType } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
-import { PostgresDataTypeOption, EnumType } from '../SidePanelEditor.types'
+import { PostgresDataTypeOption } from '../SidePanelEditor.types'
 
 interface Props {
   value: string
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   className?: string
   error?: any
@@ -66,7 +67,7 @@ const ColumnType: FC<Props> = ({
       </Listbox.Option>
 
       {enumTypes.length > 0 ? (
-        enumTypes.map((enumType: EnumType) => (
+        enumTypes.map((enumType: PostgresType) => (
           <Listbox.Option
             key={enumType.name}
             value={enumType.name}

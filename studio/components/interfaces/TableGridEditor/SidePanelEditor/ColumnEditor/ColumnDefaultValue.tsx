@@ -1,17 +1,18 @@
 import React, { FC } from 'react'
 import { isNil } from 'lodash'
 import { Select } from '@supabase/ui'
+import { PostgresType } from '@supabase/postgres-meta'
 
 import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
-import { ColumnField, EnumType } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import { Suggestion } from './ColumnEditor.types'
 import { getSelectedEnumValues } from './ColumnEditor.utils'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
 
 interface Props {
   columnFields: ColumnField
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
@@ -27,6 +28,7 @@ const ColumnDefaultValue: FC<Props> = ({
     isNil(columnFields.format) && !POSTGRES_DATA_TYPES.includes(columnFields.format)
 
   if (isUserDefinedEnum) {
+    const enumValues = getSelectedEnumValues(columnFields.format, enumTypes)
     return (
       <Select
         label="Default Value"
@@ -37,7 +39,7 @@ const ColumnDefaultValue: FC<Props> = ({
         <Select.Option key="empty-enum" value="">
           ---
         </Select.Option>
-        {getSelectedEnumValues(columnFields.format, enumTypes).map((value: string) => (
+        {enumValues.map((value: string) => (
           <Select.Option key={value} value={value}>
             {value}
           </Select.Option>

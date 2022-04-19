@@ -122,14 +122,12 @@ const EmptyFunctions = () => {
       <div className="grid py-12 lg:grid-cols-12 gap-y-12 lg:gap-x-16 max-w-7xl">
         <div className="col-span-5 space-y-4">
           <p className="max-w-lg text-base text-scale-1200">
-            Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
-            management.
+            Scalable functions to run your code with no server management.
           </p>
           <p className="max-w-lg text-sm text-scale-1100">
-            No servers to provision, manage, or upgrade Automatically scale based on the load
-            Integrated monitoring, logging, and debugging capability Built-in security at role and
-            per function level based on the principle of least privilege Key networking capabilities
-            for hybrid and multi-cloud scenarios
+            Edge Functions are server-side Typescript functions, distributed globally at the edge -
+            close to your users. They can be used for listening to webhooks or integrating your
+            Supabase project with third-parties.
           </p>
           <div className="flex gap-2">
             <Link passHref href="https://supabase.com/docs/guides/functions">

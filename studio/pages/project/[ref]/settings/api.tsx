@@ -45,7 +45,7 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import Panel from 'components/to-be-cleaned/Panel'
 import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 
 const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:

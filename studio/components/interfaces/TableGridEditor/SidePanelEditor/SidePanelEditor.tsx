@@ -45,24 +45,11 @@ const SidePanelEditor: FC<Props> = ({
 }) => {
   const { meta, ui } = useStore()
 
-  const [enumTypes, setEnumTypes] = useState<any[]>([])
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-
-  useEffect(() => {
-    let cancel = false
-    const fetchEnumTypes = async () => {
-      const enumTypes = await meta.schemas.getEnums()
-      if (!cancel) setEnumTypes(enumTypes)
-    }
-    fetchEnumTypes()
-
-    return () => {
-      cancel = true
-    }
-  }, [])
+  const enumTypes = meta.types.list()
 
   const saveRow = async (
     payload: any,
@@ -195,12 +182,25 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Updating table: ${selectedTableToEdit?.name}...`,
         })
-        const table: any = await meta.updateTable(toastId, selectedTableToEdit, payload, columns)
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Successfully updated ${table.name}!`,
-        })
+        const { table, hasError }: any = await meta.updateTable(
+          toastId,
+          selectedTableToEdit,
+          payload,
+          columns
+        )
+        if (hasError) {
+          ui.setNotification({
+            id: toastId,
+            category: 'info',
+            message: `Table ${table.name} has been updated, but there were some errors`,
+          })
+        } else {
+          ui.setNotification({
+            id: toastId,
+            category: 'success',
+            message: `Successfully updated ${table.name}!`,
+          })
+        }
       }
     } catch (error: any) {
       saveTableError = true

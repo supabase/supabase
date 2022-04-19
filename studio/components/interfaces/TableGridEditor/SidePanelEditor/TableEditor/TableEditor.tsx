@@ -1,19 +1,14 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Badge, Checkbox, SidePanel, Input } from '@supabase/ui'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnManagement from './ColumnManagement'
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
-import {
-  ColumnField,
-  EnumType,
-  CreateTablePayload,
-  UpdateTablePayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import { TableField, ImportContent } from './TableEditor.types'
 import {
@@ -22,12 +17,11 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
-import SidePanelEditor from '..'
 
 interface Props {
   table?: PostgresTable
   tables: PostgresTable[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   selectedSchema: string
   isDuplicating: boolean
   visible: boolean
@@ -50,7 +44,7 @@ interface Props {
 const TableEditor: FC<Props> = ({
   table,
   tables = [],
-  enumTypes = [] as EnumType[],
+  enumTypes = [] as PostgresType[],
   selectedSchema,
   isDuplicating,
   visible = false,
