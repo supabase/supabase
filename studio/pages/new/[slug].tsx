@@ -188,9 +188,8 @@ export const Wizard = observer(() => {
         message: `Failed to create new project: ${response.error.message}`,
       })
     } else {
-      // Use redirect to reload store data properly
-      // after creating a new project
-      window.location.replace(`/project/${response.ref}/building`)
+      app.onProjectCreated(response)
+      router.push(`/project/${response.ref}/building`)
     }
   }
 

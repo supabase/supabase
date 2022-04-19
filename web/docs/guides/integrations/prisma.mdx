@@ -117,6 +117,27 @@ This will create a `prisma/migrations` folder inside your `prisma` directory and
 > ![tables created in the UI](/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
 > That’s it! You have now successfully connected a Prisma project to a PostgreSQL database hosted on Supabase and ran your first migration.
 
+### Confirming Realtime Functionality
+
+There is an existing issue where Prisma will create Enum Types wrapped in double quotation marks in PostgreSQL. This is not compatible with Realtime-enabled database tables whose columns rely on those Enum Types. We are working on a fix but the workaround is to alter and rename the Enum Types. You can use the following query to find all Types with double quotation marks in the `public` schema:
+
+```sql
+select distinct(a.atttypid::regtype)
+  from pg_class as c
+    join pg_namespace as n
+	    on c.relnamespace = n.oid
+    join pg_attribute as a
+	    on c.oid = a.attrelid
+  where nspname = 'public'
+    and a.atttypid::regtype::text like '"%"';
+```
+
+Then use the following example query to strip the double quotation marks:
+
+```sql
+alter type "Incompatible" rename to compatible;
+```
+
 ## Connection pooling with Supabase
 
 If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [support connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
