@@ -132,11 +132,9 @@ function AuthPage() {
                 </div>
               </div>
               <h4 className="h4">All the social providers</h4>
-              <p>
-                <span className="p text-base">
-                  Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
-                  Gitlab, Twitter, Discord, and many more.
-                </span>
+              <p className="p text-base">
+                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
+                Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
             <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
