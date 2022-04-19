@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
+import { IconMoon, IconSun, Typography, Input, Listbox, Toggle } from '@supabase/ui'
 
 import { useProfile, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -98,6 +98,7 @@ const GithubProfile = observer(() => {
             disabled
             label="Username"
             layout="horizontal"
+            className="items-center"
             value={ui.profile?.username ?? ''}
           />
           <Input
@@ -105,6 +106,7 @@ const GithubProfile = observer(() => {
             disabled
             label="Email"
             layout="horizontal"
+            className="items-center"
             value={ui.profile?.primary_email ?? ''}
           />
         </div>
@@ -116,15 +118,36 @@ const GithubProfile = observer(() => {
 const ThemeSettings = observer(() => {
   const { ui } = useStore()
 
+  const [exampleProject, setExampleProject] = useState<string>('show')
+  const [clientLibraries, setClientLibraries] = useState<string>('show')
+
+  const toggleExampleProject = () => {
+    if (exampleProject === 'show') {
+      setExampleProject('hide')
+    } else {
+      setExampleProject('show')
+    }
+    localStorage.setItem('supabaseExampleProject', exampleProject)
+  }
+
+  const toggleClientLibraries = () => {
+    if (clientLibraries === 'show') {
+      setClientLibraries('hide')
+    } else {
+      setClientLibraries('show')
+    }
+    localStorage.setItem('supabaseClientLibraries', exampleProject)
+  }
+
   return (
     <Panel
       title={[
         <Typography.Title key="panel-title" level={5}>
-          Theme
+          Dashboard UI
         </Typography.Title>,
       ]}
     >
-      <Panel.Content>
+      <Panel.Content className="space-y-6">
         <Listbox
           value={ui.themeOption}
           label="Interface theme"
@@ -150,6 +173,14 @@ const ThemeSettings = observer(() => {
             Light
           </Listbox.Option>
         </Listbox>
+        <div className="text-scale-1100 text-sm flex justify-between items-center" style={{ width: '40%' }}>
+          <span>Client Libraries</span>
+          <Toggle checked={exampleProject === 'show' ? true : false} onChange={() => toggleClientLibraries()} />
+        </div>
+        <div className="text-scale-1100 text-sm flex justify-between items-center" style={{ width: '40%' }}>
+          <span>Example Projects</span>
+          <Toggle checked={exampleProject === 'show' ? true : false} onChange={() => toggleExampleProject()} />
+        </div>
       </Panel.Content>
     </Panel>
   )

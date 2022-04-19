@@ -17,6 +17,9 @@ const Home: NextPage = () => {
       ? project?.name
       : 'Welcome to your project'
 
+  const SHOW_EXAMPLE_PROJECTS = localStorage.getItem('supabaseExampleProject')
+  const SHOW_CLIENT_LIBRARIES = localStorage.getItem('supabaseClientLibrary')
+
   return (
     <BaseLayout>
       <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
@@ -24,26 +27,34 @@ const Home: NextPage = () => {
           <h1 className="text-3xl">{projectName}</h1>
         </div>
         {IS_PLATFORM && <ProjectUsageSection />}
-        <div className="space-y-8">
-          <div className="mx-6">
-            <Typography.Title level={4}>Client libraries</Typography.Title>
+        {SHOW_CLIENT_LIBRARIES === 'show' ? (
+          <div className="space-y-8">
+            <div className="mx-6">
+              <Typography.Title level={4}>Client libraries</Typography.Title>
+            </div>
+            <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
+              {CLIENT_LIBRARIES.map((library) => (
+                <ClientLibrary key={library.language} {...library} />
+              ))}
+            </div>
           </div>
-          <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
-            {CLIENT_LIBRARIES.map((library) => (
-              <ClientLibrary key={library.language} {...library} />
-            ))}
+        ) : (
+          <div className="sr-only">hide example projects</div>
+        )}
+        {SHOW_EXAMPLE_PROJECTS === 'show' ? (
+          <div className="space-y-8">
+            <div className="mx-6">
+              <Typography.Title level={4}>Example projects</Typography.Title>
+            </div>
+            <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {EXAMPLE_PROJECTS.map((project) => (
+                <ExampleProject key={project.url} {...project} />
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="space-y-8">
-          <div className="mx-6">
-            <Typography.Title level={4}>Example projects</Typography.Title>
-          </div>
-          <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {EXAMPLE_PROJECTS.map((project) => (
-              <ExampleProject key={project.url} {...project} />
-            ))}
-          </div>
-        </div>
+        ) : (
+          <div className="sr-only">hide example projects</div>
+        )}
       </div>
     </BaseLayout>
   )
