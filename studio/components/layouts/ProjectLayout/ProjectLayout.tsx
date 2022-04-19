@@ -76,15 +76,14 @@ interface ContentWrapperProps {
 const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
   const { ui } = useStore()
   const router = useRouter()
-  const project = ui.selectedProject
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
 
   return (
     <>
-      {isLoading || project === undefined ? (
+      {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
       ) : requiresDbConnection ? (
-        <TestConnection project={project!}>
+        <TestConnection project={ui.selectedProject!}>
           <div className="flex flex-col flex-1 overflow-y-auto">{children}</div>
         </TestConnection>
       ) : (
