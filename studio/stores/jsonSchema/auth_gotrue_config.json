@@ -6,6 +6,7 @@
     "JWT_EXP",
     "JWT_AUD",
     "JWT_DEFAULT_GROUP_NAME",
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION",
     "EXTERNAL_EMAIL_ENABLED",
     "EXTERNAL_PHONE_ENABLED",
     "EXTERNAL_APPLE_ENABLED",
@@ -54,27 +55,27 @@
       "help": "The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
     },
     "URI_ALLOW_LIST": {
-      "title": "Additional Redirect URLs",
+      "title": "Additional redirect URLs",
       "type": "string",
       "help": "A comma separated list of *exact* URLs that auth providers are permitted to redirect to post authentication."
     },
     "DISABLE_SIGNUP": {
-      "title": "Disable Signup",
+      "title": "Disable signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups to your project."
     },
     "EXTERNAL_EMAIL_ENABLED": {
-      "title": "Enable Email Signup",
+      "title": "Enable email signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups via email to your project."
     },
     "EXTERNAL_PHONE_ENABLED": {
-      "title": "Enable Phone Signup",
+      "title": "Enable phone signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups via phone to your project."
     },
     "JWT_EXP": {
-      "title": "JWT Expiry",
+      "title": "JWT expiry",
       "type": "integer",
       "help": "How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).",
       "minimum": 1,
@@ -82,7 +83,7 @@
       "multipleof": 1
     },
     "JWT_AUD": {
-      "title": "JWT Audience",
+      "title": "JWT audience",
       "type": "string"
     },
     "JWT_DEFAULT_GROUP_NAME": {
@@ -310,35 +311,35 @@
       "type": "string"
     },
     "SMTP_ADMIN_EMAIL": {
-      "title": "SMTP Admin Email",
+      "title": "SMTP admin email",
       "type": "string"
     },
     "SMTP_HOST": {
-      "title": "SMTP Host",
+      "title": "SMTP host",
       "type": "string"
     },
     "SMTP_PORT": {
-      "title": "SMTP Port",
+      "title": "SMTP port",
       "type": "string"
     },
     "SMTP_USER": {
-      "title": "SMTP User",
+      "title": "SMTP user",
       "type": "string"
     },
     "SMTP_PASS": {
-      "title": "SMTP Password",
+      "title": "SMTP password",
       "type": "string"
     },
     "SMTP_PASS_ENCRYPTED": {
-      "title": "SMTP Password",
+      "title": "SMTP password",
       "type": "string"
     },
     "SMTP_SENDER_NAME": {
-      "title": "SMTP Sender Name",
+      "title": "SMTP sender name",
       "type": "string"
     },
     "RATE_LIMIT_EMAIL_SENT": {
-      "title": "Rate Limit",
+      "title": "Rate limit",
       "type": "number",
       "help": "Maximum number of emails sent per hour (Default: 30, Max: 32,767)",
       "minimum": 1,
@@ -430,13 +431,18 @@
       "title": "Minimum password length",
       "type": "integer"
     },
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
+      "title": "Enable strict password updates",
+      "type": "boolean",
+      "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
+    },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",
       "type": "boolean",
       "help": "If enabled, users need to confirm their phone number before signing in."
     },
     "SMS_PROVIDER": {
-      "title": "Sms Provider",
+      "title": "Sms provider",
       "type": "string",
       "options": [
         {
@@ -458,24 +464,24 @@
       ]
     },
     "SMS_TEXTLOCAL_API_KEY": {
-      "title": "Textlocal API Key",
+      "title": "Textlocal API key",
       "type": "string"
     },
     "SMS_TEXTLOCAL_SENDER": {
-      "title": "Textlocal Sender",
+      "title": "Textlocal sender",
       "type": "string",
       "help": "Textlocal sender phone number"
     },
     "SMS_TWILIO_ACCOUNT_SID": {
-      "title": "Twilio Account SID",
+      "title": "Twilio account SID",
       "type": "string"
     },
     "SMS_TWILIO_AUTH_TOKEN": {
-      "title": "Twilio Auth Token",
+      "title": "Twilio auth token",
       "type": "string"
     },
     "SMS_TWILIO_MESSAGE_SERVICE_SID": {
-      "title": "Twilio Message Service SID",
+      "title": "Twilio message service SID",
       "type": "string",
       "help": "Twilio message service SID or twilio phone number"
     },
@@ -489,15 +495,15 @@
       "help": "Messagebird sender name or phone number"
     },
     "SMS_VONAGE_API_KEY": {
-      "title": "Vonage API Key",
+      "title": "Vonage API key",
       "type": "string"
     },
     "SMS_VONAGE_API_SECRET": {
-      "title": "Vonage API Secret",
+      "title": "Vonage API secret",
       "type": "string"
     },
     "SMS_VONAGE_FROM": {
-      "title": "Vonage Sender",
+      "title": "Vonage sender",
       "type": "string",
       "help": "Vonage sender phone number"
     },
