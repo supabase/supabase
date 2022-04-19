@@ -89,7 +89,7 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase) => {
     ...(IS_PLATFORM
       ? [
           {
-            key: 'logsExplorer',
+            key: 'logs-explorer',
             label: 'Logs Explorer',
             icon: <IconList size={18} strokeWidth={2} />,
             link: isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`,
