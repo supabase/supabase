@@ -516,6 +516,7 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Add any new columns / Update any existing columns
+    let hasError = false
     for (const column of columns) {
       if (!column.id.includes(table.id.toString())) {
         this.rootStore.ui.setNotification({
@@ -546,7 +547,19 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
-            await this.updateColumn(column.id, columnPayload, updatedTable, column.foreignKey)
+            const res: any = await this.updateColumn(
+              column.id,
+              columnPayload,
+              updatedTable,
+              column.foreignKey
+            )
+            if (res?.error) {
+              hasError = true
+              this.rootStore.ui.setNotification({
+                category: 'error',
+                message: `Failed to update column "${column.name}": ${res.error.message}`,
+              })
+            }
           }
         }
       }
@@ -562,7 +575,7 @@ export default class MetaStore implements IMetaStore {
       if (primaryKeys.error) throw primaryKeys.error
     }
 
-    return await this.tables.loadById(table.id)
+    return { table: await this.tables.loadById(table.id), hasError }
   }
 
   async insertRowsViaSpreadsheet(
