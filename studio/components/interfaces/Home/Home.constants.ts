@@ -1,6 +1,6 @@
 export const CLIENT_LIBRARIES = [
   {
-    language: 'Javascript',
+    language: 'JavaScript',
     officialSupport: true,
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/javascript/installing',

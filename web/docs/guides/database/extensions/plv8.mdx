@@ -1,18 +1,18 @@
 ---
 id: plv8
-title: "plv8: Javascript Language"
-description: Javascript language for PostgreSQL.
+title: "plv8: JavaScript Language"
+description: JavaScript language for PostgreSQL.
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The `plv8` extension allows you use Javascript within Postgres. 
+The `plv8` extension allows you use JavaScript within Postgres. 
 
 ## Overview
 
 While Postgres natively runs SQL, it can also run other "procedural languages". 
-`plv8` allows you to run Javascript code - specifically any code that runs on the [V8 Javascript engine](https://v8.dev).
+`plv8` allows you to run JavaScript code - specifically any code that runs on the [V8 JavaScript engine](https://v8.dev).
 
 It can be used for database functions, triggers, queries and more.
 
@@ -66,7 +66,7 @@ with the `language` identifier set to `plv8`.
 ```sql
 create or replace function function_name() 
 returns void as $$
-    // V8 Javascript
+    // V8 JavaScript
     // code
     // here
 $$ language plv8;
@@ -80,7 +80,7 @@ You can call `plv8` functions like any other Postgres function:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
 ]}>
 <TabItem value="SQL">
 
