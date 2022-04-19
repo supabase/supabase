@@ -12,6 +12,7 @@ export interface IAppStore {
   projects: IProjectStore
   organizations: OrganizationStore
   database: IDatabaseStore
+  onProjectCreated: (project: any) => void
   onProjectUpdated: (project: any) => void
   onProjectDeleted: (project: any) => void
   onProjectConnectionStringUpdated: (projectId: number, value: string) => void
@@ -37,6 +38,25 @@ export default class AppStore implements IAppStore {
     this.projects = new ProjectStore(rootStore, `${this.baseUrl}/projects`, headers)
     this.organizations = new OrganizationStore(rootStore, `${this.baseUrl}/organizations`, headers)
     this.database = new DatabaseStore(rootStore, `${this.baseUrl}/database`, headers)
+  }
+
+  onProjectCreated(project: any) {
+    if (project && project.id) {
+      const temp: Project = {
+        id: project.id,
+        ref: project.ref,
+        name: project.name,
+        status: project.status,
+        organization_id: project.organization_id,
+        cloud_provider: project.cloud_provider,
+        region: project.region,
+        inserted_at: project.inserted_at,
+        subscription_id: project.subscription_id,
+        kpsVersion: undefined,
+        connectionString: undefined,
+      }
+      this.projects.data[project.id] = temp
+    }
   }
 
   onProjectUpdated(project: any) {
