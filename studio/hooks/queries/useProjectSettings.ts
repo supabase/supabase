@@ -1,5 +1,5 @@
 import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import useSWR from 'swr'
 
 export function useProjectSettings(ref?: string) {
@@ -10,7 +10,9 @@ export function useProjectSettings(ref?: string) {
      * check for data.services.service_api_keys, return a valid refresh interval if it's empty
      */
     refreshInterval: function (data: any) {
-      const apiService = (data?.services ?? []).find((x: any) => x.app.id == DEFAULT_API_SERVICE_ID)
+      const apiService = (data?.services ?? []).find(
+        (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+      )
       const apiKeys = apiService?.service_api_keys ?? []
       const interval = apiKeys.length === 0 ? 2000 : 0
       return interval
@@ -26,5 +28,3 @@ export function useProjectSettings(ref?: string) {
     isError: !!anyError,
   }
 }
-
-const DEFAULT_API_SERVICE_ID = 1
