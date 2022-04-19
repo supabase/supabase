@@ -19,8 +19,6 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     return (page || resource || '') as string
   }
 
-  getPage()
-
   useEffect(() => {
     if (ui.selectedProject) {
       meta.openApi.load()
