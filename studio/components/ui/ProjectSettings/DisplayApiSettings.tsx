@@ -29,7 +29,7 @@ const DisplayApiSettings = () => {
 
   return (
     <ApiContentWrapper>
-      {!isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <SettingsLoadingState
           isError={isProjectSettingsError || isJwtSecretUpdateStatusError}
           errorMessage="Failed to fetch API keys"
