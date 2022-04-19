@@ -75,12 +75,6 @@ export interface ColumnField {
 //   column: PostgresColumn
 // }
 
-export interface EnumType {
-  id: number
-  name: string
-  values: any[]
-}
-
 export interface PostgresDataTypeOption {
   name: string
   description: string

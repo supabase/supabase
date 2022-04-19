@@ -1,14 +1,14 @@
 import { find, isUndefined, isEqual, isNull } from 'lodash'
 import { Dictionary } from '@supabase/grid'
-import { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import {
+  PostgresColumn,
+  PostgresRelationship,
+  PostgresTable,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import { uuidv4 } from 'lib/helpers'
-import {
-  ColumnField,
-  EnumType,
-  CreateColumnPayload,
-  UpdateColumnPayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 const isSQLExpression = (input: string) => {
   if (input[0] === '(' && input[input.length - 1] === ')') {
@@ -138,9 +138,9 @@ export const generateUpdateColumnPayload = (
   return payload
 }
 
-export const getSelectedEnumValues = (type: string, enums: EnumType[]) => {
+export const getSelectedEnumValues = (type: string, enums: PostgresType[]) => {
   const enumType = find(enums, { name: type })
-  return enumType?.values ?? []
+  return (enumType?.enums ?? []) as string[]
 }
 
 export const validateFields = (field: ColumnField) => {
