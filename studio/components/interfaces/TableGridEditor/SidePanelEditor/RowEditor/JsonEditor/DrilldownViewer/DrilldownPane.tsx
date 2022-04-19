@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight, Typography } from '@supabase/ui'
+import { IconChevronRight } from '@supabase/ui'
 import { isNull } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 
@@ -15,9 +15,7 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
     return (
       <div className={`flex-1 ${pane === 2 ? 'border-l border-gray-500' : ''}`}>
         <div className="py-2 px-5 flex space-x-2">
-          <Typography.Text small type="danger">
-            Invalid JSON
-          </Typography.Text>
+          <p className="text-sm">Invalid JSON</p>
         </div>
       </div>
     )
@@ -27,9 +25,7 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
     return (
       <div className={`flex-1 max-w-[50%] ${pane === 2 ? 'border-l border-gray-500' : ''}`}>
         <div className="py-2 px-5 flex space-x-2">
-          <Typography.Text small className="opacity-50">
-            No data available
-          </Typography.Text>
+          <p className="opacity-50 text-sm">No data available</p>
         </div>
       </div>
     )
@@ -55,25 +51,20 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
             `}
           onClick={() => onSelectKey(key, pane)}
         >
-          <Typography.Text small className="font-mono !text-blue-700 dark:!text-blue-300">
-            {key}
-          </Typography.Text>
+          <p className="text-xs font-mono !text-blue-700 dark:!text-blue-1100">{key}</p>
           <div className={`${key === activeKey ? 'block' : 'hidden'} group-hover:block`}>
-            <Typography>
-              <IconChevronRight strokeWidth={2} size={16} />
-            </Typography>
+            <IconChevronRight strokeWidth={2} size={16} />
           </div>
         </div>
       ))}
       {keysWithoutChildren.map((key: string) => (
         <div key={key} className="py-2 px-5 flex space-x-2">
-          <Typography.Text small className="font-mono !text-blue-700 dark:!text-blue-300">
-            {key}:
-          </Typography.Text>
-          <Typography.Text
-            small
-            className={`font-mono break-all ${
-              typeof jsonData[key] !== 'string' ? '!text-green-700 dark:!text-green-400' : '!text-yellow-700 dark:!text-yellow-500'
+          <p className="text-xs font-mono !text-blue-700 dark:!text-blue-1100">{key}:</p>
+          <p
+            className={`text-xs font-mono break-all ${
+              typeof jsonData[key] !== 'string'
+                ? '!text-green-700 dark:!text-green-1000'
+                : '!text-yellow-700 dark:!text-yellow-900'
             }`}
           >
             {isNull(jsonData[key])
@@ -81,7 +72,7 @@ const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () 
               : typeof jsonData[key] === 'string'
               ? `"${jsonData[key]}"`
               : jsonData[key].toString()}
-          </Typography.Text>
+          </p>
         </div>
       ))}
     </div>
