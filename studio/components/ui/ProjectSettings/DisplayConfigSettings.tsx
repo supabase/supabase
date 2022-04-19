@@ -4,7 +4,7 @@ import { Input } from '@supabase/ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { SettingsLoadingState } from './SettingsLoadingState'
-import { DEFAULT_API_SERVICE_ID } from './index.constants'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/to-be-cleaned/Panel'
 
 const DisplayConfigSettings = () => {
@@ -26,7 +26,7 @@ const DisplayConfigSettings = () => {
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   // Get the API service
   const jwtSecret = project?.jwt_secret ?? ''
-  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_API_SERVICE_ID)
+  const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
   const apiConfig = apiService?.app_config ?? {}
 
   return (
