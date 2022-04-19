@@ -26,10 +26,12 @@ const DisplayApiSettings = () => {
   // Get the API service
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_API_SERVICE_ID)
   const apiKeys = apiService?.service_api_keys ?? []
+  // api keys should not be empty. However it can be populated with a delay on project creation
+  const isApikeysEmpty = apiKeys.length === 0
 
   return (
     <ApiContentWrapper>
-      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading || isApikeysEmpty ? (
         <SettingsLoadingState
           isError={isProjectSettingsError || isJwtSecretUpdateStatusError}
           errorMessage="Failed to fetch API keys"
