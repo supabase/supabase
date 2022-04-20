@@ -5,9 +5,17 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 17 Apr 2022 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 19 Apr 2022 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2022/04/20/partner-gallery-works-with-supabase</guid>
+  <title>Works With Supabase - announcing our Partner Gallery</title>
+  <link>https://supabase.com/blog/2022/04/20/partner-gallery-works-with-supabase</link>
+  <description>Introducing our Partner Gallery - open source and made with Supabase.</description>
+  <pubDate>Tue, 19 Apr 2022 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2022/04/18/bring-the-func-hackathon-winners</guid>
   <title>Bring the Func Hackathon Winners 2022</title>
@@ -15,7 +23,7 @@
   <description>Celebrating many amazing OSS Hackathon projects using GraphQL and Edge Functions.</description>
   <pubDate>Sun, 17 Apr 2022 16:00:00 GMT</pubDate>
 </item>
-      
+
 <item>
   <guid>https://supabase.com/blog/2022/04/15/beta-update-march-2022</guid>
   <title>Supabase Beta March 2022</title>
