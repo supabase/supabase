@@ -1,3 +1,5 @@
+import React from "react"
+
 interface Metadata {
   [key: string]: string | number | Object | Object[]
 }
@@ -10,6 +12,11 @@ export type LogSearchCallback = (
   } & DatePickerToFrom
 ) => void
 
+export interface LogsWarning {
+  text: string | React.ReactNode
+  link?: string
+  linkText?: string
+}
 export interface LogsEndpointParams {
   // project ref
   project: string
