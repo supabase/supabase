@@ -40,7 +40,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
  * ```
  * with no template, it will be converted into `WHERE (my.nested.value = 123)
  *
- * @returns a whewhere statement with WHERE clause.
+ * @returns a where statement with WHERE clause.
  */
 const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
