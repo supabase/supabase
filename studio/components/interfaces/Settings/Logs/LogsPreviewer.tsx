@@ -84,15 +84,19 @@ export const LogsPreviewer: React.FC<Props> = ({
   }
 
   const handleSearch: LogSearchCallback = async ({ query = '', to, from }) => {
-    setParams((prev) => ({ ...prev, iso_timestamp_start: from || '', iso_timestamp_end: to || '' }))
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: from || prev.iso_timestamp_start || '',
+      iso_timestamp_end: to || prev.iso_timestamp_end || '',
+    }))
     setFilters((prev) => ({ ...prev, search_query: query }))
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
         s: query || '',
-        its: from,
-        ite: to,
+        its: from || its || '',
+        ite: to || ite || '',
       },
     })
   }
