@@ -14,7 +14,6 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
     }
   })
   const [root, child] = (stringTemplateKey || '').split('.')
-  console.log(stringTemplateKey, templates[stringTemplateKey])
   describe.each([
     { filter: { search_query: '' } },
     { filter: { search_query: undefined } },
@@ -45,8 +44,9 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
     ...(stringTemplateKey
       ? [
           {
-            filter: { [root]: { [child]: false } },
+            filter: { search_query: 'some-search-query', [root]: { [child]: false } },
             excludes: [templates[stringTemplateKey], '()'],
+            contains: ['some-search-query'],
           },
         ]
       : []),
