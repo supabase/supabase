@@ -2,7 +2,7 @@ import { Alert, Button, Dropdown, IconClock } from '@supabase/ui'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { DatetimeHelper, getDefaultHelper } from '.'
+import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
 
 interface Props {
   to: string
@@ -73,7 +73,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
         to={!helperValue ? to : undefined}
         from={!helperValue ? from : undefined}
         renderFooter={({ to, from }) => {
-          if (to && from && Math.abs(dayjs(from).diff(dayjs(to), 'day')) > 4) {
+          if (to && from && Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD) {
             return (
               <Alert title={""} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
                 Large ranges may result in memory errors for big projects.

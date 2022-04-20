@@ -1,7 +1,24 @@
-import { Button, Dropdown, Typography, IconChevronDown, IconPlay } from '@supabase/ui'
+import {
+  Button,
+  Dropdown,
+  Typography,
+  IconChevronDown,
+  IconPlay,
+  Badge,
+  Popover,
+  Alert,
+} from '@supabase/ui'
 import Flag from 'components/ui/Flag/Flag'
-import { EXPLORER_DATEPICKER_HELPERS, LogsTableName, LOGS_SOURCE_DESCRIPTION, LogTemplate } from '.'
+import {
+  EXPLORER_DATEPICKER_HELPERS,
+  LogsTableName,
+  LogsWarning,
+  LOGS_SOURCE_DESCRIPTION,
+  LogTemplate,
+} from '.'
 import DatePickers from './Logs.DatePickers'
+import Link from 'next/link'
+
 interface Props {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
@@ -14,6 +31,7 @@ interface Props {
   onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
   defaultTo: string
   defaultFrom: string
+  warnings: LogsWarning[]
 }
 
 const LogsQueryPanel: React.FC<Props> = ({
@@ -28,6 +46,7 @@ const LogsQueryPanel: React.FC<Props> = ({
   defaultFrom,
   defaultTo,
   onDateChange,
+  warnings,
 }) => (
   <div
     className="
@@ -76,6 +95,35 @@ bg-panel-header-light dark:bg-panel-header-dark
             onChange={onDateChange}
             helpers={EXPLORER_DATEPICKER_HELPERS}
           />
+          <div className="overflow-hidden">
+            <div
+              className={` transition-all duration-300 ${
+                warnings.length > 0 ? 'opacity-100' : 'invisible w-0 h-0 opacity-0'
+              }`}
+            >
+              <Popover
+                portalled
+                overlay={
+                  <Alert variant="warning" title="">
+                    <div className="flex flex-col gap-3">
+                      {warnings.map((warning, index) => (
+                        <p key={index}>
+                          {warning.text}{' '}
+                          {warning.link && (
+                            <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                          )}
+                        </p>
+                      ))}
+                    </div>
+                  </Alert>
+                }
+              >
+                <Badge color="yellow">
+                  {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                </Badge>
+              </Popover>
+            </div>
+          </div>
         </div>
         <div>
           <div className="flex items-center gap-4">

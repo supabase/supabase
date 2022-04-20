@@ -9,6 +9,8 @@ import {
   DatePickerToFrom,
   LogsQueryPanel,
   LogsTableName,
+  LogsWarning,
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
   TEMPLATES,
@@ -20,6 +22,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { UserContent } from 'types'
 import toast from 'react-hot-toast'
+import dayjs from 'dayjs'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
@@ -27,7 +30,7 @@ export const LogsExplorerPage: NextPage = () => {
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
-
+  const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { content } = useStore()
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
@@ -45,6 +48,21 @@ export const LogsExplorerPage: NextPage = () => {
       })
     }
   }, [])
+
+  useEffect(() => {
+    let newWarnings = []
+    const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+    const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+    const daysDiff = Math.abs(start.diff(end, 'days'))
+    if (
+      editorValue &&
+      !editorValue.includes('limit') &&
+      daysDiff > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
+    ) {
+      newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
+    }
+    setWarnings(newWarnings)
+  }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
@@ -108,6 +126,7 @@ export const LogsExplorerPage: NextPage = () => {
             onSelectTemplate={onSelectTemplate}
             onSave={handleOnSave}
             isLoading={isLoading}
+            warnings={warnings}
           />
 
           <div className="min-h-[7rem] h-48">
