@@ -280,14 +280,12 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   await screen.findByDisplayValue('simple-query')
 })
 
-test("bug: nav to explorer preserves newlines", async ()=>{
-  render(
-    <LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />
-  )
+test('bug: nav to explorer preserves newlines', async () => {
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   const router = useRouter()
   userEvent.click(await screen.findByText(/Explore/))
-  await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent("\n")))
-}
+  await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent('\n')))
+})
 test('filters alter generated query', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))
