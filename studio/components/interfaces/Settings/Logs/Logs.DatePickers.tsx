@@ -13,7 +13,6 @@ interface Props {
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
-  // const selectedHelper = helpers.find((h) => h.text === helperValue)
   const handleHelperChange = (newValue: string) => {
     setHelperValue(newValue)
     const selectedHelper = helpers.find((h) => h.text === newValue)
