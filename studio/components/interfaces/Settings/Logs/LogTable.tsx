@@ -5,11 +5,7 @@ import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
-import {
-  SeverityFormatter,
-  ResponseCodeFormatter,
-  HeaderFormmater,
-} from './LogsFormatters'
+import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
 
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
@@ -316,12 +312,12 @@ const LogTable = ({
                           className="w-1/2"
                         >
                           <Input.TextArea
-                            size="small"
+                            size="tiny"
                             value={
                               typeof error === 'string' ? error : JSON.stringify(error, null, 2)
                             }
                             borderless
-                            className="font-mono w-full mt-4 text-xs"
+                            className="font-mono w-full mt-4"
                             copy
                             rows={12}
                           />
