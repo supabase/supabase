@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
+export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
+
 export const TEMPLATES: LogTemplate[] = [
   {
     label: 'Recent Errors',

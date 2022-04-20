@@ -192,3 +192,16 @@ test('datepicker interaction updates query params', async () => {
     })
   )
 })
+
+test('query warnings', async () => {
+  const router = defaultRouterMock()
+  router.query = {
+    ...router.query,
+    q: 'some_query',
+    its: dayjs().subtract(10, 'days').toISOString(),
+    ite: dayjs().toISOString(),
+  }
+  useRouter.mockReturnValue(router)
+  render(<LogsExplorerPage />)
+  await screen.findByText('1 warning')
+})
