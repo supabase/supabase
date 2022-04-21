@@ -6,7 +6,7 @@ import { Project } from 'types'
 import { get, head } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import BuildingState from './BuildingState'
-import RestartingState from './RestartingState'
+import ConnectingState from './ConnectingState'
 
 interface Props {
   project: Project
@@ -69,7 +69,7 @@ const TestConnection: FC<Props> = ({ project, children }) => {
   return (
     <>
       {!isProjectOnline ? (
-        <RestartingState project={project} autoApiService={projectProps?.autoApiService} />
+        <ConnectingState project={project} autoApiService={projectProps?.autoApiService} />
       ) : isProjectActive ? (
         children
       ) : isBuilding ? (
