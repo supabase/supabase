@@ -1,13 +1,14 @@
 import { Project } from 'types'
 import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
-
+  const logsUsageCodesPaths = useFlag('logsUsageCodesPaths')
   return [
     {
       title: 'Database',
@@ -26,82 +27,91 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/replication`,
           items: [],
         },
-
       ],
     },
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Logs',
-          items: [
-            {
-              name: 'API logs',
-              key: 'api-logs',
-              url: `/project/${ref}/database/api-logs`,
-              items: [],
-            },
-            {
-              name: 'Postgres logs',
-              key: 'postgres-logs',
-              url: `/project/${ref}/database/postgres-logs`,
-              items: [],
-            },
-          ],
-        },
-      ]
+          {
+            title: 'Logs & Analytics',
+            items: [
+              {
+                name: 'API logs',
+                key: 'api-logs',
+                url: `/project/${ref}/database/api-logs`,
+                items: [],
+              },
+            ...(logsUsageCodesPaths
+                ? [
+                    {
+                      name: 'API requests',
+                      key: 'api-requests',
+                      url: `/project/${ref}/database/api-requests`,
+                      items: [],
+                    },
+                  ]
+                : []),
+              {
+                name: 'Postgres logs',
+                key: 'postgres-logs',
+                url: `/project/${ref}/database/postgres-logs`,
+                items: [],
+              },
+            ],
+          },
+        ]
       : []),
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Settings',
-          items: [
-            {
-              name: 'Backups',
-              key: 'backups',
-              url: `/project/${ref}/database/backups`,
-              items: [],
-            },
-            {
-              name: 'Connection Pooling',
-              key: 'pooling',
-              url: `/project/${ref}/database/pooling`,
-              items: [],
-            },
-          ],
-        },
-      ]
+          {
+            title: 'Settings',
+            items: [
+              {
+                name: 'Backups',
+                key: 'backups',
+                url: `/project/${ref}/database/backups`,
+                items: [],
+              },
+              {
+                name: 'Connection Pooling',
+                key: 'pooling',
+                url: `/project/${ref}/database/pooling`,
+                items: [],
+              },
+            ],
+          },
+        ]
       : []),
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Alpha Preview',
-          isPreview: true,
-          items: [
-            {
-              name: 'Triggers',
-              key: 'triggers',
-              url: `/project/${ref}/database/triggers`,
-              items: [],
-            },
-            {
-              name: 'Functions',
-              key: 'functions',
-              url: `/project/${ref}/database/functions`,
-              items: [],
-            },
-            ...(showHooksRoute
-              ? [
-                {
-                  name: 'Function Hooks',
-                  key: 'hooks',
-                  url: `/project/${ref}/database/hooks`,
-                  items: [],
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
+          {
+            title: 'Alpha Preview',
+            isPreview: true,
+            items: [
+              {
+                name: 'Triggers',
+                key: 'triggers',
+                url: `/project/${ref}/database/triggers`,
+                items: [],
+              },
+              {
+                name: 'Functions',
+                key: 'functions',
+                url: `/project/${ref}/database/functions`,
+                items: [],
+              },
+              ...(showHooksRoute
+                ? [
+                    {
+                      name: 'Function Hooks',
+                      key: 'hooks',
+                      url: `/project/${ref}/database/hooks`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
       : []),
   ]
 }

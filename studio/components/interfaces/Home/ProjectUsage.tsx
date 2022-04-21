@@ -12,57 +12,25 @@ import {
   Button,
   Dropdown,
   IconChevronDown,
-  Badge,
-  Popover,
 } from '@supabase/ui'
 
 import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 
-import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
-import Table from 'components/to-be-cleaned/Table'
-import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
-import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
-import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
-
-const CHART_INTERVALS = [
-  {
-    key: 'minutely',
-    label: '60 minutes',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-  },
-  { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
-  { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
-]
+import { CHART_INTERVALS } from 'components/ui/Charts/Charts.constants'
 interface Props {
   project: any
 }
 
 const ProjectUsage: FC<Props> = ({ project }) => {
-  const logsUsageCodesPaths = useFlag('logsUsageCodesPaths')
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
   const { data, error }: any = useSWR(
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
-    get
-  )
-  const { data: codesData, error: codesFetchError } = useSWR<EndpointResponse<StatusCodesDatum>>(
-    logsUsageCodesPaths
-      ? `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-codes?interval=${interval}`
-      : null,
-    get
-  )
-
-  const { data: pathsData, error: _pathsFetchError }: any = useSWR<EndpointResponse<PathsDatum>>(
-    logsUsageCodesPaths
-      ? `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-paths?interval=${interval}`
-      : null,
     get
   )
 
@@ -238,113 +206,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
               </Panel>
             </div>
           </>
-        )}
-        {logsUsageCodesPaths && (
-          <div className="grid md:gap-4 lg:grid-cols-4 lg:gap-8">
-            <Panel
-              key="api-status-codes"
-              className="col-start-1 col-span-2"
-              wrapWithLoading={false}
-            >
-              <Panel.Content className="space-y-4">
-                <PanelHeader title="API Status Codes" />
-                <StackedAreaChart
-                  dateFormat={datetimeFormat}
-                  data={codesData?.result}
-                  stackKey="status_code"
-                  xAxisKey="timestamp"
-                  yAxisKey="count"
-                  isLoading={!codesData && !codesFetchError ? true : false}
-                  xAxisFormatAsDate
-                  size="large"
-                  styleMap={{
-                    200: { stroke: USAGE_COLORS['200'], fill: USAGE_COLORS['200'] },
-                    201: { stroke: USAGE_COLORS['201'], fill: USAGE_COLORS['201'] },
-                    400: { stroke: USAGE_COLORS['400'], fill: USAGE_COLORS['400'] },
-                    401: { stroke: USAGE_COLORS['401'], fill: USAGE_COLORS['401'] },
-                    404: { stroke: USAGE_COLORS['404'], fill: USAGE_COLORS['404'] },
-                    500: { stroke: USAGE_COLORS['500'], fill: USAGE_COLORS['500'] },
-                  }}
-                />
-              </Panel.Content>
-            </Panel>
-            <Panel
-              key="top-routes"
-              className="col-start-3 col-span-2 pb-0"
-              bodyClassName="h-full"
-              wrapWithLoading={false}
-            >
-              <Panel.Content className="space-y-4">
-                <PanelHeader title="Top Routes" />
-                <Table
-                  head={[
-                    <Table.th rowSpan={2}>Path</Table.th>,
-                    <Table.th rowSpan={2}>Count</Table.th>,
-                    <Table.th colSpan={3} className="text-center p-1">
-                      Latency (ms)
-                    </Table.th>,
-                  ]}
-                  headSecondRow={[
-                    <Table.th className="p-1">Avg</Table.th>,
-                    <Table.th className="p-1">p95</Table.th>,
-                    <Table.th className="p-1">p99</Table.th>,
-                  ]}
-                  body={
-                    <>
-                      {(pathsData?.result ?? []).map((row: PathsDatum) => (
-                        <Table.tr>
-                          <Table.td className="flex items-center space-x-2 text-xl">
-                            <>
-                              <p className="font-mono text-xs text-scale-1200">{row.method}</p>
-                              <p className="font-mono text-xs">{row.path}</p>{' '}
-                              {row.query_params && (
-                                <Popover
-                                  align="end"
-                                  header={
-                                    <div className="flex justify-between items-center">
-                                      <h5>Query Params</h5>
-                                    </div>
-                                  }
-                                  onOpenChange={function noRefCheck() {}}
-                                  overlay={[
-                                    <>
-                                      <div className="py-6 px-2 space-y-4 max-w-sm">
-                                        <p className="font-mono text-sm whitespace-pre-line">{row.query_params}</p>
-                                      </div>
-                                    </>,
-                                  ]}
-                                  portalled
-                                  showClose
-                                  side="bottom"
-                                  size="content"
-                                >
-                                  <Badge color="scale">?...</Badge>
-                                </Popover>
-                              )}
-                            </>
-                          </Table.td>
-                          <Table.td>
-                            <span className="text-xs">{row.count}</span>
-                          </Table.td>
-                          <Table.td>
-                            <span className="text-xs">
-                              {Number(row.avg_origin_time).toFixed(0)}
-                            </span>
-                          </Table.td>
-                          <Table.td>
-                            <span className="text-xs">{Number(row.p95).toFixed(0)}</span>
-                          </Table.td>
-                          <Table.td>
-                            <span className="text-xs">{Number(row.p99).toFixed(0)}</span>
-                          </Table.td>
-                        </Table.tr>
-                      ))}
-                    </>
-                  }
-                />
-              </Panel.Content>
-            </Panel>
-          </div>
         )}
       </div>
     </div>
