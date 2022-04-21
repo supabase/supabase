@@ -3,6 +3,10 @@ import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore } from 'hooks'
+import { Button } from '@supabase/ui'
+
+import { get, head } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
 import NavigationBar from './NavigationBar/NavigationBar'
@@ -29,6 +33,8 @@ const ProjectLayout: FC<Props> = ({
   hideHeader = false,
   hideIconBar = false,
 }) => {
+  const { ui } = useStore()
+
   return (
     <>
       <Head>
