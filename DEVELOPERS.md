@@ -12,6 +12,7 @@
 - [Finally](#finally)
 - [Community Channels](#community-channels)
 - [Monorepo](#monorepo)
+  - [Development](#development)
 
 ## Development Setup
 
@@ -175,3 +176,13 @@ This is a monorepo, using Turborepo. You must be using NPM 7 or higher.
 - Install a package: `npm install <package name> -w=<workspace to install in>`. eg:
   - `npm install @supabase/ui -w ui`: installs into `./packages/ui`
   - `npm install @supabase/ui -w docs`: installs into `./packages/docs`
+
+
+### Development
+
+`npm run dev`
+
+- www: http://localhost:3000
+- docs: http://localhost:3001
+- forum: http://localhost:3002 - pulls all our github discussions into a nextjs site. Temporary/POC
+- tutorial: http://localhost:3003 - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
