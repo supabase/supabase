@@ -1,5 +1,5 @@
 {
-  "name": "supabase-website",
+  "name": "www",
   "version": "0.0.2",
   "description": "Supabase main website",
   "private": true,
@@ -21,7 +21,6 @@
     "@supabase/ui": "v0.37.0-alpha.50",
     "classnames": "^2.3.1",
     "date-fns": "2.10.0",
-    "deepmerge": "^4.2.2",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
     "markdown-toc": "^1.2.0",
