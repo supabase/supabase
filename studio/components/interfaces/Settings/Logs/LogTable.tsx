@@ -1,15 +1,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import {
-  Alert,
-  Button,
-  IconDownloadCloud,
-  IconEye,
-  IconEyeOff,
-  IconLoader,
-  Input,
-  Typography,
-} from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
@@ -262,52 +253,69 @@ const LogTable = ({
               !isLoading ? (
                 <>
                   <div className="py-4 w-full h-full flex-col space-y-12">
-                    <div
-                      className={[
-                        'transition-all duration-500 delay-200',
-                        'flex flex-col items-center gap-6 text-center',
-                        'mt-16 opacity-100 scale-100 justify-center',
-                      ].join(' ')}
-                    >
-                      <div className="flex flex-col gap-1">
-                        <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
-                        <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
-                          <div className="absolute right-1 -bottom-4">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
+                    {!error && (
+                      <div
+                        className={`transition-all
+                      duration-500
+                      delay-200
+                      
+                      flex
+                      flex-col
+                      items-center
+                  
+                      gap-6
+                      text-center
+                      mt-16
+                      opacity-100 
+                      scale-100
+                      
+                      justify-center
+                    `}
+                      >
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
+                              <div className="absolute right-1 -bottom-4">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-6 w-6"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                          <div className="flex flex-col gap-1 px-5">
+                            <h3 className="text-lg text-scale-1200">No results</h3>
+                            <p className="text-sm text-scale-900">
+                              Try another search, or adjusting the filters
+                            </p>
+                          </div>
+                        </>
                       </div>
-                      <div className="flex flex-col gap-1 px-5">
-                        <h3 className="text-lg text-scale-1200">No results</h3>
-                        <p className="text-sm text-scale-900">
-                          Try another search, or adjusting the filters
-                        </p>
-                      </div>
-                    </div>
+                    )}
                     {error && (
                       <div className="flex justify-center px-5">
                         <Alert
                           variant="danger"
                           title="Sorry! An error occured when fetching data."
                           withIcon
-                          className="max-w-xl"
+                          className="w-1/2"
                         >
                           <Input.TextArea
-                            size="small"
-                            value={JSON.stringify(error, null, 2)}
+                            size="tiny"
+                            value={
+                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
+                            }
                             borderless
                             className="font-mono w-full mt-4"
                             copy

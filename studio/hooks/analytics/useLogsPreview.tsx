@@ -5,17 +5,22 @@ import {
   genCountQuery,
   genDefaultQuery,
   genQueryParams,
+  getDefaultHelper,
   LogData,
   Logs,
   LogsEndpointParams,
   LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
+import dayjs from 'dayjs'
 
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 interface Data {
   logData: LogData[]
   error: string | Object | null
@@ -30,14 +35,14 @@ interface Handlers {
   loadOlder: () => void
   refresh: () => void
   setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
-  setFrom: (value: string) => void
-  setTo: (value: string) => void
+  setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
 function useLogsPreview(
   projectRef: string,
   table: LogsTableName,
   filterOverride?: Filters
 ): [Data, Handlers] {
+  const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
 
   const [filters, setFilters] = useState<Filters>({ ...filterOverride })
@@ -46,10 +51,8 @@ function useLogsPreview(
     project: projectRef,
     sql: '',
     rawSql: '',
-    period_start: '',
-    period_end: '',
-    timestamp_start: '',
-    timestamp_end: '',
+    iso_timestamp_start: defaultHelper.calcFrom(),
+    iso_timestamp_end: defaultHelper.calcTo(),
   })
 
   useEffect(() => {
@@ -79,8 +82,9 @@ function useLogsPreview(
     } else {
       const len = prevPageData.result.length
       const { timestamp: tsLimit }: LogData = prevPageData.result[len - 1]
+      const isoTsLimit = dayjs.utc(Number(tsLimit / 1000)).toISOString()
       // create new key from params
-      queryParams = genQueryParams({ ...params, timestamp_end: String(tsLimit) } as any)
+      queryParams = genQueryParams({ ...params, iso_timestamp_end: isoTsLimit } as any)
     }
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`
   }
@@ -105,7 +109,7 @@ function useLogsPreview(
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       ...params,
       sql: genCountQuery(table),
-      period_start: String(latestRefresh),
+      iso_timestamp_start: latestRefresh,
     } as any)}`
   }
 
@@ -157,11 +161,10 @@ function useLogsPreview(
       oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
     },
     {
-      setFrom: (value) => setParams((prev) => ({ ...prev, timestamp_start: value })),
-      setTo: (value) => setParams((prev) => ({ ...prev, timestamp_end: value })),
       setFilters: handleSetFilters,
       refresh,
       loadOlder: () => setSize((prev) => prev + 1),
+      setParams,
     },
   ]
 }
