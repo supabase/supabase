@@ -5,9 +5,7 @@ import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { toJS } from 'mobx'
-import { IconExternalLink, IconGlobe, IconTerminal, Loading } from '@supabase/ui'
-import Link from 'next/link'
+import { IconGlobe, IconTerminal } from '@supabase/ui'
 import dayjs from 'dayjs'
 import { NextPageWithLayout } from 'types'
 
@@ -22,10 +20,6 @@ const PageLayout: NextPageWithLayout = () => {
   useEffect(() => {
     setSelectedFunction(functions.byId(id))
   }, [functions.isLoaded, ui.selectedProject])
-
-  // if (!functions.isLoading) return <></>
-
-  console.log('selected', functions.byId(id))
 
   const managementCommands: any = [
     {
