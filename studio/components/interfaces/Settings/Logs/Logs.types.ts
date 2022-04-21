@@ -1,19 +1,29 @@
+import React from "react"
+
 interface Metadata {
   [key: string]: string | number | Object | Object[]
 }
-export type LogSearchCallback = (filters: { query: string; to?: string; from?: string; fromMicro?: number, toMicro?: number }) => void
 
+export type DatePickerToFrom = { to: string | null; from: string | null }
+
+export type LogSearchCallback = (
+  filters: {
+    query: string
+  } & DatePickerToFrom
+) => void
+
+export interface LogsWarning {
+  text: string | React.ReactNode
+  link?: string
+  linkText?: string
+}
 export interface LogsEndpointParams {
   // project ref
   project: string
-  // micro unix timestamp
-  timestamp_start?: string
-  // micro timestamp
-  timestamp_end?: string
-  period_start?: string
-  period_end?: string
-  sql: string
-  rawSql: string
+  iso_timestamp_start?: string
+  iso_timestamp_end?: string
+  sql?: string
+  rawSql?: string
 }
 
 export interface LogData {
@@ -65,7 +75,6 @@ export interface FilterObject {
   te?: string
 }
 
-
 export interface FilterSet {
   label: string
   key: string
@@ -90,4 +99,11 @@ export interface Filters {
 export type Override = {
   key: string
   value: string | string[] | undefined
+}
+
+export interface DatetimeHelper {
+  text: string
+  calcTo: () => string
+  calcFrom: () => string
+  default?: boolean
 }
