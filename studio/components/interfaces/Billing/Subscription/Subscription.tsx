@@ -12,11 +12,12 @@ import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
+import { PaygStats } from '../PAYGUsage/PAYGUsage.types'
 
 interface Props {
   project: any
   subscription: StripeSubscription
-  paygStats?: { [key: string]: { sum: number; max: number } }
+  paygStats?: PaygStats
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number
