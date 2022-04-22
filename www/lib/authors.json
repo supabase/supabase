@@ -120,5 +120,21 @@
     "position": "Engineering",
     "author_url": "https://github.com/dthyresson",
     "author_image_url": "https://github.com/dthyresson.png"
+  },
+  {
+    "author_id": "shanerice",
+    "author": "Shane Rice",
+    "username": "shanerice",
+    "position": "Marketing",
+    "author_url": "https://github.com/shanerice",
+    "author_image_url": "https://github.com/shanerice.png"
+  },
+  {
+    "author_id": "alaister",
+    "author": "Alaister Young",
+    "username": "alaister",
+    "position": "Engineering",
+    "author_url": "https://github.com/alaister",
+    "author_image_url": "https://github.com/alaister.png"
   }
 ]

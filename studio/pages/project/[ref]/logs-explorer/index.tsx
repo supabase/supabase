@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconAlertCircle, Card, Input, Alert, Modal, Form, Button } from '@supabase/ui'
+import { Input, Modal, Form, Button } from '@supabase/ui'
 import { useStore, withAuth } from 'hooks'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
+  DatePickerToFrom,
   LogsQueryPanel,
   LogsTableName,
+  LogsWarning,
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
   TEMPLATES,
@@ -17,37 +20,58 @@ import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { LogsExplorerLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { LogSqlSnippets, UserContent } from 'types'
+import { UserContent } from 'types'
 import toast from 'react-hot-toast'
+import dayjs from 'dayjs'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
-  const { ref, q } = router.query
+  const { ref, q, ite, its } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
-
+  const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { content } = useStore()
 
-  const [{ logData, error, isLoading }, { changeQuery, runQuery }] = useLogsQuery(ref as string)
+  const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
+    useLogsQuery(ref as string, {
+      iso_timestamp_start: (its || '') as string,
+      iso_timestamp_end: (ite || '') as string,
+    })
 
   useEffect(() => {
     // on mount, set initial values
-    if (q !== undefined && q !== '') {
-      changeQuery(q as string)
-      runQuery()
+    if (q) {
       onSelectTemplate({
         mode: 'custom',
         searchString: q as string,
       })
     }
-  }, [q])
+  }, [])
+
+  useEffect(() => {
+    let newWarnings = []
+    const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+    const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+    const daysDiff = Math.abs(start.diff(end, 'days'))
+    if (
+      editorValue &&
+      !editorValue.includes('limit') &&
+      daysDiff > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
+    ) {
+      newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
+    }
+    setWarnings(newWarnings)
+  }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setEditorValue(template.searchString)
     changeQuery(template.searchString)
     setEditorId(uuidv4())
-    runQuery()
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, q: template.searchString },
+    })
   }
 
   const handleRun = () => {
@@ -74,11 +98,26 @@ export const LogsExplorerPage: NextPage = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
+  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: from || '',
+      iso_timestamp_end: to || '',
+    }))
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, its: from || '', ite: to || '' },
+    })
+  }
+
   return (
     <LogsExplorerLayout>
       <div className="h-full flex flex-col flex-grow gap-4">
         <div className="border rounded">
           <LogsQueryPanel
+            defaultFrom={params.iso_timestamp_start || ''}
+            defaultTo={params.iso_timestamp_end || ''}
+            onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
             onRun={handleRun}
@@ -87,6 +126,7 @@ export const LogsExplorerPage: NextPage = () => {
             onSelectTemplate={onSelectTemplate}
             onSave={handleOnSave}
             isLoading={isLoading}
+            warnings={warnings}
           />
 
           <div className="min-h-[7rem] h-48">

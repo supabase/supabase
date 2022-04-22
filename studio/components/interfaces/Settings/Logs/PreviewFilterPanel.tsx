@@ -9,7 +9,7 @@ import {
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
-import { Filters, LogSearchCallback, LogTemplate } from '.'
+import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
@@ -101,9 +101,8 @@ const PreviewFilterPanel: FC<Props> = ({
       Refresh
     </Button>
   )
-
-  const handleSearch = (partial: Partial<{ query: string; to: string; from: string }>) =>
-    onSearch({ query: search, ...partial })
+  const handleSearch = (partial: Partial<Parameters<LogSearchCallback>[0]>) =>
+    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
 
   return (
     <div
@@ -147,11 +146,10 @@ const PreviewFilterPanel: FC<Props> = ({
         </form>
 
         <DatePickers
-          onChange={async (e: { to: string; from: string }) => {
-            handleSearch(e)
-          }}
+          onChange={handleSearch}
           to={defaultToValue}
           from={defaultFromValue}
+          helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
 
         <div>

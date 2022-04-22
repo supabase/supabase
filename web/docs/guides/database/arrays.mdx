@@ -8,7 +8,7 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html).  
-These arrays are also supported in the Supabase dashboard and in the Javascript API.
+These arrays are also supported in the Supabase dashboard and in the JavaScript API.
 
 ## Steps
 
@@ -79,7 +79,7 @@ INSERT INTO arraytest (id, textarray) VALUES (1, ARRAY['Harry', 'Larry', 'Moe'])
 </TabItem>
 
 <TabItem value="JavaScript">
-To insert a record from the Javascript client:
+To insert a record from the JavaScript client:
 
 ```js
 const { data, error } = await supabase
@@ -131,7 +131,7 @@ Your first array data!
 
 ### Query Array Data
 
-To query an array, PostgreSQL uses 1-based arrays, so be careful, since you're probably used to 0-based arrays in Javascript.
+To query an array, PostgreSQL uses 1-based arrays, so be careful, since you're probably used to 0-based arrays in JavaScript.
 
 <Tabs
 defaultValue="SQL"

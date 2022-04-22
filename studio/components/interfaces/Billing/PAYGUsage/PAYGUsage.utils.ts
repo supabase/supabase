@@ -1,8 +1,18 @@
-import { sum } from 'lodash'
-import { ChargeableProduct, ProductFeature } from './PAYGUsage.types'
+import { get, maxBy, sum } from 'lodash'
+import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
 
-export const deriveFeatureCost = (paygStats: any, feature: ProductFeature) => {
-  const maximumValueOfTheMonth = paygStats?.[feature.attribute] ?? 0
+/**
+ *
+ * Derives the most appropriate cost
+ * depending on what kind of product feature we are displaying cost for.
+ *
+ * @param paygStats
+ * @param feature
+ *
+ * @returns number
+ */
+export const deriveFeatureCost = (paygStats: PaygStats | undefined, feature: ProductFeature) => {
+  const maximumValueOfTheMonth = paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
   return (maximumValueOfTheMonth / feature.unitQuantity) * feature.costPerUnit
 }
 
