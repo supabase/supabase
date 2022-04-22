@@ -3,12 +3,14 @@ import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
 import NavigationBar from './NavigationBar/NavigationBar'
 import ProductMenuBar from './ProductMenuBar'
 import LayoutHeader from './LayoutHeader'
-import TestConnection from './TestConnection'
+import ConnectingState from './ConnectingState'
+import BuildingState from './BuildingState'
 
 interface Props {
   title?: string
@@ -57,7 +59,7 @@ const ProjectLayout: FC<Props> = ({
   )
 }
 
-export default observer(ProjectLayout)
+export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean
@@ -73,19 +75,38 @@ interface ContentWrapperProps {
   isLoading: boolean
 }
 
+/**
+ * Check project.status to show building state or error state
+ *
+ * TODO: how can we test project connection properly?
+ * ex: the status is ACTIVE_HEALTHY but the project instance is down.
+ *
+ * [Joshen] As of 210422: Current testing connection by pinging postgres
+ * Ideally we'd have a more specific monitoring of the project such as during restarts
+ * But that will come later: https://supabase.slack.com/archives/C01D6TWFFFW/p1650427619665549
+ *
+ * Just note that this logic does not differentiate between a "restarting" state and
+ * a "something is wrong and can't connect to project" state.
+ *
+ * [TODO] Next iteration should scrape long polling and just listen to the project's status
+ */
 const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
   const { ui } = useStore()
   const router = useRouter()
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
+    ui.selectedProject?.status ?? ''
+  )
+  const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
-      ) : requiresDbConnection ? (
-        <TestConnection project={ui.selectedProject!}>
-          <div className="flex flex-col flex-1 overflow-y-auto">{children}</div>
-        </TestConnection>
+      ) : requiresDbConnection && isProjectOffline ? (
+        <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectBuilding ? (
+        <BuildingState project={ui.selectedProject} />
       ) : (
         <>{children}</>
       )}

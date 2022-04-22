@@ -116,7 +116,6 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   sqlSnippets(filter?: any) {
-    console.log('i ran')
     let arr = Object.values(this.data)
     if (!!filter) {
       const arr_filtered = arr

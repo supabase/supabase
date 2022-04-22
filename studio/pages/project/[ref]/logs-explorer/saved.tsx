@@ -28,7 +28,6 @@ export const LogsExplorerPage: NextPage = () => {
 
   const saved = content.list()
 
-  console.log('saved in parent', saved.length)
   return (
     <LogsExplorerLayout>
       <div className="flex flex-col gap-3">
