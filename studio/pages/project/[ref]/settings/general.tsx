@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
@@ -30,8 +30,13 @@ const ProjectSettings = () => {
 
 export default withAuth(observer(ProjectSettings))
 
-const RestartServerButton: FC<any> = ({ projectRef }: any) => {
-  const { ui } = useStore()
+interface RestartServerButtonProps {
+  projectId: number
+  projectRef: string
+}
+const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef, projectId }) => {
+  const { ui, app } = useStore()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -42,8 +47,9 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
     setLoading(true)
     try {
       await post(`${API_URL}/projects/${projectRef}/restart`, {})
+      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
       ui.setNotification({ category: 'success', message: 'Restarting server' })
-      window.location.replace(`/project/${projectRef}`)
+      router.push(`/project/${projectRef}`)
     } catch (error) {
       ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
       setLoading(false)
@@ -68,7 +74,7 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
       </Button>
     </>
   )
-}
+})
 
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
@@ -133,7 +139,7 @@ const GeneralSettings = observer(() => {
                   </p>
                 </div>
               </div>
-              <RestartServerButton projectRef={project?.ref} />
+              {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
         </Panel>

@@ -69,7 +69,7 @@ const TestConnection: FC<Props> = ({ project, children }) => {
   return (
     <>
       {!isProjectOnline ? (
-        <ConnectingState project={project} autoApiService={projectProps?.autoApiService} />
+        <ConnectingState project={project} />
       ) : isProjectActive ? (
         children
       ) : isBuilding ? (
