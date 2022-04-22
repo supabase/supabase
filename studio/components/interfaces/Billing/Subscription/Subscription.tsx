@@ -17,7 +17,7 @@ import { PaygStats } from '../PAYGUsage/PAYGUsage.types'
 interface Props {
   project: any
   subscription: StripeSubscription
-  paygStats?: PaygStats
+  paygStats: PaygStats | undefined
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number

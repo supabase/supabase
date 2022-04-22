@@ -11,6 +11,7 @@ import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing
 
 import ProjectUsage from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
 type ProjectBillingProps = {} & any
 const ProjectBilling: FC<ProjectBillingProps> = ({ store }) => {
@@ -40,7 +41,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     isLoading: loading,
     error,
   } = useProjectSubscription(ui.selectedProject?.ref)
-  const { paygStats } = useProjectPaygStatistics(
+  const { paygStats }: { paygStats: PaygStats | undefined } = useProjectPaygStatistics(
     ui.selectedProject?.ref,
     subscription?.tier?.supabase_prod_id
   )
