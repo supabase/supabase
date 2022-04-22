@@ -4,7 +4,6 @@ import { get as _get, maxBy } from 'lodash'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from 'components/interfaces/Billing'
-import { Dictionary } from '@supabase/grid'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
 /**
