@@ -87,7 +87,7 @@ pages:
 
       - Navigate to https://app.supabase.io/account/tokens
       - Generate New Token
-      - Copy newly created token and past
+      - Copy newly created token and paste
 
     examples:
       - name: Usage
