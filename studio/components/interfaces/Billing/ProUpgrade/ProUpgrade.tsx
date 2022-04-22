@@ -115,7 +115,6 @@ const ProUpgrade: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
-  // Exact same thing as getSubscriptionpreview, can we make them into one
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
@@ -133,6 +132,8 @@ const ProUpgrade: FC<Props> = ({
       })
     } else {
       setIsSuccessful(true)
+      // [TODO] remove this
+      console.log('Successfully updated project, now go check AWS and stripe')
     }
     setIsSubmitting(false)
   }
