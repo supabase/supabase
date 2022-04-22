@@ -25,20 +25,23 @@ export interface ProjectBase {
 }
 
 export interface Project extends ProjectBase {
-  // only available after projects.fetchDetail
+  // available after projects.fetchDetail
   connectionString?: string
   kpsVersion?: string
   internalApiKey?: string
   restUrl?: string
 
   /**
-   * postgrestStatus is available on client only.
+   * postgrestStatus is available on client side only.
    * We use this status to check if a project instance is HEALTHY or not
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
 
-  // @deprecated, not available anymore
+  /**
+   * TODO: not available from projects.fetchDetail
+   * Retrieve it from GET /platform/projects/:ref/subscription
+   */
   subscription_tier?: string
 }
 
