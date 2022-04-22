@@ -51,7 +51,6 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       credentials: 'omit',
       timeout: 2000,
     })
-    console.log('pingPostgrest error: ', error)
     return error === undefined
   }
 }
