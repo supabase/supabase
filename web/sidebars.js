@@ -13,7 +13,7 @@ module.exports = {
   supabaseClient: [
     {
       type: 'category',
-      label: 'Javascript',
+      label: 'JavaScript',
       collapsed: false,
       items: supabaseClient.docs,
     },
@@ -110,7 +110,7 @@ module.exports = {
       type: 'category',
       label: 'APIs',
       collapsed: false,
-      items: ['guides/api'],
+      items: ['guides/api', 'guides/api/generating-types'],
     },
     {
       type: 'category',

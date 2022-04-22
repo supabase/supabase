@@ -14,8 +14,6 @@ interface Props {
 
 const FunctionsListItem: FC<Props> = ({ function: item }) => {
   const { ui } = useStore()
-
-  console.log('_function', item)
   const is_functionConfirmed = item.email_confirmed_at || item.phone_confirmed_at
 
   const router = useRouter()

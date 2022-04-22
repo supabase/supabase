@@ -1,4 +1,7 @@
-import { FilterTableSet, LogTemplate } from '.'
+import dayjs from 'dayjs'
+import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
+
+export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
 export const TEMPLATES: LogTemplate[] = [
   {
@@ -185,10 +188,8 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-
-
 const _SQL_FILTER_COMMON = {
-  'search_query': (value: string) => `regexp_contains(event_message, '${value}')`
+  search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
 }
 
 export const SQL_FILTER_TEMPLATES: any = {
@@ -424,3 +425,43 @@ export const LOGS_TAILWIND_CLASSES = {
   log_selection_x_padding: 'px-8',
   space_y: 'px-6',
 }
+
+export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
+  {
+    text: 'Last hour',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last day',
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+]
+export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
+  {
+    text: 'Last day',
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
+    text: 'Last 3 days',
+    calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 7 days',
+    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+  },
+]
+
+export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
+  helpers.find((helper) => helper.default) || helpers[0]

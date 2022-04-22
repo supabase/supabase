@@ -17,6 +17,7 @@ export interface IAppStore {
   onProjectDeleted: (project: any) => void
   onProjectConnectionStringUpdated: (projectId: number, value: string) => void
   onProjectStatusUpdated: (projectId: number, value: string) => void
+  onProjectPostgrestStatusUpdated: (projectId: number, value: 'OFFLINE' | 'ONLINE') => void
   onOrgAdded: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
@@ -52,8 +53,6 @@ export default class AppStore implements IAppStore {
         region: project.region,
         inserted_at: project.inserted_at,
         subscription_id: project.subscription_id,
-        kpsVersion: undefined,
-        connectionString: undefined,
       }
       this.projects.data[project.id] = temp
     }
@@ -86,6 +85,12 @@ export default class AppStore implements IAppStore {
   onProjectStatusUpdated(projectId: number, value: string) {
     const clone = cloneDeep(this.projects.data[projectId])
     clone.status = value
+    this.projects.data[projectId] = clone
+  }
+
+  onProjectPostgrestStatusUpdated(projectId: number, value: 'OFFLINE' | 'ONLINE') {
+    const clone = cloneDeep(this.projects.data[projectId])
+    clone.postgrestStatus = value
     this.projects.data[projectId] = clone
   }
 
