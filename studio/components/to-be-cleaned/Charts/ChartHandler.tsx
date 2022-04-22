@@ -136,7 +136,6 @@ const ChartHandler: FC<Props> = ({
   }
 
   if (isUndefined(chartData)) {
-    console.log('i am undefined chart data')
     return (
       <div className="w-full h-52 flex flex-col space-y-4 items-center justify-center">
         <IconAlertCircle className="text-scale-700" />

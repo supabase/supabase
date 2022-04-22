@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import { Alert, Button, Input, Typography, IconRefreshCcw } from '@supabase/ui'
+import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
@@ -30,8 +30,13 @@ const ProjectSettings = () => {
 
 export default withAuth(observer(ProjectSettings))
 
-const RestartServerButton: FC<any> = ({ projectRef }: any) => {
-  const { ui } = useStore()
+interface RestartServerButtonProps {
+  projectId: number
+  projectRef: string
+}
+const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef, projectId }) => {
+  const { ui, app } = useStore()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -42,8 +47,9 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
     setLoading(true)
     try {
       await post(`${API_URL}/projects/${projectRef}/restart`, {})
-      ui.setNotification({ category: 'info', message: 'Requested server restart' })
-      setLoading(false)
+      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+      ui.setNotification({ category: 'success', message: 'Restarting server' })
+      router.push(`/project/${projectRef}`)
     } catch (error) {
       ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
       setLoading(false)
@@ -68,7 +74,7 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
       </Button>
     </>
   )
-}
+})
 
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
@@ -106,9 +112,9 @@ const GeneralSettings = observer(() => {
       <section>
         <Panel
           title={
-            <Typography.Title key="panel-title" level={5} className="mb-0">
+            <h5 key="panel-title" className="text-base mb-0">
               Infrastructure
-            </Typography.Title>
+            </h5>
           }
         >
           <Panel.Content>
@@ -126,36 +132,31 @@ const GeneralSettings = observer(() => {
           <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
             <div className="w-full flex items-center justify-between">
               <div>
-                <Typography.Text className="block">Restart Server</Typography.Text>
+                <p>Restart server</p>
                 <div style={{ maxWidth: '420px' }}>
                   <p className="opacity-50 text-sm">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
               </div>
-              <RestartServerButton projectRef={project?.ref} />
+              {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
         </Panel>
       </section>
 
       <section>
-        <Panel title={<Typography.Text className="uppercase">Danger Zone</Typography.Text>}>
+        <Panel title={<p className="uppercase">Danger Zone</p>}>
           <Panel.Content>
             <Alert
               variant="danger"
               withIcon
-              // @ts-ignore
-              title={
-                <Typography.Text>
-                  Deleting this project will also remove your database.
-                </Typography.Text>
-              }
+              title="Deleting this project will also remove your database."
             >
               <div className="flex flex-col">
-                <Typography.Text className="block mb-4">
+                <p className="block mb-4">
                   Make sure you have made a backup if you want to keep your data.
-                </Typography.Text>
+                </p>
                 <ProjectDeleteModal project={project} />
               </div>
             </Alert>

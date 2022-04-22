@@ -30,20 +30,10 @@ const PageLayout = ({
     <BaseLayout>
       <div className="h-full flex flex-col flex-grow py-6">
         <div
-          className="
-            w-full mx-auto
-
-            transition-all
-            flex flex-col
-
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+          className={[
+            'w-full mx-auto flex flex-col transition-all gap-4 px-5',
+            'lg:px-16 xl:px-24 1xl:px-28 2xl:px-32',
+          ].join(' ')}
         >
           <div className="flex items-center gap-3">
             <div
@@ -59,20 +49,10 @@ const PageLayout = ({
           <LogsNavigation />
         </div>
         <div
-          // weird repetitive styling
-          className="
-            h-full flex flex-col flex-grow
-            w-full mx-auto
-            transition-all
-           
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+          className={[
+            'h-full w-full flex flex-col flex-grow mx-auto gap-4 transition-all',
+            'px-5 lg:px-16 1xl:px-28 2xl:px-32',
+          ].join(' ')}
         >
           {children}
         </div>

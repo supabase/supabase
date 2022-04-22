@@ -31,6 +31,7 @@ export interface DatePickerProps {
 
 const START_DATE_DEFAULT = new Date()
 const END_DATE_DEFAULT = new Date()
+
 const START_TIME_DEFAULT = { HH: '00', mm: '00', ss: '00' }
 const END_TIME_DEFAULT = { HH: '23', mm: '59', ss: '59' }
 
