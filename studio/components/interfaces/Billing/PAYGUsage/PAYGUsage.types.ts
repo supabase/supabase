@@ -9,7 +9,6 @@ export interface ProductFeature {
   attribute: string
   costPerUnit: number
   unitQuantity: number
-  minusAttribute?: string
   pricingModel: PricingModel
 }
 
