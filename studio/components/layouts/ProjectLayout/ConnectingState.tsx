@@ -36,7 +36,6 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
       credentials: 'omit',
       timeout: 2000,
     })
-    console.error('testProjectConnection error: ', error)
     if (error === undefined) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
