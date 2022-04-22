@@ -36,15 +36,18 @@ type SettingsProps = {
 }
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
+
   const {
     subscription,
     isLoading: loading,
     error,
   } = useProjectSubscription(ui.selectedProject?.ref)
+
   const { paygStats }: { paygStats: PaygStats | undefined } = useProjectPaygStatistics(
     ui.selectedProject?.ref,
     subscription?.tier?.supabase_prod_id
   )
+
   const [dateRange, setDateRange] = useState<any>()
 
   useEffect(() => {
