@@ -16,7 +16,7 @@ import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 interface Props {
   project: any
   subscription: StripeSubscription
-  paygStats?: Dictionary<number>
+  paygStats?: { [key: string]: { sum: number; max: number } }
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number
@@ -132,12 +132,16 @@ const Subscription: FC<Props> = ({
               {isPayg &&
                 chargeableProducts.map((product) =>
                   product.features.map((feature) => {
-                    const cost = deriveFeatureCost(paygStats, feature).toFixed(3)
+                    const derivedCost = deriveFeatureCost(paygStats, feature)
+                    const cost = derivedCost.toFixed(3)
+
                     return (
                       <CostBreakdownRow
                         key={feature.attribute}
                         item={feature.title}
-                        amount={formatBytes(paygStats?.[feature.attribute] ?? 0)}
+                        amount={formatBytes(
+                          paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
+                        )}
                         unitPrice={`${feature.costPerUnit}/GB`}
                         price={cost}
                       />

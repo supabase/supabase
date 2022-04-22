@@ -9,4 +9,10 @@ export interface ProductFeature {
   attribute: string
   costPerUnit: number
   unitQuantity: number
+  minusAttribute?: string
+  pricingModel: PricingModel
 }
+
+export type PaygStats = { [key: string]: { sum: number; max: number } }
+
+export type PricingModel = 'sum' | 'max'

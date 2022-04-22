@@ -21,6 +21,7 @@ const PAYGUsage: FC<Props> = ({ paygStats }) => {
     <div className="flex flex-col">
       {chargeableProducts.map((product: ChargeableProduct) => {
         const productCost = deriveProductCost(paygStats, product)
+
         return (
           <div
             key={product.title}
@@ -63,7 +64,7 @@ const PAYGUsage: FC<Props> = ({ paygStats }) => {
                       endDate={endDate}
                       interval="1d"
                       highlight="maximum"
-                      defaultChartStyle="line"
+                      defaultChartStyle="bar"
                       customDateFormat={'MMM D, YYYY'}
                     />
                   </div>
