@@ -83,7 +83,7 @@ const PaymentSummaryPanel: FC<Props> = ({
     <>
       <div
         className="bg-panel-body-light dark:bg-panel-body-dark w-full px-6 lg:px-12 py-10 space-y-8 border-l"
-        style={{ height: 'calc(100vh - 49.5px)' }}
+        style={{ height: 'calc(100vh - 57px)' }}
       >
         <p>Payment Summary</p>
 

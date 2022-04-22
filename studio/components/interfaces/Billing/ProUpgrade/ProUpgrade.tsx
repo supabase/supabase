@@ -164,8 +164,8 @@ const ProUpgrade: FC<Props> = ({
               <div className="space-y-8">
                 <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
                 <div
-                  className="space-y-8 overflow-scroll"
-                  style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
+                  className="space-y-8 overflow-scroll pb-8"
+                  style={{ height: 'calc(100vh - 9rem - 57px)' }}
                 >
                   <div className="space-y-2">
                     {!isManagingProSubscription ? (
