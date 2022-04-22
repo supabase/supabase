@@ -1,43 +1,45 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef } from 'react'
+import { observer } from 'mobx-react-lite'
 import { Badge, IconLoader, IconMonitor, IconServer } from '@supabase/ui'
 
 import { Project } from 'types'
-import { API_URL } from 'lib/constants'
-import { get, head } from 'lib/common/fetch'
+import { headWithTimeout } from 'lib/common/fetch'
+import { useStore } from 'hooks'
 import ShimmerLine from 'components/ui/ShimmerLine'
 
 interface Props {
   project: Project
-  autoApiService: any
 }
 
-const ProjectRestartingState: FC<Props> = ({ project, autoApiService }) => {
+const ProjectRestartingState: FC<Props> = ({ project }) => {
+  const { app } = useStore()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
   useEffect(() => {
-    if (!autoApiService) return
+    if (!project.restUrl || !project.internalApiKey) return
 
     // Check project connection status every 4 seconds
     checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
       clearInterval(checkProjectConnectionIntervalRef.current)
     }
-  }, [autoApiService])
+  }, [project])
 
   const testProjectConnection = async () => {
-    const API_KEY = autoApiService?.internalApiKey
-    const swaggerUrl = autoApiService?.restUrl
-
-    const headers: any = { apikey: API_KEY }
-    if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
-
-    const { error } = await head(swaggerUrl, [], { headers, credentials: 'omit' })
+    const headers = {
+      apikey: project.internalApiKey,
+      Authorization: `Bearer ${project.internalApiKey}`,
+    }
+    const { error } = await headWithTimeout(project.restUrl!, [], {
+      headers,
+      credentials: 'omit',
+      timeout: 2000,
+    })
+    console.error('testProjectConnection error: ', error)
     if (error === undefined) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      // We force a page refresh to retrigger TestConnection because
-      // there's no specific state for "RESTARTING" that TestConnection can listen to yet
-      window.location.replace(`/project/${project.ref}`)
+      app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
     }
   }
 
@@ -78,4 +80,4 @@ const ProjectRestartingState: FC<Props> = ({ project, autoApiService }) => {
   )
 }
 
-export default ProjectRestartingState
+export default observer(ProjectRestartingState)
