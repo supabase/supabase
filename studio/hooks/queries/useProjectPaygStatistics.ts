@@ -5,6 +5,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from 'components/interfaces/Billing'
 import { Dictionary } from '@supabase/grid'
+import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
 /**
  * Get project payg statistics
@@ -44,7 +45,7 @@ export function useProjectPaygStatistics(ref?: string, tierProdId?: string) {
   }
 }
 
-function getPaygStats(data: any): Dictionary<number> {
+function getPaygStats(data: any): PaygStats {
   const paygStats: any = {}
   if (!data) return paygStats
 

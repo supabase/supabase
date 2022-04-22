@@ -11,8 +11,8 @@ import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
  *
  * @returns number
  */
-export const deriveFeatureCost = (paygStats: PaygStats, feature: ProductFeature) => {
-  const maximumValueOfTheMonth = paygStats?.[feature.attribute][feature.pricingModel] ?? 0
+export const deriveFeatureCost = (paygStats: PaygStats | undefined, feature: ProductFeature) => {
+  const maximumValueOfTheMonth = paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
   return (maximumValueOfTheMonth / feature.unitQuantity) * feature.costPerUnit
 }
 
