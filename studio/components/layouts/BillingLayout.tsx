@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { useStore } from 'hooks'
 import { Button, IconX } from '@supabase/ui'
+
+import { headWithTimeout } from 'lib/common/fetch'
 import BaseLayout from 'components/layouts'
 
 interface Props {
@@ -43,6 +45,24 @@ const BillingLayout: FC<Props> = ({ children }) => {
               </span>
               <p className="text-sm text-scale-1100">{ui.selectedProject?.name}</p>
             </div>
+            {/* TODO: Remove this eventually */}
+            <Button
+              onClick={async () => {
+                const project = ui.selectedProject
+                const headers = {
+                  apikey: project?.internalApiKey,
+                  Authorization: `Bearer ${project?.internalApiKey}`,
+                }
+                const { error } = await headWithTimeout(project?.restUrl!, [], {
+                  headers,
+                  credentials: 'omit',
+                  timeout: 2000,
+                })
+                console.log('Project online:', error === undefined)
+              }}
+            >
+              Test connection
+            </Button>
           </div>
         </div>
         <div className="overflow-auto">
