@@ -78,14 +78,14 @@ const Landing = () => {
                 Docs
               </Button>
             </Link>
-            <p className="text-scale-1100 text-base sm:max-w-2xl sm:mx-auto md:mt-5 mb-10">
-              Ready to talk with us about our pay-as-you-go Enterprise plan?
+          </div>
+          <div className="sm:text-center">
+            <p className="text-scale-900 text-base sm:max-w-2xl sm:mx-auto md:mt-20 mb-5">
+              Ready to learn about our pay-as-you-go Enterprise plan?
             </p>
-            <Link href="https://supabase.com/contact/enterprise">
-              <Button size="medium" type="default">
-                Let's talk!
-              </Button>
-            </Link>
+              <Link href="https://supabase.com/contact/enterprise">
+                  Let's talk!
+              </Link>
           </div>
         </div>
       </div>
