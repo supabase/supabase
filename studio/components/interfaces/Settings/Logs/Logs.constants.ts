@@ -231,9 +231,6 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
 }
 
-// export const cleanQuery = (str: string) => str.replaceAll(/\n/g, ' ')
-export const cleanQuery = (str: string) => str.replace(/\n/g, ' ')
-// .replace(/\n.*\-\-.*(\n)?$?/, "")
 
 export enum LogsTableName {
   EDGE = 'edge_logs',

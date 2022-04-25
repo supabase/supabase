@@ -18,12 +18,10 @@ export interface LogsWarning {
   linkText?: string
 }
 export interface LogsEndpointParams {
-  // project ref
-  project: string
+  project: string // project ref
   iso_timestamp_start?: string
   iso_timestamp_end?: string
   sql?: string
-  rawSql?: string
 }
 
 export interface LogData {
