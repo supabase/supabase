@@ -14,7 +14,11 @@ const DefaultSelectionRenderer = ({ log }: any) => {
     return (
       <div className="grid grid-cols-12">
         <span className="text-scale-900 text-sm col-span-4 whitespace-prep-wrap">{label}</span>
-        <span className={`text-scale-1200 text-sm col-span-8 whitespace-prep-wrap ${code && 'text-xs font-mono'}`}>
+        <span
+          className={`text-scale-1200 text-sm col-span-8 whitespace-prep-wrap ${
+            code && 'text-xs font-mono'
+          }`}
+        >
           {value}
         </span>
       </div>
@@ -59,7 +63,7 @@ const DefaultSelectionRenderer = ({ log }: any) => {
             {value && typeof value === 'object' ? (
               <DetailedJsonRow label={key} value={value} />
             ) : (
-              <DetailedRow label={key} value={String(value)} />
+              <DetailedRow label={key} value={value === null ? 'NULL ' : String(value)} />
             )}
           </div>
         )

@@ -23,6 +23,24 @@ interface Props {
 }
 type LogMap = { [id: string]: LogData }
 
+interface FormatterArg {
+  column: {
+    key: string
+    name: string
+    resizable: boolean
+    header: string
+    minWidth: number
+    idx: number
+    frozen: boolean
+    isLastFrozenColumn: boolean
+    rowGroup: boolean
+    sortable: boolean
+  }
+  isCellSelected: boolean
+  onRowChange: Function
+  row: any
+}
+
 /**
  * Logs table view with focus side panel
  *
@@ -44,10 +62,16 @@ const LogTable = ({
 
   const DEFAULT_COLUMNS = columnNames.map((v) => {
     let formatter = undefined
-    const firstRow: any = data[0]
-    const value = firstRow?.[v]
-    if (typeof value === 'object') {
-      formatter = () => `[Object]`
+
+    formatter = (received: FormatterArg) => {
+      const value = received.row?.[v]
+      if (value && typeof value === 'object') {
+        return `[Object]`
+      } else if (value === null) {
+        return 'NULL'
+      } else {
+        return String(value)
+      }
     }
     return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
   })
