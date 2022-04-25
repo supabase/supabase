@@ -74,12 +74,16 @@ export const LogsExplorerPage: NextPage = () => {
     })
   }
 
-  const handleRun = () => {
-    changeQuery(editorValue)
+  const handleRun = (value?: string) => {
+    const query = value || editorValue
+    if (value) {
+      setEditorValue(value)
+    }
+    changeQuery(query)
     runQuery()
     router.push({
       pathname: router.pathname,
-      query: { ...router.query, q: editorValue },
+      query: { ...router.query, q: query },
     })
   }
 
