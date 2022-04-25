@@ -49,7 +49,7 @@
 **স্থাপত্য**
 
 সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://app.supabase.io)। আপনি সাইন আপ করতে পারেন এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
-এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/self-hosting) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
+এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
 ![আর্কিটেকচার](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
