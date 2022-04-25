@@ -239,6 +239,7 @@ const PaymentSummaryPanel: FC<Props> = ({
           </Button>
         </div>
       </div>
+
       <Modal
         hideFooter
         visible={showConfirmModal}
@@ -253,9 +254,8 @@ const PaymentSummaryPanel: FC<Props> = ({
               variant="warning"
               title="Your project will need to be restarted for changes to take place"
             >
-              Upon confirmation, your project will be restarted in order for the change in instance
-              size to take place. This will take up to 2 minutes in which your project will be
-              unavailable during the time.
+              Upon confirmation, your project will be restarted to change your instance size. This
+              will take up to 2 minutes in which your project will be unavailable during the time.
             </Alert>
           </Modal.Content>
           <Modal.Content>
