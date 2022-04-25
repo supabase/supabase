@@ -1,5 +1,4 @@
 import {
-  cleanQuery,
   Count,
   Filters,
   genCountQuery,
@@ -50,7 +49,6 @@ function useLogsPreview(
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
     sql: '',
-    rawSql: '',
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
   })
@@ -122,7 +120,7 @@ function useLogsPreview(
 
   const refresh = async () => {
     const generatedSql = genDefaultQuery(table, filters)
-    setParams((prev) => ({ ...prev, sql: cleanQuery(generatedSql), rawSql: generatedSql }))
+    setParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
     setSize(1)
   }
