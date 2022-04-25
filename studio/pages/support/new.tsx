@@ -20,6 +20,7 @@ import { useStore, withAuth } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import { Project } from 'types'
 import { isUndefined } from 'lodash'
+import Connecting from 'components/ui/Loading/Loading'
 
 const DEFAULT = {
   category: {
@@ -117,6 +118,7 @@ const SupportNew = () => {
   const { ui, app } = useStore()
   const router = useRouter()
   const projectRef = router.query.ref
+  const category = router.query.category
 
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT)
   const [errors, setErrors] = useState<any>([])
@@ -136,22 +138,35 @@ const SupportNew = () => {
     },
   ]
 
+  const isInitialized = app.projects.isInitialized
   const projects = [...sortedProjects, ...projectDefaults]
 
   useEffect(() => {
-    // set project default
-    if (sortedProjects.length > 1) {
-      const selectedProject = sortedProjects.find((project: Project) => project.ref === projectRef)
-      if (!isUndefined(selectedProject)) {
-        handleOnChange({ name: 'project', value: selectedProject.ref })
+    if (isInitialized) {
+      // set project default
+      if (sortedProjects.length > 1) {
+        const selectedProject = sortedProjects.find(
+          (project: Project) => project.ref === projectRef
+        )
+        if (!isUndefined(selectedProject)) {
+          handleOnChange({ name: 'project', value: selectedProject.ref })
+        } else {
+          handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+        }
       } else {
-        handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+        // set as 'No specific project'
+        handleOnChange({ name: 'project', value: projectDefaults[0].ref })
       }
-    } else {
-      // set as 'No specific project'
-      handleOnChange({ name: 'project', value: projectDefaults[0].ref })
+
+      // Set category based on query param
+      if (category) {
+        const selectedCategory = categoryOptions.find((option) => {
+          if (option.value.toLowerCase() === category) return option
+        })
+        if (selectedCategory) handleOnChange({ name: 'category', value: selectedCategory.value })
+      }
     }
-  }, [])
+  }, [isInitialized])
 
   function handleOnChange(x: any) {
     formDispatch({
@@ -253,6 +268,8 @@ const SupportNew = () => {
       </div>
     )
   }
+
+  if (!isInitialized) return <Connecting />
 
   return (
     <div className="flex h-screen relative overflow-y-auto overflow-x-hidden">
