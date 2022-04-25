@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { Button, IconChevronRight, IconMaximize2, IconPlay } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
 import { useRouter } from 'next/router'
 
 interface Props {
