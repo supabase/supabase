@@ -83,9 +83,7 @@ const Landing = () => {
             <p className="text-scale-900 text-base sm:max-w-2xl sm:mx-auto md:mt-20 mb-5">
               Ready to learn about our pay-as-you-go Enterprise plan?
             </p>
-              <Link href="https://supabase.com/contact/enterprise">
-                  Let's talk!
-              </Link>
+            <Link href="https://supabase.com/contact/enterprise">Let's talk!</Link>
           </div>
         </div>
       </div>
