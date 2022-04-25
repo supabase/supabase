@@ -100,7 +100,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/client/supabase-client',
+          href: 'https://supabase.com/docs/reference/javascript/supabase-client',
           external: true,
         },
       ],
