@@ -1,0 +1,6 @@
+pytest
+allure
+requests
+faker
+supabase
+psycopg

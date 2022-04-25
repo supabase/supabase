@@ -9,6 +9,7 @@ coverage
 allure-results
 allure-report
 .nyc_output
+__pycache__
 *.log
 
 # Logs

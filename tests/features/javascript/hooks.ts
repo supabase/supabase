@@ -61,7 +61,7 @@ export abstract class Hooks {
     return fakeUser
   }
 
-  @step((token: string) => `verify with token ${token}`)
+  @step((token: string) => `verify with token {${token}}`)
   async verify(token: string): Promise<Response> {
     return crossFetch(`${process.env.SUPABASE_GOTRUE}/verify`, {
       method: 'POST',
@@ -72,7 +72,7 @@ export abstract class Hooks {
     })
   }
 
-  @step((user: User) => `get confirmation token for user ${user.id}`)
+  @step((user: User) => `get confirmation token for user {${user.id}}`)
   async getConfirmationToken(user: User): Promise<[{ confirmation_token: any }]> {
     return Hooks.sql`
       select confirmation_token 
@@ -124,7 +124,7 @@ export abstract class Hooks {
     return supabase.auth.api.getUser(supabase.auth.session().access_token)
   }
 
-  @step((user: User) => `Get user by ID (${user.id}) from Supabase auth schema`)
+  @step((user: User) => `Get user by ID {${user.id}} from Supabase auth schema`)
   async selectUser(user: User): Promise<[{ email: string }]> {
     return Hooks.sql`
         select
