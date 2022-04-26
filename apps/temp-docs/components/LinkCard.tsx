@@ -10,10 +10,10 @@ export default function LinkCard({
   icon: ReactElement
 }) {
   return (
-    <div className="shadow-sm dark:bg-gray-900 border border-black px-4 rounded-md hover:border-brand-600 hover:border-2 hover:shadow-2xl cursor-pointer m-4 w-full lg:w-2/5">
+    <div className="hover:border-brand-600 m-4 w-full cursor-pointer rounded-md border border-black px-4 shadow-sm hover:border-2 hover:shadow-2xl dark:bg-gray-900 lg:w-2/5">
       {description ? (
         <>
-          <h4 className="p-0 my-0">{title}</h4>
+          <h4 className="my-0 p-0">{title}</h4>
           <p>{description}</p>
         </>
       ) : (

@@ -42,11 +42,11 @@ const DocsLayout = ({
         <NavBar currentPage={currentPage} />
         <div className="flex flex-row">
           <SideBar menuItems={menuItems} />
-          <div className="grid grid-cols-12 w-full max-w-7xl mx-auto">
-            <article className="col-span-8 prose dark:prose-dark p-8 max-w-none">
+          <div className="mx-auto grid w-full max-w-7xl grid-cols-12">
+            <article className="prose dark:prose-dark col-span-8 max-w-none p-8">
               {children}
             </article>
-            <div className="col-span-4 prose dark:prose-dark p-8 max-w-none">
+            <div className="prose dark:prose-dark col-span-4 max-w-none p-8">
               <h5>On this page</h5>
               {toc
                 ? toc.json.map((item: any) => {

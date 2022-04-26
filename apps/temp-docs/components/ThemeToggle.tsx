@@ -13,7 +13,7 @@ function DarkModeToggle() {
   }
 
   return (
-    <button className="w-full flex justify-between" onClick={() => toggleDarkMode()}>
+    <button className="flex w-full justify-between" onClick={() => toggleDarkMode()}>
       {isDarkMode ? <span>Dark Mode</span> : <span>Light Mode</span>}
       {isDarkMode ? <IconMoon /> : <IconSun />}
     </button>
