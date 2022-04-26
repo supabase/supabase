@@ -172,7 +172,7 @@ values={[
 
 #### GraphQL 
 
-The GraphQL Endpoint that we provide (`https://<project_ref>.supabase.co/rest/v1`) is compatible with any GraphiQL implementation that can pass an `apikey` header.
+The GraphQL Endpoint that we provide (`https://<project_ref>.supabase.co/graphql/v1`) is compatible with any GraphiQL implementation that can pass an `apikey` header.
 Some suggested applications:
 
 - [paw.cloud](https://paw.cloud)
@@ -262,7 +262,7 @@ const headers = {
 // Create GraphQL client
 // See: https://formidable.com/open-source/urql/docs/basics/react-preact/#setting-up-the-client
 const client = createClient({
-  url: '<SUPABASE_URL>/grapqhl/v1',
+  url: '<SUPABASE_URL>/graphql/v1',
   fetchOptions: function createFetchOptions() { 
     return { headers }
   },
@@ -295,8 +295,8 @@ const { data, fetching, error } = result
 <TabItem value="cURL">
 
 ```bash
-# Append /grapqhl/v1/ to your URL, and then use the table name as the route
-curl --request POST '<SUPABASE_URL>/grapqhl/v1' \
+# Append /graphql/v1/ to your URL, and then use the table name as the route
+curl --request POST '<SUPABASE_URL>/graphql/v1' \
 -H 'apikey: <SUPABASE_ANON_KEY>' \
 -H 'Authorization: Bearer <SUPABASE_ANON_KEY>' \
 -d '{ "query":"{ todos(first: 3) { edges { node { id } } } }" }'
