@@ -1,0 +1,131 @@
+---
+id: auth-magic-link
+title: 'Login With Magic Link'
+description: Use Supabase to Authenticate and Authorize your users using Magic Link.
+---
+
+import Tabs from '@theme/Tabs'
+import TabsPanel from '@theme/TabsPanel'
+
+By default, if no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+
+## Overview
+
+Setting up Magic Link logins for your Supabase application.
+
+- Add Magic Link authenticator to your [Supabase Project](https://app.supabase.io)
+- Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
+
+## Add Magic Link into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `Email Auth` turn `Enable Email Signup` to ON
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+<Tabs
+  defaultActiveId="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  email: 'example@email.com',
+})
+```
+
+</TabsPanel>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase.auth.signIn(
+  email: 'example@email.com'
+);
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+</TabsPanel>
+
+</Tabs>
+
+Add this function which you can call from a button, link, or UI element.
+
+<Tabs
+  defaultActiveId="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabsPanel id="js" label="js">
+
+```js
+async function signInWithEmail() {
+  const { user, error } = await supabase.auth.signIn({
+    email: 'example@email.com',
+  })
+}
+```
+
+</TabsPanel>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+function SignInWithEmail() {
+  await supabase.auth.signIn(
+    email: 'example@email.com'
+  );
+}
+```
+
+</TabsPanel>
+
+</Tabs>
+
+To log out:
+
+<Tabs
+  defaultActiveId="js"
+  groupId="guides/auth"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabsPanel id="js" label="js">
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabsPanel>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+function SignOut() {
+  await supabase.auth.signOut();
+}
+```
+
+</TabsPanel>
+
+</Tabs>
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Dart Client](https://github.com/supabase/supabase-dart)
