@@ -1,0 +1,50 @@
+---
+id: intro
+title: Supabase Auth
+sidebar_label: Introduction
+description: Use Supabase to Authenticate and Authorize your users.
+# hide_table_of_contents: true
+---
+
+
+<iframe
+  className="w-full video-with-border"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Introduction
+
+Supabase Auth is designed to work with Postgres. There are two parts to every Auth system:
+
+- **Authentication:** should this person be allowed in? If yes, who are they?
+- **Authorization:** once they are in, what are they allowed to do?
+
+## Authentication
+
+You can authenticate your users in several ways:
+
+- Email & password.
+- Magic links (one-click logins).
+- Social providers.
+- Phone logins.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    <AuthProviders />
+  </div>
+</div>
+
+
+## Authorization
+
+
+When you need granular authorization rules, nothing beats PostgreSQL's Row Level Security (RLS).
+
+Policies are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
+
+Get started with our [Row Level Security Guides](/docs/guides/auth/row-level-security).

@@ -1,0 +1,172 @@
+---
+id: local-development
+title: Local Development
+description: How to use Supabase on your local development machine.
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
+
+## Before you begin
+
+If you're using the CLI, please record your steps! You can help us improve by adding missing details and fixing errors. 
+
+Our CLI is still under heavy development, and is missing some features:
+
+- The self-hosted version of Supabase does not include a UI yet.
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
+([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+
+In the meantime, here are some suggested tools for interacting with your Postgres Database:
+
+- `pgadmin`: https://www.pgadmin.org 
+- `dbeaver`: https://dbeaver.com 
+- `BeeKeeper`: https://beekeeperstudio.io
+- `HeidiSQL`: https://heidisql.com
+- `Table Plus`: https://www.tableplus.io
+
+## Prerequisites
+
+You will need to have these in your environment:
+- Git
+- Docker (make sure the daemon is up and running)
+- Supabase CLI (instructions [here](https://github.com/supabase/cli))
+
+## Initialize your project
+
+```bash
+supabase init
+```
+
+This command will create a `supabase` folder which holds all the configuration for developing your project locally.
+
+## Start
+
+```bash
+supabase start
+```
+
+This command uses Docker Compose to start all the open source [services](/docs/#how-it-works) of Supabase. This command will take a while to run, there are a lot of services to build.
+
+Once this is running, you will see an output that contains your local Supabase credentials:
+
+```txt
+Started local development setup.
+API URL: http://localhost:54321
+DB URL: postgresql://postgres:postgres@localhost:5432/postgres
+anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiJ9.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI
+service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE
+```
+
+#### Accessing Services Directly
+
+
+<Tabs
+defaultActiveId="Postgres"
+values={[
+  {label: 'Postgres', value: 'Postgres'},
+  {label: 'API Gateway', value: 'Kong'},
+]}>
+<TabsPanel id="Postgres" label="Postgres">
+
+```sh
+# Default URL:
+postgresql://postgres:postgres@localhost:5432/postgres
+```
+
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) 
+or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
+
+For example:
+
+```bash
+psql 'postgresql://postgres:postgres@localhost:5432/postgres'
+```
+
+</TabsPanel>
+<TabsPanel id="Kong" label="Kong">
+
+```sh
+# Default URL:
+http://localhost:54321
+```
+
+All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)). 
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header. 
+You can learn more about these JWT headers in our [Resources](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
+
+```sh
+curl 'http://localhost:54321/rest/v1/' \
+    -H "apikey: SUPABASE_KEY" \
+    -H "Authorization: Bearer SUPABASE_KEY"
+
+http://localhost:54321/v1/rest/v1/           # REST (PostgREST)
+http://localhost:54321/v1/realtime/v1/       # Realtime
+http://localhost:54321/v1/storage/v1/        # Storage
+http://localhost:54321/v1/auth/v1/           # Auth (GoTrue)
+```
+
+
+</TabsPanel>
+</Tabs>
+
+
+## Example application
+
+Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application. 
+This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
+
+```bash
+# create a fresh React app
+npx create-react-app react-demo --use-npm
+
+# move into the new folder
+cd react-demo
+
+# set up Supabase 
+supabase init 
+
+# Save the install supabase-js library
+npm install --save @supabase/supabase-js
+```
+
+Now that your application is prepared, start the backend:
+
+```bash
+supabase start  # Start Supabase
+```
+
+You can use Supabase anywhere in your application. Copy this snippet into `App.js`:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = '<your API URL>'
+const SUPABASE_ANON_KEY = '<your anon key>'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+```
+
+Then start the frontend in a separate terminal:
+
+```bash
+npm start       # Start the React app
+```
+
+If everything is working, you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:54321`
+
+## Stop
+
+When you're finished with Supabase, send <kbd>Ctrl-C</kbd> to stop the Docker services.
+
+## Migrations
+
+You can also use the CLI to manage your migrations. Follow the the tour [here](https://github.com/supabase/cli/tree/main/examples/tour) to get started.
+
+## Next steps
+
+- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
+- CLI repository: [GitHub](https://github.com/supabase/cli).
+- Sign in: [app.supabase.io](https://app.supabase.io)
