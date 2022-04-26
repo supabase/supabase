@@ -103,12 +103,9 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
-      ) : // [TODO] Temp fix commenting out ConnectingState as some projects take
-      // really long to ping postgrest such that the timeout cancels out too early
-      // requiresDbConnection && isProjectOffline ? (
-      //   <ConnectingState project={ui.selectedProject} />
-      // ) :
-      requiresDbConnection && isProjectBuilding ? (
+      ) : requiresDbConnection && isProjectOffline ? (
+        <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
       ) : (
         <>{children}</>
