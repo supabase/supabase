@@ -57,7 +57,7 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="w-full header--light block" key="light">
+            <div className="header--light block w-full" key="light">
               <Image
                 src={`${basePath}/images/product/storage/header--light.png`}
                 alt="storage header"
@@ -66,7 +66,7 @@ function StoragePage() {
                 height="1067"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block" key="dark">
+            <div className="header--dark mr-0 w-full dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/storage/header--dark.png`}
                 alt="storage header"
@@ -81,8 +81,8 @@ function StoragePage() {
 
         <SectionContainer>
           <div className="grid grid-cols-12">
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <div className="mb-4 flex items-center space-x-2 p">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
+              <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['storage'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -96,7 +96,7 @@ function StoragePage() {
                 Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
               </p>
             </div>
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="mb-4 flex items-center space-x-2">
                 <ProductIcon
                   icon={
@@ -139,7 +139,7 @@ function StoragePage() {
             content={DashboardViewData}
             footer={
               <>
-                <span key="check-out" className="p block mb-4">
+                <span key="check-out" className="p mb-4 block">
                   Check out our example app
                 </span>
                 <ExampleCard
@@ -180,8 +180,8 @@ function StoragePage() {
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16 my-8" key={0}>
-                <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:mb-0 xl:col-span-4">
+              <div className="my-8 grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16" key={0}>
+                <div className="col-span-6 lg:col-span-12 lg:mb-8 xl:col-span-4 xl:mb-0">
                   <FeatureColumn
                     icon={<IconWifi />}
                     title="CDN"
@@ -215,7 +215,7 @@ function StoragePage() {
 
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
-                    <div className="col-span-12 lg:col-span-5 mb-8">
+                    <div className="col-span-12 mb-8 lg:col-span-5">
                       <h2 className="h3">
                         Integrates natively <br />
                         with Supabase Auth

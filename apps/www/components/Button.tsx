@@ -31,8 +31,8 @@ const Button = (props: Props) => {
     <button
       type="button"
       className={`
-        inline-flex items-center text-sm leading-4 rounded-md
-        focus:outline-none group transition ${colorClass} ${className}
+        group inline-flex items-center rounded-md text-sm
+        leading-4 transition focus:outline-none ${colorClass} ${className}
       `}
       style={buttonStyles}
     >
@@ -44,7 +44,7 @@ const Button = (props: Props) => {
         {text}
       </span>
       {url && (
-        <span className={`ml-2 transition-all opacity-0 group-hover:opacity-100 ${arrowClass}`}>
+        <span className={`ml-2 opacity-0 transition-all group-hover:opacity-100 ${arrowClass}`}>
           →
         </span>
       )}

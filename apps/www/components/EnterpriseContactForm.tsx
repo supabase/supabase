@@ -139,7 +139,7 @@ const EnterpriseContactForm = () => {
               />
             </div>
 
-            <div className="flex flex-row-reverse w-full col-span-2 pt-4">
+            <div className="col-span-2 flex w-full flex-row-reverse pt-4">
               <Button
                 size="xlarge"
                 disabled={isSubmitting}
@@ -154,7 +154,7 @@ const EnterpriseContactForm = () => {
       </Form>
 
       {formSubmitted && (
-        <h3 className="mt-12 text-center h3">Thanks, we'll reach out to you shortly.</h3>
+        <h3 className="h3 mt-12 text-center">Thanks, we'll reach out to you shortly.</h3>
       )}
     </div>
   )

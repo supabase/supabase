@@ -114,7 +114,7 @@ function Database() {
           ]}
           subheader={[subtitle, 'PostgreSQL is one of the worlds most scalable databases.']}
           image={[
-            <div className="block w-full header--light" key="light">
+            <div className="header--light block w-full" key="light">
               <Image
                 src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
@@ -123,7 +123,7 @@ function Database() {
                 height="1116"
               />
             </div>,
-            <div className="w-full mr-0 header--dark dark:block" key="dark">
+            <div className="header--dark mr-0 w-full dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/functions/functions-hero.png`}
                 alt="database header"
@@ -137,18 +137,18 @@ function Database() {
         />
 
         <SectionContainer>
-          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8 rounded">
+          <div className="col-span-12 mb-10 space-y-12 lg:col-span-3 lg:mb-0 ">
+            <div className="grid gap-8 rounded md:grid-cols-2 xl:grid-cols-4">
               {featureBlocks.map((item) => {
                 return (
-                  <div className="flex flex-col gap-4 px-8 py-6 border rounded group bg-scale-100 dark:bg-scale-300">
-                    <div className="flex items-center justify-center w-12 h-12 transition-all border rounded-md bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 group-hover:scale-105">
+                  <div className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6">
+                    <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                       {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                     </div>
 
                     <div>
-                      <h3 className="text-lg text-scale-1200">{item.title}</h3>
-                      <p className="text-sm text-scale-900">{item.description}</p>
+                      <h3 className="text-scale-1200 text-lg">{item.title}</h3>
+                      <p className="text-scale-900 text-sm">{item.description}</p>
                     </div>
                   </div>
                 )
@@ -158,9 +158,9 @@ function Database() {
         </SectionContainer>
 
         <SectionContainer>
-          <div className="col-span-12 mb-10 space-y-12 lg:mb-0 lg:col-span-3 ">
-            <div className="grid lg:grid-cols-12 gap-6 lg:gap-32 items-center">
-              <div className="flex flex-col lg:col-span-5 gap-8">
+          <div className="col-span-12 mb-10 space-y-12 lg:col-span-3 lg:mb-0 ">
+            <div className="grid items-center gap-6 lg:grid-cols-12 lg:gap-32">
+              <div className="flex flex-col gap-8 lg:col-span-5">
                 <div>
                   <h3 className="h3">Anatomy of an Edge Function</h3>
                   <p className="p">
@@ -175,9 +175,9 @@ function Database() {
                       <button
                         key={`featureHighlighted-${i}`}
                         className={
-                          'group transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:border' +
+                          'bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 group rounded-md border px-6 py-4 text-left transition-all hover:border' +
                           (active
-                            ? ' bg-white dark:bg-scale-400 border-scale-500'
+                            ? ' dark:bg-scale-400 border-scale-500 bg-white'
                             : ' border-scale-300')
                         }
                         onClick={() => setCurrentSelection(feat.highlightLines)}
@@ -194,7 +194,7 @@ function Database() {
                         </div>
                         <div
                           className={
-                            'transition-colors text-sm ' +
+                            'text-sm transition-colors ' +
                             (active
                               ? ' text-scale-1100'
                               : ' text-scale-800 group-hover:text-scale-1100 ')
@@ -207,7 +207,7 @@ function Database() {
                   })}
                 </div>
               </div>
-              <div className="lg:col-span-7 overflow-hidden">
+              <div className="overflow-hidden lg:col-span-7">
                 <ScrollableCodeBlock
                   lang="ts"
                   highlightLines={currentSelection}
@@ -273,11 +273,11 @@ serve(async (req) => {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
+                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="m-0 text-scale-1100">Libraries coming soon:</p>
+                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
                   </p>
-                  <div className="space-x-1 ml-1">
+                  <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
                     <Badge dot={false}>C#</Badge>
@@ -285,7 +285,7 @@ serve(async (req) => {
                   </div>
                 </div>
                 <div
-                  className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block"
+                  className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block"
                   key={1}
                 ></div>
               </div>,

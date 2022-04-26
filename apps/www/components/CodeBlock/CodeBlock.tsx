@@ -82,7 +82,7 @@ function CodeBlock(props: CodeBlockProps) {
         className={[
           CodeBlockStyles['code-block'],
           '!bg-scale-1200 dark:!bg-scale-100',
-          props.hideBorder ? '' : 'rounded-lg border border-scale-1100 dark:border-scale-400',
+          props.hideBorder ? '' : 'border-scale-1100 dark:border-scale-400 rounded-lg border',
         ].join(' ')}
         customStyle={{
           padding: 0,
@@ -114,7 +114,7 @@ function CodeBlock(props: CodeBlockProps) {
       </SyntaxHighlighter>
 
       {!props.hideCopy && props.children ? (
-        <div className="absolute right-2 top-2 dark">
+        <div className="dark absolute right-2 top-2">
           <CopyToClipboard text={props.children}>
             <Button type="default" icon={<IconCopy />}>
               Copy

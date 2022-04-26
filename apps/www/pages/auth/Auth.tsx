@@ -75,7 +75,7 @@ function AuthPage() {
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
-            <div className="w-full header--light block" key="light">
+            <div className="header--light block w-full" key="light">
               <Image
                 src={`${basePath}/images/product/auth/header--light.png`}
                 alt="auth header"
@@ -84,7 +84,7 @@ function AuthPage() {
                 height="1074"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block" key="dark">
+            <div className="header--dark mr-0 w-full dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/auth/header--dark.png`}
                 alt="auth header"
@@ -99,10 +99,10 @@ function AuthPage() {
 
         <SectionContainer>
           <div className="grid grid-cols-12">
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <p className="mb-4 -mt-[1.9rem]">
-                <div className="grid grid-rows-2 grid-flow-col gap-2 xl:w-64">
-                  <div className="w-fit flex items-center">
+                <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
+                  <div className="flex w-fit items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 32.58 31.77"
@@ -118,7 +118,7 @@ function AuthPage() {
                   </div>
                   {AuthProviders.map((auth) => {
                     return (
-                      <div className="w-fit flex items-center">
+                      <div className="flex w-fit items-center">
                         <Image
                           src={`${basePath}/images/product/auth/${auth.name}-icon.svg`}
                           alt={`${auth.name} auth login icon`}
@@ -137,7 +137,7 @@ function AuthPage() {
                 Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <p className="p mb-4">
                 <IconLink />
               </p>
@@ -180,7 +180,7 @@ function AuthPage() {
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8" key={0}>
+              <div className="mt-8 grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16" key={0}>
                 <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconBriefcase />}
@@ -219,7 +219,7 @@ function AuthPage() {
 
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
-            <div className="col-span-12 lg:col-span-5 mb-8">
+            <div className="col-span-12 mb-8 lg:col-span-5">
               <h2 className="h3">User permissions without the middleware</h2>
 
               <p className="p text-base lg:text-lg">

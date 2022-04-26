@@ -25,18 +25,18 @@ const PartnerLinkBox = ({
   const content = (
     <div
       className="
-        cursor-pointer
         hover:bg-scale-300
-        rounded
-        group px-5 py-4 bg-scale-200 
-        border border-scale-500 dark:border-scale-400 
+        bg-scale-200
+        border-scale-500
+        dark:border-scale-400 group cursor-pointer rounded 
+        border px-5 py-4 
         "
     >
       <div className="flex flex-col gap-3">
         <div
           className={`${colors[color]}
-            rounded-md h-8 w-8
-            flex items-center justify-center
+            flex h-8 w-8
+            items-center justify-center rounded-md
             transition-all
             group-hover:scale-110
             `}
@@ -44,7 +44,7 @@ const PartnerLinkBox = ({
           {icon}
         </div>
         <div>
-          <h5 className="text-base mb-2 text-scale-1200">{title}</h5>
+          <h5 className="text-scale-1200 mb-2 text-base">{title}</h5>
           <p className="p text-sm">{description}</p>
         </div>
       </div>

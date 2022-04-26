@@ -14,12 +14,12 @@ interface Types {
 }
 
 const ProductHeader = (props: Types) => (
-  <div className="container mx-auto px-6 sm:px-16 xl:px-20 relative pt-16 lg:pt-32 pb-0">
+  <div className="container relative mx-auto px-6 pt-16 pb-0 sm:px-16 lg:pt-32 xl:px-20">
     <div className="grid grid-cols-12">
-      <div className="col-span-12 lg:col-span-5 space-y-8">
+      <div className="col-span-12 space-y-8 lg:col-span-5">
         <div>
           {props.icon || props.title ? (
-            <div className="flex mb-4 items-center gap-3">
+            <div className="mb-4 flex items-center gap-3">
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
                 <span className="text-scale-1200" key={`product-name-${props.title}`}>
@@ -63,7 +63,7 @@ const ProductHeader = (props: Types) => (
         {props.footer && <div className="mb-4">{props.footer}</div>}
       </div>
       {props.image && (
-        <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7">
+        <div className="col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}

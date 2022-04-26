@@ -50,7 +50,7 @@ function ImageCarousel(props: ImageCarouselProps) {
   const details = (
     <div className="h-64 bg-white">
       <p>
-        <span className="block text-white mb-8">Allow fetch something</span>
+        <span className="mb-8 block text-white">Allow fetch something</span>
       </p>
       <p>
         <p>
@@ -68,8 +68,8 @@ function ImageCarousel(props: ImageCarouselProps) {
 
   return (
     <div className="grid grid-cols-12">
-      <div className="col-span-12 lg:col-span-6 w-full">
-        <div className="col-span-12 lg:col-span-7 sbui-tabs--alt">
+      <div className="col-span-12 w-full lg:col-span-6">
+        <div className="sbui-tabs--alt col-span-12 lg:col-span-7">
           <div className={props.altTabView ? 'hidden' : 'block'}>
             <Tabs
               scrollable
@@ -93,7 +93,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             </Tabs>
           </div>
           <div
-            className={`overflow-hidden border border-gray-100 dark:border-gray-600 rounded-md bg-gray-800 ${ImageCarouselStyles['gradient-bg']}`}
+            className={`overflow-hidden rounded-md border border-gray-100 bg-gray-800 dark:border-gray-600 ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore
@@ -134,7 +134,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           </div>
         </div>
       </div>
-      <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-5 lg:col-start-8 xl:col-span-5 xl:col-start-8">
+      <div className="col-span-12 mt-8 lg:col-span-5 lg:col-start-8 lg:mt-0 xl:col-span-5 xl:col-start-8">
         <div className={`sbui-tabs--underline-alt ${props.altTabView ? 'block' : 'hidden'} mb-3`}>
           <Tabs
             scrollable
@@ -165,7 +165,7 @@ function ImageCarousel(props: ImageCarouselProps) {
           {props.content.map((content, i) => {
             return (
               <SwiperSlide key={i} className="py-4">
-                <h4 className="text-xl text-scale-1200 mb-4">{content.title}</h4>
+                <h4 className="text-scale-1200 mb-4 text-xl">{content.title}</h4>
                 <p className="p text-base">{content.text}</p>
                 <TextLink
                   label={content.cta ? content.cta : 'View documentation'}

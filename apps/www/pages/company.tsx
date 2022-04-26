@@ -71,11 +71,11 @@ const Header = () => {
     <>
       <div
         className="
-          container 
-          mx-auto px-6 lg:px-16 xl:px-20 relative py-16 sm:py-18 md:py-24 lg:py-24
-          text-center"
+          sm:py-18 
+          container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
+          xl:px-20"
       >
-        <h1 className="text-5xl text-scale-1200">
+        <h1 className="text-scale-1200 text-5xl">
           Join one of the world's fastest growing open source communities.
         </h1>
       </div>
@@ -92,7 +92,7 @@ const Team = () => {
   const IconLink = ({ link, icon }: iIconLink) => {
     return (
       <a href={link} target="_blank">
-        <div className="transition-opacity opacity-50 hover:opacity-75">{icon}</div>
+        <div className="opacity-50 transition-opacity hover:opacity-75">{icon}</div>
       </a>
     )
   }
@@ -104,14 +104,14 @@ const Team = () => {
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
             <p>
-              <p className="text-lg text-scale-1200">
+              <p className="text-scale-1200 text-lg">
                 Supabase is fully remote, with a strong affinity for open source maintainers and
                 ex-Founders. Our engineering team is made up of developers from AWS, Google,
                 Palantir, Stripe, and other YC companies.
               </p>
             </p>
           </div>
-          <div className=" md:text-right pt-8 md:mt-0 col-span-4">
+          <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://about.supabase.com/careers">
               <Button size="medium" className="text-white">
                 Join the team
@@ -190,19 +190,19 @@ const Community = () => {
         }
       /> */}
       <div className="space-y-16">
-        <div className="relative gap-8 grid grid-cols-2 lg:grid-cols-4 max-w-5xl ">
+        <div className="relative grid max-w-5xl grid-cols-2 gap-8 lg:grid-cols-4 ">
           {CommunityData.map((x, i) => (
             <div
               key={x.title}
               className={`
               space-y-4 text-center lg:text-left
               ${i !== CommunityData.length - 1 ? 'dark:border-r-dark lg:border-r' : ''}
-              ${i === 1 ? 'md:border-0 dark:border-r-dark lg:border-r ' : ''}
+              ${i === 1 ? 'dark:border-r-dark md:border-0 lg:border-r ' : ''}
           `}
             >
               <div
-                className={`relative h-7 w-7 mx-auto lg:mx-0 ${
-                  x.invertImgDarkMode ? ' dark:filter dark:invert' : ''
+                className={`relative mx-auto h-7 w-7 lg:mx-0 ${
+                  x.invertImgDarkMode ? ' dark:invert dark:filter' : ''
                 }`}
               >
                 <Image
@@ -217,15 +217,15 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="mb-0 text-4xl text-scale-1200">{x.stat}</h1>
-                <p className="text-sm text-scale-1100">{x.statLabel}</p>
+                <h1 className="text-scale-1200 mb-0 text-4xl">{x.stat}</h1>
+                <p className="text-scale-1100 text-sm">{x.statLabel}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="space-y-8">
           <div className="max-w-3xl">
-            <p className="text-sm text-scale-1100">
+            <p className="text-scale-1100 text-sm">
               With developer signups from the world's leading brands.
             </p>
           </div>
@@ -256,17 +256,17 @@ const Investors = () => {
         />
       </div>
 
-      <div className="mt-5 max-w-lg mx-auto grid gap-0.5 lg:grid-cols-3 lg:max-w-none mb-16">
+      <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-3">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
             <div
               className="
-              col-span-1 
-              flex justify-center content-end items-center
-              bg-gray-50 dark:bg-scale-400 
-              h-32"
+              dark:bg-scale-400 
+              col-span-1 flex h-32 content-end
+              items-center justify-center 
+              bg-gray-50"
             >
-              <div className="relative overflow-auto w-full h-8">
+              <div className="relative h-8 w-full overflow-auto">
                 <Image
                   layout="fill"
                   src={`${x.img}`}
@@ -274,9 +274,9 @@ const Investors = () => {
                   objectFit="scale-down"
                   objectPosition="center"
                   className="
-                    filter 
+                    opacity-50 
                     contrast-0
-                    opacity-50
+                    filter
                   "
                 />
               </div>
@@ -284,8 +284,8 @@ const Investors = () => {
           </div>
         ))}
       </div>
-      <h2 className="text-2xl text-scale-1200">Individual investors</h2>
-      <div className="mt-5 mx-auto grid gap-5 grid-cols-2 lg:grid-cols-4 lg:max-w-none">
+      <h2 className="text-scale-1200 text-2xl">Individual investors</h2>
+      <div className="mx-auto mt-5 grid grid-cols-2 gap-5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === false)
           .sort((a, b) => a.name.localeCompare(b.name))
           .map((x) => (
@@ -294,8 +294,8 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h1 className="mb-0 text-base text-scale-1200">{x.name}</h1>
-                  <p className="mb-0 text-xs text-scale-1000">{x.title}</p>
+                  <h1 className="text-scale-1200 mb-0 text-base">{x.name}</h1>
+                  <p className="text-scale-1000 mb-0 text-xs">{x.title}</p>
                 </div>
               </div>
             </div>
@@ -311,28 +311,28 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mt-5 mx-auto grid gap-5 lg:grid-cols-2 lg:max-w-none">
+      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-2">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
-              <Space className="justify-between h-40" direction="vertical">
+            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
+              <Space className="h-40 justify-between" direction="vertical">
                 <div>
-                  <h1 className="text-xl text-scale-1200">{x.type.toUpperCase()}</h1>
-                  <p className="text-base text-scale-1100">{x.title}</p>
+                  <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
+                  <p className="text-scale-1100 text-base">{x.title}</p>
                 </div>
               </Space>
             </Card>
           </a>
         ))}
       </div>
-      <div className="mt-5 mx-auto grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:max-w-none">
+      <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="bg-white dark:bg-scale-400">
-              <Space className="justify-between h-40" direction="vertical">
+            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
+              <Space className="h-40 justify-between" direction="vertical">
                 <div>
-                  <h1 className="text-xl text-scale-1200">{x.type.toUpperCase()}</h1>
-                  <p className="text-base text-scale-1100">{x.title}</p>
+                  <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
+                  <p className="text-scale-1100 text-base">{x.title}</p>
                 </div>
               </Space>
             </Card>
