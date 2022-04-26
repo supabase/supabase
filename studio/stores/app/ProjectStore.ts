@@ -27,10 +27,12 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
+
     if (!response.error) {
       const project = response as Project
       if (
-        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+        (project.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+          project.status === PROJECT_STATUS.RESTORING) &&
         project.restUrl &&
         project.internalApiKey
       ) {
