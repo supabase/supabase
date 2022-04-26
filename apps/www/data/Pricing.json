@@ -201,7 +201,7 @@
         "tiers": {
           "free": "1 mb",
           "pro": "10 mb",
-          "enterprise": "unlimited"
+          "enterprise": "Unlimited"
         }
       },
       {
@@ -209,7 +209,7 @@
         "tiers": {
           "free": "10",
           "pro": "100",
-          "enterprise": "unlimited"
+          "enterprise": "Unlimited"
         }
       }
     ]
