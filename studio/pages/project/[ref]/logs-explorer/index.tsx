@@ -74,9 +74,9 @@ export const LogsExplorerPage: NextPage = () => {
     })
   }
 
-  const handleRun = (value?: string) => {
-    const query = value || editorValue
-    if (value) {
+  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
+    const query  = typeof value === 'string' ? (value || editorValue) : editorValue
+    if (value && typeof value === 'string') {
       setEditorValue(value)
     }
     changeQuery(query)
