@@ -196,9 +196,14 @@ The monorepo has a set of shared components under `/packages`:
 - `/packages/tsconfig`: Shared Typescript settings
 ### Installing packages
 
-Installing a package with : `npm install <package name> -w=<workspace to install in>`. eg:
-  - `npm install @supabase/ui -w ui`: installs into `./packages/ui`
-  - `npm install @supabase/ui -w docs`: installs into `./packages/docs`
+Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
+
+The format is: `npm install <package name> -w=<workspace to install in>`. 
+
+For example: 
+
+- `npm install @supabase/ui -w common`: installs into `./packages/common`
+- `npm install @supabase/ui -w www`: installs into `./apps/www`
 
 ### Development
 
