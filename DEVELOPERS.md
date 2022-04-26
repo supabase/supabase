@@ -61,7 +61,7 @@ Before you start a development server, you must choose if you want to work on th
 1. Go to the [Supabase Website](https://supabase.com) directory
 
    ```sh
-   cd www
+   cd apps/www
    ```
 
    Go to the [Supabase Docs](https://supabase.com/docs) directory
