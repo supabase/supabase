@@ -9,7 +9,7 @@
 }
 
 .code-block .code-line:first-of-type {
-  @apply flex items-end h-8;
+  @apply flex h-8 items-end;
 }
 
 .code-block .code-line:first-of-type :global(.linenumber) {
@@ -21,7 +21,7 @@
 }
 
 .code-block .code-line:last-of-type {
-  @apply flex items-start h-8;
+  @apply flex h-8 items-start;
 }
 
 .code-block .code-line:last-of-type :global(.linenumber) {

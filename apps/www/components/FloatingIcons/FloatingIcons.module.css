@@ -1,35 +1,35 @@
 .icon-react-one {
-  @apply absolute w-20 z-10;
+  @apply absolute z-10 w-20;
   right: 13%;
   top: 8%;
 }
 .icon-electron {
-  @apply absolute w-16 z-0;
+  @apply absolute z-0 w-16;
   left: 17%;
   top: 25%;
 }
 .icon-vue {
-  @apply absolute w-16 z-10;
+  @apply absolute z-10 w-16;
   right: 33%;
   top: 3%;
 }
 .icon-angular {
-  @apply absolute w-12 z-10;
+  @apply absolute z-10 w-12;
   right: 21%;
   top: 28%;
 }
 .icon-flutter {
-  @apply absolute w-16 z-10;
+  @apply absolute z-10 w-16;
   left: 5%;
   top: 15%;
 }
 .icon-nuxt {
-  @apply absolute w-12 z-10;
+  @apply absolute z-10 w-12;
   right: 5%;
   top: 28%;
 }
 .icon-redwood {
-  @apply absolute w-14 z-10;
+  @apply absolute z-10 w-14;
   /* background-color: yellow; */
   left: 15%;
   top: 5%;
