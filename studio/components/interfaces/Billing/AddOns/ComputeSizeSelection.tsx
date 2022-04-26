@@ -61,8 +61,8 @@ const ComputeSizeSelection: FC<Props> = ({
           disabled
           key="compute-size-cta"
           align="vertical"
-          label="Need something else?"
-          description="Reach out to us! We'll get you sorted."
+          label="Need a larger add on?"
+          description="Reach out to us - we've got you covered!"
           optionalLabel={
             <Link href={`/support/new?ref=${projectRef}&category=sales`}>
               <a>
