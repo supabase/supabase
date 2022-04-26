@@ -46,6 +46,17 @@ useStore.mockImplementation(() => ({
   content: jest.fn(),
 }))
 
+jest.mock('hooks/queries/useProjectSubscription')
+import useProjectSubscription from 'hooks/queries/useProjectSubscription'
+useProjectSubscription = jest.fn()
+useProjectSubscription.mockImplementation((ref) => ({
+  subscription: {
+    tier: {
+      supabase_prod_id: 'tier_free',
+    },
+  },
+}))
+
 import { SWRConfig } from 'swr'
 import { LogsExplorerPage as Page } from 'pages/project/[ref]/logs-explorer/index'
 const LogsExplorerPage = (props) => (
