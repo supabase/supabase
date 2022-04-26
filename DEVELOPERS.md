@@ -191,9 +191,9 @@ Then edit and visit any of the following sites:
 
 The monorepo has a set of shared components under `/packages`:
 
+- `/packages/common`: Common React code, shared between all sites.
 - `/packages/config`: All shared config
 - `/packages/tsconfig`: Shared Typescript settings
-- `/packages/common`: Common React code, shared between all sites.
 ### Installing packages
 
 Installing a package with : `npm install <package name> -w=<workspace to install in>`. eg:
