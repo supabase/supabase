@@ -46,7 +46,7 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 **Seni bina semasa**
 
 Supabase ialah [platform yang dihoskan](https://app.supabase.io). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
-Anda juga boleh [host sendiri](https://supabase.com/docs/guides/self-hosting) dan [lokal](https://supabase.com/docs/guides/local-development).
+Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [lokal](https://supabase.com/docs/guides/local-development).
 
 ![Seni bina](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

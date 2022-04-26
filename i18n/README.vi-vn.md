@@ -55,7 +55,7 @@ Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính
 **Kiến trúc**
 
 Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://app.supabase.io). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
-Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/self-hosting) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development).
+Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting/overview) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development).
 
 ![Kiến trúc](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
