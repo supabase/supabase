@@ -55,7 +55,7 @@ Supabase is a combination of open source tools. We’re building the features of
 **Architecture**
 
 Supabase is a [hosted platform](https://app.supabase.io). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/self-hosting) and [develop locally](https://supabase.com/docs/guides/local-development).
+You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
