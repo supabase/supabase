@@ -103,15 +103,6 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
     try {
       setIsSubmitting(true)
 
-      // Submit feedback to Freshdesk
-      await post(`${API_URL}/feedback/send`, {
-        projectRef,
-        subject: 'Subscription cancellation - Exit survey',
-        tags: ['dashboard-exitsurvey'],
-        category: 'Billing',
-        message: generateFeedbackMessage(selectedReasons, downgradeMessage),
-      })
-
       // Trigger subscription downgrade
       const tier = freeTier.prices[0].id
       const addons: string[] = []
@@ -123,7 +114,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
       })
 
       if (res?.error) {
-        ui.setNotification({
+        return ui.setNotification({
           category: 'error',
           message: `Failed to cancel subscription: ${res?.error?.message}`,
           error: res.error,
@@ -143,11 +134,21 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
           router.push(`/project/${projectRef}`)
         } else {
           setIsSuccessful(true)
-          setIsSubmitting(false)
         }
       }
+
+      // Submit feedback to Freshdesk
+      const feedbackRes = await post(`${API_URL}/feedback/send`, {
+        projectRef,
+        subject: 'Subscription cancellation - Exit survey',
+        tags: ['dashboard-exitsurvey'],
+        category: 'Billing',
+        message: generateFeedbackMessage(selectedReasons, downgradeMessage),
+      })
+      if (feedbackRes.error) throw feedbackRes.error
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: `Failed to cancel subscription: ${error}` })
+    } finally {
       setIsSubmitting(false)
     }
   }
