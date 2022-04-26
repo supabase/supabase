@@ -45,7 +45,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   const details = (
     <div className="">
       <p>
-        <span className="block text-white mb-8">Allow fetch something</span>
+        <span className="mb-8 block text-white">Allow fetch something</span>
       </p>
       <p>
         <p>
@@ -60,7 +60,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   )
 
   return (
-    <div className="col-span-12 lg:col-span-6 lg:col-start-7 sbui-tabs--alt space-y-2">
+    <div className="sbui-tabs--alt col-span-12 space-y-2 lg:col-span-6 lg:col-start-7">
       <Tabs
         scrollable
         // @ts-ignore
@@ -100,7 +100,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
         })}
       </Swiper>
 
-      <div className="overflow-hidden p-8 bg-scale-100 dark:bg-scale-300 rounded-md border border-scale-500">
+      <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 overflow-hidden rounded-md border p-8">
         <Swiper
           // @ts-ignore
           onSwiper={setSwiperDetails}
@@ -117,11 +117,11 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
             return (
               <SwiperSlide key={i}>
                 <p>
-                  <span className="block text-lg text-scale-1200 dark:text-white mb-4">
+                  <span className="text-scale-1200 mb-4 block text-lg dark:text-white">
                     {extension.detail_title}
                   </span>
                 </p>
-                <p className="p block mb-6">{extension.detail_text}</p>
+                <p className="p mb-6 block">{extension.detail_text}</p>
                 <Space className="justify-between">
                   {extension.url && (
                     <Link href={extension.url} as={extension.url}>

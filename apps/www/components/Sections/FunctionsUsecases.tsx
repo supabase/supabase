@@ -34,7 +34,7 @@ function FunctionsUsecases(props: Props) {
 
   return (
     <div className="grid grid-cols-12 lg:gap-16">
-      <div className="col-span-12 lg:col-span-5 xl:col-span-5 pb-8">
+      <div className="col-span-12 pb-8 lg:col-span-5 xl:col-span-5">
         <h2 className="h3">{props.title}</h2>
         <p className="p">{props.text}</p>
 
@@ -45,8 +45,8 @@ function FunctionsUsecases(props: Props) {
               <button
                 key={`featureHighlighted-${i}`}
                 className={
-                  'group transition-all border px-6 py-4 text-left rounded-md bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder' +
-                  (active ? ' bg-white dark:bg-scale-400 border-scale-500' : ' border-scale-300')
+                  'bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder group rounded-md border px-6 py-4 text-left transition-all' +
+                  (active ? ' dark:bg-scale-400 border-scale-500 bg-white' : ' border-scale-300')
                 }
                 // onClick={() => setCurrentSelection(feat.highlightLines)}
                 onClick={() => handleApiSwiperNavChange(i)}
@@ -61,7 +61,7 @@ function FunctionsUsecases(props: Props) {
                 </div>
                 <div
                   className={
-                    'transition-colors text-sm ' +
+                    'text-sm transition-colors ' +
                     (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
                   }
                 >
@@ -83,7 +83,7 @@ function FunctionsUsecases(props: Props) {
           )}
         </div>
       </div>
-      <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 sbui-tabs--alt">
+      <div className="sbui-tabs--alt col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7">
         <div className="overflow-hidden">
           <Swiper
             // @ts-ignore

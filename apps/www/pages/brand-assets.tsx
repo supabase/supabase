@@ -37,24 +37,24 @@ const Index = () => {
         <Container>
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">
             <div className="max-w-xl">
-              <h1 className="text-5xl text-scale-1200">Brand assets</h1>
-              <p className="text-2xl text-scale-1200">Download official Supabase logos</p>
-              <p className="text-sm text-scale-1200">
+              <h1 className="text-scale-1200 text-5xl">Brand assets</h1>
+              <p className="text-scale-1200 text-2xl">Download official Supabase logos</p>
+              <p className="text-scale-1200 text-sm">
                 All Supabase trademarks, logos, or other brand elements can never be modified or
                 used for any other purpose other than to represent Supabase Inc.
               </p>
             </div>
           </SectionContainer>
           <SectionContainer>
-            <div className="grid grid-cols-12 border dark:border-gray-600 rounded-lg shadow-small">
-              <div className="col-span-12 lg:col-span-5 relative overflow-auto w-full h-60 rounded-lg">
+            <div className="shadow-small grid grid-cols-12 rounded-lg border dark:border-gray-600">
+              <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5">
                 <Image src={`/brand-assets/logo-preview.jpg`} layout="fill" objectFit="cover" />
               </div>
-              <div className="col-span-12 lg:col-span-7 flex items-center">
+              <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">
                   <div className="space-y-2">
-                    <h1 className="text-4xl text-scale-1200">Supabase logos</h1>
-                    <p className="text-sm text-scale-1100">
+                    <h1 className="text-scale-1200 text-4xl">Supabase logos</h1>
+                    <p className="text-scale-1100 text-sm">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.

@@ -28,7 +28,7 @@ const IncludedCheck = (props: any) => (
 const Minus = (props: any) => (
   <>
     <svg
-      className="w-5 h-5 text-scale-1200 dark:text-white"
+      className="text-scale-1200 h-5 w-5 dark:text-white"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -50,11 +50,11 @@ export const PricingTableRowDesktop = (props: any) => {
   return (
     <>
       <tr
-        className="divide-x divide-scale-600 dark:divide-scale-400 bg-scale-200"
+        className="divide-scale-600 dark:divide-scale-400 bg-scale-200 divide-x"
         style={{ borderTop: 'none' }}
       >
         <th
-          className="py-3 pl-6 sticky z-10 top-[62px] text-sm font-medium bg-scale-200 text-left bg-scale-50 dark:bg-scale-300 text-scale-1200 dark:text-white"
+          className="bg-scale-200 bg-scale-50 dark:bg-scale-300 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
           scope="colgroup"
         >
           <div className="flex items-center">
@@ -62,22 +62,22 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 ml-2">{category.title}</h4>
           </div>
         </th>
-        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
-        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
-        <td className="px-6 py-5 bg-scale-50 dark:bg-scale-300"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
+        <td className="bg-scale-50 dark:bg-scale-300 px-6 py-5"></td>
       </tr>
 
       {category.features.map((feat: any) => {
         return (
-          <tr className="divide-x divide-scale-600 dark:divide-scale-400">
+          <tr className="divide-scale-600 dark:divide-scale-400 divide-x">
             <th
-              className="flex items-center px-6 py-5 text-sm font-normal text-left text-scale-1200 dark:text-white"
+              className="text-scale-1200 flex items-center px-6 py-5 text-left text-sm font-normal dark:text-white"
               scope="row"
             >
               <span>{feat.title} </span>
               {feat.tooltip && (
                 <span
-                  className="ml-2 cursor-pointer hover:text-scale-800 dark:hover:text-white"
+                  className="hover:text-scale-800 ml-2 cursor-pointer dark:hover:text-white"
                   data-tip={feat.tooltip}
                 >
                   <IconHelpCircle size="small" />
@@ -93,7 +93,7 @@ export const PricingTableRowDesktop = (props: any) => {
                   ) : typeof tier === 'boolean' && tier === false ? (
                     <Minus tier={tier} />
                   ) : (
-                    <span className="block text-sm text-scale-1200 dark:text-white">{tier}</span>
+                    <span className="text-scale-1200 block text-sm dark:text-white">{tier}</span>
                   )}
                 </td>
               )
@@ -112,11 +112,11 @@ export const PricingTableRowMobile = (props: any) => {
 
   return (
     <>
-      <table className="w-full mt-8">
-        <caption className="px-4 py-3 text-sm font-medium text-left border-t bg-scale-50 dark:bg-dark-900 border-scale-200 dark:border-scale-600 text-scale-1200 dark:text-white">
+      <table className="mt-8 w-full">
+        <caption className="bg-scale-50 dark:bg-dark-900 border-scale-200 dark:border-scale-600 text-scale-1200 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <span className="font-normal text-scale-1200">{category.title}</span>
+            <span className="text-scale-1200 font-normal">{category.title}</span>
           </div>
         </caption>
         <thead>
@@ -129,11 +129,11 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-scale-600">
+        <tbody className="divide-scale-600 divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
               <tr key={i} className="border-t">
-                <th className="px-4 py-5 text-sm font-normal text-left text-scale-1100" scope="row">
+                <th className="text-scale-1100 px-4 py-5 text-left text-sm font-normal" scope="row">
                   <span>
                     <p>{feat.title}</p>
                   </span>
@@ -148,7 +148,7 @@ export const PricingTableRowMobile = (props: any) => {
                       <Minus tier={tier} />
                     </div>
                   ) : (
-                    <span className="block text-sm text-scale-1200">{feat.tiers[tier]}</span>
+                    <span className="text-scale-1200 block text-sm">{feat.tiers[tier]}</span>
                   )}
                 </td>
               </tr>

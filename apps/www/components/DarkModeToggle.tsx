@@ -19,8 +19,8 @@ function DarkModeToggle() {
         type="button"
         aria-pressed="false"
         className={`
-                relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer 
-                transition-colors ease-in-out duration-200 focus:outline-none ${
+                relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent 
+                transition-colors duration-200 ease-in-out focus:outline-none ${
                   isDarkMode ? 'bg-scale-500' : 'bg-scale-900'
                 } mx-5
               `}
@@ -32,8 +32,8 @@ function DarkModeToggle() {
           className={`
                   ${
                     isDarkMode ? 'translate-x-5' : 'translate-x-0'
-                  } inline-block h-5 w-5 rounded-full
-                  bg-white dark:bg-scale-300 shadow-lg transform ring-0 transition ease-in-out duration-200
+                  } dark:bg-scale-300 inline-block h-5 w-5
+                  transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out
                 `}
         />
       </button>

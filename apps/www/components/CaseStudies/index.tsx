@@ -20,7 +20,7 @@ const CaseStudies = () => {
           }
         />
       </div>
-      <div className="grid max-w-lg gap-8 mx-auto mt-5 lg:gap-12 lg:grid-cols-3 lg:max-w-none">
+      <div className="mx-auto mt-5 grid max-w-lg gap-8 lg:max-w-none lg:grid-cols-3 lg:gap-12">
         {CaseStudiesData.map((caseStudy, idx: number) => (
           <BlogListItem
             key={idx}

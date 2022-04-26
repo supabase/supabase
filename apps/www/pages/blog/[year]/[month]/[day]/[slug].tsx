@@ -109,13 +109,13 @@ function BlogPostPage(props: any) {
     return (
       <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
-          <div className="cursor-pointer border border-scale-500 p-6 transition rounded hover:bg-scale-100 dark:hover:bg-scale-300">
+          <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-scale-900">{label}</p>
+                <p className="text-scale-900 text-sm">{label}</p>
               </div>
               <div>
-                <h4 className="text-lg text-scale-1200">{post.title}</h4>
+                <h4 className="text-scale-1200 text-lg">{post.title}</h4>
                 <p className="small">{post.date}</p>
               </div>
             </div>
@@ -183,17 +183,17 @@ function BlogPostPage(props: any) {
       <DefaultLayout>
         <div
           className="
-            container px-8 sm:px-16 xl:px-20 mx-auto
-            py-16
+            container mx-auto px-8 py-16 sm:px-16
+            xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-2 mb-2">
+            <div className="col-span-12 mb-2 lg:col-span-2">
               {/* Back button */}
               <p>
                 <a
                   href={'/blog'}
-                  className="transition text-sm text-scale-900 hover:text-scale-1200 cursor-pointer flex items-center"
+                  className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center text-sm transition"
                 >
                   <IconChevronLeft style={{ padding: 0 }} />
                   Back
@@ -202,7 +202,7 @@ function BlogPostPage(props: any) {
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
-              <div className="mb-16 space-y-8 max-w-5xl">
+              <div className="mb-16 max-w-5xl space-y-8">
                 <div className="space-y-4">
                   <p className="text-brand-900">Blog post</p>
                   <h1 className="h1">{props.blog.title}</h1>
@@ -214,15 +214,15 @@ function BlogPostPage(props: any) {
                   <div className="flex gap-3">
                     {author.map((author: any) => {
                       return (
-                        <div className="mt-6 mb-8 mr-4 lg:mb-0 w-max">
+                        <div className="mt-6 mb-8 mr-4 w-max lg:mb-0">
                           <Link href={author.author_url}>
                             <a className="cursor-pointer">
-                              <div className="flex gap-3 items-center">
+                              <div className="flex items-center gap-3">
                                 {author.author_image_url && (
                                   <div className="w-10">
                                     <Image
                                       src={author.author_image_url}
-                                      className="rounded-full border dark:border-dark"
+                                      className="dark:border-dark rounded-full border"
                                       width="100%"
                                       height="100%"
                                       layout="responsive"
@@ -230,10 +230,10 @@ function BlogPostPage(props: any) {
                                   </div>
                                 )}
                                 <div className="flex flex-col">
-                                  <span className="text-sm text-scale-1200 mb-0">
+                                  <span className="text-scale-1200 mb-0 text-sm">
                                     {author.author}
                                   </span>
-                                  <span className="text-xs mb-0 text-scale-900">
+                                  <span className="text-scale-900 mb-0 text-xs">
                                     {author.position}
                                   </span>
                                 </div>
@@ -250,7 +250,7 @@ function BlogPostPage(props: any) {
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <div className="relative overflow-auto w-full h-96 mb-8 border rounded">
+                    <div className="relative mb-8 h-96 w-full overflow-auto rounded border">
                       <Image
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
@@ -262,10 +262,10 @@ function BlogPostPage(props: any) {
                     {content}
                   </article>
                   <div className="py-16">
-                    <div className="text-sm text-scale-900 dark:text-scale-1000">
+                    <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
                     </div>
-                    <div className="flex space-x-4 items-center mt-4">
+                    <div className="mt-4 flex items-center space-x-4">
                       <Link
                         passHref
                         href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
@@ -304,7 +304,7 @@ function BlogPostPage(props: any) {
                       </Link>
                     </div>
                   </div>
-                  <div className="grid lg:grid-cols-1 gap-8 py-8">
+                  <div className="grid gap-8 py-8 lg:grid-cols-1">
                     <div>
                       {props.prevPost && <NextCard post={props.prevPost} label="Last post" />}
                     </div>
@@ -316,12 +316,12 @@ function BlogPostPage(props: any) {
                   </div>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-9 space-y-8">
-                  <div className="space-y-8 lg:mb-16 lg:top-16 lg:sticky">
+                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
+                  <div className="space-y-8 lg:sticky lg:top-16 lg:mb-16">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
                       <div className="mb-4">
-                        <p className="text-sm text-scale-1200">Related articles</p>
+                        <p className="text-scale-1200 text-sm">Related articles</p>
                       </div>
                       <div className="space-y-3">
                         {props.relatedPosts.map((post: any) => (
@@ -332,7 +332,7 @@ function BlogPostPage(props: any) {
                                   <div className="text-scale-900">
                                     <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
                                   </div>
-                                  <span className="text-sm text-scale-1100 hover:text-gray-1200">
+                                  <span className="text-scale-1100 hover:text-gray-1200 text-sm">
                                     {post.title}
                                   </span>
                                 </div>
@@ -343,7 +343,7 @@ function BlogPostPage(props: any) {
                         ))}
                         <div className="mt-2">
                           <Link href={`/blog`} passHref>
-                            <a className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer">
+                            <a className="text-scale-1100 hover:text-scale-1200 cursor-pointer text-sm">
                               View all posts
                             </a>
                           </Link>

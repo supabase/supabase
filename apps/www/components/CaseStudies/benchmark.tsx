@@ -4,16 +4,16 @@ import { useRouter } from 'next/router'
 const Benchmark = () => {
   const { basePath } = useRouter()
   return (
-    <div className="mt-6 lg:mt-16 max-w-lg mx-auto lg:max-w-none lg:mx-0">
-      <div className="grid gap-4 items-center rounded-md grid-cols-1 lg:grid-cols-12 overflow-auto bg-dark-800 shadow-lg">
-        <div className="col-span-1 lg:col-span-10 flex items-center flex-col lg:flex-row">
+    <div className="mx-auto mt-6 max-w-lg lg:mx-0 lg:mt-16 lg:max-w-none">
+      <div className="bg-dark-800 grid grid-cols-1 items-center gap-4 overflow-auto rounded-md shadow-lg lg:grid-cols-12">
+        <div className="col-span-1 flex flex-col items-center lg:col-span-10 lg:flex-row">
           <img
-            className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 hidden lg:block"
+            className="mb-10 hidden w-full lg:mb-0 lg:mr-14 lg:block lg:h-44 lg:w-auto"
             src={`${basePath}/images/benchmark.svg`}
             alt="Benchmark illustration"
           />
           <img
-            className="mb-10 w-full lg:w-auto lg:mb-0 lg:h-44 lg:mr-14 lg:hidden"
+            className="mb-10 w-full lg:mb-0 lg:mr-14 lg:hidden lg:h-44 lg:w-auto"
             src={`${basePath}/images/benchmark--mobile.svg`}
             alt="Benchmark illustration"
           />
@@ -31,7 +31,7 @@ const Benchmark = () => {
             </p>
           </div>
         </div>
-        <div className="pb-12 px-12 col-span-1 lg:pb-0 lg:px-0 lg:col-span-2 rounded-r-md">
+        <div className="col-span-1 rounded-r-md px-12 pb-12 lg:col-span-2 lg:px-0 lg:pb-0">
           <a href="https://supabasesubscribe.vercel.app/subscription/enterpriseBenchmarks">
             <Button>Get notified</Button>
           </a>

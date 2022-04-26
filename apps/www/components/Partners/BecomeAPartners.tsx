@@ -68,13 +68,13 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
 
   return (
     <div className="border-t">
-      <div id="become-a-partner" className="max-w-2xl mx-auto space-y-12 py-12 px-6">
+      <div id="become-a-partner" className="mx-auto max-w-2xl space-y-12 py-12 px-6">
         <h2 className="h2">Become a Partner</h2>
 
         <Form initialValues={INITIAL_VALUES} validate={validate} onSubmit={handleFormSubmit}>
           {({ isSubmitting }: any) => (
             <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-              <div className="h-24 col-span-2">
+              <div className="col-span-2 h-24">
                 <Select
                   id="type"
                   name="type"
@@ -182,7 +182,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="flex flex-row-reverse w-full col-span-2 pt-4">
+              <div className="col-span-2 flex w-full flex-row-reverse pt-4">
                 <Button
                   size="xlarge"
                   disabled={formSubmitted}

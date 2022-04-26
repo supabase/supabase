@@ -30,19 +30,19 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
   )
 
   return (
-    <div className="overflow-hidden transition duration-500 rounded-md shadow-md hover:shadow-lg group">
+    <div className="group overflow-hidden rounded-md shadow-md transition duration-500 hover:shadow-lg">
       <Collapsible open={isAddOnOpen} onOpenChange={setIsAddOnOpen}>
         <Collapsible.Trigger asChild>
           <button
             className={classNames(
-              'flex flex-col items-start lg:flex-row lg:items-center w-full rounded-t-md group text-scale-1200 bg-scale-100 dark:bg-scale-200 dark:border border-scale-300',
+              'text-scale-1200 bg-scale-100 dark:bg-scale-200 border-scale-300 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
               !isAddOnOpen && 'rounded-b-md'
             )}
             type="button"
           >
-            <div className="flex flex-col items-start flex-1 w-full lg:w-auto lg:items-center lg:flex-row">
-              <div className="relative flex items-center self-stretch w-full py-8 pl-4 space-x-3 bg-white dark:bg-scale-300 lg:py-0 lg:w-72">
-                <span className="p-2 transition-transform duration-500 rounded-md shadow-sm group-hover:scale-105 bg-scale-1200 text-scale-100 group-hover:shadow">
+            <div className="flex w-full flex-1 flex-col items-start lg:w-auto lg:flex-row lg:items-center">
+              <div className="dark:bg-scale-300 relative flex w-full items-center space-x-3 self-stretch bg-white py-8 pl-4 lg:w-72 lg:py-0">
+                <span className="bg-scale-1200 text-scale-100 rounded-md p-2 shadow-sm transition-transform duration-500 group-hover:scale-105 group-hover:shadow">
                   {icon}
                 </span>
                 <span className="flex-shrink-0">
@@ -50,8 +50,8 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between flex-1 lg:border-l border-scale-500 dark:border-scale-400">
-                <div className="grid grid-cols-1 px-3 py-6 gap-y-3 gap-x-6 grid-flow-rows lg:grid-cols-2">
+              <div className="border-scale-500 dark:border-scale-400 flex flex-1 items-center justify-between lg:border-l">
+                <div className="grid-flow-rows grid grid-cols-1 gap-y-3 gap-x-6 px-3 py-6 lg:grid-cols-2">
                   {pricing.features.map((feature, i) => (
                     <div key={i} className="flex items-center space-x-2">
                       <Check />
@@ -62,19 +62,19 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               </div>
             </div>
 
-            <div className="flex items-center self-center gap-2 p-3">
-              <IconChevronUp className="w-8 h-8 transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
+            <div className="flex items-center gap-2 self-center p-3">
+              <IconChevronUp className="data-open-parent:rotate-0 data-closed-parent:rotate-180 h-8 w-8 transition" />
             </div>
           </button>
         </Collapsible.Trigger>
 
         <Collapsible.Content>
           <div>
-            <table className="hidden w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:table">
+            <table className="text-scale-1200 m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table">
               <thead>
                 <tr className="bg-scale-500">
                   {columnNames.map((column) => (
-                    <th key={column.key} className="p-3 font-medium text-left">
+                    <th key={column.key} className="p-3 text-left font-medium">
                       {column.title}
                     </th>
                   ))}
@@ -93,13 +93,13 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
               </tbody>
             </table>
 
-            <table className="w-full m-0 overflow-hidden rounded-b table-auto text-scale-1200 lg:hidden">
+            <table className="text-scale-1200 m-0 w-full table-auto overflow-hidden rounded-b lg:hidden">
               <tbody>
                 {pricing.rows.map((row, i) => (
                   <Fragment key={i}>
                     {row.columns.map((column) => (
                       <tr key={column.key} className={classNames(i % 2 === 0 && 'bg-scale-300')}>
-                        <th className="py-3 pl-4 font-medium text-left">{column.title}</th>
+                        <th className="py-3 pl-4 text-left font-medium">{column.title}</th>
                         <td className="px-4 py-3">{column.value}</td>
                       </tr>
                     ))}

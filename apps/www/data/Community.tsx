@@ -16,11 +16,11 @@ const data: CommunityItem[] = [
     statLabel: 'Registered developers',
     img: 'supabase.png',
     detail: () => (
-      <div className="mt-5 max-w-lg mx-auto grid gap-0 sm:grid-cols-3 lg:grid-cols-4 lg:max-w-none text-center border border-dashed rounded-lg overflow-hidden ">
+      <div className="mx-auto mt-5 grid max-w-lg gap-0 overflow-hidden rounded-lg border border-dashed text-center sm:grid-cols-3 lg:max-w-none lg:grid-cols-4 ">
         {DeveloperSignups.map((signup) => (
           <div
             key={signup.title}
-            className="col-span-1 flex justify-center py-8 px-8 border border-dashed"
+            className="col-span-1 flex justify-center border border-dashed py-8 px-8"
           >
             <img key={signup.title} className="max-h-12" src={signup.img} alt={signup.title} />
           </div>

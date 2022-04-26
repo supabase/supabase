@@ -108,10 +108,10 @@ export default function IndexPage() {
     from?: boolean
   }) => {
     return (
-      <div className="px-4 mt-8">
-        <h2 className="text-base font-normal text-scale-1200">{tier}</h2>
-        <div className="flex gap-2 items-baseline">
-          {from && <span className="text-base text-scale-1200">From</span>}
+      <div className="mt-8 px-4">
+        <h2 className="text-scale-1200 text-base font-normal">{tier}</h2>
+        <div className="flex items-baseline gap-2">
+          {from && <span className="text-scale-1200 text-base">From</span>}
           <span className="h1">
             {showDollarSign && '$'}
             {price}
@@ -147,9 +147,9 @@ export default function IndexPage() {
 
       <div className="">
         <div className="relative z-10 py-16 shadow-sm lg:py-28">
-          <div className="px-4 mx-auto text-center max-w-7xl sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto space-y-2 lg:max-w-none">
-              <h1 className="text-base uppercase font-mono text-brand-900 tracking-widest">
+          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
+              <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
                 Pricing
               </h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
@@ -160,63 +160,63 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="flex flex-col max-w-7xl mx-auto">
+        <div className="mx-auto flex max-w-7xl flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
-            className="relative z-10 px-4 mx-auto w-full sm:px-6 lg:px-8
+            className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
           
-            -mt-8
+            lg:px-8
           "
           >
-            <div className="max-w-md mx-auto space-y-4 lg:max-w-7xl lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
+            <div className="mx-auto max-w-md space-y-4 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-5 lg:space-y-0">
               {tiers.map((tier) => (
                 <div
                   key={tier.name}
                   className="
-                  border 
                   flex 
-                  flex-col
-                  overflow-hidden 
+                  flex-col 
+                  overflow-hidden
                   rounded 
+                  border 
                   "
                 >
-                  <div className="h-48 px-8 pt-6 bg-white dark:bg-scale-300">
+                  <div className="dark:bg-scale-300 h-48 bg-white px-8 pt-6">
                     <h3
                       className="
-                        inline-flex 
+                        text-scale-1200 
                         mb-2 
+                        inline-flex 
+                        rounded-full 
                         text-sm 
                         font-normal 
                         tracking-wide 
-                        rounded-full 
-                        lg:text-xl 
-                        text-scale-1200"
+                        lg:text-xl"
                       id="tier-standard"
                     >
                       {tier.name}
                     </h3>
                     <div
                       className="
-                      flex items-baseline text-5xl 
+                      text-scale-1200 flex items-baseline 
+                      text-5xl 
                       font-normal 
                       lg:text-4xl 
-                      xl:text-4xl 
-                      text-scale-1200
+                      xl:text-4xl
                       
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
                         <div className="flex items-end gap-2">
                           {tier.from && (
-                            <span className="text-base xl:text-xl font-medium">From</span>
+                            <span className="text-base font-medium xl:text-xl">From</span>
                           )}
                           <div>
                             <span>${tier.priceMonthly}</span>
-                            <span className="ml-1 text-2xl font-medium text-scale-900">/mo</span>
+                            <span className="text-scale-900 ml-1 text-2xl font-medium">/mo</span>
                           </div>
                           {tier.warning && (
-                            <div className="px-2 py-1 mt-2 text-xs rounded-md bg-brand-300 bg-opacity-30 text-brand-1000">
+                            <div className="bg-brand-300 text-brand-1000 mt-2 rounded-md bg-opacity-30 px-2 py-1 text-xs">
                               {tier.warning}
                             </div>
                           )}
@@ -225,38 +225,38 @@ export default function IndexPage() {
                         <span>Contact Us</span>
                       )}
                     </div>
-                    <p className="mt-4 text-base text-scale-1100">{tier.description}</p>
+                    <p className="text-scale-1100 mt-4 text-base">{tier.description}</p>
                   </div>
                   <div
                     className="
-                    flex flex-col justify-between flex-1
+                    dark:border-scale-400 bg-scale-100 dark:bg-scale-300 flex
                     
+                    h-full 
+                    flex-1 
+                    flex-col
+                    
+                    justify-between 
                     space-y-6 
-                    border-t 
-                    dark:border-scale-400
-                    
-                    bg-scale-100 
-                    dark:bg-scale-300 
 
+                    border-t
                     px-8
-                    py-6
 
-                    h-full
+                    py-6
                   "
                   >
-                    {tier.preface && <p className="text-base text-scale-1200">{tier.preface}</p>}
+                    {tier.preface && <p className="text-scale-1200 text-base">{tier.preface}</p>}
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
-                    <ul role="list" className="divide-y dark:divide-scale-400">
+                    <ul role="list" className="dark:divide-scale-400 divide-y">
                       {tier.features.map((feature) => (
                         <li key={feature} className="flex items-center py-2">
                           {/* <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 dark:bg-brand-400 bg-opacity-30"> */}
                           <IconCheck
-                            className="w-4 h-4 text-brand-900 "
+                            className="text-brand-900 h-4 w-4 "
                             aria-hidden="true"
                             strokeWidth={3}
                           />
                           {/* </div> */}
-                          <p className="mb-0 ml-3 text-sm text-scale-1100 dark:text-scale-1200">
+                          <p className="text-scale-1100 dark:text-scale-1200 mb-0 ml-3 text-sm">
                             {feature}
                           </p>
                         </li>
@@ -266,10 +266,10 @@ export default function IndexPage() {
                     <div className="flex flex-col gap-6">
                       <div className="space-y-2">
                         {tier.additional && (
-                          <p className="text-base text-scale-1200">{tier.additional}</p>
+                          <p className="text-scale-1200 text-base">{tier.additional}</p>
                         )}
-                        {tier.scale && <p className="text-xs text-scale-900">{tier.scale}</p>}
-                        {tier.shutdown && <p className="text-xs text-scale-900">{tier.shutdown}</p>}
+                        {tier.scale && <p className="text-scale-900 text-xs">{tier.scale}</p>}
+                        {tier.shutdown && <p className="text-scale-900 text-xs">{tier.shutdown}</p>}
                       </div>
                       <a href={tier.href}>
                         <Button block size="large" className="dark:text-white">
@@ -285,36 +285,36 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className="container relative px-4 py-16 mx-auto shadow-sm lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+      <div className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <div className="text-center">
-          <h2 className="text-3xl text-scale-1200">Add-Ons</h2>
-          <p className="mb-16 text-lg text-scale-1100">
+          <h2 className="text-scale-1200 text-3xl">Add-Ons</h2>
+          <p className="text-scale-1100 mb-16 text-lg">
             Level up your Supabase experience with add-ons.
           </p>
         </div>
 
         <div className="space-y-8">
           <PricingAddOnTable
-            icon={<ServerIcon className="w-8 h-8" strokeWidth={1.5} />}
+            icon={<ServerIcon className="h-8 w-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.database}
           />
           <PricingAddOnTable
-            icon={<SupportIcon className="w-8 h-8" strokeWidth={1.5} />}
+            icon={<SupportIcon className="h-8 w-8" strokeWidth={1.5} />}
             pricing={pricingAddOn.support}
           />
         </div>
       </div>
 
       <div className="bg-scale-200">
-        <div className="container relative px-4 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+        <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
           <div className="text-center">
-            <h2 className="text-3xl text-scale-1200">Compare Plans</h2>
-            <p className="mb-16 text-lg text-scale-1100">
+            <h2 className="text-scale-1200 text-3xl">Compare Plans</h2>
+            <p className="text-scale-1100 mb-16 text-lg">
               Start with a hobby project, collaborate with a team, and scale to millions of users.
             </p>
           </div>
 
-          <div className="mb-16 sm:mb-18 md:mb-24 lg:mb-24">
+          <div className="sm:mb-18 mb-16 md:mb-24 lg:mb-24">
             {/* <!-- xs to lg --> */}
 
             <div className="lg:hidden">
@@ -440,60 +440,60 @@ export default function IndexPage() {
 
             {/* <!-- lg+ --> */}
             <div className="hidden lg:block">
-              <table className="w-full h-px table-fixed">
+              <table className="h-px w-full table-fixed">
                 <caption className="sr-only">Pricing plan comparison</caption>
-                <thead className="sticky z-10 top-[62px] border-b border-scale-700 dark:border-scale-400 bg-scale-200 dark:bg-scale-300">
+                <thead className="border-scale-700 dark:border-scale-400 bg-scale-200 dark:bg-scale-300 sticky top-[62px] z-10 border-b">
                   <tr>
                     <th
-                      className="relative px-6 py-4 text-sm font-normal text-left text-scale-1200"
+                      className="text-scale-1200 relative px-6 py-4 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span className="sr-only">Feature by</span>
                       <span>Plans</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full"
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 py-4 text-sm font-normal text-left text-scale-1200"
+                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal"
                       scope="col"
                     >
                       <span>Free</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full"
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 py-4 text-sm font-normal leading-6 text-left text-scale-1200"
+                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
                       scope="col"
                     >
                       <span>Pro</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full"
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
 
                     <th
-                      className="w-1/4 px-6 py-4 text-sm font-normal leading-6 text-left text-scale-1200"
+                      className="text-scale-1200 w-1/4 px-6 py-4 text-left text-sm font-normal leading-6"
                       scope="col"
                     >
                       <span>Enterprise</span>
                       <div
-                        className="absolute bottom-0 left-0 h-0.25 w-full"
+                        className="h-0.25 absolute bottom-0 left-0 w-full"
                         style={{ height: '1px' }}
                       ></div>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400">
-                  <tr className="divide-x divide-scale-700 dark:divide-scale-400">
+                <tbody className="border-scale-700 dark:border-scale-400 divide-scale-700 dark:divide-scale-400 divide-y">
+                  <tr className="divide-scale-700 dark:divide-scale-400 divide-x">
                     <th
-                      className="px-6 py-8 text-sm font-medium text-left align-top text-scale-900 dark:text-white"
+                      className="text-scale-900 px-6 py-8 text-left align-top text-sm font-medium dark:text-white"
                       scope="row"
                     >
                       Pricing
@@ -504,7 +504,7 @@ export default function IndexPage() {
                         <span className="h1 text-scale-1200">$0</span>
                         <p className="p">/project/month</p>
 
-                        <p className="text-sm p">Perfect for hobby projects and experiments</p>
+                        <p className="p text-sm">Perfect for hobby projects and experiments</p>
 
                         <Link href="https://app.supabase.io" as="https://app.supabase.io">
                           <a>
@@ -521,7 +521,7 @@ export default function IndexPage() {
                         <span className="h1 text-scale-1200">$25</span>
                         <p className="p">/project/month + usage costs</p>
 
-                        <p className="text-sm p">
+                        <p className="p text-sm">
                           Everything you need to scale your project into production
                         </p>
 
@@ -540,7 +540,7 @@ export default function IndexPage() {
                         <span className="h1 text-scale-1200">Contact Us</span>
                         <p className="p">for a quote</p>
 
-                        <p className="text-sm p">
+                        <p className="p text-sm">
                           Designated support team, account manager and technical specialist
                         </p>
 
@@ -578,7 +578,7 @@ export default function IndexPage() {
                   <PricingTableRowDesktop category={pricing.support} icon={pricing.support.icon} />
                 </tbody>
                 <tfoot>
-                  <tr className="border-t border-scale-200 dark:border-scale-600">
+                  <tr className="border-scale-200 dark:border-scale-600 border-t">
                     <th className="sr-only" scope="row">
                       Choose your plan
                     </th>
@@ -619,8 +619,8 @@ export default function IndexPage() {
           </div>
         </div>
         <div className="border-t">
-          <div className="lg:grid-cols-2 gap-y-10 gap-x-10 max-w-5xl mx-auto">
-            <div className="px-6 py-16 mx-auto lg:px-16 xl:px-20 sm:py-18 md:py-24 lg:py-24">
+          <div className="mx-auto max-w-5xl gap-y-10 gap-x-10 lg:grid-cols-2">
+            <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
               <h2 className="h3 text-center">Frequently asked questions</h2>
               <p className="p text-center">
                 Can&apos;t find the answer to your question, ask someone in the community either on

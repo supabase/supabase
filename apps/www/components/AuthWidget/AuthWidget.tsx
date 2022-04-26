@@ -45,7 +45,7 @@ function AuthPage() {
 
   return (
     <DefaultLayout>
-      <div className="container mx-auto px-8 sm:px-16 xl:px-20 relative py-32">
+      <div className="container relative mx-auto px-8 py-32 sm:px-16 xl:px-20">
         <div className="grid grid-cols-12">
           <div className="col-span-8">
             <h2 className="mb-4">ReactJS Auth Widget</h2>
@@ -56,9 +56,9 @@ function AuthPage() {
           </div>
           <div className="col-span-8">
             <div
-              className={`relative bg-white dark:bg-gray-800 py-2 pb-16 border-t border-l border-b dark:border-gray-600 ${AuthStyles['auth-container']}`}
+              className={`relative border-t border-l border-b bg-white py-2 pb-16 dark:border-gray-600 dark:bg-gray-800 ${AuthStyles['auth-container']}`}
             >
-              <div className="w-full h-full left-0 top-2">
+              <div className="left-0 top-2 h-full w-full">
                 <Tabs
                   size="medium"
                   defaultActiveId="panel-1"
@@ -134,7 +134,7 @@ function AuthPage() {
           </div>
 
           <div className="col-span-4">
-            <div className="bg-white dark:bg-gray-800 border rounded-l-none dark:border-gray-600 rounded h-full">
+            <div className="h-full rounded rounded-l-none border bg-white dark:border-gray-600 dark:bg-gray-800">
               <div className={`p-8`}>
                 <Space size={12} direction="vertical">
                   <div>

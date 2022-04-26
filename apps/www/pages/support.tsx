@@ -38,22 +38,22 @@ const Index = ({}: Props) => {
         <Container>
           <SectionContainer className="">
             <div className="text-center">
-              <h1 className="text-4xl text-scale-1200">Get Support</h1>
+              <h1 className="text-scale-1200 text-4xl">Get Support</h1>
               <p>
-                <p className="lg:text-lg text-scale-1100">
+                <p className="text-scale-1100 lg:text-lg">
                   Need a bit of help? We're here for you. Check out our current issues, GitHub
                   discussions, or get email support.
                 </p>
               </p>
             </div>
-            <div className="grid sm:grid-cols-3 md:grid-cols-12 gap-5 mt-16 text-scale-1200">
+            <div className="text-scale-1200 mt-16 grid gap-5 sm:grid-cols-3 md:grid-cols-12">
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-scale-400 
-                    border-t border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
-                    flex flex-col justify-between
-                    rounded rounded-b-none
+                  className="dark:bg-scale-400 flex h-40 
+                    flex-col justify-between rounded rounded-b-none border-t
+                    border-r
+                    border-l border-gray-100 bg-white
+                    p-5 dark:border-gray-600
                     "
                 >
                   <div className="mb-4">
@@ -73,11 +73,11 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    bg-white dark:bg-scale-400 
-                    border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5 pt-10
-                    flex flex-col justify-between
-                    rounded rounded-t-none"
+                    dark:bg-scale-400 flex 
+                    flex-col justify-between rounded rounded-t-none border-b
+                    border-r border-l
+                    border-gray-100 bg-white p-5
+                    pt-10 dark:border-gray-600"
                   >
                     <Link
                       href="https://github.com/supabase/supabase/issues"
@@ -94,11 +94,11 @@ const Index = ({}: Props) => {
               </div>
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-scale-400 
-                    border-t border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
-                    flex flex-col justify-between
-                    rounded rounded-b-none
+                  className="dark:bg-scale-400 flex h-40 
+                    flex-col justify-between rounded rounded-b-none border-t
+                    border-r
+                    border-l border-gray-100 bg-white
+                    p-5 dark:border-gray-600
                     "
                 >
                   <div className="mb-4">
@@ -118,11 +118,11 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    bg-white dark:bg-scale-400 
-                    border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5 pt-10
-                    flex flex-col justify-between
-                    rounded rounded-t-none"
+                    dark:bg-scale-400 flex 
+                    flex-col justify-between rounded rounded-t-none border-b
+                    border-r border-l
+                    border-gray-100 bg-white p-5
+                    pt-10 dark:border-gray-600"
                   >
                     <Link
                       href="https://github.com/supabase/supabase/discussions"
@@ -140,11 +140,11 @@ const Index = ({}: Props) => {
 
               <div className="col-span-12 lg:col-span-6 xl:col-span-4">
                 <div
-                  className="h-40 bg-white dark:bg-scale-400 
-                    border-t border-r border-l border-gray-100 dark:border-gray-600
-                    p-5
-                    flex flex-col justify-between
-                    rounded rounded-b-none
+                  className="dark:bg-scale-400 flex h-40 
+                    flex-col justify-between rounded rounded-b-none border-t
+                    border-r
+                    border-l border-gray-100 bg-white
+                    p-5 dark:border-gray-600
                     "
                 >
                   <div className="mb-4">
@@ -166,10 +166,10 @@ const Index = ({}: Props) => {
                   <div
                     className="
                     bbg-white dark:bg-scale-400 
-                    border-b border-r border-l border-gray-100 dark:border-gray-600
-                    p-5 pt-10
-                    flex flex-col justify-between
-                    rounded rounded-t-none"
+                    flex flex-col justify-between rounded rounded-t-none
+                    border-b border-r
+                    border-l border-gray-100 p-5
+                    pt-10 dark:border-gray-600"
                   >
                     <a href="mailto:support@supabase.io">
                       <Button size="medium" type="default" iconRight={<IconMail />}>

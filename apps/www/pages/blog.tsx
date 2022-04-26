@@ -88,7 +88,7 @@ function Blog(props: any) {
       />
       <DefaultLayout>
         <div className="overflow-hidden py-12">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
+          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
                 <FeaturedThumb key={i} {...blog} />
@@ -97,8 +97,8 @@ function Blog(props: any) {
           </div>
         </div>
 
-        <div className="border-t border-scale-600">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-16">
+        <div className="border-scale-600 border-t">
+          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
               <div className="grid grid-cols-12">
                 <div className="col-span-12 lg:col-span-12">
@@ -117,7 +117,7 @@ function Blog(props: any) {
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
               {blogs.map((blog: PostTypes, idx: number) => (
                 <div
-                  className="col-span-12 md:col-span-12 lg:col-span-6 xl:col-span-4 mb-16"
+                  className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
                   key={idx}
                 >
                   <BlogListItem post={blog} />
@@ -147,10 +147,10 @@ function FeaturedThumb(blog: PostTypes) {
   }
 
   return (
-    <div key={blog.slug} className="cursor-pointer w-full">
+    <div key={blog.slug} className="w-full cursor-pointer">
       <Link href={`/blog/${blog.url}`}>
-        <a className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          <div className="relative overflow-auto w-full h-96 border rounded-lg">
+        <a className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+          <div className="relative h-96 w-full overflow-auto rounded-lg border">
             <Image
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
               layout="fill"
@@ -169,12 +169,12 @@ function FeaturedThumb(blog: PostTypes) {
               <p className="p text-xl">{blog.description}</p>
             </div>
 
-            <div className="grid grid-rows-4 grid-flow-col gap-4 w-max">
+            <div className="grid w-max grid-flow-col grid-rows-4 gap-4">
               {author.map((author: any) => {
                 return (
-                  <div className="flex space-x-3 items-center">
+                  <div className="flex items-center space-x-3">
                     {author.author_image_url && (
-                      <div className="relative overflow-auto w-10 h-10">
+                      <div className="relative h-10 w-10 overflow-auto">
                         <Image
                           src={author.author_image_url}
                           alt={`${author.author} avatar`}
@@ -185,8 +185,8 @@ function FeaturedThumb(blog: PostTypes) {
                       </div>
                     )}
                     <div className="flex flex-col">
-                      <span className="m-0 text-sm text-scale-1200">{author.author}</span>
-                      <span className="m-0 text-xs text-scale-900">{author.position}</span>
+                      <span className="text-scale-1200 m-0 text-sm">{author.author}</span>
+                      <span className="text-scale-900 m-0 text-xs">{author.position}</span>
                     </div>
                   </div>
                 )

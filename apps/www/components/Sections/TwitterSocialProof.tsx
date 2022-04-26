@@ -35,7 +35,7 @@ function TwitterSocialProof() {
           <p className="p">
             Supported by a network of early advocates, contributors, and champions.
           </p>
-          <div className="my-8 flex gap-2 justify-center">
+          <div className="my-8 flex justify-center gap-2">
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
               <Button
                 as="a"
@@ -113,13 +113,13 @@ function TwitterSocialProof() {
                 </SwiperSlide>
               )
             })}
-            <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
-              <div ref={prevRef} className="cursor-pointer ml-4">
+            <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
+              <div ref={prevRef} className="ml-4 cursor-pointer">
                 <p>
                   <IconArrowLeft />
                 </p>
               </div>
-              <div ref={nextRef} className="cursor-pointer mr-4">
+              <div ref={nextRef} className="mr-4 cursor-pointer">
                 <p>
                   <IconArrowRight />
                 </p>

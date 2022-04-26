@@ -7,8 +7,8 @@ function FloatingIcons() {
   const { basePath } = useRouter()
 
   return (
-    <div className="absolute w-full h-full hidden lg:block">
-      <div className="container max-w-screen-2xl h-full relative mx-auto">
+    <div className="absolute hidden h-full w-full lg:block">
+      <div className="container relative mx-auto h-full max-w-screen-2xl">
         <img
           className={`${Styles['icon-react-one']}`}
           src={`${basePath}/images/product/auth/react-icon.svg`}

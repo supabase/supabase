@@ -35,7 +35,7 @@ function TagBlogsPage(props: Props) {
     <>
       <NextSeo title={`Blog | ${tag}`} description="Latest news from the Supabase team." />
       <DefaultLayout>
-        <div className="container px-8 py-16 mx-auto sm:px-16 xl:px-20">
+        <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
           <div className="flex space-x-1">
             <p className="cursor-pointer">
               <Link href="/blog">Blog</Link>

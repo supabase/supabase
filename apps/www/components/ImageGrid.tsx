@@ -70,7 +70,7 @@ const ImageGrid = ({
           if (x.link) {
             return (
               <Link href={link}>
-                <div className="cursor-pointer transform duration-100 ease-in-out scale-100 hover:scale-105 hover:shadow-sm hover:z-50">
+                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:z-50 hover:scale-105 hover:shadow-sm">
                   {children}
                 </div>
               </Link>
@@ -85,14 +85,14 @@ const ImageGrid = ({
             <div
               key={`${x.name}-${i}`}
               className={`
-                  col-span-1 flex items-center justify-center 
-                bg-gray-50 
-                dark:bg-scale-400
-                  ${x.link && 'hover:bg-gray-100 dark:hover:bg-scale-600'}
+                  dark:bg-scale-400 col-span-1 flex items-center 
+                justify-center 
+                bg-gray-50
+                  ${x.link && 'dark:hover:bg-scale-600 hover:bg-gray-100'}
                   p-8 ${className}`}
             >
               <div
-                className={`relative overflow-auto w-full h-8
+                className={`relative h-8 w-full overflow-auto
                     ${imgPadding[padding]}
                   `}
               >
@@ -104,9 +104,9 @@ const ImageGrid = ({
                   objectPosition="center"
                   className="
                       bg-no-repeat
-                    filter 
+                    opacity-50 
                     contrast-0
-                    opacity-50
+                    filter
                   "
                 />
               </div>
