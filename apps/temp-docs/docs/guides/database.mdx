@@ -1,0 +1,176 @@
+---
+title: 'Database'
+description: 'Supabase is built on top of Postgres, an extremely scalable Relational Database.'
+---
+
+# Database
+
+Supabase is built on top of Postgres, an extremely scalable Relational Database.
+
+## Features
+
+### Table View
+
+You don't have to be a database expert to start using Supabase. Our table view makes Postgres as easy to use as a spreadsheet.
+
+![Table view](https://supabase.com/docs/assets/images/table-view-827aa3e2958fda01517f0a47474827b0.png)
+
+### Relationships 
+
+Dig into the relationships within your data.
+
+<video width="99%" playsinline controls>
+  <source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" playsInline />
+</video>
+
+
+### Clone tables
+You can duplicate your tables, just like you would inside a spreadsheet.
+
+<video width="99%" playsinline controls>
+  <source src="/videos/duplicate-tables.mp4" type="video/mp4" playsInline />
+</video>
+
+### The SQL Editor
+Supabase comes with a SQL Editor. You can also save your favorite queries to run later!
+
+<video width="99%" playsinline controls>
+  <source src="/videos/favorites.mp4" type="video/mp4" playsInline />
+</video>
+
+### Additional features
+
+- Supabase extends Postgres with realtime functionality using our [Realtime Server](https://github.com/supabase/realtime).
+- Every project is a full Postgres database, with postgres level access.
+- Managed backups - Supabase handles all your database [backups](https://supabase.com/docs/guides/database#fn-backups).backups
+- Data imports - import directly from a CSV or excel spreadsheet.
+
+Database backups do NOT include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
+
+
+### Extensions
+To expand the functionality of your Postgres database, you can use extensions. You can enable Postgres extensions with the click of a button within the Supabase dashboard.
+
+<video width="99%" playsinline controls>
+  <source src="/videos/toggle-extensions.mp4" type="video/mp4" playsInline />
+</video>
+
+## Tips
+
+### Realtime
+
+Supabase provides a realtime engine on top of Postgres, so that you can listen to changes as they happen. Our realtime engine uses the built-in replication functionality of Postgres.
+
+Realtime server broadcasts database changes to authorized users depending on your Row Level Security (RLS) policies. We recommend that you enable row level security and set row security policies on tables that you add to the publication. However, you may choose to disable RLS on a table and have changes broadcast to all connected clients.
+
+You can manage the realtime system, simply by [updating](https://supabase.com/docs/guides/database/replication) the `supabase_realtime` publication.
+
+For example to enable realtime only for individual tables:
+
+```sql
+begin; 
+  -- remove the realtime publication
+  drop publication if exists supabase_realtime; 
+
+  -- re-create the publication but don't enable it for any tables
+  create publication supabase_realtime;  
+commit;
+
+-- add a table to the publication
+alter publication supabase_realtime add table products;
+
+-- add other tables to the publication
+alter publication supabase_realtime add table posts;
+```
+By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you update or delete a record, you can update the replica identity of your tables, setting it to `full`:
+
+```sql
+alter table your_table replica identity full;
+```
+
+
+### Migrating between projects#
+
+If you have an existing Supabase Project and you want to migrate it into a new (fresh) Project, you can simply follow these steps:
+
+**Before you begin**
+
+- Make sure Realtime is disabled. This will improve the performance of inserts on your new database.
+- Make sure you have psql installed on your computer so that you can run pg_dump.
+
+**Migrate the database**
+First we want to grab the database structure only:
+```bash
+pg_dump \
+-h db.PROJECT_REF.supabase.co \
+-U postgres \
+--clean \
+--schema-only \
+> supabase_schema.sql
+```
+
+This command creates a file on your computer called `supabase_schema.sql`.
+
+After creating a new Supabase project we can use it to restore the database structure:
+
+```bash
+psql \
+-h db.NEW_PROJECT_REF.supabase.co \
+-U postgres \
+< supabase_schema.sql
+```
+You may see some errors - the restore will attempt to drop any tables if they are present, and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
+
+
+**(Optionally) Migrate the data**
+
+We can migrate everything in our database, however we don't want to migrate the data in our storage schema because the files exist outside of the database. For now, we can just get all the data inside the public and auth schemas:
+
+```bash
+pg_dump \
+-h db.PROJECT_REF.supabase.co \
+-U postgres \
+--data-only \
+-n public \
+-n auth \
+> supabase_data.sql
+```
+This command creates a file on your computer called supabase_data.sql. We can use this file to restore the data in our new database:
+```bash
+psql \
+-h db.NEW_PROJECT_REF.supabase.co \
+-U postgres \
+< supabase_data.sql
+```
+
+### Resetting your project password
+
+When you create a new project in Supabase we ask for a password. You can use this password to connect directly to your Postgres database.
+
+If you forget your password, you can reset it from the Dashboard SQL editor:
+
+For example:
+
+```sql
+alter user postgres 
+with password 'new_password';
+```
+
+Read more in [Database Configuration](https://supabase.com/docs/guides/database/managing-passwords).
+
+###Changing the timezone of your server.
+
+
+Your database is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculations. If, however, you want to update the timezone, you can do so using any of the [database timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+For example:
+
+```sql
+alter database postgres set timezone to 'America/New_York';
+```
+Read more in [Database Configuration](https://supabase.com/docs/guides/database/managing-timezones).
+
+## Next steps
+- Read more about [Postgres](https://supabase.com/docs/postgres/server/about)
+- Sign in: [app.supabase.io](https://app.supabase.io/)
+
