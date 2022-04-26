@@ -24,11 +24,11 @@ async function pingPostgrest(
   const { kpsVersion, timeout } = options ?? {}
   const healthCheckApiEnable = semver.gte(
     // @ts-ignore
-    semver.coerce(toJS(kpsVersion) ?? 'kps-v0.0.1'),
+    semver.coerce(kpsVersion ?? 'kps-v0.0.1'),
     semver.coerce('kps-v3.8.6')
   )
   if (healthCheckApiEnable) {
-    const healthCheckUrl = `${restUrl.replace('/rest/', '/rest-admin/')}/live`
+    const healthCheckUrl = `${restUrl.replace('/rest/', '/rest-admin/')}live`
     return pingHealthCheckApi(healthCheckUrl, apikey, timeout)
   }
 
@@ -60,6 +60,7 @@ async function pingHealthCheckApi(url: string, apikey: string, timeout?: number)
   const headers = { apikey }
   const { error } = await getWithTimeout(url, {
     headers,
+    credentials: 'omit',
     timeout: timeout ?? 5000,
   })
   return error === undefined
