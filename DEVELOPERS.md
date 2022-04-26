@@ -205,6 +205,8 @@ For example:
 - `npm install @supabase/ui -w common`: installs into `./packages/common`
 - `npm install @supabase/ui -w www`: installs into `./apps/www`
 
+You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
+
 ### Development
 
 `npm run dev`
