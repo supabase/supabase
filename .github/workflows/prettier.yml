@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Run prettier
         run: |-
-          npx prettier -c 'apps/docs/**/*.{js,jsx,ts,tsx,css,md,json}'
+          npx prettier --config ./.prettierrc -c 'apps/docs/**/*.{js,jsx,ts,tsx,css,md,json}'
         # run: |-
         #   function run_check() {
         #     if $(grep -q '"prettier"' "$1") ; then
