@@ -106,7 +106,7 @@ h6 { */
 }
 
 .small:not(.prose *):not(.overwrite) {
-  @apply text-xs text-scale-900;
+  @apply text-scale-900 text-xs;
 }
 
 .sbui-border-fix select {
@@ -165,7 +165,7 @@ h6 { */
 } */
 
 .sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply text-white bg-gray-800 dark:bg-scale-300 dark:text-white;
+  @apply dark:bg-scale-300 bg-gray-800 text-white dark:text-white;
   text-shadow: none;
   font-weight: 400;
 }
