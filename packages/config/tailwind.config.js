@@ -15,13 +15,13 @@ const svgToDataUri = require('mini-svg-data-uri')
 module.exports = ui({
   mode: 'JIT',
   content: [
-    "../../packages/ui/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    '../../packages/ui/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
     './components/**/*.tsx',
     './pages/**/*.tsx',
     './_blog/*.mdx',
     // purge styles from supabase ui theme
-    './node_modules/@supabase/ui/dist/config/default-theme.js',
+    '../../node_modules/@supabase/ui/dist/config/default-theme.js',
   ],
   darkMode: 'class', // 'media' or 'class'
   // mode: 'jit',
