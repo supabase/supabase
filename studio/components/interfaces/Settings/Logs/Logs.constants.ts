@@ -464,7 +464,7 @@ export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
 export const TIER_QUERY_LIMITS = {
-  FREE: { text: '1 day', windowSeconds: 3600 * 24 },
-  PRO: { text: '7 days', windowSeconds: 3600 * 24 * 7 },
-  PAYG: { text: '3 months', windowSeconds: 3600 * 24 * 30 * 3 },
+  FREE: { text: '1 day', value: 1, unit: 'day' },
+  PRO: { text: '7 day', value: 7, unit: 'day' },
+  PAYG: { text: '3 month', value: 3, unit: 'month' },
 }

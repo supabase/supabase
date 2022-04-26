@@ -56,6 +56,17 @@ LogsPreviewer.mockImplementation((props) => {
   )
 })
 
+jest.mock('hooks/queries/useProjectSubscription')
+import useProjectSubscription from 'hooks/queries/useProjectSubscription'
+useProjectSubscription = jest.fn()
+useProjectSubscription.mockImplementation((ref) => ({
+  subscription: {
+    tier: {
+      supabase_prod_id: 'tier_free',
+    },
+  },
+}))
+
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { getToggleByText } from '../../helpers'
