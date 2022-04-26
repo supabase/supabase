@@ -57,7 +57,7 @@ export default function ProfileList({ profiles }: ProfileListProps) {
   return (
     <>
       {state.profiles.length === 0 ? (
-        <p className="opacity-half font-light m-0">There are no public profiles created yet</p>
+        <p className="opacity-half m-0 font-light">There are no public profiles created yet</p>
       ) : (
         <div className="profileList">
           {state.profiles?.map((profile: any) => (
