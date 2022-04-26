@@ -2,7 +2,7 @@ import semver from 'semver'
 import { headWithTimeout, getWithTimeout } from './common/fetch'
 
 /**
- * Ping Postgrest for health check
+ * Ping Postgrest for health check. Default timeout in 5s.
  *
  * Project with version gte 'kps-v3.8.6', we can ping the health-check api
  * else ping the OpenApi url
@@ -37,7 +37,7 @@ async function pingPostgrest(
 export default pingPostgrest
 
 /**
- * Send a HEAD request to postgrest OpenAPI. Default timeout in 5s
+ * Send a HEAD request to postgrest OpenAPI.
  *
  * @return true if there's no error else false
  */
@@ -52,7 +52,7 @@ async function pingOpenApi(url: string, apikey: string, timeout?: number) {
 }
 
 /**
- * Send a GET request to postgrest health check api. Default timeout in 5s
+ * Send a GET request to postgrest health check api.
  *
  * @return true if there's no error else false
  */
