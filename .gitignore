@@ -79,8 +79,6 @@ typings/
 
 # dotenv environment variables file
 .env
-# exclude the env file in /www 
-!www/.env
 .env.test
 .env.local
 .env.production
