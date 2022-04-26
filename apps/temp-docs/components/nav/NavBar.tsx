@@ -33,10 +33,10 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
 
   return (
     <nav
-      className={`flex justify-between border-b dark:border-dark p-4 sticky top-0 z-10 h-[72px] bg-white dark:bg-gray-800 backdrop-filter backdrop-blur`}
+      className={`dark:border-dark sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter dark:bg-gray-800`}
     >
       <div className="flex items-center">
-        <button className="block lg:hidden mr-2">
+        <button className="mr-2 block lg:hidden">
           <IconMenu />
         </button>
         {mounted && (

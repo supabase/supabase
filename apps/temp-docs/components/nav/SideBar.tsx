@@ -7,7 +7,7 @@ import ThemeToggle from '../ThemeToggle'
 const SideBar = ({ menuItems }: { menuItems: any }) => {
   const { asPath } = useRouter()
   return (
-    <div className={`${styles.sidebar} fixed relative h-full py-4 border-r dark:border-dark`}>
+    <div className={`${styles.sidebar} dark:border-dark fixed relative h-full border-r py-4`}>
       <Menu>
         <div>
           {Object.keys(menuItems).map((key) => {

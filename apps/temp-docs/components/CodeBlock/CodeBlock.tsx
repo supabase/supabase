@@ -38,7 +38,7 @@ function CodeBlock(props: Props) {
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
-        className={'code-block rounded-lg border border-gray-600 dark:border-dark'}
+        className={'code-block dark:border-dark rounded-lg border border-gray-600'}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,
@@ -64,7 +64,7 @@ function CodeBlock(props: Props) {
         {props.children}
       </SyntaxHighlighter>
       {!props.hideCopy && props.children ? (
-        <div className="absolute right-2 top-2 dark">
+        <div className="dark absolute right-2 top-2">
           <CopyToClipboard text={props.children}>
             <Button type="outline" className="dark:bg-dark-800" icon={<IconCopy />}>
               Copy
