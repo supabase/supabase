@@ -1,11 +1,6 @@
+import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { FC } from 'react'
-import { Typography } from '@supabase/ui'
-
 import GetStartedPanel from './GetStartedPanel'
-import {
-  DisplayApiSettings,
-  DisplayConfigSettings,
-} from 'components/to-be-cleaned/DisplayProjectSettings'
 
 interface Props {}
 

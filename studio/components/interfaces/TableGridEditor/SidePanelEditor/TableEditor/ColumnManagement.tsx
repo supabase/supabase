@@ -9,7 +9,12 @@ import {
   IconTrash,
   Typography,
 } from '@supabase/ui'
-import { PostgresTable, PostgresColumn, PostgresRelationship } from '@supabase/postgres-meta'
+import {
+  PostgresTable,
+  PostgresColumn,
+  PostgresRelationship,
+  PostgresType,
+} from '@supabase/postgres-meta'
 import {
   DragDropContext,
   Droppable,
@@ -22,7 +27,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
 import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
-import { ColumnField, EnumType } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import { ImportContent } from './TableEditor.types'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 
@@ -30,7 +35,7 @@ interface Props {
   table?: Partial<PostgresTable>
   tables: PostgresTable[]
   columns?: ColumnField[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   importContent?: ImportContent
   isNewRecord: boolean
   onColumnsUpdated: (columns: ColumnField[]) => void

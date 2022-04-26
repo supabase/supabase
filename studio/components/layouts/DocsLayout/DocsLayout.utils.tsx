@@ -13,13 +13,13 @@ export const generateDocsMenu = (
         { name: 'Introduction', key: 'introduction', url: `/project/${ref}/api`, items: [] },
         {
           name: 'Authentication',
-          key: 'authentication',
+          key: 'auth',
           url: `/project/${ref}/api?page=auth`,
           items: [],
         },
         {
           name: 'User Management',
-          key: 'user-management',
+          key: 'users',
           url: `/project/${ref}/api?page=users`,
           items: [],
         },
@@ -30,7 +30,7 @@ export const generateDocsMenu = (
       items: [
         {
           name: 'Introduction',
-          key: 'tables-introduction',
+          key: 'tables-intro',
           url: `/project/${ref}/api?page=tables-intro`,
           items: [],
         },
@@ -49,7 +49,7 @@ export const generateDocsMenu = (
       items: [
         {
           name: 'Introduction',
-          key: 'sp-introduction',
+          key: 'rpc-intro',
           url: `/project/${ref}/api?page=rpc-intro`,
           items: [],
         },
@@ -72,7 +72,7 @@ export const generateDocsMenu = (
         {
           name: 'API Reference',
           key: 'api-reference',
-          url: `https://supabase.com/docs/client/supabase-client`,
+          url: `https://supabase.com/docs/reference/javascript/supabase-client`,
           icon: <IconBookOpen size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,

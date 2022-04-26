@@ -4,7 +4,7 @@ import { get as _get, maxBy } from 'lodash'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from 'components/interfaces/Billing'
-import { Dictionary } from '@supabase/grid'
+import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
 /**
  * Get project payg statistics
@@ -16,7 +16,7 @@ export function useProjectPaygStatistics(ref?: string, tierProdId?: string) {
   const startDate = dayjs().utc().startOf('month').format(DATE_FORMAT)
   const endDate = dayjs().utc().endOf('month').format(DATE_FORMAT)
   const attributes =
-    'total_db_size_bytes,total_db_egress_bytes,total_storage_size_bytes,total_storage_egress'
+    'total_egress,total_db_size_bytes,total_db_egress_bytes,total_storage_size_bytes,total_storage_egress'
   const url = `${API_URL}/projects/${ref}/daily-stats?attribute=${attributes}&startDate=${encodeURIComponent(
     startDate
   )}&endDate=${encodeURIComponent(endDate)}&interval='1d'`
@@ -44,13 +44,29 @@ export function useProjectPaygStatistics(ref?: string, tierProdId?: string) {
   }
 }
 
-function getPaygStats(data: any): Dictionary<number> {
+function getPaygStats(data: any): PaygStats {
   const paygStats: any = {}
   if (!data) return paygStats
 
-  chargeableProducts.forEach((product: any) => {
-    product.features.forEach((feature: any) => {
-      paygStats[feature.attribute] = _get(maxBy(data, feature.attribute), feature.attribute)
+  let dataModified: any = []
+  data.map((x: any) => {
+    dataModified.push({ ...x, total_egress_modified: x.total_egress - x.total_storage_egress })
+  })
+
+  chargeableProducts.forEach((product) => {
+    product.features.forEach((feature) => {
+      // calculate max
+      const max = _get(maxBy(dataModified, feature.attribute), feature.attribute)
+      // calculate sum
+      let sum = 0
+      dataModified.map((x: any) => {
+        sum = sum + x[feature.attribute]
+      })
+      // set sum and max under attribute name
+      paygStats[feature.attribute] = {
+        sum,
+        max,
+      }
     })
   })
   return paygStats

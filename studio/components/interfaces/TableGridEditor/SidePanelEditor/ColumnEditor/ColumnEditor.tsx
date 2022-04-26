@@ -2,7 +2,12 @@ import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
-import { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import {
+  PostgresColumn,
+  PostgresRelationship,
+  PostgresTable,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
@@ -18,18 +23,13 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
-import {
-  EnumType,
-  ColumnField,
-  CreateColumnPayload,
-  UpdateColumnPayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
   column?: PostgresColumn
   selectedTable: PostgresTable
   tables: PostgresTable[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   visible: boolean
   closePanel: () => void
   saveChanges: (

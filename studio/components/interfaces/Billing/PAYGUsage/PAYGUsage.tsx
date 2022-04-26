@@ -3,14 +3,14 @@ import dayjs from 'dayjs'
 import { Typography } from '@supabase/ui'
 
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { ChargeableProduct, ProductFeature } from './PAYGUsage.types'
+import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
 import { deriveProductCost } from './PAYGUsage.utils'
 import { chargeableProducts } from './PAYGUsage.constants'
 import { DATE_FORMAT } from 'lib/constants'
 import { Dictionary } from '@supabase/grid'
 
 interface Props {
-  paygStats: Dictionary<number>
+  paygStats: PaygStats
 }
 
 const PAYGUsage: FC<Props> = ({ paygStats }) => {
@@ -21,6 +21,7 @@ const PAYGUsage: FC<Props> = ({ paygStats }) => {
     <div className="flex flex-col">
       {chargeableProducts.map((product: ChargeableProduct) => {
         const productCost = deriveProductCost(paygStats, product)
+
         return (
           <div
             key={product.title}
@@ -63,7 +64,7 @@ const PAYGUsage: FC<Props> = ({ paygStats }) => {
                       endDate={endDate}
                       interval="1d"
                       highlight="maximum"
-                      defaultChartStyle="line"
+                      defaultChartStyle="bar"
                       customDateFormat={'MMM D, YYYY'}
                     />
                   </div>

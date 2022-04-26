@@ -42,7 +42,7 @@ export const useStorageExplorerStore = () => {
   return useContext(StorageExplorerContext)
 }
 
-const LIMIT = 100000
+const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
@@ -225,6 +225,12 @@ class StorageExplorerStore {
     this.columns = this.columns.slice(0, index + 1)
   }
 
+  setColumnIsLoadingMore = (index, isLoadingMoreItems = true) => {
+    this.columns = this.columns.map((col, idx) => {
+      return idx === index ? { ...col, isLoadingMoreItems } : col
+    })
+  }
+
   pushOpenedFolderAtIndex = (folder, index) => {
     this.openedFolders = this.openedFolders.slice(0, index).concat(folder)
   }
@@ -266,10 +272,11 @@ class StorageExplorerStore {
   }
 
   addNewFolderPlaceholder = (columnIndex) => {
+    const isPrepend = true
     const folderName = 'Untitled folder'
     const folderType = STORAGE_ROW_TYPES.FOLDER
     const columnIdx = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
-    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx)
+    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, {}, isPrepend)
   }
 
   addNewFolder = async (folderName, columnIndex) => {
@@ -917,35 +924,75 @@ class StorageExplorerStore {
 
   /* Folders CRUD */
 
-  fetchFolderContents = async (folderId, folderName, index, showLoading = true) => {
+  fetchFolderContents = async (folderId, folderName, index, searchString = '') => {
     this.abortApiCalls()
 
-    if (showLoading) {
-      this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
-      this.pushColumnAtIndex(
-        { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
-        index
-      )
-    }
+    this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
+    this.pushColumnAtIndex(
+      { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
+      index
+    )
 
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
-    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: 'asc' } }
+    const options = {
+      limit: LIMIT,
+      offset: OFFSET,
+      search: searchString,
+      sortBy: { column: this.sortBy, order: 'asc' },
+    }
     const parameters = { signal: this.abortController.signal }
 
     const { data: items, error } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(prefix, options, parameters)
 
-    if (showLoading) {
-      this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
-    }
+    this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
 
     if (!error) {
       const formattedItems = this.formatFolderItems(items)
       this.pushColumnAtIndex(
-        { id: folderId || folderName, name: folderName, items: formattedItems },
+        {
+          id: folderId || folderName,
+          name: folderName,
+          items: formattedItems,
+          hasMoreItems: formattedItems.length === LIMIT,
+          isLoadingMoreItems: false,
+        },
         index
       )
+    }
+  }
+
+  fetchMoreFolderContents = async (index, column, searchString = '') => {
+    this.setColumnIsLoadingMore(index)
+
+    const prefix = this.openedFolders.map((folder) => folder.name).join('/')
+    const options = {
+      limit: LIMIT,
+      offset: column.items.length,
+      search: searchString,
+      sortBy: { column: this.sortBy, order: 'asc' },
+    }
+    const parameters = { signal: this.abortController.signal }
+
+    const { data: items, error } = await this.supabaseClient.storage
+      .from(this.selectedBucket.name)
+      .list(prefix, options, parameters)
+
+    if (!error) {
+      // Add items to column
+      const formattedItems = this.formatFolderItems(items)
+      this.columns = this.columns.map((col, idx) => {
+        if (idx === index) {
+          return {
+            ...col,
+            items: col.items.concat(formattedItems),
+            isLoadingMoreItems: false,
+            hasMoreItems: items.length === LIMIT,
+          }
+        }
+        return col
+      })
     }
   }
 
@@ -984,6 +1031,8 @@ class StorageExplorerStore {
         id: null,
         name: idx === 0 ? this.selectedBucket.name : pathsWithEmptyPrefix[idx],
         items: formattedItems,
+        hasMoreItems: formattedItems.length === LIMIT,
+        isLoadingMoreItems: false,
       }
     })
 
@@ -1182,11 +1231,13 @@ class StorageExplorerStore {
     return formattedItems
   }
 
-  addTempRow = (type, name, status, columnIndex, metadata = {}) => {
+  addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const tempRow = { type, name, status, metadata }
-        const updatedItems = column.items.concat([tempRow])
+        const updatedItems = isPrepend
+          ? [tempRow].concat(column.items)
+          : column.items.concat([tempRow])
         return { ...column, items: updatedItems }
       }
       return column

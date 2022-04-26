@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Typography, IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
 
@@ -10,15 +10,13 @@ import {
   LogsTableName,
   QueryType,
   LogEventChart,
-  FilterObject,
   Filters,
+  unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs'
-import dayjs from 'dayjs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
 
 import { LOGS_TABLES } from './Logs.constants'
-import { Override } from './Logs.types'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 
@@ -47,29 +45,26 @@ export const LogsPreviewer: React.FC<Props> = ({
   tableName,
 }) => {
   const router = useRouter()
-  const { s, te, ts } = router.query
+  const { s, ite, its } = router.query
   const [showChart, setShowChart] = useState(true)
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
-    { error, logData, params, newCount, filters, isLoading, oldestTimestamp },
-    { loadOlder, setFilters, refresh, setTo, setFrom },
+    { error, logData, params, newCount, filters, isLoading },
+    { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
-    if (te) {
-      setTo(te as string)
-    } else {
-      setTo('')
+    if (ite || its) {
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: (its || '') as string,
+        iso_timestamp_end: (ite || '') as string,
+      }))
     }
-    if (ts) {
-      setFrom(ts as string)
-    } else {
-      setFrom('')
-    }
-  }, [s, te, ts])
+  }, [s, ite, its])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -81,33 +76,27 @@ export const LogsPreviewer: React.FC<Props> = ({
       pathname: router.pathname,
       query: {
         ...router.query,
-        te: undefined,
-        ts: undefined,
+        ite: undefined,
+        its: undefined,
         // ...whereFilters,
       },
     })
   }
 
-  const handleSearch: LogSearchCallback = async ({ query, to, from, fromMicro, toMicro }) => {
-    let toValue, fromValue
-    if (to || toMicro) {
-      toValue = toMicro ? toMicro : dayjs(to).valueOf() * 1000
-
-      setTo(String(toValue))
-    }
-    if (from || fromMicro) {
-      fromValue = fromMicro ? fromMicro : dayjs(from).valueOf() * 1000
-      setFrom(String(fromValue))
-    }
-    setFilters((prev) => ({ ...prev, search_query: query || '' }))
-
+  const handleSearch: LogSearchCallback = async ({ query = '', to, from }) => {
+    setParams((prev) => ({
+      ...prev,
+      iso_timestamp_start: from || prev.iso_timestamp_start || '',
+      iso_timestamp_end: to || prev.iso_timestamp_end || '',
+    }))
+    setFilters((prev) => ({ ...prev, search_query: query }))
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
         s: query || '',
-        ts: fromValue,
-        te: toValue,
+        its: from || its || '',
+        ite: to || ite || '',
       },
     })
   }
@@ -123,18 +112,16 @@ export const LogsPreviewer: React.FC<Props> = ({
         onRefresh={handleRefresh}
         onSearch={handleSearch}
         defaultSearchValue={filters.search_query as string}
-        defaultToValue={
-          params.timestamp_end ? dayjs(Number(params.timestamp_end) / 1000).toISOString() : ''
-        }
-        defaultFromValue={
-          params.timestamp_start
-            ? dayjs(Number(params.timestamp_start) / 1000).toISOString()
-            : oldestTimestamp
-            ? dayjs(Number(oldestTimestamp) / 1000).toISOString()
-            : ''
-        }
+        defaultToValue={params.iso_timestamp_end}
+        defaultFromValue={params.iso_timestamp_start}
         onExploreClick={() => {
-          router.push(`/project/${projectRef}/logs-explorer?q=${encodeURIComponent(params.rawSql)}`)
+          router.push(
+            `/project/${projectRef}/logs-explorer?q=${encodeURIComponent(
+              params.rawSql || ''
+            )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
+              params.iso_timestamp_end || ''
+            )}`
+          )
         }}
         onSelectTemplate={onSelectTemplate}
         filters={filters}
@@ -157,7 +144,8 @@ export const LogsPreviewer: React.FC<Props> = ({
             <LogEventChart
               data={!isLoading ? logData : undefined}
               onBarClick={(timestampMicro) => {
-                handleSearch({ query: filters.search_query as string, toMicro: timestampMicro })
+                const to = unixMicroToIsoTimestamp(timestampMicro)
+                handleSearch({ query: filters.search_query as string, to, from: null })
               }}
             />
           )}
