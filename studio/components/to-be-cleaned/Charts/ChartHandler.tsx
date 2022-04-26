@@ -15,7 +15,7 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { BarChart, AreaChart } from './ChartRenderer'
 import { ChartData } from './ChartHandler.types'
-import { TooltipProps } from 'recharts'
+import { AreaProps } from 'recharts'
 
 interface Props {
   label: string
@@ -34,6 +34,7 @@ interface Props {
   format?: string
   highlightedValue?: string | number
   onBarClick?: (v: any) => void
+  areaType?: AreaProps['type']
 }
 
 /**
@@ -62,6 +63,7 @@ const ChartHandler: FC<Props> = ({
   format,
   highlightedValue,
   onBarClick,
+  areaType,
 }) => {
   const router = useRouter()
   const { ref } = router.query
@@ -120,6 +122,8 @@ const ChartHandler: FC<Props> = ({
 
   highlightedValue = highlightedValue
     ? highlightedValue
+    : provider === 'daily-stats' && !attribute.includes('ingress') && !attribute.includes('egress')
+    ? chartData?.maximum
     : provider === 'daily-stats'
     ? chartData?.total
     : provider === 'log-stats'
@@ -136,7 +140,6 @@ const ChartHandler: FC<Props> = ({
   }
 
   if (isUndefined(chartData)) {
-    console.log('i am undefined chart data')
     return (
       <div className="w-full h-52 flex flex-col space-y-4 items-center justify-center">
         <IconAlertCircle className="text-scale-700" />

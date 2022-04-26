@@ -5,7 +5,7 @@ import { useStore, withAuth } from 'hooks'
 import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { IS_PLATFORM } from 'lib/constants'
-import BaseLayout from 'components/layouts'
+import ProjectLayout from 'components/layouts'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 
 const Home: NextPage = () => {
@@ -18,7 +18,7 @@ const Home: NextPage = () => {
       : 'Welcome to your project'
 
   return (
-    <BaseLayout>
+    <ProjectLayout>
       <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
         <div className="mx-6 flex space-x-6 items-center">
           <h1 className="text-3xl">{projectName}</h1>
@@ -45,7 +45,7 @@ const Home: NextPage = () => {
           </div>
         </div>
       </div>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

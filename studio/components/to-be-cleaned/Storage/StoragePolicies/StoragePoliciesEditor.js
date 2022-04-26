@@ -55,7 +55,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         </label>
         <p className="text-sm text-scale-900">
           Based on the operations you have selected, you can use any of the highlighted functions in
-          the supabase-js Javascript library
+          the supabase-js JavaScript library
         </p>
       </div>
       <div className="w-2/3">

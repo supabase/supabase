@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { compact, find, isEmpty, uniqBy, get } from 'lodash'
 
@@ -48,6 +48,7 @@ const StorageExplorer = observer(({ bucket }) => {
     addNewFolderPlaceholder,
     addNewFolder,
     fetchFolderContents,
+    fetchMoreFolderContents,
     fetchFoldersByPath,
     renameFolder,
     deleteFolder,
@@ -71,6 +72,22 @@ const StorageExplorer = observer(({ bucket }) => {
   const previewPaneWidth = 450
   // Requires a fixed height to ensure that explorer is constrained to the viewport
   const fileExplorerHeight = window.innerHeight - 122
+
+  useEffect(async () => {
+    const currentFolderIdx = openedFolders.length - 1
+    const currentFolder = openedFolders[currentFolderIdx]
+
+    if (itemSearchString) {
+      await fetchFolderContents(
+        currentFolder.id,
+        currentFolder.name,
+        currentFolderIdx,
+        itemSearchString
+      )
+    } else if (currentFolder) {
+      await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+    }
+  }, [itemSearchString])
 
   useEffect(() => {
     // Load user preferences (view and sort)
@@ -243,7 +260,9 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const onToggleSearch = (bool) => {
     setIsSearching(bool)
-    if (bool === false) setItemSearchString('')
+    if (bool === false) {
+      setItemSearchString('')
+    }
   }
 
   return (
@@ -289,8 +308,6 @@ const StorageExplorer = observer(({ bucket }) => {
           openedFolders={openedFolders}
           selectedItems={selectedItems}
           selectedFilePreview={selectedFilePreview}
-          isSearching={isSearching}
-          itemSearchString={itemSearchString}
           onCheckItem={onCheckItem}
           onSelectFile={onSelectFile}
           onRenameFile={onRenameFile}
@@ -308,6 +325,9 @@ const StorageExplorer = observer(({ bucket }) => {
           onSelectCreateFolder={onSelectCreateFolder}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onColumnLoadMore={(index, column) =>
+            fetchMoreFolderContents(index, column, itemSearchString)
+          }
         />
         <PreviewPane
           isOpen={!isEmpty(selectedFilePreview)}

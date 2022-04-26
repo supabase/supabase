@@ -15,7 +15,6 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
   const router = useRouter()
   const { ref } = router.query
 
-  console.log('item in component', item)
   return (
     <>
       <Table.tr key={item.id} className="expandable-tr">
@@ -47,7 +46,9 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
             type="alternative"
             iconRight={<IconPlay size={10} />}
             onClick={() =>
-              router.push(`/project/${ref}/logs-explorer?sql=${encodeURIComponent(item.content.sql)}`)
+              router.push(
+                `/project/${ref}/logs-explorer?sql=${encodeURIComponent(item.content.sql)}`
+              )
             }
           >
             Run

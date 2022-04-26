@@ -63,3 +63,17 @@ test('toggle histogram', async () => {
   userEvent.click(toggle)
   expect(mockFn).toBeCalled()
 })
+
+
+test('error message handling', async () => {
+  const {rerender} = render(<LogTable error="some \nstring" />)
+  await expect(screen.findByText("some \nstring")).rejects.toThrow()
+  await screen.findByDisplayValue(/some/)
+  await screen.findByDisplayValue(/string/)
+
+  rerender(<LogTable error={{my_error: "some \nstring"}} />)
+  await screen.findByText(/some \\nstring/)
+  await screen.findByText(/some/)
+  await screen.findByText(/string/)
+  await screen.findByText(/my_error/)
+})

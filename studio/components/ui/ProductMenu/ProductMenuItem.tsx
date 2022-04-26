@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 import Link from 'next/link'
-import { Menu, Typography } from '@supabase/ui'
+import { Menu } from '@supabase/ui'
 
 interface Props {
   name: string | ReactNode
@@ -25,10 +25,8 @@ const ProductMenuItem: FC<Props> = ({
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
-      <div className="flex w-full justify-between">
-        <span className={'truncate flex items-center ' + textClassName}>
-          {name}
-        </span>
+      <div className="flex w-full justify-between items-center">
+        <span className={'truncate flex items-center ' + textClassName}>{name}</span>
         {action}
       </div>
     </Menu.Item>
