@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react'
 
-import SidebarLayout from "./layouts/SidebarLayout";
+import SidebarLayout from './layouts/SidebarLayout'
 
-export * from "./Button";
+export * from './Button'
 
 export const Layouts = {
   SidebarLayout,
