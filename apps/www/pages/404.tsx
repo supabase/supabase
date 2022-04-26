@@ -19,11 +19,11 @@ const Error404 = () => {
 
   return (
     <DefaultLayout hideHeader hideFooter>
-      <div className="w-full h-screen relative flex flex-col items-center justify-center mx-auto">
-        <div className="absolute top-0 w-full max-w-7xl mx-auto pt-6 px-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-screen w-full flex-col items-center justify-center">
+        <div className="absolute top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
           <nav className="relative flex items-center justify-between sm:h-10">
-            <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
-              <div className="flex items-center justify-between w-full md:w-auto">
+            <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+              <div className="flex w-full items-center justify-between md:w-auto">
                 <a href="/">
                   <Image
                     src={
@@ -42,7 +42,7 @@ const Error404 = () => {
         </div>
         <div className="absolute">
           <h1
-            className={`select-none filter transition opacity-[5%] duration-200 ${
+            className={`select-none opacity-[5%] filter transition duration-200 ${
               show404 ? 'blur-sm' : 'blur-none'
             }`}
             style={{ fontSize: '28rem' }}
@@ -51,12 +51,12 @@ const Error404 = () => {
           </h1>
         </div>
         <div
-          className={`transition flex flex-col space-y-6 items-center justify-center ${
+          className={`flex flex-col items-center justify-center space-y-6 transition ${
             show404 ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div className="w-[320px] flex flex-col items-center justify-center space-y-3 text-scale-1200">
-            <h1 className="text-2xl m-2">Looking for something? 🔍</h1>
+          <div className="text-scale-1200 flex w-[320px] flex-col items-center justify-center space-y-3">
+            <h1 className="m-2 text-2xl">Looking for something? 🔍</h1>
             <p className="text-center text-sm">
               We couldn't find the page that you're looking for!
             </p>

@@ -13,7 +13,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="border-t border-scale-500 dark:border-scale-600"
+      className="border-scale-500 dark:border-scale-600 border-t"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -39,7 +39,7 @@ const Footer = () => {
             <div className="flex space-x-5">
               <a
                 href="https://twitter.com/supabase"
-                className="transition text-scale-900 hover:text-scale-1200"
+                className="text-scale-900 hover:text-scale-1200 transition"
               >
                 <span className="sr-only">Twitter</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -49,7 +49,7 @@ const Footer = () => {
 
               <a
                 href="https://github.com/supabase"
-                className="transition text-scale-900 hover:text-scale-1200"
+                className="text-scale-900 hover:text-scale-1200 transition"
               >
                 <span className="sr-only">GitHub</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -63,7 +63,7 @@ const Footer = () => {
 
               <a
                 href="https://discord.supabase.com/"
-                className="transition text-scale-900 hover:text-scale-1200"
+                className="text-scale-900 hover:text-scale-1200 transition"
               >
                 <span className="sr-only">Discord</span>
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
@@ -77,7 +77,7 @@ const Footer = () => {
 
               <a
                 href="https://youtube.com/c/supabase"
-                className="transition text-scale-900 hover:text-scale-1200"
+                className="text-scale-900 hover:text-scale-1200 transition"
               >
                 <span className="sr-only">Youtube</span>
                 <svg
@@ -91,18 +91,18 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 xl:mt-0 xl:col-span-2">
+          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               {FooterLinks.map((segment: any) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h6 className="text-base text-scale-1200 overwrite">{segment.title}</h6>
+                    <h6 className="text-scale-1200 overwrite text-base">{segment.title}</h6>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map((link: any, idx: number) => (
                         <li key={`${segment.title}_link_${idx}`}>
                           <a
                             href={link.url}
-                            className={`transition-colors text-sm ${
+                            className={`text-sm transition-colors ${
                               link.url
                                 ? 'text-scale-1100 hover:text-scale-1200 '
                                 : 'text-scale-900 hover:text-scale-900'
@@ -110,7 +110,7 @@ const Footer = () => {
                           >
                             {link.text}
                             {!link.url && (
-                              <div className="inline ml-2 xl:ml-0 xl:block 2xl:inline 2xl:ml-2 text-xs">
+                              <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
                                 <Badge color="scale" size="small">
                                   Coming soon
                                 </Badge>
@@ -126,7 +126,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="mt-32 border-t border-scale-500 dark:border-scale-600 pt-8 flex justify-between">
+        <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
           <DarkModeToggle />
         </div>

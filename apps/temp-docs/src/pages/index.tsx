@@ -1,4 +1,4 @@
-import { Button, Layouts } from 'ui'
+import { Button, Layouts } from 'common'
 import Sidebar from '../components/Sidebar'
 
 export default function Docs() {

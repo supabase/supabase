@@ -1,5 +1,5 @@
 import { fetchPosts, DevPost } from '../utils/api'
-import { Button, Layouts } from 'ui'
+import { Button, Layouts } from 'common'
 import { useEffect, useState } from 'react'
 
 export default function Main() {

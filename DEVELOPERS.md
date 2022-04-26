@@ -9,14 +9,20 @@
   - [Supabase Website Development Server](#supabase-website-development-server)
   - [Supabase Docs Development Server](#supabase-docs-development-server)
   - [Supabase Studio Development Server](#supabase-studio-development-server)
+- [Monorepo](#monorepo)
+  - [Getting started](#getting-started)
+  - [Shared components](#shared-components)
+  - [Installing packages](#installing-packages)
+  - [Development](#development)
 - [Finally](#finally)
 - [Community Channels](#community-channels)
-- [Monorepo](#monorepo)
-  - [Development](#development)
 
 ## Development Setup
 
-First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the [existing issues](https://github.com/supabase/supabase/issues). This document describes how to set up your development environment to build and test Supabase.
+First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the 
+[code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the 
+[existing issues](https://github.com/supabase/supabase/issues). 
+This document describes how to set up your development environment to build and test Supabase.
 
 ### Installing Dependencies
 
@@ -94,25 +100,7 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 ### Supabase Website Development Server
 
-1. Start development server
-
-   npm
-
-   ```sh
-   npm run dev
-   ```
-
-   or with yarn
-
-   ```sh
-   yarn dev
-   ```
-
-2. To access the local server, enter the following URL into your web browser:
-
-   ```sh
-   http://localhost:3000/
-   ```
+The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) section below.
 
 ### Supabase Docs Development Server
 
@@ -174,6 +162,57 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
 
+## Monorepo
+
+We are in the process of migrating this repository to monorepo, using Turborepo. 
+Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
+You must be using NPM 7 or higher.
+
+### Getting started
+
+```sh
+npm run install # install dependencies
+npm run dev # start all the applications
+```
+
+Then edit and visit any of the following sites:
+
+- `/apps/www`: http://localhost:3000
+  - The main website.
+- `/apps/temp-docs`: http://localhost:3001
+  - We are migrating the docs to a Next.js application.
+- `/apps/temp-community-forum`: http://localhost:3002 
+  - pulls all our github discussions into a nextjs site. Temporary/POC
+- `/apps/temp-community-tutorials`: http://localhost:3003 
+  - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
+
+
+### Shared components
+
+The monorepo has a set of shared components under `/packages`:
+
+- `/packages/common`: Common React code, shared between all sites.
+- `/packages/config`: All shared config
+- `/packages/tsconfig`: Shared Typescript settings
+### Installing packages
+
+Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
+
+The format is: `npm install <package name> -w=<workspace to install in>`. 
+
+For example: 
+
+- `npm install @supabase/ui -w common`: installs into `./packages/common`
+- `npm install @supabase/ui -w www`: installs into `./apps/www`
+
+You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
+
+### Development
+
+`npm run dev`
+
+
+
 ## Finally
 
 After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you.
@@ -183,20 +222,3 @@ Did you have an issue, like a merge conflict, or don't know how to open a pull r
 ## Community Channels
 
 Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
-
-## Monorepo
-
-This is a monorepo, using Turborepo. You must be using NPM 7 or higher.
-
-- Install a package: `npm install <package name> -w=<workspace to install in>`. eg:
-  - `npm install @supabase/ui -w ui`: installs into `./packages/ui`
-  - `npm install @supabase/ui -w docs`: installs into `./packages/docs`
-
-### Development
-
-`npm run dev`
-
-- www: http://localhost:3000
-- docs: http://localhost:3001
-- forum: http://localhost:3002 - pulls all our github discussions into a nextjs site. Temporary/POC
-- tutorial: http://localhost:3003 - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC

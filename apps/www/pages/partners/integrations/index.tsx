@@ -112,10 +112,10 @@ function IntegrationPartnersPage(props: Props) {
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <h2 className="text-xl text-scale-900">{meta_description}</h2>
+            <h2 className="text-scale-900 text-xl">{meta_description}</h2>
           </div>
           {/* Title */}
-          <div className="grid space-y-12 lg:grid-cols-12 lg:space-y-0 md:gap-8 lg:gap-16 xl:gap-16">
+          <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
             <div className="lg:col-span-4 xl:col-span-3">
               {/* Horizontal link menu */}
               <div className="space-y-6">
@@ -131,20 +131,20 @@ function IntegrationPartnersPage(props: Props) {
                   onChange={(e) => setSearch(e.target.value)}
                   actions={
                     isSearching && (
-                      <span className="mr-1 text-white animate-spin">
+                      <span className="mr-1 animate-spin text-white">
                         <IconLoader />
                       </span>
                     )
                   }
                 />
                 <div className="hidden lg:block">
-                  <div className="mb-2 text-sm text-scale-900">Categories</div>
+                  <div className="text-scale-900 mb-2 text-sm">Categories</div>
                   <div className="space-y-1">
                     {allCategories.map((category) => (
                       <button
                         key={category}
                         onClick={() => router.push(`#${category.toLowerCase()}`)}
-                        className="block text-base text-scale-1100"
+                        className="text-scale-1100 block text-base"
                       >
                         {category}
                       </button>
@@ -152,7 +152,7 @@ function IntegrationPartnersPage(props: Props) {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="mb-2 text-sm text-scale-900">Explore more</div>
+                  <div className="text-scale-900 mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
                     <PartnerLinkBox
                       title="Experts"
@@ -162,7 +162,7 @@ function IntegrationPartnersPage(props: Props) {
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-6 h-6"
+                          className="h-6 w-6"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -185,7 +185,7 @@ function IntegrationPartnersPage(props: Props) {
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5"
+                          className="h-5 w-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

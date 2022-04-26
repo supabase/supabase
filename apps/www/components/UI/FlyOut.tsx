@@ -36,21 +36,21 @@ const FlyOut = (props: Props) => {
         <>
           <div className="absolute inset-x-0 transform shadow-lg ">
             <div
-              className="border-b dark:border-scale-500 absolute inset-0 flex sm:flex-col lg:flex-row"
+              className="dark:border-scale-500 absolute inset-0 flex border-b sm:flex-col lg:flex-row"
               aria-hidden="true"
             >
-              <div className="bg-white dark:bg-scale-200 border-r dark:border-scale-400 sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full" />
+              <div className="dark:bg-scale-200 dark:border-scale-400 border-r bg-white sm:h-1/2 sm:w-full lg:h-full lg:w-1/2" />
               <div
                 className={`${
-                  singleBgColor ? 'bg-white dark:bg-scale-200' : 'bg-gray-50 dark:bg-scale-200'
-                } sm:w-full sm:h-1/2 lg:w-1/2 lg:h-full`}
+                  singleBgColor ? 'dark:bg-scale-200 bg-white' : 'dark:bg-scale-200 bg-gray-50'
+                } sm:h-1/2 sm:w-full lg:h-full lg:w-1/2`}
               />
             </div>
-            <div className="container relative mx-auto lg:grid-cols-2 px-6 lg:px-10 xl:px-14 py-2">
+            <div className="container relative mx-auto px-6 py-2 lg:grid-cols-2 lg:px-10 xl:px-14">
               {children}
             </div>
             <div
-              className="z-50 w-full h-screen absolute opacity-0"
+              className="absolute z-50 h-screen w-full opacity-0"
               style={{
                 pointerEvents: 'visiblePainted',
               }}

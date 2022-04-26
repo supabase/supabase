@@ -33,10 +33,10 @@ function Partner({ partner }: { partner: Partner }) {
 
       <DefaultLayout>
         <SectionContainer>
-          <div className="max-w-5xl col-span-12 mx-auto mb-2 space-y-12 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
             {/* Back button */}
             <Link href={`/partners/${partner.type === 'technology' ? 'integrations' : 'experts'}`}>
-              <a className="flex items-center transition-colors cursor-pointer text-scale-1200 hover:text-scale-1000">
+              <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
                 <IconChevronLeft style={{ padding: 0 }} />
                 Back
               </a>
@@ -47,7 +47,7 @@ function Partner({ partner }: { partner: Partner }) {
                 layout="fixed"
                 width={56}
                 height={56}
-                className="rounded-full bg-scale-400 w-14 h-14 flex-shrink-f0"
+                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -57,7 +57,7 @@ function Partner({ partner }: { partner: Partner }) {
             </div>
 
             <div
-              className="py-6 bg-scale-300"
+              className="bg-scale-300 py-6"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
@@ -88,7 +88,7 @@ function Partner({ partner }: { partner: Partner }) {
                 {partner.images.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
-                      <div className="relative block ml-3 mr-3 overflow-hidden rounded-md cursor-move">
+                      <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
                         <Image
                           layout="responsive"
                           objectFit="contain"
@@ -124,7 +124,7 @@ function Partner({ partner }: { partner: Partner }) {
                   Details
                 </h2>
 
-                <div className="divide-y text-scale-1200">
+                <div className="text-scale-1200 divide-y">
                   <div className="flex items-center justify-between py-2">
                     <span className="text-scale-900">Developer</span>
                     <span className="text-scale-1200">{partner.developer}</span>
@@ -137,7 +137,7 @@ function Partner({ partner }: { partner: Partner }) {
                         partner.type === 'technology' ? 'integrations' : 'experts'
                       }#${partner.category.toLowerCase()}`}
                     >
-                      <a className="transition-colors text-brand-900 hover:text-brand-800">
+                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
                         {partner.category}
                       </a>
                     </Link>
@@ -149,7 +149,7 @@ function Partner({ partner }: { partner: Partner }) {
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="transition-colors text-brand-900 hover:text-brand-800"
+                      className="text-brand-900 hover:text-brand-800 transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
@@ -161,7 +161,7 @@ function Partner({ partner }: { partner: Partner }) {
                       href={partner.docs}
                       target="_blank"
                       rel="noreferrer"
-                      className="transition-colors text-brand-900 hover:text-brand-800"
+                      className="text-brand-900 hover:text-brand-800 transition-colors"
                     >
                       <span className="flex items-center space-x-1">
                         <span>Learn</span>

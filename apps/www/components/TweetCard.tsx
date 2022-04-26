@@ -12,9 +12,9 @@ function TweetCard(props: TweetCard) {
     <div
       className="
       
-      bg-white dark:bg-scale-300 rounded-md
+      dark:bg-scale-300 border-scale-300 dark:border-scale-400
     
-      border border-scale-300 dark:border-scale-400 p-6
+      rounded-md border bg-white p-6
       drop-shadow-sm
 
     
@@ -22,12 +22,12 @@ function TweetCard(props: TweetCard) {
     >
       <div className="relative">
         <div className="flex items-center gap-2">
-          <div className="rounded-full w-10 h-10 border dark:border-gray-600 overflow-hidden">
+          <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
             <Image src={props.img_url} layout="responsive" width="64" height="64" />
           </div>
-          <p className="text-sm font-medium text-scale-1200 mt-3">{props.handle}</p>
+          <p className="text-scale-1200 mt-3 text-sm font-medium">{props.handle}</p>
           <div
-            className="absolute -left-1 -top-1 w-5 h-5 flex justify-center items-center rounded-full"
+            className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
             style={{ background: '#00acee' }}
           >
             <div className="text-white">
@@ -38,7 +38,7 @@ function TweetCard(props: TweetCard) {
       </div>
 
       <p>
-        <p className="text-base mt-3 text-scale-1100">"{props.quote}"</p>
+        <p className="text-scale-1100 mt-3 text-base">"{props.quote}"</p>
       </p>
     </div>
   )
