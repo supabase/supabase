@@ -27,14 +27,15 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     const response = await get(url, { headers })
     if (!response.error) {
       const project = response as Project
-      if (
-        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-        project.restUrl &&
-        project.internalApiKey
-      ) {
-        const success = await this.pingPostgrest(project.restUrl, project.internalApiKey)
-        project.postgrestStatus = success ? 'ONLINE' : 'OFFLINE'
-      }
+      // [TODO] Tempfix comment out ConnectingState
+      // if (
+      //   project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+      //   project.restUrl &&
+      //   project.internalApiKey
+      // ) {
+      //   const success = await this.pingPostgrest(project.restUrl, project.internalApiKey)
+      //   project.postgrestStatus = success ? 'ONLINE' : 'OFFLINE'
+      // }
       this.data[project.id] = project
     }
   }
