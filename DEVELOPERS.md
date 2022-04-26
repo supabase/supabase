@@ -23,11 +23,11 @@ First off, thanks for your interest in Supabase and for wanting to contribute! b
 Before you can build Supabase, you must install and configure the following dependencies on your
 machine:
 
-* [Git](http://git-scm.com/)
+- [Git](http://git-scm.com/)
 
-* [Node.js v16.x (LTS)](http://nodejs.org)
+- [Node.js v16.x (LTS)](http://nodejs.org)
 
-* [npm](https://www.npmjs.com/) version 7+.
+- [npm](https://www.npmjs.com/) version 7+.
 
 ### Forking Supabase on GitHub
 
@@ -38,6 +38,7 @@ To contribute code to Supabase, you must fork the [Supabase Repository](https://
 To build Supabase, you clone the source code repository:
 
 2. Clone your GitHub forked repository:
+
    ```sh
    git clone https://github.com/<github_username>/supabase.git
    ```
@@ -52,29 +53,36 @@ To build Supabase, you clone the source code repository:
 Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs/), or [Supabase Studio](https://app.supabase.io).
 
 1. Go to the [Supabase Website](https://supabase.com) directory
-    ```sh
-    cd www
-    ```
-    Go to the [Supabase Docs](https://supabase.com/docs/) directory
-    ```sh
-    cd web
-    ```
-    Go to the [Supabase Studio](https://app.supabase.io) directory
-    ```sh
-    cd studio
-    ```
+
+   ```sh
+   cd www
+   ```
+
+   Go to the [Supabase Docs](https://supabase.com/docs/) directory
+
+   ```sh
+   cd web
+   ```
+
+   Go to the [Supabase Studio](https://app.supabase.io) directory
+
+   ```sh
+   cd studio
+   ```
 
 2. Install npm dependencies:
 
-    npm
-    ```sh
-    npm install
-    ```
+   npm
 
-    or with yarn
-    ```sh
-    yarn install
-    ```
+   ```sh
+   npm install
+   ```
+
+   or with yarn
+
+   ```sh
+   yarn install
+   ```
 
 ## Start a Development Server
 
@@ -88,73 +96,81 @@ To debug code, and to see changes in real time, it is often useful to have a loc
 
 1. Start development server
 
-    npm
-    ```sh
-    npm run dev
-    ```
+   npm
 
-    or with yarn
-    ```sh
-    yarn dev
-    ```
+   ```sh
+   npm run dev
+   ```
+
+   or with yarn
+
+   ```sh
+   yarn dev
+   ```
 
 2. To access the local server, enter the following URL into your web browser:
 
-    ```sh
-    http://localhost:3000/
-    ```
+   ```sh
+   http://localhost:3000/
+   ```
 
 ### Supabase Docs Development Server
 
 1. Build development server
 
-    npm
-    ```sh
-    npm run build
-    ```
+   npm
 
-    or with yarn
-    ```sh
-    yarn build
-    ```
+   ```sh
+   npm run build
+   ```
+
+   or with yarn
+
+   ```sh
+   yarn build
+   ```
 
 2. Start development server
 
-    npm
-    ```sh
-    npm run start
-    ```
+   npm
 
-    or with yarn
-    ```sh
-    yarn start
-    ```
+   ```sh
+   npm run start
+   ```
+
+   or with yarn
+
+   ```sh
+   yarn start
+   ```
 
 3. To access the local server, enter the following URL into your web browser:
 
-    ```sh
-    http://localhost:3005/docs
-    ```
+   ```sh
+   http://localhost:3005/docs
+   ```
 
 ### Supabase Studio Development Server
 
 1. Start development server
 
-    npm
-    ```sh
-    npm run dev
-    ```
+   npm
 
-    or with yarn
-    ```sh
-    yarn dev
-    ```
+   ```sh
+   npm run dev
+   ```
+
+   or with yarn
+
+   ```sh
+   yarn dev
+   ```
 
 2. To access the local server, enter the following URL into your web browser:
 
-    ```sh
-    http://localhost:8082/
-    ```
+   ```sh
+   http://localhost:8082/
+   ```
 
 For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
 
@@ -168,7 +184,6 @@ Did you have an issue, like a merge conflict, or don't know how to open a pull r
 
 Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
-
 ## Monorepo
 
 This is a monorepo, using Turborepo. You must be using NPM 7 or higher.
@@ -176,7 +191,6 @@ This is a monorepo, using Turborepo. You must be using NPM 7 or higher.
 - Install a package: `npm install <package name> -w=<workspace to install in>`. eg:
   - `npm install @supabase/ui -w ui`: installs into `./packages/ui`
   - `npm install @supabase/ui -w docs`: installs into `./packages/docs`
-
 
 ### Development
 

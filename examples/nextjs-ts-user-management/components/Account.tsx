@@ -155,7 +155,7 @@ export default function Account({ session }: { session: AuthSession }) {
       </div>
 
       <div>
-        <button className="button block primary" onClick={() => updateProfile()} disabled={loading}>
+        <button className="button primary block" onClick={() => updateProfile()} disabled={loading}>
           {loading ? 'Loading ...' : 'Update'}
         </button>
       </div>

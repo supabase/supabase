@@ -17,7 +17,7 @@ export default function Main() {
     <Layouts.SidebarLayout
       sidebarContent={
         <div className="p-4 text-white">
-          <div className='text-sm uppercase'>Categories</div>
+          <div className="text-sm uppercase">Categories</div>
           <div>One</div>
           <div>Two</div>
         </div>

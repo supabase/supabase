@@ -11,7 +11,13 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function SidebarLayout({ children, sidebarContent }: { children: React.ReactNode, sidebarContent: React.ReactNode }) {
+export default function SidebarLayout({
+  children,
+  sidebarContent,
+}: {
+  children: React.ReactNode
+  sidebarContent: React.ReactNode
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -67,10 +73,7 @@ export default function SidebarLayout({ children, sidebarContent }: { children: 
                     alt="Workflow"
                   />
                 </div>
-                <div className="mt-5 h-0 flex-1 overflow-y-auto">
-                 
-                  {sidebarContent}
-                </div>
+                <div className="mt-5 h-0 flex-1 overflow-y-auto">{sidebarContent}</div>
               </div>
             </Transition.Child>
             <div className="w-14 flex-shrink-0" aria-hidden="true">
@@ -90,9 +93,7 @@ export default function SidebarLayout({ children, sidebarContent }: { children: 
                 alt="Workflow"
               />
             </div>
-            <div className="mt-5 flex flex-1 flex-col">
-              {sidebarContent}
-            </div>
+            <div className="mt-5 flex flex-1 flex-col">{sidebarContent}</div>
           </div>
         </div>
         <div className="flex flex-1 flex-col md:pl-64">
