@@ -11,9 +11,10 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
+      # disable this check while we migrate to monorepo
       - name: Run prettier
         run: |-
-          npx prettier --config ./.prettierrc -c 'apps/docs/**/*.{js,jsx,ts,tsx,css,md,json}'
+          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}' 
         # run: |-
         #   function run_check() {
         #     if $(grep -q '"prettier"' "$1") ; then
