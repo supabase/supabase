@@ -49,7 +49,7 @@ const Nav = () => {
     const content = (
       <div className="mb-3 flex md:h-full lg:flex-col">
         <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center h-10 w-10 rounded-md bg-gray-800 text-white dark:bg-white dark:text-gray-800 sm:h-12 sm:w-12">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-gray-800 text-white dark:bg-white dark:text-gray-800 sm:h-12 sm:w-12">
             {/* <!-- Heroicon name: chart-bar --> */}
             <svg
               className="h-6 w-6"
@@ -63,9 +63,9 @@ const Nav = () => {
             </svg>
           </div>
         </div>
-        <div className="ml-4 md:flex-1 md:flex md:flex-col md:justify-between lg:ml-0 lg:mt-4">
+        <div className="ml-4 md:flex md:flex-1 md:flex-col md:justify-between lg:ml-0 lg:mt-4">
           <div>
-            <p className="text-base font-medium text-gray-900 dark:text-white space-x-2">
+            <p className="space-x-2 text-base font-medium text-gray-900 dark:text-white">
               <span>{name}</span>
               {label && (
                 <Badge dot color="green">
@@ -73,10 +73,10 @@ const Nav = () => {
                 </Badge>
               )}
             </p>
-            <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
+            <p className="text-scale-1100 dark:text-dark-100 mt-1 text-sm">{description}</p>
           </div>
           {url && (
-            <p className="mt-2 text-sm font-medium text-brand-900 lg:mt-4">
+            <p className="text-brand-900 mt-2 text-sm font-medium lg:mt-4">
               <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />
             </p>
           )}
@@ -87,14 +87,14 @@ const Nav = () => {
       <a
         key={`solution_${idx}`}
         href={url}
-        className="-m-3 p-3 my-2 flex flex-col justify-between rounded-lg hover:bg-gray-50 dark:hover:bg-scale-600 transition ease-in-out duration-150"
+        className="dark:hover:bg-scale-600 -m-3 my-2 flex flex-col justify-between rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50"
       >
         {content}
       </a>
     ) : (
       <div
         key={`solution_${idx}`}
-        className="-m-3 p-3 flex flex-col justify-between rounded-lg transition ease-in-out duration-150"
+        className="-m-3 flex flex-col justify-between rounded-lg p-3 transition duration-150 ease-in-out"
       >
         {content}
       </div>
@@ -107,11 +107,11 @@ const Nav = () => {
 
   const HamburgerButton = (props: HamburgerButtonProps) => (
     <div
-      className="absolute inset-y-0 left-0 px-2 flex items-center lg:hidden"
+      className="absolute inset-y-0 left-0 flex items-center px-2 lg:hidden"
       onClick={() => props.toggleFlyOut()}
     >
       <button
-        className="inline-flex items-center justify-center p-2 rounded-md bg-gray-50 text-scale-900 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300"
+        className="text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset"
         aria-expanded="false"
       >
         <span className="sr-only">Open main menu</span>
@@ -155,13 +155,13 @@ const Nav = () => {
     <div
       className={
         `
-        inline-flex items-center 
-        px-1 border-b-2 border-transparent 
-        text-sm 
-        font-medium 
+        text-scale-1200 hover:text-brand-900 
+        inline-flex cursor-pointer items-center 
+        border-b-2 
+        border-transparent 
+        px-1
+        text-sm font-medium
         transition-colors
-        text-scale-1200 hover:text-brand-900
-        cursor-pointer
                 ` + props.active
       }
       onClick={props.onClick}
@@ -170,8 +170,8 @@ const Nav = () => {
         <span>{props.title}</span>
         <div
           className={
-            'flex items-center justify-center ml-2 h-5 w-5 text-scale-900 group-hover:text-scale-900 transition ease-in-out duration-150' +
-            (props.active && ' transform transition-all duration-100 rotate-180')
+            'text-scale-900 group-hover:text-scale-900 ml-2 flex h-5 w-5 items-center justify-center transition duration-150 ease-in-out' +
+            (props.active && ' rotate-180 transform transition-all duration-100')
           }
         >
           <IconChevronDown size={14} strokeWidth={2} />
@@ -184,14 +184,14 @@ const Nav = () => {
     <>
       <Announcement />
       <div className="sticky top-0 z-50">
-        <div className="absolute w-full h-full bg-scale-200 top-0 opacity-80"></div>
-        <nav className="backdrop-blur-sm border-b border-scale-400">
+        <div className="bg-scale-200 absolute top-0 h-full w-full opacity-80"></div>
+        <nav className="border-scale-400 border-b backdrop-blur-sm">
           {/* <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-10 xl:px-0"> */}
-          <div className="lg:container mx-auto relative flex justify-between h-16 lg:px-16 xl:px-20">
+          <div className="relative mx-auto flex h-16 justify-between lg:container lg:px-16 xl:px-20">
             <HamburgerButton toggleFlyOut={() => setOpen(true)} />
-            <div className="flex-1 flex items-center justify-center sm:items-stretch lg:justify-between">
+            <div className="flex flex-1 items-center justify-center sm:items-stretch lg:justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0 flex items-center">
+                <div className="flex flex-shrink-0 items-center">
                   <Link href="/" as="/">
                     <a className="block h-6 w-auto">
                       <Image
@@ -207,7 +207,7 @@ const Nav = () => {
                     </a>
                   </Link>
                 </div>
-                <div className="pl-4 hidden sm:ml-6 lg:flex sm:space-x-4">
+                <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
                   <FlyOutNavButton
                     title={'Product'}
                     onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
@@ -221,9 +221,9 @@ const Nav = () => {
                   <a
                     href="/pricing"
                     className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                    border-b-2 border-transparent p-5 px-1
+                    text-sm font-medium
                   `}
                   >
                     Pricing
@@ -231,9 +231,9 @@ const Nav = () => {
                   <a
                     href="/blog"
                     className={`
-                    inline-flex items-center px-1 border-b-2 border-transparent text-sm font-medium
-                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 p-5
-                    dark:text-dark-100 dark:hover:border-dark-100
+                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                    border-b-2 border-transparent p-5 px-1
+                    text-sm font-medium
                   `}
                   >
                     Blog
@@ -249,18 +249,18 @@ const Nav = () => {
                   target="_blank"
                   type="text"
                   icon={
-                    <div className="flex items-center justify-center  text-brand-800 w-4 h-4">
+                    <div className="text-brand-800 flex h-4  w-4 items-center justify-center">
                       <div
-                        className="text-scale-900 flex items-center justify-center w-3 h-3 
+                        className="text-scale-900 flex h-3 w-3 items-center justify-center 
                       
-                      group-hover:w-4  
+                      transition-all  
                       group-hover:h-4 
-                      group-hover:text-yellow-900 
-                      group-focus:w-4  
+                      group-hover:w-4 
+                      group-hover:text-yellow-900  
                       group-focus:h-4 
-                      group-focus:text-yellow-900 
+                      group-focus:w-4 
                       
-                      transition-all"
+                      group-focus:text-yellow-900"
                       >
                         <IconStar strokeWidth={2} />
                       </div>
@@ -276,7 +276,7 @@ const Nav = () => {
                   </Button>
                 </a>
                 <a href="https://app.supabase.io/">
-                  <Button className="text-white hidden lg:block">Start your project</Button>
+                  <Button className="hidden text-white lg:block">Start your project</Button>
                 </a>
               </div>
             </div>
@@ -294,13 +294,13 @@ const Nav = () => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <div className="p-4 md:p-8 h-screen w-screen fixed bg-white transform overflow-y-scroll -inset-y-0 z-50 dark:bg-scale-300">
+            <div className="dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8">
               <div className="absolute right-4 top-4 items-center justify-between">
                 <div className="-mr-2">
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 rounded-md bg-white text-scale-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400"
+                    className="text-scale-900 focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400 inline-flex items-center justify-center rounded-md bg-white p-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -323,50 +323,50 @@ const Nav = () => {
               </div>
               {/* </div> */}
               <div className="mt-6 mb-12">
-                <div className="pt-2 pb-4 space-y-1">
+                <div className="space-y-1 pt-2 pb-4">
                   <a
                     href="https://app.supabase.io/"
-                    className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white"
+                    className="text-scale-900 block pl-3 pr-4 text-base font-medium dark:text-white"
                   >
                     Sign in
                   </a>
                 </div>
-                <div className="pt-2 pb-4 space-y-1">
+                <div className="space-y-1 pt-2 pb-4">
                   <a
                     href="/docs"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                   >
                     Developers
                   </a>
                   <a
                     href="/company"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                   >
                     Company
                   </a>
                   <a
                     href="/pricing"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                   >
                     Pricing
                   </a>
                   <a
                     href="https://github.com/supabase/supabase"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                   >
                     GitHub
                   </a>
                   <a
                     href="/blog"
                     target="_blank"
-                    className="block pl-3 pr-4 py-2 text-base font-medium text-scale-900 hover:bg-gray-50 dark:hover:bg-scale-600 hover:border-gray-300 dark:text-white rounded-md"
+                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                   >
                     Blog
                   </a>
                 </div>
                 <div className="p-3">
-                  <p className="mb-6 text-sm text-scale-900">Products available:</p>
+                  <p className="text-scale-900 mb-6 text-sm">Products available:</p>
                   {iconSections}
                 </div>
               </div>

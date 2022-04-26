@@ -76,7 +76,7 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="w-full header--light block" key="light">
+            <div className="header--light block w-full" key="light">
               <Image
                 src={`${basePath}/images/product/database/header--light-2.png`}
                 alt="database header"
@@ -85,7 +85,7 @@ function Database() {
                 height="1116"
               />
             </div>,
-            <div className="w-full header--dark mr-0 dark:block" key="dark">
+            <div className="header--dark mr-0 w-full dark:block" key="dark">
               <Image
                 src={`${basePath}/images/product/database/header--dark-2.png`}
                 alt="database header"
@@ -100,11 +100,11 @@ function Database() {
 
         <SectionContainer>
           <div className="grid grid-cols-12">
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3">
-              <div className="mb-4 flex items-center space-x-2 p">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
+              <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
-                <div className="w-fit flex items-center">
+                <div className="flex w-fit items-center">
                   <Image
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
@@ -118,8 +118,8 @@ function Database() {
                 100% portable. Bring your existing Postgres database, or migrate away at any time.
               </p>
             </div>
-            <div className="mb-10 lg:mb-0 col-span-12 lg:col-span-3 lg:col-start-5">
-              <div className="mb-4 flex items-center space-x-2 p">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
+              <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={Solutions['authentication'].icon} />
@@ -133,7 +133,7 @@ function Database() {
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <div className="mb-4 flex items-center space-x-2 p">
+              <div className="p mb-4 flex items-center space-x-2">
                 <ProductIcon icon={Solutions['database'].icon} />
                 <IconX />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
@@ -240,18 +240,18 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="mt-0 col-span-12 lg:col-span-6 xl:col-span-12 xl:mb-8 flex">
+                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p>
-                    <p className="m-0 text-scale-1100">Libraries coming soon:</p>
+                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
                   </p>
-                  <div className="space-x-1 ml-1">
+                  <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>
                     <Badge dot={false}>C#</Badge>
                     <Badge dot={false}>Kotlin</Badge>
                   </div>
                 </div>
-                <div className="col-span-12 lg:col-span-6 xl:col-span-10 hidden xl:block" key={1}>
+                <div className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block" key={1}>
                   {/* <TweetCard
                     handle="@eunjae_lee"
                     img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
@@ -284,7 +284,7 @@ function Database() {
 
         <SectionContainer className="lg:py-48">
           <div className="grid grid-cols-12 lg:gap-16">
-            <div className="col-span-12 lg:col-span-6 xl:col-span-5 mb-8">
+            <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
               <h2 className="h3">Extend your database</h2>
 
               <p className="p">Supabase works natively with Postgres extensions.</p>
@@ -302,7 +302,7 @@ function Database() {
                 </Button>
               </Link>
             </div>
-            <div className="mt-8 lg:mt-0 col-span-12 lg:col-span-6 lg:col-start-7">
+            <div className="col-span-12 mt-8 lg:col-span-6 lg:col-start-7 lg:mt-0">
               <SplitCodeBlockCarousel
                 // @ts-ignore
                 content={ExtensionsExamplesData}

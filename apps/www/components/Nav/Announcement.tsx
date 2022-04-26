@@ -42,22 +42,22 @@ const Announcement = () => {
       <div
         onClick={handleLink}
         className="
-          relative
-          cursor-pointer
-          bg-gradient-to-r from-green-900 to-green-1000
-          hover:from-green-1000 hover:to-green-1100        
-          text-white 
-          flex flex-row space-x-3
+          to-green-1000
+          hover:from-green-1000
+          hover:to-green-1100 relative flex
+          cursor-pointer flex-row        
+          space-x-3 
+          bg-gradient-to-r from-green-900 text-white
         "
       >
         <div
           className="
-            flex items-center justify-center p-3 mx-auto text-sm lg:container lg:px-16 xl:px-20 font-medium 
-            lg:divide-x divide-white
+            mx-auto flex items-center justify-center divide-white p-3 text-sm font-medium lg:container lg:divide-x 
+            lg:px-16 xl:px-20
           "
         >
-          <span className="px-3 hidden lg:block">{announcement.text}</span>
-          <span className="px-3 flex items-center space-x-2">
+          <span className="hidden px-3 lg:block">{announcement.text}</span>
+          <span className="flex items-center space-x-2 px-3">
             <span>
               {
                 // @ts-ignore
@@ -68,7 +68,7 @@ const Announcement = () => {
           </span>
         </div>
         <div
-          className="transition-opacity absolute right-4 h-full flex items-center opacity-50 hover:opacity-100"
+          className="absolute right-4 flex h-full items-center opacity-50 transition-opacity hover:opacity-100"
           onClick={handleClose}
         >
           <IconX size={16} />

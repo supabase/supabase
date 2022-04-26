@@ -5,15 +5,15 @@ function ExampleCard(props: any) {
   return (
     <>
       <div
-        className="h-40 
-          bg-white 
-          dark:bg-scale-300 
-          border 
-          border-scale-400
-          border-t border-r border-l 
-          p-5
-          flex flex-col justify-between
-          rounded rounded-b-none
+        className="dark:bg-scale-300 
+          border-scale-400 
+          flex 
+          h-40 
+          flex-col
+          justify-between rounded rounded-b-none 
+          border
+          border-t border-r border-l
+          bg-white p-5
           "
       >
         <div className="mb-4">
@@ -23,9 +23,9 @@ function ExampleCard(props: any) {
             <img
               src={props.author_img}
               alt={props.author + ' GitHub profile picture'}
-              className="inline w-6 rounded-full border-scale-500"
+              className="border-scale-500 inline w-6 rounded-full"
             />
-            <span className="text-sm ml-2 text-scale-1200">{props.author}</span>
+            <span className="text-scale-1200 ml-2 text-sm">{props.author}</span>
           </div>
         </div>
       </div>
@@ -35,15 +35,15 @@ function ExampleCard(props: any) {
           className="
           bg-scale-100
           dark:bg-scale-400
-          border border-scale-400
-          border-b border-r border-l border-t-0
-          p-5
-          flex flex-col justify-between
-          rounded rounded-t-none"
+          border-scale-400 flex
+          flex-col justify-between rounded rounded-t-none
+          border
+          border-b border-r border-l
+          border-t-0 p-5"
         >
           <Link href={props.repo_url} as={props.repo_url} passHref>
             <a
-              className="text-sm text-scale-1100 hover:text-scale-1200 flex flex-row items-center"
+              className="text-scale-1100 hover:text-scale-1200 flex flex-row items-center text-sm"
               target="_blank"
             >
               <span>{props.repo_name}</span>
@@ -53,7 +53,7 @@ function ExampleCard(props: any) {
             </a>
           </Link>
 
-          <div className="flex gap-2 items-center mt-3">
+          <div className="mt-3 flex items-center gap-2">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
                 <img className="h-6" src="https://vercel.com/button" />

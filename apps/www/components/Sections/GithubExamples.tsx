@@ -30,7 +30,7 @@ function GithubExamples() {
           <p className="p ">
             Supported by a network of early advocates, contributors, and champions.
           </p>
-          <div className="flex items-center gap-2 justify-center py-4">
+          <div className="flex items-center justify-center gap-2 py-4">
             <Link href="/docs/guides/examples#guides" as="/docs/guides/examples#guides">
               <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
                 View guides
@@ -99,11 +99,11 @@ function GithubExamples() {
                 </SwiperSlide>
               )
             })}
-            <div className="container mx-auto hidden md:flex flex-row justify-between mt-3">
-              <div ref={prevRef} className="cursor-pointer ml-4 p">
+            <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
+              <div ref={prevRef} className="p ml-4 cursor-pointer">
                 <IconArrowLeft />
               </div>
-              <div ref={nextRef} className="cursor-pointer mr-4 p">
+              <div ref={nextRef} className="p mr-4 cursor-pointer">
                 <IconArrowRight />
               </div>
             </div>

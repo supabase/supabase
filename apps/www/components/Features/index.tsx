@@ -10,10 +10,10 @@ const Features = () => {
   const IconSections = Object.values(Solutions).map((solution: any) => {
     const { name, description, icon, label, url } = solution
     return (
-      <div key={name} className="mb-10 md:mb-0 space-y-4">
+      <div key={name} className="mb-10 space-y-4 md:mb-0">
         <div className="flex items-center">
           <ProductIcon icon={icon} />
-          <dt className="text-scale-1200 flex flex-row xl:flex-col ml-4">{name}</dt>
+          <dt className="text-scale-1200 ml-4 flex flex-row xl:flex-col">{name}</dt>
         </div>
 
         <p className="p">{description}</p>
@@ -29,9 +29,9 @@ const Features = () => {
   })
 
   return (
-    <SectionContainer className="pb-0 space-y-16">
+    <SectionContainer className="space-y-16 pb-0">
       <h3 className="h3">Build faster and focus on your products</h3>
-      <dl className="grid grid-cols-1 sm:grid-cols-2  gap-y-4 md:grid-cols-2 lg:grid-cols-4 md:gap-16 lg:gap-x-8 xl:gap-x-24">
+      <dl className="grid grid-cols-1 gap-y-4  sm:grid-cols-2 md:grid-cols-2 md:gap-16 lg:grid-cols-4 lg:gap-x-8 xl:gap-x-24">
         {IconSections}
       </dl>
     </SectionContainer>

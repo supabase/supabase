@@ -60,7 +60,7 @@ function ExpertPartnersPage(props: Props) {
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
-            <h2 className="text-xl text-scale-900">{meta_description}</h2>
+            <h2 className="text-scale-900 text-xl">{meta_description}</h2>
           </div>
           <div className="grid grid-cols-12 lg:gap-16 xl:gap-32">
             <div className="col-span-3">
@@ -68,7 +68,7 @@ function ExpertPartnersPage(props: Props) {
               <div className="space-y-6">
                 {/* Search Bar */}
                 <div className="space-y-4">
-                  <div className="mb-2 text-sm text-scale-900">Explore more</div>
+                  <div className="text-scale-900 mb-2 text-sm">Explore more</div>
                   <PartnerLinkBox
                     title="Integrations"
                     color="blue"
@@ -77,7 +77,7 @@ function ExpertPartnersPage(props: Props) {
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="w-6 h-6"
+                        className="h-6 w-6"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -99,7 +99,7 @@ function ExpertPartnersPage(props: Props) {
                     icon={
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="w-5 h-5"
+                        className="h-5 w-5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

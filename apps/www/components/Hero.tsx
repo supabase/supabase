@@ -13,22 +13,22 @@ const Hero = () => {
           <main className="">
             <div className="mx-auto">
               <div className="lg:grid lg:grid-cols-12 lg:gap-16">
-                <div className="md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left lg:flex lg:items-center">
+                <div className="md:mx-auto md:max-w-2xl lg:col-span-6 lg:flex lg:items-center lg:text-left">
                   <div
                     className="
-                    sm:mx-auto md:w-3/4 lg:w-full lg:mx-0 
-                    space-y-12"
+                    space-y-12 sm:mx-auto md:w-3/4 lg:mx-0 
+                    lg:w-full"
                   >
                     <div>
                       <h1
                         className="
-                        sm:leading-none 
-                        text-xl lg:text-4xl xl:text-5xl
-                        text-scale-1200
+                        text-scale-1200 
+                        text-xl sm:leading-none lg:text-4xl
+                        xl:text-5xl
                         "
                       >
                         <span className="block">The Open Source</span>
-                        <span className="text-brand-900 md:ml-0 block">Firebase Alternative</span>
+                        <span className="text-brand-900 block md:ml-0">Firebase Alternative</span>
                       </h1>
                       <div>
                         <p className="p text-base sm:mt-5 lg:text-lg ">
@@ -38,7 +38,7 @@ const Hero = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex gap-2 items-center">
+                    <div className="flex items-center gap-2">
                       <Link href="https://app.supabase.io" as="https://app.supabase.io" passHref>
                         <Button as="a" size="small" className="text-white">
                           Start your project
@@ -55,17 +55,17 @@ const Hero = () => {
                       <div className="w-full sm:max-w-lg lg:ml-0">
                         <div className="flex flex-wrap items-center justify-start">
                           <img
-                            className="h-8 sm:h-10 pr-5 md:pr-10 mb-5"
+                            className="mb-5 h-8 pr-5 sm:h-10 md:pr-10"
                             src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
-                            className="relative h-5 sm:h-7 pr-5 md:pr-10 mb-5"
+                            className="relative mb-5 h-5 pr-5 sm:h-7 md:pr-10"
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
                           <img
-                            className="relative h-5 sm:h-7 pr-5 md:pr-10 mb-5"
+                            className="relative mb-5 h-5 pr-5 sm:h-7 md:pr-10"
                             src={`${basePath}/images/logos/coatue.png`}
                             alt="Coatue"
                           />
@@ -74,20 +74,20 @@ const Hero = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex content-center mt-16 sm:mt-24 lg:absolute lg:-right-80 lg:w-9/12 lg:mt-0 lg:col-span-6 xl:relative xl:right-0 xl:w-full">
-                  <div className="flex flex-col items-center justify-center relative w-full rounded-md">
-                    <div className="w-full rounded-t-md h-5 bg-scale-400 flex items-center justify-start px-2">
-                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
-                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
-                      <div className="h-2 w-2 mr-2 rounded-full bg-scale-800" />
+                <div className="mt-16 flex content-center sm:mt-24 lg:absolute lg:-right-80 lg:col-span-6 lg:mt-0 lg:w-9/12 xl:relative xl:right-0 xl:w-full">
+                  <div className="relative flex w-full flex-col items-center justify-center rounded-md">
+                    <div className="bg-scale-400 flex h-5 w-full items-center justify-start rounded-t-md px-2">
+                      <div className="bg-scale-800 mr-2 h-2 w-2 rounded-full" />
+                      <div className="bg-scale-800 mr-2 h-2 w-2 rounded-full" />
+                      <div className="bg-scale-800 mr-2 h-2 w-2 rounded-full" />
                     </div>
                     <div
-                      className="w-full relative bg-scale-1000 shadow-lg rounded-b-md"
+                      className="bg-scale-1000 relative w-full rounded-b-md shadow-lg"
                       style={{ padding: '56.25% 0 0 0' }}
                     >
                       <iframe
                         title="Demo video showcasing Supabase"
-                        className="absolute w-full h-full rounded-b-md"
+                        className="absolute h-full w-full rounded-b-md"
                         src="https://www.youtube-nocookie.com/embed/dBOSUER_5T4?playlist=dBOSUER_5T4&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1"
                         style={{ top: 0, left: 0 }}
                         frameBorder="0"

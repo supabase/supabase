@@ -14,7 +14,7 @@ const BuiltExamples = () => {
       <div className="text-center">
         <h3 className="h2">What can you build with supabase?</h3>
         <p className="p">There are many example apps and starter projects to get going</p>
-        <div className="flex gap-2 justify-center py-4">
+        <div className="flex justify-center gap-2 py-4">
           <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
             <Button as="a" type="default" size="small">
               View all examples
@@ -31,7 +31,7 @@ const BuiltExamples = () => {
           </Link>
         </div>
       </div>
-      <div className="grid grid-cols-12 gap-5 mt-16">
+      <div className="mt-16 grid grid-cols-12 gap-5">
         {Examples.slice(0, 6).map((example, i) => {
           return (
             <div
