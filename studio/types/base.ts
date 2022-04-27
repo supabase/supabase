@@ -30,7 +30,7 @@ export interface Project extends ProjectBase {
   kpsVersion?: string
   internalApiKey?: string
   restUrl?: string
-  // the same as stripe.products.metadata.supabase_prod_id
+  // store subscription tier products.metadata.supabase_prod_id
   subscription_tier?: string
 
   /**
