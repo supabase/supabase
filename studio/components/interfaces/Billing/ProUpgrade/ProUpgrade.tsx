@@ -142,6 +142,7 @@ const ProUpgrade: FC<Props> = ({
           category: 'success',
           message:
             'Your project has been updated and is currently restarting to update its instance size',
+          duration: 8000,
         })
         router.push(`/project/${projectRef}`)
       } else {
