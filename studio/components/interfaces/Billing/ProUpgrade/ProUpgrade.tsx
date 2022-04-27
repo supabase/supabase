@@ -5,7 +5,7 @@ import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import Divider from 'components/ui/Divider'
 import {
@@ -137,7 +137,7 @@ const ProUpgrade: FC<Props> = ({
       })
     } else {
       if (isChangingComputeSize) {
-        app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
         ui.setNotification({
           category: 'success',
           message:

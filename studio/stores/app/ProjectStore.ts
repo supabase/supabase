@@ -31,8 +31,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     if (!response.error) {
       const project = response as Project
       if (
-        (project.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-          project.status === PROJECT_STATUS.RESTORING) &&
+        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
         project.restUrl &&
         project.internalApiKey
       ) {
