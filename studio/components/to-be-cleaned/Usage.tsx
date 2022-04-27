@@ -272,6 +272,10 @@ export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filt
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
 
+  if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG) {
+    return <></>
+  }
+
   const tier =
     subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO ? 'pro' : 'free'
 
