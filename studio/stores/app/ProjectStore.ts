@@ -54,12 +54,12 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     if (!response.error) {
       const subscriptionInfo = response as {
         tier: {
-          key: string
+          supabase_prod_id: string
         }
       }
       // update subscription_tier key
       const clone = cloneDeep(this.data[projectId])
-      clone.subscription_tier = subscriptionInfo.tier.key
+      clone.subscription_tier = subscriptionInfo.tier.supabase_prod_id
       this.data[projectId] = clone
     }
   }
