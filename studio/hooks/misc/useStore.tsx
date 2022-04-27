@@ -49,15 +49,15 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
 
     autorun(() => {
       if (ui.notification) {
-        const { id, category, error, message, progress } = ui.notification
+        const { id, category, error, message, progress, duration } = ui.notification
         switch (category) {
           case 'info':
-            return toast(message, { id })
+            return toast(message, { id, duration })
           case 'success':
-            return toast.success(message, { id })
+            return toast.success(message, { id, duration })
           case 'error':
             console.error('Error:', { error, message })
-            return toast.error(message, { id })
+            return toast.error(message, { id, duration })
           case 'loading':
             if (progress) {
               return toast.loading(
