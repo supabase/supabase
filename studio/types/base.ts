@@ -30,6 +30,7 @@ export interface Project extends ProjectBase {
   kpsVersion?: string
   internalApiKey?: string
   restUrl?: string
+  // FREE, PRO or PAYG
   subscription_tier?: string
 
   /**
