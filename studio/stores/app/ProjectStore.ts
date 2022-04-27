@@ -42,7 +42,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       }
       this.data[project.id] = project
 
-      // lazily fetch
+      // lazy fetchs
       this.fetchSubscriptionTier(project.id, project.ref)
     }
   }
