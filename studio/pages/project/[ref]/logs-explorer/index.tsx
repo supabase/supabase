@@ -23,7 +23,7 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { UserContent } from 'types'
 import toast from 'react-hot-toast'
 import dayjs from 'dayjs'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/Logs.UpgradePrompt'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
