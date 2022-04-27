@@ -1,0 +1,70 @@
+---
+id: auth-signout
+title: "auth.signOut()"
+slug: auth-signout
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Signs out the current user, if there is a logged in user.
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase.auth.signOut();
+
+final error = res.error;
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Sign out
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase.auth.signOut();
+
+final error = res.error;
+```
+
+
+</TabsPanel>
+
+</Tabs>

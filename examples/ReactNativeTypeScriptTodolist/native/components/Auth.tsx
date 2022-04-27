@@ -1,37 +1,37 @@
-import React, {useState} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
-import {Styles} from '../lib/constants';
-import {supabase} from '../lib/initSupabase';
+import React, { useState } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
+import { Styles } from '../lib/constants'
+import { supabase } from '../lib/initSupabase'
 
-import {Button, Input} from 'react-native-elements';
+import { Button, Input } from 'react-native-elements'
 
 export default function Auth() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState('')
 
   const handleLogin = async (type: string, email: string, password: string) => {
-    setLoading(type);
-    const {error, user} =
+    setLoading(type)
+    const { error, user } =
       type === 'LOGIN'
-        ? await supabase.auth.signIn({email, password})
-        : await supabase.auth.signUp({email, password});
+        ? await supabase.auth.signIn({ email, password })
+        : await supabase.auth.signUp({ email, password })
     if (!error && user && type === 'SIGNUP') {
-      Alert.alert('Check your email for the login link!');
+      Alert.alert('Check your email for the login link!')
     }
     if (error) {
-      Alert.alert(error.message);
+      Alert.alert(error.message)
     }
-    setLoading('');
-  };
+    setLoading('')
+  }
 
   return (
     <View>
-      <View style={[styles.verticallySpaced, {marginTop: 20}]}>
+      <View style={[styles.verticallySpaced, { marginTop: 20 }]}>
         <Input
           label="Email"
-          leftIcon={{type: 'font-awesome', name: 'envelope'}}
-          onChangeText={text => setEmail(text)}
+          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+          onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={'none'}
@@ -40,15 +40,15 @@ export default function Auth() {
       <View style={styles.verticallySpaced}>
         <Input
           label="Password"
-          leftIcon={{type: 'font-awesome', name: 'lock'}}
-          onChangeText={text => setPassword(text)}
+          leftIcon={{ type: 'font-awesome', name: 'lock' }}
+          onChangeText={(text) => setPassword(text)}
           value={password}
           secureTextEntry={true}
           placeholder="Password"
           autoCapitalize={'none'}
         />
       </View>
-      <View style={[styles.verticallySpaced, {marginTop: 20}]}>
+      <View style={[styles.verticallySpaced, { marginTop: 20 }]}>
         <Button
           title="Sign in"
           disabled={!!loading.length}
@@ -65,7 +65,7 @@ export default function Auth() {
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     alignSelf: 'stretch',
   },
-});
+})
