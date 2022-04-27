@@ -124,28 +124,30 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
-        <div className="space-y-8">
-          <div className="mx-6">
-            <h5>Client libraries</h5>
+      {project.status === PROJECT_STATUS.COMING_UP && (
+        <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h5>Client libraries</h5>
+            </div>
+            <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
+              {CLIENT_LIBRARIES.map((library) => (
+                <ClientLibrary key={library.language} {...library} />
+              ))}
+            </div>
           </div>
-          <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
-            {CLIENT_LIBRARIES.map((library) => (
-              <ClientLibrary key={library.language} {...library} />
-            ))}
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h5>Example projects</h5>
+            </div>
+            <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {EXAMPLE_PROJECTS.map((project) => (
+                <ExampleProject key={project.url} {...project} />
+              ))}
+            </div>
           </div>
         </div>
-        <div className="space-y-8">
-          <div className="mx-6">
-            <h5>Example projects</h5>
-          </div>
-          <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {EXAMPLE_PROJECTS.map((project) => (
-              <ExampleProject key={project.url} {...project} />
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
