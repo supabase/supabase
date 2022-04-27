@@ -94,7 +94,9 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const { ui } = useStore()
   const router = useRouter()
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-  const isProjectBuilding = [PROJECT_STATUS.COMING_UP].includes(ui.selectedProject?.status ?? '')
+  const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
+    ui.selectedProject?.status ?? ''
+  )
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (

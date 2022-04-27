@@ -6,7 +6,7 @@ import { Button, Form, Input, Modal, IconArrowLeft, Alert } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { CANCELLATION_REASONS } from '../Billing.constants'
 import { generateFeedbackMessage } from './ExitSurvey.utils'
 import { UpdateSuccess } from '../'
@@ -121,7 +121,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         })
       } else {
         if (willChangeComputeSize) {
-          app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+          app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'info',
             message: getDowngradeSuccessMessage(),
