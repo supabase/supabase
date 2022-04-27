@@ -5,7 +5,15 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "docker:dev": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker-compose up",
     "docker:down": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
@@ -14,7 +22,6 @@
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables"
   },
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
@@ -22,21 +29,28 @@
     "@supabase/supabase-js": "^1.28.1",
     "@types/jest": "^27.0.3",
     "@types/node": "^14.14.14",
+    "autoprefixer": "^10.4.4",
     "axios": "^0.24.0",
     "babel-jest": "^27.3.1",
     "dotenv": "^10.0.0",
     "faker": "^5.5.3",
     "jest": "^27.3.1",
+    "postcss": "^8.4.12",
+    "prettier": "^2.6.2",
+    "prettier-plugin-tailwindcss": "^0.1.8",
+    "tailwindcss": "^3.0.24",
     "ts-jest": "^27.0.7",
     "ts-node": "^9.1.1",
+    "turbo": "latest",
     "typescript": "^4.5.2"
-  },
-  "directories": {
-    "doc": "docs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
+  },
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=14.0.0"
   },
   "keywords": [
     "postgres",
@@ -45,5 +59,9 @@
     "functions",
     "database",
     "auth"
-  ]
+  ],
+  "dependencies": {
+    "@mdx-js/react": "^2.1.1",
+    "mini-svg-data-uri": "^1.4.4"
+  }
 }

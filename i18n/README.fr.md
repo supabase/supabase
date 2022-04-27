@@ -49,7 +49,7 @@ Supabase est une combinaison d'outils open source. Nous développons les fonctio
 **Architecture actuelle**
 
 Supabase est une [plateforme hébergée](https://app.supabase.io). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
-Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/self-hosting) et [développer localement](https://supabase.com/docs/guides/local-development).
+Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/hosting/overview) et [développer localement](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

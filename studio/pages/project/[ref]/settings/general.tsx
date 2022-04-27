@@ -182,7 +182,7 @@ const ProjectDeleteModal = ({ project }: any) => {
   async function handleDeleteProject() {
     setLoading(true)
     try {
-      const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
+      const response = await delete_(`${API_URL}/projects/${project.ref}`)
       if (response.error) throw response.error
       app.onProjectDeleted(response)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
