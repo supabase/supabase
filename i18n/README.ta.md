@@ -55,7 +55,7 @@
 **கட்டிடக்கலை**
 
 சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.io). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
-நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/self-hosting) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
+நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
 ![கட்டிடக்கலை](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

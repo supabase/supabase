@@ -1,10 +1,10 @@
-import React from 'react';
-import {StyleSheet, View, Platform, StatusBar} from 'react-native';
-import {ThemeProvider, colors, Text} from 'react-native-elements';
-import {Styles} from './native/lib/constants';
-import {UserContextProvider, useUser} from './native/components/UserContext';
-import List from './native/components/TodoList';
-import Auth from './native/components/Auth';
+import React from 'react'
+import { StyleSheet, View, Platform, StatusBar } from 'react-native'
+import { ThemeProvider, colors, Text } from 'react-native-elements'
+import { Styles } from './native/lib/constants'
+import { UserContextProvider, useUser } from './native/components/UserContext'
+import List from './native/components/TodoList'
+import Auth from './native/components/Auth'
 
 const theme = {
   colors: {
@@ -13,13 +13,13 @@ const theme = {
       ios: colors.platform.ios,
     }),
   },
-};
+}
 
 const Container = () => {
-  const {user} = useUser();
+  const { user } = useUser()
 
-  return user ? <List /> : <Auth />;
-};
+  return user ? <List /> : <Auth />
+}
 
 export default function App() {
   return (
@@ -34,7 +34,7 @@ export default function App() {
         </View>
       </ThemeProvider>
     </UserContextProvider>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     alignSelf: 'stretch',
   },
-});
+})
