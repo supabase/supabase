@@ -163,7 +163,7 @@ const SupportNew = () => {
     if (x.name === 'project') {
       const selectedProject = projects.find((project: any) => project.ref === x.value)
       if (
-        (selectedProject?.subscription_tier ?? 'Free') === 'Free' &&
+        (selectedProject?.subscription_tier ?? 'FREE') === 'FREE' &&
         formState.severity.value === 'Critical'
       ) {
         formDispatch({
@@ -358,7 +358,7 @@ const SupportNew = () => {
                           (project: any) => project.ref === formState.project.value
                         )
                         const isAllowedCritical =
-                          (selectedProject?.subscription_tier ?? 'Free') !== 'Free'
+                          (selectedProject?.subscription_tier ?? 'FREE') !== 'FREE'
                         return (
                           <Listbox.Option
                             key={`option-${option.value}`}
