@@ -36,8 +36,6 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       ) {
         const success = await pingPostgrest(project.restUrl, project.internalApiKey, {
           kpsVersion: project.kpsVersion,
-          // only wait for 2s. to improve project first load
-          timeout: 2000,
         })
         project.postgrestStatus = success ? 'ONLINE' : 'OFFLINE'
       }

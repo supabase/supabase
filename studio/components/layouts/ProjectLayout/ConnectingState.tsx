@@ -19,9 +19,9 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   useEffect(() => {
     if (!project.restUrl || !project.internalApiKey) return
 
-    // Check project connection status every 7 seconds
-    // pingPostgrest timeouts in 5s, wait for another 2s before checking again
-    checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 7000)
+    // Check project connection status every 4 seconds
+    // pingPostgrest timeouts in 2s, wait for another 2s before checking again
+    checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
       clearInterval(checkProjectConnectionIntervalRef.current)
     }
