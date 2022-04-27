@@ -12,7 +12,6 @@ import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
  * @returns number
  */
 export const deriveFeatureCost = (paygStats: PaygStats | undefined, feature: ProductFeature) => {
-  console.log('paygStats', paygStats)
   let rawUsage = paygStats?.[feature.attribute]?.[feature.pricingModel]
 
   if (rawUsage && feature.freeQuota) {
