@@ -12,7 +12,7 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     expect(type).toBe('text')
   })
   test('should default column type to text if the first row data value is null', () => {
-    const mockData = [{ id: null, name: 'bob', age: '42' }]
+    const mockData = [{ id: 'null', name: 'bob', age: '42' }]
     const type = inferColumnType('id', mockData)
     expect(type).toBe('text')
   })
