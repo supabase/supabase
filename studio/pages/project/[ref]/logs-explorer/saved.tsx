@@ -22,7 +22,6 @@ export const LogsSavedPage: NextPage = () => {
     }
   }, [ui.selectedProject])
 
-  const contentList = content.list()
   if (content.isLoading) {
     return (
       <LogsExplorerLayout>
@@ -30,8 +29,8 @@ export const LogsSavedPage: NextPage = () => {
       </LogsExplorerLayout>
     )
   }
+  const saved = content.logSqlSnippets()
 
-  const saved: UserContent[] = (contentList?.[0] || []).filter((content: UserContent)=> content.type === 'log_sql')
   return (
     <LogsExplorerLayout>
       <div className="flex flex-col gap-3">
