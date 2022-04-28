@@ -9,6 +9,7 @@ import StorageLayout from './StorageLayout/StorageLayout'
 import AccountLayout from './AccountLayout/AccountLayout'
 import { AccountLayoutWithoutAuth } from './AccountLayout/AccountLayout'
 import WizardLayout from './WizardLayout'
+import { WizardLayoutWithoutAuth } from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
 import LogsExplorerLayout from './LogsExplorerLayout/LogsExplorerLayout'
@@ -24,6 +25,7 @@ export {
   AccountLayout,
   AccountLayoutWithoutAuth,
   WizardLayout,
+  WizardLayoutWithoutAuth,
   VercelIntegrationLayout,
   BillingLayout,
   LogsExplorerLayout,
