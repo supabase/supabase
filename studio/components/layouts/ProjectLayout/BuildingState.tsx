@@ -8,7 +8,7 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
+import { get, getWithTimeout } from 'lib/common/fetch'
 import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 
@@ -20,7 +20,10 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
   async function checkServer() {
     if (!project) return
 
-    const projectStatus = await get(`${API_URL}/projects/${project.ref}/status`)
+    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
+      timeout: 2000,
+    })
+
     if (projectStatus && !projectStatus.error) {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
