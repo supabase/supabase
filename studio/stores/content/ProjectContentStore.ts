@@ -9,6 +9,7 @@ import { API_URL } from 'lib/constants'
 // [Joshen] This will be the new ProjectContentStore
 // but use the one under the stores folder projectContentStore first while we transition
 
+type CustomFilter = (content: UserContent) => boolean
 export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
@@ -20,6 +21,7 @@ export interface IProjectContentStore {
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
+  logSqlSnippets: (filter?: CustomFilter) => UserContent[]
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
@@ -131,6 +133,15 @@ export default class ProjectContentStore implements IProjectContentStore {
 
       return arr_filtered
     }
+  }
+
+  logSqlSnippets(filter?: CustomFilter) {
+    let arr = (Object.values(this.data)[0] as any || []) as UserContent[]
+    let snippets = arr.filter(c => c.type === 'log_sql')
+    if (filter) {
+      snippets = snippets.filter(filter)
+    }
+    return snippets.sort((a, b) => a.name.localeCompare(b.name))
   }
 
   // @ts-ignore

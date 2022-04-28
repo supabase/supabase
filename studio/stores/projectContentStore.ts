@@ -10,6 +10,7 @@ import { API_URL } from 'lib/constants'
  *   import { useProjectContentStore } from 'stores/userContent/projectContentStore'
  *   const contentStore = useProjectContentStore(projectRef)
  *   contentStore.load() // inside usEffect()
+ * @deprecated use content store on RootStore instead.
  */
 let store: any = null
 let projectRef: any = null
@@ -32,6 +33,7 @@ interface UserContentMap {
 
 /**
  * MobX Store
+ * @deprecated
  */
 export default class ProjectContent {
   STATES = {
