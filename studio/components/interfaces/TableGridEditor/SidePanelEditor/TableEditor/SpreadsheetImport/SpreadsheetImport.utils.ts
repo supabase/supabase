@@ -93,7 +93,7 @@ export const revertSpreadsheet = (headers: string[], rows: any[]) => {
   return Papa.unparse(rows, { columns: headers })
 }
 
-const inferColumnType = (column: string, rows: object[]) => {
+export const inferColumnType = (column: string, rows: object[]) => {
   // General strategy is to check the first row first, before checking across all the rows
   // to ensure uniformity in data type. Thinking we do this as an optimization instead of
   // checking all the rows up front.
@@ -105,7 +105,7 @@ const inferColumnType = (column: string, rows: object[]) => {
   const columnDataAcrossRows = rows.map((row: object) => (row as any)[column])
 
   // Unable to infer any type as there's no data, default to text
-  if (!columnData) {
+  if (columnData === undefined || columnData === null) {
     return 'text'
   }
 
@@ -121,9 +121,9 @@ const inferColumnType = (column: string, rows: object[]) => {
   }
 
   // Infer boolean type
-  if (includes(['true', 'false'], columnData.toLowerCase())) {
+  if (includes(['true', 'false'], columnData.toString().toLowerCase())) {
     const isAllBoolean = columnDataAcrossRows.every((item: any) =>
-      includes(['true', 'false'], item.toLowerCase())
+      includes(['true', 'false'], item.toString().toLowerCase())
     )
     if (isAllBoolean) {
       return 'boolean'
