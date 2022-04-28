@@ -6,12 +6,13 @@ import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
 import DocsLayout from './DocsLayout/DocsLayout'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 import StorageLayout from './StorageLayout/StorageLayout'
-
 import AccountLayout from './AccountLayout/AccountLayout'
+import { AccountLayoutWithoutAuth } from './AccountLayout/AccountLayout'
 import WizardLayout from './WizardLayout'
 import VercelIntegrationLayout from './VercelIntegrationLayout'
 import BillingLayout from './BillingLayout'
 import LogsExplorerLayout from './LogsExplorerLayout/LogsExplorerLayout'
+
 export {
   AuthLayout,
   DatabaseLayout,
@@ -21,10 +22,11 @@ export {
   SettingsLayout,
   StorageLayout,
   AccountLayout,
+  AccountLayoutWithoutAuth,
   WizardLayout,
   VercelIntegrationLayout,
   BillingLayout,
-  LogsExplorerLayout
-
+  LogsExplorerLayout,
 }
+
 export default ProjectLayout

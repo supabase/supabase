@@ -5,52 +5,26 @@ import { NextRouter, useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
 import { Typography } from '@supabase/ui'
 
-import { Project } from 'types'
+import { NextPageWithLayout, Project } from 'types'
 import { useStore, withAuth } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
-import { AccountLayout } from 'components/layouts'
+import { AccountLayoutWithoutAuth } from 'components/layouts'
 import Landing from 'components/interfaces/Home/Landing'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 
-const Home: NextPage = () => {
+const Home: NextPageWithLayout = () => {
   const { app, ui } = useStore()
-  const { profile } = ui
 
   const router = useRouter()
 
   const [isDeletingProject, setIsDeletingProject] = useState<boolean>(false)
   const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project>()
-
-  if (!profile) {
-    return <UnauthorizedLanding />
-  } else {
-    const isRedirect = isRedirectFromThirdPartyService(router)
-    if (isRedirect) {
-      const queryParams = (router.query as any) || {}
-      const params = new URLSearchParams(queryParams)
-      if (router.query?.next?.includes('https://vercel.com')) {
-        router.push(`/vercel/integrate?${params.toString()}`)
-      } else if (router.query?.next?.includes('new-project')) {
-        router.push('/new/project')
-      } else if (router.query['x-amzn-marketplace-token'] != undefined) {
-        router.push(`/account/associate?${params.toString()}`)
-      } else if (
-        typeof router.query?.next === 'string' &&
-        router.query?.next?.startsWith('project/_/')
-      ) {
-        router.push(router.query.next as string)
-      } else {
-        router.push('/')
-      }
-      return <Connecting />
-    }
-  }
 
   const onSelectDeleteProject = async (project: Project) => {
     setSelectedProjectToDelete(project)
@@ -80,16 +54,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <AccountLayout
-      title="Supabase"
-      // @ts-ignore
-      breadcrumbs={[
-        {
-          key: `supabase-projects`,
-          label: 'Projects',
-        },
-      ]}
-    >
+    <>
       {app.organizations.isLoading ? (
         <div className="flex h-full items-center justify-center space-x-2">
           <Connecting />
@@ -132,10 +97,13 @@ const Home: NextPage = () => {
         onCancel={() => setSelectedProjectToDelete(undefined)}
         onConfirm={() => onDeleteProject(selectedProjectToDelete)}
       />
-    </AccountLayout>
+    </>
   )
 }
-export default withAuth(observer(Home))
+
+Home.getLayout = (page) => <IndexLayout>{page}</IndexLayout>
+
+export default observer(Home)
 
 // detect for redirect from 3rd party service like vercel, aws...
 function isRedirectFromThirdPartyService(router: NextRouter) {
@@ -162,3 +130,51 @@ const UnauthorizedLanding = () => {
 
   return autoLogin ? <Connecting /> : <Landing />
 }
+
+const IndexLayout = withAuth(
+  observer(({ children }) => {
+    const { ui } = useStore()
+    const { profile } = ui
+
+    const router = useRouter()
+
+    if (!profile) {
+      return <UnauthorizedLanding />
+    } else {
+      const isRedirect = isRedirectFromThirdPartyService(router)
+      if (isRedirect) {
+        const queryParams = (router.query as any) || {}
+        const params = new URLSearchParams(queryParams)
+        if (router.query?.next?.includes('https://vercel.com')) {
+          router.push(`/vercel/integrate?${params.toString()}`)
+        } else if (router.query?.next?.includes('new-project')) {
+          router.push('/new/project')
+        } else if (router.query['x-amzn-marketplace-token'] != undefined) {
+          router.push(`/account/associate?${params.toString()}`)
+        } else if (
+          typeof router.query?.next === 'string' &&
+          router.query?.next?.startsWith('project/_/')
+        ) {
+          router.push(router.query.next as string)
+        } else {
+          router.push('/')
+        }
+        return <Connecting />
+      }
+    }
+
+    return (
+      <AccountLayoutWithoutAuth
+        title="Supabase"
+        breadcrumbs={[
+          {
+            key: `supabase-projects`,
+            label: 'Projects',
+          },
+        ]}
+      >
+        {children}
+      </AccountLayoutWithoutAuth>
+    )
+  })
+)
