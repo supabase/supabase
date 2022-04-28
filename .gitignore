@@ -11,6 +11,9 @@ allure-report
 .nyc_output
 *.log
 
+# turbo
+.turbo
+
 # Logs
 *.log
 npm-debug.log*
@@ -78,6 +81,7 @@ typings/
 .env
 .env.test
 .env.local
+.env.production
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

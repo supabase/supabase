@@ -4,9 +4,9 @@ import { observer } from 'mobx-react-lite'
 import { Badge, IconLoader, IconMonitor, IconServer } from '@supabase/ui'
 
 import { Project } from 'types'
-import { headWithTimeout } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import pingPostgrest from 'lib/pingPostgrest'
 
 interface Props {
   project: Project
@@ -20,6 +20,7 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
     if (!project.restUrl || !project.internalApiKey) return
 
     // Check project connection status every 4 seconds
+    // pingPostgrest timeouts in 2s, wait for another 2s before checking again
     checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
       clearInterval(checkProjectConnectionIntervalRef.current)
@@ -27,16 +28,10 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   }, [project])
 
   const testProjectConnection = async () => {
-    const headers = {
-      apikey: project.internalApiKey,
-      Authorization: `Bearer ${project.internalApiKey}`,
-    }
-    const { error } = await headWithTimeout(project.restUrl!, [], {
-      headers,
-      credentials: 'omit',
-      timeout: 2000,
+    const result = await pingPostgrest(project.restUrl!, project.internalApiKey!, {
+      kpsVersion: project.kpsVersion,
     })
-    if (error === undefined) {
+    if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
     }

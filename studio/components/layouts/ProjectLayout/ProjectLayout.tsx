@@ -78,9 +78,6 @@ interface ContentWrapperProps {
 /**
  * Check project.status to show building state or error state
  *
- * TODO: how can we test project connection properly?
- * ex: the status is ACTIVE_HEALTHY but the project instance is down.
- *
  * [Joshen] As of 210422: Current testing connection by pinging postgres
  * Ideally we'd have a more specific monitoring of the project such as during restarts
  * But that will come later: https://supabase.slack.com/archives/C01D6TWFFFW/p1650427619665549
@@ -103,12 +100,9 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
-      ) : // [TODO] Temp fix commenting out ConnectingState as some projects take
-      // really long to ping postgrest such that the timeout cancels out too early
-      // requiresDbConnection && isProjectOffline ? (
-      //   <ConnectingState project={ui.selectedProject} />
-      // ) :
-      requiresDbConnection && isProjectBuilding ? (
+      ) : requiresDbConnection && isProjectOffline ? (
+        <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
       ) : (
         <>{children}</>

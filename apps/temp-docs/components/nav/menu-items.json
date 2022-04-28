@@ -1,0 +1,806 @@
+{
+  "Docs": {
+    "Overview": [
+      { "text": "Introduction", "link": "/" },
+      { "text": "Architecture", "link": "/architecture" },
+      { "text": "Database", "link": "/guides/database" },
+      { "text": "Auth", "link": "/guides/auth" },
+      { "text": "Storage", "link": "/guides/storage" },
+      { "text": "APIs", "link": "/guides/apis" },
+      { "text": "Examples and Resources", "link": "/guides/examples" }
+    ],
+    "Tutorials": [
+      { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
+      { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
+      { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
+      { "text": "Quickstart: React", "link": "/guides/with-react" },
+      { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
+      { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
+      { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
+    ],
+    "See Also": [
+      { "text": "FAQs", "link": "/faqs" },
+      { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
+      { "text": "Contributing", "link": "/handbook/contributing" },
+      { "text": "SupaSquad", "link": "/handbook/supasquad" },
+      { "text": "Terms of Service", "link": "/company/terms" },
+      { "text": "Privacy Policy", "link": "/company/privacy" },
+      { "text": "Acceptable Use Policy", "link": "/company/aup" }
+    ]
+  },
+  "Guides": {
+    "Guides": [
+      { "text": "Overview", "link": "/guides" },
+      { "text": "Local Development", "link": "/guides/local-development" }
+    ],
+    "Database": [
+      { "text": "Introduction", "link": "/guides/database/introduction" },
+      { "text": "Tables", "link": "/guides/database/tables" },
+      { "text": "Functions", "link": "/guides/database/functions" },
+      { "text": "Full Text Search", "link": "/guides/database/full-text-search" },
+      {
+        "text": "Extensions",
+        "sections": [
+          {
+            "text": "Overview",
+            "link": "/guides/database/extensions"
+          },
+          {
+            "text": "plv8: Javascript Language",
+            "link": "/guides/database/extensions/plv8"
+          },
+          {
+            "text": "http: RESTful Client",
+            "link": "/guides/database/extensions/http"
+          },
+          {
+            "text": "uuid-ossp: Unique Identifiers",
+            "link": "/guides/database/extensions/uuid-ossp"
+          }
+        ]
+      },
+      {
+        "text": "Connecting to Postgres",
+        "sections": [
+          {
+            "text": "Overview",
+            "link": "/guides/database/connecting/connecting-to-postgres"
+          },
+          {
+            "text": "Direct Connections",
+            "link": "/guides/database/connecting/direct-connections"
+          },
+          {
+            "text": "Connection Pooling",
+            "link": "/guides/database/connecting/connection-pooling"
+          }
+        ]
+      },
+      {
+        "text": "Configuration",
+        "sections": [
+          {
+            "text": "Timeouts",
+            "link": "/guides/database/timeouts"
+          },
+          {
+            "text": "Direct Connections",
+            "link": "/guides/database/replication"
+          },
+          {
+            "text": "Passwords",
+            "link": "/guides/database/managing-passwords"
+          },
+          {
+            "text": "Timezones",
+            "link": "/guides/database/managing-timezones"
+          }
+        ]
+      }
+    ],
+    "Auth": [
+      {
+        "text": "Introduction",
+        "link": "/guides/auth/intro"
+      },
+      {
+        "text": "Authentication",
+        "sections": [
+          { "text": "Login With Email", "link": "/guides/auth/auth-email" },
+          { "text": "Login With Magic Link", "link": "/guides/auth/auth-magic-link" },
+          { "text": "Login With Apple", "link": "/guides/auth/auth-apple" },
+          { "text": "Login With Bitbucket", "link": "/guides/auth/auth-bitbucket" },
+          { "text": "Login With Discord", "link": "/guides/auth/auth-discord" },
+          { "text": "Login With Facebook", "link": "/guides/auth/auth-facebook" },
+          { "text": "Login With GitHub", "link": "/guides/auth/auth-gitHub" },
+          { "text": "Login With GitLab", "link": "/guides/auth/auth-gitLab" },
+          { "text": "Login With Google", "link": "/guides/auth/auth-google" },
+          { "text": "Login With Slack", "link": "/guides/auth/auth-slack" },
+          { "text": "Login With Spotify", "link": "/guides/auth/auth-spotify" },
+          { "text": "Login With Twitter", "link": "/guides/auth/auth-twitter" },
+          { "text": "Login With Twitch", "link": "/guides/auth/auth-twitch" },
+          { "text": "Phone Auth With Twilio", "link": "/guides/auth/auth-twilio" },
+          { "text": "Phone Auth With MessageBird", "link": "/guides/auth/auth-messageBird" }
+        ]
+      },
+      {
+        "text": "Authorization",
+        "sections": [
+          { "text": "Row Level Security", "link": "/guides/auth/row-level-security" },
+          { "text": "Managing User Data", "link": "/guides/auth/managing-user-data" }
+        ]
+      },
+      {
+        "text": "Deep Dive",
+        "link": [
+          { "text": "Part One: JWTs", "link": "/guides/auth-deep-dive/auth-deep-dive-jwts" },
+          {
+            "text": "Part Two: Row Level Security",
+            "link": "/guides/auth-deep-dive/auth-row-level-security"
+          },
+          { "text": "Part Three: Policies", "link": "/guides/auth-deep-dive/auth-policies" },
+          { "text": "Part Four: Gotrue", "link": "/guides/auth-deep-dive/auth-gotrue" },
+          { "text": "Part Five: Google Oauth", "link": "/guides/auth-deep-dive/auth-google-auth" }
+        ]
+      }
+    ],
+    "Integrations": [
+      {
+        "text": "Auth0",
+        "link": "/guides/integrations/auth0"
+      },
+      {
+        "text": "Draftbit",
+        "link": "/guides/integrations/draftbit"
+      },
+      {
+        "text": "Prisma",
+        "link": "/guides/integrations/prisma"
+      },
+      {
+        "text": "Vercel",
+        "link": "/guides/integrations/vercel"
+      }
+    ],
+    "Self Hosting": [
+      { "text": "Overview", "link": "/guides/hosting/overview" },
+      { "text": "Supabase Platform", "link": "/guides/hosting/platform" },
+      { "text": "With Docker", "link": "/guides/hosting/docker" }
+    ]
+  },
+  "Reference": {
+    "JAVASCRIPT": [
+      {
+        "text": "Getting Started",
+        "sections": [
+          { "text": "Getting Started", "link": "/reference/javascript/index" },
+          { "text": "Installing", "link": "/reference/javascript/installing" },
+          { "text": "Initializing", "link": "/reference/javascript/initializing" },
+          { "text": "Generating Types", "link": "/reference/javascript/generating-types" }
+        ]
+      },
+      {
+        "text": "Auth",
+        "sections": [
+          { "text": "signUp()", "link": "/reference/javascript/auth-signup" },
+          { "text": "signIn()", "link": "/reference/javascript/auth-signin" },
+          { "text": "signOut()", "link": "/reference/javascript/auth-signout" },
+          { "text": "session()", "link": "/reference/javascript/auth-session" },
+          { "text": "user()", "link": "/reference/javascript/auth-user" },
+          { "text": "update()", "link": "/reference/javascript/auth-update" },
+          { "text": "setAuth()", "link": "/reference/javascript/auth-setauth" },
+          { "text": "onAuthStateChange()", "link": "/reference/javascript/auth-onauthstatechange" },
+          { "text": "getUser()", "link": "/reference/javascript/auth-api-getuser" },
+          { "text": "Reset Password(Email)", "link": "/reference/javascript/reset-password-email" }
+        ]
+      },
+      {
+        "text": "Auth (Server Only)",
+        "sections": [
+          { "text": "createUser()", "link": "/reference/javascript/auth-api-createuser" },
+          { "text": "deleteUser()", "link": "/reference/javascript/auth-api-deleteuser" },
+          { "text": "generateLink()", "link": "/reference/javascript/auth-api-generatelink" },
+          {
+            "text": "inviteUserByEmail()",
+            "link": "/reference/javascript/auth-api-inviteuserbyemail"
+          },
+          { "text": "sendMobileOTP()", "link": "/reference/javascript/auth-api-sendmobileotp" },
+          {
+            "text": "resetPasswordForEmail()",
+            "link": "/reference/javascript/auth-api-resetpasswordforemail"
+          }
+        ]
+      },
+      {
+        "text": "Database",
+        "sections": [
+          {
+            "text": "Fetch data: select()",
+            "link": "/reference/javascript/select"
+          },
+          {
+            "text": "Create data: insert()",
+            "link": "/reference/javascript/insert"
+          },
+          {
+            "text": "Modify data: update()",
+            "link": "/reference/javascript/update"
+          },
+          {
+            "text": "Upsert data: upsert()",
+            "link": "/reference/javascript/upsert"
+          },
+          {
+            "text": "Delete data: delete()",
+            "link": "/reference/javascript/delete"
+          },
+          {
+            "text": "Postgres functions: rpc()",
+            "link": "/reference/javascript/rpc"
+          }
+        ]
+      },
+      {
+        "text": "Realtime",
+        "sections": [
+          {
+            "text": "on().subscribe()",
+            "link": "/reference/javascript/subscribe"
+          },
+          {
+            "text": "removeSubscription()",
+            "link": "/reference/javascript/removesubscription"
+          },
+          {
+            "text": "removeAllSubscriptions()",
+            "link": "/reference/javascript/removeallsubscriptions"
+          },
+          {
+            "text": "getSubscriptions()",
+            "link": "/reference/javascript/getsubscriptions"
+          }
+        ]
+      },
+      {
+        "text": "Storage",
+        "sections": [
+          {
+            "text": "createBucket()",
+            "link": "/reference/javascript/storage-createbucket"
+          },
+          {
+            "text": "getBucket()",
+            "link": "/reference/javascript/storage-getbucket"
+          },
+          {
+            "text": "listBuckets()",
+            "link": "/reference/javascript/storage-listbuckets"
+          },
+          {
+            "text": "updateBucket()",
+            "link": "/reference/javascript/storage-updatebucket"
+          },
+          {
+            "text": "deleteBucket()",
+            "link": "/reference/javascript/storage-deletebucket"
+          },
+          {
+            "text": "emptyBucket()",
+            "link": "/reference/javascript/storage-emptybucket"
+          },
+          {
+            "text": "from.upload()",
+            "link": "/reference/javascript/storage-from-upload"
+          },
+          {
+            "text": "from.download()",
+            "link": "/reference/javascript/storage-from-download"
+          },
+          {
+            "text": "from.list()",
+            "link": "/reference/javascript/storage-from-list"
+          },
+          {
+            "text": "from.update()",
+            "link": "/reference/javascript/storage-from-update"
+          },
+          {
+            "text": "from.move()",
+            "link": "/reference/javascript/storage-from-move"
+          },
+          {
+            "text": "from.remove()",
+            "link": "/reference/javascript/storage-from-remove"
+          },
+          {
+            "text": "from.createSignedUrl()",
+            "link": "/reference/javascript/storage-from-createsignedurl"
+          },
+          {
+            "text": "from.getPublicUrl()",
+            "link": "/reference/javascript/storage-from-getpublicurl"
+          }
+        ]
+      },
+      {
+        "text": "Modifiers",
+        "sections": [
+          {
+            "text": "Using Modifiers",
+            "link": "/reference/javascript/using-modifiers"
+          },
+          {
+            "text": "limit()",
+            "link": "/reference/javascript/limit"
+          },
+          {
+            "text": "order()",
+            "link": "/reference/javascript/order"
+          },
+          {
+            "text": "range()",
+            "link": "/reference/javascript/range"
+          },
+          {
+            "text": "single()",
+            "link": "/reference/javascript/single"
+          },
+          {
+            "text": "maybeSingle()",
+            "link": "/reference/javascript/maybesingle"
+          }
+        ]
+      },
+      {
+        "text": "Filters",
+        "sections": [
+          {
+            "text": "Using Filters",
+            "link": "/reference/javascript/using-filters"
+          },
+          {
+            "text": "or()",
+            "link": "/reference/javascript/or"
+          },
+          {
+            "text": "not()",
+            "link": "/reference/javascript/not"
+          },
+          {
+            "text": "match()",
+            "link": "/reference/javascript/match"
+          },
+          {
+            "text": "eq()",
+            "link": "/reference/javascript/eq"
+          },
+          {
+            "text": "neq()",
+            "link": "/reference/javascript/neq"
+          },
+          {
+            "text": "gt()",
+            "link": "/reference/javascript/gt"
+          },
+          {
+            "text": "gte()",
+            "link": "/reference/javascript/gte"
+          },
+          {
+            "text": "lt()",
+            "link": "/reference/javascript/lt"
+          },
+          {
+            "text": "lte()",
+            "link": "/reference/javascript/lte"
+          },
+          {
+            "text": "like()",
+            "link": "/reference/javascript/like"
+          },
+          {
+            "text": "ilike()",
+            "link": "/reference/javascript/ilike"
+          },
+          {
+            "text": "is()",
+            "link": "/reference/javascript/is"
+          },
+          {
+            "text": "in()",
+            "link": "/reference/javascript/in"
+          },
+          {
+            "text": "contains()",
+            "link": "/reference/javascript/contains"
+          },
+          {
+            "text": "containedBy()",
+            "link": "/reference/javascript/containedby"
+          },
+          {
+            "text": "rangeLt()",
+            "link": "/reference/javascript/rangelt"
+          },
+          {
+            "text": "rangeGt()",
+            "link": "/reference/javascript/rangegt"
+          },
+          {
+            "text": "rangeGte()",
+            "link": "/reference/javascript/rangegte"
+          },
+          {
+            "text": "rangeLte()",
+            "link": "/reference/javascript/rangelte"
+          },
+
+          {
+            "text": "rangeAdjacent()",
+            "link": "/reference/javascript/rangeadjacent"
+          },
+          {
+            "text": "overlaps()",
+            "link": "/reference/javascript/overlaps"
+          },
+          {
+            "text": "textSearch()",
+            "link": "/reference/javascript/textsearch"
+          },
+          {
+            "text": "filter()",
+            "link": "/reference/javascript/filter"
+          }
+        ]
+      }
+    ],
+    "DART": [
+      {
+        "text": "Getting Started",
+        "sections": [
+          { "text": "Installing", "link": "/reference/dart/installing" },
+          { "text": "Initializing", "link": "/reference/dart/initializing" }
+        ]
+      },
+      {
+        "text": "Auth",
+        "sections": [
+          { "text": "signUp()", "link": "/reference/dart/auth-signup" },
+          { "text": "signIn()", "link": "/reference/dart/auth-signin" },
+          { "text": "signOut()", "link": "/reference/dart/auth-signout" },
+          { "text": "session()", "link": "/reference/dart/auth-session" },
+          { "text": "user()", "link": "/reference/dart/auth-user" },
+          { "text": "update()", "link": "/reference/dart/auth-update" },
+          { "text": "setAuth()", "link": "/reference/dart/auth-setauth" },
+          { "text": "onAuthStateChange()", "link": "/reference/dart/auth-onauthsatechange" },
+          { "text": "Reset Password(Email)", "link": "/reference/dart/reset-password-email" }
+        ]
+      },
+
+      {
+        "text": "Database",
+        "sections": [
+          {
+            "text": "Fetch data: select()",
+            "link": "/reference/dart/select"
+          },
+          {
+            "text": "Create data: insert()",
+            "link": "/reference/dart/insert"
+          },
+          {
+            "text": "Modify data: update()",
+            "link": "/reference/dart/update"
+          },
+          {
+            "text": "Upsert data: upsert()",
+            "link": "/reference/dart/upsert"
+          },
+          {
+            "text": "Delete data: delete()",
+            "link": "/reference/dart/delete"
+          },
+          {
+            "text": "Postgres functions: rpc()",
+            "link": "/reference/dart/rpc"
+          }
+        ]
+      },
+      {
+        "text": "Realtime",
+        "sections": [
+          {
+            "text": "on().subscribe()",
+            "link": "/reference/dart/subscribe"
+          },
+          {
+            "text": "removeSubscription()",
+            "link": "/reference/dart/removesubscription"
+          },
+          {
+            "text": "getSubscriptions()",
+            "link": "/reference/dart/getsubscriptions"
+          }
+        ]
+      },
+      {
+        "text": "Storage",
+        "sections": [
+          {
+            "text": "createBucket()",
+            "link": "/reference/dart/storage-createbucket"
+          },
+          {
+            "text": "getBucket()",
+            "link": "/reference/dart/storage-getbucket"
+          },
+          {
+            "text": "listBuckets()",
+            "link": "/reference/dart/storage-listbuckets"
+          },
+          {
+            "text": "updateBucket()",
+            "link": "/reference/dart/storage-updatebucket"
+          },
+          {
+            "text": "deleteBucket()",
+            "link": "/reference/dart/storage-deletebucket"
+          },
+          {
+            "text": "emptyBucket()",
+            "link": "/reference/dart/storage-emptybucket"
+          },
+          {
+            "text": "from.upload()",
+            "link": "/reference/dart/storage-from-upload"
+          },
+          {
+            "text": "from.download()",
+            "link": "/reference/dart/storage-from-download"
+          },
+          {
+            "text": "from.list()",
+            "link": "/reference/dart/storage-from-list"
+          },
+          {
+            "text": "from.update()",
+            "link": "/reference/dart/storage-from-update"
+          },
+          {
+            "text": "from.move()",
+            "link": "/reference/dart/storage-from-move"
+          },
+          {
+            "text": "from.remove()",
+            "link": "/reference/dart/storage-from-remove"
+          },
+          {
+            "text": "from.createSignedUrl()",
+            "link": "/reference/dart/storage-from-createsignedurl"
+          },
+          {
+            "text": "from.getPublicUrl()",
+            "link": "/reference/dart/storage-from-getpublicurl"
+          }
+        ]
+      },
+      {
+        "text": "Modifiers",
+        "sections": [
+          {
+            "text": "Using Modifiers",
+            "link": "/reference/dart/using-modifiers"
+          },
+          {
+            "text": "limit()",
+            "link": "/reference/dart/limit"
+          },
+          {
+            "text": "order()",
+            "link": "/reference/dart/order"
+          },
+          {
+            "text": "range()",
+            "link": "/reference/dart/range"
+          },
+          {
+            "text": "single()",
+            "link": "/reference/dart/single"
+          },
+          {
+            "text": "maybeSingle()",
+            "link": "/reference/dart/maybesingle"
+          }
+        ]
+      },
+      {
+        "text": "Filters",
+        "sections": [
+          {
+            "text": "Using Filters",
+            "link": "/reference/dart/using-filters"
+          },
+          {
+            "text": "or()",
+            "link": "/reference/dart/or"
+          },
+          {
+            "text": "not()",
+            "link": "/reference/dart/not"
+          },
+          {
+            "text": "match()",
+            "link": "/reference/dart/match"
+          },
+          {
+            "text": "eq()",
+            "link": "/reference/dart/eq"
+          },
+          {
+            "text": "neq()",
+            "link": "/reference/dart/neq"
+          },
+          {
+            "text": "gt()",
+            "link": "/reference/dart/gt"
+          },
+          {
+            "text": "gte()",
+            "link": "/reference/dart/gte"
+          },
+          {
+            "text": "lt()",
+            "link": "/reference/dart/lt"
+          },
+          {
+            "text": "lte()",
+            "link": "/reference/dart/lte"
+          },
+          {
+            "text": "like()",
+            "link": "/reference/dart/like"
+          },
+          {
+            "text": "ilike()",
+            "link": "/reference/dart/ilike"
+          },
+          {
+            "text": "is_()",
+            "link": "/reference/dart/is_"
+          },
+          {
+            "text": "in_()",
+            "link": "/reference/dart/in_"
+          },
+          {
+            "text": "contains()",
+            "link": "/reference/dart/contains"
+          },
+          {
+            "text": "containedBy()",
+            "link": "/reference/dart/containedby"
+          },
+          {
+            "text": "rangeLt()",
+            "link": "/reference/dart/rangelt"
+          },
+          {
+            "text": "rangeGt()",
+            "link": "/reference/dart/rangegt"
+          },
+          {
+            "text": "rangeGte()",
+            "link": "/reference/dart/rangegte"
+          },
+          {
+            "text": "rangeLte()",
+            "link": "/reference/dart/rangelte"
+          },
+
+          {
+            "text": "rangeAdjacent()",
+            "link": "/reference/dart/rangeadjacent"
+          },
+          {
+            "text": "overlaps()",
+            "link": "/reference/dart/overlaps"
+          },
+          {
+            "text": "textSearch()",
+            "link": "/reference/dart/textsearch"
+          },
+          {
+            "text": "filter()",
+            "link": "/reference/dart/filter"
+          }
+        ]
+      }
+    ],
+    "CLI": [
+      {
+        "text": "About",
+        "sections": [{ "text": "About", "link": "/reference/cli/about" }]
+      },
+      {
+        "text": "Command reference",
+        "sections": [
+          {
+            "text": "supabase help",
+            "link": "/reference/cli/supabase-help"
+          },
+
+          {
+            "text": "supabase init",
+            "link": "/reference/cli/supabase-init"
+          },
+          {
+            "text": "supabase start",
+            "link": "/reference/cli/supabase-start"
+          },
+          {
+            "text": "supabase stop",
+            "link": "/reference/cli/supabase-stop"
+          },
+          {
+            "text": "supabase eject",
+            "link": "/reference/cli/supabase-eject"
+          },
+
+          {
+            "text": "supabase db branch list",
+            "link": "/reference/cli/supabase-db-branch-list"
+          },
+          {
+            "text": "supabase db branch create",
+            "link": "/reference/cli/supabase-db-branch-create"
+          },
+          {
+            "text": "supabase db branch delete",
+            "link": "/reference/cli/supabase-db-branch-delete"
+          },
+          {
+            "text": "supabase db switch",
+            "link": "/reference/cli/supabase-db-switch"
+          },
+          {
+            "text": "supabase db changes",
+            "link": "/reference/cli/supabase-db-changes"
+          },
+          {
+            "text": "supabase db commit",
+            "link": "/reference/cli/supabase-db-commit"
+          },
+          {
+            "text": "supabase db reset",
+            "link": "/reference/cli/supabase-db-reset"
+          },
+          {
+            "text": "supabase db remote set",
+            "link": "/reference/cli/supabase-db-remote-set"
+          },
+          {
+            "text": "supabase db remote commit",
+            "link": "/reference/cli/supabase-db-remote-commit"
+          },
+          {
+            "text": "supabase db push",
+            "link": "/reference/cli/supabase-db-push"
+          },
+          {
+            "text": "supabase migration new",
+            "link": "/reference/cli/supabase-migration-new"
+          }
+        ]
+      },
+      {
+        "text": "Config reference",
+        "sections": [
+          {
+            "text": "Config reference",
+            "link": "/reference/cli/config-reference"
+          }
+        ]
+      }
+    ]
+  }
+}
