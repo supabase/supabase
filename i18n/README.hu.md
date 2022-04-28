@@ -47,7 +47,7 @@ A Supabase nyílt forráskódú eszközök kombinációja.A Firebase funkcióit 
 **Jelenlegi architektúra**
 
 Supabase egy [hosztolt platform](https://app.supabase.io). Regisztrálással letöltés nélkül is elkezdheted használni.
-De [hosztolhatod magadnak](https://supabase.com/docs/guides/self-hosting) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
+De [hosztolhatod magadnak](https://supabase.com/docs/guides/hosting/overview) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
 
 ![Architektúra](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

@@ -1,0 +1,98 @@
+---
+id: or
+title: ".or()"
+slug: or
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Finds all rows satisfying at least one of the filters.
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### With `select()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### Use `or` with `and`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>

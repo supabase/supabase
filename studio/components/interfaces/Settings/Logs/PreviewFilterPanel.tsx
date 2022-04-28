@@ -84,7 +84,7 @@ const PreviewFilterPanel: FC<Props> = ({
             >
               <div className="absolute z-20">
                 <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
-                  {newCount}
+                  {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                 </Typography.Text>
               </div>
               <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
