@@ -9,7 +9,6 @@ import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplor
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
-import { UserContent } from 'types'
 
 export const LogsSavedPage: NextPage = () => {
   const { content, ui } = useStore()
