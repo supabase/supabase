@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash'
 import { Project } from 'types'
 import { IRootStore } from '../RootStore'
 import { constructHeaders } from 'lib/api/apiHelpers'
@@ -41,6 +42,26 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
         project.postgrestStatus = success ? 'ONLINE' : 'OFFLINE'
       }
       this.data[project.id] = project
+
+      // lazy fetchs
+      this.fetchSubscriptionTier(project.id, project.ref)
+    }
+  }
+
+  async fetchSubscriptionTier(projectId: number, projectRef: string) {
+    const url = `${this.url}/${projectRef}/subscription`
+    const headers = constructHeaders(this.headers)
+    const response = await get(url, { headers })
+    if (!response.error) {
+      const subscriptionInfo = response as {
+        tier: {
+          supabase_prod_id: string
+        }
+      }
+      // update subscription_tier key
+      const clone = cloneDeep(this.data[projectId])
+      clone.subscription_tier = subscriptionInfo.tier.supabase_prod_id
+      this.data[projectId] = clone
     }
   }
 }
