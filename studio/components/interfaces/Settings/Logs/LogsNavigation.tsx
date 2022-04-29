@@ -17,6 +17,7 @@ const LogsNavigation = () => {
   const tabs = [
     { id: 'query', label: 'Query' },
     logsSavedQueries ? { id: 'saved', label: 'Saved' } : null,
+    { id: 'recent', label: 'Recent' },
     { id: 'templates', label: 'Templates' },
   ].filter(Boolean) as TabItem[]
 

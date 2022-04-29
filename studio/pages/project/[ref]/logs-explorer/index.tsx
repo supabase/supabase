@@ -85,6 +85,9 @@ export const LogsExplorerPage: NextPage = () => {
       pathname: router.pathname,
       query: { ...router.query, q: query },
     })
+    content.addRecentLogSqlSnippet({
+      sql: query
+    })
   }
 
   const handleClear = () => {
