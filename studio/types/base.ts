@@ -30,19 +30,15 @@ export interface Project extends ProjectBase {
   kpsVersion?: string
   internalApiKey?: string
   restUrl?: string
+  // store subscription tier products.metadata.supabase_prod_id
+  subscription_tier?: string
 
   /**
    * postgrestStatus is available on client side only.
    * We use this status to check if a project instance is HEALTHY or not
    * If not we will show ConnectingState and run a polling until it's back online
    */
-  postgrestStatus?: 'ONLINE' | 'OFFLINE'
-
-  /**
-   * TODO: not available from projects.fetchDetail
-   * Retrieve it from GET /platform/projects/:ref/subscription
-   */
-  subscription_tier?: string
+  postgrestStatus?: 'ONLINE' | 'OFFLINE'  
 }
 
 export interface User {
