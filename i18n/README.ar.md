@@ -20,7 +20,7 @@
 
 ## الشرح
 
-للحصول على الشرح الكامل، قم بزيارة [supabase.io/docs](https://supabase.com/docs).
+للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs).
 
 ## المجتمع والدعم
 
