@@ -8,7 +8,7 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
+import { get, getWithTimeout } from 'lib/common/fetch'
 import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 
@@ -20,7 +20,10 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
   async function checkServer() {
     if (!project) return
 
-    const projectStatus = await get(`${API_URL}/projects/${project.ref}/status`)
+    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
+      timeout: 2000,
+    })
+
     if (projectStatus && !projectStatus.error) {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
@@ -36,18 +39,18 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
   }
 
   useEffect(() => {
-    // check server status every 2s
-    checkServerInterval.current = window.setInterval(checkServer, 2000)
+    // check server status every 4s
+    checkServerInterval.current = window.setInterval(checkServer, 4000)
     return () => {
       clearInterval(checkServerInterval.current)
     }
   }, [])
 
   return (
-    <div className="max-w-6xl mx-auto w-full items-center justify-center my-16">
-      <div className="flex flex-col space-y-16 mx-6">
+    <div className="mx-auto my-16 w-full max-w-6xl items-center justify-center">
+      <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
-          <div className="space-x-3 flex items-center">
+          <div className="flex items-center space-x-3">
             <h1 className="text-scale-1200 text-3xl">{project?.name}</h1>
             <Badge color="brand">
               <div className="flex items-center gap-2">
@@ -70,7 +73,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
         </div>
         <div>
           <div className=" grid grid-cols-12 gap-12">
-            <div className="col-span-12 lg:col-span-4 space-y-12">
+            <div className="col-span-12 space-y-12 lg:col-span-4">
               <div>
                 <h4 className="text-scale-1200 text-base">While you wait</h4>
 
@@ -80,7 +83,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="text-brand-900 hover:text-brand-1200 transition-colors mb-0"
+                          className="text-brand-900 hover:text-brand-1200 mb-0 transition-colors"
                           target="_blank"
                         >
                           documentation
@@ -104,7 +107,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
                   <ChecklistItem
                     description={
                       <>
-                        <p className="text-scale-1100 text-sm mb-4">
+                        <p className="text-scale-1100 mb-4 text-sm">
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
@@ -124,28 +127,30 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
-        <div className="space-y-8">
-          <div className="mx-6">
-            <h5>Client libraries</h5>
+      {project.status === PROJECT_STATUS.COMING_UP && (
+        <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h5>Client libraries</h5>
+            </div>
+            <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+              {CLIENT_LIBRARIES.map((library) => (
+                <ClientLibrary key={library.language} {...library} />
+              ))}
+            </div>
           </div>
-          <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
-            {CLIENT_LIBRARIES.map((library) => (
-              <ClientLibrary key={library.language} {...library} />
-            ))}
+          <div className="space-y-8">
+            <div className="mx-6">
+              <h5>Example projects</h5>
+            </div>
+            <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {EXAMPLE_PROJECTS.map((project) => (
+                <ExampleProject key={project.url} {...project} />
+              ))}
+            </div>
           </div>
         </div>
-        <div className="space-y-8">
-          <div className="mx-6">
-            <h5>Example projects</h5>
-          </div>
-          <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {EXAMPLE_PROJECTS.map((project) => (
-              <ExampleProject key={project.url} {...project} />
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -153,7 +158,7 @@ export default observer(ProjectBuildingState)
 
 const ChecklistItem = ({ description }: any) => {
   return (
-    <li className="flex flex-wrap my-3 space-x-3">
+    <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
         <IconArrowRight className="text-scale-900" size="tiny" />
       </div>

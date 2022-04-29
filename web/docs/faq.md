@@ -10,7 +10,7 @@ Choose the support channel relevant for your situation here: [supabase.com/suppo
 
 ### How much does it cost?
 
-Self-hosting Supabase is free. If you wish to use our cloud-platform, we provide [simple, predictable pricing](/pricing).
+Self-hosting Supabase is free. If you wish to use our cloud-platform, we provide [simple, predictable pricing](https://supabase.com/pricing).
 
 ### How do I host Supabase?
 

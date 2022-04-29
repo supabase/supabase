@@ -182,6 +182,9 @@ div[data-radix-portal]:not(.portal--toast) {
 .billing-compute-radio {
   label {
     @apply items-center justify-between;
+    &:last-child {
+      opacity: 100 !important;
+    }
   }
 }
 

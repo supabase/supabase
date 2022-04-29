@@ -1,5 +1,4 @@
 import {
-  cleanQuery,
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
   getDefaultHelper,
@@ -29,7 +28,6 @@ const useLogsQuery = (
   const [params, setParams] = useState<LogsEndpointParams>({
     project: projectRef,
     sql: '',
-    rawSql: '',
     iso_timestamp_start: defaultHelper.calcFrom(),
     iso_timestamp_end: defaultHelper.calcTo(),
     ...initialParams,
@@ -54,7 +52,7 @@ const useLogsQuery = (
     error = data?.error
   }
   const changeQuery = (newQuery = '') => {
-    setParams((prev) => ({ ...prev, sql: cleanQuery(newQuery), rawSql: newQuery }))
+    setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
   return [

@@ -1,10 +1,11 @@
 import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
-import { Badge, Button, IconArrowLeft, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
+import { useRouter } from 'next/router'
+import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import Divider from 'components/ui/Divider'
 import {
@@ -42,21 +43,19 @@ const ProUpgrade: FC<Props> = ({
    */
   const nativeBilling = useFlag('nativeBilling')
 
-  const { ui } = useStore()
+  const { app, ui } = useStore()
+  const router = useRouter()
 
   const { addons } = products
   const computeSizes = formatComputeSizes(addons)
 
+  const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref
   const projectRegion = ui.selectedProject?.region ?? ''
 
   const currentComputeSize =
     computeSizes.find((option: any) => option.id === currentSubscription?.addons[0]?.prod_id) ||
     computeSizes.find((option: any) => option.metadata.supabase_prod_id === 'addon_instance_micro')
-
-  const isManagingProSubscription =
-    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
-    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
 
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(
     // If project is currently free, default to enabling spend caps
@@ -78,6 +77,12 @@ const ProUpgrade: FC<Props> = ({
   const selectedTier = isSpendCapEnabled
     ? products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PRO)
     : products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.PAYG)
+
+  const isManagingProSubscription =
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PRO ||
+    currentSubscription.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+
+  const isChangingComputeSize = currentComputeSize?.id !== selectedComputeSize.id
 
   useEffect(() => {
     if (!isLoadingPaymentMethods && paymentMethods && paymentMethods.length > 0) {
@@ -115,7 +120,6 @@ const ProUpgrade: FC<Props> = ({
     setIsRefreshingPreview(false)
   }
 
-  // Exact same thing as getSubscriptionpreview, can we make them into one
   const onConfirmPayment = async () => {
     const payload = formSubscriptionUpdatePayload(
       selectedTier,
@@ -132,7 +136,18 @@ const ProUpgrade: FC<Props> = ({
         message: `Failed to update subscription: ${res?.error?.message}`,
       })
     } else {
-      setIsSuccessful(true)
+      if (isChangingComputeSize) {
+        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+        ui.setNotification({
+          category: 'success',
+          message:
+            'Your project has been updated and is currently restarting to update its instance size',
+          duration: 8000,
+        })
+        router.push(`/project/${projectRef}`)
+      } else {
+        setIsSuccessful(true)
+      }
     }
     setIsSubmitting(false)
   }
@@ -163,8 +178,8 @@ const ProUpgrade: FC<Props> = ({
               <div className="space-y-8">
                 <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
                 <div
-                  className="space-y-8 overflow-scroll"
-                  style={{ height: 'calc(100vh - 6.3rem - 49.5px)' }}
+                  className="space-y-8 overflow-scroll pb-8"
+                  style={{ height: 'calc(100vh - 9rem - 57px)' }}
                 >
                   <div className="space-y-2">
                     {!isManagingProSubscription ? (

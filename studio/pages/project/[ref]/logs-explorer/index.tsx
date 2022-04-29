@@ -74,12 +74,16 @@ export const LogsExplorerPage: NextPage = () => {
     })
   }
 
-  const handleRun = () => {
-    changeQuery(editorValue)
+  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
+    const query  = typeof value === 'string' ? (value || editorValue) : editorValue
+    if (value && typeof value === 'string') {
+      setEditorValue(value)
+    }
+    changeQuery(query)
     runQuery()
     router.push({
       pathname: router.pathname,
-      query: { ...router.query, q: editorValue },
+      query: { ...router.query, q: query },
     })
   }
 
