@@ -9,7 +9,7 @@ const Auth = () => {
 
   return (
     <AuthLayout title="Auth Logs">
-      {project && <LogsPreviewer projectRef={project!.ref} queryType="auth" />}
+      {project && <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />}
     </AuthLayout>
   )
 }
