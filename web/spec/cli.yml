@@ -269,6 +269,8 @@ pages:
 
       Flags:
 
+      `--no-verify-jwt`: Disable JWT verification for the Function.
+
       `--project-ref`: Project ref of the Supabase project.
     examples:
       - name: Usage
@@ -290,6 +292,10 @@ pages:
   supabase functions serve:
     description: |
       Serve a Function locally.
+
+      Flags:
+
+      `--no-verify-jwt`: Disable JWT verification for the Function.
     examples:
       - name: Usage
         sh: |
