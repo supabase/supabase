@@ -34,7 +34,7 @@ export interface PreviewLogData extends CustomLogData {
   event_message: string
   metadata: Metadata
 }
-export type LogData = CustomLogData & Partial<PreviewLogData>
+export type LogData = CustomLogData & PreviewLogData
 
 export interface LogTemplate {
   label?: string

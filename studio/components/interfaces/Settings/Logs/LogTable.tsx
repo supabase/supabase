@@ -57,7 +57,7 @@ const LogTable = ({
   error,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
-  const firstRow: LogData | undefined = data?.[0]
+  const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
