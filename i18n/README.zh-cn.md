@@ -53,7 +53,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 **当前架构**
 
 Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。
-你也可以[自托管](https://supabase.com/docs/guides/self-hosting)和[本地开发](https://supabase.com/docs/guides/local-development)。
+你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

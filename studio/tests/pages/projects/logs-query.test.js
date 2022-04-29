@@ -154,8 +154,11 @@ test('custom sql querying', async () => {
   // type new query
   userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
 
-  // should trigger query
+  // run query by button
   userEvent.click(await screen.findByText('Run'))
+  
+  // run query by editor
+  userEvent.type(editor, '\nlimit 123{ctrl}{enter}')
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
@@ -163,9 +166,11 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent("limit 123")))
     },
     { timeout: 1000 }
   )
+
 
   await screen.findByText(/my_count/) //column header
   const rowValue = await screen.findByText(/12345/) // row value

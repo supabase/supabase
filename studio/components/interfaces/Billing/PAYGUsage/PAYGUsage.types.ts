@@ -10,6 +10,7 @@ export interface ProductFeature {
   costPerUnit: number
   unitQuantity: number
   pricingModel: PricingModel
+  freeQuota?: number
 }
 
 export type PaygStats = { [key: string]: { sum: number; max: number } }
