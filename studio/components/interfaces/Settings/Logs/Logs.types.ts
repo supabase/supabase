@@ -24,13 +24,17 @@ export interface LogsEndpointParams {
   sql?: string
 }
 
-export interface LogData {
+export interface CustomLogData {
+  [other: string]: unknown
+}
+
+export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
   metadata: Metadata
-  [other: string]: unknown
 }
+export type LogData = CustomLogData & Partial<PreviewLogData>
 
 export interface LogTemplate {
   label?: string
