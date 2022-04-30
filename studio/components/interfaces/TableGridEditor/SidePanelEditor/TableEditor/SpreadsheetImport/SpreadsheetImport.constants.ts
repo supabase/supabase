@@ -3,6 +3,7 @@ import { SpreadsheetData } from './SpreadsheetImport.types'
 export const UPLOAD_FILE_TYPES = [
   'text/csv',
   'text/tab-separated-values',
+  'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]
 
