@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import Papa from 'papaparse'
 import { has, includes } from 'lodash'
 import { tryParseJson } from 'lib/helpers'
+import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
@@ -144,4 +145,9 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   return 'text'
+}
+
+export const acceptedFileExtension = (file: any) => {
+  const ext = file?.name.split('.').pop().toLowerCase()
+  return UPLOAD_FILE_EXTENSIONS.includes(ext)
 }
