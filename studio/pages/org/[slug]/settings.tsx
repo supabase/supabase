@@ -23,7 +23,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore, withAuth } from 'hooks'
 import { post, delete_, patch } from 'lib/common/fetch'
-import { AccountLayout } from 'components/layouts'
+import { AccountLayoutWithoutAuth } from 'components/layouts'
 import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -32,91 +32,93 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Project } from 'types'
+import { NextPageWithLayout, Project } from 'types'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
 const PageContext = createContext(null)
 
-const OrgSettings = () => {
-  const { app, ui } = useStore()
-  const router = useRouter()
-  const PageState: any = useLocalObservable(() => ({
-    user: {} as any,
-    organization: {},
-    projects: [],
-    members: [],
-    products: [],
-    membersFilterString: '',
-    get isOrgOwner() {
-      return (
-        this.members.find((x: any) => x.profile.id === this.user?.id && x.is_owner) != undefined
-      )
-    },
-    get filteredMembers() {
-      const temp = this.members.filter((x: any) => {
-        let profile = x.profile
+const OrgSettingsLayout = withAuth(
+  observer(({ children }) => {
+    const { app, ui } = useStore()
+    const router = useRouter()
+    const PageState: any = useLocalObservable(() => ({
+      user: {} as any,
+      organization: {},
+      projects: [],
+      members: [],
+      products: [],
+      membersFilterString: '',
+      get isOrgOwner() {
         return (
-          profile.username.includes(this.membersFilterString) ||
-          profile.primary_email.includes(this.membersFilterString)
+          this.members.find((x: any) => x.profile.id === this.user?.id && x.is_owner) != undefined
         )
-      })
-      return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
-    },
-    initData(organization: any, user: any, projects: any) {
-      this.organization = organization
-      this.user = user
-      this.projects = projects
-    },
-    onOrgUpdated(updatedOrg: any) {
-      app.onOrgUpdated(updatedOrg)
-    },
-    onOrgDeleted() {
-      app.onOrgDeleted(this.organization)
-    },
-  }))
+      },
+      get filteredMembers() {
+        const temp = this.members.filter((x: any) => {
+          let profile = x.profile
+          return (
+            profile.username.includes(this.membersFilterString) ||
+            profile.primary_email.includes(this.membersFilterString)
+          )
+        })
+        return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
+      },
+      initData(organization: any, user: any, projects: any) {
+        this.organization = organization
+        this.user = user
+        this.projects = projects
+      },
+      onOrgUpdated(updatedOrg: any) {
+        app.onOrgUpdated(updatedOrg)
+      },
+      onOrgDeleted() {
+        app.onOrgDeleted(this.organization)
+      },
+    }))
 
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
-    }
-  }, [])
+    useEffect(() => {
+      // User added a new payment method
+      if (router.query.setup_intent && router.query.redirect_status) {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully added new payment method',
+        })
+      }
+    }, [])
 
-  useEffect(() => {
-    const organization = ui.selectedOrganization
-    const user = ui.profile
-    const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
-    PageState.initData(organization, user, projects)
-  }, [ui.selectedOrganization, ui.profile])
+    useEffect(() => {
+      const organization = ui.selectedOrganization
+      const user = ui.profile
+      const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
+      PageState.initData(organization, user, projects)
+    }, [ui.selectedOrganization, ui.profile])
 
-  return (
-    <PageContext.Provider value={PageState}>
-      <PageLayout />
-    </PageContext.Provider>
-  )
-}
-export default withAuth(observer(OrgSettings))
+    return (
+      <AccountLayoutWithoutAuth
+        title={PageState.organization?.name || 'Supabase'}
+        breadcrumbs={[
+          {
+            key: `org-settings`,
+            label: 'Settings',
+          },
+        ]}
+      >
+        <PageContext.Provider value={PageState}>{children}</PageContext.Provider>
+      </AccountLayoutWithoutAuth>
+    )
+  })
+)
 
-const PageLayout = observer(() => {
+const OrgSettings: NextPageWithLayout = () => {
   const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
 
-  return (
-    <AccountLayout
-      title={PageState.organization?.name || 'Supabase'}
-      // @ts-ignore
-      breadcrumbs={[
-        {
-          key: `org-settings`,
-          label: 'Settings',
-        },
-      ]}
-    >
-      {ui.selectedOrganization && <OrganizationSettings />}
-    </AccountLayout>
-  )
-})
+  return <>{ui.selectedOrganization && <OrganizationSettings />}</>
+}
+
+OrgSettings.getLayout = (page) => <OrgSettingsLayout>{page}</OrgSettingsLayout>
+
+export default observer(OrgSettings)
 
 const OrganizationSettings = observer(() => {
   const PageState: any = useContext(PageContext)
@@ -217,7 +219,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="my-4 container max-w-4xl space-y-8">
+    <article className="container my-4 max-w-4xl space-y-8">
       <SchemaFormPanel
         title="General"
         schema={pluckJsonSchemaFields(organizations, BASIC_FIELDS)}
@@ -300,9 +302,9 @@ const OrgDeleteModal = observer(() => {
         visible={isOpen}
         onCancel={toggle}
         header={
-          <div className="flex gap-2 items-baseline">
-            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
-            <span className="text-xs text-scale-900">Are you sure?</span>
+          <div className="flex items-baseline gap-2">
+            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
+            <span className="text-scale-900 text-xs">Are you sure?</span>
           </div>
         }
         size="small"
@@ -416,7 +418,7 @@ const TeamSettings = observer(() => {
 
   return (
     <>
-      <div className="my-4 container max-w-4xl space-y-8">
+      <div className="container my-4 max-w-4xl space-y-8">
         <div className="flex justify-between">
           <MembersFilterInput />
           {PageState.isOrgOwner ? (
@@ -435,7 +437,7 @@ const TeamSettings = observer(() => {
           )}
         </div>
       </div>
-      <div className="my-4 container max-w-4xl space-y-8">
+      <div className="container my-4 max-w-4xl space-y-8">
         <MembersView />
       </div>
     </>
@@ -483,7 +485,7 @@ const MembersView = observer(() => {
                       <img
                         src={`https://github.com/${x.profile.username}.png?size=80`}
                         width="40"
-                        className="rounded-full border border-border-secondary-light dark:border-border-secondary-dark"
+                        className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
                       />
                     </div>
                     <div>
@@ -607,7 +609,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
             <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
               <div className="flex flex-col">
                 <p>Make owner</p>
-                <p className="opacity-50 block">Transfer ownership of "{orgName}"</p>
+                <p className="block opacity-50">Transfer ownership of "{orgName}"</p>
               </div>
             </Dropdown.Item>
             <Dropdown.Seperator />
@@ -639,7 +641,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         text={
           <span>
             By transferring this organization, it will be solely owned by{' '}
-            <span className="dark:text-white font-medium">{member.profile.username}</span>, they
+            <span className="font-medium dark:text-white">{member.profile.username}</span>, they
             will also be able to remove you from the organization as a member
           </span>
         }
