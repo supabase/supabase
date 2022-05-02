@@ -20,7 +20,7 @@
 
 ## תיעוד
 
-לתיעוד המלא, בקר\י ב[supabase.io/docs](https://supabase.com/docs)
+לתיעוד המלא, בקר\י ב[supabase.com/docs](https://supabase.com/docs)
 
 ## קהילה & תמיכה
 

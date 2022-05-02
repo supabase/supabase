@@ -18,7 +18,7 @@
 
 ## દસ્તાવેજીકરણ
 
-સંપૂર્ણ દસ્તાવેજીકરણ માટે, મુલાકાત લો [supabase.io/docs](https://supabase.com/docs)
+સંપૂર્ણ દસ્તાવેજીકરણ માટે, મુલાકાત લો [supabase.com/docs](https://supabase.com/docs)
 
 ## સમુદાય અને મદદ
 

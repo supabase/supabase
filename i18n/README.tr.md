@@ -18,7 +18,7 @@
 
 ## Dokümantasyon
 
-Tam dokümantasyon için, ziyaret et [supabase.io/docs](https://supabase.com/docs)
+Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/docs)
 
 ## Topluluk & Destek
 
