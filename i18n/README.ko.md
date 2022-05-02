@@ -18,7 +18,7 @@
 
 ## 문서
 
-전체 문서는 [supabase.io/docs](https://supabase.com/docs)를 참조하세요.
+전체 문서는 [supabase.com/docs](https://supabase.com/docs)를 참조하세요.
 
 ## 커뮤니티 및 지원
 

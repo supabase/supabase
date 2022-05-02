@@ -18,7 +18,7 @@
 
 ## ডকুমেন্টেশন
 
-সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.io/docs](https://supabase.com/docs)
+সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
 কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](./DEVELOPERS.md)
 
