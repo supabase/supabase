@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { NextPage } from 'next'
+import { useEffect, useState, createContext, useContext, PropsWithChildren } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
@@ -8,13 +7,134 @@ import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { tryParseJson } from 'lib/helpers'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { Modal } from '@supabase/ui'
+import { NextPageWithLayout } from 'types'
 
-const TableEditorPage: NextPage = () => {
+interface IPageLayoutContext {
+  sidePanelKey: 'row' | 'column' | 'table' | undefined
+  isDuplicating: boolean
+  isDeleting: boolean
+  setIsDeleting: React.Dispatch<React.SetStateAction<boolean>>
+  selectedSchema: string | undefined
+  selectedTable: any
+  selectedRowToEdit: Dictionary<any> | undefined
+  selectedColumnToEdit: PostgresColumn | undefined
+  selectedTableToEdit: PostgresTable | undefined
+  selectedColumnToDelete: PostgresColumn | undefined
+  selectedTableToDelete: PostgresTable | undefined
+  onConfirmDeleteColumn: () => Promise<void>
+  onAddRow: () => void
+  onEditRow: (row: Dictionary<any>) => void
+  onAddColumn: () => void
+  onEditColumn: (column: PostgresColumn) => void
+  onDeleteColumn: (column: PostgresColumn) => void
+  onClosePanel: () => void
+  onConfirmDeleteTable: () => Promise<void>
+}
+
+const PageLayoutContext = createContext<IPageLayoutContext>({
+  sidePanelKey: undefined,
+  isDuplicating: false,
+  isDeleting: false,
+  setIsDeleting: () => {},
+  selectedSchema: undefined,
+  selectedTable: undefined,
+  selectedRowToEdit: undefined,
+  selectedColumnToEdit: undefined,
+  selectedTableToEdit: undefined,
+  selectedColumnToDelete: undefined,
+  selectedTableToDelete: undefined,
+  onConfirmDeleteColumn: () => Promise.resolve(),
+  onAddRow: () => {},
+  onEditRow: () => {},
+  onAddColumn: () => {},
+  onEditColumn: () => {},
+  onDeleteColumn: () => {},
+  onClosePanel: () => {},
+  onConfirmDeleteTable: () => Promise.resolve(),
+})
+
+const TableEditorPage: NextPageWithLayout = () => {
+  const {
+    sidePanelKey,
+    isDuplicating,
+    isDeleting,
+    setIsDeleting,
+    selectedSchema,
+    selectedTable,
+    selectedRowToEdit,
+    selectedColumnToEdit,
+    selectedTableToEdit,
+    selectedColumnToDelete,
+    selectedTableToDelete,
+    onConfirmDeleteColumn,
+    onAddRow,
+    onEditRow,
+    onAddColumn,
+    onEditColumn,
+    onDeleteColumn,
+    onClosePanel,
+    onConfirmDeleteTable,
+  } = useContext(PageLayoutContext)
+
+  return (
+    <>
+      <TableGridEditor
+        selectedSchema={selectedSchema}
+        selectedTable={selectedTable}
+        sidePanelKey={sidePanelKey}
+        isDuplicating={isDuplicating}
+        selectedRowToEdit={selectedRowToEdit}
+        selectedColumnToEdit={selectedColumnToEdit}
+        selectedTableToEdit={selectedTableToEdit}
+        onAddRow={onAddRow}
+        onEditRow={onEditRow}
+        onAddColumn={onAddColumn}
+        onEditColumn={onEditColumn}
+        onDeleteColumn={onDeleteColumn}
+        onClosePanel={onClosePanel}
+      />
+      <ConfirmationModal
+        danger
+        visible={isDeleting && !isUndefined(selectedColumnToDelete)}
+        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
+        children={
+          <Modal.Content>
+            <p className="text-scale-1100 py-4 text-sm">
+              Are you sure you want to delete the selected column? This action cannot be undone.
+            </p>
+          </Modal.Content>
+        }
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleting(false)}
+        onSelectConfirm={onConfirmDeleteColumn}
+      />
+      <ConfirmationModal
+        danger
+        visible={isDeleting && !isUndefined(selectedTableToDelete)}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        children={
+          <Modal.Content>
+            <p className="text-scale-1100 py-4 text-sm">
+              Are you sure you want to delete the selected table? This action cannot be undone.
+            </p>
+          </Modal.Content>
+        }
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleting(false)}
+        onSelectConfirm={onConfirmDeleteTable}
+      />
+    </>
+  )
+}
+
+const PageLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { id }: any = router.query
 
@@ -34,7 +154,8 @@ const TableEditorPage: NextPage = () => {
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
   const selectedTable = !isNaN(Number(id))
-    ? tables.find((table) => table.id === Number(id))
+    ? // @ts-ignore
+      tables.find((table) => table.id === Number(id))
     : tryParseJson(Base64.decode(id))
 
   useEffect(() => {
@@ -143,6 +264,28 @@ const TableEditorPage: NextPage = () => {
     }
   }
 
+  const contextValue = {
+    sidePanelKey,
+    isDuplicating,
+    isDeleting,
+    setIsDeleting,
+    selectedSchema,
+    selectedTable,
+    selectedRowToEdit,
+    selectedColumnToEdit,
+    selectedTableToEdit,
+    selectedColumnToDelete,
+    selectedTableToDelete,
+    onConfirmDeleteColumn,
+    onAddRow,
+    onEditRow,
+    onAddColumn,
+    onEditColumn,
+    onDeleteColumn,
+    onClosePanel,
+    onConfirmDeleteTable,
+  }
+
   return (
     <TableEditorLayout
       selectedSchema={selectedSchema}
@@ -152,55 +295,11 @@ const TableEditorPage: NextPage = () => {
       onDeleteTable={onDeleteTable}
       onDuplicateTable={onDuplicateTable}
     >
-      <TableGridEditor
-        selectedSchema={selectedSchema}
-        selectedTable={selectedTable}
-        sidePanelKey={sidePanelKey}
-        isDuplicating={isDuplicating}
-        selectedRowToEdit={selectedRowToEdit}
-        selectedColumnToEdit={selectedColumnToEdit}
-        selectedTableToEdit={selectedTableToEdit}
-        onAddRow={onAddRow}
-        onEditRow={onEditRow}
-        onAddColumn={onAddColumn}
-        onEditColumn={onEditColumn}
-        onDeleteColumn={onDeleteColumn}
-        onClosePanel={onClosePanel}
-      />
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedColumnToDelete)}
-        header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteColumn}
-      />
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
-        children={
-          <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
-          </Modal.Content>
-        }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteTable}
-      />
+      <PageLayoutContext.Provider value={contextValue}>{children}</PageLayoutContext.Provider>
     </TableEditorLayout>
   )
 }
 
-export default withAuth(observer(TableEditorPage))
+TableEditorPage.getLayout = (page) => <PageLayout>{page}</PageLayout>
+
+export default observer(TableEditorPage)

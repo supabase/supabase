@@ -1,17 +1,85 @@
-import { useState } from 'react'
-import { NextPage } from 'next'
+import { useState, createContext, useContext, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresTable } from '@supabase/postgres-meta'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import router from 'next/router'
-import { SidePanel } from '@supabase/ui'
+import { NextPageWithLayout } from 'types'
 
-const Editor: NextPage = () => {
+interface IPageLayoutContext {
+  projectRef: string | undefined
+  selectedSchema: string
+  isDeleting: boolean
+  setIsDeleting: React.Dispatch<React.SetStateAction<boolean>>
+  selectedTableToDelete: PostgresTable | undefined
+  isDuplicating: boolean
+  selectedTableToEdit: PostgresTable | undefined
+  sidePanelKey: 'row' | 'column' | 'table' | undefined
+  onConfirmDeleteTable: () => Promise<void>
+  onAddTable: () => void
+  onClosePanel: () => void
+}
+
+const PageLayoutContext = createContext<IPageLayoutContext>({
+  projectRef: undefined,
+  selectedSchema: '',
+  isDeleting: false,
+  setIsDeleting: () => {},
+  selectedTableToDelete: undefined,
+  isDuplicating: false,
+  selectedTableToEdit: undefined,
+  sidePanelKey: undefined,
+  onConfirmDeleteTable: () => Promise.resolve(),
+  onAddTable: () => {},
+  onClosePanel: () => {},
+})
+
+const Editor: NextPageWithLayout = () => {
+  const {
+    projectRef,
+    selectedSchema,
+    isDeleting,
+    setIsDeleting,
+    selectedTableToDelete,
+    isDuplicating,
+    selectedTableToEdit,
+    sidePanelKey,
+    onConfirmDeleteTable,
+    onAddTable,
+    onClosePanel,
+  } = useContext(PageLayoutContext)
+
+  return (
+    <>
+      <EmptyState selectedSchema={selectedSchema} onAddTable={onAddTable} />
+      {/* On this page it'll only handle tables */}
+      <ConfirmationModal
+        danger
+        visible={isDeleting && !isUndefined(selectedTableToDelete)}
+        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        description={`Are you sure you want to delete the selected table? This action cannot be undone`}
+        buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setIsDeleting(false)}
+        onSelectConfirm={onConfirmDeleteTable}
+      />
+      <SidePanelEditor
+        selectedSchema={selectedSchema}
+        isDuplicating={isDuplicating}
+        selectedTableToEdit={selectedTableToEdit}
+        sidePanelKey={sidePanelKey}
+        closePanel={onClosePanel}
+        onTableCreated={(table: any) => router.push(`/project/${projectRef}/editor/${table.id}`)}
+      />
+    </>
+  )
+}
+
+const PageLayout = ({ children }: PropsWithChildren<{}>) => {
   const { meta, ui } = useStore()
   const projectRef = ui.selectedProject?.ref
   const [sidePanelKey, setSidePanelKey] = useState<'row' | 'column' | 'table'>()
@@ -64,6 +132,20 @@ const Editor: NextPage = () => {
     }
   }
 
+  const contextValue = {
+    projectRef,
+    selectedSchema,
+    isDeleting,
+    setIsDeleting,
+    selectedTableToDelete,
+    isDuplicating,
+    selectedTableToEdit,
+    sidePanelKey,
+    onConfirmDeleteTable,
+    onAddTable,
+    onClosePanel,
+  }
+
   return (
     <TableEditorLayout
       selectedSchema={selectedSchema}
@@ -73,28 +155,11 @@ const Editor: NextPage = () => {
       onDeleteTable={onDeleteTable}
       onDuplicateTable={onDuplicateTable}
     >
-      <EmptyState selectedSchema={selectedSchema} onAddTable={onAddTable} />
-      {/* On this page it'll only handle tables */}
-      <ConfirmationModal
-        danger
-        visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
-        description={`Are you sure you want to delete the selected table? This action cannot be undone`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsDeleting(false)}
-        onSelectConfirm={onConfirmDeleteTable}
-      />
-      <SidePanelEditor
-        selectedSchema={selectedSchema}
-        isDuplicating={isDuplicating}
-        selectedTableToEdit={selectedTableToEdit}
-        sidePanelKey={sidePanelKey}
-        closePanel={onClosePanel}
-        onTableCreated={(table: any) => router.push(`/project/${projectRef}/editor/${table.id}`)}
-      />
+      <PageLayoutContext.Provider value={contextValue}>{children}</PageLayoutContext.Provider>
     </TableEditorLayout>
   )
 }
 
-export default withAuth(observer(Editor))
+Editor.getLayout = (page) => <PageLayout>{page}</PageLayout>
+
+export default observer(Editor)

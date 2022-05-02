@@ -1,8 +1,8 @@
-import { FC, ReactNode, useState, useEffect } from 'react'
+import { useState, useEffect, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PostgresTable } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
@@ -15,10 +15,9 @@ interface Props {
   onEditTable: (table: PostgresTable) => void
   onDeleteTable: (table: PostgresTable) => void
   onDuplicateTable: (table: PostgresTable) => void
-  children: ReactNode
 }
 
-const TableEditorLayout: FC<Props> = ({
+const TableEditorLayout = ({
   selectedSchema,
   onSelectSchema = () => {},
   onAddTable = () => {},
@@ -26,7 +25,7 @@ const TableEditorLayout: FC<Props> = ({
   onDeleteTable = () => {},
   onDuplicateTable = () => {},
   children,
-}) => {
+}: PropsWithChildren<Props>) => {
   const { meta, ui } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
 
@@ -78,4 +77,4 @@ const TableEditorLayout: FC<Props> = ({
   )
 }
 
-export default observer(TableEditorLayout)
+export default withAuth(observer(TableEditorLayout))
