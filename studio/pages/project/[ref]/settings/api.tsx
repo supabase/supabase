@@ -66,7 +66,7 @@ const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
     'updated configuration for API services',
   [JwtSecretUpdateProgress.UpdatedDatabaseAdminAPIConfiguration]:
     'updated configuration for database admin API',
-  [JwtSecretUpdateProgress.UpdatedAPIGatewayConfiguration]: 'updated API Gateway',
+  [JwtSecretUpdateProgress.UpdatedAPIGatewayConfiguration]: 'updated configuration for API Gateway',
 }
 
 const PageContext: any = createContext(null)
