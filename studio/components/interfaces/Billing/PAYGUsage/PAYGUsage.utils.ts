@@ -12,7 +12,24 @@ import { ChargeableProduct, PaygStats, ProductFeature } from './PAYGUsage.types'
  * @returns number
  */
 export const deriveFeatureCost = (paygStats: PaygStats | undefined, feature: ProductFeature) => {
-  const maximumValueOfTheMonth = paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
+  let rawUsage = paygStats?.[feature.attribute]?.[feature.pricingModel]
+
+  /**
+   * Some features have a free quota
+   *
+   * Check there is included free quota,
+   * and remove free quota amount from the raw usage derived from paygStats
+   *
+   * if the number is negative, then Math.max should return 0
+   *
+   * todo: move this logic to backend @mildtomato
+   */
+  if (rawUsage && feature.freeQuota) {
+    rawUsage = Math.max(0, rawUsage - feature.freeQuota)
+  }
+
+  const maximumValueOfTheMonth = rawUsage ?? 0
+
   return (maximumValueOfTheMonth / feature.unitQuantity) * feature.costPerUnit
 }
 

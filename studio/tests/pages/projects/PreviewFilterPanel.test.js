@@ -93,3 +93,11 @@ test.todo('timestamp to/from filter value change')
 //   await screen.findByText('Custom')
 //   await screen.findByTitle(/Clear timestamp filter/)
 // })
+
+
+
+test('shortened count to K', async () => {
+  render(<PreviewFilterPanel newCount={1234} />)
+  await screen.findByText(/1\.2K/)
+})
+

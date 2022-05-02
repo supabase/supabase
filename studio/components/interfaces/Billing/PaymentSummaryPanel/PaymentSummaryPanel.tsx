@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import {
   Listbox,
   IconLoader,
@@ -6,6 +6,8 @@ import {
   IconPlus,
   IconAlertCircle,
   IconCreditCard,
+  Modal,
+  Alert,
 } from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
@@ -59,6 +61,7 @@ const PaymentSummaryPanel: FC<Props> = ({
    * Feature flags
    */
   const nativeBilling = useFlag('nativeBilling')
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
@@ -77,160 +80,207 @@ const PaymentSummaryPanel: FC<Props> = ({
   }
 
   return (
-    <div
-      className="bg-panel-body-light dark:bg-panel-body-dark w-full px-6 lg:px-12 py-10 space-y-8 border-l"
-      style={{ height: 'calc(100vh - 49.5px)' }}
-    >
-      <p>Payment Summary</p>
+    <>
+      <div
+        className="bg-panel-body-light dark:bg-panel-body-dark w-full px-6 lg:px-12 py-10 space-y-8 border-l"
+        style={{ height: 'calc(100vh - 57px)' }}
+      >
+        <p>Payment Summary</p>
 
-      {/* Subscription details */}
-      <div className="space-y-1">
-        <p className="text-sm text-scale-1100">Selected subscription</p>
-        <div className="flex items-center justify-between">
-          <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
-            {getPlanName(currentPlan)}
-          </p>
-          <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
-            ${(currentPlan.unit_amount / 100).toFixed(2)}
-          </p>
-        </div>
-        {isChangingPlan && (
+        {/* Subscription details */}
+        <div className="space-y-1">
+          <p className="text-sm text-scale-1100">Selected subscription</p>
           <div className="flex items-center justify-between">
-            <p className="text-sm">{getPlanName(selectedPlan)}</p>
-            <p className="text-sm">
-              ${(getProductPrice(selectedPlan).unit_amount / 100).toFixed(2)}
+            <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
+              {getPlanName(currentPlan)}
+            </p>
+            <p className={`${isChangingPlan ? 'text-scale-1100 line-through' : ''} text-sm`}>
+              ${(currentPlan.unit_amount / 100).toFixed(2)}
             </p>
           </div>
-        )}
-      </div>
-
-      {/* Add on details */}
-      {nativeBilling && (
-        <>
-          {projectRegion !== 'af-south-1' && (
-            <div className="space-y-1">
-              <p className="text-sm">Selected add-ons</p>
-              {currentComputeSize === undefined && selectedComputeSize === undefined && (
-                <p className="text-scale-1100 text-sm">No add-ons selected</p>
-              )}
-              {currentComputeSize !== undefined && (
-                <div className="flex items-center justify-between">
-                  <p
-                    className={`${
-                      isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                    } text-sm`}
-                  >
-                    {currentComputeSize.name}
-                  </p>
-                  <p
-                    className={`${
-                      isChangingComputeSize ? 'text-scale-1100 line-through' : ''
-                    } text-sm`}
-                  >
-                    ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
-                  </p>
-                </div>
-              )}
-              {isChangingComputeSize && (
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">{selectedComputeSize.name}</p>
-                  <p className="text-sm">
-                    ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
-                  </p>
-                </div>
-              )}
-              {isChangingComputeSize && (
-                <div className="!mt-4">
-                  <InformationBox
-                    hideCollapse
-                    defaultVisibility
-                    icon={<IconAlertCircle strokeWidth={2} />}
-                    title="Changing your compute size"
-                    description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </>
-      )}
-
-      <div className="h-px w-full bg-scale-600" />
-
-      <PaymentTotal
-        subscriptionPreview={subscriptionPreview}
-        isRefreshingPreview={isRefreshingPreview}
-        isSpendCapEnabled={isSpendCapEnabled}
-      />
-
-      {/* Payment method selection */}
-      <div className="space-y-2">
-        <p className="text-sm">Select payment method</p>
-        {isLoadingPaymentMethods ? (
-          <div className="flex items-center rounded-md space-x-4 px-4 py-2 bg-scale-400 border border-scale-700">
-            <IconLoader className="animate-spin" size={14} />
-            <p className="text-sm text-scale-1100">Retrieving payment methods</p>
-          </div>
-        ) : paymentMethods.length === 0 ? (
-          <div className="flex items-center justify-between rounded-md px-4 py-2 bg-scale-100 border border-dashed">
-            <div className="flex items-center space-x-4 text-scale-1100">
-              <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm">No saved payment methods</p>
-            </div>
-            <Button type="default" icon={<IconCreditCard />} onClick={onSelectAddNewPaymentMethod}>
-              Add new
-            </Button>
-          </div>
-        ) : (
-          <Listbox value={selectedPaymentMethod?.id} onChange={onSelectPaymentMethod}>
-            {paymentMethods.map((method: any) => {
-              const label = `•••• •••• •••• ${method.card.last4}`
-              return (
-                <Listbox.Option
-                  key={method.id}
-                  label={label}
-                  value={method.id}
-                  addOnBefore={() => {
-                    return (
-                      <img
-                        src={`/img/payment-methods/${method.card.brand
-                          .replace(' ', '-')
-                          .toLowerCase()}.png`}
-                        width="32"
-                      />
-                    )
-                  }}
-                >
-                  <div>{label}</div>
-                </Listbox.Option>
-              )
-            })}
-            <div
-              className="py-2 px-3 flex items-center space-x-2 cursor-pointer transition group hover:bg-scale-500"
-              onClick={onSelectAddNewPaymentMethod}
-            >
-              <IconPlus size={16} />
-              <p className="text-scale-1000 transition group-hover:text-scale-1200">
-                Add new payment method
+          {isChangingPlan && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm">{getPlanName(selectedPlan)}</p>
+              <p className="text-sm">
+                ${(getProductPrice(selectedPlan).unit_amount / 100).toFixed(2)}
               </p>
             </div>
-          </Listbox>
+          )}
+        </div>
+
+        {/* Add on details */}
+        {nativeBilling && (
+          <>
+            {projectRegion !== 'af-south-1' && (
+              <div className="space-y-1">
+                <p className="text-sm">Selected add-ons</p>
+                {currentComputeSize === undefined && selectedComputeSize === undefined && (
+                  <p className="text-scale-1100 text-sm">No add-ons selected</p>
+                )}
+                {currentComputeSize !== undefined && (
+                  <div className="flex items-center justify-between">
+                    <p
+                      className={`${
+                        isChangingComputeSize ? 'text-scale-1100 line-through' : ''
+                      } text-sm`}
+                    >
+                      {currentComputeSize.name}
+                    </p>
+                    <p
+                      className={`${
+                        isChangingComputeSize ? 'text-scale-1100 line-through' : ''
+                      } text-sm`}
+                    >
+                      ${(getProductPrice(currentComputeSize).unit_amount / 100).toFixed(2)}
+                    </p>
+                  </div>
+                )}
+                {isChangingComputeSize && (
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">{selectedComputeSize.name}</p>
+                    <p className="text-sm">
+                      ${(getProductPrice(selectedComputeSize).unit_amount / 100).toFixed(2)}
+                    </p>
+                  </div>
+                )}
+                {isChangingComputeSize && (
+                  <div className="!mt-4">
+                    <InformationBox
+                      hideCollapse
+                      defaultVisibility
+                      icon={<IconAlertCircle strokeWidth={2} />}
+                      title="Changing your compute size"
+                      description="It will take up to 2 minutes for changes to take place, and your project will be unavailable during that time"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
+
+        <div className="h-px w-full bg-scale-600" />
+
+        <PaymentTotal
+          subscriptionPreview={subscriptionPreview}
+          isRefreshingPreview={isRefreshingPreview}
+          isSpendCapEnabled={isSpendCapEnabled}
+        />
+
+        {/* Payment method selection */}
+        <div className="space-y-2">
+          <p className="text-sm">Select payment method</p>
+          {isLoadingPaymentMethods ? (
+            <div className="flex items-center rounded-md space-x-4 px-4 py-2 bg-scale-400 border border-scale-700">
+              <IconLoader className="animate-spin" size={14} />
+              <p className="text-sm text-scale-1100">Retrieving payment methods</p>
+            </div>
+          ) : paymentMethods.length === 0 ? (
+            <div className="flex items-center justify-between rounded-md px-4 py-2 bg-scale-100 border border-dashed">
+              <div className="flex items-center space-x-4 text-scale-1100">
+                <IconAlertCircle size={16} strokeWidth={1.5} />
+                <p className="text-sm">No saved payment methods</p>
+              </div>
+              <Button
+                type="default"
+                icon={<IconCreditCard />}
+                onClick={onSelectAddNewPaymentMethod}
+              >
+                Add new
+              </Button>
+            </div>
+          ) : (
+            <Listbox value={selectedPaymentMethod?.id} onChange={onSelectPaymentMethod}>
+              {paymentMethods.map((method: any) => {
+                const label = `•••• •••• •••• ${method.card.last4}`
+                return (
+                  <Listbox.Option
+                    key={method.id}
+                    label={label}
+                    value={method.id}
+                    addOnBefore={() => {
+                      return (
+                        <img
+                          src={`/img/payment-methods/${method.card.brand
+                            .replace(' ', '-')
+                            .toLowerCase()}.png`}
+                          width="32"
+                        />
+                      )
+                    }}
+                  >
+                    <div>{label}</div>
+                  </Listbox.Option>
+                )
+              })}
+              <div
+                className="py-2 px-3 flex items-center space-x-2 cursor-pointer transition group hover:bg-scale-500"
+                onClick={onSelectAddNewPaymentMethod}
+              >
+                <IconPlus size={16} />
+                <p className="text-scale-1000 transition group-hover:text-scale-1200">
+                  Add new payment method
+                </p>
+              </div>
+            </Listbox>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end">
+          <Button
+            block
+            type="primary"
+            size="medium"
+            loading={isSubmitting}
+            disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
+            onClick={() => (isChangingComputeSize ? setShowConfirmModal(true) : onConfirmPayment())}
+          >
+            Confirm payment
+          </Button>
+        </div>
       </div>
 
-      <div className="flex items-center justify-end">
-        <Button
-          type="primary"
-          loading={isSubmitting}
-          disabled={isSubmitting || isLoadingPaymentMethods || !hasChangesToPlan}
-          onClick={() => onConfirmPayment()}
-          block
-          size="medium"
-        >
-          Confirm payment
-        </Button>
-      </div>
-    </div>
+      <Modal
+        hideFooter
+        visible={showConfirmModal}
+        size="large"
+        header="Updating project database instance size"
+        onCancel={() => setShowConfirmModal(false)}
+      >
+        <div className="py-4 space-y-4">
+          <Modal.Content>
+            <Alert
+              withIcon
+              variant="warning"
+              title="Your project will need to be restarted for changes to take place"
+            >
+              Upon confirmation, your project will be restarted to change your instance size. This
+              will take up to 2 minutes in which your project will be unavailable during the time.
+            </Alert>
+          </Modal.Content>
+          <Modal.Content>
+            <p className="text-sm text-scale-1200">Would you like to update your project now?</p>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <div className="flex items-center gap-2">
+              <Button block type="default" onClick={() => setShowConfirmModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                block
+                type="primary"
+                loading={isSubmitting}
+                disabled={isSubmitting}
+                onClick={() => onConfirmPayment()}
+              >
+                Confirm
+              </Button>
+            </div>
+          </Modal.Content>
+        </div>
+      </Modal>
+    </>
   )
 }
 

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { useStore } from 'hooks'
 import { Button, IconX } from '@supabase/ui'
+
+import { headWithTimeout } from 'lib/common/fetch'
 import BaseLayout from 'components/layouts'
 
 interface Props {
