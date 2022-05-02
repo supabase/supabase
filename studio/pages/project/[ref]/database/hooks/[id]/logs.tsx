@@ -10,20 +10,21 @@ import { useStore, withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { DatabaseLayout } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-const FunctionsPage = () => {
+const FunctionsPage: NextPageWithLayout = () => {
   return (
-    <DatabaseLayout title="Hooks">
-      <div className="flex">
-        <div className="w-full my-4">
-          <HookLogs />
-        </div>
+    <div className="flex">
+      <div className="my-4 w-full">
+        <HookLogs />
       </div>
-    </DatabaseLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(FunctionsPage))
+FunctionsPage.getLayout = (page) => <DatabaseLayout title="Hooks">{page}</DatabaseLayout>
+
+export default observer(FunctionsPage)
 
 const HookLogs: FC<any> = observer(() => {
   const router = useRouter()
@@ -83,8 +84,8 @@ const HookLogs: FC<any> = observer(() => {
         <div className="divide-y-2 ">
           {logsData?.map((log: any) => {
             return (
-              <div className="space-y-1 flex flex-col py-4 px-6">
-                <div className="flex justify-between items-center">
+              <div className="flex flex-col space-y-1 py-4 px-6">
+                <div className="flex items-center justify-between">
                   <div className="space-x-3">
                     <Typography.Text className="font-mono" type="secondary">
                       [{log.method}]
