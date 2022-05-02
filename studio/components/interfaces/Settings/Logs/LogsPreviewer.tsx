@@ -117,7 +117,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         onExploreClick={() => {
           router.push(
             `/project/${projectRef}/logs-explorer?q=${encodeURIComponent(
-              params.rawSql || ''
+              params.sql || ''
             )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
               params.iso_timestamp_end || ''
             )}`

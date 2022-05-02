@@ -1,5 +1,7 @@
 import { FC } from 'react'
-import { Badge, Radio } from '@supabase/ui'
+import Link from 'next/link'
+import { Badge, Button, Radio } from '@supabase/ui'
+import { useStore } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
 
 interface Props {
@@ -17,6 +19,9 @@ const ComputeSizeSelection: FC<Props> = ({
 }) => {
   // [Joshen] We should have some indication on what's the current compute
   // size of the project based on currentComputeSize
+  const { ui } = useStore()
+  const projectRef = ui.selectedProjectRef
+
   return (
     <div className="space-y-4">
       <div>
@@ -51,6 +56,21 @@ const ComputeSizeSelection: FC<Props> = ({
             />
           )
         })}
+        <Radio
+          hidden
+          disabled
+          key="compute-size-cta"
+          align="vertical"
+          label="Need a larger add on?"
+          description="Reach out to us - we've got you covered!"
+          optionalLabel={
+            <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <a>
+                <Button>Contact us</Button>
+              </a>
+            </Link>
+          }
+        />
       </Radio.Group>
     </div>
   )

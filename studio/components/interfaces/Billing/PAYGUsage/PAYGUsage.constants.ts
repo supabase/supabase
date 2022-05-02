@@ -11,6 +11,7 @@ export const chargeableProducts: ChargeableProduct[] = [
         costPerUnit: 0.125,
         unitQuantity: 1000000000, // 1GB
         pricingModel: 'max',
+        freeQuota: 8000000000, // 8GB
       },
       {
         title: 'Database Egress',
@@ -18,6 +19,7 @@ export const chargeableProducts: ChargeableProduct[] = [
         costPerUnit: 0.09,
         unitQuantity: 1000000000, // 1GB
         pricingModel: 'sum',
+        freeQuota: 50000000000, // 50GB
       },
     ],
   },
@@ -31,6 +33,7 @@ export const chargeableProducts: ChargeableProduct[] = [
         costPerUnit: 0.021,
         unitQuantity: 1000000000, // 1GB
         pricingModel: 'max',
+        freeQuota: 100000000000, // 100GB
       },
       {
         title: 'Storage Egress',
@@ -38,6 +41,7 @@ export const chargeableProducts: ChargeableProduct[] = [
         costPerUnit: 0.09,
         unitQuantity: 1000000000, // 1GB
         pricingModel: 'sum',
+        freeQuota: 200000000000, // 200GB
       },
     ],
   },

@@ -60,7 +60,7 @@ const Home: NextPage = () => {
   const onDeleteProject = async (project?: Project) => {
     if (!project) return
     setIsDeletingProject(true)
-    const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
+    const response = await delete_(`${API_URL}/projects/${project.ref}`)
 
     if (response.error) {
       return ui.setNotification({ category: 'error', message: response.error.message })

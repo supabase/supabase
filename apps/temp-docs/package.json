@@ -1,0 +1,41 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@mdx-js/loader": "^1.6.22",
+    "@mdx-js/react": "^1.6.22",
+    "@next/mdx": "^12.0.4",
+    "@supabase/ui": "^0.36.2",
+    "@tailwindcss/typography": "^0.4.1",
+    "common": "*",
+    "gray-matter": "^4.0.3",
+    "markdown-toc": "^1.2.0",
+    "next": "12.1.0",
+    "next-mdx-remote": "^3.0.8",
+    "next-themes": "0.0.15",
+    "react": "17.0.2",
+    "react-copy-to-clipboard": "^5.0.2",
+    "react-dom": "17.0.2",
+    "react-syntax-highlighter": "^15.3.1",
+    "remark": "^14.0.2",
+    "remark-html": "^15.0.0",
+    "remark-mdx": "^2.0.0-rc.2",
+    "remark-prism": "^1.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.12",
+    "@types/react": "17.0.39",
+    "config": "*",
+    "eslint": "8.9.0",
+    "next-transpile-modules": "9.0.0",
+    "tsconfig": "*",
+    "typescript": "^4.5.3"
+  }
+}
