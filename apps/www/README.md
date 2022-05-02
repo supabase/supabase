@@ -13,7 +13,7 @@ You will need to run the marketing website and docs website separately. To learn
 cd supabase
 
 # step 2
-cd www
+cd apps/www
 
 # step 3
 npm install
