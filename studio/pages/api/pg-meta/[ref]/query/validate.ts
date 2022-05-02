@@ -21,7 +21,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
-
   const headers = constructHeaders(req.headers)
   const response = await post(`${PG_META_URL}/query/parse`, { query }, { headers })
 
