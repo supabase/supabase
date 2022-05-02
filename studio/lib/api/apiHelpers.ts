@@ -7,13 +7,6 @@ export function constructHeaders(headers: any) {
   if (headers) {
     return {
       ...headers,
-      /**
-       * temporary removal
-       * testing an additional domain for dashboard client
-       *
-       * @author @mildtomato
-       */
-      host: undefined,
       ...(IS_PLATFORM
         ? { apiKey: `${process.env.READ_ONLY_API_KEY}` }
         : { apiKey: `${process.env.SUPABASE_SERVICE_KEY}` }),
