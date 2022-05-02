@@ -1,27 +1,25 @@
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
 
-import { withAuth } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { BackupsList } from 'components/interfaces/Database'
+import { NextPageWithLayout } from 'types'
 
-const DatabaseBackups: NextPage = () => {
+const DatabaseBackups: NextPageWithLayout = () => {
   return (
-    <DatabaseLayout title="Database">
-      <div className="flex">
-        <div className="p-4 w-full my-2 max-w-4xl mx-auto space-y-8">
-          <h3 className="text-2xl">Backups</h3>
-          <div className="space-y-4">
-            <p className="text-sm text-scale-1100">
-              Projects are backed up daily and can be restored at any time.
-            </p>
-            <BackupsList />
-          </div>
+    <div className="flex">
+      <div className="my-2 mx-auto w-full max-w-4xl space-y-8 p-4">
+        <h3 className="text-2xl">Backups</h3>
+        <div className="space-y-4">
+          <p className="text-scale-1100 text-sm">
+            Projects are backed up daily and can be restored at any time.
+          </p>
+          <BackupsList />
         </div>
       </div>
-    </DatabaseLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(DatabaseBackups))
+DatabaseBackups.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(DatabaseBackups)
