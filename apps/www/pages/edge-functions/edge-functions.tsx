@@ -80,7 +80,7 @@ function Database() {
   }
 
   const title = 'Serverless Edge Functions that automatically scale'
-  const subtitle = `Execute your code closest to your users with fast deploy times and low latency.`
+  const subtitle = `Write functions in Deno, a modern runtime for Typescript and WASM.`
   const meta_title = `${title}`
   const meta_description = subtitle
 
