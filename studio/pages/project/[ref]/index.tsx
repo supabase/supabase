@@ -4,7 +4,7 @@ import { useStore } from 'hooks'
 import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { IS_PLATFORM } from 'lib/constants'
-import ProjectLayout from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { NextPageWithLayout } from 'types'
 
@@ -47,6 +47,6 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => <ProjectLayout>{page}</ProjectLayout>
+Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
 export default observer(Home)

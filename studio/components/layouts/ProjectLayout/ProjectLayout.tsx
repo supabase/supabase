@@ -58,7 +58,9 @@ const ProjectLayout = ({
   )
 }
 
-export default withAuth(ProjectLayout)
+export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
+
+export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean
