@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, action } from 'mobx'
 import { keyBy } from 'lodash'
 
 import { get, post, patch, delete_ } from 'lib/common/fetch'
@@ -15,11 +15,15 @@ export interface IProjectContentStore {
   isLoaded: boolean
   error: any
 
+  baseUrl: string
+  projectRef?: string
+
   load: () => void
   create: (x: UserContent) => { data: UserContent; error: { error: { message: string } } }
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
+  setProjectRef: (ref?: string) => void
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
@@ -33,6 +37,8 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   baseUrl: string
+  projectRef: string
+
   data: UserContentMap = {}
 
   state = this.STATES.INITIAL
@@ -40,8 +46,9 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
+    this.projectRef = projectRef
     this.rootStore = rootStore
-    this.baseUrl = `${API_URL}/projects/${projectRef}/content`
+    this.baseUrl = ``
     makeAutoObservable(this)
   }
 
@@ -188,6 +195,13 @@ export default class ProjectContentStore implements IProjectContentStore {
       return { data: true, error: null }
     } catch (error) {
       return { data: false, error }
+    }
+  }
+
+  setProjectRef(ref?: string) {
+    if (ref) {
+      this.projectRef = ref
+      this.baseUrl = `${API_URL}/projects/${ref}/content`
     }
   }
 }
