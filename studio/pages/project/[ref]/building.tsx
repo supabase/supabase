@@ -1,6 +1,6 @@
 import { FC, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import ProjectLayout from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 
 const ProjectBuildingPage: NextPageWithLayout = () => {
@@ -8,7 +8,7 @@ const ProjectBuildingPage: NextPageWithLayout = () => {
 }
 
 ProjectBuildingPage.getLayout = (page) => (
-  <ProjectLayout title="Project Building">{page}</ProjectLayout>
+  <ProjectLayoutWithAuth title="Project Building">{page}</ProjectLayoutWithAuth>
 )
 
 export default ProjectBuildingPage
