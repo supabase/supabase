@@ -15,7 +15,6 @@ export interface IAppStore {
   onProjectCreated: (project: any) => void
   onProjectUpdated: (project: any) => void
   onProjectDeleted: (project: any) => void
-  onProjectConnectionStringUpdated: (projectId: number, value: string) => void
   onProjectStatusUpdated: (projectId: number, value: string) => void
   onProjectPostgrestStatusUpdated: (projectId: number, value: 'OFFLINE' | 'ONLINE') => void
   onOrgAdded: (org: any) => void
@@ -74,12 +73,6 @@ export default class AppStore implements IAppStore {
       localStorage.removeItem(`supabase_${project.ref}`)
       delete this.projects.data[project.id]
     }
-  }
-
-  onProjectConnectionStringUpdated(projectId: number, value: string) {
-    const clone = cloneDeep(this.projects.data[projectId])
-    clone.connectionString = value
-    this.projects.data[projectId] = clone
   }
 
   onProjectStatusUpdated(projectId: number, value: string) {

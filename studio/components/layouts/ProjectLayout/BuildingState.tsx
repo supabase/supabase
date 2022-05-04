@@ -23,19 +23,12 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
     const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
       timeout: 2000,
     })
-
     if (projectStatus && !projectStatus.error) {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-        // re-fetch project detail
+        // re-fetch project detail. This will trigger UI state change to show the welcome screen
         await app.projects.fetchDetail(project.ref)
-
-        // const res = await get(`${API_URL}/props/project/${project.ref}/connection-string`)
-        // if (res && res.connectionString) {
-        //   app.onProjectConnectionStringUpdated(project.id, res.connectionString)
-        // }
-        // app.onProjectStatusUpdated(project.id, status)
       }
     }
   }
