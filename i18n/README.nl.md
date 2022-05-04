@@ -18,7 +18,7 @@
 
 ## Documentatie
 
-Kijk voor de volledige documentatie op [supabase.io/docs](https://supabase.com/docs).
+Kijk voor de volledige documentatie op [supabase.com/docs](https://supabase.com/docs).
 
 ## Community & Hulp
 

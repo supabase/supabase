@@ -1,29 +1,29 @@
-import { NextPage } from 'next'
 import { useState } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { withAuth } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
+import { NextPageWithLayout } from 'types'
 
-const DatabaseReplication: NextPage = () => {
+const DatabaseReplication: NextPageWithLayout = () => {
   const [selectedPublication, setSelectedPublication] = useState<any>()
+
   return (
-    <DatabaseLayout title="Database">
-      <div className="p-4">
-        {isUndefined(selectedPublication) ? (
-          <PublicationsList onSelectPublication={setSelectedPublication} />
-        ) : (
-          <PublicationsTables
-            selectedPublication={selectedPublication}
-            onSelectBack={() => setSelectedPublication(undefined)}
-            onPublicationUpdated={setSelectedPublication}
-          />
-        )}
-      </div>
-    </DatabaseLayout>
+    <div className="p-4">
+      {isUndefined(selectedPublication) ? (
+        <PublicationsList onSelectPublication={setSelectedPublication} />
+      ) : (
+        <PublicationsTables
+          selectedPublication={selectedPublication}
+          onSelectBack={() => setSelectedPublication(undefined)}
+          onPublicationUpdated={setSelectedPublication}
+        />
+      )}
+    </div>
   )
 }
 
-export default withAuth(observer(DatabaseReplication))
+DatabaseReplication.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(DatabaseReplication)

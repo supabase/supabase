@@ -229,6 +229,9 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
   },
+  auth_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 
@@ -237,6 +240,7 @@ export enum LogsTableName {
   POSTGRES = 'postgres_logs',
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
+  AUTH = 'auth_logs',
 }
 
 export const LOGS_TABLES = {
@@ -244,6 +248,7 @@ export const LOGS_TABLES = {
   database: LogsTableName.POSTGRES,
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
+  auth: LogsTableName.AUTH
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -251,6 +256,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
@@ -462,3 +468,9 @@ export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 
 export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
+
+export const TIER_QUERY_LIMITS = {
+  FREE: { text: '1 day', value: 1, unit: 'day' },
+  PRO: { text: '7 days', value: 7, unit: 'day' },
+  PAYG: { text: '3 months', value: 3, unit: 'month' },
+}

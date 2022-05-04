@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, Typography } from '@supabase/ui'
+import { Button, Input } from '@supabase/ui'
 import { useRouter } from 'next/router'
 
 import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { WizardLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
+import { NextPageWithLayout } from 'types'
 
 /**
  * No org selected yet, create a new one
  */
-const Wizard = () => {
+const Wizard: NextPageWithLayout = () => {
   const { ui, app } = useStore()
   const router = useRouter()
 
@@ -55,49 +56,53 @@ const Wizard = () => {
   }
 
   return (
-    <WizardLayout organization={null} project={null}>
-      <Panel
-        hideHeaderStyling
-        title={[
-          <div key="panel-title">
-            <h4>Create a new organization</h4>
-          </div>,
-        ]}
-        footer={[
-          <div key="panel-footer" className="flex items-center w-full justify-between">
-            <Button type="default" onClick={() => router.push('/')}>
-              Cancel
+    <Panel
+      hideHeaderStyling
+      title={[
+        <div key="panel-title">
+          <h4>Create a new organization</h4>
+        </div>,
+      ]}
+      footer={[
+        <div key="panel-footer" className="flex w-full items-center justify-between">
+          <Button type="default" onClick={() => router.push('/')}>
+            Cancel
+          </Button>
+          <div className="flex items-center space-x-3">
+            <p className="text-scale-900 text-xs">You can rename your organization later</p>
+            <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
+              Create organization
             </Button>
-            <div className="flex items-center space-x-3">
-              <p className="text-xs text-scale-900">You can rename your organization later</p>
-              <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
-                Create organization
-              </Button>
-            </div>
-          </div>,
-        ]}
-      >
-        <Panel.Content className="pt-0">
-          <p className="text-sm">This is your organization's name within Supabase.</p>
-          <p className="text-sm text-scale-1100">
-            For example, you can use the name of your company or department
-          </p>
-        </Panel.Content>
-        <Panel.Content className="Form section-block--body has-inputs-centered">
-          <Input
-            autoFocus
-            label="Name"
-            type="text"
-            layout="horizontal"
-            placeholder="Organization name"
-            descriptionText="What's the name of your company or team?"
-            value={orgName}
-            onChange={onOrgNameChange}
-          />
-        </Panel.Content>
-      </Panel>
-    </WizardLayout>
+          </div>
+        </div>,
+      ]}
+    >
+      <Panel.Content className="pt-0">
+        <p className="text-sm">This is your organization's name within Supabase.</p>
+        <p className="text-scale-1100 text-sm">
+          For example, you can use the name of your company or department
+        </p>
+      </Panel.Content>
+      <Panel.Content className="Form section-block--body has-inputs-centered">
+        <Input
+          autoFocus
+          label="Name"
+          type="text"
+          layout="horizontal"
+          placeholder="Organization name"
+          descriptionText="What's the name of your company or team?"
+          value={orgName}
+          onChange={onOrgNameChange}
+        />
+      </Panel.Content>
+    </Panel>
   )
 }
 
-export default withAuth(observer(Wizard))
+Wizard.getLayout = (page) => (
+  <WizardLayout organization={null} project={null}>
+    {page}
+  </WizardLayout>
+)
+
+export default observer(Wizard)

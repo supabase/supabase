@@ -15,7 +15,7 @@ import {
   IconLoader,
 } from '@supabase/ui'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { DatabaseLayout } from 'components/layouts'
@@ -24,12 +24,13 @@ import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import CreateHook from 'components/interfaces/Database/Hooks/CreateHook'
 import DeleteHook from 'components/interfaces/Database/Hooks/DeleteHook'
+import { NextPageWithLayout } from 'types'
 
 function isHooksEnabled(schemas: any): boolean {
   return schemas.some((schema: any) => schema.name === 'supabase_functions')
 }
 
-const HooksPage: FC<any> = () => {
+const HooksPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
 
   const router = useRouter()
@@ -79,7 +80,7 @@ const HooksPage: FC<any> = () => {
   }
 
   return (
-    <DatabaseLayout title="Triggers">
+    <>
       <TriggersList
         hooksEnabled={hooksEnabled}
         filterString={filterString}
@@ -99,11 +100,13 @@ const HooksPage: FC<any> = () => {
         visible={showDeleteHookForm}
         setVisible={setShowDeleteHookForm}
       />
-    </DatabaseLayout>
+    </>
   )
 }
 
-export default withAuth(observer(HooksPage))
+HooksPage.getLayout = (page) => <DatabaseLayout title="Hooks">{page}</DatabaseLayout>
+
+export default observer(HooksPage)
 
 const TriggersList: FC<any> = observer(
   ({
@@ -137,7 +140,7 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => enableHooks()}
             >
               <AlphaPreview />
-              <p className="text-sm text-scale-1100">Enable hooks on your project.</p>
+              <p className="text-scale-1100 text-sm">Enable hooks on your project.</p>
             </ProductEmptyState>
           )}
         </>
@@ -146,7 +149,7 @@ const TriggersList: FC<any> = observer(
 
     if (meta.hooks.isLoading) {
       return (
-        <div className="w-full h-full flex items-center justify-center space-x-2">
+        <div className="flex h-full w-full items-center justify-center space-x-2">
           <IconLoader className="animate-spin" size={14} />
           <Typography.Text>Loading hooks...</Typography.Text>
         </div>
@@ -172,15 +175,15 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => createHook()}
             >
               <AlphaPreview />
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 Function Hooks can be used to trigger serverless functions or send requests to an
                 HTTP endpoint.
               </p>
             </ProductEmptyState>
           </div>
         ) : (
-          <div className="w-full py-4 space-y-4">
-            <div className="flex justify-between items-center px-6">
+          <div className="w-full space-y-4 py-4">
+            <div className="flex items-center justify-between px-6">
               <Input
                 placeholder="Filter by name"
                 size="small"
@@ -191,7 +194,7 @@ const TriggersList: FC<any> = observer(
               <Button onClick={() => createHook()}>Create a new hook</Button>
             </div>
             {filteredHooks.length <= 0 && (
-              <div className="border dark:border-dark rounded p-6 max-w-lg mx-auto flex justify-center space-x-3 items-center shadow-md">
+              <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
                 <Typography.Text>No results match your filter query</Typography.Text>
                 <Button type="outline" onClick={() => setFilterString('')}>
                   Reset filter
@@ -225,8 +228,8 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ schema, filterString, editHook = () => {}, deleteHook = () => {} }) => {
     return (
       <div key={schema} className="">
-        <div className="sticky top-0 backdrop-filter backdrop-blur">
-          <div className="flex space-x-1 items-baseline py-2 px-6">
+        <div className="sticky top-0 backdrop-blur backdrop-filter">
+          <div className="flex items-baseline space-x-1 py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema
             </Typography.Title>
@@ -297,7 +300,7 @@ const HookList: FC<HookListProps> = observer(
             <Table.td className="space-x-2">
               <Typography.Text>{x.name}</Typography.Text>
             </Table.td>
-            <Table.td className="space-x-2 hidden lg:table-cell">
+            <Table.td className="hidden space-x-2 lg:table-cell">
               <Typography.Text>{x.table}</Typography.Text>
             </Table.td>
             <Table.td className="hidden xl:table-cell">
@@ -313,7 +316,7 @@ const HookList: FC<HookListProps> = observer(
               </Typography.Text>
             </Table.td>
             <Table.td className="text-right">
-              <div className="flex gap-4 justify-end">
+              <div className="flex justify-end gap-4">
                 {/* <Link href={`/project/${_pageState.project.ref}/database/hooks/${x.id}/logs`}>
                   <Button type="default">Logs</Button>
                 </Link> */}

@@ -19,9 +19,9 @@
 
 ## Development Setup
 
-First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the 
-[code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the 
-[existing issues](https://github.com/supabase/supabase/issues). 
+First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the
+[code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the
+[existing issues](https://github.com/supabase/supabase/issues).
 This document describes how to set up your development environment to build and test Supabase.
 
 ### Installing Dependencies
@@ -61,7 +61,7 @@ Before you start a development server, you must choose if you want to work on th
 1. Go to the [Supabase Website](https://supabase.com) directory
 
    ```sh
-   cd www
+   cd apps/www
    ```
 
    Go to the [Supabase Docs](https://supabase.com/docs) directory
@@ -164,14 +164,14 @@ For more information on Supabase Studio, see the [Supabase Studio readme](./stud
 
 ## Monorepo
 
-We are in the process of migrating this repository to monorepo, using Turborepo. 
+We are in the process of migrating this repository to monorepo, using Turborepo.
 Eventually, the docs and the Studio will be run using Turborepo, which will significantly improve the developer workflow.
 You must be using NPM 7 or higher.
 
 ### Getting started
 
 ```sh
-npm run install # install dependencies
+npm install # install dependencies
 npm run dev # start all the applications
 ```
 
@@ -181,9 +181,9 @@ Then edit and visit any of the following sites:
   - The main website.
 - `/apps/temp-docs`: http://localhost:3001
   - We are migrating the docs to a Next.js application.
-- `/apps/temp-community-forum`: http://localhost:3002 
+- `/apps/temp-community-forum`: http://localhost:3002
   - pulls all our github discussions into a nextjs site. Temporary/POC
-- `/apps/temp-community-tutorials`: http://localhost:3003 
+- `/apps/temp-community-tutorials`: http://localhost:3003
   - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
 
 
@@ -198,9 +198,9 @@ The monorepo has a set of shared components under `/packages`:
 
 Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
 
-The format is: `npm install <package name> -w=<workspace to install in>`. 
+The format is: `npm install <package name> -w=<workspace to install in>`.
 
-For example: 
+For example:
 
 - `npm install @supabase/ui -w common`: installs into `./packages/common`
 - `npm install @supabase/ui -w www`: installs into `./apps/www`
