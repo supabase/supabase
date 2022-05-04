@@ -3,16 +3,17 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { PROJECT_STATUS } from 'lib/constants'
 import { StorageLayout } from 'components/layouts'
 import { StorageUsage } from 'components/to-be-cleaned/Storage'
+import { NextPageWithLayout } from 'types'
 
 /**
  * PageLayout is used to setup layout - as usual it will requires inject global store
  */
-const PageLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -28,12 +29,12 @@ const PageLayout = () => {
   if (!project) return <div></div>
 
   return (
-    <StorageLayout title="Usage">
-      <div className="storage-container flex flex-grow">
-        <StorageUsage />
-      </div>
-    </StorageLayout>
+    <div className="storage-container flex flex-grow">
+      <StorageUsage />
+    </div>
   )
 }
 
-export default withAuth(observer(PageLayout))
+PageLayout.getLayout = (page) => <StorageLayout title="Usage">{page}</StorageLayout>
+
+export default observer(PageLayout)
