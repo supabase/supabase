@@ -160,7 +160,8 @@ export default class ProjectContentStore implements IProjectContentStore {
       return arr_filtered
     }
   }
-  public addRecentLogSqlSnippet(snippet: Partial<LogSqlSnippets.Content>) {
+
+  addRecentLogSqlSnippet(snippet: Partial<LogSqlSnippets.Content>) {
     if (typeof window === 'undefined') return
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
@@ -174,7 +175,8 @@ export default class ProjectContentStore implements IProjectContentStore {
       JSON.stringify(this.recentLogSqlSnippets)
     )
   }
-  public clearRecentLogSqlSnippets() {
+
+  clearRecentLogSqlSnippets() {
     if (typeof window === 'undefined') return
     this.recentLogSqlSnippets = []
     ;(window as any).localStorage.setItem(this.recentLogSqlKey, JSON.stringify([]))
