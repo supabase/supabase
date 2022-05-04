@@ -27,7 +27,8 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-        // re-fetch project detail. This will trigger UI state change to show the welcome screen
+        // re-fetch project detail.
+        // This will also trigger UI state change to show project building completed
         await app.projects.fetchDetail(project.ref)
       }
     }
