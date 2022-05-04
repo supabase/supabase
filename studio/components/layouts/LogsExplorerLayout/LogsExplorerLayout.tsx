@@ -21,7 +21,7 @@ const PageLayout = ({
   if (!content.isLoaded) {
     return (
       <BaseLayout>
-        <Loading active={true}>loading</Loading>
+        <Loading active={true}>{null}</Loading>
       </BaseLayout>
     )
   }

@@ -10,28 +10,30 @@ import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplor
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 
-export const LogsExplorerPage: NextPage = () => {
+export const LogsSavedPage: NextPage = () => {
   const { content, ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
 
   useEffect(() => {
-    content.load()
+    if (!content.isLoading) {
+      content.load()
+    }
   }, [ui.selectedProject])
 
-  if (content.isLoaded)
+  if (content.isLoading) {
     return (
       <LogsExplorerLayout>
-        <Loading active={true}>loading</Loading>
+        <Loading active={true}>{null}</Loading>
       </LogsExplorerLayout>
     )
-
-  const saved = content.list()
+  }
+  const saved = content.logSqlSnippets()
 
   return (
     <LogsExplorerLayout>
       <div className="flex flex-col gap-3">
-        {saved[0].length > 0 && (
+        {saved.length > 0 && (
           <Table
             headTrClasses="expandable-tr"
             head={
@@ -44,13 +46,15 @@ export const LogsExplorerPage: NextPage = () => {
               </>
             }
             body={
-              saved.length > 0 &&
-              saved[0].map((item: any) => <LogsSavedQueriesItem key={item.id} item={item} />)
+              <>
+                {saved.length > 0 &&
+                  saved.map((item: any) => <LogsSavedQueriesItem key={item.id} item={item} />)}
+              </>
             }
           />
         )}
       </div>
-      {saved[0].length === 0 && (
+      {saved.length === 0 && (
         <>
           <div className="items-center flex flex-col gap-1 my-auto justify-center h-full flex-grow">
             <IconSave className="animate-bounce" />
@@ -69,4 +73,4 @@ export const LogsExplorerPage: NextPage = () => {
   )
 }
 
-export default withAuth(observer(LogsExplorerPage))
+export default withAuth(observer(LogsSavedPage))

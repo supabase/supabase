@@ -1,29 +1,28 @@
 import { useState } from 'react'
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 
-import { withAuth } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { RolesList, RolesSettings } from 'components/interfaces/Database'
+import { NextPageWithLayout } from 'types'
 
-const DatabaseRoles: NextPage = () => {
+const DatabaseRoles: NextPageWithLayout = () => {
   const [selectedRole, setSelectedRole] = useState<any>()
 
   return (
-    <DatabaseLayout title="Database">
-      <div className="p-4">
-        {isUndefined(selectedRole) ? (
-          <RolesList onSelectRole={setSelectedRole} />
-        ) : (
-          <RolesSettings
-            selectedRole={selectedRole}
-            onSelectBack={() => setSelectedRole(undefined)}
-          />
-        )}
-      </div>
-    </DatabaseLayout>
+    <div className="p-4">
+      {isUndefined(selectedRole) ? (
+        <RolesList onSelectRole={setSelectedRole} />
+      ) : (
+        <RolesSettings
+          selectedRole={selectedRole}
+          onSelectBack={() => setSelectedRole(undefined)}
+        />
+      )}
+    </div>
   )
 }
 
-export default withAuth(observer(DatabaseRoles))
+DatabaseRoles.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(DatabaseRoles)

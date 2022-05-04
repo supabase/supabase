@@ -18,7 +18,7 @@ A [Supabase](https://supabase.com) egy nyílt forráskódú Firebase alternatív
 
 ## Dokumentáció
 
-A teljes dokumentációért látogasson el a [supabase.io/docs](https://supabase.com/docs) oldalra.
+A teljes dokumentációért látogasson el a [supabase.com/docs](https://supabase.com/docs) oldalra.
 
 ## Közösség & Támogatás
 

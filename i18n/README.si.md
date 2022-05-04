@@ -18,7 +18,7 @@
 
 ## ප්‍රලේඛනය
 
-සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [supabase.io/docs](https://supabase.com/docs)
+සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [supabase.com/docs](https://supabase.com/docs)
 
 ## Community එක හා සහයෝගය ගැනීමට
 

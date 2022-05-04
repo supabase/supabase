@@ -6,15 +6,18 @@ import { StripeSubscription } from 'components/interfaces/Billing'
 /**
  * Get project payg statistics
  *
+ * todo: this looks like a duplicate
+ * of /studio/hooks/misc/useProjectSubscription.tsx
+ *
  * @param ref project reference
  */
-export function useProjectSubscription(ref?: string) {
+export function useProjectSubscription(ref: string | undefined) {
   const url = `${API_URL}/projects/${ref}/subscription`
-  const { data, error } = useSWR<any>(ref ? url : null, get)
+  const { data, error } = useSWR<StripeSubscription & { error?: string }>(url, get)
   const anyError = data?.error || error
 
   return {
-    subscription: anyError ? undefined : (data as StripeSubscription),
+    subscription: anyError ? null : (data as StripeSubscription),
     error: anyError,
     isLoading: !anyError && !data,
     isError: !!anyError,
