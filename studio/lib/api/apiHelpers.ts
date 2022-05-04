@@ -17,7 +17,11 @@ export function constructHeaders(headers: { [prop: string]: any }) {
       Authorization: headers.Authorization,
       'Content-Type': headers['Content-Type'],
       'x-connection-encrypted': headers['x-connection-encrypted'],
-    }
+    } as any
+    // clean up key with underfined value
+    Object.keys(cleansedHeaders).forEach((key) =>
+      cleansedHeaders[key] === undefined ? delete cleansedHeaders[key] : {}
+    )
     return {
       ...cleansedHeaders,
       ...(IS_PLATFORM
