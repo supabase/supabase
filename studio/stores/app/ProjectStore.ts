@@ -9,7 +9,7 @@ import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/Postgre
 import pingPostgrest from 'lib/pingPostgrest'
 
 export interface IProjectStore extends IPostgresMetaInterface<Project> {
-  fetchDetail: (projectRef: string) => void
+  fetchDetail: (projectRef: string) => Promise<void>
 }
 
 export default class ProjectStore extends PostgresMetaInterface<Project> {
@@ -57,22 +57,21 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
   async fetchSubscriptionTier(project: Project) {
     const { id: projectId, ref: projectRef, status } = project
-    // if project.status is not ACTIVE_HEALTHY, don't fetch subscription
-    if (status !== PROJECT_STATUS.ACTIVE_HEALTHY) return
-
-    const url = `${this.url}/${projectRef}/subscription`
-    const headers = constructHeaders(this.headers)
-    const response = await get(url, { headers })
-    if (!response.error) {
-      const subscriptionInfo = response as {
-        tier: {
-          supabase_prod_id: string
+    if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      const url = `${this.url}/${projectRef}/subscription`
+      const headers = constructHeaders(this.headers)
+      const response = await get(url, { headers })
+      if (!response.error) {
+        const subscriptionInfo = response as {
+          tier: {
+            supabase_prod_id: string
+          }
         }
+        // update subscription_tier key
+        const clone = cloneDeep(this.data[projectId])
+        clone.subscription_tier = subscriptionInfo.tier.supabase_prod_id
+        this.data[projectId] = clone
       }
-      // update subscription_tier key
-      const clone = cloneDeep(this.data[projectId])
-      clone.subscription_tier = subscriptionInfo.tier.supabase_prod_id
-      this.data[projectId] = clone
     }
   }
 }
