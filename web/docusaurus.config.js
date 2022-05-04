@@ -63,6 +63,11 @@ module.exports = {
           position: 'right',
         },
         {
+          href: 'https://discord.supabase.com',
+          className: 'navbar-item-discord',
+          position: 'right',
+        },
+        {
           href: 'https://twitter.com/supabase',
           className: 'navbar-item-twitter',
           position: 'right',
