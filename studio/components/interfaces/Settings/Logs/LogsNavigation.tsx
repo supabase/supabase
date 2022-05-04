@@ -13,10 +13,12 @@ const LogsNavigation = () => {
 
   const indexRoute = 'query'
   const logsSavedQueries = useFlag('logsSavedQueries')
+  const logsRecentQueries = useFlag('logsRecentQueries')
 
   const tabs = [
     { id: 'query', label: 'Query' },
     logsSavedQueries ? { id: 'saved', label: 'Saved' } : null,
+    logsRecentQueries ? { id: 'recent', label: 'Recent' } : null,
     { id: 'templates', label: 'Templates' },
   ].filter(Boolean) as TabItem[]
 
