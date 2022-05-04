@@ -32,7 +32,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     if (!response.error) {
       const project = response as Project
       // to improve UX, we wait for PingPostgrest result before continue
-      project.postgrestStatus = await this.myPingPostgrest(project)
+      project.postgrestStatus = await this.pingPostgrest(project)
       // update project detail by key id
       this.data[project.id] = project
 
@@ -41,7 +41,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     }
   }
 
-  async myPingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
+  async pingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
     if (
       project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
       project.restUrl &&
