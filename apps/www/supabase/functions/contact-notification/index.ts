@@ -44,7 +44,7 @@ serve(async (req) => {
   }
 
   try {
-    const response = await smtp.send({
+    await smtp.send({
       from: Deno.env.get('SMTP_FROM')!,
       to,
       cc: Deno.env.get('SMTP_CC_TO')!,
