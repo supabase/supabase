@@ -402,7 +402,7 @@ article header {
 nav.menu {
   border-right: 1px solid var(--custom-border-color);
   padding: 0;
-  margin: 0;;
+  margin: 0;
 }
 
 .navbar__toggle svg {
@@ -472,8 +472,7 @@ a.card:hover {
   }
 }
 .menu > ul.menu__list li {
-  margin-top: 0;
-  margin-bottom: 0;
+  padding: 0 var(--ifm-col-spacing-vertical);
 }
 .menu > ul.menu__list li > a {
   padding-left: 0;
@@ -511,8 +510,7 @@ a.card:hover {
   text-transform: uppercase;
 }
 .menu > .menu__list > .menu__list-item > .menu__list-item-collapsible a {
-  margin-left: calc(var(--ifm-menu-link-padding-horizontal) * -1);
-  padding-left: var(--ifm-menu-link-padding-horizontal);
+  padding-left: var(--ifm-col-spacing-vertical);
 }
 
 /* Disable click events for large screens  */
@@ -533,8 +531,8 @@ a.card:hover {
 .menu > ul.menu__list ul.menu__list .menu__link {
   border-radius: 0;
   font-size: 0.85rem;
-  margin-left: calc(var(--ifm-menu-link-padding-horizontal) * -1);
-  padding-left: var(--ifm-menu-link-padding-horizontal);
+  /* margin-left: calc(var(--ifm-menu-link-padding-horizontal) * -1);
+  padding-left: var(--ifm-menu-link-padding-horizontal); */
 }
 .menu > ul.menu__list > li > ul.menu__list {
   border-left: 0px none;
@@ -633,11 +631,8 @@ div[class^='docSidebarContainer_'] {
   border-right-color: var(--ifm-sidebar-border-color);
 }
 
-div[class^='sidebar_'] .menu {
-  margin-right: calc(var(--ifm-spacing-horizontal) * -1);
-}
 div[class^='sidebar_'] .menu .menu__link {
-  padding-right: var(--ifm-menu-link-padding-horizontal);
+  /* padding-right: var(--ifm-menu-link-padding-horizontal); */
   color: var(--custom-color-content);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) {
@@ -650,12 +645,6 @@ div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) 
   background: var(--ifm-color-primary);
   border: 1px solid var(--ifm-color-primary);
   color: white;
-}
-@media (min-width: 997px) {
-  div[class^='sidebar_'] {
-    padding-right: var(--ifm-spacing-horizontal);
-    padding-left: var(--ifm-spacing-horizontal);
-  }
 }
 
 .DummyData {
