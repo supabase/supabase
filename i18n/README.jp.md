@@ -18,7 +18,7 @@
 
 ## ドキュメンテーション
 
-詳しいドキュメントは[supabase.io/docs](https://supabase.com/docs)をご覧ください。
+詳しいドキュメントは[supabase.com/docs](https://supabase.com/docs)をご覧ください。
 
 ## コミュニティとサポート
 

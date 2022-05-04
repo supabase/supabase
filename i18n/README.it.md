@@ -18,7 +18,7 @@
 
 ## Documentazione
 
-Per ottenere la documentazione completa, visitare il sito [supabase.io/docs](https://supabase.com/docs).
+Per ottenere la documentazione completa, visitare il sito [supabase.com/docs](https://supabase.com/docs).
 
 ## Comunità e Supporto
 

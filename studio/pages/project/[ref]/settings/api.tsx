@@ -55,6 +55,7 @@ const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
     'failed to update configuration for database admin API',
   [JwtSecretUpdateError.PostgreSQLRestartFailed]: 'failed to restart PostgreSQL service',
   [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update Supabase API key',
+  [JwtSecretUpdateError.APIGatewayUpdateFailed]: 'failed to update API Gateway',
 }
 
 const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
@@ -65,6 +66,7 @@ const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
     'updated configuration for API services',
   [JwtSecretUpdateProgress.UpdatedDatabaseAdminAPIConfiguration]:
     'updated configuration for database admin API',
+  [JwtSecretUpdateProgress.UpdatedAPIGatewayConfiguration]: 'updated configuration for API Gateway',
 }
 
 const PageContext: any = createContext(null)
@@ -255,8 +257,8 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                   isJwtSecretUpdateFailed
                     ? 'JWT secret update failed'
                     : isUpdatingJwtSecret
-                    ? 'Updating JWT secret...'
-                    : config?.jwt_secret || ''
+                      ? 'Updating JWT secret...'
+                      : config?.jwt_secret || ''
                 }
                 className="input-mono"
                 descriptionText={

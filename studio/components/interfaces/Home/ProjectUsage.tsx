@@ -231,7 +231,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/realtime')}
                   />
-                  <div className="py-[1.64rem]" />
                 </Panel.Content>
               </Panel>
             </div>

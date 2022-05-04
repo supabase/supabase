@@ -52,14 +52,12 @@ export class RootStore implements IRootStore {
       (selectedProject) => {
         if (selectedProject) {
           // @ts-ignore
-          this.content = new ProjectContentStore(this, { projectRef: selectedProject.ref })
           this.meta = new MetaStore(this, {
             projectRef: selectedProject.ref,
             connectionString: selectedProject.connectionString ?? '',
           })
         } else {
           // @ts-ignore
-          this.content = new ProjectContentStore(this, { projectRef: '' })
           this.meta = new MetaStore(this, {
             projectRef: '',
             connectionString: '',
@@ -88,6 +86,7 @@ export class RootStore implements IRootStore {
 
     this.ui.setProjectRef(value)
     this.functions.setProjectRef(value)
+    this.content.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {
