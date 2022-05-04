@@ -20,7 +20,7 @@
 - [x] Kho lưu trữ. [Tài liệu](https://supabase.com/docs/guides/storage)
 - [x] Bảng điều khiển
 
-![Bảng điều khiển của Supabase](https://raw.githubusercontent.com/supabase/supabase/master/www/public/images/github/supabase-dashboard.png)
+![Bảng điều khiển của Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Tài liệu tham khảo
 

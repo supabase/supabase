@@ -27,12 +27,12 @@ const Hero = () => {
                         xl:text-5xl
                         "
                       >
-                        <span className="block">The Open Source</span>
-                        <span className="text-brand-900 block md:ml-0">Firebase Alternative</span>
+                        <span className="block">Build in a weekend.</span>
+                        <span className="text-brand-900 block md:ml-0">Scale to millions.</span>
                       </h1>
                       <div>
                         <p className="p text-base sm:mt-5 lg:text-lg ">
-                          Create a backend in less than 2 minutes. Start your project with a
+                          Supabase is an open source Firebase alternative. Start your project with a
                           Postgres Database, Authentication, instant APIs, Realtime subscriptions
                           and Storage.
                         </p>

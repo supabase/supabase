@@ -11,7 +11,9 @@ import FunctionInvocationSelectionRender, {
   FunctionInvocationHeaderRender,
 } from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import DefaultSelectionRenderer from './LogSelectionRenderers/DefaultSelectionRenderer'
+import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { isDefaultLogPreviewFormat } from '.'
 
 interface Props {
   log: LogData | null
@@ -38,7 +40,12 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
         break
 
       default:
-        return <DefaultSelectionRenderer log={log} />
+
+        if (log && isDefaultLogPreviewFormat(log)) {
+          return <DefaultPreviewSelectionRenderer log={log} />
+        }
+
+        return <DefaultExplorerSelectionRenderer log={log} />
     }
   }
 
