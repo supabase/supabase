@@ -76,7 +76,7 @@ export const LogsExplorerPage: NextPage = () => {
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
-    const query  = typeof value === 'string' ? (value || editorValue) : editorValue
+    const query = typeof value === 'string' ? value || editorValue : editorValue
     if (value && typeof value === 'string') {
       setEditorValue(value)
     }
@@ -85,6 +85,9 @@ export const LogsExplorerPage: NextPage = () => {
     router.push({
       pathname: router.pathname,
       query: { ...router.query, q: query },
+    })
+    content.addRecentLogSqlSnippet({
+      sql: query,
     })
   }
 
@@ -117,8 +120,8 @@ export const LogsExplorerPage: NextPage = () => {
 
   return (
     <LogsExplorerLayout>
-      <div className="h-full flex flex-col flex-grow gap-4">
-        <div className="border rounded">
+      <div className="flex h-full flex-grow flex-col gap-4">
+        <div className="rounded border">
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
@@ -134,7 +137,7 @@ export const LogsExplorerPage: NextPage = () => {
             warnings={warnings}
           />
 
-          <div className="min-h-[7rem] h-48">
+          <div className="h-48 min-h-[7rem]">
             <ShimmerLine active={isLoading} />
             <CodeEditor
               id={editorId}
@@ -145,13 +148,13 @@ export const LogsExplorerPage: NextPage = () => {
             />
           </div>
         </div>
-        <div className="flex flex-col flex-grow relative">
+        <div className="relative flex flex-grow flex-col">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow h-full">
+            <div className="flex h-full flex-grow">
               <LogTable data={logData} error={error} />
             </div>
           </LoadingOpacity>
-          <div className="flex flex-row justify-end mt-2">
+          <div className="mt-2 flex flex-row justify-end">
             <UpgradePrompt projectRef={ref as string} from={params.iso_timestamp_start || ''} />
           </div>
         </div>
@@ -214,9 +217,9 @@ export const LogsExplorerPage: NextPage = () => {
                   </div>
                 </Modal.Content>
               </div>
-              <div className="bg-scale-300 py-3 border-t">
+              <div className="bg-scale-300 border-t py-3">
                 <Modal.Content>
-                  <div className="flex gap-2 items-center justify-end">
+                  <div className="flex items-center justify-end gap-2">
                     <Button size="tiny" type="default">
                       Cancel
                     </Button>

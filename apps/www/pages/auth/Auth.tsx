@@ -100,7 +100,7 @@ function AuthPage() {
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
-              <p className="mb-4 -mt-[1.9rem]">
+              <div className="mb-4 -mt-[1.9rem]">
                 <div className="grid grid-flow-col grid-rows-2 gap-2 xl:w-64">
                   <div className="flex w-fit items-center">
                     <svg
@@ -130,7 +130,7 @@ function AuthPage() {
                     )
                   })}
                 </div>
-              </p>
+              </div>
               <h4 className="h4">All the social providers</h4>
               <p className="p text-base">
                 Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
@@ -138,9 +138,9 @@ function AuthPage() {
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
-              <p className="p mb-4">
+              <div className="p mb-4">
                 <IconLink />
-              </p>
+              </div>
               <h4 className="h4">Fully integrated</h4>
               <p className="p text-base">
                 Incredibly simple Auth, without a single external authentication service. Built-in
@@ -148,9 +148,9 @@ function AuthPage() {
               </p>
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
-              <p className="p mb-4">
+              <div className="p mb-4">
                 <IconShield />
-              </p>
+              </div>
               <h4 className="h4">Own your data</h4>
               <p className="p text-base">
                 User data stored in your Supabase database so you never have to worry about 3rd

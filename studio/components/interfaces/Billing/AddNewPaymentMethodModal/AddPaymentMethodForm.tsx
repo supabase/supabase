@@ -1,6 +1,7 @@
 import { FC, useState } from 'react'
 import { Button, Modal } from '@supabase/ui'
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
+import { useStore } from 'hooks'
 
 interface Props {
   returnUrl: string
@@ -12,6 +13,7 @@ interface Props {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
+  const { ui } = useStore()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -19,17 +21,26 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
-    setIsSaving(true)
 
     if (!stripe || !elements) {
       console.error('Stripe.js has not loaded')
       return
     }
 
-    await stripe.confirmSetup({
+    setIsSaving(true)
+
+    const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: { return_url: returnUrl },
     })
+
+    if (error) {
+      setIsSaving(false)
+      ui.setNotification({
+        category: 'error',
+        message: error?.message ?? ' Failed to save card details',
+      })
+    }
   }
 
   return (
