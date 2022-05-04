@@ -15,14 +15,15 @@ import {
 } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import Table from 'components/to-be-cleaned/Table'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { NextPageWithLayout } from 'types'
 
-const FunctionsPage: FC<any> = () => {
+const FunctionsPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const [selectedFunction, setSelectedFunction] = useState<any>()
@@ -55,7 +56,7 @@ const FunctionsPage: FC<any> = () => {
   }
 
   return (
-    <DatabaseLayout title="Database">
+    <>
       <PageLayout
         filterString={filterString}
         setFilterString={setFilterString}
@@ -73,11 +74,13 @@ const FunctionsPage: FC<any> = () => {
         visible={showDeleteFunctionForm}
         setVisible={setShowDeleteFunctionForm}
       />
-    </DatabaseLayout>
+    </>
   )
 }
 
-export default withAuth(observer(FunctionsPage))
+FunctionsPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(FunctionsPage)
 
 const PageLayout: FC<any> = observer(
   ({
@@ -96,7 +99,7 @@ const PageLayout: FC<any> = observer(
 
     if (meta.functions.isLoading) {
       return (
-        <div className="w-full h-full flex items-center justify-center space-x-2">
+        <div className="flex h-full w-full items-center justify-center space-x-2">
           <IconLoader className="animate-spin" size={14} />
           <Typography.Text>Loading functions...</Typography.Text>
         </div>
@@ -122,18 +125,18 @@ const PageLayout: FC<any> = observer(
               onClickCta={() => createFunction()}
             >
               <AlphaPreview />
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 PostgreSQL functions, also known as stored procedures, is a set of SQL and
                 procedural commands such as declarations, assignments, loops, flow-of-control, etc.
               </p>
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 It's stored on the database server and can be invoked using the SQL interface.
               </p>
             </ProductEmptyState>
           </div>
         ) : (
-          <div className="w-full py-4 space-y-4">
-            <div className="flex justify-between items-center px-6">
+          <div className="w-full space-y-4 py-4">
+            <div className="flex items-center justify-between px-6">
               <Input
                 placeholder="Filter by name"
                 size="small"
@@ -144,7 +147,7 @@ const PageLayout: FC<any> = observer(
               <Button onClick={() => createFunction()}>Create a new function</Button>
             </div>
             {filteredFunctions.length <= 0 && (
-              <div className="border dark:border-dark rounded p-6 max-w-lg mx-auto flex justify-center space-x-3 items-center shadow-md">
+              <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
                 <Typography.Text>No results match your filter query</Typography.Text>
                 <Button type="outline" onClick={() => setFilterString('')}>
                   Reset filter
@@ -178,8 +181,8 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ schema, filterString, editFunction = () => {}, deleteFunction = () => {} }) => {
     return (
       <div key={schema} className="">
-        <div className="sticky top-0 backdrop-filter backdrop-blur">
-          <div className="flex space-x-1 items-baseline py-2 px-6">
+        <div className="sticky top-0 backdrop-blur backdrop-filter">
+          <div className="flex items-baseline space-x-1 py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema
             </Typography.Title>

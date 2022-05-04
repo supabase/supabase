@@ -1,14 +1,14 @@
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 import { Typography } from '@supabase/ui'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import { IS_PLATFORM } from 'lib/constants'
-import ProjectLayout from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
+import { NextPageWithLayout } from 'types'
 
-const Home: NextPage = () => {
+const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
 
   const project = ui.selectedProject
@@ -18,35 +18,35 @@ const Home: NextPage = () => {
       : 'Welcome to your project'
 
   return (
-    <ProjectLayout>
-      <div className="max-w-7xl mx-auto w-full my-16 space-y-16">
-        <div className="mx-6 flex space-x-6 items-center">
-          <h1 className="text-3xl">{projectName}</h1>
+    <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
+      <div className="mx-6 flex items-center space-x-6">
+        <h1 className="text-3xl">{projectName}</h1>
+      </div>
+      {IS_PLATFORM && <ProjectUsageSection />}
+      <div className="space-y-8">
+        <div className="mx-6">
+          <Typography.Title level={4}>Client libraries</Typography.Title>
         </div>
-        {IS_PLATFORM && <ProjectUsageSection />}
-        <div className="space-y-8">
-          <div className="mx-6">
-            <Typography.Title level={4}>Client libraries</Typography.Title>
-          </div>
-          <div className="mx-6 grid md:grid-cols-3 gap-12 mb-12">
-            {CLIENT_LIBRARIES.map((library) => (
-              <ClientLibrary key={library.language} {...library} />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-8">
-          <div className="mx-6">
-            <Typography.Title level={4}>Example projects</Typography.Title>
-          </div>
-          <div className="mx-6 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {EXAMPLE_PROJECTS.map((project) => (
-              <ExampleProject key={project.url} {...project} />
-            ))}
-          </div>
+        <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+          {CLIENT_LIBRARIES.map((library) => (
+            <ClientLibrary key={library.language} {...library} />
+          ))}
         </div>
       </div>
-    </ProjectLayout>
+      <div className="space-y-8">
+        <div className="mx-6">
+          <Typography.Title level={4}>Example projects</Typography.Title>
+        </div>
+        <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {EXAMPLE_PROJECTS.map((project) => (
+            <ExampleProject key={project.url} {...project} />
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
-export default withAuth(observer(Home))
+Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+
+export default observer(Home)

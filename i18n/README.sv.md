@@ -18,7 +18,7 @@
 
 ## Dokumentation
 
-För fullständig dokumentation, besök [supabase.io/docs](https://supabase.com/docs)
+För fullständig dokumentation, besök [supabase.com/docs](https://supabase.com/docs)
 
 ## Community & Support
 

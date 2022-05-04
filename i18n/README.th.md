@@ -18,7 +18,7 @@
 
 ## เอกสารข้อมูล
 
-เข้าไปที่ [supabase.io/docs](https://supabase.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
+เข้าไปที่ [supabase.com/docs](https://supabase.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
 
 ## ชุมชนและการสนับสนุน
 

@@ -18,7 +18,7 @@
 
 ## Documentation
 
-Pour une documentation complète, visitez [supabase.io/docs](https://supabase.com/docs)
+Pour une documentation complète, visitez [supabase.com/docs](https://supabase.com/docs)
 
 Pour voir comment Contribuer, visitez [Getting Started](./DEVELOPERS.md)
 

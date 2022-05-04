@@ -18,7 +18,7 @@
 
 ## مستندات
 
-برای مستندات کامل به‫ [supabase.io/docs](https://supabase.com/docs) مراجعه کنید.
+برای مستندات کامل به‫ [supabase.com/docs](https://supabase.com/docs) مراجعه کنید.
 
 ## جامعه و پشتیبانی
 

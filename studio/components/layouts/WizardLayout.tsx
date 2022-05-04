@@ -1,35 +1,40 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { IconChevronRight } from '@supabase/ui'
+import { withAuth } from 'hooks'
+import { observer } from 'mobx-react-lite'
 
 const WizardLayout: FC<any> = ({ organization, project, children }) => {
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex h-full w-full flex-col">
       <Header organization={organization} project={project} />
       <div className="overflow-auto">
-        <section className="mx-auto max-w-2xl relative my-10 has-slide-in slide-in">
+        <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
           {children}
         </section>
       </div>
     </div>
   )
 }
-export default WizardLayout
+
+export default withAuth(observer(WizardLayout))
+
+export const WizardLayoutWithoutAuth = observer(WizardLayout)
 
 const Header: FC<any> = ({ organization, project }) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
-    <div className="p-3 border-b dark:border-dark">
+    <div className="dark:border-dark border-b p-3">
       <div className="PageHeader">
         <div className="Breadcrumbs flex justify-between">
-          <div className="text-sm flex items-center">
-            <div className="space-x-2 flex items-center">
+          <div className="flex items-center text-sm">
+            <div className="flex items-center space-x-2">
               <Link href="/">
                 <a>
                   <img
                     src="/img/supabase-logo.svg"
                     alt="Supabase"
-                    className="border dark:border-dark rounded p-1 hover:border-white"
+                    className="dark:border-dark rounded border p-1 hover:border-white"
                     style={{ height: 24 }}
                   />
                 </a>

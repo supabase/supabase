@@ -1,20 +1,19 @@
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 
-import { withAuth } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { BouncerSettings } from 'components/interfaces/Database'
+import { NextPageWithLayout } from 'types'
 
-const DatabasePooling: NextPage = () => {
+const DatabasePooling: NextPageWithLayout = () => {
   return (
-    <DatabaseLayout title="Database">
-      <div className="content w-full h-full overflow-y-auto">
-        <div className="mx-auto h-full w-full">
-          <BouncerSettings />
-        </div>
+    <div className="content h-full w-full overflow-y-auto">
+      <div className="mx-auto h-full w-full">
+        <BouncerSettings />
       </div>
-    </DatabaseLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(DatabasePooling))
+DatabasePooling.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(DatabasePooling)
