@@ -18,7 +18,7 @@
 
 ## कागजात
 
-पूर्ण कागजातको लागि [supabase.io/docs](https://supabase.com/docs) मा जानुहोस्
+पूर्ण कागजातको लागि [supabase.com/docs](https://supabase.com/docs) मा जानुहोस्
 
 ## समुदाय र समर्थन सहयोग
 

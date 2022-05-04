@@ -23,6 +23,7 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { UserContent } from 'types'
 import toast from 'react-hot-toast'
 import dayjs from 'dayjs'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPage = () => {
   const router = useRouter()
@@ -144,12 +145,15 @@ export const LogsExplorerPage: NextPage = () => {
             />
           </div>
         </div>
-        <div className="flex flex-col flex-grow relative pb-8">
+        <div className="flex flex-col flex-grow relative">
           <LoadingOpacity active={isLoading}>
             <div className="flex flex-grow h-full">
               <LogTable data={logData} error={error} />
             </div>
           </LoadingOpacity>
+          <div className="flex flex-row justify-end mt-2">
+            <UpgradePrompt projectRef={ref as string} from={params.iso_timestamp_start || ''} />
+          </div>
         </div>
       </div>
       <Modal

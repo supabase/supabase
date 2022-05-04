@@ -18,7 +18,7 @@
 
 ## Documentație
 
-Pentru documentația completă vizitați [supabase.io/docs](https://supabase.com/docs)
+Pentru documentația completă vizitați [supabase.com/docs](https://supabase.com/docs)
 
 ## Comunitate și suport
 

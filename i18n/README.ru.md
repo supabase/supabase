@@ -18,7 +18,7 @@
 
 ## Документация
 
-Для получения полной документации посетите [supabase.io/docs](https://supabase.com/docs)
+Для получения полной документации посетите [supabase.com/docs](https://supabase.com/docs)
 
 ## Сообщество и Поддержка
 

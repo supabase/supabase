@@ -80,7 +80,7 @@ function Database() {
   }
 
   const title = 'Serverless Edge Functions that automatically scale'
-  const subtitle = `Execute your code closest to your users with fast deploy times and low latency.`
+  const subtitle = `Write functions in Deno, a modern runtime for Typescript and WASM.`
   const meta_title = `${title}`
   const meta_description = subtitle
 
@@ -159,7 +159,7 @@ function Database() {
 
         <SectionContainer>
           <div className="col-span-12 mb-10 space-y-12 lg:col-span-3 lg:mb-0 ">
-            <div className="grid items-center gap-6 lg:grid-cols-12 lg:gap-32">
+            <div className="grid items-center gap-6 lg:grid-cols-12 lg:gap-16">
               <div className="flex flex-col gap-8 lg:col-span-5">
                 <div>
                   <h3 className="h3">Anatomy of an Edge Function</h3>
