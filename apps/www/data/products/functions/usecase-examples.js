@@ -21,10 +21,10 @@ await client.connect({
 
 serve(async (_req) => {
   await client.send({
-    from: "jonny@supabase.io",
-    to: "div@supabase.io",
-    subject: "Notifications Ui has launched",
-    content: "And this is a notification about that",
+    from: "admin@acme.com",
+    to: "user@gmail.com",
+    subject: "Thank you for signing up",
+    content: "We sell the best roadrunner traps in the world!",
   });
 
   return new Response("Email sent", { status: 200 });
@@ -38,7 +38,7 @@ serve(async (_req) => {
     code: `import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
 
-const databaseUrl = Deno.env.get("DATABASE_URL") ?? "";
+const databaseUrl = Deno.env.get("SUPABASE_DB_URL") ?? "";
 const pool = new postgres.Pool(databaseUrl, 3, true);
 const connection = await pool.connect();
 
@@ -60,7 +60,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 
 serve(async (req) => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-  const SERVICE_KEY = Deno.env.get("SERVICE_KEY") ?? "";
+  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
   if (req.headers.get("Authorization") === "super-secret-key") {
     const { data } = await supabase.storage
@@ -82,7 +82,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 
 serve(async () => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-  const SERVICE_KEY = Deno.env.get("SERVICE_KEY") ?? "";
+  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
   const { data } = await supabase.from("todos").select();
   return new Response(JSON.stringify(data), {

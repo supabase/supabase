@@ -19,6 +19,7 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import { LOGS_TABLES } from './Logs.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
+import UpgradePrompt from './UpgradePrompt'
 
 /**
  * Acts as a container component for the entire log display
@@ -163,10 +164,11 @@ export const LogsPreviewer: React.FC<Props> = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="p-2">
+          <div className="p-2 flex flex-row justify-between">
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
+            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''}/>
           </div>
         )}
         {error && (

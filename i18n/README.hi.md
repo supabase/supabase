@@ -18,7 +18,7 @@
 
 ## प्रलेखन
 
-पूर्ण प्रलेखन के लिए, [supabase.io/docs](https://supabase.com/docs) पर जाएँ
+पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 

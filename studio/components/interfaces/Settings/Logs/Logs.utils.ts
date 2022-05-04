@@ -1,4 +1,4 @@
-import { Filters, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import { Filters, LogData, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs from 'dayjs'
 import { get } from 'lodash'
 
@@ -6,8 +6,22 @@ import { get } from 'lodash'
  * Convert a micro timestamp from number/string to iso timestamp
  */
 export const unixMicroToIsoTimestamp = (unix: string | number): string => {
-  return dayjs.unix(Number(unix) / 1000).toISOString()
+  return dayjs.unix(Number(unix) / 1000 / 1000).toISOString()
 }
+
+export const isUnixMicro = (unix: string | number): boolean => {
+  const digitLength = String(unix).length === 16
+  const isNum = !Number.isNaN(Number(unix))
+  return isNum && digitLength
+}
+
+export const isDefaultLogPreviewFormat = (log: LogData) =>
+  log &&
+  log.timestamp &&
+  log.metadata &&
+  log.event_message &&
+  log.id &&
+  Object.keys(log).length === 4
 
 /**
  * Recursively retrieve all nested object key paths.
@@ -148,7 +162,10 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     default:
-      return ''
+      return `select id, ${table}.timestamp, event_message, metadata from ${table}
+  ${where}
+  limit 100          
+  `
       break
   }
 }
