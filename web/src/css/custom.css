@@ -427,15 +427,15 @@ nav.menu {
   margin-top: -1em;
   margin-left: 0.25em;
 }
-.navbar-sidebar__items .menu .menu__link.menu__link--sublist::after {
-  display: none;
-}
-.menu__list-item svg,
+/* .menu__list-item svg,
 .navbar__link svg {
   display: none;
-}
+} */
 
 @media screen and (max-width: 996px) {
+  .navbar-sidebar__items .menu .menu__link.menu__link--sublist {
+    display: flex;
+  }
   .row .col {
     padding-top: var(--ifm-col-spacing-vertical);
     padding-bottom: var(--ifm-col-spacing-vertical);
@@ -547,12 +547,18 @@ a.card:hover {
 
 .menu__link--sublist {
   margin-bottom: 0;
-  /* padding: 0; */
+  padding-left: 0;
+  padding-right: 0;
 }
-
-.menu__link {
-  /* padding: 0;
-  margin: 0; */
+.menu__list-item .menu__list .menu__list-item .menu__list-item-collapsible:hover {
+  background: transparent !important;
+}
+.menu__list-item
+  .menu__list
+  .menu__list-item
+  .menu__list-item-collapsible
+  .menu__link--sublist.menu__link--sublist-caret::after {
+  margin-right: -10px;
 }
 
 /*
@@ -637,8 +643,6 @@ div[class^='sidebar_'] .menu .menu__link {
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) {
   border-radius: 0;
-  border-right: 2px solid var(--ifm-color-primary);
-  padding-right: calc(var(--ifm-menu-link-padding-horizontal) - 2px);
   color: var(--ifm-color-primary);
 }
 div[class^='sidebar_'] .menu__link.menu__link--active:not(.menu__link--sublist) .badge {
