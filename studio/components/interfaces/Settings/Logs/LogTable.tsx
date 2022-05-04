@@ -6,11 +6,12 @@ import DataGrid from '@supabase/react-data-grid'
 import LogSelection from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
-
+import { isDefaultLogPreviewFormat } from './Logs.utils'
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
+import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -56,6 +57,7 @@ const LogTable = ({
   error,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+  const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
@@ -175,7 +177,11 @@ const LogTable = ({
         break
 
       default:
-        columns = DEFAULT_COLUMNS
+        if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
+          columns = DefaultPreviewColumnRenderer
+        } else {
+          columns = DEFAULT_COLUMNS
+        }
         break
     }
   }

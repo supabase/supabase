@@ -1,7 +1,7 @@
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import { jsonSyntaxHighlight } from '../LogsFormatters'
 
-const DefaultSelectionRenderer = ({ log }: any) => {
+const DefaultExplorerSelectionRenderer = ({ log }: any) => {
   const DetailedRow = ({
     label,
     value,
@@ -72,4 +72,4 @@ const DefaultSelectionRenderer = ({ log }: any) => {
   )
 }
 
-export default DefaultSelectionRenderer
+export default DefaultExplorerSelectionRenderer
