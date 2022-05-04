@@ -31,24 +31,35 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
     if (!response.error) {
       const project = response as Project
-      if (
-        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-        project.restUrl &&
-        project.internalApiKey
-      ) {
-        const success = await pingPostgrest(project.restUrl, project.internalApiKey, {
-          kpsVersion: project.kpsVersion,
-        })
-        project.postgrestStatus = success ? 'ONLINE' : 'OFFLINE'
-      }
+      // to improve UX, we wait for PingPostgrest result before continue
+      project.postgrestStatus = await this.myPingPostgrest(project)
+      // update project detail by key id
       this.data[project.id] = project
 
-      // lazy fetchs
-      this.fetchSubscriptionTier(project.id, project.ref)
+      // lazy fetches
+      this.fetchSubscriptionTier(project)
     }
   }
 
-  async fetchSubscriptionTier(projectId: number, projectRef: string) {
+  async myPingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
+    if (
+      project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+      project.restUrl &&
+      project.internalApiKey
+    ) {
+      const success = await pingPostgrest(project.restUrl, project.internalApiKey, {
+        kpsVersion: project.kpsVersion,
+      })
+      return success ? 'ONLINE' : 'OFFLINE'
+    }
+    return undefined
+  }
+
+  async fetchSubscriptionTier(project: Project) {
+    const { id: projectId, ref: projectRef, status } = project
+    // if project.status is not ACTIVE_HEALTHY, don't fetch subscription
+    if (status !== PROJECT_STATUS.ACTIVE_HEALTHY) return
+
     const url = `${this.url}/${projectRef}/subscription`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
