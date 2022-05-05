@@ -4,9 +4,9 @@ import { Member } from 'types'
 import { API_URL } from 'lib/constants'
 
 export function useOrganizationDetail(slug: string) {
-  const url = `${API_URL}/props/org/${slug}`
+  const url = `${API_URL}/props/org/${slug}?member_roles`
   const { data, error } = useSWR<any>(url, get)
-  const { members, products } = data ?? []
+  const members = data?.members ?? []
   const anyError = data?.error || error
 
   function mutateOrgMembers(updatedMembers: Member[], revalidate?: boolean) {
@@ -15,7 +15,6 @@ export function useOrganizationDetail(slug: string) {
 
   return {
     members: members as Member[],
-    products,
     isLoading: !anyError && !data,
     isError: !!anyError,
     mutateOrgMembers,

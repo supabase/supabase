@@ -6,26 +6,27 @@ import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
 import dayjs from 'dayjs'
 import {
-  Dropdown,
-  Button,
-  IconSave,
   Badge,
-  IconSettings,
+  Button,
+  Dropdown,
   IconArrowRight,
-  IconHome,
   IconChevronRight,
+  IconHome,
   IconPlus,
+  IconSave,
+  IconSettings,
 } from '@supabase/ui'
 
-import { withAuth } from 'hooks'
+import { usePermissions, withAuth } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import BaseLayout from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -62,6 +63,13 @@ const Reports = () => {
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
 
+  const canSaveReport = usePermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.user_content',
+    {
+      resource: { type: 'report' },
+    }
+  )
   const contentStore = useProjectContentStore(ref)
 
   /*
@@ -291,7 +299,12 @@ const Reports = () => {
                         <Dropdown.Checkbox
                           key={metric.key}
                           checked={config.layout?.find((x: any) => x.attribute === metric.key)}
-                          onChange={(e) => handleChartSelection({ metric, value: e })}
+                          onChange={(e) =>
+                            handleChartSelection({
+                              metric,
+                              value: e,
+                            })
+                          }
                         >
                           <div className="flex flex-col space-y-0">
                             <span>{metric.label}</span>
@@ -347,21 +360,20 @@ const Reports = () => {
         </div>
 
         <div className="flex space-x-2 items-center">
-          {hasEdits && (
-            <div className="hidden xl:inline-block">
-              <Badge color="green">There are unsaved changes</Badge>
-            </div>
-          )}
-          {hasEdits && (
-            <Button
-              type={!hasEdits ? 'default' : 'primary'}
-              disabled={!hasEdits}
-              icon={<IconSave />}
-              onClick={() => saveReport()}
-              loading={saving}
-            >
-              {hasEdits && 'Save changes'}
-            </Button>
+          {canSaveReport && hasEdits && (
+            <>
+              <div className="hidden xl:inline-block">
+                <Badge color="green">There are unsaved changes</Badge>
+              </div>
+              <Button
+                type={'default'}
+                icon={<IconSave />}
+                onClick={() => saveReport()}
+                loading={saving}
+              >
+                Save changes
+              </Button>
+            </>
           )}
 
           <Dropdown side="bottom" align="end" overlay={<MetricOptions />}>

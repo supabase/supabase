@@ -2,17 +2,17 @@ import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
-import { Loading, Button } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Button, Loading } from '@supabase/ui'
 
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { useStore, useSubscriptionStats } from 'hooks'
+import { usePermissions, useStore, useSubscriptionStats } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   project: any
@@ -39,6 +39,10 @@ const Subscription: FC<Props> = ({
 
   // const nativeBilling = useFlag('nativeBilling')
   const subscriptionStats = useSubscriptionStats()
+  const canChangeSubscription = usePermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
@@ -67,7 +71,7 @@ const Subscription: FC<Props> = ({
             </div>
             <div className="flex flex-col items-end space-y-2">
               <Button
-                disabled={!isOrgOwner}
+                disabled={!canChangeSubscription || !isOrgOwner}
                 onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
                 type="primary"
               >

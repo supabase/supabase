@@ -7,15 +7,20 @@ import { Typography } from '@supabase/ui'
 import { AutoField, LongTextField } from 'uniforms-bootstrap4'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useProjectAuthConfig, useStore } from 'hooks'
+import { usePermissions, useProjectAuthConfig, useStore } from 'hooks'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { patch } from 'lib/common/fetch'
 import { authConfig } from 'stores/jsonSchema'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const Templates: FC<any> = ({ project }) => {
   const router = useRouter()
   const { ui } = useStore()
+  const canUpdate = usePermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.custom_config_gotrue'
+  )
   const magicLinkEnable = semver.gte(
     // @ts-ignore
     semver.coerce(toJS(project?.kpsVersion) || 'kps-v0.0.1'),
@@ -67,6 +72,7 @@ const Templates: FC<any> = ({ project }) => {
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an sms body."
+            disabled={!canUpdate}
           />
         </SchemaFormPanel>
       </div>
@@ -88,6 +94,7 @@ const Templates: FC<any> = ({ project }) => {
             name="MAILER_SUBJECTS_CONFIRMATION"
             readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
+            disabled={!canUpdate}
           />
           <LongTextField
             showInlineError
@@ -96,6 +103,7 @@ const Templates: FC<any> = ({ project }) => {
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
+            disabled={!canUpdate}
           />
         </SchemaFormPanel>
       </div>
@@ -117,6 +125,7 @@ const Templates: FC<any> = ({ project }) => {
             name="MAILER_SUBJECTS_RECOVERY"
             readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
+            disabled={!canUpdate}
           />
           <LongTextField
             showInlineError
@@ -125,6 +134,7 @@ const Templates: FC<any> = ({ project }) => {
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
+            disabled={!canUpdate}
           />
         </SchemaFormPanel>
       </div>
@@ -147,6 +157,7 @@ const Templates: FC<any> = ({ project }) => {
               name="MAILER_SUBJECTS_MAGIC_LINK"
               readOnly={!IS_PLATFORM}
               errorMessage="Please enter a subject."
+              disabled={!canUpdate}
             />
             <LongTextField
               showInlineError
@@ -155,6 +166,7 @@ const Templates: FC<any> = ({ project }) => {
               readOnly={!IS_PLATFORM}
               inputClassName="font-mono"
               errorMessage="Please enter an email body."
+              disabled={!canUpdate}
             />
           </SchemaFormPanel>
         </div>
@@ -177,6 +189,7 @@ const Templates: FC<any> = ({ project }) => {
             name="MAILER_SUBJECTS_EMAIL_CHANGE"
             readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
+            disabled={!canUpdate}
           />
           <LongTextField
             showInlineError
@@ -185,6 +198,7 @@ const Templates: FC<any> = ({ project }) => {
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
+            disabled={!canUpdate}
           />
         </SchemaFormPanel>
       </div>
@@ -206,6 +220,7 @@ const Templates: FC<any> = ({ project }) => {
             name="MAILER_SUBJECTS_INVITE"
             readOnly={!IS_PLATFORM}
             errorMessage="Please enter a subject."
+            disabled={!canUpdate}
           />
           <LongTextField
             showInlineError
@@ -214,6 +229,7 @@ const Templates: FC<any> = ({ project }) => {
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an email body."
+            disabled={!canUpdate}
           />
         </SchemaFormPanel>
       </div>

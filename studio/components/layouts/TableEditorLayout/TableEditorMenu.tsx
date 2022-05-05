@@ -1,29 +1,30 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import {
+  Alert,
   Button,
   Dropdown,
-  Typography,
-  Listbox,
-  Menu,
-  Input,
-  IconCopy,
   IconChevronDown,
+  IconCopy,
   IconEdit,
-  IconTrash,
-  IconSearch,
-  IconX,
   IconLoader,
   IconRefreshCw,
-  Alert,
+  IconSearch,
+  IconTrash,
+  IconX,
+  Input,
+  Listbox,
+  Menu,
+  Typography,
 } from '@supabase/ui'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
-import { useStore } from 'hooks'
+import { usePermissions, useStore } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedSchema?: string
@@ -50,6 +51,7 @@ const TableEditorMenu: FC<Props> = ({
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const canCreate = usePermissions(PermissionAction.TENANT_SQL_CREATE_TABLE, 'postgres.public.*')
 
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views
@@ -116,7 +118,8 @@ const TableEditorMenu: FC<Props> = ({
                 // @ts-ignore
                 label={
                   <>
-                    <span className="text-scale-900">schema</span> <span>{schema.name}</span>
+                    <span className="text-scale-900">schema</span>
+                    <span>{schema.name}</span>
                   </>
                 }
               >
@@ -129,7 +132,7 @@ const TableEditorMenu: FC<Props> = ({
       </div>
 
       <div className="space-y-1">
-        {selectedSchema === 'public' && (
+        {selectedSchema === 'public' && canCreate && (
           <div className="px-3">
             {/* Add new table button */}
             <Button

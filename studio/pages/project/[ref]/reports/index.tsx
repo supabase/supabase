@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { usePermissions, useStore, withAuth } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
 import BaseLayout from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const PageLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -22,6 +22,15 @@ const PageLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
+  const canCreateReport = usePermissions(
+    PermissionAction.SQL_INSERT,
+    'postgres.public.user_content',
+    {
+      resource: {
+        type: 'report',
+      },
+    }
+  )
   const contentStore = useProjectContentStore(ref)
 
   useEffect(() => {
@@ -66,6 +75,7 @@ const PageLayout = () => {
                 })
               }
             }}
+            disabled={!canCreateReport}
           >
             <p className="text-sm text-scale-1100">Create custom reports for your projects.</p>
             <p className="text-sm text-scale-1100">

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { toJS } from 'mobx'
@@ -6,33 +6,47 @@ import { pluckJsonSchemaFields, pluckObjectFields, timeout } from 'lib/helpers'
 import { AutoField } from 'uniforms-bootstrap4'
 import { organizations } from 'stores/jsonSchema'
 import {
-  Loading,
+  Alert,
   Button,
+  Dropdown,
+  Form,
   IconMoreHorizontal,
+  IconSearch,
+  IconTrash,
+  Input,
+  Loading,
+  Modal,
   Tabs,
   Typography,
-  IconTrash,
-  Alert,
-  Input,
-  Dropdown,
-  Modal,
-  IconSearch,
-  Form,
 } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
-import { useOrganizationDetail, useStore, withAuth } from 'hooks'
-import { post, delete_, patch } from 'lib/common/fetch'
+import {
+  useOrganizationDetail,
+  usePermissions,
+  useStore,
+  withAuth,
+} from 'hooks'
+import { delete_, get, patch, post } from 'lib/common/fetch'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
-import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
+import {
+  BillingSettings,
+  InvoicesSettings,
+} from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import {
+  confirmAlert,
+} from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import InviteMemberModal
+  from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
+import TextConfirmModal
+  from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { NextPageWithLayout, Project } from 'types'
+import useSWR from 'swr'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
@@ -47,22 +61,20 @@ const OrgSettingsLayout = withAuth(
       organization: {},
       projects: [],
       members: [],
-      products: [],
       membersFilterString: '',
       get isOrgOwner() {
-        return (
-          this.members.find((x: any) => x.profile.id === this.user?.id && x.is_owner) != undefined
-        )
+        return this.members.find((x: any) => x.user_id === this.user?.id && x.is_owner) != undefined
       },
       get filteredMembers() {
-        const temp = this.members.filter((x: any) => {
-          let profile = x.profile
-          return (
-            profile.username.includes(this.membersFilterString) ||
-            profile.primary_email.includes(this.membersFilterString)
-          )
-        })
-        return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
+        const temp = this.members.filter(
+          ({ username, primary_email }: { username: string; primary_email: string }) => {
+            return (
+              username.includes(this.membersFilterString) ||
+              primary_email.includes(this.membersFilterString)
+            )
+          }
+        )
+        return temp.sort((a: any, b: any) => a.username.localeCompare(b.username))
       },
       initData(organization: any, user: any, projects: any) {
         this.organization = organization
@@ -123,18 +135,15 @@ export default observer(OrgSettings)
 const OrganizationSettings = observer(() => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
-  const {
-    members,
-    products,
-    isError: isOrgDetailError,
-  } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
+  const { members, isError: isOrgDetailError } = useOrganizationDetail(
+    ui.selectedOrganization?.slug || ''
+  )
 
   useEffect(() => {
     if (!isOrgDetailError) {
       PageState.members = members ?? []
-      PageState.products = products ?? []
     }
-  }, [members, products, isOrgDetailError])
+  }, [members, isOrgDetailError])
 
   if (!PageState.organization) return <div />
 
@@ -198,6 +207,10 @@ const TabsView = observer(() => {
 const GeneralSettings = observer(() => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
+  const canUpdateOrganization = usePermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.organizations'
+  )
 
   const formModel = toJS(PageState.organization)
   // remove warning null value for controlled input
@@ -214,7 +227,10 @@ const GeneralSettings = observer(() => {
     } else {
       const updatedOrg = response
       PageState.onOrgUpdated(updatedOrg)
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully saved settings',
+      })
     }
   }
 
@@ -231,11 +247,13 @@ const GeneralSettings = observer(() => {
           name="name"
           showInlineError
           errorMessage="Please enter an organization name"
+          disabled={!canUpdateOrganization}
         />
         <AutoField
           name="billing_email"
           showInlineError
           errorMessage="Please enter an email address"
+          disabled={!canUpdateOrganization}
         />
       </SchemaFormPanel>
 
@@ -410,7 +428,10 @@ const TeamSettings = observer(() => {
         },
       })
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Error leaving: ${error?.message}` })
+      ui.setNotification({
+        category: 'error',
+        message: `Error leaving: ${error?.message}`,
+      })
     } finally {
       setIsLeaving(false)
     }
@@ -466,6 +487,10 @@ const MembersFilterInput = observer(() => {
 
 const MembersView = observer(() => {
   const PageState: any = useContext(PageContext)
+  const { data: roles, error: rolesError } = useSWR(
+    `${API_URL}/organizations/${PageState.organization.slug}/roles`,
+    get
+  )
 
   return (
     <div className="rounded">
@@ -478,32 +503,36 @@ const MembersView = observer(() => {
           ]}
           body={[
             PageState.filteredMembers.map((x: any) => (
-              <Table.tr key={x.id}>
+              <Table.tr key={x.member_id}>
                 <Table.td>
                   <div className="flex items-center space-x-4">
                     <div>
                       <img
-                        src={`https://github.com/${x.profile.username}.png?size=80`}
+                        src={`https://github.com/${x.username}.png?size=80`}
                         width="40"
                         className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
                       />
                     </div>
                     <div>
-                      <Typography.Text>{x.profile.username}</Typography.Text>
+                      <Typography.Text>{x.username}</Typography.Text>
                       <br />
-                      <Typography.Text type="secondary">{x.profile.primary_email}</Typography.Text>
+                      <Typography.Text type="secondary">{x.primary_email}</Typography.Text>
                     </div>
                   </div>
                 </Table.td>
                 <Table.td>
                   <Typography.Text type="secondary">
-                    {x.is_owner ? 'Owner' : 'Developer'}
+                    {roles &&
+                      x.role_ids
+                        .map((roleId) => roles.find(({ id }) => roleId === id).name)
+                        .sort()
+                        .join(', ')}
                   </Typography.Text>
                 </Table.td>
                 <Table.td>
                   {PageState.isOrgOwner && !x.is_owner && (
                     // @ts-ignore
-                    <OwnerDropdown members={PageState.members} member={x} />
+                    <OwnerDropdown members={PageState.members} member={x} roles={roles} />
                   )}
                 </Table.td>
               </Table.tr>
@@ -530,7 +559,7 @@ const MembersView = observer(() => {
   )
 })
 
-const OwnerDropdown = observer(({ members, member }: any) => {
+const OwnerDropdown = observer(({ members, member, roles }: any) => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
@@ -552,11 +581,11 @@ const OwnerDropdown = observer(({ members, member }: any) => {
 
     confirmAlert({
       title: 'Confirm to remove',
-      message: `This is permanent! Are you sure you want to remove ${member.profile.username} ?`,
+      message: `This is permanent! Are you sure you want to remove ${member.username} ?`,
       onAsyncConfirm: async () => {
         setLoading(true)
         const response = await delete_(`${API_URL}/organizations/${orgSlug}/members/remove`, {
-          member_id: member.id,
+          member_id: member.member_id,
         })
         if (response.error) {
           ui.setNotification({
@@ -567,7 +596,10 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         } else {
           const updatedMembers = members.filter((x: any) => x.id !== member.id)
           mutateOrgMembers(updatedMembers)
-          ui.setNotification({ category: 'success', message: 'Successfully removed member' })
+          ui.setNotification({
+            category: 'success',
+            message: 'Successfully removed member',
+          })
         }
       },
     })
@@ -595,8 +627,41 @@ const OwnerDropdown = observer(({ members, member }: any) => {
       if (newOwner) newOwner.is_owner = true
       mutateOrgMembers(updatedMembers)
       setOwnerTransferIsVisble(false)
-      ui.setNotification({ category: 'success', message: 'Successfully transfered organization' })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully transfered organization',
+      })
     }
+  }
+
+  async function handleRoleChecked(checked: boolean, roleId: number) {
+    setLoading(true)
+    const response = await (checked ? post : delete_)(
+      `${API_URL}/users/${member.gotrue_id}/roles/${roleId}`,
+      {}
+    )
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to ${checked ? 'add' : 'remove'} member's role: ${response.error.message}`,
+      })
+    } else {
+      const updatedMembers = [...members]
+      const updatedMember = updatedMembers.find((x) => x.id == member.id)
+      if (checked) {
+        updatedMember.role_ids.push(roleId)
+      } else {
+        updatedMember.role_ids = updatedMember.role_ids.filter(
+          (role_id: number) => role_id != roleId
+        )
+      }
+      mutateOrgMembers(updatedMembers)
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully ${checked ? 'added' : 'removed'} member's role`,
+      })
+    }
+    setLoading(false)
   }
 
   return (
@@ -606,6 +671,18 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         align="end"
         overlay={
           <>
+            <Dropdown.Label>Roles</Dropdown.Label>
+            {roles
+              ?.filter(({ name }: { name: string }) => name !== 'Owner')
+              .map(({ id, name }: { id: number; name: string }) => (
+                <Dropdown.Checkbox
+                  checked={member.role_ids.includes(id)}
+                  onChange={(checked) => handleRoleChecked(checked, id)}
+                >
+                  {name}
+                </Dropdown.Checkbox>
+              ))}
+            <Dropdown.Seperator />
             <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
               <div className="flex flex-col">
                 <p>Make owner</p>
@@ -641,8 +718,8 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         text={
           <span>
             By transferring this organization, it will be solely owned by{' '}
-            <span className="font-medium dark:text-white">{member.profile.username}</span>, they
-            will also be able to remove you from the organization as a member
+            <span className="font-medium dark:text-white">{member.username}</span>, they will also
+            be able to remove you from the organization as a member
           </span>
         }
       />
