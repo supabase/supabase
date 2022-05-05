@@ -193,6 +193,8 @@ export const Wizard = observer(() => {
     }
   }
 
+  console.log('PRICING_TIER_LABELS', PRICING_TIER_LABELS)
+
   return (
     <WizardLayout organization={currentOrg} project={null}>
       <Panel
@@ -204,11 +206,11 @@ export const Wizard = observer(() => {
           </div>
         }
         footer={
-          <div key="panel-footer" className="flex items-center w-full justify-between">
+          <div key="panel-footer" className="flex w-full items-center justify-between">
             <Button type="default" onClick={() => Router.push('/')}>
               Cancel
             </Button>
-            <div className="space-x-3 items-center">
+            <div className="items-center space-x-3">
               <span className="text-scale-900 text-xs">You can rename your project later</span>
               <Button
                 onClick={onClickNext}
@@ -231,7 +233,7 @@ export const Wizard = observer(() => {
             </p>
           </Panel.Content>
 
-          <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4">
+          <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-b border-t">
             {organizations.length > 0 && (
               <Listbox
                 label="Organization"
@@ -257,7 +259,7 @@ export const Wizard = observer(() => {
 
           {canCreateProject && (
             <>
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b border-t">
                 <Input
                   id="project-name"
                   layout="horizontal"
@@ -270,7 +272,7 @@ export const Wizard = observer(() => {
                 />
               </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                 <Input
                   id="password"
                   layout="horizontal"
@@ -290,7 +292,7 @@ export const Wizard = observer(() => {
                 />
               </Panel.Content>
 
-              <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+              <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                 <Listbox
                   layout="horizontal"
                   label="Region"
@@ -359,7 +361,7 @@ export const Wizard = observer(() => {
 
           {subscriptionStats.isLoading && (
             <Panel.Content>
-              <div className="py-10 flex items-center justify-center">
+              <div className="flex items-center justify-center py-10">
                 <IconLoader size={16} className="animate-spin" />
               </div>
             </Panel.Content>

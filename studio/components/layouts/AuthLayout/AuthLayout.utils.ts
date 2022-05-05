@@ -22,6 +22,18 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 url: `/project/${ref}/auth/settings`,
                 items: [],
               },
+              {
+                name: 'Settings new',
+                key: 'settings-new',
+                url: `/project/${ref}/auth/settings-new`,
+                items: [],
+              },
+              {
+                name: 'Templates',
+                key: 'settings-templates',
+                url: `/project/${ref}/auth/templates-new`,
+                items: [],
+              },
             ],
           },
         ]
