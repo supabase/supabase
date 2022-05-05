@@ -18,21 +18,23 @@ export interface LogsWarning {
   linkText?: string
 }
 export interface LogsEndpointParams {
-  // project ref
-  project: string
+  project: string // project ref
   iso_timestamp_start?: string
   iso_timestamp_end?: string
   sql?: string
-  rawSql?: string
 }
 
-export interface LogData {
+export interface CustomLogData {
+  [other: string]: unknown
+}
+
+export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
   metadata: Metadata
-  [other: string]: unknown
 }
+export type LogData = CustomLogData & PreviewLogData
 
 export interface LogTemplate {
   label?: string
@@ -57,7 +59,7 @@ export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge'
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | "auth"
 
 export type Mode = 'simple' | 'custom'
 

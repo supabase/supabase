@@ -15,7 +15,7 @@ import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import { Project } from 'types'
@@ -178,7 +178,7 @@ const SupportNew = () => {
     if (x.name === 'project') {
       const selectedProject = projects.find((project: any) => project.ref === x.value)
       if (
-        (selectedProject?.subscription_tier ?? 'Free') === 'Free' &&
+        (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) === PRICING_TIER_PRODUCT_IDS.FREE &&
         formState.severity.value === 'Critical'
       ) {
         formDispatch({
@@ -375,7 +375,7 @@ const SupportNew = () => {
                           (project: any) => project.ref === formState.project.value
                         )
                         const isAllowedCritical =
-                          (selectedProject?.subscription_tier ?? 'Free') !== 'Free'
+                          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) !== PRICING_TIER_PRODUCT_IDS.FREE
                         return (
                           <Listbox.Option
                             key={`option-${option.value}`}

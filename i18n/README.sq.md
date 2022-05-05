@@ -18,7 +18,7 @@
 
 ## Dokumentimi
 
-Për dokumentimin e plotë, vizitoni [supabase.io/docs](https://supabase.com/docs)
+Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/docs)
 
 ## Komuniteti dhe Mbështetja
 

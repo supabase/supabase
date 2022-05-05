@@ -18,7 +18,7 @@
 
 ## 說明文件
 
-完整的說明文件請見：[supabase.io/docs](https://supabase.com/docs)
+完整的說明文件請見：[supabase.com/docs](https://supabase.com/docs)
 
 ## 社群與支援
 

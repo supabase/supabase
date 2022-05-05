@@ -18,12 +18,13 @@ import {
 } from '.'
 import DatePickers from './Logs.DatePickers'
 import Link from 'next/link'
+import React from 'react'
 
 interface Props {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
-  onRun: () => void
+  onRun: (e: React.MouseEvent<HTMLButtonElement>) => void
   onClear: () => void
   onSave?: () => void
   hasEditorValue: boolean

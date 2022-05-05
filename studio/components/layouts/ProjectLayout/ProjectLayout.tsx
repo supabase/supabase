@@ -1,8 +1,8 @@
 import Head from 'next/head'
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
@@ -17,12 +17,11 @@ interface Props {
   isLoading?: boolean
   product?: string
   productMenu?: ReactNode
-  children: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
 }
 
-const ProjectLayout: FC<Props> = ({
+const ProjectLayout = ({
   title,
   isLoading = false,
   product = '',
@@ -30,7 +29,7 @@ const ProjectLayout: FC<Props> = ({
   children,
   hideHeader = false,
   hideIconBar = false,
-}) => {
+}: PropsWithChildren<Props>) => {
   return (
     <>
       <Head>
@@ -49,7 +48,7 @@ const ProjectLayout: FC<Props> = ({
 
         <main
           style={{ maxHeight: '100vh' }}
-          className="w-full flex flex-col flex-1 overflow-x-hidden"
+          className="flex w-full flex-1 flex-col overflow-x-hidden"
         >
           {!hideHeader && <LayoutHeader />}
           <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
@@ -58,6 +57,8 @@ const ProjectLayout: FC<Props> = ({
     </>
   )
 }
+
+export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 
 export default ProjectLayout
 
