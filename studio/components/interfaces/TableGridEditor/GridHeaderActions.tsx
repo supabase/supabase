@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Badge, Button, IconAlertCircle, Typography } from '@supabase/ui'
+import { Button, IconAlertCircle, IconLock } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useStore } from 'hooks'
 
@@ -16,18 +16,13 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
 
   return (
     <div className="space-x-3 flex items-center">
-      {!table.rls_enabled && (
-        <Link href={urlToRLSPolicies}>
-          <Button type="warning" icon={<IconAlertCircle strokeWidth={2} size={14} />}>
-            RLS not enabled
+      <Link href={urlToRLSPolicies}>
+          <Button
+            type={table.rls_enabled ? 'link' : 'warning'}
+            icon={table.rls_enabled ? <IconLock strokeWidth={2} size={14} /> : <IconAlertCircle strokeWidth={2} size={14} />}>
+            RLS {table.rls_enabled ? 'is' : 'not'} enabled
           </Button>
-        </Link>
-      )}
-      {/* <Button type="text">
-        <Typography.Text small code>
-          Shortcuts
-        </Typography.Text>
-      </Button> */}
+      </Link>
     </div>
   )
 }

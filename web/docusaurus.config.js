@@ -25,19 +25,6 @@ module.exports = {
       // Should we use the prefers-color-scheme media-query,
       // using user system preferences, instead of the hardcoded defaultMode
       respectPrefersColorScheme: false,
-
-      // Dark/light switch icon options
-      switchConfig: {
-        // Icon for the switch while in dark mode
-        darkIcon: '  ',
-        darkIconStyle: {
-          marginTop: '1px',
-        },
-        lightIcon: '  ',
-        lightIconStyle: {
-          marginTop: '1px',
-        },
-      },
     },
     algolia: {
       appId: 'W4BIZ4FKU9',
@@ -73,6 +60,11 @@ module.exports = {
         {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
+          position: 'right',
+        },
+        {
+          href: 'https://discord.supabase.com',
+          className: 'navbar-item-discord',
           position: 'right',
         },
         {
