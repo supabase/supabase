@@ -7,14 +7,11 @@ const config: Config.InitialOptions = {
   },
   moduleFileExtensions: ['ts', 'js', 'cjs', 'json', 'node'],
   // globalSetup: './test/hooks.ts',
-  // globalTeardown: './teardown.js',
+  globalTeardown: '<rootDir>/.jest/teardown.ts',
   setupFiles: ['<rootDir>/.jest/jest-env.js'],
   setupFilesAfterEnv: ['<rootDir>/.jest/jest-custom-reporter.ts'],
   testRunner: 'jest-jasmine2',
-  testTimeout: 5000,
-  // testEnvironmentOptions: {
-  //   jiraUrl: ""
-  // },
+  testTimeout: 15000,
   coverageThreshold: {
     global: {
       branches: 0,
