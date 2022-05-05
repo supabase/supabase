@@ -93,7 +93,7 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   }
 
   return (
-    <article className="my-4 container max-w-4xl space-y-8">
+    <article className="container my-4 max-w-4xl space-y-8">
       {organization.aws_marketplace ? (
         <AWSMarketplaceSubscription organization={organization} />
       ) : (
