@@ -18,7 +18,7 @@ To [Supabase](https://supabase.com) είναι μια εναλλακτική λ�
 
 ## Documentation
 
-Για το πλήρες Documentation, επισκεφθείτε το [supabase.io/docs](https://supabase.com/docs)
+Για το πλήρες Documentation, επισκεφθείτε το [supabase.com/docs](https://supabase.com/docs)
 
 ## Κοινότητα και υποστήριξη
 

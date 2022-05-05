@@ -6,8 +6,8 @@ import Connecting from 'components/ui/Loading'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
-export function withAuth(
-  WrappedComponent: ComponentType,
+export function withAuth<T>(
+  WrappedComponent: ComponentType<T>,
   options?: {
     redirectTo: string
     redirectIfFound?: boolean

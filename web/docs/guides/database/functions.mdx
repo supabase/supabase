@@ -312,7 +312,7 @@ end;
 $$;
 ```
 
-It is best practice to use `security invoker` (which is also the default). If you ever use `security invoker`, you _must_ set the `search_path`. 
+It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`. 
 This limits the potential damage if you allow access to schemas which the user executing the function should not have.
 
 ## Resources

@@ -6,11 +6,12 @@ import DataGrid from '@supabase/react-data-grid'
 import LogSelection from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
-
+import { isDefaultLogPreviewFormat } from './Logs.utils'
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
+import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -22,6 +23,24 @@ interface Props {
   showDownload?: boolean
 }
 type LogMap = { [id: string]: LogData }
+
+interface FormatterArg {
+  column: {
+    key: string
+    name: string
+    resizable: boolean
+    header: string
+    minWidth: number
+    idx: number
+    frozen: boolean
+    isLastFrozenColumn: boolean
+    rowGroup: boolean
+    sortable: boolean
+  }
+  isCellSelected: boolean
+  onRowChange: Function
+  row: any
+}
 
 /**
  * Logs table view with focus side panel
@@ -38,16 +57,23 @@ const LogTable = ({
   error,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+  const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
   const DEFAULT_COLUMNS = columnNames.map((v) => {
     let formatter = undefined
-    const firstRow: any = data[0]
-    const value = firstRow?.[v]
-    if (typeof value === 'object') {
-      formatter = () => `[Object]`
+
+    formatter = (received: FormatterArg) => {
+      const value = received.row?.[v]
+      if (value && typeof value === 'object') {
+        return `[Object]`
+      } else if (value === null) {
+        return 'NULL'
+      } else {
+        return String(value)
+      }
     }
     return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
   })
@@ -151,7 +177,11 @@ const LogTable = ({
         break
 
       default:
-        columns = DEFAULT_COLUMNS
+        if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
+          columns = DefaultPreviewColumnRenderer
+        } else {
+          columns = DEFAULT_COLUMNS
+        }
         break
     }
   }

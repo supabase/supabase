@@ -43,7 +43,20 @@ jest.mock('hooks')
 import { useStore, useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 useStore.mockImplementation(() => ({
-  content: jest.fn(),
+  content: {
+    addRecentLogSqlSnippet: jest.fn(),
+  },
+}))
+
+jest.mock('hooks/queries/useProjectSubscription')
+import useProjectSubscription from 'hooks/queries/useProjectSubscription'
+useProjectSubscription = jest.fn()
+useProjectSubscription.mockImplementation((ref) => ({
+  subscription: {
+    tier: {
+      supabase_prod_id: 'tier_free',
+    },
+  },
 }))
 
 import { SWRConfig } from 'swr'
@@ -106,6 +119,7 @@ test('q= query param will populate the query input', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
   })
 })
+
 test('ite= and its= query param will populate the datepicker', async () => {
   const router = defaultRouterMock()
   const start = dayjs().subtract(1, 'day')
@@ -154,8 +168,11 @@ test('custom sql querying', async () => {
   // type new query
   userEvent.type(editor, 'select \ncount(*) as my_count \nfrom edge_logs')
 
-  // should trigger query
+  // run query by button
   userEvent.click(await screen.findByText('Run'))
+
+  // run query by editor
+  userEvent.type(editor, '\nlimit 123{ctrl}{enter}')
   await waitFor(
     () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')))
@@ -163,6 +180,7 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
     },
     { timeout: 1000 }
   )

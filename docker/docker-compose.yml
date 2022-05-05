@@ -36,7 +36,7 @@ services:
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - ./volumes/api/kong.yml:/var/lib/kong/kong.yml
+      - ./volumes/api:/var/lib/kong
 
   auth:
     container_name: supabase-auth

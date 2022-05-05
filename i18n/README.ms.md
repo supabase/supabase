@@ -18,7 +18,7 @@
 
 ## Dokumentasi
 
-Untuk dokumentasi lengkap, layari [supabase.io/docs](https://supabase.com/docs)
+Untuk dokumentasi lengkap, layari [supabase.com/docs](https://supabase.com/docs)
 
 ## Komuniti & Sokongan
 

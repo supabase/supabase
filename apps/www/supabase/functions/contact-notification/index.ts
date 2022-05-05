@@ -4,12 +4,17 @@ import { SmtpClient } from 'https://deno.land/x/denomailer@0.12.0/mod.ts'
 const smtp = new SmtpClient()
 
 serve(async (req) => {
-  await smtp.connect({
-    hostname: Deno.env.get('SMTP_HOSTNAME')!,
-    port: Number(Deno.env.get('SMTP_PORT')!),
-    username: Deno.env.get('SMTP_USERNAME')!,
-    password: Deno.env.get('SMTP_PASSWORD')!,
-  })
+  try {
+    await smtp.connect({
+      hostname: Deno.env.get('SMTP_HOSTNAME')!,
+      port: Number(Deno.env.get('SMTP_PORT')!),
+      username: Deno.env.get('SMTP_USERNAME')!,
+      password: Deno.env.get('SMTP_PASSWORD')!,
+    })
+  } catch (error) {
+    console.log('error connecting to smtp: ', error)
+    return new Response(error.message, { status: 500 })
+  }
 
   const body = await req.json()
 
@@ -42,10 +47,12 @@ serve(async (req) => {
     await smtp.send({
       from: Deno.env.get('SMTP_FROM')!,
       to,
+      cc: Deno.env.get('SMTP_CC_TO')!,
       subject: `New Contact Form Submission (${form})`,
       content,
     })
   } catch (error: any) {
+    console.log('email sending failed with error: ', error)
     return new Response(error.message, { status: 500 })
   }
 
