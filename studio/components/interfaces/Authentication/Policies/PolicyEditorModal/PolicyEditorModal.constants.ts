@@ -13,7 +13,7 @@
  * command: Operation to create policy for
  */
 
-export const getGeneralPolicyTemplates = (schema, table) => [
+export const getGeneralPolicyTemplates = (schema: string, table: string) => [
   {
     id: 'policy-1',
     templateName: 'Enable read access to everyone',

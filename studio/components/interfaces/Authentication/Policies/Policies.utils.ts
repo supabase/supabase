@@ -5,7 +5,7 @@ import { has, isEmpty, isEqual } from 'lodash'
  * @param {*} policyFormFields { name, using, check, command }
  */
 
-export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {}) => {
+export const createSQLPolicy = (policyFormFields: any, originalPolicyFormFields: any = {}) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
@@ -23,7 +23,7 @@ export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {})
   }
 
   // Extract out all the fields that updated
-  const fieldsToUpdate = {}
+  const fieldsToUpdate: any = {}
   if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
     fieldsToUpdate.name = formattedPolicyFormFields.name
   }
@@ -41,7 +41,7 @@ export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {})
   return { description: 'hello', statement: 'hello' }
 }
 
-export const createSQLStatementForCreatePolicy = (policyFormFields) => {
+export const createSQLStatementForCreatePolicy = (policyFormFields: any) => {
   const { name, definition, check, command, schema, table } = policyFormFields
   const description = `Add policy for the ${command} operation under the policy "${name}"`
   const statement =
@@ -55,7 +55,10 @@ export const createSQLStatementForCreatePolicy = (policyFormFields) => {
   return { description, statement }
 }
 
-export const createSQLStatementForUpdatePolicy = (policyFormFields = {}, fieldsToUpdate = {}) => {
+export const createSQLStatementForUpdatePolicy = (
+  policyFormFields: any = {},
+  fieldsToUpdate: any = {}
+) => {
   const { name, schema, table } = policyFormFields
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
@@ -94,7 +97,7 @@ export const createSQLStatementForUpdatePolicy = (policyFormFields = {}, fieldsT
   return { description, statement }
 }
 
-export const createPayloadForCreatePolicy = (policyFormFields = {}) => {
+export const createPayloadForCreatePolicy = (policyFormFields: any = {}) => {
   const { definition, check } = policyFormFields
   return {
     ...policyFormFields,
@@ -105,8 +108,8 @@ export const createPayloadForCreatePolicy = (policyFormFields = {}) => {
 }
 
 export const createPayloadForUpdatePolicy = (
-  policyFormFields = {},
-  originalPolicyFormFields = {}
+  policyFormFields: any = {},
+  originalPolicyFormFields: any = {}
 ) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
@@ -115,7 +118,7 @@ export const createPayloadForUpdatePolicy = (
     check: check ? check.replace(/\s+/g, ' ').trim() : check,
   }
 
-  const payload = { id: originalPolicyFormFields.id }
+  const payload: any = { id: originalPolicyFormFields.id }
 
   if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
     payload.name = formattedPolicyFormFields.name

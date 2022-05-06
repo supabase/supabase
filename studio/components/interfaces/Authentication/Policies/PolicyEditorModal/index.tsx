@@ -1,5 +1,5 @@
-import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
-import { useState, useEffect } from 'react'
+import { Modal } from '@supabase/ui'
+import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
 
 import { POLICY_MODAL_VIEWS } from 'lib/constants'
@@ -8,56 +8,27 @@ import {
   createSQLPolicy,
   createPayloadForCreatePolicy,
   createPayloadForUpdatePolicy,
-} from './policyHelpers'
+} from '../Policies.utils'
 
-import PolicySelection from './PolicySelection'
-import PolicyEditor from './PolicyEditor'
-import PolicyReview from './PolicyReview'
-import PolicyTemplates from './PolicyTemplates'
+import PolicyEditorModalTitle from './PolicyEditorModalTitle'
+import PolicySelection from '../PolicySelection'
+import PolicyEditor from '../PolicyEditor'
+import PolicyReview from '../PolicyReview'
+import PolicyTemplates from '../PolicyTemplates'
 import { useStore } from 'hooks'
 
-const PolicyEditorModalTitle = ({
-  view,
-  schema,
-  table,
-  isNewPolicy,
-  onSelectBackFromTemplates = () => {},
-}) => {
-  const getTitle = () => {
-    if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
-      return `${isNewPolicy ? 'Adding new policy to' : 'Editing policy from'} ${schema}.${table}`
-    }
-    if (view === POLICY_MODAL_VIEWS.REVIEW) {
-      return `Reviewing policy to be ${isNewPolicy ? 'created' : 'updated'} on ${schema}.${table}`
-    }
-  }
-  if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
-    return (
-      <div className="">
-        <div className="flex items-center space-x-3">
-          <span
-            onClick={onSelectBackFromTemplates}
-            className="cursor-pointer text-scale-900 hover:text-scale-1200 transition-colors"
-          >
-            <IconChevronLeft strokeWidth={2} size={14} />
-          </span>
-          <Typography.Title level={4} className="m-0">
-            Select a template to use for your new policy
-          </Typography.Title>
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className="flex items-center space-x-3">
-      <Typography.Title level={4} className="m-0">
-        {getTitle()}
-      </Typography.Title>
-    </div>
-  )
+interface Props {
+  visible: boolean
+  schema: string
+  table: string
+  selectedPolicyToEdit: any
+  onSelectCancel: () => void
+  onCreatePolicy: (payload: any) => boolean
+  onUpdatePolicy: (payload: any) => boolean
+  onSaveSuccess: () => void
 }
 
-const PolicyEditorModal = ({
+const PolicyEditorModal: FC<Props> = ({
   visible = false,
   schema = '',
   table = '',
@@ -85,7 +56,7 @@ const PolicyEditorModal = ({
   const [view, setView] = useState(POLICY_MODAL_VIEWS.EDITOR)
 
   const [policyFormFields, setPolicyFormFields] = useState(initializedPolicyFormFields)
-  const [policyStatementForReview, setPolicyStatementForReview] = useState('')
+  const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
 
   useEffect(() => {
     if (visible) {
@@ -109,7 +80,7 @@ const PolicyEditorModal = ({
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
 
-  const onUseTemplate = (template) => {
+  const onUseTemplate = (template: any) => {
     setPolicyFormFields({
       ...policyFormFields,
       name: template.name,
@@ -120,7 +91,7 @@ const PolicyEditorModal = ({
     onViewEditor()
   }
 
-  const onUpdatePolicyFormFields = (field) => {
+  const onUpdatePolicyFormFields = (field: any) => {
     if (field.name && field.name.length > 63) return
     setPolicyFormFields({ ...policyFormFields, ...field })
   }
@@ -168,7 +139,7 @@ const PolicyEditorModal = ({
     onSavePolicy(payload)
   }
 
-  const onSavePolicy = async (payload) => {
+  const onSavePolicy = async (payload: any) => {
     const hasError = isNewPolicy ? await onCreatePolicy(payload) : await onUpdatePolicy(payload)
     hasError ? onViewEditor() : onSaveSuccess()
   }
@@ -212,7 +183,6 @@ const PolicyEditorModal = ({
           <PolicyTemplates
             templates={getGeneralPolicyTemplates(schema, table)}
             templatesNote="* References a specific column in the table"
-            onSelectBackFromTemplates={onSelectBackFromTemplates}
             onUseTemplate={onUseTemplate}
           />
         ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
