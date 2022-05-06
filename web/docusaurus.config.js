@@ -27,11 +27,6 @@ module.exports = {
       // using user system preferences, instead of the hardcoded defaultMode
       respectPrefersColorScheme: false,
     },
-    // algolia: {
-    //   appId: 'W4BIZ4FKU9',
-    //   apiKey: 'ac408c5c0a323ee4d7952cee149d1474',
-    //   indexName: 'supabase',
-    // },
     typesense: {
       typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
 
