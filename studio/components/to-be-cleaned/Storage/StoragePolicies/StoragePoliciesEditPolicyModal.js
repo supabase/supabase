@@ -12,8 +12,7 @@ import {
   applyBucketIdToTemplateDefinition,
 } from '../Storage.utils'
 
-import PolicySelection from 'components/to-be-cleaned/Auth/PolicySelection'
-import PolicyTemplates from 'components/to-be-cleaned/Auth/PolicyTemplates'
+import { PolicySelection, PolicyTemplates } from 'components/interfaces/Authentication/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
@@ -162,7 +161,7 @@ const StoragePoliciesEditPolicyModal = ({
           <div className="flex items-center space-x-3">
             <span
               onClick={onSelectBackFromTemplates}
-              className="cursor-pointer text-scale-900 hover:text-scale-1200 transition-colors"
+              className="text-scale-900 hover:text-scale-1200 cursor-pointer transition-colors"
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>

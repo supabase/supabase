@@ -5,11 +5,11 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { withAuth, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import PolicyTableRow from 'components/to-be-cleaned/Auth/PolicyTableRow'
-import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
 import NoTableState from 'components/ui/States/NoTableState'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
 const PageContext = createContext(null)
 
@@ -84,7 +84,7 @@ const AuthPolicies = observer(() => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div>
             <Input
               size="small"
