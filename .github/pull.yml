@@ -1,0 +1,6 @@
+version: "1"
+rules:
+  - base: master
+    upstream: null:master
+    mergeMethod: merge
+    mergeUnstable: true
