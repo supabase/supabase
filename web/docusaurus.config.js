@@ -13,6 +13,7 @@ module.exports = {
   organizationName: 'supabase', // Usually your GitHub org/user name.
   projectName: 'Supabase Docs', // Usually your repo name.
   onBrokenLinks: 'ignore',
+  themes: ['docusaurus-theme-search-typesense'],
   themeConfig: {
     colorMode: {
       // "light" | "dark"
@@ -26,10 +27,25 @@ module.exports = {
       // using user system preferences, instead of the hardcoded defaultMode
       respectPrefersColorScheme: false,
     },
-    algolia: {
-      appId: 'W4BIZ4FKU9',
-      apiKey: 'ac408c5c0a323ee4d7952cee149d1474',
-      indexName: 'supabase',
+    typesense: {
+      typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+
+      typesenseServerConfig: {
+        nodes: [
+          {
+            host: '104.197.49.156',
+            port: 80,
+            protocol: 'http',
+          },
+        ],
+        apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
+      },
+
+      // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+      typesenseSearchParameters: {},
+
+      // Optional
+      contextualSearch: true,
     },
     image: '/img/supabase-og-image.png', // used for meta tag, in particular og:image and twitter:image
     metaImage: '/img/supabase-og-image.png',
