@@ -81,7 +81,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'React',
     title: 'React todo List app',
     description: 'React todo List example',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/react-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list',
   },
   {
     framework: 'Svelte',
