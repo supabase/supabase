@@ -23,7 +23,7 @@
   {
     "imgUrl": "images/slack-clone.jpg",
     "title": "Chat app with Next.js",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
+    "url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone",
     "description": "Build a full-stack Slack clone using Next.js and Supabase.",
     "icons": [
       {
