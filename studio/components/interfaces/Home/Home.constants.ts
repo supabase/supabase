@@ -33,7 +33,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NextJS',
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
     framework: 'NextJS',

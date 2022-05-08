@@ -415,8 +415,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
     description: 'Build a basic slack clone with Row Level Security.',
     sql: `
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone
---
+-- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
 
 -- Custom types
 create type public.app_permission as enum ('channels.delete', 'messages.delete');
