@@ -86,7 +86,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "javascript-auth",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/javascript-auth",
+    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/auth/javascript-auth",
     "vercel_deploy_url": "",
     "demo_url": "https://auth-vanilla-js.vercel.app/"
   },

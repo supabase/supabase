@@ -63,7 +63,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'JavaScript',
     title: 'Vanilla-js Auth app',
     description: 'Example app of real-time chat using supabase realtime api',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/javascript-auth',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/auth/javascript-auth',
   },
   {
     framework: 'React',
