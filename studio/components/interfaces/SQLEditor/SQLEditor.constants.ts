@@ -616,7 +616,7 @@ values
 -- https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list
 --
 
 create table todos (
