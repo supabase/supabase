@@ -69,7 +69,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'React',
     title: 'React Native todo list app',
     description: 'React Native Todo List example with Expo',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/expo-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/expo-todo-list',
   },
   {
     framework: 'NextJS',
