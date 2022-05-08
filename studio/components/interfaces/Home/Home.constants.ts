@@ -93,6 +93,6 @@ export const EXAMPLE_PROJECTS = [
     framework: 'VueJS',
     title: 'Vue.js todo list app',
     description: 'Vue.js todo app using TypeScript',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list',
   },
 ]
