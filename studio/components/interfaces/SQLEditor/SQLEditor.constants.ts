@@ -613,7 +613,7 @@ values
     sql: `
 --
 -- For use with:
--- https://github.com/supabase/supabase/tree/master/examples/nextjs-todo-list or
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/react-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/sveltejs-todo-list or
 -- https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list

@@ -75,7 +75,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NextJS',
     title: 'NextJS todo list app',
     description: 'NextJS todo list example',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/nextjs-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',
   },
   {
     framework: 'React',
