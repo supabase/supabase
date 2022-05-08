@@ -87,7 +87,7 @@ export const EXAMPLE_PROJECTS = [
     framework: 'Svelte',
     title: 'Svelte todo list app',
     description: 'Sveltejs todo with TailwindCSS and Snowpack',
-    url: 'https://github.com/supabase/supabase/tree/master/examples/sveltejs-todo-list',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list',
   },
   {
     framework: 'VueJS',
