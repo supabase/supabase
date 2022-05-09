@@ -2,7 +2,7 @@ import { createContext, useContext, useCallback, useState, useEffect } from 'rea
 import { debounce, isNil } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { post } from 'lib/common/fetch'
-import { Button, IconKey, IconLoader, IconUser, IconX, Input, Typography } from '@supabase/ui'
+import { Button, IconKey, IconLoader, IconUser, IconMail, IconX, Input, Typography } from '@supabase/ui'
 import { Modal } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
@@ -24,12 +24,13 @@ function InviteMemberModal({ organization, members = [] }) {
     profiles: null,
     selectedProfile: null,
     addMemberLoading: false,
+    emailAddress: '',
     get addBtnText() {
       if (this.selectedProfile) return `Add ${this.selectedProfile.username} to organization`
-      return 'Select a member above'
+      return 'Invite new member'
     },
     get addBtnDisable() {
-      return !this.selectedProfile || this.addMemberLoading
+      return (!this.emailIsValid() && !this.selectedProfile) || this.addMemberLoading
     },
     setProfiles(profiles) {
       let temp = profiles
@@ -43,6 +44,11 @@ function InviteMemberModal({ organization, members = [] }) {
       }
       this.profiles = temp
     },
+    emailIsValid() {
+      return String(this.emailAddress)
+        .toLowerCase()
+        .match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    }
   }))
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
@@ -60,12 +66,14 @@ function InviteMemberModal({ organization, members = [] }) {
       PageState.selectedProfile = null
       PageState.profiles = null
       PageState.addMemberLoading = false
+      PageState.emailAddress = ''
     }
     setIsOpen(!isOpen)
   }
 
   async function addMember() {
     PageState.addMemberLoading = true
+    PageState.emailAddress = ''
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/add`, {
       org_id: orgId,
       user_id: PageState.selectedProfile.id,
@@ -86,6 +94,10 @@ function InviteMemberModal({ organization, members = [] }) {
     }
   }
 
+  function onEmailInputChange(e) {
+    PageState.emailAddress = e.target.value
+  }
+
   return (
     <PageContext.Provider value={PageState}>
       <Button onClick={toggle}>Invite</Button>
@@ -95,14 +107,27 @@ function InviteMemberModal({ organization, members = [] }) {
         icon={<IconKey size="xlarge" background="brand" />}
         visible={isOpen}
         onCancel={toggle}
-        header="Invite a member to organization"
+        header="Invite a member to this organization"
         description="Members you'd like to invite must already be registered on Supabase"
         layout="vertical"
         hideFooter
       >
         <div className="w-full py-4 space-y-4">
           <Modal.Content>
-            <div className="text-center">
+            <div className="text-center">{PageState.emailAddress}
+              <Input
+                icon={<IconMail />}
+                autoFocus
+                id="email"
+                label="Email"
+                placeholder="Enter email address"
+                onChange={onEmailInputChange}
+                value={PageState.emailAddress}
+                className="w-full"
+                />
+                <div className='border-t mt-8 mb-4 py-2 relative'>
+                  <span className='text-sm absolute -top-3 text-center text-scale-1100 uppercase bg-bg-light left-1/2 px-4 bg-scale-100 dark:bg-gray-800 -translate-x-1/2'>or</span>
+                </div>
               <InputSearchWithResults className="" />
             </div>
           </Modal.Content>
@@ -159,7 +184,7 @@ const InputSearchWithResults = observer(({ className }) => {
     }
   }
 
-  function onInputChange(e) {
+  function onUsernameInputChange(e) {
     PageState.keywords = e.target.value
   }
 
@@ -191,6 +216,7 @@ const InputSearchWithResults = observer(({ className }) => {
   }
 
   const onSelectDropdownOption = (e, option) => {
+    PageState.emailAddress = ''
     if (!option.isMember) PageState.selectedProfile = option
   }
 
@@ -199,14 +225,14 @@ const InputSearchWithResults = observer(({ className }) => {
       <div className="relative rounded-md shadow-sm">
         <Input
           icon={<IconUser />}
-          autoFocus
-          id="email"
+          label="Search existing users"
+          id="username"
           type="text"
           className="form-input"
-          onChange={onInputChange}
+          onChange={onUsernameInputChange}
           autoComplete="off"
           value={PageState.keywords}
-          placeholder="search by username or email"
+          placeholder="Enter GitHub username"
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
           {loading && <IconLoader className="animate-spin" size={16} />}

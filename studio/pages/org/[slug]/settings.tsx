@@ -8,6 +8,7 @@ import { organizations } from 'stores/jsonSchema'
 import {
   Loading,
   Button,
+  Badge,
   IconMoreHorizontal,
   Tabs,
   Typography,
@@ -17,6 +18,7 @@ import {
   Dropdown,
   Modal,
   IconSearch,
+  IconUser,
   Form,
 } from '@supabase/ui'
 
@@ -464,6 +466,10 @@ const MembersFilterInput = observer(() => {
   )
 })
 
+// Hardcode an invite_status until this is added to the table
+// will become Pagestate.filteredMembers[0].profile.invite_status
+const invite_status = 'pending';
+
 const MembersView = observer(() => {
   const PageState: any = useContext(PageContext)
 
@@ -473,6 +479,7 @@ const MembersView = observer(() => {
         <Table
           head={[
             <Table.th key="header-user">User</Table.th>,
+            <Table.th key="header-status"></Table.th>,
             <Table.th key="header-role">Role</Table.th>,
             <Table.th key="header-action"></Table.th>,
           ]}
@@ -482,11 +489,16 @@ const MembersView = observer(() => {
                 <Table.td>
                   <div className="flex items-center space-x-4">
                     <div>
-                      <img
-                        src={`https://github.com/${x.profile.username}.png?size=80`}
-                        width="40"
-                        className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
-                      />
+                      {invite_status === 'pending' ?
+                        ( <span className='border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2'><IconUser size={18} strokeWidth={2} /></span> )
+                        : (
+                          <img
+                            src={`https://github.com/${x.profile.username}.png?size=80`}
+                            width="40"
+                            className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                          />
+                        )}
+
                     </div>
                     <div>
                       <Typography.Text>{x.profile.username}</Typography.Text>
@@ -495,6 +507,11 @@ const MembersView = observer(() => {
                     </div>
                   </div>
                 </Table.td>
+
+                <Table.td>
+                  {!x.is_owner && invite_status === 'pending' && <Badge color="yellow">Pending</Badge>}
+                </Table.td>
+
                 <Table.td>
                   <Typography.Text type="secondary">
                     {x.is_owner ? 'Owner' : 'Developer'}
@@ -515,7 +532,7 @@ const MembersView = observer(() => {
               className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
             >
               {/* @ts-ignore */}
-              <Table.td colSpan="3">
+              <Table.td colSpan="4">
                 <Typography.Text type="secondary">
                   {PageState.membersFilterString ? `${PageState.filteredMembers.length} of ` : ''}
                   {PageState.members.length || '0'}{' '}
