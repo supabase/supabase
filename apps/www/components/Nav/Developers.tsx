@@ -38,7 +38,7 @@ const Developers = () => {
       </div>
     )
     return url ? (
-      <Link href={url} passHref key={text}>
+      <Link href={url} key={text}>
         <a className="dark:hover:bg-scale-500 col-span-6 rounded p-3 transition hover:bg-gray-50">
           {content}
         </a>
@@ -64,7 +64,7 @@ const Developers = () => {
           <ul className="mt-6 space-y-3 pb-6">
             {AnnouncementsData.map((caseStudy: any, idx: number) => (
               <li className="flow-root" key={`flyout_case_${idx}`}>
-                <Link href={caseStudy.url} passHref>
+                <Link href={caseStudy.url}>
                   <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
                     <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
                       <Image
