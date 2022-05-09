@@ -23,7 +23,7 @@ const Hero = () => {
                       <h1
                         className="
                         text-scale-1200 
-                        text-xl sm:leading-none lg:text-4xl
+                        text-3xl sm:leading-none lg:text-4xl
                         xl:text-5xl
                         "
                       >
