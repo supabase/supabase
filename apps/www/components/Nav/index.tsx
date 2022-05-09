@@ -84,13 +84,11 @@ const Nav = () => {
       </div>
     )
     return url ? (
-      <a
-        key={`solution_${idx}`}
-        href={url}
-        className="dark:hover:bg-scale-600 -m-3 my-2 flex flex-col justify-between rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50"
-      >
-        {content}
-      </a>
+      <Link href={url} key={`solution_${idx}`}>
+        <a className="dark:hover:bg-scale-600 -m-3 my-2 flex flex-col justify-between rounded-lg p-3 transition duration-150 ease-in-out hover:bg-gray-50">
+          {content}
+        </a>
+      </Link>
     ) : (
       <div
         key={`solution_${idx}`}
@@ -202,7 +200,7 @@ const Nav = () => {
                         }
                         width={124}
                         height={24}
-                        alt="Logo"
+                        alt="Supabase Logo"
                       />
                     </a>
                   </Link>
@@ -218,26 +216,28 @@ const Nav = () => {
                     onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
                     active={openDevelopers}
                   />
-                  <a
-                    href="/pricing"
-                    className={`
-                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                    border-b-2 border-transparent p-5 px-1
-                    text-sm font-medium
-                  `}
-                  >
-                    Pricing
-                  </a>
-                  <a
-                    href="/blog"
-                    className={`
-                    text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                    border-b-2 border-transparent p-5 px-1
-                    text-sm font-medium
-                  `}
-                  >
-                    Blog
-                  </a>
+                  <Link href="/pricing">
+                    <a
+                      className={`
+                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        border-b-2 border-transparent p-5 px-1
+                        text-sm font-medium
+                      `}
+                    >
+                      Pricing
+                    </a>
+                  </Link>
+                  <Link href="/blog">
+                    <a
+                      className={`
+                        text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        border-b-2 border-transparent p-5 px-1
+                        text-sm font-medium
+                      `}
+                    >
+                      Blog
+                    </a>
+                  </Link>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -270,14 +270,18 @@ const Nav = () => {
                   Star us on GitHub
                 </Button>
 
-                <a href="https://app.supabase.io/">
-                  <Button type="default" className="hidden lg:block">
-                    Sign in
-                  </Button>
-                </a>
-                <a href="https://app.supabase.io/">
-                  <Button className="hidden text-white lg:block">Start your project</Button>
-                </a>
+                <Link href="https://app.supabase.io/">
+                  <a>
+                    <Button type="default" className="hidden lg:block">
+                      Sign in
+                    </Button>
+                  </a>
+                </Link>
+                <Link href="https://app.supabase.io/">
+                  <a>
+                    <Button className="hidden text-white lg:block">Start your project</Button>
+                  </a>
+                </Link>
               </div>
             </div>
             {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"></div> */}
@@ -324,46 +328,45 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="space-y-1 pt-2 pb-4">
-                  <a
-                    href="https://app.supabase.io/"
-                    className="text-scale-900 block pl-3 pr-4 text-base font-medium dark:text-white"
-                  >
-                    Sign in
-                  </a>
+                  <Link href="https://app.supabase.io/">
+                    <a className="text-scale-900 block pl-3 pr-4 text-base font-medium dark:text-white">
+                      Sign in
+                    </a>
+                  </Link>
                 </div>
                 <div className="space-y-1 pt-2 pb-4">
-                  <a
-                    href="/docs"
-                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    Developers
-                  </a>
-                  <a
-                    href="/company"
-                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    Company
-                  </a>
-                  <a
-                    href="/pricing"
-                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    Pricing
-                  </a>
-                  <a
-                    href="https://github.com/supabase/supabase"
-                    target="_blank"
-                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    GitHub
-                  </a>
-                  <a
-                    href="/blog"
-                    target="_blank"
-                    className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    Blog
-                  </a>
+                  <Link href="/docs">
+                    <a className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Developers
+                    </a>
+                  </Link>
+                  <Link href="/company">
+                    <a className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Company
+                    </a>
+                  </Link>
+                  <Link href="/pricing">
+                    <a className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Pricing
+                    </a>
+                  </Link>
+
+                  <Link href="https://github.com/supabase/supabase">
+                    <a
+                      target="_blank"
+                      className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      GitHub
+                    </a>
+                  </Link>
+                  <Link href="/blog">
+                    <a
+                      target="_blank"
+                      className="text-scale-900 dark:hover:bg-scale-600 block rounded-md py-2 pl-3 pr-4 text-base font-medium hover:border-gray-300 hover:bg-gray-50 dark:text-white"
+                    >
+                      Blog
+                    </a>
+                  </Link>
                 </div>
                 <div className="p-3">
                   <p className="text-scale-900 mb-6 text-sm">Products available:</p>
