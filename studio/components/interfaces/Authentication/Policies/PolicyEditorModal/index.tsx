@@ -165,7 +165,6 @@ const PolicyEditorModal: FC<Props> = ({
           onSelectBackFromTemplates={onSelectBackFromTemplates}
         />,
       ]}
-      // style={{ maxWidth: 'none', width: '60rem' }}
       onCancel={onSelectCancel}
     >
       <div className="">

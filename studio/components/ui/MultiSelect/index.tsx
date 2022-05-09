@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, FormEvent, KeyboardEvent } from 'react'
+import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
 import { Popover, IconCheck, IconAlertCircle, IconSearch } from '@supabase/ui'
 
@@ -15,9 +15,10 @@ interface Props {
   options: MultiSelectOption[]
   value: string[]
   label?: string
+  placeholder?: string | ReactNode
   searchPlaceholder?: string
-  descriptionText?: string | React.ReactNode
-  emptyMessage?: string | React.ReactNode
+  descriptionText?: string | ReactNode
+  emptyMessage?: string | ReactNode
   onChange?(x: string[]): void
 }
 
@@ -26,6 +27,7 @@ export default function MultiSelect({
   value,
   label,
   descriptionText,
+  placeholder,
   searchPlaceholder = 'Search for option',
   emptyMessage,
   onChange = () => {},
@@ -37,7 +39,7 @@ export default function MultiSelect({
   const [inputWidth, setInputWidth] = useState(128)
 
   // Selected is `value` if defined, otherwise use local useState
-  const selectedOptions = value || selected
+  const selectedOptions = (value || selected).filter((option) => option !== 'public')
 
   // Calculate width of the Popover
   useEffect(() => {
@@ -191,6 +193,9 @@ export default function MultiSelect({
                 `${selectedOptions.length === 0 ? 'h-9' : ''}`,
               ].join(' ')}
             >
+              {selectedOptions.length === 0 && placeholder && (
+                <div className="text-scale-1000 px-2 text-sm">{placeholder}</div>
+              )}
               {formattedOptions.map((option) => {
                 const active =
                   selectedOptions &&
