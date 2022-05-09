@@ -1,6 +1,7 @@
 import { Modal } from '@supabase/ui'
 import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 import { POLICY_MODAL_VIEWS } from 'lib/constants'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
@@ -19,6 +20,7 @@ import { useStore } from 'hooks'
 
 interface Props {
   visible: boolean
+  roles?: PostgresRole[]
   schema: string
   table: string
   selectedPolicyToEdit: any
@@ -30,6 +32,7 @@ interface Props {
 
 const PolicyEditorModal: FC<Props> = ({
   visible = false,
+  roles = [],
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
@@ -47,6 +50,7 @@ const PolicyEditorModal: FC<Props> = ({
     definition: '',
     check: '',
     command: null,
+    roles: [],
   }
 
   const isNewPolicy = isEmpty(selectedPolicyToEdit)
@@ -174,6 +178,7 @@ const PolicyEditorModal: FC<Props> = ({
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
             isNewPolicy={isNewPolicy}
+            roles={roles}
             policyFormFields={policyFormFields}
             onUpdatePolicyFormFields={onUpdatePolicyFormFields}
             onViewTemplates={onViewTemplates}
