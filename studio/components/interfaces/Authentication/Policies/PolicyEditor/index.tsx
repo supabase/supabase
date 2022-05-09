@@ -1,14 +1,16 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { Modal } from '@supabase/ui'
-import { get } from 'lodash'
 
 import PolicyName from './PolicyName'
 import PolicyDefinition from './PolicyDefinition'
 import PolicyAllowedOperation from './PolicyAllowedOperation'
+import PolicyRoles from './PolicyRoles'
 import PolicyEditorFooter from './PolicyEditorFooter'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 interface Props {
   isNewPolicy: boolean
+  roles: PostgresRole[]
   policyFormFields: any
   onUpdatePolicyFormFields: (value: any) => void
   onViewTemplates: () => void
@@ -17,18 +19,20 @@ interface Props {
 
 const PolicyEditor: FC<Props> = ({
   isNewPolicy = true,
+  roles = [],
   policyFormFields = {},
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
 }) => {
-  const operation = get(policyFormFields, ['command'], '')
-  const definition = get(policyFormFields, ['definition'], '') || ''
-  const check = get(policyFormFields, ['check'], '') || ''
+  const operation = policyFormFields?.operation ?? ''
+  const definition = policyFormFields?.definition ?? ''
+  const check = policyFormFields?.check ?? ''
+  const selectedRoles = policyFormFields?.roles ?? []
 
   return (
     <div className="">
-      <div className="mb-8 space-y-8 py-8">
+      <div className="space-y-8 py-8">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}
@@ -47,6 +51,13 @@ const PolicyEditor: FC<Props> = ({
             <Modal.Seperator />
           </>
         )}
+        <Modal.Content>
+          <PolicyRoles
+            roles={roles}
+            selectedRoles={selectedRoles}
+            onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
+          />
+        </Modal.Content>
         <Modal.Content>
           <PolicyDefinition
             operation={operation}
