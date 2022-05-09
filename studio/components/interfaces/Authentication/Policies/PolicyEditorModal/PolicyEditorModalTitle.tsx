@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { IconChevronLeft } from '@supabase/ui'
-import { POLICY_MODAL_VIEWS } from 'lib/constants'
+import { POLICY_MODAL_VIEWS } from 'components/interfaces/Authentication/Policies'
 
 interface Props {
   view: string

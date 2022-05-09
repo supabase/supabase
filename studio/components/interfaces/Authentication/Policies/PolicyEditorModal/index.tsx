@@ -3,20 +3,20 @@ import { FC, useState, useEffect } from 'react'
 import { isEmpty } from 'lodash'
 import { PostgresRole } from '@supabase/postgres-meta'
 
-import { POLICY_MODAL_VIEWS } from 'lib/constants'
+import { useStore } from 'hooks'
+import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
+
+import PolicyEditor from '../PolicyEditor'
+import PolicyReview from '../PolicyReview'
+import PolicyTemplates from '../PolicyTemplates'
+import PolicySelection from '../PolicySelection'
 import {
   createSQLPolicy,
   createPayloadForCreatePolicy,
   createPayloadForUpdatePolicy,
 } from '../Policies.utils'
-
-import PolicyEditorModalTitle from './PolicyEditorModalTitle'
-import PolicySelection from '../PolicySelection'
-import PolicyEditor from '../PolicyEditor'
-import PolicyReview from '../PolicyReview'
-import PolicyTemplates from '../PolicyTemplates'
-import { useStore } from 'hooks'
+import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface Props {
   visible: boolean
@@ -91,6 +91,7 @@ const PolicyEditorModal: FC<Props> = ({
       definition: template.definition,
       check: template.check,
       command: template.command,
+      roles: template.roles,
     })
     onViewEditor()
   }
