@@ -25,7 +25,7 @@ const PolicyEditor: FC<Props> = ({
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
 }) => {
-  const operation = policyFormFields?.operation ?? ''
+  const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
   const check = policyFormFields?.check ?? ''
   const selectedRoles = policyFormFields?.roles ?? []

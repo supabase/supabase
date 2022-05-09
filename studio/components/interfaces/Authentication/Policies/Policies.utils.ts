@@ -1,3 +1,4 @@
+import { PostgresRole } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
 
 /**
@@ -33,20 +34,26 @@ export const createSQLPolicy = (policyFormFields: any, originalPolicyFormFields:
   if (!isEqual(formattedPolicyFormFields.check, originalPolicyFormFields.check)) {
     fieldsToUpdate.check = formattedPolicyFormFields.check
   }
+  if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
+    fieldsToUpdate.roles = formattedPolicyFormFields.roles
+  }
 
   if (!isEmpty(fieldsToUpdate)) {
     return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
   }
 
-  return { description: 'hello', statement: 'hello' }
+  return {}
 }
 
 export const createSQLStatementForCreatePolicy = (policyFormFields: any) => {
   const { name, definition, check, command, schema, table } = policyFormFields
+  const roles = policyFormFields.roles.length === 0 ? ['public'] : policyFormFields.roles
   const description = `Add policy for the ${command} operation under the policy "${name}"`
   const statement =
     `
-    CREATE POLICY "${name}" ON ${schema}.${table} FOR ${command}
+    CREATE POLICY "${name}" ON "${schema}"."${table}"
+    AS PERMISSIVE FOR ${command}
+    TO ${roles.join(', ')}
     ${definition ? `USING (${definition})` : ''}
     ${check ? `WITH CHECK (${check})` : ''}
   `
@@ -64,46 +71,40 @@ export const createSQLStatementForUpdatePolicy = (
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
   const nameChanged = has(fieldsToUpdate, ['name'])
+  const rolesChanged = has(fieldsToUpdate, ['roles'])
 
-  let description = `
-    ${
-      definitionChanged || checkChanged
-        ? `Update policy's ${definitionChanged ? 'USING expression' : ''} ${
-            definitionChanged && checkChanged ? ' and' : ''
-          } ${checkChanged ? ' WITH CHECK expression.' : ''}`
-        : ''
-    }
-    ${nameChanged ? `Rename policy to ${fieldsToUpdate.name}.` : ''}
+  const parameters = Object.keys(fieldsToUpdate)
+  const description = `Update policy's ${
+    parameters.length === 1
+      ? parameters[0]
+      : `${parameters.slice(0, parameters.length - 1).join(', ')} and ${
+          parameters[parameters.length - 1]
+        }`
+  } `
+
+  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  const statement = `
+    BEGIN;
+      ${definitionChanged ? `${alterStatement} USING (${fieldsToUpdate.definition});` : ''}
+      ${checkChanged ? `${alterStatement} WITH CHECK (${fieldsToUpdate.check});` : ''}
+      ${rolesChanged ? `${alterStatement} TO ${fieldsToUpdate.roles.join(', ')};` : ''}
+      ${nameChanged ? `${alterStatement} RENAME TO "${fieldsToUpdate.name}";` : ''}
+    COMMIT;
   `
-  // Need to figure out a way to derive description: name, definition and check can change
-
-  const definitionOrCheckUpdateStatement =
-    definitionChanged || checkChanged
-      ? `
-          ALTER POLICY "${name}" ON ${schema}.${table} ${
-          definitionChanged ? `USING (${fieldsToUpdate.definition})` : ''
-        } ${checkChanged ? `WITH CHECK (${fieldsToUpdate.check})` : ''};
-        `
-          .replace(/\s+/g, ' ')
-          .trim()
-      : ''
-
-  const renameStatement = nameChanged
-    ? `ALTER POLICY "${name}" ON ${schema}.${table} RENAME TO "${fieldsToUpdate.name}";`
-    : ''
-
-  const statement = definitionOrCheckUpdateStatement + renameStatement
+    .replace(/\s+/g, ' ')
+    .trim()
 
   return { description, statement }
 }
 
 export const createPayloadForCreatePolicy = (policyFormFields: any = {}) => {
-  const { definition, check } = policyFormFields
+  const { definition, check, roles } = policyFormFields
   return {
     ...policyFormFields,
     action: 'PERMISSIVE',
     definition: definition || undefined,
     check: check || undefined,
+    roles: roles.length > 0 ? roles : undefined,
   }
 }
 
@@ -128,6 +129,9 @@ export const createPayloadForUpdatePolicy = (
   }
   if (!isEqual(formattedPolicyFormFields.check, originalPolicyFormFields.check)) {
     payload.check = formattedPolicyFormFields.check || undefined
+  }
+  if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
+    payload.roles = formattedPolicyFormFields.roles || undefined
   }
 
   return payload

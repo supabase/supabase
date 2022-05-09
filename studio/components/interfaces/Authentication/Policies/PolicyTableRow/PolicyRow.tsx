@@ -15,15 +15,10 @@ const PolicyRow: FC<Props> = ({
 }) => {
   return (
     <Panel.Content
-      className="
-        border-panel-border-light 
-        dark:border-panel-border-dark flex 
-        w-full
-        gap-2 
-        border-b 
-        py-4 
-        lg:items-center
-      "
+      className={[
+        'border-panel-border-light dark:border-panel-border-dark flex',
+        'w-full gap-4 border-b py-4 lg:items-center',
+      ].join(' ')}
     >
       <div className="text-scale-900 font-mono text-xs">{policy.command}</div>
       <div className="flex grow flex-col gap-2 truncate lg:flex-row">

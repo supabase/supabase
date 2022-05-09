@@ -1,12 +1,12 @@
 import { FC } from 'react'
 import { PostgresRole } from '@supabase/postgres-meta'
 
-import MultiSelectUI from 'components/ui/MultiSelect'
+import MultiSelect from 'components/ui/MultiSelect'
 
 interface Props {
   roles: PostgresRole[]
-  selectedRoles: PostgresRole[]
-  onUpdateSelectedRoles: (roles: PostgresRole[]) => void
+  selectedRoles: string[]
+  onUpdateSelectedRoles: (roles: string[]) => void
 }
 
 const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles }) => {
@@ -29,13 +29,14 @@ const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles })
         <p className="text-scale-900 text-sm">Apply policy to the specified roles</p>
       </div>
       <div className="relative w-2/3">
-        <MultiSelectUI
+        <MultiSelect
           options={formattedRoles}
-          value={selectedRoles.map((role) => role.name)}
+          value={selectedRoles}
+          placeholder='Defaults to "public" role if none selected'
           searchPlaceholder="Search for a role"
           onChange={(updatedRoles) => {
-            const selectedRoles = roles.filter((role) => updatedRoles.includes(role.name))
-            onUpdateSelectedRoles(selectedRoles)
+            // const selectedRoles = roles.filter((role) => updatedRoles.includes(role.name))
+            onUpdateSelectedRoles(updatedRoles)
           }}
         />
       </div>
