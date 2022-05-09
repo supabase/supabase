@@ -116,6 +116,8 @@ const AuthPoliciesTables = observer(() => {
   const { ui, meta } = useStore()
   const PageState: any = useContext(PageContext)
 
+  const roles = meta.roles.list()
+
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
@@ -246,6 +248,7 @@ const AuthPoliciesTables = observer(() => {
 
       <PolicyEditorModal
         visible={!isEmpty(selectedSchemaAndTable)}
+        roles={roles}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
