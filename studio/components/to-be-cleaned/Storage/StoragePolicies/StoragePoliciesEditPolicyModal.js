@@ -1,10 +1,8 @@
 import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
-import toast from 'react-hot-toast'
 
 import { useStore } from 'hooks'
-import { POLICY_MODAL_VIEWS } from 'lib/constants'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import {
   createPayloadsForAddPolicy,
@@ -12,7 +10,11 @@ import {
   applyBucketIdToTemplateDefinition,
 } from '../Storage.utils'
 
-import { PolicySelection, PolicyTemplates } from 'components/interfaces/Authentication/Policies'
+import {
+  PolicySelection,
+  PolicyTemplates,
+  POLICY_MODAL_VIEWS,
+} from 'components/interfaces/Authentication/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
