@@ -3,10 +3,11 @@ import { Input } from '@supabase/ui'
 
 interface Props {
   name: string
+  limit?: number
   onUpdatePolicyName: (name: string) => void
 }
 
-const PolicyName: FC<Props> = ({ name = '', onUpdatePolicyName }) => {
+const PolicyName: FC<Props> = ({ name = '', limit = 100, onUpdatePolicyName }) => {
   return (
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
@@ -20,7 +21,11 @@ const PolicyName: FC<Props> = ({ name = '', onUpdatePolicyName }) => {
           id="policy-name"
           value={name}
           onChange={(e) => onUpdatePolicyName(e.target.value)}
-          actions={<span className="text-scale-900 mr-3 text-sm">{name.length}/63</span>}
+          actions={
+            <span className="text-scale-900 mr-3 text-sm">
+              {name.length}/{limit}
+            </span>
+          }
         />
       </div>
     </div>

@@ -9,20 +9,18 @@ import { useStore, withAuth } from 'hooks'
 import { StorageLayout } from 'components/layouts'
 import { StoragePolicies } from 'components/to-be-cleaned/Storage'
 
-/**
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
 const PageLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const project = ui.selectedProject
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, {})
     }
+    meta.roles.load()
   }, [project])
 
   if (!project) return <div></div>
