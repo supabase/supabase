@@ -33,7 +33,7 @@ module.exports = {
       typesenseServerConfig: {
         nodes: [
           {
-            host: '104.197.49.156',
+            host: 'doc-search.supabase.com',
             port: 80,
             protocol: 'http',
           },
