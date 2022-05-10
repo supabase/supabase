@@ -337,7 +337,6 @@ class StorageExplorerStore {
         this.selectedFilePreview = { ...file, previewUrl: cachedPreview.url }
       } else {
         const previewUrl = await this.fetchFilePreview(file.name)
-
         const formattedPreviewUrl = this.selectedBucket.public
           ? `${previewUrl}?t=${new Date().toISOString()}`
           : previewUrl
@@ -374,12 +373,13 @@ class StorageExplorerStore {
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      copyToClipboard(signedUrl, () => {
+      const formattedUrl = `${signedUrl}?t=${new Date().toISOString()}`
+      copyToClipboard(formattedUrl, () => {
         toast(`Copied URL for ${file.name} to clipboard.`)
       })
       const fileCache = {
         id: file.id,
-        url: signedUrl,
+        url: formattedUrl,
         expiresIn: DEFAULT_EXPIRY,
         fetchedAt: Date.now(),
       }
