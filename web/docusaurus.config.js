@@ -34,8 +34,8 @@ module.exports = {
         nodes: [
           {
             host: 'doc-search.supabase.com',
-            port: 80,
-            protocol: 'http',
+            port: 443,
+            protocol: 'https',
           },
         ],
         apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
