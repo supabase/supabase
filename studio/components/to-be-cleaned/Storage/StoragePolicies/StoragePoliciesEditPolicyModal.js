@@ -130,8 +130,7 @@ const StoragePoliciesEditPolicyModal = ({
         message: 'You will need to allow at least one operation in your policy',
       })
     }
-    console.log('Validate', policyFormFields)
-    // [TODO] Joshen left off here to implement roles
+
     const policySQLStatements = createSQLPolicies(bucketName, policyFormFields)
     setPolicyStatementsForReview(policySQLStatements)
     onReviewPolicy()
