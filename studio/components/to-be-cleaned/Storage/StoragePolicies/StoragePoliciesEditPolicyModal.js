@@ -20,6 +20,7 @@ import StoragePoliciesReview from './StoragePoliciesReview'
 
 const newPolicyTemplate = {
   name: '',
+  roles: [],
   policyIds: [],
   definition: '',
   allowedOperations: [],
@@ -28,6 +29,7 @@ const newPolicyTemplate = {
 const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
+  roles = [],
   onSelectCancel = () => {},
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
@@ -103,6 +105,13 @@ const StoragePoliciesEditPolicyModal = ({
     })
   }
 
+  const onUpdatePolicyRoles = (roles) => {
+    setPolicyFormFields({
+      ...policyFormFields,
+      roles,
+    })
+  }
+
   const validatePolicyEditorFormFields = () => {
     const { name, definition, allowedOperations } = policyFormFields
     if (name.length === 0) {
@@ -121,6 +130,8 @@ const StoragePoliciesEditPolicyModal = ({
         message: 'You will need to allow at least one operation in your policy',
       })
     }
+    console.log('Validate', policyFormFields)
+    // [TODO] Joshen left off here to implement roles
     const policySQLStatements = createSQLPolicies(bucketName, policyFormFields)
     setPolicyStatementsForReview(policySQLStatements)
     onReviewPolicy()
@@ -209,11 +220,13 @@ const StoragePoliciesEditPolicyModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
+            roles={roles}
             policyFormFields={policyFormFields}
             onViewTemplates={onViewTemplates}
             onUpdatePolicyName={onUpdatePolicyName}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
             onToggleOperation={onToggleOperation}
+            onUpdatePolicyRoles={onUpdatePolicyRoles}
             onReviewPolicy={validatePolicyEditorFormFields}
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (

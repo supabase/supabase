@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react'
+import { FC } from 'react'
 import { Modal } from '@supabase/ui'
 
 import PolicyName from './PolicyName'
@@ -7,6 +7,9 @@ import PolicyAllowedOperation from './PolicyAllowedOperation'
 import PolicyRoles from './PolicyRoles'
 import PolicyEditorFooter from './PolicyEditorFooter'
 import { PostgresRole } from '@supabase/postgres-meta'
+
+// Exposed for StoragePoliciesEditor.js
+export { PolicyName, PolicyRoles }
 
 interface Props {
   isNewPolicy: boolean
@@ -36,6 +39,7 @@ const PolicyEditor: FC<Props> = ({
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}
+            limit={63}
             onUpdatePolicyName={(name) => onUpdatePolicyFormFields({ name })}
           />
         </Modal.Content>
@@ -58,6 +62,7 @@ const PolicyEditor: FC<Props> = ({
             onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
           />
         </Modal.Content>
+        <Modal.Seperator />
         <Modal.Content>
           <PolicyDefinition
             operation={operation}

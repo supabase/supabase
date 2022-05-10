@@ -18,6 +18,8 @@ const StoragePolicies = () => {
   const storageStore = useStorageStore()
   const { loaded, buckets } = storageStore
 
+  const roles = meta.roles.list()
+
   const [policies, setPolicies] = useState([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState({})
@@ -208,6 +210,7 @@ const StoragePolicies = () => {
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
+        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -217,6 +220,7 @@ const StoragePolicies = () => {
       <PolicyEditorModal
         visible={showGeneralPolicyEditor}
         schema="storage"
+        roles={roles}
         table={isEditingPolicyForBucket.table}
         target={isEditingPolicyForBucket.bucket}
         selectedPolicyToEdit={selectedPolicyToEdit}

@@ -22,6 +22,11 @@ interface Props {
   onChange?(x: string[]): void
 }
 
+/**
+ * Copy styling from supabase/ui default.theme
+ * input base + standard
+ */
+
 export default function MultiSelect({
   options,
   value,
@@ -90,7 +95,6 @@ export default function MultiSelect({
           className={[
             'form-control form-control--multi-select',
             'border-scale-700 bg-scale-400 border',
-            // 'border-input-border-light dark:border-input-border-dark dark:border-dark border',
             'multi-select relative w-full space-x-1 overflow-auto rounded',
           ].join(' ')}
           ref={ref}
