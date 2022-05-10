@@ -142,7 +142,7 @@ const RowEditor: FC<Props> = ({
       key="RowEditor"
       visible={visible}
       header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
-      className={`transition-all ease-in duration-100 ${
+      className={`transition-all duration-100 ease-in ${
         isEditingJson || isViewingReferenceRow ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
@@ -177,8 +177,8 @@ const RowEditor: FC<Props> = ({
           <SidePanel.Content>
             <div className="space-y-10 py-6">
               <div>
-                <h3 className="text-base text-scale-1200">Optional Fields</h3>
-                <p className="text-sm text-scale-900">
+                <h3 className="text-scale-1200 text-base">Optional Fields</h3>
+                <p className="text-scale-900 text-sm">
                   These are columns that do not need any value
                 </p>
               </div>
