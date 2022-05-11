@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { Button, IconX } from '@supabase/ui'
 
 import { headWithTimeout } from 'lib/common/fetch'
@@ -15,19 +15,19 @@ const BillingLayout: FC<Props> = ({ children }) => {
 
   return (
     <BaseLayout hideHeader hideIconBar>
-      <div className="flex flex-col h-full w-full">
+      <div className="flex h-full w-full flex-col">
         {/* Header */}
-        <div className="py-4 border-b dark:border-dark flex items-center space-x-3 px-5">
+        <div className="dark:border-dark flex items-center space-x-3 border-b py-4 px-5">
           <Link href={`/project/${ui.selectedProject?.ref}/settings/billing`} passHref>
-            <a className="transition-colors text-scale-900 hover:text-scale-1200">
+            <a className="text-scale-900 hover:text-scale-1200 transition-colors">
               <IconX size={16} strokeWidth={1.5} />
             </a>
           </Link>
           <div className="flex items-center space-x-6">
-            <h1 className="text-base text-scale-1200">Customize your plan</h1>
-            <div className="h-6 w-px bg-scale-600"></div>
-            <div className="flex space-x-3 items-center">
-              <p className="text-sm text-scale-1100">{ui.selectedOrganization?.name}</p>
+            <h1 className="text-scale-1200 text-base">Customize your plan</h1>
+            <div className="bg-scale-600 h-6 w-px"></div>
+            <div className="flex items-center space-x-3">
+              <p className="text-scale-1100 text-sm">{ui.selectedOrganization?.name}</p>
               <span className="text-scale-800">
                 <svg
                   viewBox="0 0 24 24"
@@ -43,7 +43,7 @@ const BillingLayout: FC<Props> = ({ children }) => {
                   <path d="M16 3.549L7.12 20.600"></path>
                 </svg>
               </span>
-              <p className="text-sm text-scale-1100">{ui.selectedProject?.name}</p>
+              <p className="text-scale-1100 text-sm">{ui.selectedProject?.name}</p>
             </div>
           </div>
         </div>
@@ -55,4 +55,4 @@ const BillingLayout: FC<Props> = ({ children }) => {
   )
 }
 
-export default BillingLayout
+export default withAuth(BillingLayout)
