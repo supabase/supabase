@@ -489,18 +489,20 @@ export default function Avatar({ url, size, onUpload }) {
         style={{ height: size, width: size }}
       />
       {uploading ? "Uploading..." : (
-        <label className="button primary block" htmlFor="single">
-          Upload an avatar
-        </label>
-        <VisuallyHidden>
-          <input
-            type="file"
-            id="single"
-            accept="image/*"
-            onChange={uploadAvatar}
-            disabled={uploading}
-          />
-        </VisuallyHidden>
+        <>
+          <label className="button primary block" htmlFor="single">
+            Upload an avatar
+          </label>
+          <VisuallyHidden>
+            <input
+              type="file"
+              id="single"
+              accept="image/*"
+              onChange={uploadAvatar}
+              disabled={uploading}
+            />
+          </VisuallyHidden>
+        </>
       )}
     </div>
   )
