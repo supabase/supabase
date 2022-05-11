@@ -27,7 +27,7 @@ jobs:
           BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
         with:
           action: scan
-          api_endpoint: https://devel.boostsecurity.dev
+          api_endpoint: https://api.boostsecurity.net
           api_token: ${{ secrets.BOOST_API_KEY }}
           additional_args: --disable-telemetry --api-version v2
           cli_version: 3.0.0.rc483
