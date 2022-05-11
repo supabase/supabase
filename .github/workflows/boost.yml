@@ -1,6 +1,34 @@
-version: "1"
-rules:
-  - base: master
-    upstream: null:master
-    mergeMethod: merge
-    mergeUnstable: true
+name: SAST
+on: 
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'INFO' 
+        type: choice
+        options:
+        - INFO
+        - DEBUG
+  push:
+    branches:
+      - master
+jobs:
+  boost_security_sast:
+    name: Boost Security / Native Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Native Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        env:
+          BOOST_CLI_URL: https://assets.build.boostsecurity.io
+          BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
+        with:
+          action: scan
+          api_endpoint: https://devel.boostsecurity.dev
+          api_token: ${{ secrets.BOOST_API_TOKEN_DEV }}
+          additional_args: --disable-telemetry --api-version v2
+          cli_version: 3.0.0.rc483
+          scanner_version: 3.0.0.rc483
