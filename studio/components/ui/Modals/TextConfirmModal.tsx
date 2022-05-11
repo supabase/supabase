@@ -49,47 +49,45 @@ const TextConfirmModal: FC<Props> = ({
         validate={validate}
         onSubmit={onConfirm}
       >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <div className="w-full py-4">
-            <div className="space-y-4">
-              {alert && (
-                <Modal.Content>
-                  <Alert variant="warning" withIcon title={alert} />
-                </Modal.Content>
-              )}
+        <div className="w-full py-4">
+          <div className="space-y-4">
+            {alert && (
               <Modal.Content>
-                <Typography.Text className="block">
-                  <p className="mb-2 text-sm">{text}</p>
-                </Typography.Text>
+                <Alert variant="warning" withIcon title={alert} />
               </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Input
-                  id="confirmValue"
-                  label={
-                    <span>
-                      Type <span className="text-scale-1200">{confirmString}</span> to confirm.
-                    </span>
-                  }
-                  placeholder={confirmPlaceholder}
-                />
-              </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Button
-                  block
-                  type="danger"
-                  size="medium"
-                  htmlType="submit"
-                  loading={loading}
-                  disabled={loading}
-                >
-                  {confirmLabel}
-                </Button>
-              </Modal.Content>
-            </div>
+            )}
+            <Modal.Content>
+              <Typography.Text className="block">
+                <p className="mb-2 text-sm">{text}</p>
+              </Typography.Text>
+            </Modal.Content>
+            <Modal.Seperator />
+            <Modal.Content>
+              <Input
+                id="confirmValue"
+                label={
+                  <span>
+                    Type <span className="text-scale-1200">{confirmString}</span> to confirm.
+                  </span>
+                }
+                placeholder={confirmPlaceholder}
+              />
+            </Modal.Content>
+            <Modal.Seperator />
+            <Modal.Content>
+              <Button
+                block
+                type="danger"
+                size="medium"
+                htmlType="submit"
+                loading={loading}
+                disabled={loading}
+              >
+                {confirmLabel}
+              </Button>
+            </Modal.Content>
           </div>
-        )}
+        </div>
       </Form>
     </Modal>
   )
