@@ -167,6 +167,7 @@ These variables will be exposed on the browser, and that's completely fine since
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js title="lib/supabase.ts"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL

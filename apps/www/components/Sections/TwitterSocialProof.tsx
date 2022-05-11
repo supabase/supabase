@@ -114,15 +114,11 @@ function TwitterSocialProof() {
               )
             })}
             <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
-              <div ref={prevRef} className="ml-4 cursor-pointer">
-                <p>
-                  <IconArrowLeft />
-                </p>
+              <div ref={prevRef} className="ml-4 cursor-pointer p">
+                <IconArrowLeft />
               </div>
-              <div ref={nextRef} className="mr-4 cursor-pointer">
-                <p>
-                  <IconArrowRight />
-                </p>
+              <div ref={nextRef} className="mr-4 cursor-pointer p">
+                <IconArrowRight />
               </div>
             </div>
           </Swiper>
