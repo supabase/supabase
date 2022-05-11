@@ -1,10 +1,9 @@
-import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from '@supabase/ui'
 
-import { withAuth, useStore, useSubscriptionStats } from 'hooks'
+import { useStore, useSubscriptionStats } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -12,8 +11,9 @@ import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { PlanSelection, StripeSubscription } from 'components/interfaces/Billing'
 import Connecting from 'components/ui/Loading/Loading'
+import { NextPageWithLayout } from 'types'
 
-const BillingUpdate: NextPage = () => {
+const BillingUpdate: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
@@ -98,15 +98,15 @@ const BillingUpdate: NextPage = () => {
 
   if (isLoadingProducts) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <Connecting />
       </div>
     )
   }
 
   return (
-    <BillingLayout>
-      <div className="mx-auto max-w-6xl my-10 px-6">
+    <>
+      <div className="mx-auto my-10 max-w-6xl px-6">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={products?.tiers ?? []}
@@ -137,9 +137,9 @@ const BillingUpdate: NextPage = () => {
         header="Free tier limit exceeded"
         onCancel={() => setShowDowngradeError(false)}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-scale-1100 text-sm">
               Your account is entitled up to {freeProjectsLimit} free projects across all
               organizations you own. You will need to delete or upgrade an existing free project
               first, before being able to downgrade this project.
@@ -160,8 +160,10 @@ const BillingUpdate: NextPage = () => {
           </Modal.Content>
         </div>
       </Modal>
-    </BillingLayout>
+    </>
   )
 }
 
-export default withAuth(observer(BillingUpdate))
+BillingUpdate.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
+
+export default observer(BillingUpdate)
