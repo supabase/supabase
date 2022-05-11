@@ -132,7 +132,9 @@ const ColumnForeignKeyAdded: FC<{
               <span className="text-green-900">added</span>:
             </span>
             <div className="text-scale-1200 flex items-center space-x-2">
-              <span className="text-code max-w-xs truncate">{columnName}</span>
+              <span className={`${columnName.length > 0 ? 'text-code' : ''} max-w-xs truncate`}>
+                {columnName || 'This column'}
+              </span>
               <IconArrowRight size={14} strokeWidth={2} />
               <span className="text-code max-w-xs truncate">
                 {foreignKey?.target_table_schema}.{foreignKey?.target_table_name}.
