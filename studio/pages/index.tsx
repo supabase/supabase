@@ -1,4 +1,3 @@
-import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { NextRouter, useRouter } from 'next/router'
@@ -16,7 +15,7 @@ import { AccountLayoutWithoutAuth } from 'components/layouts'
 import Landing from 'components/interfaces/Home/Landing'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 
 const Home: NextPageWithLayout = () => {
   const { app, ui } = useStore()
@@ -93,7 +92,7 @@ const Home: NextPageWithLayout = () => {
         loading={isDeletingProject}
         confirmLabel="Confirm delete"
         confirmPlaceholder="Type in name of project"
-        confirmString={selectedProjectToDelete?.name}
+        confirmString={selectedProjectToDelete?.name ?? ''}
         onCancel={() => setSelectedProjectToDelete(undefined)}
         onConfirm={() => onDeleteProject(selectedProjectToDelete)}
       />

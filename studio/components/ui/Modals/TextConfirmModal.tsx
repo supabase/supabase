@@ -1,6 +1,20 @@
+import { FC, ReactNode } from 'react'
 import { Modal, Button, Typography, Input, Alert, Form } from '@supabase/ui'
 
-export default function TextConfirmModal({
+interface Props {
+  loading: boolean
+  visible: boolean
+  title: string
+  confirmLabel: string
+  confirmPlaceholder: string
+  confirmString: string
+  alert: string
+  text: string | ReactNode
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+const TextConfirmModal: FC<Props> = ({
   title,
   onConfirm,
   visible,
@@ -11,9 +25,14 @@ export default function TextConfirmModal({
   confirmString,
   alert,
   text,
-}) {
-  const validate = (values) => {
-    const errors = {}
+}) => {
+  // [Joshen] Have to keep the loading prop here as this component itself doesn't
+  // directly trigger any potential async job that follows onConfirm. It only triggers
+  // the onConfirm callback function, and hence if anything fails in the callback,
+  // have to depend on loading prop to unfreeze the UI state
+
+  const validate = (values: any) => {
+    const errors: any = {}
     if (values.confirmValue.length === 0) {
       errors.confirmValue = 'Enter the required value.'
     } else if (values.confirmValue !== confirmString) {
@@ -22,19 +41,15 @@ export default function TextConfirmModal({
     return errors
   }
 
-  const onSubmit = async (values, form) => {
-    console.log('onSUBMITTT', values, confirmString, form)
-  }
-
   return (
     <Modal hideFooter closable size="small" visible={visible} header={title} onCancel={onCancel}>
       <Form
         validateOnBlur
         initialValues={{ confirmValue: '' }}
         validate={validate}
-        onSubmit={onSubmit}
+        onSubmit={onConfirm}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting }: { isSubmitting: boolean }) => (
           <div className="w-full py-4">
             <div className="space-y-4">
               {alert && (
@@ -66,9 +81,8 @@ export default function TextConfirmModal({
                   type="danger"
                   size="medium"
                   htmlType="submit"
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
-                  onClick={() => onSubmit()}
+                  loading={loading}
+                  disabled={loading}
                 >
                   {confirmLabel}
                 </Button>
@@ -80,3 +94,5 @@ export default function TextConfirmModal({
     </Modal>
   )
 }
+
+export default TextConfirmModal
