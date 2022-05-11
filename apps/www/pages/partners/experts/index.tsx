@@ -62,14 +62,14 @@ function ExpertPartnersPage(props: Props) {
             <h1 className="h1">{meta_title}</h1>
             <h2 className="text-scale-900 text-xl">{meta_description}</h2>
           </div>
-          <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
+          <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-32">
             <div className="lg:col-span-4 xl:col-span-3">
               {/* Horizontal link menu */}
               <div className="space-y-6">
                 {/* Search Bar */}
                 <div className="space-y-4">
                   <div className="text-scale-900 mb-2 text-sm">Explore more</div>
-                  <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
+                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
                     <PartnerLinkBox
                       title="Integrations"
                       color="blue"
