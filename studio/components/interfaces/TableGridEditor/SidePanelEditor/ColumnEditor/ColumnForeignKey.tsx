@@ -88,7 +88,7 @@ const ColumnForeignKeyInformation: FC<{
       block
       icon={<IconLink />}
       title={
-        <div className="flex items-center justify-between text-scale-900">
+        <div className="text-scale-900 flex items-center justify-between">
           <div className="space-y-2">
             <span>This column has the following foreign key relation:</span>
             <div className="flex items-center space-x-2">
@@ -125,13 +125,13 @@ const ColumnForeignKeyAdded: FC<{
       block
       icon={<IconLink />}
       title={
-        <div className="flex items-center justify-between text-scale-1100">
+        <div className="text-scale-1100 flex items-center justify-between">
           <div className="space-y-2">
             <span>
               The following foreign key relation will be{' '}
               <span className="text-green-900">added</span>:
             </span>
-            <div className="flex items-center space-x-2 text-scale-1200">
+            <div className="text-scale-1200 flex items-center space-x-2">
               <span className="text-code max-w-xs truncate">{columnName}</span>
               <IconArrowRight size={14} strokeWidth={2} />
               <span className="text-code max-w-xs truncate">
@@ -213,7 +213,7 @@ const ColumnForeignKeyUpdated: FC<{
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <Typography.Text>
-              The foreign key relation will be <span className="text-green-500">updated</span> as
+              The foreign key relation will be <span className="text-green-1000">updated</span> as
               such:
             </Typography.Text>
             <div className="flex items-start space-x-2">
