@@ -13,11 +13,11 @@ const PolicyAllowedOperation: FC<Props> = ({ operation = '', onSelectOperation }
         <label className="text-scale-1100 text-base" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-scale-900 text-sm">Selection an operation for this policy</p>
+        <p className="text-scale-900 text-sm">Select an operation for this policy</p>
       </div>
       <div className="w-2/3">
         <div className="flex items-center space-x-8">
-          <Radio.Group type="small-cards" id="allowed-operation">
+          <Radio.Group type="small-cards" size="tiny" id="allowed-operation">
             <Radio
               name="allowed-operation"
               label="SELECT"

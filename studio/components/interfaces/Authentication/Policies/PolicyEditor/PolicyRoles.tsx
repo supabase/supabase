@@ -24,20 +24,17 @@ const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles })
     <div className="flex space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
         <label className="text-scale-1100 text-base" htmlFor="policy-name">
-          Roles
+          Target roles
         </label>
-        <p className="text-scale-900 text-sm">Apply policy to the specified roles</p>
+        <p className="text-scale-900 text-sm">Apply policy to the selected roles</p>
       </div>
       <div className="relative w-2/3">
         <MultiSelect
           options={formattedRoles}
           value={selectedRoles}
-          placeholder='Defaults to "public" role if none selected'
+          placeholder="Defaults to all roles if none selected"
           searchPlaceholder="Search for a role"
-          onChange={(updatedRoles) => {
-            // const selectedRoles = roles.filter((role) => updatedRoles.includes(role.name))
-            onUpdateSelectedRoles(updatedRoles)
-          }}
+          onChange={onUpdateSelectedRoles}
         />
       </div>
     </div>

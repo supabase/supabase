@@ -49,16 +49,14 @@ export const createSQLStatementForCreatePolicy = (policyFormFields: any) => {
   const { name, definition, check, command, schema, table } = policyFormFields
   const roles = policyFormFields.roles.length === 0 ? ['public'] : policyFormFields.roles
   const description = `Add policy for the ${command} operation under the policy "${name}"`
-  const statement =
-    `
-    CREATE POLICY "${name}" ON "${schema}"."${table}"
-    AS PERMISSIVE FOR ${command}
-    TO ${roles.join(', ')}
-    ${definition ? `USING (${definition})` : ''}
-    ${check ? `WITH CHECK (${check})` : ''}
-  `
-      .replace(/\s+/g, ' ')
-      .trim() + ';'
+  const statement = [
+    `CREATE POLICY "${name}" ON "${schema}"."${table}"`,
+    `AS PERMISSIVE FOR ${command}`,
+    `TO ${roles.join(', ')}`,
+    `${definition ? `USING (${definition})` : ''}`,
+    `${check ? `WITH CHECK (${check})` : ''}`,
+  ].join('\n')
+
   return { description, statement }
 }
 
@@ -83,16 +81,14 @@ export const createSQLStatementForUpdatePolicy = (
   } `
 
   const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
-  const statement = `
-    BEGIN;
-      ${definitionChanged ? `${alterStatement} USING (${fieldsToUpdate.definition});` : ''}
-      ${checkChanged ? `${alterStatement} WITH CHECK (${fieldsToUpdate.check});` : ''}
-      ${rolesChanged ? `${alterStatement} TO ${fieldsToUpdate.roles.join(', ')};` : ''}
-      ${nameChanged ? `${alterStatement} RENAME TO "${fieldsToUpdate.name}";` : ''}
-    COMMIT;
-  `
-    .replace(/\s+/g, ' ')
-    .trim()
+  const statement = [
+    'BEGIN;',
+    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
+    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(rolesChanged ? [`  ${alterStatement} TO ${fieldsToUpdate.roles.join(', ')};`] : []),
+    ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
+    'COMMIT;',
+  ].join('\n')
 
   return { description, statement }
 }
