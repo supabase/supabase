@@ -14,7 +14,7 @@ interface Props {
 }
 
 const ProductMenuItem: FC<Props> = ({
-  name,
+  name = '',
   isActive,
   icon,
   action,
@@ -25,8 +25,13 @@ const ProductMenuItem: FC<Props> = ({
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
-      <div className="flex w-full justify-between items-center">
-        <span className={'truncate flex items-center ' + textClassName}>{name}</span>
+      <div className="flex w-full items-center justify-between">
+        <span
+          title={typeof name === 'string' ? name : ''}
+          className={'flex items-center truncate ' + textClassName}
+        >
+          {name}
+        </span>
         {action}
       </div>
     </Menu.Item>
