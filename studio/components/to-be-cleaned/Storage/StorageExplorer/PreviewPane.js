@@ -129,9 +129,7 @@ const PreviewPane = ({
         <div className="w-full space-y-6">
           {/* Preview Information */}
           <div className="space-y-1">
-            <div className="flex items-center">
-              <h5 className="text-scale-1200 text-base font-bold mr-2 truncate">{file.name}</h5>
-            </div>
+            <h5 className="text-scale-1200 break-words text-base">{file.name}</h5>
             {mimeType && (
               <p className="text-sm text-scale-1100">
                 {mimeType}

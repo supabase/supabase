@@ -1,11 +1,21 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
+import {
+  PolicyFormField,
+  PolicyForReview,
+  PostgresPolicyCreatePayload,
+  PostgresPolicyUpdatePayload,
+} from './Policies.types'
 
 /**
  * Returns an array of SQL statements that will preview in the review step of the policy editor
  * @param {*} policyFormFields { name, using, check, command }
  */
 
-export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {}) => {
+export const createSQLPolicy = (
+  policyFormFields: PolicyFormField,
+  originalPolicyFormFields: PostgresPolicy
+) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
@@ -23,7 +33,7 @@ export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {})
   }
 
   // Extract out all the fields that updated
-  const fieldsToUpdate = {}
+  const fieldsToUpdate: any = {}
   if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
     fieldsToUpdate.name = formattedPolicyFormFields.name
   }
@@ -33,81 +43,87 @@ export const createSQLPolicy = (policyFormFields, originalPolicyFormFields = {})
   if (!isEqual(formattedPolicyFormFields.check, originalPolicyFormFields.check)) {
     fieldsToUpdate.check = formattedPolicyFormFields.check
   }
+  if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
+    fieldsToUpdate.roles = formattedPolicyFormFields.roles
+  }
 
   if (!isEmpty(fieldsToUpdate)) {
     return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
   }
 
-  return { description: 'hello', statement: 'hello' }
+  return {}
 }
 
-export const createSQLStatementForCreatePolicy = (policyFormFields) => {
+export const createSQLStatementForCreatePolicy = (
+  policyFormFields: PolicyFormField
+): PolicyForReview => {
   const { name, definition, check, command, schema, table } = policyFormFields
+  const roles = policyFormFields.roles.length === 0 ? ['public'] : policyFormFields.roles
   const description = `Add policy for the ${command} operation under the policy "${name}"`
-  const statement =
-    `
-    CREATE POLICY "${name}" ON ${schema}.${table} FOR ${command}
-    ${definition ? `USING (${definition})` : ''}
-    ${check ? `WITH CHECK (${check})` : ''}
-  `
-      .replace(/\s+/g, ' ')
-      .trim() + ';'
+  const statement = [
+    `CREATE POLICY "${name}" ON "${schema}"."${table}"`,
+    `AS PERMISSIVE FOR ${command}`,
+    `TO ${roles.join(', ')}`,
+    `${definition ? `USING (${definition})` : ''}`,
+    `${check ? `WITH CHECK (${check})` : ''}`,
+  ].join('\n')
+
   return { description, statement }
 }
 
-export const createSQLStatementForUpdatePolicy = (policyFormFields = {}, fieldsToUpdate = {}) => {
+export const createSQLStatementForUpdatePolicy = (
+  policyFormFields: PolicyFormField,
+  fieldsToUpdate: Partial<PolicyFormField>
+): PolicyForReview => {
   const { name, schema, table } = policyFormFields
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
   const nameChanged = has(fieldsToUpdate, ['name'])
+  const rolesChanged = has(fieldsToUpdate, ['roles'])
 
-  let description = `
-    ${
-      definitionChanged || checkChanged
-        ? `Update policy's ${definitionChanged ? 'USING expression' : ''} ${
-            definitionChanged && checkChanged ? ' and' : ''
-          } ${checkChanged ? ' WITH CHECK expression.' : ''}`
-        : ''
-    }
-    ${nameChanged ? `Rename policy to ${fieldsToUpdate.name}.` : ''}
-  `
-  // Need to figure out a way to derive description: name, definition and check can change
+  const parameters = Object.keys(fieldsToUpdate)
+  const description = `Update policy's ${
+    parameters.length === 1
+      ? parameters[0]
+      : `${parameters.slice(0, parameters.length - 1).join(', ')} and ${
+          parameters[parameters.length - 1]
+        }`
+  } `
+  const roles =
+    (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
-  const definitionOrCheckUpdateStatement =
-    definitionChanged || checkChanged
-      ? `
-          ALTER POLICY "${name}" ON ${schema}.${table} ${
-          definitionChanged ? `USING (${fieldsToUpdate.definition})` : ''
-        } ${checkChanged ? `WITH CHECK (${fieldsToUpdate.check})` : ''};
-        `
-          .replace(/\s+/g, ' ')
-          .trim()
-      : ''
-
-  const renameStatement = nameChanged
-    ? `ALTER POLICY "${name}" ON ${schema}.${table} RENAME TO "${fieldsToUpdate.name}";`
-    : ''
-
-  const statement = definitionOrCheckUpdateStatement + renameStatement
+  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  const statement = [
+    'BEGIN;',
+    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
+    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
+    ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
+    'COMMIT;',
+  ].join('\n')
 
   return { description, statement }
 }
 
-export const createPayloadForCreatePolicy = (policyFormFields = {}) => {
-  const { definition, check } = policyFormFields
+export const createPayloadForCreatePolicy = (
+  policyFormFields: PolicyFormField
+): PostgresPolicyCreatePayload => {
+  const { command, definition, check, roles } = policyFormFields
   return {
     ...policyFormFields,
     action: 'PERMISSIVE',
+    command: command || undefined,
     definition: definition || undefined,
     check: check || undefined,
+    roles: roles.length > 0 ? roles : undefined,
   }
 }
 
 export const createPayloadForUpdatePolicy = (
-  policyFormFields = {},
-  originalPolicyFormFields = {}
-) => {
+  policyFormFields: PolicyFormField,
+  originalPolicyFormFields: PostgresPolicy
+): PostgresPolicyUpdatePayload => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
@@ -115,7 +131,7 @@ export const createPayloadForUpdatePolicy = (
     check: check ? check.replace(/\s+/g, ' ').trim() : check,
   }
 
-  const payload = { id: originalPolicyFormFields.id }
+  const payload: PostgresPolicyUpdatePayload = { id: originalPolicyFormFields.id }
 
   if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
     payload.name = formattedPolicyFormFields.name
@@ -125,6 +141,9 @@ export const createPayloadForUpdatePolicy = (
   }
   if (!isEqual(formattedPolicyFormFields.check, originalPolicyFormFields.check)) {
     payload.check = formattedPolicyFormFields.check || undefined
+  }
+  if (!isEqual(formattedPolicyFormFields.roles, originalPolicyFormFields.roles)) {
+    payload.roles = formattedPolicyFormFields.roles || undefined
   }
 
   return payload

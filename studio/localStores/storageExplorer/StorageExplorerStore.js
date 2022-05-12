@@ -286,6 +286,9 @@ class StorageExplorerStore {
     if (isNull(formattedName)) {
       return
     }
+    /** 
+     * todo: move this to a util file, as renameFolder() uses same logic
+     */
     if (formattedName.includes('/') || formattedName.includes('\\')) {
       return toast.error('Folder names should not have forward or back slashes.')
     }
@@ -337,7 +340,6 @@ class StorageExplorerStore {
         this.selectedFilePreview = { ...file, previewUrl: cachedPreview.url }
       } else {
         const previewUrl = await this.fetchFilePreview(file.name)
-
         const formattedPreviewUrl = this.selectedBucket.public
           ? `${previewUrl}?t=${new Date().toISOString()}`
           : previewUrl
@@ -374,12 +376,13 @@ class StorageExplorerStore {
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      copyToClipboard(signedUrl, () => {
+      const formattedUrl = `${signedUrl}?t=${new Date().toISOString()}`
+      copyToClipboard(formattedUrl, () => {
         toast(`Copied URL for ${file.name} to clipboard.`)
       })
       const fileCache = {
         id: file.id,
-        url: signedUrl,
+        url: formattedUrl,
         expiresIn: DEFAULT_EXPIRY,
         fetchedAt: Date.now(),
       }
@@ -1087,11 +1090,25 @@ class StorageExplorerStore {
 
   renameFolder = async (folder, newName, columnIndex) => {
     const originalName = folder.name
+
+    /**
+     * Catch any folder names that contain slash or backslash
+     * 
+     * this is because slashes are used to denote 
+     * children/parent relationships in bucket
+     * 
+     * todo: move this to a util file, as createFolder() uses same logic
+     */
+    if (newName.includes('/') || newName.includes('\\')) {
+      return toast.error('Folder names should not have forward or back slashes.')
+    }
+
     if (originalName === newName) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     } else {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
       const files = await this.getAllItemsAlongFolder(folder)
+
       // Make this batched promises into a reusable function for storage, i think this will be super helpful
       const promises = files.map((file) => {
         const fromPath = `${file.prefix}/${file.name}`
