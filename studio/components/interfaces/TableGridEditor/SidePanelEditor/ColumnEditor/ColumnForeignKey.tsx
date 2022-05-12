@@ -215,7 +215,7 @@ const ColumnForeignKeyUpdated: FC<{
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <Typography.Text>
-              The foreign key relation will be <span className="text-green-1000">updated</span> as
+              The foreign key relation will be <span className="text-green-900">updated</span> as
               such:
             </Typography.Text>
             <div className="flex items-start space-x-2">
