@@ -1,6 +1,7 @@
+import { FC } from 'react'
 import { IconX } from '@supabase/ui'
 
-export const BadgeDisabled = (props: any) => (
+export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
   <div
     className={[
       'text-typography-body-light dark:text-typography-body-dark',
@@ -8,11 +9,14 @@ export const BadgeDisabled = (props: any) => (
       'py-0.5 px-2 text-sm',
     ].join(' ')}
   >
-    <span className="opacity-50">{props.name}</span>
+    <span className="opacity-50">{name}</span>
   </div>
 )
 
-export const BadgeSelected = (props: any) => (
+export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
+  name,
+  handleRemove,
+}) => (
   <div
     className={[
       'text-typography-body-light dark:text-typography-body-dark',
@@ -20,13 +24,13 @@ export const BadgeSelected = (props: any) => (
       'py-0.5 px-2 text-sm',
     ].join(' ')}
   >
-    <span>{props.name}</span>
+    <span>{name}</span>
     <IconX
       size={12}
       className="cursor-pointer opacity-50 transition hover:opacity-100"
       onClick={(e: any) => {
         e.preventDefault()
-        props.handleRemove()
+        handleRemove()
       }}
     />
   </div>

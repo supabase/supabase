@@ -17,6 +17,12 @@ import {
   createPayloadForUpdatePolicy,
 } from '../Policies.utils'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
+import {
+  PolicyFormField,
+  PostgresPolicyCreatePayload,
+  PostgresPolicyUpdatePayload,
+} from '../Policies.types'
+import { PolicyTemplate } from './PolicyEditorModal.types'
 
 interface Props {
   visible: boolean
@@ -25,8 +31,8 @@ interface Props {
   table: string
   selectedPolicyToEdit: any
   onSelectCancel: () => void
-  onCreatePolicy: (payload: any) => boolean
-  onUpdatePolicy: (payload: any) => boolean
+  onCreatePolicy: (payload: PostgresPolicyCreatePayload) => boolean
+  onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => boolean
   onSaveSuccess: () => void
 }
 
@@ -43,7 +49,7 @@ const PolicyEditorModal: FC<Props> = ({
 }) => {
   const { ui } = useStore()
 
-  const newPolicyTemplate = {
+  const newPolicyTemplate: PolicyFormField = {
     schema,
     table,
     name: '',
@@ -56,10 +62,13 @@ const PolicyEditorModal: FC<Props> = ({
   const isNewPolicy = isEmpty(selectedPolicyToEdit)
   const initializedPolicyFormFields = isNewPolicy ? newPolicyTemplate : selectedPolicyToEdit
 
-  const [previousView, setPreviousView] = useState('') // Mainly to decide which view to show when back from templates
+  // Mainly to decide which view to show when back from templates
+  const [previousView, setPreviousView] = useState('')
   const [view, setView] = useState(POLICY_MODAL_VIEWS.EDITOR)
 
-  const [policyFormFields, setPolicyFormFields] = useState(initializedPolicyFormFields)
+  const [policyFormFields, setPolicyFormFields] = useState<PolicyFormField>(
+    initializedPolicyFormFields
+  )
   const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
 
   useEffect(() => {
@@ -84,7 +93,7 @@ const PolicyEditorModal: FC<Props> = ({
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
 
-  const onUseTemplate = (template: any) => {
+  const onUseTemplate = (template: PolicyTemplate) => {
     setPolicyFormFields({
       ...policyFormFields,
       name: template.name,
@@ -96,7 +105,7 @@ const PolicyEditorModal: FC<Props> = ({
     onViewEditor()
   }
 
-  const onUpdatePolicyFormFields = (field: any) => {
+  const onUpdatePolicyFormFields = (field: Partial<PolicyFormField>) => {
     if (field.name && field.name.length > 63) return
     setPolicyFormFields({ ...policyFormFields, ...field })
   }
@@ -144,7 +153,10 @@ const PolicyEditorModal: FC<Props> = ({
     onSavePolicy(payload)
   }
 
-  const onSavePolicy = async (payload: any) => {
+  const onSavePolicy = async (
+    payload: PostgresPolicyCreatePayload | PostgresPolicyUpdatePayload
+  ) => {
+    // @ts-ignore
     const hasError = isNewPolicy ? await onCreatePolicy(payload) : await onUpdatePolicy(payload)
     hasError ? onViewEditor() : onSaveSuccess()
   }
