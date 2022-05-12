@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from '@supabase/grid'
-import { Form, Input, Button, Select } from '@supabase/ui'
+import { Form, Input, Button, Listbox } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
@@ -90,16 +90,16 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                     <Input id="line1" name="line1" placeholder="Address line 1" />
                     <Input id="line2" name="line2" placeholder="Address line 2" />
                     <div className="flex items-center space-x-2">
-                      <Select className="w-full" id="country" name="country" placeholder="Country">
-                        <Select.Option key="empty" value="">
+                      <Listbox className="w-full" id="country" name="country" placeholder="Country">
+                        <Listbox.Option label="---" key="empty" value="">
                           ---
-                        </Select.Option>
+                        </Listbox.Option>
                         {COUNTRIES.map((country) => (
-                          <Select.Option key={country.code} value={country.code}>
+                          <Listbox.Option label={country.name} key={country.code} value={country.code}>
                             {country.name}
-                          </Select.Option>
+                          </Listbox.Option>
                         ))}
-                      </Select>
+                      </Listbox>
                       <Input
                         className="w-full"
                         id="postal_code"
