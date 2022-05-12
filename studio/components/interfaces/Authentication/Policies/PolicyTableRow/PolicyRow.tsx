@@ -5,12 +5,12 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 
 interface Props {
   policy: PostgresPolicy
-  onSelectEditPolicy: (policy: any) => void
-  onSelectDeletePolicy: (policy: any) => void
+  onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
 const PolicyRow: FC<Props> = ({
-  policy = {},
+  policy,
   onSelectEditPolicy = () => {},
   onSelectDeletePolicy = () => {},
 }) => {

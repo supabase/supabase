@@ -22,7 +22,7 @@ import {
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
 } from '../Policies.types'
-import { PolicyTemplate } from './PolicyEditorModal.types'
+import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface Props {
   visible: boolean

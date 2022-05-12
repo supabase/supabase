@@ -1,5 +1,6 @@
 import { trimEnd, groupBy, difference } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
+import { StoragePolicyFormField } from './Storage.types'
 
 export const shortHash = (str: string) => {
   let hash = 0
@@ -89,7 +90,7 @@ export const groupPoliciesByBucket = (policies: any[]) => {
 
 export const createPayloadsForAddPolicy = (
   bucketName = '',
-  policyFormFields: any = {},
+  policyFormFields: StoragePolicyFormField,
   addSuffixToPolicyName = true
 ) => {
   const { name: policyName, definition, allowedOperations, roles } = policyFormFields
@@ -172,7 +173,7 @@ export const createSQLStatementForCreatePolicy = (
 
 export const createSQLPolicies = (
   bucketName: string,
-  policyFormFields: any,
+  policyFormFields: StoragePolicyFormField,
   addSuffixToPolicyName = true
 ) => {
   const { name: policyName, definition, allowedOperations, roles } = policyFormFields

@@ -1,17 +1,18 @@
 import { FC } from 'react'
 import { Menu } from '@supabase/ui'
+import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface Props {
-  templates: any[]
+  templates: PolicyTemplate[]
   templatesNote: string
-  selectedTemplate: any
-  setSelectedTemplate: (template: any) => void
+  selectedTemplate: PolicyTemplate
+  setSelectedTemplate: (template: PolicyTemplate) => void
 }
 
 const TemplatesList: FC<Props> = ({
   templates = [],
   templatesNote = '',
-  selectedTemplate = {},
+  selectedTemplate,
   setSelectedTemplate = () => {},
 }) => (
   <div className="dark:border-dark flex flex-col justify-between border-r" style={{ width: '30%' }}>
