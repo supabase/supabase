@@ -18,9 +18,10 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
   const model = prepareModel()
 
   function prepareModel() {
-    const tabInfo = sqlEditorStore.tabs.find((x) => x.id == tabId)
+    const tabInfo = sqlEditorStore.tabs.find((x) => x.id === tabId)
     if (tabInfo) return tabInfo.renameModel
-    const favInfo = sqlEditorStore.favorites.find((x) => x.key == tabId)
+
+    const favInfo = sqlEditorStore.favorites.find((x) => x.key === tabId)
     if (favInfo) return favInfo.renameModel
   }
 
@@ -56,7 +57,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
         validateOnBlur
         initialValues={{
           name: model ? model.name : '',
-          description: model ? model.desc : '',
+          desc: model ? model.desc : '',
         }}
         validate={(values) => {
           const errors = {}
@@ -70,7 +71,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
         }}
       >
         {({ isSubmitting }) => (
-          <div className="py-4 space-y-4">
+          <div className="space-y-4 py-4">
             <Modal.Content>
               <Input label="Name" id="name" name="name" />
             </Modal.Content>

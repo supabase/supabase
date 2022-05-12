@@ -11,12 +11,14 @@ import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
+import { PolicyEditorModal } from 'components/interfaces/Authentication/Policies'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
   const storageStore = useStorageStore()
   const { loaded, buckets } = storageStore
+
+  const roles = meta.roles.list()
 
   const [policies, setPolicies] = useState([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
@@ -140,7 +142,7 @@ const StoragePolicies = () => {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-full">
+    <div className="flex min-h-full w-full flex-col">
       <h4 className="text-xl">Storage policies</h4>
       <p className="text-scale-1100">
         Safeguard your files with policies that define the operations allowed for your users at the
@@ -148,11 +150,11 @@ const StoragePolicies = () => {
       </p>
 
       {!loaded ? (
-        <div className="h-full flex items-center justify-center">
+        <div className="flex h-full items-center justify-center">
           <IconLoader className="animate-spin" size={16} />
         </div>
       ) : (
-        <div className="space-y-4 mt-4">
+        <div className="mt-4 space-y-4">
           {buckets.length === 0 && <StoragePoliciesPlaceholder />}
 
           {/* Sections for policies grouped by buckets */}
@@ -176,7 +178,7 @@ const StoragePolicies = () => {
             )
           })}
 
-          <div className="w-full border-b border-gray-600 !mb-4" />
+          <div className="!mb-4 w-full border-b border-gray-600" />
           <Typography.Text className="opacity-50">
             You may also write policies for the tables under the storage schema directly for greater
             control
@@ -208,6 +210,7 @@ const StoragePolicies = () => {
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
+        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -217,6 +220,7 @@ const StoragePolicies = () => {
       <PolicyEditorModal
         visible={showGeneralPolicyEditor}
         schema="storage"
+        roles={roles}
         table={isEditingPolicyForBucket.table}
         target={isEditingPolicyForBucket.bucket}
         selectedPolicyToEdit={selectedPolicyToEdit}

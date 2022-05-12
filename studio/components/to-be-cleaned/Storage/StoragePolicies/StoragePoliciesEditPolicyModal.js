@@ -1,10 +1,8 @@
 import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
-import toast from 'react-hot-toast'
 
 import { useStore } from 'hooks'
-import { POLICY_MODAL_VIEWS } from 'lib/constants'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import {
   createPayloadsForAddPolicy,
@@ -12,13 +10,17 @@ import {
   applyBucketIdToTemplateDefinition,
 } from '../Storage.utils'
 
-import PolicySelection from 'components/to-be-cleaned/Auth/PolicySelection'
-import PolicyTemplates from 'components/to-be-cleaned/Auth/PolicyTemplates'
+import {
+  PolicySelection,
+  PolicyTemplates,
+  POLICY_MODAL_VIEWS,
+} from 'components/interfaces/Authentication/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
 const newPolicyTemplate = {
   name: '',
+  roles: [],
   policyIds: [],
   definition: '',
   allowedOperations: [],
@@ -27,6 +29,7 @@ const newPolicyTemplate = {
 const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
+  roles = [],
   onSelectCancel = () => {},
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
@@ -102,6 +105,13 @@ const StoragePoliciesEditPolicyModal = ({
     })
   }
 
+  const onUpdatePolicyRoles = (roles) => {
+    setPolicyFormFields({
+      ...policyFormFields,
+      roles,
+    })
+  }
+
   const validatePolicyEditorFormFields = () => {
     const { name, definition, allowedOperations } = policyFormFields
     if (name.length === 0) {
@@ -120,6 +130,7 @@ const StoragePoliciesEditPolicyModal = ({
         message: 'You will need to allow at least one operation in your policy',
       })
     }
+
     const policySQLStatements = createSQLPolicies(bucketName, policyFormFields)
     setPolicyStatementsForReview(policySQLStatements)
     onReviewPolicy()
@@ -162,7 +173,7 @@ const StoragePoliciesEditPolicyModal = ({
           <div className="flex items-center space-x-3">
             <span
               onClick={onSelectBackFromTemplates}
-              className="cursor-pointer text-scale-900 hover:text-scale-1200 transition-colors"
+              className="text-scale-900 hover:text-scale-1200 cursor-pointer transition-colors"
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>
@@ -208,11 +219,13 @@ const StoragePoliciesEditPolicyModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
+            roles={roles}
             policyFormFields={policyFormFields}
             onViewTemplates={onViewTemplates}
             onUpdatePolicyName={onUpdatePolicyName}
             onUpdatePolicyDefinition={onUpdatePolicyDefinition}
             onToggleOperation={onToggleOperation}
+            onUpdatePolicyRoles={onUpdatePolicyRoles}
             onReviewPolicy={validatePolicyEditorFormFields}
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
