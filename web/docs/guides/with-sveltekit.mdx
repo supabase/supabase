@@ -390,9 +390,7 @@ npm run dev
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-> If you wish to run the dev server on a different port use `npm run dev -- -p <DESIRED_PORT>`. For example: `npm run dev -- -p 42069`
-> To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:<DESIRED_PORT>` 
-> If using GitPod or StackBlitz, you will need to adjust the `Site Url` to match your VSCode projects URL. For example: `https://3000-user-sveltekit-supab-hw7tqoa16bz.ws-us27.gitpod.io/`
+> ⚠️ WARNING: Svelte uses by default `port 5000`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5000`
 
 ![Supabase Svelte](/img/supabase-svelte-demo.png)
 
