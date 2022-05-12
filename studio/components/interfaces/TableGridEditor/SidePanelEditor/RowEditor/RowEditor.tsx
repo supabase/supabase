@@ -113,10 +113,6 @@ const RowEditor: FC<Props> = ({
     }
   }
 
-  function resolve() {
-    setLoading(false)
-  }
-
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -139,9 +135,9 @@ const RowEditor: FC<Props> = ({
         configuration.rowIdx = row!.idx
       }
 
-      saveChanges(payload, isNewRecord, configuration, resolve)
+      saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
     } else {
-      resolve()
+      setLoading(false)
     }
   }
 
@@ -230,7 +226,6 @@ const RowEditor: FC<Props> = ({
               backButtonLabel="Cancel"
               applyButtonLabel="Save"
               closePanel={closePanel}
-              noApplyFunction
             />
           </div>
         </div>
