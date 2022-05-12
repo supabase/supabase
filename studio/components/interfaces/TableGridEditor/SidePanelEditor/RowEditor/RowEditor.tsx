@@ -46,6 +46,8 @@ const RowEditor: FC<Props> = ({
   const isNewRecord = isUndefined(row)
   const isEditingJson = !isUndefined(selectedValueForJsonEdit)
 
+  const [loading, setLoading] = useState(false)
+
   const [requiredFields, optionalFields] = partition(
     rowFields,
     (rowField: any) => !rowField.isNullable
@@ -111,9 +113,12 @@ const RowEditor: FC<Props> = ({
     }
   }
 
-  const onSaveChanges = (resolve: any) => {
+  const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
     const errors = validateFields(rowFields)
     setErrors(errors)
+    setLoading(true)
 
     if (isEmpty(errors)) {
       updateEditorDirty()
@@ -130,9 +135,9 @@ const RowEditor: FC<Props> = ({
         configuration.rowIdx = row!.idx
       }
 
-      saveChanges(payload, isNewRecord, configuration, resolve)
+      saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
     } else {
-      resolve()
+      setLoading(false)
     }
   }
 
@@ -142,82 +147,89 @@ const RowEditor: FC<Props> = ({
       key="RowEditor"
       visible={visible}
       header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
-      className={`transition-all ease-in duration-100 ${
+      className={`transition-all duration-100 ease-in ${
         isEditingJson || isViewingReferenceRow ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
-      customFooter={
-        <ActionBar
-          backButtonLabel="Cancel"
-          applyButtonLabel="Save"
-          closePanel={closePanel}
-          applyFunction={(resolve: any) => onSaveChanges(resolve)}
-        />
-      }
+      hideFooter
     >
-      <SidePanel.Content>
-        <div className="space-y-10 py-6">
-          {requiredFields.map((field: RowField) => {
-            return (
-              <InputField
-                key={field.id}
-                field={field}
-                errors={errors}
-                onUpdateField={onUpdateField}
-                onEditJson={setSelectedValueForJsonEdit}
-                onViewForeignKey={() => onViewForeignKey(field)}
-              />
-            )
-          })}
-        </div>
-      </SidePanel.Content>
-      {optionalFields.length > 0 && (
-        <>
-          <SidePanel.Seperator />
-          <SidePanel.Content>
-            <div className="space-y-10 py-6">
-              <div>
-                <h3 className="text-base text-scale-1200">Optional Fields</h3>
-                <p className="text-sm text-scale-900">
-                  These are columns that do not need any value
-                </p>
+      <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
+        <div className="flex h-full flex-col">
+          <div className="flex flex-grow flex-col">
+            <SidePanel.Content>
+              <div className="space-y-10 py-6">
+                {requiredFields.map((field: RowField) => {
+                  return (
+                    <InputField
+                      key={field.id}
+                      field={field}
+                      errors={errors}
+                      onUpdateField={onUpdateField}
+                      onEditJson={setSelectedValueForJsonEdit}
+                      onViewForeignKey={() => onViewForeignKey(field)}
+                    />
+                  )
+                })}
               </div>
-              {optionalFields.map((field: RowField) => {
-                return (
-                  <InputField
-                    key={field.id}
-                    field={field}
-                    errors={errors}
-                    onUpdateField={onUpdateField}
-                    onEditJson={setSelectedValueForJsonEdit}
-                    onViewForeignKey={() => onViewForeignKey(field)}
-                  />
-                )
-              })}
-            </div>
-          </SidePanel.Content>
-        </>
-      )}
+            </SidePanel.Content>
+            {optionalFields.length > 0 && (
+              <>
+                <SidePanel.Seperator />
+                <SidePanel.Content>
+                  <div className="space-y-10 py-6">
+                    <div>
+                      <h3 className="text-scale-1200 text-base">Optional Fields</h3>
+                      <p className="text-scale-900 text-sm">
+                        These are columns that do not need any value
+                      </p>
+                    </div>
+                    {optionalFields.map((field: RowField) => {
+                      return (
+                        <InputField
+                          key={field.id}
+                          field={field}
+                          errors={errors}
+                          onUpdateField={onUpdateField}
+                          onEditJson={setSelectedValueForJsonEdit}
+                          onViewForeignKey={() => onViewForeignKey(field)}
+                        />
+                      )
+                    })}
+                  </div>
+                </SidePanel.Content>
+              </>
+            )}
 
-      <JsonEdit
-        visible={isEditingJson}
-        column={selectedValueForJsonEdit?.column ?? ''}
-        jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
-        closePanel={() => setSelectedValueForJsonEdit(undefined)}
-        onSaveJSON={(value: string) => {
-          onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
-          setSelectedValueForJsonEdit(undefined)
-        }}
-      />
+            <JsonEdit
+              visible={isEditingJson}
+              column={selectedValueForJsonEdit?.column ?? ''}
+              jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
+              closePanel={() => setSelectedValueForJsonEdit(undefined)}
+              onSaveJSON={(value: string) => {
+                onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
+                setSelectedValueForJsonEdit(undefined)
+              }}
+            />
 
-      <ReferenceRowViewer
-        visible={isViewingReferenceRow}
-        referenceRow={referenceRow}
-        closePanel={() => {
-          setIsViewingReferenceRow(false)
-          setReferenceRow(undefined)
-        }}
-      />
+            <ReferenceRowViewer
+              visible={isViewingReferenceRow}
+              referenceRow={referenceRow}
+              closePanel={() => {
+                setIsViewingReferenceRow(false)
+                setReferenceRow(undefined)
+              }}
+            />
+          </div>
+          <div className="flex-shrink">
+            <ActionBar
+              loading={loading}
+              backButtonLabel="Cancel"
+              applyButtonLabel="Save"
+              closePanel={closePanel}
+            />
+          </div>
+        </div>
+      </form>
     </SidePanel>
   )
 }

@@ -5,7 +5,13 @@ import { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
-import { JSON_TYPES, NUMERICAL_TYPES } from '../SidePanelEditor.constants'
+import {
+  DATE_FORMAT,
+  JSON_TYPES,
+  NUMERICAL_TYPES,
+  DATETIME_TYPES,
+  TIME_TYPES,
+} from '../SidePanelEditor.constants'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -13,6 +19,7 @@ export const generateRowFields = (
   isNewRecord?: boolean
 ): RowField[] => {
   const { relationships, primary_keys } = table
+  // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns.map((column) => {
@@ -21,6 +28,8 @@ export const generateRowFields = (
         ? nowDateTimeValue(column.format)
         : isUndefined(row)
         ? ''
+        : DATETIME_TYPES.includes(column.format)
+        ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
         : parseValue(row[column.name], column.format, column.data_type)
 
     const foreignKey = find(relationships, (relationship) => {
@@ -146,6 +155,44 @@ const parseDescription = (description: string | null) => {
   }
 }
 
+const nowDateTimeValue = (format: string) => {
+  if (format?.includes('timestamp')) {
+    return dayjs().format('YYYY-MM-DDTHH:mm:ss')
+  } else if (format == 'time') {
+    return dayjs().format('HH:mm:ss')
+  } else if (format == 'timetz') {
+    return dayjs().format('HH:mm:ssZZ')
+  } else {
+    return dayjs().format('YYYY-MM-DD')
+  }
+}
+
+const convertPostgresDatetimeToInputDatetime = (format: string, value: string) => {
+  if (!value || value.length == 0) return ''
+
+  if (DATETIME_TYPES.includes(format)) {
+    return dayjs(value, DATE_FORMAT).format('YYYY-MM-DDTHH:mm:ss')
+  } else if (TIME_TYPES.includes(format)) {
+    const serverTimeFormat = value && value.includes('+') ? 'HH:mm:ssZZ' : 'HH:mm:ss'
+    return dayjs(value, serverTimeFormat).format('HH:mm:ss')
+  } else {
+    return value
+  }
+}
+
+const convertInputDatetimeToPostgresDatetime = (format: string, value: string | null) => {
+  if (!value || value.length == 0) return null
+
+  if (DATETIME_TYPES.includes(format)) {
+    return dayjs(value, 'YYYY-MM-DDTHH:mm:ss').format(DATE_FORMAT)
+  } else if (TIME_TYPES.includes(format)) {
+    const serverTimeFormat = format.toLowerCase() === 'timetz' ? 'HH:mm:ssZZ' : 'HH:mm:ss'
+    return dayjs(value, 'HH:mm:ss').format(serverTimeFormat)
+  } else {
+    return value
+  }
+}
+
 /**
  * postgres-meta can return default value with format like
  * 'hello world'::character varying
@@ -208,18 +255,6 @@ const _unescapeLiteralArray = (value: any) => {
   }
 }
 
-const nowDateTimeValue = (format: string) => {
-  if (format?.includes('timestamp')) {
-    return dayjs().format()
-  } else if (format == 'time') {
-    return dayjs().format('HH:mm:ss')
-  } else if (format == 'timetz') {
-    return dayjs().format('HH:mm:ssZZ')
-  } else {
-    return dayjs().format('YYYY-MM-DD')
-  }
-}
-
 export const generateRowObjectFromFields = (
   fields: RowField[],
   includeNullProperties = false
@@ -239,6 +274,8 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = Number(value)
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
+    } else if (DATETIME_TYPES.includes(field.format)) {
+      rowObject[field.name] = convertInputDatetimeToPostgresDatetime(field.format, value)
     } else {
       rowObject[field.name] = value
     }

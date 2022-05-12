@@ -14,12 +14,12 @@ import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 
 const ProjectSettings = () => {
   return (
     <SettingsLayout title="General">
-      <div className="content w-full h-full overflow-y-auto">
+      <div className="content h-full w-full overflow-y-auto">
         <div className="mx-auto w-full">
           <GeneralSettings />
         </div>
@@ -97,7 +97,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="p-4 max-w-4xl">
+    <article className="max-w-4xl p-4">
       <section>
         <SchemaFormPanel
           title="General"
@@ -112,7 +112,7 @@ const GeneralSettings = observer(() => {
       <section>
         <Panel
           title={
-            <h5 key="panel-title" className="text-base mb-0">
+            <h5 key="panel-title" className="mb-0 text-base">
               Infrastructure
             </h5>
           }
@@ -126,15 +126,15 @@ const GeneralSettings = observer(() => {
               layout="horizontal"
             />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
             <Input readOnly disabled value={project?.region} label="Region" layout="horizontal" />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="w-full flex items-center justify-between">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+            <div className="flex w-full items-center justify-between">
               <div>
                 <p>Restart server</p>
                 <div style={{ maxWidth: '420px' }}>
-                  <p className="opacity-50 text-sm">
+                  <p className="text-sm opacity-50">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
@@ -154,7 +154,7 @@ const GeneralSettings = observer(() => {
               title="Deleting this project will also remove your database."
             >
               <div className="flex flex-col">
-                <p className="block mb-4">
+                <p className="mb-4 block">
                   Make sure you have made a backup if you want to keep your data.
                 </p>
                 <ProjectDeleteModal project={project} />

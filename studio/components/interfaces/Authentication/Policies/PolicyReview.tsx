@@ -1,18 +1,20 @@
 import { Button, Modal } from '@supabase/ui'
 import { isEmpty } from 'lodash'
-import { useState } from 'react'
+import { FC, useState } from 'react'
+import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import { PolicyForReview } from './Policies.types'
 
-import SqlEditor from '../SqlEditor'
-
-const ReviewEmptyState = () => {
-  return (
-    <div className="flex items-center justify-center my-10 opacity-50 space-x-2">
-      <p className="text-base text-scale-1100">There are no changes made to this policy</p>
-    </div>
-  )
+interface Props {
+  policy: PolicyForReview
+  onSelectBack: () => void
+  onSelectSave: () => void
 }
 
-const PolicyReview = ({ policy = {}, onSelectBack = () => {}, onSelectSave = () => {} }) => {
+const PolicyReview: FC<Props> = ({
+  policy = {},
+  onSelectBack = () => {},
+  onSelectSave = () => {},
+}) => {
   const [isSaving, setIsSaving] = useState(false)
   const onSavePolicy = () => {
     setIsSaving(true)
@@ -25,16 +27,20 @@ const PolicyReview = ({ policy = {}, onSelectBack = () => {}, onSelectSave = () 
     <>
       <Modal.Content>
         <div className="space-y-6 py-8">
-          <div className="space-y-8 flex items-center justify-between">
+          <div className="flex items-center justify-between space-y-8">
             <div className="flex flex-col">
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 This is the SQL statement that will be used to create your policy.
               </p>
             </div>
           </div>
           <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
             {isEmpty(policy) ? (
-              <ReviewEmptyState />
+              <div className="my-10 flex items-center justify-center space-x-2 opacity-50">
+                <p className="text-scale-1100 text-base">
+                  There are no changes made to this policy
+                </p>
+              </div>
             ) : (
               <div className="space-y-2">
                 <span>{policy.description}</span>
@@ -46,7 +52,7 @@ const PolicyReview = ({ policy = {}, onSelectBack = () => {}, onSelectSave = () 
           </div>
         </div>
       </Modal.Content>
-      <div className="px-6 py-4 w-full flex justify-end items-center gap-2 border-t dark:border-dark">
+      <div className="dark:border-dark flex w-full items-center justify-end gap-2 border-t px-6 py-4">
         <Button type="default" onClick={onSelectBack}>
           Back to edit
         </Button>

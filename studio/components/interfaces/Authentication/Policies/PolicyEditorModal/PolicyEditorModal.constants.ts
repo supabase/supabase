@@ -1,3 +1,4 @@
+import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 /**
  * ----------------------------------------------------------------
  * PostgreSQL policy templates for the auth policies page
@@ -13,7 +14,7 @@
  * command: Operation to create policy for
  */
 
-export const getGeneralPolicyTemplates = (schema, table) => [
+export const getGeneralPolicyTemplates = (schema: string, table: string): PolicyTemplate[] => [
   {
     id: 'policy-1',
     templateName: 'Enable read access to everyone',
@@ -29,6 +30,7 @@ FOR SELECT USING (
     definition: 'true',
     check: '',
     command: 'SELECT',
+    roles: [],
   },
   {
     id: 'policy-2',
@@ -37,13 +39,14 @@ FOR SELECT USING (
     statement: `
 CREATE POLICY "policy_name"
 ON ${schema}.${table}
-FOR INSERT WITH CHECK (
-  auth.role() = 'authenticated'
-);`.trim(),
+FOR INSERT 
+TO authenticated 
+WITH CHECK (true);`.trim(),
     name: 'Enable insert for authenticated users only',
     definition: '',
-    check: `auth.role() = 'authenticated'`,
+    check: 'true',
     command: 'INSERT',
+    roles: ['authenticated'],
   },
   {
     id: 'policy-3',
@@ -62,6 +65,7 @@ FOR UPDATE USING (
     definition: 'auth.email() = email',
     check: 'auth.email() = email',
     command: 'UPDATE',
+    roles: [],
   },
   {
     id: 'policy-4',
@@ -78,5 +82,6 @@ FOR DELETE USING (
     definition: 'auth.uid() = user_id',
     check: '',
     command: 'DELETE',
+    roles: [],
   },
 ]
