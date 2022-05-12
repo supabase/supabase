@@ -1,3 +1,4 @@
+import { PolicyTemplate } from './PolicyEditorModal.types'
 /**
  * ----------------------------------------------------------------
  * PostgreSQL policy templates for the auth policies page
@@ -13,7 +14,7 @@
  * command: Operation to create policy for
  */
 
-export const getGeneralPolicyTemplates = (schema: string, table: string) => [
+export const getGeneralPolicyTemplates = (schema: string, table: string): PolicyTemplate[] => [
   {
     id: 'policy-1',
     templateName: 'Enable read access to everyone',

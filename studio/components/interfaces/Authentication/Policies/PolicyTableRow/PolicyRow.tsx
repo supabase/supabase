@@ -1,9 +1,10 @@
 import { FC } from 'react'
 import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from '@supabase/ui'
 import Panel from 'components/to-be-cleaned/Panel'
+import { PostgresPolicy } from '@supabase/postgres-meta'
 
 interface Props {
-  policy: any
+  policy: PostgresPolicy
   onSelectEditPolicy: (policy: any) => void
   onSelectDeletePolicy: (policy: any) => void
 }
