@@ -2,24 +2,22 @@ import { FC, useState } from 'react'
 import { Button } from '@supabase/ui'
 
 interface ActionBarProps {
+  loading?: boolean
+  disableApply?: boolean
+  children?: any
   applyButtonLabel?: string
   backButtonLabel?: string
-  children?: any
-  disableApply?: boolean
   applyFunction?: (resolve: any) => void
   closePanel: () => void
-  loading?: boolean
-  noApplyFunction?: boolean
 }
 const ActionBar: FC<ActionBarProps> = ({
+  loading = false,
+  disableApply = false,
+  children = undefined,
   applyButtonLabel = 'Apply',
   backButtonLabel = 'Back',
-  children = null,
-  disableApply = false,
-  applyFunction = null,
-  closePanel,
-  loading = undefined,
-  noApplyFunction = false,
+  applyFunction = undefined,
+  closePanel = () => {},
 }) => {
   const [isRunning, setIsRunning] = useState(false)
 
@@ -40,13 +38,8 @@ const ActionBar: FC<ActionBarProps> = ({
 
       {children}
 
-      {applyFunction && (
-        /**
-         * old solution
-         * this is necessary when loading is handled by this component
-         *
-         * author @mildtomato
-         */
+      {applyFunction !== undefined ? (
+        // Old solution, necessary when loading is handled by this component itself
         <Button
           size="small"
           onClick={onSelectApply}
@@ -55,17 +48,9 @@ const ActionBar: FC<ActionBarProps> = ({
         >
           {applyButtonLabel}
         </Button>
-      )}
-
-      {noApplyFunction && (
-        /**
-         * new solution to avoid using applyFunction
-         * this is necessary for handling loading by form itself
-         *
-         * this does not require he applyCallback() above
-         *
-         * author @mildtomato
-         */
+      ) : (
+        // New solution, when using the Form component, loading is handled by the Form itself
+        // Does not require applyFunction() callback
         <Button size="small" disabled={disableApply} loading={loading}>
           {applyButtonLabel}
         </Button>
