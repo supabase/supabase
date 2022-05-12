@@ -213,8 +213,6 @@ export default function MultiSelect({
                   <BadgeSelected
                     key={option.id}
                     name={option.name}
-                    id={option.name}
-                    value={option.value}
                     handleRemove={() => handleChange(option)}
                   />
                 )
