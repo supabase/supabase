@@ -224,13 +224,13 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <article className="max-w-4xl p-4">
-        <DisplayApiSettings key="DisplayAPISettings" />
+      <div className="max-w-4xl p-4">
+
         <section>
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Configuration
+                Project URL
               </Typography.Title>
             }
           >
@@ -246,6 +246,21 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
             </Panel.Content>
+          </Panel>
+        </section>
+
+        <section>
+          <DisplayApiSettings key="DisplayAPISettings" />
+        </section>
+
+        <section>
+          <Panel
+            title={
+              <Typography.Title level={5} className="mb-0">
+                JWT Settings
+              </Typography.Title>
+            }
+          >
             <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
               <Input
                 label="JWT Secret"
@@ -344,8 +359,10 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
+
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
-      </article>
+
+      </div>
 
       <ConfirmModal
         danger
