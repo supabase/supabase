@@ -41,7 +41,6 @@ const ForeignKeySelector: FC<Props> = ({
     // Reset the state of the side panel
     if (visible) {
       setErrors({})
-      console.log('Foreign key', foreignKey)
       if (foreignKey) {
         setSelectedForeignKey({
           schema: foreignKey.target_table_schema,
