@@ -198,3 +198,34 @@ export async function passwordStrength(value: string) {
     strength,
   }
 }
+
+export const detectBrowser = () => {
+  if (!navigator) return undefined
+
+  if (navigator.userAgent.indexOf('Chrome') !== -1) {
+    return 'Chrome'
+  } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
+    return 'Firefox'
+  } else if (navigator.userAgent.indexOf('Safari') !== -1) {
+    return 'Safari'
+  }
+}
+
+/**
+ * Formats a PG datetime string into a format that's
+ * readable across browsers.
+ * - Postgres: 2022-05-12 09:24:12.639463+00
+ *
+ * These are the acceptable formats that Joshen has experimented so far
+ * - Chrome:   2022-05-12 09:24:12.639463+00 (No format required)
+ * - Firefox:  2022-05-12 09:24:12.639463+00 (No format required)
+ * - Safari:   2022-05-12T09:24:12.639463+00
+ */
+export const formatPgDateString = (dateString: string) => {
+  const browser = detectBrowser()
+  if (browser === 'Safari') {
+    return dateString.replace(' ', 'T')
+  } else {
+    return dateString
+  }
+}
