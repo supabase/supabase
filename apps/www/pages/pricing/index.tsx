@@ -636,7 +636,7 @@ export default function IndexPage() {
                 </Link>
                 <Link href="https://github.com/supabase/supabase/discussions">
                   <a>
-                    <Button type="default" size="small" className="text-white">
+                    <Button type="default" size="small">
                       GitHub
                     </Button>
                   </a>
