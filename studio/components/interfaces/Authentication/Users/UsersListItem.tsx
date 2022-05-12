@@ -3,10 +3,10 @@ import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge } from '@supabase/ui'
 
-import { formatPgDateString } from 'lib/helpers'
 import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import UserDropdown from './UserDropdown'
+import { formatUserDateString } from './Users.utils'
 
 interface Props {
   user: any
@@ -14,8 +14,8 @@ interface Props {
 
 const UserListItem: FC<Props> = ({ user }) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
-  const createdAt = formatPgDateString(user.created_at)
-  const lastSignedIn = formatPgDateString(user.last_sign_in_at)
+  const createdAt = formatUserDateString(user.created_at)
+  const lastSignedIn = formatUserDateString(user.last_sign_in_at)
 
   return (
     <Table.tr key={user.id}>
