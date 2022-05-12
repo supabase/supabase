@@ -1,12 +1,21 @@
-import { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { has, isEmpty, isEqual } from 'lodash'
+import {
+  PolicyFormField,
+  PolicyForReview,
+  PostgresPolicyCreatePayload,
+  PostgresPolicyUpdatePayload,
+} from './Policies.types'
 
 /**
  * Returns an array of SQL statements that will preview in the review step of the policy editor
  * @param {*} policyFormFields { name, using, check, command }
  */
 
-export const createSQLPolicy = (policyFormFields: any, originalPolicyFormFields: any = {}) => {
+export const createSQLPolicy = (
+  policyFormFields: PolicyFormField,
+  originalPolicyFormFields: PostgresPolicy
+) => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
@@ -45,7 +54,9 @@ export const createSQLPolicy = (policyFormFields: any, originalPolicyFormFields:
   return {}
 }
 
-export const createSQLStatementForCreatePolicy = (policyFormFields: any) => {
+export const createSQLStatementForCreatePolicy = (
+  policyFormFields: PolicyFormField
+): PolicyForReview => {
   const { name, definition, check, command, schema, table } = policyFormFields
   const roles = policyFormFields.roles.length === 0 ? ['public'] : policyFormFields.roles
   const description = `Add policy for the ${command} operation under the policy "${name}"`
@@ -61,9 +72,9 @@ export const createSQLStatementForCreatePolicy = (policyFormFields: any) => {
 }
 
 export const createSQLStatementForUpdatePolicy = (
-  policyFormFields: any = {},
-  fieldsToUpdate: any = {}
-) => {
+  policyFormFields: PolicyFormField,
+  fieldsToUpdate: Partial<PolicyFormField>
+): PolicyForReview => {
   const { name, schema, table } = policyFormFields
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
@@ -79,13 +90,15 @@ export const createSQLStatementForUpdatePolicy = (
           parameters[parameters.length - 1]
         }`
   } `
+  const roles =
+    (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
   const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
     ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
     ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
-    ...(rolesChanged ? [`  ${alterStatement} TO ${fieldsToUpdate.roles.join(', ')};`] : []),
+    ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',
   ].join('\n')
@@ -93,11 +106,14 @@ export const createSQLStatementForUpdatePolicy = (
   return { description, statement }
 }
 
-export const createPayloadForCreatePolicy = (policyFormFields: any = {}) => {
-  const { definition, check, roles } = policyFormFields
+export const createPayloadForCreatePolicy = (
+  policyFormFields: PolicyFormField
+): PostgresPolicyCreatePayload => {
+  const { command, definition, check, roles } = policyFormFields
   return {
     ...policyFormFields,
     action: 'PERMISSIVE',
+    command: command || undefined,
     definition: definition || undefined,
     check: check || undefined,
     roles: roles.length > 0 ? roles : undefined,
@@ -105,9 +121,9 @@ export const createPayloadForCreatePolicy = (policyFormFields: any = {}) => {
 }
 
 export const createPayloadForUpdatePolicy = (
-  policyFormFields: any = {},
-  originalPolicyFormFields: any = {}
-) => {
+  policyFormFields: PolicyFormField,
+  originalPolicyFormFields: PostgresPolicy
+): PostgresPolicyUpdatePayload => {
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
@@ -115,7 +131,7 @@ export const createPayloadForUpdatePolicy = (
     check: check ? check.replace(/\s+/g, ' ').trim() : check,
   }
 
-  const payload: any = { id: originalPolicyFormFields.id }
+  const payload: PostgresPolicyUpdatePayload = { id: originalPolicyFormFields.id }
 
   if (!isEqual(formattedPolicyFormFields.name, originalPolicyFormFields.name)) {
     payload.name = formattedPolicyFormFields.name

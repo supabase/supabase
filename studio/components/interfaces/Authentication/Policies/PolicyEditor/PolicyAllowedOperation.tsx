@@ -18,41 +18,16 @@ const PolicyAllowedOperation: FC<Props> = ({ operation = '', onSelectOperation }
       <div className="w-2/3">
         <div className="flex items-center space-x-8">
           <Radio.Group type="small-cards" size="tiny" id="allowed-operation">
-            <Radio
-              name="allowed-operation"
-              label="SELECT"
-              value="SELECT"
-              checked={operation === 'SELECT'}
-              onChange={(e) => onSelectOperation(e.target.value)}
-            />
-            <Radio
-              name="allowed-operation"
-              label="INSERT"
-              value="INSERT"
-              checked={operation === 'INSERT'}
-              onChange={(e) => onSelectOperation(e.target.value)}
-            />
-            <Radio
-              name="allowed-operation"
-              label="UPDATE"
-              value="UPDATE"
-              checked={operation === 'UPDATE'}
-              onChange={(e) => onSelectOperation(e.target.value)}
-            />
-            <Radio
-              name="allowed-operation"
-              label="DELETE"
-              value="DELETE"
-              checked={operation === 'DELETE'}
-              onChange={(e) => onSelectOperation(e.target.value)}
-            />
-            <Radio
-              name="allowed-operation"
-              label="ALL"
-              value="ALL"
-              checked={operation === 'ALL'}
-              onChange={(e) => onSelectOperation(e.target.value)}
-            />
+            {['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'ALL'].map((op) => (
+              <Radio
+                key={op}
+                name="allowed-operation"
+                label={op}
+                value={op}
+                checked={operation === op}
+                onChange={(e) => onSelectOperation(e.target.value)}
+              />
+            ))}
           </Radio.Group>
         </div>
       </div>
