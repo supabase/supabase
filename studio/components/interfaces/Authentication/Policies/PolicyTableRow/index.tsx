@@ -1,19 +1,20 @@
 import { FC } from 'react'
+import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
 import Panel from 'components/to-be-cleaned/Panel'
 
 interface Props {
-  table: any
-  onSelectToggleRLS: (table: any) => void
+  table: PostgresTable
+  onSelectToggleRLS: (table: PostgresTable) => void
   onSelectCreatePolicy: () => void
-  onSelectEditPolicy: (policy: any) => void
-  onSelectDeletePolicy: (policy: any) => void
+  onSelectEditPolicy: (policy: PostgresPolicy) => void
+  onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
 const PolicyTableRow: FC<Props> = ({
-  table = {},
+  table,
   onSelectToggleRLS = () => {},
   onSelectCreatePolicy = () => {},
   onSelectEditPolicy = () => {},
@@ -35,7 +36,8 @@ const PolicyTableRow: FC<Props> = ({
         </div>
       )}
 
-      {table.policies.map((policy: any) => (
+      {/* @ts-ignore */}
+      {table.policies.map((policy) => (
         <PolicyRow
           key={policy.id}
           policy={policy}

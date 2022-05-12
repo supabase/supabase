@@ -4,11 +4,12 @@ import { isEmpty } from 'lodash'
 
 import TemplatesList from './TemplatesList'
 import TemplatePreview from './TemplatePreview'
+import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface Props {
-  templates: any[]
+  templates: PolicyTemplate[]
   templatesNote: string
-  onUseTemplate: (template: any) => void
+  onUseTemplate: (template: PolicyTemplate) => void
 }
 
 const PolicyTemplates: FC<Props> = ({

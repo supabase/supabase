@@ -5,7 +5,7 @@ import { Popover, IconCheck, IconAlertCircle, IconSearch } from '@supabase/ui'
 import { BadgeDisabled, BadgeSelected } from './Badges'
 
 export interface MultiSelectOption {
-  id: string
+  id: string | number
   value: string
   name: string
   disabled: boolean

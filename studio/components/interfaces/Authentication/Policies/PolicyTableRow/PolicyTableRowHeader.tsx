@@ -1,14 +1,15 @@
 import { FC } from 'react'
 import { Badge, Button } from '@supabase/ui'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
-  table: any
-  onSelectToggleRLS: (table: any) => void
-  onSelectCreatePolicy: (table: any) => void
+  table: PostgresTable
+  onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectCreatePolicy: (table: PostgresTable) => void
 }
 
 const PolicyTableRowHeader: FC<Props> = ({
-  table = {},
+  table,
   onSelectToggleRLS = () => {},
   onSelectCreatePolicy = () => {},
 }) => {
