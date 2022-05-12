@@ -20,6 +20,7 @@ import {
 import { IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import QueryTab from 'localStores/sqlEditor/QueryTab'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
@@ -27,7 +28,7 @@ import { createSqlSnippet } from 'components/to-be-cleaned/SqlEditor/SqlEditor.u
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
-const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
+const OpenQueryItem = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   const sqlEditorStore: any = useSqlStore()
   const { id, name } = tabInfo || {}
   const active = sqlEditorStore.activeTab.id === id
@@ -44,7 +45,8 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: any }) => {
   )
 })
 
-const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
+const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
+  console.log('TAB INFO', tabInfo)
   const router = useRouter()
   const { ref } = router.query
 
@@ -115,7 +117,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: any }) => {
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="text-sm text-scale-1100 py-4">{`Are you sure you want to remove '${name}' ?`}</p>
+          <p className="text-scale-1100 py-4 text-sm">{`Are you sure you want to remove '${name}' ?`}</p>
         </Modal.Content>
       </ConfirmationModal>
     </div>
@@ -183,7 +185,7 @@ const SideBarContent = observer(() => {
     <div className="mt-6">
       <Menu type="pills">
         {IS_PLATFORM && (
-          <div className="my-4 px-3 space-y-1 mx-3">
+          <div className="my-4 mx-3 space-y-1 px-3">
             <Button
               block
               icon={<IconPlus />}
@@ -204,7 +206,7 @@ const SideBarContent = observer(() => {
                 filterString && (
                   <IconX
                     size={'tiny'}
-                    className="cursor-pointer mr-2"
+                    className="mr-2 cursor-pointer"
                     onClick={() => setFilterString('')}
                   />
                 )
@@ -214,7 +216,7 @@ const SideBarContent = observer(() => {
         )}
 
         {(sqlEditorStore?.tabs ?? []).length === 0 ? (
-          <div className="my-4 px-7 flex items-center space-x-2">
+          <div className="my-4 flex items-center space-x-2 px-7">
             <IconLoader className="animate-spin" size={16} strokeWidth={2} />
             <p className="text-sm">Loading SQL snippets</p>
           </div>
@@ -237,7 +239,7 @@ const SideBarContent = observer(() => {
               </div>
             )}
             <Loading active={contentStore.isInitialized}>
-              <div className="px-3 space-y-6">
+              <div className="space-y-6 px-3">
                 {favouriteTabs.length >= 1 && (
                   <div className="editor-product-menu">
                     <Menu.Group title="Favorites" />
