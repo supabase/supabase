@@ -53,6 +53,7 @@
     "react-grid-layout": "^1.3.0",
     "react-hot-toast": "^2.1.1",
     "react-inlinesvg": "^2.3.0",
+    "react-markdown": "^8.0.3",
     "react-split": "^2.0.13",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
@@ -64,6 +65,7 @@
     "swr": "^1.2.1",
     "uniforms-bootstrap4": "^3.6.2",
     "uniforms-bridge-json-schema": "^3.6.2",
+    "yup": "^0.32.11",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
