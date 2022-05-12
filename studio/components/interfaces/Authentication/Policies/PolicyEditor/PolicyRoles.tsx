@@ -13,7 +13,7 @@ const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles })
   // @ts-ignore
   const formattedRoles = roles.map((role) => {
     return {
-      id: role.id.toString(),
+      id: role.id,
       name: role.name,
       value: role.name,
       disabled: false,
