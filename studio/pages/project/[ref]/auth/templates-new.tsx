@@ -19,7 +19,7 @@ import AutoSchemaForm from 'components/ui/Forms/AutoSchemaForm'
 import { withAuth } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import React, { useReducer, useState } from 'react'
-import AuthFormSchema from './AuthFormSchema.json'
+import AuthFormSchema from './AuthFormSchema'
 
 // import GoogleIcon './../../../static/icons/google-icon.svg'
 

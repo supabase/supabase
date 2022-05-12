@@ -68,7 +68,7 @@ const AutoSchemaForm = () => {
           return errors
         }}
       >
-        {({ isSubmitting, handleReset }: any) => (
+        {({ isSubmitting, handleReset, values }: any) => (
           <Panel
             footer={
               <>

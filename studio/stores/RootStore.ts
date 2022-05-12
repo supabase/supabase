@@ -5,6 +5,9 @@ import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
 import ProjectContentStore, { IProjectContentStore } from './content/ProjectContentStore'
 import ProjectFunctionsStore, { IProjectFunctionsStore } from './functions/ProjectFunctionsStore'
+import ProjectAuthConfigStore, {
+  IProjectAuthConfigStore,
+} from './authConfig/ProjectAuthConfigStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -16,6 +19,7 @@ export interface IRootStore {
   ui: IUiStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
+  authConfig: IProjectAuthConfigStore
   meta: IMetaStore
   app: IAppStore
   setProjectRef: (value?: string) => void
@@ -25,6 +29,7 @@ export class RootStore implements IRootStore {
   ui: IUiStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
+  authConfig: IProjectAuthConfigStore
   meta: IMetaStore
   app: IAppStore
 
@@ -33,6 +38,7 @@ export class RootStore implements IRootStore {
     // @ts-ignore
     this.content = new ProjectContentStore(this, { projectRef: '' })
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
+    this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
       projectRef: '',
       connectionString: '',
@@ -86,6 +92,7 @@ export class RootStore implements IRootStore {
 
     this.ui.setProjectRef(value)
     this.functions.setProjectRef(value)
+    this.authConfig.setProjectRef(value)
     this.content.setProjectRef(value)
   }
 
