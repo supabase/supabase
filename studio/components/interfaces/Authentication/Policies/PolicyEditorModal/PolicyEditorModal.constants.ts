@@ -1,4 +1,4 @@
-import { PolicyTemplate } from './PolicyEditorModal.types'
+import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 /**
  * ----------------------------------------------------------------
  * PostgreSQL policy templates for the auth policies page
