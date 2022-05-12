@@ -65,6 +65,7 @@ module.exports = {
         'guides/with-redwoodjs',
         'guides/with-solidjs',
         'guides/with-svelte',
+        'guides/with-sveltekit',
         'guides/with-vue-3',
       ],
     },
