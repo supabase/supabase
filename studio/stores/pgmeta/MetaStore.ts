@@ -31,7 +31,7 @@ import {
   generateUpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore from './RolesStore'
+import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
 import PublicationStore, { IPublicationStore } from './PublicationStore'
@@ -52,7 +52,7 @@ export interface IMetaStore {
   schemas: ISchemaStore
 
   hooks: IPostgresMetaInterface<any>
-  roles: IPostgresMetaInterface<any>
+  roles: IRolesStore
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
