@@ -275,7 +275,11 @@ export const generateRowObjectFromFields = (
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
-      rowObject[field.name] = convertInputDatetimeToPostgresDatetime(field.format, value)
+      // Seconds are missing if they are set to 0 in the HTML input
+      // Need to format that first, before passing to dayjs
+      const timeSegments = (value || '').split(':')
+      const formattedValue = timeSegments.length === 2 ? `${value}:00` : value
+      rowObject[field.name] = convertInputDatetimeToPostgresDatetime(field.format, formattedValue)
     } else {
       rowObject[field.name] = value
     }
