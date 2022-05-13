@@ -80,7 +80,7 @@ function Database() {
   }
 
   const title = 'Serverless Edge Functions that automatically scale'
-  const subtitle = `Write functions in Deno, a modern runtime for Typescript and WASM.`
+  const subtitle = `Execute your code closest to your users with fast deploy times and low latency.`
   const meta_title = `${title}`
   const meta_description = subtitle
 
@@ -112,7 +112,7 @@ function Database() {
               <br /> that automatically scale
             </span>,
           ]}
-          subheader={[subtitle, 'PostgreSQL is one of the worlds most scalable databases.']}
+          subheader={[subtitle]}
           image={[
             <div className="header--light block w-full" key="light">
               <Image

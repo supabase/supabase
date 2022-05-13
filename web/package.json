@@ -15,10 +15,11 @@
     "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-beta.6",
-    "@docusaurus/preset-classic": "^2.0.0-beta.6",
+    "@docusaurus/core": "^2.0.0-beta.18",
+    "@docusaurus/preset-classic": "^2.0.0-beta.18",
     "@kiwicopple/prism-react-renderer": "https://github.com/kiwicopple/prism-react-renderer.git",
     "@octokit/core": "^3.5.1",
+    "docusaurus-theme-search-typesense": "^0.4.0-2",
     "jsrsasign": "^10.4.1",
     "mermaid": "^8.13.8",
     "react": "^17.0.2",

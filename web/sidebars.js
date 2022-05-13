@@ -65,6 +65,7 @@ module.exports = {
         'guides/with-redwoodjs',
         'guides/with-solidjs',
         'guides/with-svelte',
+        'guides/with-sveltekit',
         'guides/with-vue-3',
       ],
     },
@@ -183,7 +184,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'going-into-prod'],
+      items: ['guides/platform/logs', 'going-into-prod', 'guides/platform/metrics'],
     },
     {
       type: 'category',
