@@ -11,6 +11,7 @@ import {
   NUMERICAL_TYPES,
   DATETIME_TYPES,
   TIME_TYPES,
+  TIMESTAMP_TYPES,
 } from '../SidePanelEditor.constants'
 
 export const generateRowFields = (
@@ -23,8 +24,9 @@ export const generateRowFields = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns.map((column) => {
+    const defaultValue: string = (column?.default_value as string) ?? ''
     const value =
-      isNewRecord && column.default_value === 'now()'
+      isNewRecord && defaultValue.includes('now()')
         ? nowDateTimeValue(column.format)
         : isUndefined(row)
         ? ''
@@ -156,22 +158,25 @@ const parseDescription = (description: string | null) => {
 }
 
 const nowDateTimeValue = (format: string) => {
-  if (format?.includes('timestamp')) {
-    return dayjs().format('YYYY-MM-DDTHH:mm:ss')
-  } else if (format == 'time') {
-    return dayjs().format('HH:mm:ss')
-  } else if (format == 'timetz') {
-    return dayjs().format('HH:mm:ssZZ')
-  } else {
-    return dayjs().format('YYYY-MM-DD')
+  switch (format) {
+    case 'timestamptz':
+      return dayjs().format('YYYY-MM-DDTHH:mm:ss')
+    case 'timestamp':
+      return dayjs().format('YYYY-MM-DDTHH:mm:ss')
+    case 'timetz':
+      return dayjs().format('HH:mm:ss')
+    case 'time':
+      return dayjs().format('HH:mm:ss')
+    default:
+      return dayjs().format('YYYY-MM-DD')
   }
 }
 
 const convertPostgresDatetimeToInputDatetime = (format: string, value: string) => {
   if (!value || value.length == 0) return ''
 
-  if (DATETIME_TYPES.includes(format)) {
-    return dayjs(value, DATE_FORMAT).format('YYYY-MM-DDTHH:mm:ss')
+  if (TIMESTAMP_TYPES.includes(format)) {
+    return dayjs(value).format('YYYY-MM-DDTHH:mm:ss')
   } else if (TIME_TYPES.includes(format)) {
     const serverTimeFormat = value && value.includes('+') ? 'HH:mm:ssZZ' : 'HH:mm:ss'
     return dayjs(value, serverTimeFormat).format('HH:mm:ss')
@@ -183,13 +188,17 @@ const convertPostgresDatetimeToInputDatetime = (format: string, value: string) =
 const convertInputDatetimeToPostgresDatetime = (format: string, value: string | null) => {
   if (!value || value.length == 0) return null
 
-  if (DATETIME_TYPES.includes(format)) {
-    return dayjs(value, 'YYYY-MM-DDTHH:mm:ss').format(DATE_FORMAT)
-  } else if (TIME_TYPES.includes(format)) {
-    const serverTimeFormat = format.toLowerCase() === 'timetz' ? 'HH:mm:ssZZ' : 'HH:mm:ss'
-    return dayjs(value, 'HH:mm:ss').format(serverTimeFormat)
-  } else {
-    return value
+  switch (format) {
+    case 'timestamptz':
+      return dayjs(value, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ssZ')
+    case 'timestamp':
+      return dayjs(value, 'YYYY-MM-DDTHH:mm:ss').format('YYYY-MM-DDTHH:mm:ss')
+    case 'timetz':
+      return dayjs(value, 'HH:mm:ss').format('HH:mm:ssZZ')
+    case 'time':
+      return dayjs(value, 'HH:mm:ss').format('HH:mm:ss')
+    default:
+      return value
   }
 }
 
