@@ -64,7 +64,7 @@ function TwitterSocialProof() {
         </div>
       </div>
       <div className="mt-6">
-        <div className={'lg:-mr-32 lg:-ml-32'}>
+        <div className='lg:-mr-32 lg:-ml-32 cursor-move'>
           <Swiper
             initialSlide={3}
             spaceBetween={0}
@@ -102,13 +102,17 @@ function TwitterSocialProof() {
             {Examples.map((tweet: any, i: number) => {
               return (
                 <SwiperSlide key={i}>
-                  <div className="mr-3 ml-3 cursor-move">
-                    <TweetCard
-                      key={i}
-                      handle={`@${tweet.handle}`}
-                      quote={tweet.text}
-                      img_url={`${basePath}${tweet.img_url}`}
-                    />
+                  <div className="mr-3 ml-3">
+                    <Link href={tweet.url}>
+                      <a target="_blank" className='cursor-pointer'>
+                        <TweetCard
+                          key={i}
+                          handle={`@${tweet.handle}`}
+                          quote={tweet.text}
+                          img_url={`${basePath}${tweet.img_url}`}
+                        />
+                      </a>
+                    </Link>
                   </div>
                 </SwiperSlide>
               )
