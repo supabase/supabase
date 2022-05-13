@@ -18,7 +18,7 @@ const StoragePolicies = () => {
   const storageStore = useStorageStore()
   const { loaded, buckets } = storageStore
 
-  const roles = meta.roles.list()
+  const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
 
   const [policies, setPolicies] = useState([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
