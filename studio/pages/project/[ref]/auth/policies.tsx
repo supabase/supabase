@@ -10,6 +10,7 @@ import NoTableState from 'components/ui/States/NoTableState'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 const PageContext = createContext(null)
 
@@ -116,7 +117,7 @@ const AuthPoliciesTables = observer(() => {
   const { ui, meta } = useStore()
   const PageState: any = useContext(PageContext)
 
-  const roles = meta.roles.list()
+  const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
