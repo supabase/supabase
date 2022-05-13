@@ -1,6 +1,5 @@
 import { FC, ReactNode } from 'react'
 import Link from 'next/link'
-import { Menu } from '@supabase/ui'
 
 interface Props {
   name: string | ReactNode
@@ -24,17 +23,27 @@ const ProductMenuItem: FC<Props> = ({
   textClassName = '',
 }) => {
   const menuItem = (
-    <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
-      <div className="flex w-full items-center justify-between">
-        <span
-          title={typeof name === 'string' ? name : ''}
-          className={'flex items-center truncate ' + textClassName}
-        >
-          {name}
+    <button
+      className={`cursor-pointer flex space-x-3 items-center outline-none focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 group px-3 py-1 font-normal border-scale-500 group-hover:border-scale-900 w-full rounded-md ${isActive ? 'bg-scale-400 dark:bg-scale-300' : ''}`}
+      onClick={onClick || (() => {})}
+    >
+      {icon && (
+        <span className="transition  text-sm text-scale-900 group-hover:text-scale-1100">
+          {icon}
         </span>
-        {action}
-      </div>
-    </Menu.Item>
+      )}
+      <span className='transition truncate text-sm w-full text-scale-1100 group-hover:text-scale-1200'>
+        <div className="flex w-full items-center justify-between">
+          <span
+            title={typeof name === 'string' ? name : ''}
+            className={'flex items-center truncate ' + textClassName}
+          >
+            {name}
+          </span>
+          {action}
+        </div>
+      </span>
+    </button>
   )
 
   if (url) {
