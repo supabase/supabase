@@ -15,13 +15,13 @@
   {
     "type": "example",
     "products": ["database"],
-    "title": "NextJS Realtime chat app",
-    "description": "NextJS Slack clone app using Supabase realtime subscriptions",
+    "title": "Next.js Realtime chat app",
+    "description": "Next.js Slack clone app using Supabase realtime subscriptions",
     "author": "supabase",
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "nextjs-slack-clone",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone",
+    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
