@@ -82,7 +82,7 @@ const Landing = () => {
 
           <div className="sm:text-center">
             <p className="text-scale-900 text-xs sm:max-w-sm sm:mx-auto mt-8 mb-5">
-              By continuing, you agree to Supabase's <Link href="https://supabase.com/docs/company/terms"><a className='underline hover:text-scale-1100'>Terms of Service</a></Link>, and to receive periodic emails with updates.
+              By continuing, you agree to Supabase's <Link href="https://supabase.com/docs/company/terms"><a className='underline hover:text-scale-1100'>Terms of Service</a></Link> and <Link href="https://supabase.com/docs/company/privacy"><a className='underline hover:text-scale-1100'>Privacy Policy</a></Link>, and to receive periodic emails with updates.
             </p>
           </div>
 
