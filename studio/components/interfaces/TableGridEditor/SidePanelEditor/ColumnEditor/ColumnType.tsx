@@ -63,6 +63,11 @@ const ColumnType: FC<Props> = ({
       className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
       onChange={(value: string) => onOptionSelect(value)}
       optionsWidth={480}
+      descriptionText={
+        !isNativeDataType
+          ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
+          : ''
+      }
     >
       <Listbox.Option key="empty" value="" label="---">
         ---
