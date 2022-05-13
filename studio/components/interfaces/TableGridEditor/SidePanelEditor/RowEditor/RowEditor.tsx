@@ -122,6 +122,7 @@ const RowEditor: FC<Props> = ({
 
     if (isEmpty(errors)) {
       updateEditorDirty()
+
       const payload = isNewRecord
         ? generateRowObjectFromFields(rowFields)
         : generateUpdateRowPayload(row, rowFields)
