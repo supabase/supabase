@@ -17,13 +17,14 @@ const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const project = ui.selectedProject
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
       post(`${API_URL}/projects/${ref}/restore`, {})
     }
+    meta.roles.load()
   }, [project])
 
   if (!project) return <div></div>

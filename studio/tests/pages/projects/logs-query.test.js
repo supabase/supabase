@@ -43,7 +43,9 @@ jest.mock('hooks')
 import { useStore, useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 useStore.mockImplementation(() => ({
-  content: jest.fn(),
+  content: {
+    addRecentLogSqlSnippet: jest.fn(),
+  },
 }))
 
 jest.mock('hooks/queries/useProjectSubscription')
@@ -117,6 +119,7 @@ test('q= query param will populate the query input', async () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('sql=some_query'))
   })
 })
+
 test('ite= and its= query param will populate the datepicker', async () => {
   const router = defaultRouterMock()
   const start = dayjs().subtract(1, 'day')
@@ -167,7 +170,7 @@ test('custom sql querying', async () => {
 
   // run query by button
   userEvent.click(await screen.findByText('Run'))
-  
+
   // run query by editor
   userEvent.type(editor, '\nlimit 123{ctrl}{enter}')
   await waitFor(
@@ -177,11 +180,10 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent("limit 123")))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
     },
     { timeout: 1000 }
   )
-
 
   await screen.findByText(/my_count/) //column header
   const rowValue = await screen.findByText(/12345/) // row value

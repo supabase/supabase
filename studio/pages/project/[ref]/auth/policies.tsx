@@ -3,14 +3,14 @@ import React, { createContext, useContext, useState, useEffect, PropsWithChildre
 import { Button, IconSearch, Input } from '@supabase/ui'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import PolicyTableRow from 'components/to-be-cleaned/Auth/PolicyTableRow'
-import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
 import NoTableState from 'components/ui/States/NoTableState'
 import { NextPageWithLayout } from 'types'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
 const PageContext = createContext(null)
 
@@ -119,6 +119,8 @@ export default observer(AuthPoliciesPage)
 const AuthPoliciesTables = observer(() => {
   const { ui, meta } = useStore()
   const PageState: any = useContext(PageContext)
+
+  const roles = meta.roles.list()
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
@@ -250,6 +252,7 @@ const AuthPoliciesTables = observer(() => {
 
       <PolicyEditorModal
         visible={!isEmpty(selectedSchemaAndTable)}
+        roles={roles}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
