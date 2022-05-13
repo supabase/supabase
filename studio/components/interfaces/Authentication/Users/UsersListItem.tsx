@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconUser, Typography } from '@supabase/ui'
-import Table from 'components/to-be-cleaned/Table'
+import { Badge } from '@supabase/ui'
 
+import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import UserDropdown from './UserDropdown'
+import { formatUserDateString } from './Users.utils'
 
 interface Props {
   user: any
@@ -13,6 +14,9 @@ interface Props {
 
 const UserListItem: FC<Props> = ({ user }) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
+  const createdAt = formatUserDateString(user.created_at)
+  const lastSignedIn = formatUserDateString(user.last_sign_in_at)
+
   return (
     <Table.tr key={user.id}>
       <Table.td className="whitespace-nowrap">
@@ -29,15 +33,13 @@ const UserListItem: FC<Props> = ({ user }) => {
         </span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1200">
-          {dayjs(user.created_at).format('DD MMM, YYYY HH:mm')}
-        </span>
+        <span className="text-scale-1200">{dayjs(createdAt).format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="hidden xl:table-cell">
         {!isUserConfirmed ? (
           <Badge color="yellow">Waiting for verification..</Badge>
         ) : user.last_sign_in_at ? (
-          dayjs(user.last_sign_in_at).format('DD MMM, YYYY HH:mm')
+          dayjs(lastSignedIn).format('DD MMM, YYYY HH:mm')
         ) : (
           'Never'
         )}
