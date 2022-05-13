@@ -129,7 +129,7 @@ const ColumnForeignKeyAdded: FC<{
           <div className="space-y-2">
             <span>
               The following foreign key relation will be{' '}
-              <span className="text-green-900">added</span>:
+              <span className="text-brand-900">added</span>:
             </span>
             <div className="text-scale-1200 flex items-center space-x-2">
               <span className={`${columnName.length > 0 ? 'text-code' : ''} max-w-xs truncate`}>
@@ -215,7 +215,7 @@ const ColumnForeignKeyUpdated: FC<{
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <Typography.Text>
-              The foreign key relation will be <span className="text-green-900">updated</span> as
+              The foreign key relation will be <span className="text-brand-900">updated</span> as
               such:
             </Typography.Text>
             <div className="flex items-start space-x-2">
