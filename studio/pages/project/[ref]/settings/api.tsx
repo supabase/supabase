@@ -500,7 +500,6 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
               value={updates.db_schema.replace(/ /g, '').split(',')}
               // onChange returns array of strings
               onChange={(event) => {
-                console.log('onChange', event)
                 let payload = updates
                 payload.db_schema = event.join(', ') // permanentSchema.concat(event).join(', ')
                 setUpdates({ ...payload })
