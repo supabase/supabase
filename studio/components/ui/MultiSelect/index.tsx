@@ -39,12 +39,12 @@ export default function MultiSelect({
 }: Props) {
   const ref = useRef(null)
 
-  const [selected, setSelected] = useState(value || [])
-  const [searchString, setSearchString] = useState('')
-  const [inputWidth, setInputWidth] = useState(128)
+  const [selected, setSelected] = useState<string[]>(value || [])
+  const [searchString, setSearchString] = useState<string>('')
+  const [inputWidth, setInputWidth] = useState<number>(128)
 
   // Selected is `value` if defined, otherwise use local useState
-  const selectedOptions = (value || selected).filter((option) => option !== 'public')
+  const selectedOptions = value || selected
 
   // Calculate width of the Popover
   useEffect(() => {
@@ -75,8 +75,14 @@ export default function MultiSelect({
       ? [...without(_selected, option.value)]
       : [..._selected.concat([option.value])]
 
-    setSelected(updatedPayload)
-    onChange(updatedPayload)
+    // Payload must always include disabled options
+    const compulsoryOptions = options
+      .filter((option) => option.disabled)
+      .map((option) => option.name)
+    const formattedPayload = [...new Set(updatedPayload.concat(compulsoryOptions))]
+
+    setSelected(formattedPayload)
+    onChange(formattedPayload)
   }
 
   const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
