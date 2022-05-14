@@ -165,10 +165,10 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    bbg-white dark:bg-scale-400 
-                    flex flex-col justify-between rounded rounded-t-none
-                    border-b border-r
-                    border-l border-gray-100 p-5
+                    dark:bg-scale-400 flex 
+                    flex-col justify-between rounded rounded-t-none border-b
+                    border-r border-l
+                    border-gray-100 bg-white p-5
                     pt-10 dark:border-gray-600"
                   >
                     <a href="mailto:support@supabase.io">
