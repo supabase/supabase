@@ -26,7 +26,7 @@ import {
 import { useStore, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import InformationBox from 'components/ui/InformationBox'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
@@ -191,7 +191,7 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      isLoading={app.organizations.isInitialized}
+      loading={app.organizations.isInitialized}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>

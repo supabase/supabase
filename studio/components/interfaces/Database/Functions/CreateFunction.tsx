@@ -17,7 +17,7 @@ import { Dictionary } from '@supabase/grid'
 import { makeAutoObservable } from 'mobx'
 
 import { useStore } from 'hooks'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
