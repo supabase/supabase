@@ -1,11 +1,24 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect } from 'react'
 import useSWR from 'swr'
 import { Loading, Typography } from '@supabase/ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { get, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import SparkBar from 'components/ui/SparkBar'
+
+interface ApiUsageStats {
+  authUsers: string | null;
+  bucketSize: string | null;
+  dbSize: string | null;
+  dbTables: string | null;
+}
+interface UsageStats {
+  authUsers: number;
+  bucketSize: number;
+  dbSize: number;
+  dbTables: number;
+}
 
 const GB = 1000000000
 const MB = 1000000
@@ -32,13 +45,13 @@ const usageLimits = {
         title: 'Database space',
         tiers: {
           free: {
-            description: (stats: any) =>
-              `${(((stats?.dbSize || 0) / (500 * MB)) * 100).toFixed(2)} %`,
-            render: (stats: any) => {
-              const bytes: any = stats?.dbSize ? new Number(stats?.dbSize) : 0
+            description: (stats: UsageStats) =>
+              `${((stats.dbSize / (500 * MB)) * 100).toFixed(2)} %`,
+            render: (stats: UsageStats) => {
+              const bytes: number = stats.dbSize;
               const usage = {
-                gb: bytes / GB || 0,
-                mb: bytes / MB || 0,
+                gb: bytes / GB,
+                mb: bytes / MB,
               }
               return (
                 <SparkBar
@@ -46,20 +59,20 @@ const usageLimits = {
                   max={500}
                   type={'horizontal'}
                   barClass={'bg-brand-900'}
-                  labelBottom={`${new Number(usage.mb).toFixed(2).toLocaleString()} MB`}
+                  labelBottom={`${usage.mb.toFixed(2).toLocaleString()} MB`}
                   labelTop={`500 MB`}
                 />
               )
             },
           },
           pro: {
-            description: (stats: any) =>
-              `${(((stats?.dbSize || 0) / (8000 * MB)) * 100).toFixed(2)} %`,
-            render: (stats: any) => {
-              const bytes: any = stats?.dbSize ? new Number(stats?.dbSize) : 0
+            description: (stats: UsageStats) =>
+              `${((stats.dbSize / (8000 * MB)) * 100).toFixed(2)} %`,
+            render: (stats: UsageStats) => {
+              const bytes: number = stats.dbSize
               const usage = {
-                gb: bytes / GB || 0,
-                mb: bytes / MB || 0,
+                gb: bytes / GB,
+                mb: bytes / MB,
               }
               return (
                 <SparkBar
@@ -67,7 +80,7 @@ const usageLimits = {
                   max={8000}
                   type={'horizontal'}
                   barClass={'bg-brand-900'}
-                  labelBottom={`${new Number(usage.mb).toFixed(2).toLocaleString()} MB`}
+                  labelBottom={`${usage.mb.toFixed(2).toLocaleString()} MB`}
                   labelTop={`8 GB`}
                 />
               )
@@ -85,29 +98,29 @@ const usageLimits = {
         title: 'Users',
         tiers: {
           free: {
-            description: (stats: any) => `${(((stats?.authUsers || 0) / 10000) * 100).toFixed(2)}%`,
-            render: (stats: any) => (
+            description: (stats: UsageStats) => `${((stats.authUsers / 10000) * 100).toFixed(2)}%`,
+            render: (stats: UsageStats) => (
               <SparkBar
-                value={stats?.authUsers || 0}
+                value={stats.authUsers}
                 max={10000}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
-                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
-                labelTop={`${new Number(10000).toLocaleString()}`}
+                labelBottom={stats.authUsers.toLocaleString()}
+                labelTop={`${Number(10000).toLocaleString()}`}
               />
             ),
           },
           pro: {
-            description: (stats: any) =>
-              `${(((stats?.authUsers || 0) / 100000) * 100).toFixed(2)}%`,
-            render: (stats: any) => (
+            description: (stats: UsageStats) =>
+              `${((stats.authUsers / 100000) * 100).toFixed(2)}%`,
+            render: (stats: UsageStats) => (
               <SparkBar
-                value={stats?.authUsers || 0}
+                value={stats.authUsers}
                 max={100000}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
-                labelBottom={stats?.authUsers ? new Number(stats?.authUsers).toLocaleString() : '0'}
-                labelTop={`${new Number(100000).toLocaleString()}`}
+                labelBottom={stats.authUsers.toLocaleString()}
+                labelTop={`${Number(100000).toLocaleString()}`}
               />
             ),
           },
@@ -117,11 +130,11 @@ const usageLimits = {
         title: 'Auth confirmation emails',
         tiers: {
           free: {
-            description: () => `${new Number(1000).toLocaleString()}/month`,
+            description: () => `${Number(1000).toLocaleString()}/month`,
             render: null,
           },
           pro: {
-            description: () => `${new Number(30000).toLocaleString()}/month`,
+            description: () => `${Number(30000).toLocaleString()}/month`,
             render: null,
           },
         },
@@ -136,38 +149,34 @@ const usageLimits = {
         title: 'Storage space',
         tiers: {
           free: {
-            description: (stats: any) =>
-              `${(((stats?.bucketSize || 0) / (1 * GB)) * 100).toFixed(2)}%`,
-            render: (stats: any) => (
+            description: (stats: UsageStats) =>
+              `${((stats.bucketSize / (1 * GB)) * 100).toFixed(2)}%`,
+            render: (stats: UsageStats) => (
               <SparkBar
-                value={stats?.bucketSize / (1024 * 1024) || 0}
+                value={stats.bucketSize / (1024 * 1024) || 0}
                 max={1 * 1024}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
                 labelBottom={
-                  stats?.bucketSize
-                    ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                    : '0'
+                  `${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`
                 }
-                labelTop={`${new Number(1 * 1024).toLocaleString()} MB`}
+                labelTop={`${(1 * 1024).toLocaleString()} MB`}
               />
             ),
           },
           pro: {
-            description: (stats: any) =>
-              `${(((stats?.bucketSize || 0) / (100 * GB)) * 100).toFixed(2)}%`,
-            render: (stats: any) => (
+            description: (stats: UsageStats) =>
+              `${((stats.bucketSize / (100 * GB)) * 100).toFixed(2)}%`,
+            render: (stats: UsageStats) => (
               <SparkBar
-                value={stats?.bucketSize / (1024 * 1024) || 0}
+                value={stats.bucketSize / (1024 * 1024) || 0}
                 max={100 * 1024}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
                 labelBottom={
-                  stats?.bucketSize
-                    ? `${new Number(stats?.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                    : '0'
+                  `${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`
                 }
-                labelTop={`${new Number(100).toLocaleString()} GB`}
+                labelTop={`${Number(100).toLocaleString()} GB`}
               />
             ),
           },
@@ -177,11 +186,11 @@ const usageLimits = {
         title: 'Transfer limits',
         tiers: {
           free: {
-            description: () => `${new Number(2).toLocaleString()} GB`,
+            description: () => `${Number(2).toLocaleString()} GB`,
             render: () => {},
           },
           pro: {
-            description: () => `${new Number(200).toLocaleString()} GB`,
+            description: () => `${Number(200).toLocaleString()} GB`,
             render: () => {},
           },
         },
@@ -190,7 +199,12 @@ const usageLimits = {
   },
 }
 
-const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
+interface ProjectUsageProps {
+  projectRef?: string;
+  subscription_id?: string;
+}
+
+const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) => {
   const { ui } = useStore()
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
@@ -268,9 +282,19 @@ const ProjectUsage: FC<any> = ({ projectRef, subscription_id }) => {
 
 export default ProjectUsage
 
-export const ProjectUsageMinimal: FC<any> = ({ projectRef, subscription_id, filter }) => {
-  const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
+interface ProjectUsageMinimalProps extends ProjectUsageProps {
+  filter: string;
+}
+
+export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, subscription_id, filter }) => {
+  const { data: apiStats, error: usageError } = useSWR<ApiUsageStats>(`${API_URL}/projects/${projectRef}/usage`, get)
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
+  const stats: UsageStats = {
+    authUsers: Number(apiStats?.authUsers),
+    bucketSize: Number(apiStats?.bucketSize),
+    dbSize: Number(apiStats?.dbSize),
+    dbTables: Number(apiStats?.dbTables)
+  }
 
   if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG) {
     return <></>

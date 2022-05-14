@@ -9,9 +9,10 @@ import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
 import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
 
-import ProjectUsage from 'components/to-be-cleaned/Usage'
+import ProjectUsage from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
+import { Project } from '../../../../../types'
 
 type ProjectBillingProps = {} & any
 const ProjectBilling: FC<ProjectBillingProps> = ({ store }) => {
@@ -32,7 +33,7 @@ const ProjectBilling: FC<ProjectBillingProps> = ({ store }) => {
 export default withAuth(observer(ProjectBilling))
 
 type SettingsProps = {
-  project: any
+  project?: Project
 }
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
@@ -108,7 +109,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {paygStats && <PAYGUsage paygStats={paygStats} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project.ref} subscription_id={project.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>
