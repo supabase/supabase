@@ -1,10 +1,6 @@
 import { FC } from 'react'
 import { Input } from '@supabase/ui'
-import {
-  convertInputToPostgresValue,
-  convertPostgresToInputValue,
-  getColumnType,
-} from './DateTimeInput.utils'
+import { getColumnType } from './DateTimeInput.utils'
 
 interface Props {
   name: string
@@ -20,12 +16,11 @@ interface Props {
  */
 const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }) => {
   const inputType = getColumnType(format)
-  const formattedValue = convertPostgresToInputValue(inputType, value)
 
   function handleOnChange(e: any) {
     const temp = e.target.value
-    const value = convertInputToPostgresValue({ inputType, format, value: temp })
-    onChange(value)
+    if (temp.length === 0) return
+    onChange(temp)
   }
 
   return (
@@ -42,7 +37,7 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
       }
       labelOptional={format}
       size="small"
-      value={formattedValue}
+      value={value}
       type={inputType}
       onChange={handleOnChange}
       step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
