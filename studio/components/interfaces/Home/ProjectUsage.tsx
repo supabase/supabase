@@ -16,7 +16,7 @@ import {
 
 import Panel from 'components/ui/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
+import { ProjectUsageMinimal } from 'components/ui/Usage'
 
 import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'

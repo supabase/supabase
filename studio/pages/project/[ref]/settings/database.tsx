@@ -18,7 +18,7 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
+import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 
@@ -50,7 +50,7 @@ export default withAuth(observer(ProjectSettings))
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const { ref } = router.query
+  const ref = router.query.ref as string;
 
   return (
     <>
