@@ -17,7 +17,7 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
@@ -328,12 +328,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
       <div className="">
         <section className="space-y-6 mt-6">
           <Panel
-            title={[
+            title={
               <Typography.Title key="panel-title" level={5} className="mb-0">
                 Connection info
-              </Typography.Title>,
+              </Typography.Title>
               // <Title level={4}>Connection info</Title>
-            ]}
+            }
           >
             <Panel.Content className="space-y-6">
               <Input

@@ -7,7 +7,7 @@ import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 interface Props {}
 

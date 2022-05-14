@@ -5,7 +5,7 @@ import { Input, Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Loading from 'components/ui/Loading'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import PgBouncerConfig from './PgBouncerConfig'
 import DownloadCertificate from './DownloadCertificate'
 
@@ -69,11 +69,11 @@ const BouncerSettings: FC<Props> = ({}) => {
       </div>
 
       <Panel
-        title={[
+        title={
           <Typography.Title key="panel-title" level={5} className="mb-0">
             Connection info
-          </Typography.Title>,
-        ]}
+          </Typography.Title>
+        }
       >
         <div className="">
           <Panel.Content>
@@ -145,11 +145,11 @@ const BouncerSettings: FC<Props> = ({}) => {
 
       <section>
         <Panel
-          title={[
+          title={
             <Typography.Title key="panel-title" level={5} className="mb-0">
               Connection string
-            </Typography.Title>,
-          ]}
+            </Typography.Title>
+          }
         >
           <Panel.Content className="space-y-4">
             <Input
