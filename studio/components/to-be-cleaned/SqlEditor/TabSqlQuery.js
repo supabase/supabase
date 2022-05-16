@@ -17,7 +17,6 @@ import Editor from '@monaco-editor/react'
 import { copyToClipboard, timeout } from 'lib/helpers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-import { useProjectContentStore } from 'stores/projectContentStore'
 
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
@@ -50,7 +49,7 @@ const TabSqlQuery = observer(() => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <Split
         style={{ height: '100%' }}
         direction="vertical"
@@ -76,7 +75,7 @@ const MonacoEditor = ({ error }) => {
   const router = useRouter()
   const { ref } = router.query
 
-  const contentStore = useProjectContentStore(ref)
+  const { content: contentStore } = useStore()
 
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
@@ -185,7 +184,7 @@ const MonacoEditor = ({ error }) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
+    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -352,14 +351,10 @@ const SizeToggleButton = observer(() => {
 })
 
 const FavoriteButton = observer(() => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { ui } = useStore()
+  const { ui, content: contentStore } = useStore()
   const { profile: user } = ui
 
   const sqlEditorStore = useSqlStore()
-  const contentStore = useProjectContentStore(ref)
 
   const [loading, setLoading] = useState(false)
 
@@ -397,8 +392,9 @@ const FavoriteButton = observer(() => {
       /*
        * reload sql data in store and re-select tab
        */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
       sqlEditorStore.selectTab(id)
+
       setLoading(false)
     } catch (error) {
       ui.setNotification({
@@ -434,7 +430,7 @@ const FavoriteButton = observer(() => {
       /*
        * reload sql data in store and re-select tab
        */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error) {
@@ -479,14 +475,14 @@ const UtilityTabResults = observer(() => {
   if (sqlEditorStore.activeTab.isExecuting) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 border-0 font-mono text-sm">Running...</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.errorResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text>
-          <p className="px-6 py-4 m-0 border-0 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
         </Typography.Text>
       </div>
     )
@@ -494,7 +490,7 @@ const UtilityTabResults = observer(() => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text type="secondary">
-          <p className="px-6 py-4 m-0 border-0 ">
+          <p className="m-0 border-0 px-6 py-4 ">
             Click <Typography.Text code>RUN</Typography.Text> to execute your query.
           </p>
         </Typography.Text>
@@ -530,7 +526,7 @@ const Results = ({ results }) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text type="danger">
-          <p className="px-6 py-4 m-0 font-mono border-0"> {`ERROR: ${results.error}`}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono"> {`ERROR: ${results.error}`}</p>
         </Typography.Text>
       </div>
     )
@@ -538,7 +534,7 @@ const Results = ({ results }) => {
   if (!results.length) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 font-mono border-0 text-sm">Success. No rows returned</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
       </div>
     )
   }
@@ -547,7 +543,7 @@ const Results = ({ results }) => {
     return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
   }
   const columnRender = (name) => {
-    return <div className="flex items-center justify-center font-mono h-full">{name}</div>
+    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
   const columns = Object.keys(results[0]).map((key) => ({
     key,
