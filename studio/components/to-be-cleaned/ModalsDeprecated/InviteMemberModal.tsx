@@ -89,7 +89,7 @@ function InviteMemberModal({ organization, members = [] }) {
       >
         <div className="w-full py-4 space-y-4">
           <Modal.Content>
-            <div className="text-center">{PageState.emailAddress}
+            <div className="text-center">
               <Input
                 icon={<IconMail />}
                 autoFocus
@@ -107,7 +107,7 @@ function InviteMemberModal({ organization, members = [] }) {
               <Button
                 onClick={addMember}
                 loading={PageState.addMemberLoading}
-                disabled={PageState.addBtnDisable}
+                disabled={!PageState.emailIsValid()}
                 block
               >
                 Invite new member
