@@ -1,12 +1,11 @@
 import { createContext, useContext, useCallback, useState, useEffect } from 'react'
-import { debounce, isNil } from 'lodash'
+import { isNil } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { post } from 'lib/common/fetch'
-import { Button, IconKey, IconLoader, IconUser, IconMail, IconX, Input, Typography } from '@supabase/ui'
+import { Button, IconKey, IconMail, Input } from '@supabase/ui'
 import { Modal } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
-import { Transition } from '@headlessui/react'
 import { useOrganizationDetail, useStore } from 'hooks'
 
 /**
@@ -20,30 +19,8 @@ const PageContext = createContext(null)
 function InviteMemberModal({ organization, members = [] }) {
   const PageState = useLocalObservable(() => ({
     members: [],
-    keywords: '',
-    profiles: null,
-    selectedProfile: null,
     addMemberLoading: false,
     emailAddress: '',
-    get addBtnText() {
-      if (this.selectedProfile) return `Add ${this.selectedProfile.username} to organization`
-      return 'Invite new member'
-    },
-    get addBtnDisable() {
-      return (!this.emailIsValid() && !this.selectedProfile) || this.addMemberLoading
-    },
-    setProfiles(profiles) {
-      let temp = profiles
-      if (profiles) {
-        temp = profiles
-          .map((profile) => {
-            const foundMember = this.members.find((x) => x.profile.id == profile.id)
-            return { ...profile, isMember: foundMember !== undefined }
-          })
-          .sort((a, b) => a.username.localeCompare(b.username))
-      }
-      this.profiles = temp
-    },
     emailIsValid() {
       return String(this.emailAddress)
         .toLowerCase()
@@ -62,9 +39,6 @@ function InviteMemberModal({ organization, members = [] }) {
   function toggle() {
     // reset data before showing modal again
     if (!isOpen) {
-      PageState.keywords = ''
-      PageState.selectedProfile = null
-      PageState.profiles = null
       PageState.addMemberLoading = false
       PageState.emailAddress = ''
     }
@@ -74,9 +48,10 @@ function InviteMemberModal({ organization, members = [] }) {
   async function addMember() {
     PageState.addMemberLoading = true
     PageState.emailAddress = ''
+
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/add`, {
       org_id: orgId,
-      user_id: PageState.selectedProfile.id,
+      email: PageState.emailAddress
     })
     if (isNil(response)) {
       ui.setNotification({ category: 'error', message: 'Failed to add member' })
@@ -119,16 +94,11 @@ function InviteMemberModal({ organization, members = [] }) {
                 icon={<IconMail />}
                 autoFocus
                 id="email"
-                label="Email"
                 placeholder="Enter email address"
                 onChange={onEmailInputChange}
                 value={PageState.emailAddress}
                 className="w-full"
                 />
-                <div className='border-t mt-8 mb-4 py-2 relative'>
-                  <span className='text-sm absolute -top-3 text-center text-scale-1100 uppercase bg-bg-light left-1/2 px-4 bg-scale-100 dark:bg-gray-800 -translate-x-1/2'>or</span>
-                </div>
-              <InputSearchWithResults className="" />
             </div>
           </Modal.Content>
           <Modal.Seperator />
@@ -140,7 +110,7 @@ function InviteMemberModal({ organization, members = [] }) {
                 disabled={PageState.addBtnDisable}
                 block
               >
-                {PageState.addBtnText}
+                Invite new member
               </Button>
             </div>
           </Modal.Content>
@@ -150,200 +120,3 @@ function InviteMemberModal({ organization, members = [] }) {
   )
 }
 export default observer(InviteMemberModal)
-
-const InputSearchWithResults = observer(({ className }) => {
-  const PageState = useContext(PageContext)
-  const { ui } = useStore()
-  const [loading, setLoading] = useState(false)
-  const debounceSearchProfile = useCallback(debounce(searchProfile, 500), [PageState.keywords])
-
-  useEffect(() => {
-    debounceSearchProfile()
-    // Cancel the debounce on useEffect cleanup.
-    return debounceSearchProfile.cancel
-  }, [PageState.keywords, debounceSearchProfile])
-
-  async function searchProfile() {
-    if (PageState.keywords.length === 0) {
-      PageState.setProfiles(null)
-      return
-    }
-    setLoading(true)
-    const response = await post(`${API_URL}/profile/search`, { keywords: PageState.keywords })
-    if (isNil(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to search profile' })
-    } else if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to search profile: ${response.error.message}`,
-      })
-      setLoading(false)
-    } else {
-      PageState.setProfiles(response)
-      setLoading(false)
-    }
-  }
-
-  function onUsernameInputChange(e) {
-    PageState.keywords = e.target.value
-  }
-
-  function reset() {
-    PageState.keywords = ''
-    PageState.setProfiles(null)
-    PageState.selectedProfile = null
-  }
-
-  if (PageState.selectedProfile) {
-    const fullName = `${PageState.selectedProfile.first_name || ''} ${
-      PageState.selectedProfile.last_name || ''
-    }`
-    return (
-      <div className={className}>
-        <div className="flex px-6 py-2 items-center rounded bg-scale-400 border">
-          <div className="flex-grow text-left">
-            <p className="text-scale-1200 font-medium">{PageState.selectedProfile.username}</p>
-            <p className="text-sm leading-5 text-scale-1100">
-              {fullName !== ' ' ? `${fullName} • Invite collaborator` : 'Invite collaborator'}
-            </p>
-          </div>
-          <button className="text-scale-900 hover:text-scale-1200">
-            <IconX strokeWidth={2} onClick={reset} />
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  const onSelectDropdownOption = (e, option) => {
-    PageState.emailAddress = ''
-    if (!option.isMember) PageState.selectedProfile = option
-  }
-
-  return (
-    <div className={className}>
-      <div className="relative rounded-md shadow-sm">
-        <Input
-          icon={<IconUser />}
-          label="Search existing users"
-          id="username"
-          type="text"
-          className="form-input"
-          onChange={onUsernameInputChange}
-          autoComplete="off"
-          value={PageState.keywords}
-          placeholder="Enter GitHub username"
-        />
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-          {loading && <IconLoader className="animate-spin" size={16} />}
-        </div>
-      </div>
-      {PageState.profiles && PageState.profiles.length !== 0 ? (
-        <>
-          <div className="flex flex-col gap-1 py-4">
-            {PageState.profiles.map((profile, i) => {
-              const { first_name, last_name, username, isMember } = profile
-              const fullName = `${first_name || ''} ${last_name || ''}`
-              let subText = isMember ? 'Already in this organization' : 'Invite collaborator'
-              if (fullName !== ' ') subText = `${fullName} • ${subText}`
-              return (
-                <Button
-                  block
-                  key={`option_${i}`}
-                  className={`px-3 py-1 ${
-                    isMember
-                      ? 'cursor-not-allowed opacity-50'
-                      : 'cursor-pointer hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark'
-                  } first:rounded-t-md last:rounded-b-md`}
-                  onClick={(e) => onSelectDropdownOption(e, profile)}
-                  type="default"
-                  style={{ justifyContent: 'flex-start' }}
-                  size="medium"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="block truncate">{username}</span>
-                    <span className="text-scale-900 block truncate" type="secondary">
-                      {subText}
-                    </span>
-                  </div>
-                </Button>
-              )
-            })}
-          </div>
-        </>
-      ) : PageState.profiles &&
-        PageState.profiles.length === 0 &&
-        !loading &&
-        PageState.keywords ? (
-        <>
-          <p className="text-sm text-scale-1200 mt-4">Could not find account.</p>
-          <p className="text-sm text-scale-1100">Has the user already signed up?</p>
-        </>
-      ) : null}
-    </div>
-  )
-})
-
-const ProfileDropdown = observer(({ className }) => {
-  const PageState = useContext(PageContext)
-
-  const onSelectDropdownOption = (e, option) => {
-    if (!option.isMember) PageState.selectedProfile = option
-  }
-
-  if (!PageState.profiles) return null
-  return (
-    <div className={className}>
-      <Transition
-        show={!PageState.selectedProfile}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <div className="origin-top-right w-full max-h-48 rounded-md shadow-lg overflow-y-auto z-100 fixed">
-          <div className="rounded-md bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 text-left">
-            <div
-              className="py-1"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="options-menu"
-            >
-              {PageState.profiles.length === 0 && (
-                <div className="px-3 py-2">
-                  <p className="text-base leading-6 font-medium">
-                    Could not find account. Has the user already signed up?
-                  </p>
-                </div>
-              )}
-              {PageState.profiles.map((profile, i) => {
-                const { first_name, last_name, username, isMember } = profile
-                const fullName = `${first_name || ''} ${last_name || ''}`
-                let subText = isMember ? 'Already in this organization' : 'Invite collaborator'
-                if (fullName !== ' ') subText = `${fullName} • ${subText}`
-                return (
-                  <div
-                    key={`option_${i}`}
-                    className={`px-3 py-1 ${
-                      isMember
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'cursor-pointer hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark'
-                    } first:rounded-t-md last:rounded-b-md`}
-                    onClick={(e) => onSelectDropdownOption(e, profile)}
-                  >
-                    <Typography.Text className="block">{username}</Typography.Text>
-                    <Typography.Text className="block" type="secondary">
-                      {subText}
-                    </Typography.Text>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </div>
-  )
-})
