@@ -5,7 +5,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import Tab from './Tab'
 import QueryTab from './QueryTab'
 import Favorite from './Favorite'
-// import { useStore } from 'hooks'
 import { SchemasQuery, TableColumnsQuery, AllFunctionsQuery } from './queries'
 import { isUndefined } from 'lodash'
 
@@ -17,6 +16,10 @@ export function useSqlEditorStore(ref, meta) {
     store = new SqlEditorStore(ref, meta)
   }
   return store
+}
+
+export function createSqlEditorStore(ref, meta) {
+  return new SqlEditorStore(ref, meta)
 }
 
 export const TAB_TYPES = {
@@ -112,22 +115,16 @@ class SqlEditorStore {
     else return tab.isExecuting
   }
 
-  /*
-   * ! Temporary solution !
-   *
-   * New action for retriving data from main db user_content
-   * You need to pass the contentStore into this
-   */
-  async loadRemotePersistentData(contentStore, user_id) {
-    await contentStore.load()
-    const sqlSnippets = contentStore.sqlSnippets((x) => x.owner_id === user_id)
-    const snippets = toJS(sqlSnippets)
+  tabsFromContentStore(contentStore, user_id) {
+    const snippets = contentStore
+      .sqlSnippets((x) => x.owner_id === user_id)
+      .map((snippet) => toJS(snippet))
 
     // add the welcome tab
     let tabs = IS_PLATFORM ? [new Tab('Welcome', TAB_TYPES.WELCOME)] : []
 
     // add the tabs to array, but with structure the localStore expects
-    snippets.map((snippet) => {
+    snippets.forEach((snippet) => {
       const data = {
         desc: snippet.description,
         id: snippet.id,
@@ -136,8 +133,23 @@ class SqlEditorStore {
         type: 'SQL_QUERY',
         favorite: snippet.content.favorite,
       }
+
       tabs.push(data)
     })
+
+    return tabs
+  }
+
+  /*
+   * ! Temporary solution !
+   *
+   * New action for retriving data from main db user_content
+   * You need to pass the contentStore into this
+   */
+  async loadRemotePersistentData(contentStore, user_id) {
+    await contentStore.load()
+
+    const tabs = this.tabsFromContentStore(contentStore, user_id)
 
     /*
      * Reshape snippet content to fit the SqlEditorStore shape
@@ -197,7 +209,7 @@ class SqlEditorStore {
     this.selectedTabId = this.tabs.length ? this.tabs[0].id : undefined
   }
 
-  loadTabs(values) {
+  loadTabs(values, autoSelectTab = true) {
     const tabs = values.map((x) => {
       switch (x.type) {
         case TAB_TYPES.WELCOME:
@@ -213,7 +225,10 @@ class SqlEditorStore {
     })
 
     this.tabs = tabs.filter((x) => x !== undefined)
-    this.selectedTabId = this.tabs.length ? this.tabs[0].id : undefined
+
+    if (autoSelectTab) {
+      this.selectedTabId = this.tabs.length ? this.tabs[0].id : undefined
+    }
   }
 
   loadFavorites(values) {
@@ -279,10 +294,15 @@ class SqlEditorStore {
   }
 
   closeTab(id) {
-    this.tabs = this.tabs.filter((x) => x.id !== id)
+    this.tabs.filter((x) => x.id !== id)
     // if user close selectedTab, select the last tab if available
-    if (this.tabs.length && this.selectedTabId === id)
-      this.selectedTabId = this.tabs[this.tabs.length - 1].id
+    if (this.tabs.length && this.selectedTabId === id) {
+      const nextId = this.tabs[this.tabs.length - 1].id
+
+      if (nextId) {
+        this.selectedTabId = nextId
+      }
+    }
   }
 
   createQueryTab(query, name) {
