@@ -171,10 +171,10 @@ const convertPostgresDatetimeToInputDatetime = (format: string, value: string) =
   if (!value || value.length == 0) return ''
 
   if (DATETIME_TYPES.includes(format)) {
-    return dayjs(value, DATE_FORMAT).format('YYYY-MM-DDTHH:mm:ss')
+    return dayjs(value).format(DATE_FORMAT)
   } else if (TIME_TYPES.includes(format)) {
     const serverTimeFormat = value && value.includes('+') ? 'HH:mm:ssZZ' : 'HH:mm:ss'
-    return dayjs(value, serverTimeFormat).format('HH:mm:ss')
+    return dayjs(value).format(serverTimeFormat)
   } else {
     return value
   }
@@ -184,7 +184,7 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   if (!value || value.length == 0) return null
 
   if (DATETIME_TYPES.includes(format)) {
-    return dayjs(value, 'YYYY-MM-DDTHH:mm:ss').format(DATE_FORMAT)
+    return dayjs(value).format(DATE_FORMAT)
   } else if (TIME_TYPES.includes(format)) {
     const serverTimeFormat = format.toLowerCase() === 'timetz' ? 'HH:mm:ssZZ' : 'HH:mm:ss'
     return dayjs(value, 'HH:mm:ss').format(serverTimeFormat)

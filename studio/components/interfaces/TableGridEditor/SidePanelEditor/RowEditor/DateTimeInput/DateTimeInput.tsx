@@ -40,7 +40,7 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
       value={value}
       type={inputType}
       onChange={handleOnChange}
-      step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
+      step={inputType == 'datetime-local' || inputType == 'time' || inputType == 'date' ? '1' : undefined}
     />
   )
 }

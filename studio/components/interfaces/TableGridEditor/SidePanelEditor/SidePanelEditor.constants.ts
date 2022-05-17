@@ -9,7 +9,7 @@ export const TEXT_TYPES = ['text', 'varchar']
 export const TIMESTAMP_TYPES = ['timestamp', 'timestamptz']
 export const DATE_TYPES = ['date']
 export const TIME_TYPES = ['time', 'timetz']
-export const DATETIME_TYPES = concat(TIMESTAMP_TYPES, DATE_TYPES, TIME_TYPES)
+export const DATETIME_TYPES = concat(TIMESTAMP_TYPES, DATE_TYPES)
 
 export const OTHER_DATA_TYPES = ['uuid', 'bool']
 export const POSTGRES_DATA_TYPES = sortBy(
