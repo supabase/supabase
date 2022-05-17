@@ -79,12 +79,22 @@ const Landing = () => {
               </Button>
             </Link>
           </div>
+
           <div className="sm:text-center">
-            <p className="text-scale-900 text-base sm:max-w-2xl sm:mx-auto md:mt-20 mb-5">
+            <p className="text-scale-900 text-xs sm:max-w-sm sm:mx-auto mt-8 mb-5">
+              By continuing, you agree to Supabase's <Link href="https://supabase.com/docs/company/terms"><a className='underline hover:text-scale-1100'>Terms of Service</a></Link> and <Link href="https://supabase.com/docs/company/privacy"><a className='underline hover:text-scale-1100'>Privacy Policy</a></Link>, and to receive periodic emails with updates.
+            </p>
+          </div>
+
+          <hr className='max-w-[75px] sm:mx-auto mt-16 border-zinc-500 '/>
+
+          <div className="sm:text-center">
+            <p className="text-scale-900 text-base sm:max-w-2xl sm:mx-auto mt-16 mb-5">
               Ready to learn about our pay-as-you-go Enterprise plan?
             </p>
             <Link href="https://supabase.com/contact/enterprise">Let's talk!</Link>
           </div>
+
         </div>
       </div>
     </div>
