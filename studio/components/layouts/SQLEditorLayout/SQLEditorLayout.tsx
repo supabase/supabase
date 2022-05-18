@@ -40,7 +40,7 @@ const SQLEditorLayout: FC<Props> = ({ title, children }) => {
         </ProjectLayout>
       ) : (
         <ProjectLayout
-          isLoading={content.isLoading}
+          isLoading={content.isLoading || sqlEditorStore === null}
           title={title || 'SQL'}
           product="SQL Editor"
           productMenu={<SQLEditorMenu />}
