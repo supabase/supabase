@@ -105,12 +105,6 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         buttonLabel="Confirm"
         visible={deleteModalOpen}
         onSelectConfirm={async () => {
-          // TODO: remove this hack
-          // it's needed because the onClick handler from the menu item registers here, instead
-          // of on just the menu item. Meaning that the selectTab runs, causing an error.
-          // Once a fix is made in supabase/ui this can safely be removed.
-          await new Promise((resolve) => setTimeout(resolve, 10))
-
           sqlEditorStore.closeTab(id)
 
           await contentStore.del(id)

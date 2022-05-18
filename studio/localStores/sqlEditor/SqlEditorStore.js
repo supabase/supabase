@@ -73,6 +73,10 @@ class SqlEditorStore {
   }
 
   get activeTab() {
+    if (this.tabs.length === 1) {
+      this.selectedTabId = this.tabs[0].id
+    }
+
     const found = this.tabs.find((x) => x.id === this.selectedTabId)
     return found
   }
@@ -294,10 +298,10 @@ class SqlEditorStore {
   }
 
   closeTab(id) {
-    this.tabs.filter((x) => x.id !== id)
+    const tabs = this.tabs.filter((x) => x.id !== id)
     // if user close selectedTab, select the last tab if available
-    if (this.tabs.length && this.selectedTabId === id) {
-      const nextId = this.tabs[this.tabs.length - 1].id
+    if (tabs.length && this.selectedTabId === id) {
+      const nextId = tabs[tabs.length - 1].id
 
       if (nextId) {
         this.selectedTabId = nextId
