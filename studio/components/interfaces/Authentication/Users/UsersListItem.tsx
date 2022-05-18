@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge } from '@supabase/ui'
@@ -6,16 +5,30 @@ import { Badge } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import UserDropdown from './UserDropdown'
-import { formatUserDateString } from './Users.utils'
+import { getDateFromIsoString } from './Users.utils'
 
 interface Props {
-  user: any
+  user: {
+    id: string
+    email: string
+    phone: string
+    email_confirmed_at: string
+    phone_confirmed_at: string
+    created_at: string
+    last_sign_in_at: string
+    raw_app_meta_data?: {
+      provider: string
+    }
+    app_metadata?: {
+      provider: string
+    }
+  }
 }
 
 const UserListItem: FC<Props> = ({ user }) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
-  const createdAt = formatUserDateString(user.created_at)
-  const lastSignedIn = formatUserDateString(user.last_sign_in_at)
+  const createdAt = getDateFromIsoString(user.created_at)
+  const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
 
   return (
     <Table.tr key={user.id}>
@@ -33,13 +46,13 @@ const UserListItem: FC<Props> = ({ user }) => {
         </span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1200">{dayjs(createdAt).format('DD MMM, YYYY HH:mm')}</span>
+        <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="hidden xl:table-cell">
         {!isUserConfirmed ? (
           <Badge color="yellow">Waiting for verification..</Badge>
         ) : user.last_sign_in_at ? (
-          dayjs(lastSignedIn).format('DD MMM, YYYY HH:mm')
+          lastSignedIn?.format('DD MMM, YYYY HH:mm')
         ) : (
           'Never'
         )}
