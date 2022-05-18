@@ -122,7 +122,6 @@ export default class MetaStore implements IMetaStore {
   projectRef?: string
   connectionString?: string
   baseUrl: string
-  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -138,9 +137,13 @@ export default class MetaStore implements IMetaStore {
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
+<<<<<<< HEAD
     this.projectRef = projectRef
     this.baseUrl = `/api/pg-meta/${projectRef}`
     this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
+=======
+    this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
+>>>>>>> master
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -176,7 +179,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.queryBaseUrl}/query`
+      const url = `${this.baseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
