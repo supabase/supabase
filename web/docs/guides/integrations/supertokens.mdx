@@ -4,14 +4,13 @@ title: 'SuperTokens'
 description: "Create a Next.js application secured by Email-Password or Social Login from Stytch, and Supabase's Row Level Security (RLS)."
 ---
 
+[SuperTokens](https://www.supertokens.com) is an open source authentication solution which provides many stratergies for authenticating and managing users. You can use the managed service for easy setup or you can self host the solution to have complete control over your data.
 
-In this guide we will build a simple web application using SuperTokens, Supabase, and Next.js. You will be able to sign up and your email will be stored in Supabase. Once authenticated the frontend will be able to query Supabase and retrieve the user's email.
-
-[SuperTokens](https://www.supertokens.com) is an open source authentication solution which provides many stratergies for authenticating and managing users. You can use the managed service for easy setup or you can self host the solution to have complete control over your data. In this example we will be using the [Email-Password and Social Login](https://supertokens.com/docs/thirdpartyemailpassword/introduction) recipe for authentication and session management.
+In this guide we will build a simple web application using SuperTokens, Supabase, and Next.js. You will be able to sign up and your email will be stored in Supabase. Once authenticated the frontend will be able to query Supabase and retrieve the user's email. Our example app will be using the [Email-Password and Social Login](https://supertokens.com/docs/thirdpartyemailpassword/introduction) recipe for authentication and session management.
 
 We will use Supabase to store and authorize access to user data. Supabase makes it simple to setup Row Level Security(RLS) policies  which ensure users can only read and write data they are authorized to do so. If you do not have a Supabase account, you will need to create one.
 
-> Note: You can find a completed version of this project on [Github](TODO)
+> Note: You can find a completed version of this project on [Github](https://github.com/supertokens/supertokens-auth-react/tree/master/examples/with-supabase)
 
 
 ## Step 1: Create a new Supabase project
@@ -81,7 +80,7 @@ Our second policy will check whether the `user_id` being inserted is the same as
 
 Create another policy and add the following:
 
-![Policy settings for INSERT](/img/guides/integrations/supertokens/policy_config_select.png)
+![Policy settings for INSERT](/img/guides/integrations/supertokens/policy_config_insert.png)
 
 Similar to the previous policy we are calling the function we created to get the currently logged in user's ID `auth.user_id()` and check whether this matches the `user_id` column for the row we are trying to insert. If it does, then it will allow the user to insert the row, otherwise it will continue to deny.
 
@@ -110,14 +109,14 @@ Once you finish setting up your app, you will be greeted with the following scre
 
 In our Nextjs app when a user signs up, we want to store the user's email in Supabase. We would then retrieve this email from Supabase and display it on our frontend.
 
-To use the Supabase client to query your database we will need to create a JWT signed with your Supabase app's signing secret. This JWT will also need to contain the user's userId so Supabase knows an authenticated user is making the queries.  
+To use the Supabase client to query the database we will need to create a JWT signed with your Supabase app's signing secret. This JWT will also need to contain the user's userId so Supabase knows an authenticated user is making the request.  
 
-To create this flow we will need to modify SuperTokens so that, when a user signs up, a JWT signed with Supabase's signing secret is created and attached to the user's session. Additionally their email and userId should be mapped and stored in Supabase. Attaching the JWT to the user's session will allow us to retrieve the user's email on the frontend without having to create another JWT and exposing the signing secret to the frontend. We can do so be extending SuperTokens APIs and functions using `Overriding`. 
+To create this flow we will need to modify SuperTokens so that, when a user signs up, a JWT signed with Supabase's signing secret is created and attached to the user's session. Additionally their email and userId should be mapped and stored in Supabase. Attaching the JWT to the user's session will allow us to retrieve the user's email on the frontend without having to create another JWT, exposing the signing secret to the frontend. We can do so be extending SuperTokens APIs and functions using `Overriding`. 
 
 
 `Overriding` is a feature in SuperTokens which allows us to extend and modify SuperTokens's UI and Authentication experience. You can learn more about `Overriding` [here](https://supertokens.com/docs/thirdpartyemailpassword/advanced-customizations/overview).
 
-For our purpose we will first `override` SuperTokens `createNewSession` function in your backend config to create a JWT which contains the user's userId.
+For our purpose we will first override SuperTokens `createNewSession` function in your backend config to create a JWT which contains the user's userId.
 
 ```ts
 // config/backendConfig.ts
@@ -504,6 +503,10 @@ As seen above we will be using SuperTokens `useSessionContext` hook to retrieve 
 Once you sign up you should see the following screen:
 
 ![SuperTokens App Authenticated](/img/guides/integrations/supertokens/supabase_app_authenticated_screen.png)
+
+If you navigate to your table you should see a new row with the user's `user_id` and `email`.
+
+![Supabase Users table](/img/guides/integrations/supertokens/table_with_user.png)
 
 ## Resources
 
