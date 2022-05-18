@@ -1,4 +1,4 @@
-import { detectBrowser } from 'lib/helpers'
+import dayjs from 'dayjs'
 
 /**
  * Formats the user datetime string into a format that's
@@ -13,12 +13,11 @@ import { detectBrowser } from 'lib/helpers'
  * Note: I've only seen this issue on the Auth page, hence why keeping
  * this util here for now. But if it does happen elsewhere i'll bring it
  * to lib/helpers
+ *
+ * Update 18-May-2022
+ * Ref: https://github.com/iamkun/dayjs/issues/931
+ * Instead of using the default parsing. We should use CustomParseFormat.
  */
-export const formatUserDateString = (dateString: string) => {
-  const browser = detectBrowser()
-  if (browser === 'Safari') {
-    return dateString.replace(' ', 'T')
-  } else {
-    return dateString
-  }
+export const getDateFromIsoString = (dateString?: string): dayjs.Dayjs | undefined => {
+  return dateString ? dayjs(dateString, 'YYYY-MM-DD HH:mm:ss.SSSSSSZZ') : undefined
 }
