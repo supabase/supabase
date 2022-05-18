@@ -206,6 +206,7 @@ module.exports = {
         'guides/integrations/prisma',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
+        'guides/integrations/supertokens',
         'guides/integrations/vercel',
       ],
     },
