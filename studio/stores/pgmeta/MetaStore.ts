@@ -137,13 +137,8 @@ export default class MetaStore implements IMetaStore {
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
-<<<<<<< HEAD
     this.projectRef = projectRef
-    this.baseUrl = `/api/pg-meta/${projectRef}`
-    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
-=======
     this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
->>>>>>> master
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
