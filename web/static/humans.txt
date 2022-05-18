@@ -5,17 +5,22 @@ Supabase is 100% remote.
 Alaister Young
 Angelico de los Reyes
 Amy Q
+Andrew Smith
 Ant Wilson
+Ariuna K
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Chase Granberry
 Chris Copplestone
 Dave Wilson
 David Thyresson
 Div Arora
+Egor Romanov
 Hieu Pham
 Inian P
 Isaiah Hamilton
+Jess Shears
 Joel Lee
 Jon M
 Jonny Summers-Muir
@@ -24,18 +29,22 @@ Kang Ming Tay
 Lakshmipathi G
 Laura C
 Leo T
+Margarita Sandomirskaia
 Mark Burggraf
+Michel Pelletier
+Monica El Khoury
+Nikita Kotlyarov
 Oli R
 Paul Copplestone
 Rory Wilding
-Shane Rice  
+Shane Rice
 Stanislav M
 Steve Chavez
+Terry Sutton
 Thor Schaeff
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
-Monica El Khoury
 ____________
 
 JOBS
@@ -45,7 +54,7 @@ If you are interested in working with us check out the open roles here: https://
 ___________
 
 
-TECHNOLOGIES 
+TECHNOLOGIES
 
 Supabase would not be possible without the work of some other amazing open source contributors.
 
