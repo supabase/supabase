@@ -14,10 +14,10 @@ import { detectBrowser } from 'lib/helpers'
  * this util here for now. But if it does happen elsewhere i'll bring it
  * to lib/helpers
  */
-export const formatUserDateString = (dateString: string) => {
+export const formatUserDateString = (dateString?: string) => {
   const browser = detectBrowser()
   if (browser === 'Safari') {
-    return dateString.replace(' ', 'T')
+    return dateString?.replace(' ', 'T')
   } else {
     return dateString
   }
