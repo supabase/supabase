@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconInfo, IconLoader } from '@supabase/ui'
+import { Typography, IconInfo } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
