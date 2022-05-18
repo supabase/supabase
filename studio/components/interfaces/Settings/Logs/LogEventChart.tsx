@@ -1,9 +1,8 @@
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import dayjs from 'dayjs'
 import { LogData } from '.'
-import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
-dayjs.extend(utc)
+
 interface Props {
   data?: LogData[]
   onBarClick: (timestamp: number) => void
