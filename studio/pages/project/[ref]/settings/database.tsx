@@ -21,16 +21,11 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { BouncerSettings } from 'components/interfaces/Database'
-import ConnectionPoolingSettings from 'components/interfaces/Database/Pooling/ConnectionPoolingSettings'
+import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
 dayjs.extend(utc)
-
-
-
-
 
 const ProjectSettings = () => {
   const router = useRouter()
@@ -43,11 +38,9 @@ const ProjectSettings = () => {
     <SettingsLayout title="Database">
       <div className="content w-full h-full overflow-y-auto">
         <div className="w-full px-4 py-4 max-w-5xl">
-          <ConnectionPoolingSettings />
-          <BouncerSettings />
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
-          {/* move bouncer settings back down here ->>>>>>>>>>>>> <BouncerSettings /> */}
+          <ConnectionPooling />
         </div>
       </div>
     </SettingsLayout>

@@ -15,7 +15,7 @@ import { Input } from '@supabase/ui'
 
 interface Props {}
 
-const BouncerSettings: FC<Props> = ({}) => {
+const ConnectionPooling: FC<Props> = () => {
   const { ui, app } = useStore()
   const projectRef = ui.selectedProject?.ref ?? 'default'
 
@@ -70,31 +70,28 @@ const BouncerSettings: FC<Props> = ({}) => {
   ]
   const bouncerInfo = pluckObjectFields(formModel, BOUNCER_FIELDS)
 
-  console.log()
   return (
-      <PgbouncerConfig projectRef={projectRef} config={bouncerInfo} portNumber={connectionInfo.db_port} />
+      <PgbouncerConfig projectRef={projectRef} bouncerInfo={bouncerInfo} connectionInfo={connectionInfo} />
   )
 }
 
-export default observer(BouncerSettings)
-
+export default observer(ConnectionPooling)
 
 interface ConfigProps {
   projectRef: string
-  config: any,
-  portNumber: number
+  bouncerInfo: {default_pool_size: number, ignore_startup_parameters: 'string', pool_mode: string, pgbouncer_enabled: boolean},
+  connectionInfo: {db_host: string, db_name: string, db_port: number, db_user: string, inserted_at: string}
 }
 
-export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config, portNumber }) => {
+export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, bouncerInfo, connectionInfo }) => {
 
   const { ui } = useStore()
 
   const [updates, setUpdates] = useState<any>({
-    // pgbouncer_status: config.pgbouncer_status,
-    pgbouncer_enabled: config.pgbouncer_enabled,
-    pool_mode: config.pool_mode || 'transaction',
-    default_pool_size: config.default_pool_size || '',
-    ignore_startup_parameters: config.ignore_startup_parameters || '',
+    pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
+    pool_mode: bouncerInfo.pool_mode || 'transaction',
+    default_pool_size: bouncerInfo.default_pool_size || '',
+    ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
   })
 
   const updateConfig = async (updatedConfig: any) => {
@@ -152,31 +149,20 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config, 
 
   return (
     <SchemaFormPanel
-      title="Connection Pooling Settings"
+      title="Connection Pooling"
       schema={formSchema}
       model={updates}
       submitLabel="Save"
       cancelLabel="Cancel"
       onChangeModel={(model: any) => setUpdates(model)}
       onSubmit={(model: any) => updateConfig(model)}
-      onReset={() => setUpdates(config)}
+      onReset={() => setUpdates(bouncerInfo)}
     >
       <div className="space-y-6 py-4">
         <ToggleField name="pgbouncer_enabled" />
-        <Divider light />
-
-        <Input
-          className="input-mono"
-          layout="horizontal"
-          readOnly
-          copy
-          disabled
-          value={portNumber}
-          label="Port"
-        />
 
         <Divider light />
-        {/* <AutoField name="pgbouncer_status" disabled={true} /> */}
+
         {updates.pgbouncer_enabled && (
           <>
             <AutoField
@@ -199,14 +185,33 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config, 
               </p>
             </div>
             <Divider light />
-            {/* <AutoField
-              name="default_pool_size"
-              showInlineError
-              errorMessage="Value must be within 1 and 20"
-            /> */}
             <AutoField name="ignore_startup_parameters" />
           </>
         )}
+        <Divider light />
+        <Input
+          className="input-mono"
+          layout="horizontal"
+          readOnly
+          copy
+          disabled
+          value={connectionInfo.db_port}
+          label="Port"
+        />
+        <Divider light />
+        <Input
+          className="input-mono"
+          layout="vertical"
+          readOnly
+          copy
+          disabled
+          label="Connection string"
+          value={
+            `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
+            `${connectionInfo.db_host}:${connectionInfo.db_port}` +
+            `/${connectionInfo.db_name}`
+          }
+        />
       </div>
     </SchemaFormPanel>
   )
