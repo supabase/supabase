@@ -309,7 +309,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   const { project } = data
   const formModel = toJS(project)
-  console.log(formModel)
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
