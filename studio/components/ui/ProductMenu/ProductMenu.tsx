@@ -14,7 +14,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
       <Menu type="pills">
         {menu.map((group: ProductMenuGroup, idx: number) => (
           <div key={group.title}>
-            <div className="space-y-8 my-6">
+            <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group
                   //@ts-ignore
@@ -33,6 +33,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                       name={item.name}
                       icon={item.icon}
                       isActive={page === item.key}
+                      isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
                     />
                   ))}
