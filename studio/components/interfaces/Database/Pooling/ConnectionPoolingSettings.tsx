@@ -69,8 +69,10 @@ const BouncerSettings: FC<Props> = ({}) => {
     'pgbouncer_enabled',
   ]
   const bouncerInfo = pluckObjectFields(formModel, BOUNCER_FIELDS)
+
+  console.log()
   return (
-      <PgbouncerConfig config={bouncerInfo} projectRef={projectRef} />
+      <PgbouncerConfig projectRef={projectRef} config={bouncerInfo} portNumber={connectionInfo.db_port} />
   )
 }
 
@@ -79,10 +81,12 @@ export default observer(BouncerSettings)
 
 interface ConfigProps {
   projectRef: string
-  config: any
+  config: any,
+  portNumber: number
 }
 
-export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config }) => {
+export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config, portNumber }) => {
+
   const { ui } = useStore()
 
   const [updates, setUpdates] = useState<any>({
@@ -147,7 +151,6 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config }
   }
 
   return (
-    <>
     <SchemaFormPanel
       title="Connection Pooling Settings"
       schema={formSchema}
@@ -168,7 +171,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config }
           readOnly
           copy
           disabled
-          value="44444444444444"
+          value={portNumber}
           label="Port"
         />
 
@@ -206,6 +209,5 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, config }
         )}
       </div>
     </SchemaFormPanel>
-    </>
   )
 })
