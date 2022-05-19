@@ -291,24 +291,6 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 const GeneralSettings: FC<any> = ({ projectRef }) => {
   const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
 
-  const { app } = useStore()
-
-
-  useEffect(() => {
-   console.log('fetchPoolingConfiguration()')
-    fetchPoolingConfiguration()
-  }, [])
-
-  const fetchPoolingConfiguration = async () => {
-    // setIsLoading(true)
-    const response = await app.database.getPoolingConfiguration(projectRef)
-    console.log('response is: ', response)
-    // setPoolingConfiguration(response)
-    // setIsLoading(false)
-  }
-
-
-
   if (data?.error || error) {
     return (
       <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
