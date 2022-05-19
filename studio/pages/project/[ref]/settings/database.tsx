@@ -21,10 +21,16 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import { BouncerSettings } from 'components/interfaces/Database'
+import ConnectionPoolingSettings from 'components/interfaces/Database/Pooling/ConnectionPoolingSettings'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(timezone)
 dayjs.extend(utc)
+
+
+
+
 
 const ProjectSettings = () => {
   const router = useRouter()
@@ -37,8 +43,11 @@ const ProjectSettings = () => {
     <SettingsLayout title="Database">
       <div className="content w-full h-full overflow-y-auto">
         <div className="w-full px-4 py-4 max-w-5xl">
+          <ConnectionPoolingSettings />
+          <BouncerSettings />
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
+          {/* move bouncer settings back down here ->>>>>>>>>>>>> <BouncerSettings /> */}
         </div>
       </div>
     </SettingsLayout>
@@ -289,6 +298,24 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
 const GeneralSettings: FC<any> = ({ projectRef }) => {
   const { data, error }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
 
+  const { app } = useStore()
+
+
+  useEffect(() => {
+   console.log('fetchPoolingConfiguration()')
+    fetchPoolingConfiguration()
+  }, [])
+
+  const fetchPoolingConfiguration = async () => {
+    // setIsLoading(true)
+    const response = await app.database.getPoolingConfiguration(projectRef)
+    console.log('response is: ', response)
+    // setPoolingConfiguration(response)
+    // setIsLoading(false)
+  }
+
+
+
   if (data?.error || error) {
     return (
       <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
@@ -307,10 +334,11 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   const { project } = data
   const formModel = toJS(project)
+  console.log(formModel)
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const uriConnString =
+const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
