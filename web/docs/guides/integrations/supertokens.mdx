@@ -6,7 +6,7 @@ description: "Create a Next.js application secured by Email-Password or Social L
 
 [SuperTokens](https://www.supertokens.com) is an open source authentication solution which provides many stratergies for authenticating and managing users. You can use the managed service for easy setup or you can self host the solution to have complete control over your data.
 
-In this guide we will build a simple web application using SuperTokens, Supabase, and Next.js. You will be able to sign up and your email will be stored in Supabase. Once authenticated the frontend will be able to query Supabase and retrieve the user's email. Our example app will be using the [Email-Password and Social Login](https://supertokens.com/docs/thirdpartyemailpassword/introduction) recipe for authentication and session management.
+In this guide we will build a simple web application using SuperTokens, Supabase, and Next.js. You will be able to sign up using SuperTokens and your email and user ID will be stored in Supabase. Once authenticated the frontend will be able to query Supabase and retrieve the user's email. Our example app will be using the [Email-Password and Social Login](https://supertokens.com/docs/thirdpartyemailpassword/introduction) recipe for authentication and session management.
 
 We will use Supabase to store and authorize access to user data. Supabase makes it simple to setup Row Level Security(RLS) policies  which ensure users can only read and write data they are authorized to do so. If you do not have a Supabase account, you will need to create one.
 
@@ -20,7 +20,7 @@ Enter a `Name` for your Supabase project.
 
 Enter a secure `Database Password`.
 
-Select the same `Region` you selected for your Auth0 tenant.
+Select the same `Region` you host your app's backend in. 
 
 Click `Create new project`.
 
@@ -513,6 +513,6 @@ If you navigate to your table you should see a new row with the user's `user_id`
 - [SuperTokens](https://supertokens.com/) official website.
 - [SuperTokens blog](https://supertokens.com/blog).
 - [SuperTokens community](https://supertokens.com/discord).
-- [Auth0 documentation](https://supertokens.com/docs/guides).
+- [SuperTokens documentation](https://supertokens.com/docs/guides).
 
 
