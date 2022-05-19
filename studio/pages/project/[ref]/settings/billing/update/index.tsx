@@ -74,13 +74,9 @@ const BillingUpdate: NextPage = () => {
   }
 
   const onSelectPlan = (plan: any) => {
-    if (plan.name === 'Enterprise') {
-      return router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
-    } else if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
-      return router.push(`/project/${projectRef}/settings/billing/update/pro`)
-    }
-
-    if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
+    if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
+      router.push(`/project/${projectRef}/settings/billing/update/pro`)
+    } else if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
       setSelectedPlan(plan)
       setShowConfirmDowngrade(true)
     }
@@ -98,7 +94,7 @@ const BillingUpdate: NextPage = () => {
 
   if (isLoadingProducts) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <Connecting />
       </div>
     )
@@ -106,7 +102,7 @@ const BillingUpdate: NextPage = () => {
 
   return (
     <BillingLayout>
-      <div className="mx-auto max-w-6xl my-10 px-6">
+      <div className="mx-auto my-10 max-w-6xl px-6">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
           tiers={products?.tiers ?? []}
@@ -137,9 +133,9 @@ const BillingUpdate: NextPage = () => {
         header="Free tier limit exceeded"
         onCancel={() => setShowDowngradeError(false)}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-scale-1100 text-sm">
               Your account is entitled up to {freeProjectsLimit} free projects across all
               organizations you own. You will need to delete or upgrade an existing free project
               first, before being able to downgrade this project.
