@@ -8,7 +8,7 @@ description: "Create a Next.js application secured by Email-Password or Social L
 
 In this guide we will build a simple web application using SuperTokens, Supabase, and Next.js. You will be able to sign up using SuperTokens and your email and user ID will be stored in Supabase. Once authenticated the frontend will be able to query Supabase and retrieve the user's email. Our example app will be using the [Email-Password and Social Login](https://supertokens.com/docs/thirdpartyemailpassword/introduction) recipe for authentication and session management.
 
-We will use Supabase to store and authorize access to user data. Supabase makes it simple to setup Row Level Security(RLS) policies  which ensure users can only read and write data they are authorized to do so. If you do not have a Supabase account, you will need to create one.
+We will use Supabase to store and authorize access to user data. Supabase makes it simple to setup Row Level Security(RLS) policies which ensure users can only read and write data that belongs to them.
 
 > Note: You can find a completed version of this project on [Github](https://github.com/supertokens/supertokens-auth-react/tree/master/examples/with-supabase)
 
@@ -44,79 +44,24 @@ Click `Save` to create the new table.
 
 ![Users table](/img/guides/integrations/supertokens/supabase_table_create.png)
 
-## Step 3: Create Policies to allow Select and Insert
 
-Our polices will need to know who our currently logged in user is to determine whether or not they should have access. Let's create a PostgreSQL function to extract the current user from our new JWT.
+## Step 3: Setup your Next.js App with SuperTokens.
 
-Navigate back to the Supabase dashboard, select `SQL` from the sidebar menu, and click `New query`. This will create a new query called `new sql snippet`, which will allow us to run any SQL against our Postgres database.
-
-
-Write the following and click `Run`.
-
-```sql
-create or replace function auth.user_id() returns text as $$
-  select nullif(current_setting('request.jwt.claims', true)::json->>'userId', '')::text;
-$$ language sql stable;
-```
-
-This will create a function called `auth.user_id()`, which will inspect the `userId` field of our JWT payload.
-
-Let's create our first policy that checks whether this user is the owner of the email.
-
-Select `Authentication` from the Supabase sidebar menu, click `Policies`, and then `New Policy` on the `Users` table.
-
-![Create new policy](/img/guides/integrations/supertokens/create_policy.png)
-
-From the modal, select `Create a policy from scratch` and add the following.
-
-![Policy settings for SELECT](/img/guides/integrations/supertokens/policy_config_select.png)
-
-This policy is calling the function we just created to get the currently logged in user's ID `auth.user_id()` and checking whether this matches the `user_id` column for the current `email`. If it does, then it will allow the user to select it, otherwise it will continue to deny.
-
-Click `Review` and then `Save policy`.
-
-
-Our second policy will check whether the `user_id` being inserted is the same as the authenticated user.
-
-Create another policy and add the following:
-
-![Policy settings for INSERT](/img/guides/integrations/supertokens/policy_config_insert.png)
-
-Similar to the previous policy we are calling the function we created to get the currently logged in user's ID `auth.user_id()` and check whether this matches the `user_id` column for the row we are trying to insert. If it does, then it will allow the user to insert the row, otherwise it will continue to deny.
-
-Click `Review` and then `Save policy`.
-
-
-## Step 4: Setup your Next.js App with SuperTokens.
-
-Since the scope of this guide is limited to the intergration between SuperTokens and Supabase, you can refer to these [docs](https://supertokens.com/docs/thirdpartyemailpassword/nextjs/about) on how to setup your Next.js app with SuperTokens.
+Since the scope of this guide is limited to the intergration between SuperTokens and Supabase, you can refer to the SuperTokens website to see [how to setup your Next.js app with SuperTokens](https://supertokens.com/docs/thirdpartyemailpassword/nextjs/about).
  
-**This demo will be using `try.supertokens.com` as our SuperTokens core instance. This is for demo and testing purposes, click [here](https://supertokens.com/pricing) to find out how you can setup your own SuperTokens core.**
-
-You will also need to add Supabase's config values to your `.env` file, these can be retrieved from the dashboard:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=get-from-supabase-dashboard
-NEXT_PUBLIC_SUPABASE_KEY=get-from-supabase-dashboard
-SUPABASE_SIGNING_SECRET=get-from-supabase-dashboard
-```
-
 Once you finish setting up your app, you will be greeted with the following screen
 
 ![SuperTokens Auth Screen](/img/guides/integrations/supertokens/supertokens_thirdpartyemailpassword_auth_screen.png)
 
-## Step 5: Overriding SuperTokens backend and Creating the JWT
+## Step 4: Creating a Supabase JWT to access Supabase
 
 In our Nextjs app when a user signs up, we want to store the user's email in Supabase. We would then retrieve this email from Supabase and display it on our frontend.
 
 To use the Supabase client to query the database we will need to create a JWT signed with your Supabase app's signing secret. This JWT will also need to contain the user's userId so Supabase knows an authenticated user is making the request.  
 
-To create this flow we will need to modify SuperTokens so that, when a user signs up, a JWT signed with Supabase's signing secret is created and attached to the user's session. Additionally their email and userId should be mapped and stored in Supabase. Attaching the JWT to the user's session will allow us to retrieve the user's email on the frontend without having to create another JWT, exposing the signing secret to the frontend. We can do so be extending SuperTokens APIs and functions using `Overriding`. 
+To create this flow we will need to modify SuperTokens so that, when a user signs up or signs in, a JWT signed with Supabase's signing secret is created and attached to the user's session. Attaching the JWT to the user's session will allow us to retrieve the Supabase JWT on the frontend and backend (post session verification), using which we can query Supabase. 
 
-
-`Overriding` is a feature in SuperTokens which allows us to extend and modify SuperTokens's UI and Authentication experience. You can learn more about `Overriding` [here](https://supertokens.com/docs/thirdpartyemailpassword/advanced-customizations/overview).
-
-For our purpose we will first override SuperTokens `createNewSession` function in your backend config to create a JWT which contains the user's userId.
+We want to create a Supabase JWT when we are creating a SuperTokens' session. This can be done by overriding the `createNewSession` function in your backend config.
 
 ```ts
 // config/backendConfig.ts
@@ -135,28 +80,7 @@ let backendConfig = (): TypeInput => {
         },
         appInfo,
         recipeList: [
-            ThirdPartyEmailPasswordNode.init({
-                providers: [
-                    // We have provided you with development keys which you can use for testing.
-                    // IMPORTANT: Please replace them with your own OAuth keys for production use.
-                    ThirdPartyEmailPasswordNode.Google({
-                        clientId: process.env.GOOGLE_CLIENT_ID,
-                        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                    }),
-                    ThirdPartyEmailPasswordNode.Github({
-                        clientId: process.env.GITHUB_CLIENT_ID,
-                        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-                    }),
-                    ThirdPartyEmailPasswordNode.Apple({
-                        clientId: process.env.APPLE_CLIENT_ID,
-                        clientSecret: {
-                            keyId: process.env.APPLE_KEY_ID,
-                            privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-                            teamId: process.env.APPLE_TEAM_ID,
-                        },
-                    }),
-                ]
-            }),
+            ThirdPartyEmailPasswordNode.init({...}),
             SessionNode.init({
                 override: {
                     functions: (originalImplementation) => {
@@ -193,9 +117,9 @@ let backendConfig = (): TypeInput => {
 
 As seen above, we will be using the `jsonwebtoken` library to create a JWT signed with Supabase's signing secret whose payload contains the user's userId.
 
-We will be storing this token in the `accessTokenPayload` which will essentially allow us to access the JWT whenever the user's session is accessible.
+We will be storing this token in the `accessTokenPayload` which will essentially allow us to access the `supabase_token` on the frontend and backend whilst the user is logged in.
 
-## Step 6: Requesting data from Supabase 
+## Step 5: Creating a Supabase client 
 
 Create a new file called `utils/supabase.ts` and add the following:
 
@@ -217,9 +141,9 @@ const getSupabase = (access_token) => {
 export { getSupabase };
 ```
 
-This will be our client for talking to Supabase. We can pass it an `access_token` and it will be attached to our request.
+This will be our client for talking to Supabase. We can pass it an `access_token` and it will be attached to our request. This `access_token` is the same as the `supabase_token` we had created earlier.
 
-## Step 7: Overriding SuperTokens Sign Up APIs:
+## Step 6: Inserting users into Supabase when they sign up:
 
 In our example app there are two ways for signing up a user. Email-Password and Social Login based authentication. We will need to override both these APIs such that when a user signs up, their email mapped to their userId is stored in Supabase.
 
@@ -242,57 +166,43 @@ let backendConfig = (): TypeInput => {
         appInfo,
         recipeList: [
             ThirdPartyEmailPasswordNode.init({
-                providers: [
-                    // We have provided you with development keys which you can use for testing.
-                    // IMPORTANT: Please replace them with your own OAuth keys for production use.
-                    ThirdPartyEmailPasswordNode.Google({
-                        clientId: process.env.GOOGLE_CLIENT_ID,
-                        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                    }),
-                    ThirdPartyEmailPasswordNode.Github({
-                        clientId: process.env.GITHUB_CLIENT_ID,
-                        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-                    }),
-                    ThirdPartyEmailPasswordNode.Apple({
-                        clientId: process.env.APPLE_CLIENT_ID,
-                        clientSecret: {
-                            keyId: process.env.APPLE_KEY_ID,
-                            privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-                            teamId: process.env.APPLE_TEAM_ID,
-                        },
-                    }),
-                ],
+                providers: [...],
                 override: {
                     apis: (originalImplementation) => {
                         return {
                             ...originalImplementation,
+                            // the thirdPartySignInUpPost function handles sign up/in via Social login
                             thirdPartySignInUpPOST: async function (input) {
                                 if (originalImplementation.thirdPartySignInUpPOST === undefined) {
                                     throw Error("Should never come here");
                                 }
+
+                                // call the sign up/in api for social login
                                 let response = await originalImplementation.thirdPartySignInUpPOST(input);
 
+                                // check that there is no issue with sign up and that a new user is created
                                 if (response.status === "OK" && response.createdNewUser) {
-                                    // retrieve the supabase_token from the accessTokenPayload
+
+                                    // retrieve the accessTokenPayload from the user's session
                                     const accessTokenPayload = response.session.getAccessTokenPayload();
 
-                                    // create a supabase client whose JWT contains the user's id
+                                    // create a supabase client with the supabase_token from the accessTokenPayload
                                     const supabase = getSupabase(accessTokenPayload.supabase_token);
+
                                     // store the user's email mapped to their userId in Supabase
                                     const { error } = await supabase
                                         .from("users")
                                         .insert({ email: response.user.email, user_id: response.user.id });
 
                                     if (error !== null) {
-                                        // Since Row Level Security is enabled in our Supabase tables, if a policy for inserting
-                                        // rows to a table has not been defined, insertion will throw an error.
+
                                         throw error;
                                     }
                                 }
 
                                 return response;
                             },
-
+                            // the emailPasswordSignUpPOST function handles sign up via Email-Password
                             emailPasswordSignUpPOST: async function (input) {
                                 if (originalImplementation.emailPasswordSignUpPOST === undefined) {
                                     throw Error("Should never come here");
@@ -301,10 +211,11 @@ let backendConfig = (): TypeInput => {
                                 let response = await originalImplementation.emailPasswordSignUpPOST(input);
 
                                 if (response.status === "OK") {
-                                    // retrieve the supabase_token from the accessTokenPayload
+
+                                    // retrieve the accessTokenPayload from the user's session
                                     const accessTokenPayload = response.session.getAccessTokenPayload();
 
-                                    // create a supabase client whose JWT contains the user's id
+                                    // create a supabase client with the supabase_token from the accessTokenPayload
                                     const supabase = getSupabase(accessTokenPayload.supabase_token);
 
                                     // store the user's email mapped to their userId in Supabase
@@ -313,8 +224,7 @@ let backendConfig = (): TypeInput => {
                                         .insert({ email: response.user.email, user_id: response.user.id });
 
                                     if (error !== null) {
-                                        // Since Row Level Security is enabled in our Supabase tables, if a policy for inserting
-                                        // rows to a table has not been defined, insertion will throw an error.
+
                                         throw error;
                                     }
                                 }
@@ -325,33 +235,7 @@ let backendConfig = (): TypeInput => {
                     },
                 },
             }),
-            SessionNode.init({
-                override: {
-                    functions: (originalImplementation) => {
-                        return {
-                            ...originalImplementation,
-                            // We want to create a JWT which contains the users userId signed with Supabase's secret so
-                            // it can be used by Supabase to validate the user when retrieving user data from their service.
-                            // We store this token in the accessTokenPayload so it can be accessed on the frontend and on the backend.
-                            createNewSession: async function (input) {
-                                const payload = {
-                                    userId: input.userId,
-                                    exp: Math.floor(Date.now() / 1000) + 60 * 60,
-                                };
-
-                                const supabase_jwt_token = jwt.sign(payload, process.env.SUPABASE_SIGNING_SECRET);
-
-                                input.accessTokenPayload = {
-                                    ...input.accessTokenPayload,
-                                    supabase_token: supabase_jwt_token,
-                                };
-
-                                return await originalImplementation.createNewSession(input);
-                            },
-                        };
-                    },
-                },
-            }),
+            SessionNode.init({...}),
         ],
         isInServerlessEnv: true,
     };
@@ -359,9 +243,9 @@ let backendConfig = (): TypeInput => {
 
 ```
 
-As seen above, we will be overriding the `emailPasswordSignUpPOST` and `thirdPartySignInUpPOST` APIs such that if a user signs up, we retrieve the Supabase JWT (which we created in the `createNewSession` function and attached to the user's session) from the user's accessTokenPayload and send a request to Supabase to insert the email-userid mapping.
+As seen above, we will be overriding the `emailPasswordSignUpPOST` and `thirdPartySignInUpPOST` APIs such that if a user signs up, we retrieve the Supabase JWT (which we created in the `createNewSession` function) from the user's accessTokenPayload and send a request to Supabase to insert the email-userid mapping.
 
-## Step 8: Retrieving the user's email on the frontend
+## Step 7: Retrieving the user's email on the frontend
 
 Now that our backend is setup we can modify our frontend to retrieve the user's email from Supabase.
 
@@ -376,7 +260,7 @@ import dynamic from "next/dynamic";
 import { useSessionContext } from "supertokens-auth-react/recipe/session";
 import { getSupabase } from "../utils/supabase";
 
-const ThirdPartyEmailPasswordAuthNoSSR = dynamic(
+const ThirdPartyEmailPasswordAuthWrapper = dynamic(
     new Promise<typeof ThirdPartyEmailPassword.ThirdPartyEmailPasswordAuth>((res) =>
         res(ThirdPartyEmailPassword.ThirdPartyEmailPasswordAuth)
     ),
@@ -385,9 +269,12 @@ const ThirdPartyEmailPasswordAuthNoSSR = dynamic(
 
 export default function Home() {
     return (
-        <ThirdPartyEmailPasswordAuthNoSSR>
+        // We will wrap the ProtectedPage component with the ThirdPartyEmailPasswordAuthWrapper so only an
+        // authenticated user can access it. This will also allow us to access the users session information
+        // within the component.
+        <ThirdPartyEmailPasswordAuthWrapper>
             <ProtectedPage />
-        </ThirdPartyEmailPasswordAuthNoSSR>
+        </ThirdPartyEmailPasswordAuthWrapper>
     );
 }
 
@@ -412,19 +299,6 @@ function ProtectedPage() {
         getUserEmail();
     }, []);
 
-    async function logoutClicked() {
-        await ThirdPartyEmailPassword.signOut();
-        ThirdPartyEmailPassword.redirectToAuth();
-    }
-
-    async function fetchUserData() {
-        const res = await fetch("/api/user");
-        if (res.status === 200) {
-            const json = await res.json();
-            alert(JSON.stringify(json));
-        }
-    }
-
     return (
         <div className={styles.container}>
             <Head>
@@ -438,59 +312,6 @@ function ProtectedPage() {
                     <br />
                     Your email retrieved from Supabase: {userEmail}
                 </p>
-
-                <div
-                    style={{
-                        display: "flex",
-                        height: "70px",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        paddingLeft: "75px",
-                        paddingRight: "75px",
-                    }}>
-                    <div
-                        onClick={logoutClicked}
-                        style={{
-                            display: "flex",
-                            width: "116px",
-                            height: "42px",
-                            backgroundColor: "#000000",
-                            borderRadius: "10px",
-                            cursor: "pointer",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                        }}>
-                        SIGN OUT
-                    </div>
-                </div>
-                <div
-                    style={{
-                        display: "flex",
-                        height: "70px",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        paddingLeft: "75px",
-                        paddingRight: "75px",
-                    }}>
-                    <div
-                        onClick={fetchUserData}
-                        style={{
-                            display: "flex",
-                            width: "150px",
-                            height: "42px",
-                            backgroundColor: "rgb(247 54 54)",
-                            borderRadius: "10px",
-                            cursor: "pointer",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                        }}>
-                        FETCH USER API
-                    </div>
-                </div>
             </main>
         </div>
     );
@@ -498,9 +319,71 @@ function ProtectedPage() {
 
 ```
 
-As seen above we will be using SuperTokens `useSessionContext` hook to retrieve the authenticated user's `userId` and `accessTokenPayload`. We can then use React's `useEffect` hook to retrieve the user's email from Supabase using the JWT retrieved from the user's `accessTokenPayload` and their `userId`.
+As seen above we will be using SuperTokens `useSessionContext` hook to retrieve the authenticated user's `userId` and `accessTokenPayload`. Using React's `useEffect` hook we can use the Supabase client to retrieve the user's email from Supabase using the JWT retrieved from the user's `accessTokenPayload` and their `userId`.
 
-Once you sign up you should see the following screen:
+
+## Step 8: Create Policies to enforce Row Level Security for Select and Insert requests
+
+To enforce Row Level Security for the `Users` table we will need to create policies for Select and Insert requests.
+
+These polices will retrieve the userId from the JWT and check if it matches the userId in the Supabase table 
+
+To do this we will need a PostgreSQL function to extract the userId from the JWT.
+
+The payload in the JWT will have the following structure:
+
+```
+// JWT payload
+{
+    userId,
+    exp
+}
+```
+
+To create the PostgreSQL function, lets navigate back to the Supabase dashboard, select `SQL` from the sidebar menu, and click `New query`. This will create a new query called `new sql snippet`, which will allow us to run any SQL against our Postgres database.
+
+Write the following and click `Run`.
+
+```sql
+create or replace function auth.user_id() returns text as $$
+  select nullif(current_setting('request.jwt.claims', true)::json->>'userId', '')::text;
+$$ language sql stable;
+```
+
+This will create a function called `auth.user_id()`, which will inspect the `userId` field of our JWT payload.
+
+### SELECT query policy
+
+Our first policy will check whether the user is the owner of the email.
+
+Select `Authentication` from the Supabase sidebar menu, click `Policies`, and then `New Policy` on the `Users` table.
+
+![Create new policy](/img/guides/integrations/supertokens/create_policy.png)
+
+From the modal, select `Create a policy from scratch` and add the following.
+
+![Policy settings for SELECT](/img/guides/integrations/supertokens/policy_config_select.png)
+
+This policy is calling the PostgreSQL function we just created to get the currently logged in user's ID `auth.user_id()` and checking whether this matches the `user_id` column for the current `email`. If it does, then it will allow the user to select it, otherwise it will continue to deny.
+
+Click `Review` and then `Save policy`.
+
+### INSERT query policy
+
+Our second policy will check whether the `user_id` being inserted is the same as the `userId` in the JWT.
+
+Create another policy and add the following:
+
+![Policy settings for INSERT](/img/guides/integrations/supertokens/policy_config_insert.png)
+
+Similar to the previous policy we are calling the PostgreSQL function we created to get the currently logged in user's ID `auth.user_id()` and check whether this matches the `user_id` column for the row we are trying to insert. If it does, then it will allow the user to insert the row, otherwise it will continue to deny.
+
+Click `Review` and then `Save policy`.
+
+
+## Step 9: Test your changes
+
+You can now sign up and you should see the following screen:
 
 ![SuperTokens App Authenticated](/img/guides/integrations/supertokens/supabase_app_authenticated_screen.png)
 
