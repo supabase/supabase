@@ -1,7 +1,4 @@
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
 import useSWR from 'swr'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
@@ -22,10 +19,6 @@ import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 
-dayjs.extend(customParseFormat)
-dayjs.extend(timezone)
-dayjs.extend(utc)
-
 const ProjectSettings = () => {
   const router = useRouter()
   const { ref } = router.query
@@ -35,8 +28,8 @@ const ProjectSettings = () => {
 
   return (
     <SettingsLayout title="Database">
-      <div className="content w-full h-full overflow-y-auto">
-        <div className="w-full px-4 py-4 max-w-5xl">
+      <div className="content h-full w-full overflow-y-auto">
+        <div className="w-full max-w-5xl px-4 py-4">
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
         </div>
@@ -64,7 +57,7 @@ const Usage: FC<any> = ({ project }) => {
             }
           >
             <Panel.Content>
-              <div className="flex space-x-3 items-center mb-4">
+              <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
                   loading={false}
                   value={'3h'}
@@ -73,7 +66,7 @@ const Usage: FC<any> = ({ project }) => {
                   onChange={setDateRange}
                 />
                 {dateRange && (
-                  <div className="flex space-x-2 items-center">
+                  <div className="flex items-center space-x-2">
                     <Typography.Text type="secondary">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
                     </Typography.Text>
@@ -207,11 +200,11 @@ const ResetDbPassword: FC<any> = () => {
     <>
       <Panel>
         <Panel.Content>
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+          <div className="grid grid-cols-1 items-center lg:grid-cols-2">
             <div>
               <Typography.Text className="block">Database password</Typography.Text>
               <div style={{ maxWidth: '420px' }}>
-                <p className="opacity-50 text-sm">
+                <p className="text-sm opacity-50">
                   You can use this password to connect directly to your Postgres database.
                 </p>
               </div>
@@ -234,7 +227,7 @@ const ResetDbPassword: FC<any> = () => {
         onCancel={() => setShowResetDbPass(false)}
         onConfirm={() => confirmResetDbPass()}
       >
-        <div className="w-full space-y-8 mb-8">
+        <div className="mb-8 w-full space-y-8">
           <Input
             type="password"
             onChange={onDbPassChange}
@@ -261,11 +254,11 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
   return (
     <Panel>
       <Panel.Content>
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+        <div className="grid grid-cols-1 items-center lg:grid-cols-2">
           <div>
             <Typography.Text className="block">SSL Connection</Typography.Text>
             <div style={{ maxWidth: '420px' }}>
-              <p className="opacity-50 text-sm">
+              <p className="text-sm opacity-50">
                 Use this cert when connecting to your database to prevent snooping and
                 man-in-the-middle attacks.
               </p>
@@ -291,7 +284,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   if (data?.error || error) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Error loading database settings</Typography.Title>
       </div>
     )
@@ -299,7 +292,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   if (!data) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Loading...</Typography.Title>
       </div>
     )
@@ -326,7 +319,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   return (
     <>
       <div className="">
-        <section className="space-y-6 mt-6">
+        <section className="mt-6 space-y-6">
           <Panel
             title={[
               <Typography.Title key="panel-title" level={5} className="mb-0">
@@ -368,7 +361,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
               <Input
                 layout="horizontal"
-                className="input-mono text-base table-input-cell"
+                className="input-mono table-input-cell text-base"
                 readOnly
                 copy
                 disabled
@@ -391,7 +384,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
       <div>
-        <section className="space-y-6 mt-6">
+        <section className="mt-6 space-y-6">
           <Panel
             title={
               <Typography.Title key="panel-title" level={5} className="mb-0">
