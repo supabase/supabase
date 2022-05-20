@@ -2,7 +2,7 @@
 
 Try it out: https://t.me/supabase_example_bot
 
-![demo](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/supabase_community/telegram_bot/supa_telegram_bot.gif?t=2022-05-20T05:27:04.904Z)
+![demo](./demo.gif)
 
 ## Deploy
 
