@@ -28,7 +28,16 @@ const ColumnType: FC<Props> = ({
   const isNativeDataType = POSTGRES_DATA_TYPES.includes(value)
 
   if (!isNativeDataType) {
-    return <Input readOnly disabled label="Type" layout="horizontal" value={value} />
+    return (
+      <Input
+        readOnly
+        disabled
+        label="Type"
+        layout="horizontal"
+        value={value}
+        descriptionText="Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio"
+      />
+    )
   }
 
   const inferIcon = (type: string) => {
@@ -59,15 +68,10 @@ const ColumnType: FC<Props> = ({
       value={value}
       size={size}
       error={error}
-      disabled={disabled || !isNativeDataType}
+      disabled={disabled}
       className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
       onChange={(value: string) => onOptionSelect(value)}
       optionsWidth={480}
-      descriptionText={
-        !isNativeDataType
-          ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
-          : ''
-      }
     >
       <Listbox.Option key="empty" value="" label="---">
         ---
