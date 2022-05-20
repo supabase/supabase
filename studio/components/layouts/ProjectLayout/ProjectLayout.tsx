@@ -92,6 +92,12 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const { ui } = useStore()
   const router = useRouter()
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const requiresPostgrestConnection =
+    [
+      '/project/[ref]/settings/general',
+      '/project/[ref]/reports',
+      '/project/[ref]/settings/database',
+    ].includes(router.pathname) === false
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
@@ -101,7 +107,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
-      ) : requiresDbConnection && isProjectOffline ? (
+      ) : requiresPostgrestConnection && isProjectOffline ? (
         <ConnectingState project={ui.selectedProject} />
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
