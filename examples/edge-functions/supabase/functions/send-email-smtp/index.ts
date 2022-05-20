@@ -7,6 +7,8 @@ import { SmtpClient } from 'https://deno.land/x/denomailer@0.12.0/mod.ts'
 
 const smtp = new SmtpClient()
 
+console.log(`Function "send-email-smtp" up and running!`)
+
 serve(async (req) => {
   await smtp.connect({
     hostname: Deno.env.get('SMTP_HOSTNAME')!,

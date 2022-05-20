@@ -91,6 +91,14 @@ supabase functions deploy hello-world
 This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform.
 The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
+:::note
+
+By default Edge Functions require a valid JWT to be send in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
+
+If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks), or [chat bot webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
+
+:::
+
 ### Executing Remote Functions
 
 You can execute Edge Functions using curl. Copy the curl command from the Dashboard. It should look like this:
