@@ -21,6 +21,7 @@ const ColumnDefaultValue: FC<Props> = ({
   enumTypes = [],
   onUpdateField = () => {},
 }) => {
+  console.log('DefaultValue', columnFields)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[columnFields.format] ?? []
 
   // If selected column type is a user-defined enum, show a dropdown list of options
@@ -55,6 +56,7 @@ const ColumnDefaultValue: FC<Props> = ({
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
       placeholder="NULL"
       value={columnFields?.defaultValue ?? ''}
+      format={columnFields?.format}
       suggestionsHeader="Suggested expressions"
       suggestions={suggestions}
       onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
