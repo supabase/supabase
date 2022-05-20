@@ -112,6 +112,7 @@ const InputField: FC<Props> = ({
         actions={
           <Button
             type="default"
+            htmlType="button"
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
             icon={<IconLink />}
           >
