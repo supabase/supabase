@@ -19,5 +19,5 @@ import dayjs from 'dayjs'
  * Instead of using the default parsing. We should use CustomParseFormat.
  */
 export const getDateFromIsoString = (dateString?: string): dayjs.Dayjs | undefined => {
-  return dateString ? dayjs(dateString, 'YYYY-MM-DD HH:mm:ss.SSSSSSZZ') : undefined
+  return dateString ? dayjs(dateString, 'YYYY-MM-DD HH:mm:ss.SSSZZ') : undefined
 }
