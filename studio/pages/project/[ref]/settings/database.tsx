@@ -219,11 +219,7 @@ const ResetDbPassword: FC<any> = () => {
       </Panel>
       <Modal
         hideFooter
-        header={
-          <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Reset database password</h5>
-          </div>
-        }
+        header={<h5 className="text-scale-1200 text-sm">Reset database password</h5>}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
