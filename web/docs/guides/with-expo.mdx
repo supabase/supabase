@@ -153,13 +153,27 @@ cd supabaseReactNative
 
 Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
-yarn add @supabase/supabase-js
-yarn add react-native-elements
-yarn add react-native-safe-area-context
-yarn add @react-native-async-storage/async-storage
-yarn add react-native-url-polyfill
+npm install @supabase/supabase-js react-native-elements react-native-safe-area-context @react-native-async-storage/async-storage react-native-url-polyfill
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js react-native-elements react-native-safe-area-context @react-native-async-storage/async-storage react-native-url-polyfill
+```
+
+</TabItem>
+</Tabs>
 
 Now let's create a helper file to initialize the Supabase client.
 We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -439,9 +453,27 @@ export default function App() {
 
 Once that's done, run this in a terminal window:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
+```bash
+npm run start
+```
+
+</TabItem>
+<TabItem value="YARN">
+
 ```bash
 yarn start
 ```
+
+</TabItem>
+</Tabs>
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
