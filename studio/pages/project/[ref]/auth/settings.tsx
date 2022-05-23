@@ -1021,6 +1021,40 @@ const Settings = () => {
               />
             </>
           )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_BOXYHQSAML_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_BOXYHQSAML_ENABLED && (
+                <a
+                  className="pl-4 text-scale-900"
+                  href="https://boxyhq.com/docs/jackson/saml-flow#31-authorize"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_BOXYHQSAML_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_BOXYHQSAML_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_BOXYHQSAML_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+              <AutoField
+                name="EXTERNAL_BOXYHQSAML_URL"
+                showInlineError
+                errorMessage="Please enter the URL for BOXYHQSAML service"
+              />
+            </>
+          )}          
         </SchemaFormPanel>
       </div>
 
