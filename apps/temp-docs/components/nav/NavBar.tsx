@@ -33,7 +33,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
 
   return (
     <nav
-      className={`dark:border-scale-400 sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter dark:bg-scale-200`}
+      className={`dark:border-scale-400 dark:bg-scale-200 sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter`}
     >
       <div className="flex items-center">
         <button className="mr-2 block lg:hidden">
@@ -57,9 +57,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           {pageLinks.map((p) => (
             <li key={`${p.text}-${p.link}`}>
               <Link href={p.link}>
-                <a
-                  className={`text-sm ${p.active ? 'text-brand-900' : 'text-scale-1100'}`}
-                >
+                <a className={`text-sm ${p.active ? 'text-brand-900' : 'text-scale-1100'}`}>
                   {p.text}
                 </a>
               </Link>
@@ -67,7 +65,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           ))}
           <li>
             <Link href="https://app.supabase.io">
-              <a className={`text-sm text-scale-1100`}>Login</a>
+              <a className={`text-scale-1100 text-sm`}>Login</a>
             </Link>
           </li>
         </ul>
