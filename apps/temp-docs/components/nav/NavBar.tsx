@@ -33,7 +33,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
 
   return (
     <nav
-      className={`dark:border-dark sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter dark:bg-gray-800`}
+      className={`dark:border-scale-400 sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter dark:bg-scale-200`}
     >
       <div className="flex items-center">
         <button className="mr-2 block lg:hidden">
@@ -44,7 +44,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <a>
               <Image
                 className="cursor-pointer"
-                src={isDarkMode ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`}
+                src={isDarkMode ? `/supabase-dark.svg` : `/supabase-light.svg`}
                 width={200}
                 height={32}
                 alt="Supabase Logo"
@@ -58,7 +58,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             <li key={`${p.text}-${p.link}`}>
               <Link href={p.link}>
                 <a
-                  className={`${p.active ? 'text-gray-800 dark:text-gray-200' : 'text-brand-600'}`}
+                  className={`text-sm ${p.active ? 'text-brand-900' : 'text-scale-1100'}`}
                 >
                   {p.text}
                 </a>
@@ -67,7 +67,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           ))}
           <li>
             <Link href="https://app.supabase.io">
-              <a className={`text-brand-600`}>Login</a>
+              <a className={`text-sm text-scale-1100`}>Login</a>
             </Link>
           </li>
         </ul>
@@ -75,12 +75,12 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
       <div className={`${styles.navRight} flex items-center`}>
         <Link href="https://github.com/supabase/supabase">
           <a>
-            <IconGitHub className="text-brand-600" />
+            <IconGitHub className="text-scale-1100" />
           </a>
         </Link>
         <Link href="https://twitter.com/supabase">
           <a>
-            <IconTwitter className="text-brand-600" />
+            <IconTwitter className="text-scale-1100" />
           </a>
         </Link>
         <Input
