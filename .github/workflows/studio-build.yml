@@ -1,10 +1,10 @@
 name: Studio Build
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - studio
     paths:
       - 'studio/**'
 jobs:
