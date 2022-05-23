@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  ReferenceLine,
   Cell,
   ResponsiveContainer,
 } from 'recharts'
@@ -272,6 +273,8 @@ export function BarChart({
                       />
                     ))}
                   </Bar>
+
+                  <ReferenceLine y={8000000000} label="8GB Included" stroke="red" strokeDasharray="3 3" />
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (

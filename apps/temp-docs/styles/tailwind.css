@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply bg-white dark:bg-[#1c1c1c] !important;
+}
+
+::selection {
+  background-color: #6ee7b7;
+  color: #333 !important;
+}
