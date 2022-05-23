@@ -3,7 +3,6 @@ import Subscription from './Subscription/Subscription'
 
 import PlanSelection from './PlanSelection/PlanSelection'
 import ProUpgrade from './ProUpgrade/ProUpgrade'
-import EnterpriseRequest from './EnterpriseRequest'
 import ExitSurvey from './ExitSurvey/ExitSurvey'
 import PaymentSummaryPanel from './PaymentSummaryPanel/PaymentSummaryPanel'
 import ComputeSizeSelection from './AddOns/ComputeSizeSelection'
@@ -19,7 +18,6 @@ export {
   Subscription,
   PlanSelection,
   ProUpgrade,
-  EnterpriseRequest,
   ExitSurvey,
   PaymentSummaryPanel,
   ComputeSizeSelection,

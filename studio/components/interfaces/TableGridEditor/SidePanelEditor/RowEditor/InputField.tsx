@@ -4,7 +4,7 @@ import { Button, Select, Input, IconLink, Typography, IconArrowRight } from '@su
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
-import { TEXT_TYPES, JSON_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.constants'
+import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
 
 interface Props {
   field: RowField
@@ -112,6 +112,7 @@ const InputField: FC<Props> = ({
         actions={
           <Button
             type="default"
+            htmlType="button"
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
             icon={<IconLink />}
           >
@@ -122,7 +123,7 @@ const InputField: FC<Props> = ({
     )
   }
 
-  if (includes(TIMESTAMP_TYPES, field.format)) {
+  if (includes(DATETIME_TYPES, field.format)) {
     return (
       <DateTimeInput
         name={field.name}

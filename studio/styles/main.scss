@@ -206,3 +206,10 @@ div.fixed.inset-0 {
   grid-column: 1/-1;
   justify-content: flex-start;
 }
+
+.multi-select {
+  button {
+    display: block;
+    width: 100%;
+  }
+}

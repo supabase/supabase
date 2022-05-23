@@ -1,7 +1,4 @@
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
 import useSWR from 'swr'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
@@ -23,10 +20,6 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { NextPageWithLayout } from 'types'
 
-dayjs.extend(customParseFormat)
-dayjs.extend(timezone)
-dayjs.extend(utc)
-
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
@@ -35,10 +28,12 @@ const ProjectSettings: NextPageWithLayout = () => {
   const project = ui.selectedProject
 
   return (
-    <div className="content h-full w-full overflow-y-auto">
-      <div className="w-full max-w-5xl px-4 py-4">
-        <Usage project={project} />
-        <GeneralSettings projectRef={ref} />
+    <div>
+      <div className="content h-full w-full overflow-y-auto">
+        <div className="w-full max-w-5xl px-4 py-4">
+          <Usage project={project} />
+          <GeneralSettings projectRef={ref} />
+        </div>
       </div>
     </div>
   )

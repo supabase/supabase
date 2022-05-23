@@ -74,13 +74,9 @@ const BillingUpdate: NextPageWithLayout = () => {
   }
 
   const onSelectPlan = (plan: any) => {
-    if (plan.name === 'Enterprise') {
-      return router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
-    } else if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
-      return router.push(`/project/${projectRef}/settings/billing/update/pro`)
-    }
-
-    if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
+    if (plan.id === STRIPE_PRODUCT_IDS.PRO) {
+      router.push(`/project/${projectRef}/settings/billing/update/pro`)
+    } else if (plan.id === STRIPE_PRODUCT_IDS.FREE) {
       setSelectedPlan(plan)
       setShowConfirmDowngrade(true)
     }
