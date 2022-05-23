@@ -108,13 +108,13 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
               <p className="text-scale-1200 text-sm">
                 Your project might be facing resource constraints and hence is having trouble
                 connecting. You can verify this by checking your{' '}
-                <span className="text-green-1000">
+                <span className="text-brand-1000">
                   <Link href={`/project/${project.ref}/settings/database`}>
                     <a>database's health</a>
                   </Link>
                 </span>{' '}
                 or your remaining daily disk IO budget via a{' '}
-                <span className="text-green-1000">
+                <span className="text-brand-1000">
                   <Link href={`/project/${project.ref}/reports`}>
                     <a>customizable project report</a>
                   </Link>
@@ -123,7 +123,7 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
               </p>
               <p className="text-scale-1200 text-sm">
                 If your project is facing resource constraints, you can{' '}
-                <span className="text-green-1000">
+                <span className="text-brand-1000">
                   <Link href={`/project/${project.ref}/reports`}>
                     <a>upgrade</a>
                   </Link>
@@ -133,7 +133,7 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
               <p className="text-scale-1200 text-sm">
                 However, if your project still fails to connect thereafter, you can open a support
                 ticket{' '}
-                <span className="text-green-1000">
+                <span className="text-brand-1000">
                   <Link href={`/support/new?ref=${project.ref}`}>here</Link>
                 </span>
                 .
