@@ -31,7 +31,7 @@ import {
   generateUpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore from './RolesStore'
+import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
 import PublicationStore, { IPublicationStore } from './PublicationStore'
@@ -52,7 +52,7 @@ export interface IMetaStore {
   schemas: ISchemaStore
 
   hooks: IPostgresMetaInterface<any>
-  roles: IPostgresMetaInterface<any>
+  roles: IRolesStore
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
@@ -119,7 +119,6 @@ export default class MetaStore implements IMetaStore {
 
   connectionString?: string
   baseUrl: string
-  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -135,8 +134,7 @@ export default class MetaStore implements IMetaStore {
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
-    this.baseUrl = `/api/pg-meta/${projectRef}`
-    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
+    this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -172,7 +170,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.queryBaseUrl}/query`
+      const url = `${this.baseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 

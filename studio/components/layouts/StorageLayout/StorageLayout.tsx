@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect } from 'react'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -123,4 +123,4 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
   )
 }
 
-export default observer(StorageLayout)
+export default withAuth(observer(StorageLayout))

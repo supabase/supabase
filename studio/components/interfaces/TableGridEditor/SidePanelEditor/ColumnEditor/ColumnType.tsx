@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight } from '@supabase/ui'
+import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
 import { PostgresType } from '@supabase/postgres-meta'
-import { POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
+import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
 
 interface Props {
@@ -25,6 +25,21 @@ const ColumnType: FC<Props> = ({
   showLabel = true,
   onOptionSelect = () => {},
 }) => {
+  const isNativeDataType = POSTGRES_DATA_TYPES.includes(value)
+
+  if (!isNativeDataType) {
+    return (
+      <Input
+        readOnly
+        disabled
+        label="Type"
+        layout="horizontal"
+        value={value}
+        descriptionText="Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio"
+      />
+    )
+  }
+
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
@@ -67,13 +82,14 @@ const ColumnType: FC<Props> = ({
       </Listbox.Option>
 
       {enumTypes.length > 0 ? (
+        // @ts-ignore
         enumTypes.map((enumType: PostgresType) => (
           <Listbox.Option
             key={enumType.name}
             value={enumType.name}
             label={enumType.name}
             addOnBefore={() => {
-              return <div className="mx-1 w-2 h-2 rounded-full bg-scale-1200" />
+              return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
             }}
           >
             <div className="flex items-center space-x-4">
@@ -88,7 +104,7 @@ const ColumnType: FC<Props> = ({
           value="no-enums"
           label="no-enums"
           addOnBefore={() => {
-            return <div className="mx-1 w-2 h-2 rounded-full bg-gray-500" />
+            return <div className="mx-1 h-2 w-2 rounded-full bg-gray-500" />
           }}
         >
           <div className="flex items-center space-x-4">

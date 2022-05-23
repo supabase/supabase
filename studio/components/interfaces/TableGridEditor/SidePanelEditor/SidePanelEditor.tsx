@@ -55,7 +55,7 @@ const SidePanelEditor: FC<Props> = ({
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
-    resolve: any
+    onComplete: Function
   ) => {
     let saveRowError = false
     if (isNewRecord) {
@@ -96,7 +96,7 @@ const SidePanelEditor: FC<Props> = ({
       }
     }
 
-    resolve()
+    onComplete()
     if (!saveRowError) {
       setIsEdited(false)
       closePanel()
@@ -270,7 +270,7 @@ const SidePanelEditor: FC<Props> = ({
         }}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>
