@@ -218,30 +218,52 @@ const ResetDbPassword: FC<any> = () => {
         </Panel.Content>
       </Panel>
       <Modal
-        title="Reset database password"
+        hideFooter
+        header={
+          <div className="flex items-baseline gap-2">
+            <h5 className="text-scale-1200 text-sm">Reset database password</h5>
+          </div>
+        }
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingPassword}
         onCancel={() => setShowResetDbPass(false)}
-        onConfirm={() => confirmResetDbPass()}
       >
-        <div className="mb-8 w-full space-y-8">
-          <Input
-            type="password"
-            onChange={onDbPassChange}
-            error={passwordStrengthWarning}
-            // @ts-ignore
-            descriptionText={
-              <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore}
-                passwordStrengthMessage={passwordStrengthMessage}
-                password={password}
-              />
-            }
-          />
-        </div>
+        <Modal.Content>
+          <div className="w-full space-y-8 py-8">
+            <Input
+              type="password"
+              onChange={onDbPassChange}
+              error={passwordStrengthWarning}
+              // @ts-ignore
+              descriptionText={
+                <PasswordStrengthBar
+                  passwordStrengthScore={passwordStrengthScore}
+                  passwordStrengthMessage={passwordStrengthMessage}
+                  password={password}
+                />
+              }
+            />
+          </div>
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
+          <div className="flex space-x-2 pb-2">
+            <Button type="default" onClick={() => setShowResetDbPass(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              loading={isUpdatingPassword}
+              disabled={isUpdatingPassword}
+              onClick={() => confirmResetDbPass()}
+            >
+              Reset password
+            </Button>
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )
