@@ -65,6 +65,14 @@ Using the query plan analyzer on your expensive queries:
 explain analyze <query-statement-here>;
 ```
 
-Using the query plan analyzer to optimize your queries is a massive topic in itself, with [a number](https://www.postgresql.org/docs/current/using-explain.html) [of online](https://theartofpostgresql.com/explain-plan-visualizer/) [resources] (https://wiki.postgresql.org/wiki/Using_EXPLAIN) [available](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze).
+Be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+
+Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
+
+- [Official docs.](https://www.postgresql.org/docs/current/using-explain.html)
+- [The Art of PostgreSQL.](https://theartofpostgresql.com/explain-plan-visualizer/)
+- [Postgres Wiki.](https://wiki.postgresql.org/wiki/Using_EXPLAIN)
+- [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
+
 
 You can also pair the information available from `pg_stat_statements` with the detailed system metrics made available [via our metrics endpoint](/docs/guides/platform/metrics) in order to better understand the behaviour of your DB and the queries you're executing against it.
