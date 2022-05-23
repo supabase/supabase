@@ -8,7 +8,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="border-t border-scale-400 bg-white p-10 dark:bg-scale-200"
+      className="border-scale-400 dark:bg-scale-200 border-t bg-white p-10"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -44,7 +44,10 @@ const Footer = () => {
               </svg>
             </a>
 
-            <a href="https://discord.supabase.com/" className="text-scale-900 hover:text-scale-1100">
+            <a
+              href="https://discord.supabase.com/"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">Discord</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
                 <path
@@ -55,7 +58,10 @@ const Footer = () => {
               </svg>
             </a>
 
-            <a href="https://youtube.com/c/supabase" className="text-scale-900 hover:text-scale-1100">
+            <a
+              href="https://youtube.com/c/supabase"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">Youtube</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 576 512" aria-hidden="true">
                 <path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z" />
@@ -68,7 +74,7 @@ const Footer = () => {
             {footer.map((segment: any) => {
               return (
                 <div key={`footer_${segment.title}`}>
-                  <h3 className="text-sm text-scale-900 dark:text-scale-800">{segment.title}</h3>
+                  <h3 className="text-scale-900 dark:text-scale-800 text-sm">{segment.title}</h3>
                   <ul className="mt-4 space-y-2">
                     {segment.links.map((link: any, idx: number) => (
                       <li key={`${segment.title}_link_${idx}`}>
@@ -97,7 +103,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="dark:border-scale-400 mt-32 flex justify-between border-t pt-8">
-        <p className="dark:text-dark-400 mb-0 self-center text-sm text-scale-800">
+        <p className="dark:text-dark-400 text-scale-800 mb-0 self-center text-sm">
           &copy; {new Date().getFullYear()} Supabase.
         </p>
       </div>
