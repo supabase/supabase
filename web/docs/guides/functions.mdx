@@ -280,9 +280,9 @@ We recommend developing “fat functions”. This means that you should develop 
     │   |   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
     │ 	│   └── supabaseClient.ts # Supabase client with ANON key
     │ 	├── function-one # use hyphens to name functions
-    │ 	│ 	└── index.ts
+    │ 	│   └── index.ts
     │ 	└── function-two
-    │ 			└── index.ts
+    │       └── index.ts
     ├── migrations
     └── config.toml
 ```
@@ -300,5 +300,5 @@ Edge Functions are Experimental. They aren't going away, but there will be break
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `POST` responses.
-  - Supabase Functions does not support HTML responses.
+  - Supabase Functions only supports `POST` requests.
+  - Supabase Functions do not support HTML responses.
