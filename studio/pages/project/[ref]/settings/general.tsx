@@ -14,14 +14,16 @@ import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
-    <div className="content h-full w-full overflow-y-auto">
-      <div className="mx-auto w-full">
-        <GeneralSettings />
+    <div>
+      <div className="content h-full w-full overflow-y-auto">
+        <div className="mx-auto w-full">
+          <GeneralSettings />
+        </div>
       </div>
     </div>
   )

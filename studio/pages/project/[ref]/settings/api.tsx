@@ -38,13 +38,13 @@ import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
 import { useStore, useJwtSecretUpdateStatus } from 'hooks'
 
+import Panel from 'components/to-be-cleaned/Panel'
+import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+
 import { SettingsLayout } from 'components/layouts'
 import Flag from 'components/ui/Flag/Flag'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-
-import Panel from 'components/to-be-cleaned/Panel'
-import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import MultiSelect from 'components/ui/MultiSelect'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { NextPageWithLayout } from 'types'
 
@@ -225,13 +225,12 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <article className="max-w-4xl p-4">
-        <DisplayApiSettings key="DisplayAPISettings" />
+      <div className="max-w-4xl p-4">
         <section>
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Configuration
+                Project URL
               </Typography.Title>
             }
           >
@@ -247,6 +246,21 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
             </Panel.Content>
+          </Panel>
+        </section>
+
+        <section>
+          <DisplayApiSettings key="DisplayAPISettings" />
+        </section>
+
+        <section>
+          <Panel
+            title={
+              <Typography.Title level={5} className="mb-0">
+                JWT Settings
+              </Typography.Title>
+            }
+          >
             <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
               <Input
                 label="JWT Secret"
@@ -345,8 +359,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
+
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
-      </article>
+      </div>
 
       <ConfirmModal
         danger
@@ -495,7 +510,7 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
       >
         <div className="space-y-6 py-4">
           {schema.length >= 1 && (
-            <MultiSelectUI
+            <MultiSelect
               options={schema}
               // value must be passed as array of strings
               value={updates.db_schema.replace(/ /g, '').split(',')}

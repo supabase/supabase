@@ -49,6 +49,7 @@ export const generateColumnFieldFromPostgresColumn = (
   table: PostgresTable
 ): ColumnField => {
   const { primary_keys } = table
+  // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table)
   const isArray = column?.data_type === 'ARRAY'
@@ -194,19 +195,20 @@ const formatArrayToPostgresArray = (arrayString: string) => {
   return arrayString.replaceAll('[', '{').replaceAll(']', '}')
 }
 
-const unescapeLiteral = (value: string) => {
+export const unescapeLiteral = (value: string) => {
   if (!value) return value
 
   const splits = value.split("'::")
   if (splits.length <= 1) return value
 
-  // Handle timezones differently
-  if (value.includes('timezone')) {
-    const timezoneSplits = splits[0].split('(')
-    const timezone = timezoneSplits[1].slice(1)
-    const expressionSplits = splits[1].split(',')
-    const expression = expressionSplits[1].slice(0, expressionSplits[1].length - 1)
-    return `(${expression} at time zone '${timezone}')`
+  // Handle timezones
+  if (value.toLowerCase().includes('time zone')) {
+    return `${splits[0].toLowerCase()}')`
+  }
+
+  // Handle json
+  if (value.toLowerCase().includes('json')) {
+    return splits[0].slice(1)
   }
 
   let temp = splits[0].slice(1).replace("'{", '{')
@@ -216,21 +218,21 @@ const unescapeLiteral = (value: string) => {
     value.endsWith('bigint[]') ||
     value.endsWith('smallint[]')
   ) {
-    temp = temp.replaceAll('{', '[')
-    temp = temp.replaceAll('}', ']')
+    temp = temp.replace(/{/g, '[')
+    temp = temp.replace(/}/g, ']')
     return temp
   } else {
     const matches = temp.match(/\{([^{}]+)\}/g)
     if (matches) {
       const array = [...matches]
       array.forEach((x) => {
-        let _x = x.replaceAll('{', '{"')
-        _x = _x.replaceAll('}', '"}')
-        _x = _x.replaceAll(',', '","')
+        let _x = x.replace(/{/g, '{"')
+        _x = _x.replace(/}/g, '"}')
+        _x = _x.replace(/,/g, '","')
         temp = temp.replace(x, _x)
       })
-      temp = temp.replaceAll('{', '[')
-      temp = temp.replaceAll('}', ']')
+      temp = temp.replace(/{/g, '[')
+      temp = temp.replace(/}/g, ']')
     }
     return temp
   }

@@ -109,13 +109,23 @@ const TableEditor: FC<Props> = ({
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
+        const columns = tableFields.columns.map((column) => {
+          if (column.foreignKey) {
+            return {
+              ...column,
+              foreignKey: { ...column.foreignKey, source_table_name: tableFields.name },
+            }
+          }
+          return column
+        })
         const configuration = {
           tableId: table?.id,
           importContent,
           isRLSEnabled: tableFields.isRLSEnabled,
           isDuplicateRows: isDuplicateRows,
         }
-        saveChanges(payload, tableFields.columns, isNewRecord, configuration, resolve)
+
+        saveChanges(payload, columns, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -131,7 +141,7 @@ const TableEditor: FC<Props> = ({
       visible={visible}
       // @ts-ignore
       header={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
-      className={`transition-all ease-in duration-100 ${isImportingSpreadsheet ? ' mr-32' : ''}`}
+      className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
       customFooter={
