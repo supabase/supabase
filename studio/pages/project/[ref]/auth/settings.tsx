@@ -453,6 +453,10 @@ const Settings = () => {
             'EXTERNAL_ZOOM_ENABLED',
             'EXTERNAL_ZOOM_CLIENT_ID',
             'EXTERNAL_ZOOM_SECRET',
+            'EXTERNAL_BOXYHQSAML_ENABLED',
+            'EXTERNAL_BOXYHQSAML_CLIENT_ID',
+            'EXTERNAL_BOXYHQSAML_SECRET',
+            'EXTERNAL_BOXYHQSAML_URL'
           ])}
           model={{
             EXTERNAL_APPLE_ENABLED: model.EXTERNAL_APPLE_ENABLED,
@@ -509,6 +513,10 @@ const Settings = () => {
             EXTERNAL_ZOOM_ENABLED: model.EXTERNAL_ZOOM_ENABLED,
             EXTERNAL_ZOOM_CLIENT_ID: model.EXTERNAL_ZOOM_CLIENT_ID || undefined,
             EXTERNAL_ZOOM_SECRET: model.EXTERNAL_ZOOM_SECRET || undefined,
+            EXTERNAL_BOXYHQSAML_ENABLED: model.EXTERNAL_BOXYHQSAML_ENABLED,
+            EXTERNAL_BOXYHQSAML_CLIENT_ID: model.EXTERNAL_BOXYHQSAML_CLIENT_ID || 'dummy',
+            EXTERNAL_BOXYHQSAML_SECRET: model.EXTERNAL_BOXYHQSAML_SECRET || undefined,
+            EXTERNAL_BOXYHQSAML_URL: model.EXTERNAL_BOXYHQSAML_URL || undefined
           }}
           onChangeModel={(model) => setExternalProvidersModel(model)}
           onReset={() => onFormReset()}

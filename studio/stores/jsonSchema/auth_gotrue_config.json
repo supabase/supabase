@@ -26,6 +26,7 @@
     "EXTERNAL_SPOTIFY_ENABLED",
     "EXTERNAL_WORKOS_ENABLED",
     "EXTERNAL_ZOOM_ENABLED",
+    "EXTERNAL_BOXYHQSAML_ENABLED",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
     "SMS_OTP_EXP",
@@ -310,6 +311,22 @@
       "title": "Zoom secret",
       "type": "string"
     },
+    "EXTERNAL_BOXYHQSAML_ENABLED": {
+      "title": "BoxyHQSAML enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_BOXYHQSAML_CLIENT_ID": {
+      "title": "BoxyHQSAML client ID",
+      "type": "string"
+    },
+    "EXTERNAL_BOXYHQSAML_SECRET": {
+      "title": "BoxyHQSAML secret",
+      "type": "string"
+    },
+    "EXTERNAL_BOXYHQSAML_URL": {
+      "title": "BoxyHQSAML URL",
+      "type": "string"
+    },   
     "SMTP_ADMIN_EMAIL": {
       "title": "SMTP admin email",
       "type": "string"
