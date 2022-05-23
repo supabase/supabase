@@ -1,12 +1,13 @@
 import { isEmpty } from 'lodash'
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react'
 import { Button, IconSearch, Input } from '@supabase/ui'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
+import { NextPageWithLayout } from 'types'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -14,7 +15,7 @@ import { PostgresRole } from '@supabase/postgres-meta'
 
 const PageContext = createContext(null)
 
-const AuthPoliciesPage = ({}) => {
+const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
   const PageState: any = useLocalObservable(() => ({
     meta: null,
     project: null,
@@ -61,17 +62,12 @@ const AuthPoliciesPage = ({}) => {
 
   return (
     <PageContext.Provider value={PageState}>
-      <AuthLayout title="Auth">
-        <div className="p-4">
-          <AuthPolicies />
-        </div>
-      </AuthLayout>
+      <div className="p-4">{children}</div>
     </PageContext.Provider>
   )
 }
-export default withAuth(observer(AuthPoliciesPage))
 
-const AuthPolicies = observer(() => {
+const AuthPoliciesPage: NextPageWithLayout = () => {
   const PageState: any = useContext(PageContext)
 
   const { meta } = useStore()
@@ -111,7 +107,15 @@ const AuthPolicies = observer(() => {
       </div>
     </>
   )
-})
+}
+
+AuthPoliciesPage.getLayout = (page) => (
+  <AuthLayout title="Auth">
+    <AuthPoliciesLayout>{page}</AuthPoliciesLayout>
+  </AuthLayout>
+)
+
+export default observer(AuthPoliciesPage)
 
 const AuthPoliciesTables = observer(() => {
   const { ui, meta } = useStore()
