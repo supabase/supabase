@@ -18,6 +18,7 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
@@ -33,6 +34,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         <div className="w-full max-w-5xl px-4 py-4">
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
+          <ConnectionPooling />
         </div>
       </div>
     </div>
@@ -321,10 +323,11 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   const { project } = data
   const formModel = toJS(project)
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const uriConnString =
+const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
