@@ -37,9 +37,6 @@ const Subscription: FC<Props> = ({
   const { ui } = useStore()
   const isOrgOwner = ui.selectedOrganization?.is_owner
 
-  // const nativeBilling = useFlag('nativeBilling')
-  const subscriptionStats = useSubscriptionStats()
-
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0

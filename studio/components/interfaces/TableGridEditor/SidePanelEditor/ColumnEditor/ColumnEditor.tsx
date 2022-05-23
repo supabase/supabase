@@ -54,7 +54,7 @@ const ColumnEditor: FC<Props> = ({
 }) => {
   const isNewRecord = isUndefined(column)
   const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
-  const foreignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+  const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -184,7 +184,7 @@ const ColumnEditor: FC<Props> = ({
           )}
           <ColumnForeignKey
             column={columnFields}
-            originalForeignKey={foreignKey}
+            originalForeignKey={originalForeignKey}
             onSelectEditRelation={() => setIsEditingRelation(true)}
             onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
           />
@@ -263,7 +263,6 @@ const ColumnEditor: FC<Props> = ({
           <ForeignKeySelector
             tables={tables}
             column={columnFields}
-            foreignKey={foreignKey}
             visible={isEditingRelation}
             closePanel={() => setIsEditingRelation(false)}
             saveChanges={saveColumnForeignKey}

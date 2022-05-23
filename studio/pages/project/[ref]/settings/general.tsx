@@ -9,26 +9,29 @@ import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { NextPageWithLayout } from 'types'
 
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   return (
-    <SettingsLayout title="General">
-      <div className="content w-full h-full overflow-y-auto">
+    <div>
+      <div className="content h-full w-full overflow-y-auto">
         <div className="mx-auto w-full">
           <GeneralSettings />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
+
+export default observer(ProjectSettings)
 
 interface RestartServerButtonProps {
   projectId: number
@@ -97,7 +100,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="p-4 max-w-4xl">
+    <article className="max-w-4xl p-4">
       <section>
         <SchemaFormPanel
           title="General"
@@ -112,7 +115,7 @@ const GeneralSettings = observer(() => {
       <section>
         <Panel
           title={
-            <h5 key="panel-title" className="text-base mb-0">
+            <h5 key="panel-title" className="mb-0 text-base">
               Infrastructure
             </h5>
           }
@@ -126,15 +129,15 @@ const GeneralSettings = observer(() => {
               layout="horizontal"
             />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
             <Input readOnly disabled value={project?.region} label="Region" layout="horizontal" />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="w-full flex items-center justify-between">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+            <div className="flex w-full items-center justify-between">
               <div>
                 <p>Restart server</p>
                 <div style={{ maxWidth: '420px' }}>
-                  <p className="opacity-50 text-sm">
+                  <p className="text-sm opacity-50">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
@@ -154,7 +157,7 @@ const GeneralSettings = observer(() => {
               title="Deleting this project will also remove your database."
             >
               <div className="flex flex-col">
-                <p className="block mb-4">
+                <p className="mb-4 block">
                   Make sure you have made a backup if you want to keep your data.
                 </p>
                 <ProjectDeleteModal project={project} />
