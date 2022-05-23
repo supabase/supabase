@@ -4,6 +4,9 @@ title: 'Auth0'
 description: 'Swap out Supabase authentication with Auth0. Let Auth0 handle tokens and signing users in and out, while Supabase enforces authorization policies with Row Level Security (RLS).'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This guide steps through building a Next.js application with Auth0 and Supabase. We configure Auth0 to handle authenticating users and managing tokens, while writing our authorization logic in Supabase - using Row Level Security policies.
 
 > Note: This guide is heavily inspired by the [Using Next.js and Auth0 with Supabase](https://auth0.com/blog/using-nextjs-and-auth0-with-supabase/) article on [Auth0's blog](https://auth0.com/blog/). Check it out for a practical step-by-step guide on integrating Auth0 and Supabase.
@@ -129,17 +132,53 @@ SUPABASE_SIGNING_SECRET=get-from-supabase-dashboard
 
 Restart your Next.js development server to read in the new values from `.env.local`.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm run dev
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn dev
+```
+
+</TabItem>
+</Tabs>
 
 ## Step 6: Install Auth0 Next.js library
 
 Install the `@auth0/nextjs-auth0` library.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
-npm i @auth0/nextjs-auth0
+npm install @auth0/nextjs-auth0
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @auth0/nextjs-auth0
+```
+
+</TabItem>
+</Tabs>
 
 Create a new file `pages/api/auth/[...auth0].js` and add:
 
@@ -221,9 +260,27 @@ We can do that using Auth0's `afterCallback` function, which gets called anytime
 
 Install the `jsonwebtoken` library.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
-npm i jsonwebtoken
+npm install jsonwebtoken
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add jsonwebtoken
+```
+
+</TabItem>
+</Tabs>
 
 Update `pages/api/auth/[...auth0].js` with the following:
 

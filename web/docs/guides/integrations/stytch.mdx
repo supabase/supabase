@@ -4,6 +4,9 @@ title: 'Stytch'
 description: "Build a Next.js application powered by password-less authentication from Stytch, and Supabase's Row Level Security (RLS)."
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 In this guide we will build a simple expense tracker web application using Stytch, Supabase, and Next.js.
 
 [Stytch](https://stytch.com?utm_source=supabase&utm_medium=guide) provides an all-in-one platform for passwordless auth. Stytch makes it easy for you to embed passwordless solutions into your websites and apps for better security, better conversion rates, and a better end user experience. Their easy-to-use SDKs and direct API access allows for maximum control and customization. In this example we will use [Email magic links](https://stytch.com/products/email-magic-links?utm_source=supabase&utm_medium=guide) to create and log in our users, and Session management. There is an additional, optional step to enable [Google One Tap](https://stytch.com/blog/improving-conversion-with-google-one-tap?utm_source=supabase&utm_medium=guide) which is an especially high-converting Google OAuth sign-up and login flow.
@@ -106,9 +109,27 @@ SUPABASE_SIGNING_SECRET=GET_FROM_SUPABASE_DASHBOARD
 
 Start your Next.js development server to read in the new values from `.env.local`.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm run dev
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn dev
+```
+
+</TabItem>
+</Tabs>
 
 You should have a running Next.js application on `localhost:3000`.
 
@@ -120,9 +141,27 @@ Now we will replace the default Next.js home page with a login UI. We will use t
 
 Install the `@stytch/stytch-react` library.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @stytch/stytch-react
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @stytch/stytch-react
+```
+
+</TabItem>
+</Tabs>
 
 In the root directory, create a new folder named `components` and file in that folder named `/StytchLogin.js`. Within this file, paste the snippet below. This will configure, and style the Stytch React component to use Email magic links.
 
@@ -241,15 +280,51 @@ However, if you click the link in the email you will get a 404. We need to build
 
 To make authentication easier we will use the Stytch Node.js library. Run
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install stytch
 ```
 
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add stytch
+```
+
+</TabItem>
+</Tabs>
+
 Additionally, we will need to store the authenticated session in a cookie. Run
+
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
 
 ```bash
 npm install cookies-next
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add cookies-next
+```
+
+</TabItem>
+</Tabs>
 
 Create a new folder named `utils` and inside a file named`stytchLogic.js` with the following contents
 
@@ -405,15 +480,51 @@ Now that we have a working login flow with persistent authentication it is time 
 
 First, install the Supabase client:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @supabase/supabase-js
 ```
 
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
+
 In order to pass an authenticated `user_id` to Supabase we will package it within a JWT. Install jsonwebtoken:
+
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
 
 ```bash
 npm install jsonwebtoken
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add jsonwebtoken
+```
+
+</TabItem>
+</Tabs>
 
 Create a new file `utils/supabase.js` and add the following:
 

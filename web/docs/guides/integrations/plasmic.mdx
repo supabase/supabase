@@ -4,6 +4,9 @@ title: 'Plasmic'
 description: 'Get started with Supabase and Plasmic, an open-source framework for building internal tools.'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 In this guide, we will show you how to build a crowd-sourced Pokemon Pokedex, by connecting **Supabase**, an open source Firebase backend alternative, with **Plasmic**, a visual builder for the web. While many users leverage Plasmic to quickly launch and iterate on landing pages, in this tutorial we’ll show just how powerful Plasmic can be as a general-purpose visual builder for React, which can be used to design and implement fully featured read-write applications.
 
 You can play with the live demo here:  
@@ -53,19 +56,57 @@ We have a working code example for you [here](https://github.com/plasmicapp/plas
 
 First, clone the repo to your development machine and install the dependencies.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
+```bash
+git clone git@github.com:plasmicapp/plasmic.git
+cd plasmic/examples/supabase-demo/
+npm install
+```
+
+</TabItem>
+<TabItem value="YARN">
+
 ```bash
 git clone git@github.com:plasmicapp/plasmic.git
 cd plasmic/examples/supabase-demo/
 yarn install
 ```
 
+</TabItem>
+</Tabs>
+
 Copy `.env.example` to `.env.local`, which will store the environment variables when running a local development server. Add your Supabase project’s URL and public key, which you can find in the `API` tab on the left pane of your Supabase dashboard.
 
 Now run the dev server, which listens at `http://localhost:3000`
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
+```bash
+npm run dev
+```
+
+</TabItem>
+<TabItem value="YARN">
+
 ```bash
 yarn dev
 ```
+
+</TabItem>
+</Tabs>
 
 ## Step 3: Explore the existing application
 
@@ -152,9 +193,27 @@ For your convenience, the following video shows you how to create the page end-t
 
 If you have been running your development server this whole time, you’ll see that we have been automatically fetching and rebuilding your site as you make changes in Plasmic Studio. If you need to restart your dev server, just run:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
+```bash
+npm run dev
+```
+
+</TabItem>
+<TabItem value="YARN">
+
 ```bash
 yarn dev
 ```
+
+</TabItem>
+</Tabs>
 
 See the results at `http://localhost:3000/gallery`.
 

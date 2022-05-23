@@ -4,6 +4,9 @@ title: 'Clerk'
 description: 'This guide explains how to connect your Supabase database with Clerk, a powerful authentication provider built for the modern web.'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This guide explains how to connect your Supabase database with [Clerk](https://clerk.dev), an authentication provider built for the modern web.
 
 Clerk authenticates users, manages session tokens, and provides user management functionality that can be used in combination with the authorization logic available in Supabase through PostgreSQL Row Level Security (RLS) policies.
@@ -70,9 +73,27 @@ After setting those three environment variables, you should be able to start up 
 
 Install the JavaScript client for Supabase with:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @supabase/supabase-js
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
 
 Initialize the Supabase client by passing it the environment variables.
 
@@ -92,9 +113,27 @@ export default supabase;
 
 Install the latest Clerk Next.js SDK by running the following:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @clerk/nextjs@next
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @clerk/nextjs@next
+```
+
+</TabItem>
+</Tabs>
 
 **Note**: There is also a Clerk library for [React](https://github.com/clerkinc/javascript/tree/main/packages/react) and [React Native with Expo](https://github.com/clerkinc/javascript/tree/main/packages/expo).
 

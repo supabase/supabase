@@ -4,6 +4,9 @@ title: 'Prisma'
 description: 'Connect your Supabase postgres database to your Prisma project.'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This guide explains how to quickly connect the Postgres database provided by Supabase to a Prisma project.
 
 [Prisma](https://prisma.io) is an [open source](https://github.com/prisma/prisma) next-generation ORM. It consists of the following parts:
@@ -41,9 +44,27 @@ curl -L https://pris.ly/quickstart | tar -xz --strip=2 quickstart-main/typescrip
 
 You can now navigate into the directory and install the project’s dependencies:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 cd starter && npm install
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+cd starter && yarn install
+```
+
+</TabItem>
+</Tabs>
 
 ### A look at the project’s structure
 

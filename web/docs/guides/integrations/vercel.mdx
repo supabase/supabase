@@ -4,6 +4,9 @@ title: 'Vercel'
 description: The fastest way to get up and running with an application that uses Supabase is with Vercel's Next.js starter and Supabase integration.
 ---
 
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 This guide steps through using Vercel's dashboard to create a Next.js project integrated with Supabase. To further streamline the process, we will be using the Next.js starter template, which can be automatically forked to a new GitHub repo, without leaving the dashboard!
 
 If you don’t have a Vercel account, create one [here](https://vercel.com/signup).
@@ -119,9 +122,27 @@ export default function Home() {
 
 Run a local development server.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm run dev
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn dev
+```
+
+</TabItem>
+</Tabs>
 
 Navigate to `http://localhost:3000` to confirm the project is "working".
 
@@ -161,9 +182,27 @@ This will create a `.env` file containing our Supabase environment variables. Re
 
 Install the `supabase-js` library.
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
-npm i @supabase/supabase-js
+npm install @supabase/supabase-js
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
 
 Create a new file called `/utils/supabase.js` and add the following.
 
