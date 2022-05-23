@@ -2,10 +2,14 @@ TEAM
 
 Supabase is 100% remote.
 
+TEAM
+
+Supabase is 100% remote.
+
 Alaister Young
-Angelico de los Reyes
 Amy Q
 Andrew Smith
+Angelico de los Reyes
 Ant Wilson
 Ariuna K
 Beng Eu
@@ -37,6 +41,7 @@ Nikita Kotlyarov
 Oli R
 Paul Copplestone
 Ramiro Nuñez Dosio
+Rodrigo Mansueli Nunes
 Rory Wilding
 Shane Rice
 Stanislav M
@@ -46,6 +51,28 @@ Thor Schaeff
 Tyler Shukert
 TzeYiing L
 Wen Bo Xie
+____________
+
+JOBS
+
+If you are interested in working with us check out the open roles here: https://about.supabase.com/careers
+
+___________
+
+
+TECHNOLOGIES
+
+Supabase would not be possible without the work of some other amazing open source contributors.
+
+- Postgres - https://www.postgresql.org/docs/devel/git.html
+- PostgREST - https://github.com/PostgREST
+- Kong - https://github.com/kong/
+- Next.js - https://nextjs.org/
+- Tailwind CSS - https://tailwindcss.com/
+- Phoenix - https://www.phoenixframework.org/
+- Docusaurus - https://v2.docusaurus.io/
+- GoTrue - https://github.com/netlify/gotrue
+
 ____________
 
 JOBS
