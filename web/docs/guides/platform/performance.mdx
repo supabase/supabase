@@ -32,7 +32,7 @@ FATAL: remaining connection slots are reserved for non-replication superuser con
 
 In such a scenario, you can consider either upgrading to a larger compute add-on, or alternatively, by manually configuring the database for a higher number of connections.
 
-You can configure Postgresql by executing the following statement, followed by a server restart:
+You can configure Postgres by executing the following statement, followed by a server restart:
 
 ```sql
 alter system set max_connections = '<val-here>';
