@@ -276,7 +276,7 @@ const FileExplorerHeader = ({
             size="tiny"
             icon={<IconRefreshCw />}
             type="text"
-            loading={PageState.usersLoading}
+            loading={loading.isLoading}
             onClick={refreshData}
           >
             Reload
