@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
@@ -18,8 +18,9 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import { NextPageWithLayout } from 'types'
 
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -27,18 +28,20 @@ const ProjectSettings = () => {
   const project = ui.selectedProject
 
   return (
-    <SettingsLayout title="Database">
+    <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full max-w-5xl px-4 py-4">
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
+
+export default observer(ProjectSettings)
 
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)

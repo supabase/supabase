@@ -17,15 +17,15 @@ import {
   IconPlus,
 } from '@supabase/ui'
 
-import { withAuth } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import BaseLayout from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { NextPageWithLayout } from 'types'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -36,18 +36,20 @@ const DEFAULT_CHART_ROW_COUNT = 4
 /*
  * PageLayout is used to setup layout - as usual it will requires inject global store
  */
-const PageLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   return (
-    <BaseLayout>
-      <div className="max-w-7xl mx-auto w-full my-8">
+    <>
+      <div className="mx-auto my-8 w-full max-w-7xl">
         <Reports />
       </div>
       <EditReportModal />
-    </BaseLayout>
+    </>
   )
 }
 
-export default withAuth(observer(PageLayout))
+PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+
+export default observer(PageLayout)
 
 const Reports = () => {
   const router = useRouter()
@@ -319,10 +321,10 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-scale-1200">Reports</h1>
+      <h1 className="text-scale-1200 text-xl">Reports</h1>
 
-      <div className="flex mb-4 items-center space-x-3 justify-between">
-        <div className="flex space-x-3 items-center">
+      <div className="mb-4 flex items-center justify-between space-x-3">
+        <div className="flex items-center space-x-3">
           {/* @ts-ignore */}
           <DateRangePicker
             onChange={handleDateRangePicker}
@@ -332,21 +334,21 @@ const Reports = () => {
           />
 
           {startDate && endDate && (
-            <div className="hidden lg:flex space-x-1 items-center ">
-              <span className="text-sm text-scale-1100">
+            <div className="hidden items-center space-x-1 lg:flex ">
+              <span className="text-scale-1100 text-sm">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
               <span className="text-scale-900">
                 <IconArrowRight size={12} />
               </span>
-              <span className="text-sm text-scale-1100">
+              <span className="text-scale-1100 text-sm">
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
           )}
         </div>
 
-        <div className="flex space-x-2 items-center">
+        <div className="flex items-center space-x-2">
           {hasEdits && (
             <div className="hidden xl:inline-block">
               <Badge color="green">There are unsaved changes</Badge>
@@ -376,7 +378,7 @@ const Reports = () => {
       </div>
 
       {config.layout.length <= 0 ? (
-        <div className="border-2 dark:border-dark border-dashed p-16 rounded flex items-center justify-center min-h-full">
+        <div className="dark:border-dark flex min-h-full items-center justify-center rounded border-2 border-dashed p-16">
           <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
             <Button as="span" type="default" iconRight={<IconPlus />}>
               {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
@@ -384,7 +386,7 @@ const Reports = () => {
           </Dropdown>
         </div>
       ) : (
-        <div className="relative flex-grow max-w-7xl mb-16">
+        <div className="relative mb-16 max-w-7xl flex-grow">
           {config && startDate && endDate && (
             // @ts-ignore
             <GridResize
@@ -416,7 +418,7 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
         <div
           key={x.id}
           data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
-          className="relative react-grid-layout__report-item bg-panel-body-light dark:bg-panel-body-dark border border-panel-border-light dark:border-panel-border-dark shadow-sm rounded px-6 py-4 hover:border-green-900 dark:hover:border-green-900 group"
+          className="react-grid-layout__report-item bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light dark:border-panel-border-dark group relative rounded border px-6 py-4 shadow-sm hover:border-green-900 dark:hover:border-green-900"
         >
           <ChartHandler
             startDate={startDate}
@@ -427,10 +429,10 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
             label={x.label}
             customDateFormat={'MMM D, YYYY'}
           />
-          <div className="absolute top-3 inset-x-0 ">
+          <div className="absolute inset-x-0 top-3 ">
             <div className="flex justify-around">
-              <div className="w-24 h-3 space-y-2 flex flex-col cursor-move">
-                <div className="transition-all border-4 border-dotted border-green-900 h-3 w-full hidden opacity-50 group-hover:block hover:opacity-100"></div>
+              <div className="flex h-3 w-24 cursor-move flex-col space-y-2">
+                <div className="hidden h-3 w-full border-4 border-dotted border-green-900 opacity-50 transition-all hover:opacity-100 group-hover:block"></div>
               </div>
             </div>
           </div>

@@ -1,10 +1,9 @@
-import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Modal } from '@supabase/ui'
 
-import { withAuth, useStore, useSubscriptionStats } from 'hooks'
+import { useStore, useSubscriptionStats } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
@@ -12,8 +11,9 @@ import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { PlanSelection, StripeSubscription } from 'components/interfaces/Billing'
 import Connecting from 'components/ui/Loading/Loading'
+import { NextPageWithLayout } from 'types'
 
-const BillingUpdate: NextPage = () => {
+const BillingUpdate: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
@@ -101,7 +101,7 @@ const BillingUpdate: NextPage = () => {
   }
 
   return (
-    <BillingLayout>
+    <>
       <div className="mx-auto my-10 max-w-6xl px-6">
         <PlanSelection
           visible={!selectedPlan || (selectedPlan && showConfirmDowngrade)}
@@ -156,8 +156,10 @@ const BillingUpdate: NextPage = () => {
           </Modal.Content>
         </div>
       </Modal>
-    </BillingLayout>
+    </>
   )
 }
 
-export default withAuth(observer(BillingUpdate))
+BillingUpdate.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
+
+export default observer(BillingUpdate)

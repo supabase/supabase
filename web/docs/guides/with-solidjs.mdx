@@ -173,9 +173,27 @@ cd supabase-solid
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @supabase/supabase-js
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
 
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -245,7 +263,7 @@ export default function Auth() {
               value={email()}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="button block" aria-live="polite">
+            <button type="submit" className="button block" aria-live="polite">
               Send magic link
             </button>
           </form>
@@ -359,7 +377,7 @@ const Account = (props) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button type="submit" className="button block primary" disabled={loading()}>
               Update profile
             </button>
           </div>
@@ -407,9 +425,27 @@ export default () => {
 
 Once that's done, run this in a terminal window:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm start
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn start
+```
+
+</TabItem>
+</Tabs>
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 

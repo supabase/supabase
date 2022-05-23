@@ -1,15 +1,12 @@
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 
-import { withAuth } from 'hooks'
 import { AuthLayout } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-const Authentication: NextPage = () => {
-  return (
-    <AuthLayout title="Authentication">
-      <>{/* <h1>Use this as a template for authentication pages</h1> */}</>
-    </AuthLayout>
-  )
+const Authentication: NextPageWithLayout = () => {
+  return <>{/* <h1>Use this as a template for authentication pages</h1> */}</>
 }
 
-export default withAuth(observer(Authentication))
+Authentication.getLayout = (page) => <AuthLayout title="Authentication">{page}</AuthLayout>
+
+export default observer(Authentication)
