@@ -245,7 +245,7 @@ export default function Auth() {
               value={email()}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="button block" aria-live="polite">
+            <button type="submit" className="button block" aria-live="polite">
               Send magic link
             </button>
           </form>
@@ -359,7 +359,7 @@ const Account = (props) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button type="submit" className="button block primary" disabled={loading()}>
               Update profile
             </button>
           </div>
