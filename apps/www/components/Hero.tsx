@@ -16,13 +16,13 @@ const Hero = () => {
                 <div className="md:mx-auto md:max-w-2xl lg:col-span-6 lg:flex lg:items-center lg:text-left">
                   <div
                     className="
-                    space-y-12 sm:mx-auto md:w-3/4 lg:mx-0 
+                    space-y-12 sm:mx-auto md:w-3/4 lg:mx-0
                     lg:w-full"
                   >
                     <div>
                       <h1
                         className="
-                        text-scale-1200 
+                        text-scale-1200
                         text-xl sm:leading-none lg:text-4xl
                         xl:text-5xl
                         "
@@ -53,21 +53,26 @@ const Hero = () => {
                     <div className="flex flex-col gap-4">
                       <small className="small text-xs">backed by</small>
                       <div className="w-full sm:max-w-lg lg:ml-0">
-                        <div className="flex flex-wrap items-center justify-start">
+                        <div className="flex flex-wrap sm:flex-nowrap items-center justify-start gap-y-8">
                           <img
-                            className="mb-5 h-8 pr-5 sm:h-10 md:pr-10"
+                            className="h-8 pr-5 sm:h-8 md:pr-10"
                             src={`${basePath}/images/logos/yc--grey.png`}
                             alt="Y Combinator"
                           />
                           <img
-                            className="relative mb-5 h-5 pr-5 sm:h-7 md:pr-10"
+                            className="relative h-5 pr-5 sm:h-5 md:pr-10"
                             src={`${basePath}/images/logos/mozilla--grey.png`}
                             alt="Mozilla"
                           />
                           <img
-                            className="relative mb-5 h-5 pr-5 sm:h-7 md:pr-10"
+                            className="relative h-5 pr-5 sm:h-5 md:pr-10"
                             src={`${basePath}/images/logos/coatue.png`}
                             alt="Coatue"
+                          />
+                          <img
+                            className="relative h-6 pr-5 sm:h-6 md:pr-10"
+                            src={`${basePath}/images/logos/felicis.png`}
+                            alt="Felicis"
                           />
                         </div>
                       </div>

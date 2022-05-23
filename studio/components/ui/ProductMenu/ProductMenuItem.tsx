@@ -1,10 +1,11 @@
-import { FC, ReactNode } from 'react'
 import Link from 'next/link'
-import { Menu } from '@supabase/ui'
+import { FC, ReactNode } from 'react'
+import { Button, IconExternalLink, Menu } from '@supabase/ui'
 
 interface Props {
   name: string | ReactNode
   isActive: boolean
+  isExternal?: boolean
   icon?: ReactNode
   action?: ReactNode
   url?: string
@@ -16,6 +17,7 @@ interface Props {
 const ProductMenuItem: FC<Props> = ({
   name = '',
   isActive,
+  isExternal,
   icon,
   action,
   url = '',
@@ -38,6 +40,18 @@ const ProductMenuItem: FC<Props> = ({
   )
 
   if (url) {
+    if (isExternal) {
+      return (
+        <Link href={url}>
+          <a target="_blank">
+            <Button block className="!justify-start" type="text" size="small" icon={icon}>
+              {name}
+            </Button>
+          </a>
+        </Link>
+      )
+    }
+
     return (
       <Link href={url}>
         <a className="block" target={target}>

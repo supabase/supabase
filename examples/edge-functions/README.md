@@ -10,6 +10,8 @@ The function examples are located in [`./supabase/functions`](./supabase/functio
 
 - [`browser-with-cors`](./supabase/functions/browser-with-cors/index.ts): Handle CORS headers for function invocations from browser environments.
 - [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts): Retrieve data from an authenticated user via RLS.
+- [`send-email-smtp`](./supabase/functions/send-email-smtp/index.ts): Send an email using SMTP credentials.
+- [`telegram-bot`](./supabase/functions/telegram-bot/index.ts): Webhook handler for Telegram bots using [grammY](https://grammy.dev/).
 
 ## Develop locally
 

@@ -21,6 +21,7 @@ interface Props {
   disabled?: boolean
   className?: string
   value: string
+  format?: string
   suggestionsHeader?: string
   suggestionsWidth?: number
   suggestions: Suggestion[]
@@ -37,8 +38,7 @@ const InputWithSuggestions: FC<Props> = ({
   disabled = false,
   className = '',
   value = '',
-  suggestionsHeader = 'Suggestions',
-  suggestionsWidth,
+  format,
   suggestions = [],
   onChange = () => {},
   onSelectSuggestion = () => {},
@@ -75,7 +75,7 @@ const InputWithSuggestions: FC<Props> = ({
         size={size}
         layout={layout}
         disabled={disabled}
-        className={className}
+        className={`${className} ${format?.includes('json') ? 'input-mono' : ''}`}
         type="text"
         value={value}
         onChange={onInputChange}
@@ -95,7 +95,7 @@ const InputWithSuggestions: FC<Props> = ({
                       onClick={() => onSelectSuggestion(suggestion)}
                     >
                       <div className="text-sm">{suggestion.name}</div>
-                      <div className="text-xs text-scale-900">{suggestion.description}</div>
+                      <div className="text-scale-900 text-xs">{suggestion.description}</div>
                     </Dropdown.Item>
                   ))}
                 </>
