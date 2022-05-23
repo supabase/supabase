@@ -40,7 +40,7 @@
   {
     "imgUrl": "images/to-do-app.jpg",
     "title": "Todo list with Vue.js",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list",
+    "url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list",
     "description": "Build a simple todo list with Vue and Supabase.",
     "icons": [
       {
