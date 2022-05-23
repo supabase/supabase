@@ -52,7 +52,7 @@ Configuring the number of PgBouncer connections is not supported at this time.
 
 ## Examining Query Performance
 
-Each Supabase project comes with [the pg_stat_statements extension](https://www.postgresql.org/docs/14/pgstatstatements.html) enabled out of the box. This extension records query execution performance details that can be reviewed in order to find the queries that are e.g. taking the most time to execute, which you can then use in combination with the Postgresql query plan analyzer in order to come up with strategies for more efficient querying.
+Every Supabase project has [the pg_stat_statements extension](https://www.postgresql.org/docs/14/pgstatstatements.html) enabled by default. This extension records query execution performance details and is the best way to find queries that take the most time to execute. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
 
 Obtaining information from pg_stat_statements:
 ```sql
