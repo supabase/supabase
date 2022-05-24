@@ -78,14 +78,24 @@ const StorageExplorer = observer(({ bucket }) => {
     const currentFolder = openedFolders[currentFolderIdx]
 
     if (itemSearchString) {
-      await fetchFolderContents(
-        currentFolder.id,
-        currentFolder.name,
-        currentFolderIdx,
-        itemSearchString
-      )
-    } else if (currentFolder) {
-      await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+      if (!currentFolder) {
+        // At root of bucket
+        await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+      } else {
+        await fetchFolderContents(
+          currentFolder.id,
+          currentFolder.name,
+          currentFolderIdx,
+          itemSearchString
+        )
+      }
+    } else {
+      if (!currentFolder) {
+        // At root of bucket
+        await fetchFolderContents(bucket.id, bucket.name, -1)
+      } else {
+        await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+      }
     }
   }, [itemSearchString])
 
