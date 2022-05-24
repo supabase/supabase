@@ -389,7 +389,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Button>
             <Button
               type="primary"
-              disabled={customToken.length < 32}
+              disabled={!customToken.match(/^[a-zA-Z0-9-_]{32,}$/)}
               loading={isSubmittingJwtSecretUpdateRequest}
               onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
             >
