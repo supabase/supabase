@@ -8,7 +8,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="border-t border-gray-100 bg-white p-10 dark:border-gray-600 dark:bg-gray-800"
+      className="border-scale-400 dark:bg-scale-200 border-t bg-white p-10"
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -20,20 +20,20 @@ const Footer = () => {
             <a>
               <img
                 className="w-40"
-                src={isDarkMode ? `/docs/supabase-dark.svg` : `/docs/supabase-light.svg`}
+                src={isDarkMode ? `/supabase-dark.svg` : `/supabase-light.svg`}
                 alt="Supabase"
               />
             </a>
           </Link>
           <div className="flex space-x-5">
-            <a href="https://twitter.com/supabase" className="text-gray-300 hover:text-gray-400">
+            <a href="https://twitter.com/supabase" className="text-scale-900 hover:text-scale-1100">
               <span className="sr-only">Twitter</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
               </svg>
             </a>
 
-            <a href="https://github.com/supabase" className="text-gray-300 hover:text-gray-400">
+            <a href="https://github.com/supabase" className="text-scale-900 hover:text-scale-1100">
               <span className="sr-only">GitHub</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -44,7 +44,10 @@ const Footer = () => {
               </svg>
             </a>
 
-            <a href="https://discord.supabase.com/" className="text-gray-300 hover:text-gray-400">
+            <a
+              href="https://discord.supabase.com/"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">Discord</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 71 55" aria-hidden="true">
                 <path
@@ -55,7 +58,10 @@ const Footer = () => {
               </svg>
             </a>
 
-            <a href="https://youtube.com/c/supabase" className="text-gray-300 hover:text-gray-400">
+            <a
+              href="https://youtube.com/c/supabase"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">Youtube</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 576 512" aria-hidden="true">
                 <path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z" />
@@ -68,7 +74,7 @@ const Footer = () => {
             {footer.map((segment: any) => {
               return (
                 <div key={`footer_${segment.title}`}>
-                  <h3 className="text-sm text-gray-600 dark:text-gray-200">{segment.title}</h3>
+                  <h3 className="text-scale-900 dark:text-scale-800 text-sm">{segment.title}</h3>
                   <ul className="mt-4 space-y-2">
                     {segment.links.map((link: any, idx: number) => (
                       <li key={`${segment.title}_link_${idx}`}>
@@ -76,9 +82,9 @@ const Footer = () => {
                           href={link.url}
                           className={`text-sm ${
                             link.url
-                              ? 'text-gray-400 dark:text-gray-400'
-                              : 'text-gray-300 dark:text-gray-300'
-                          } hover:text-gray-900 dark:hover:text-gray-300`}
+                              ? 'text-scale-1000 dark:text-scale-1000'
+                              : 'text-scale-300 dark:text-scale-300'
+                          } hover:text-scale-900 dark:hover:text-scale-500`}
                         >
                           {link.text}
                           {!link.url && (
@@ -96,8 +102,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className="dark:border-dark mt-32 flex justify-between border-t pt-8">
-        <p className="dark:text-dark-400 mb-0 self-center text-base text-gray-400">
+      <div className="dark:border-scale-400 mt-32 flex justify-between border-t pt-8">
+        <p className="dark:text-dark-400 text-scale-800 mb-0 self-center text-sm">
           &copy; {new Date().getFullYear()} Supabase.
         </p>
       </div>
