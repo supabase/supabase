@@ -165,37 +165,55 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   }
 }
 
-export async function passwordStrength(value: string) {
+type PasswordStrengthResponse = {
+  message: string
+  warning: string | null
+  strength: number
+}
+export async function passwordStrength(value: string): Promise<PasswordStrengthResponse> {
   let message = ''
   let warning = ''
   let strength = 0
 
-  if (value && value !== '') {
-    if (value.length < 99){
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
-        const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
-
-        // set message :string
-        message = `${score} ${suggestions}`
-
-        // set strength :number
-        strength = result.score
-
-        // warning message for anything below 4 strength :string
-        if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-          warning = `${
-            result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
-          } You need a stronger password.`
-        }
-      }
-    } else {
-      message = `${PASSWORD_STRENGTH[0]} Passwords must be 99 or fewer characters.`
-      strength = 0;
-      warning = 'You need a shorter password.'
+  if (!value) {
+    return {
+      message,
+      warning,
+      strength,
     }
+  }
+
+  if (value.length >= 100) {
+    return {
+      message: `${PASSWORD_STRENGTH[0]} Passwords must be less than 100 characters long.`,
+      warning: 'You need a shorter password.',
+      strength: 0,
+    }
+  }
+
+  const { error, result } = await post(`${API_URL}/profile/password-check`, { password: value })
+  if (error) {
+    return {
+      message,
+      warning,
+      strength,
+    }
+  }
+
+  const score = (PASSWORD_STRENGTH as any)[result.score]
+  const suggestions = result.feedback?.suggestions ? result.feedback.suggestions.join(' ') : ''
+
+  // set message :string
+  message = `${score} ${suggestions}`
+
+  // set strength :number
+  strength = result.score
+
+  // warning message for anything below 4 strength :string
+  if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+    warning = `${
+      result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
+    } You need a stronger password.`
   }
 
   return {
