@@ -31,15 +31,15 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
             <IconLoader size={16} strokeWidth={2} className="animate-spin" />
           </Typography.Text>
           <Typography.Text>
-            <p className="text-sm ml-3">{loading.message}</p>
+            <p className="ml-3 text-sm">{loading.message}</p>
           </Typography.Text>
         </div>
       ) : (
-        <div className="cursor-pointer flex items-center">
+        <div className="flex cursor-pointer items-center">
           <Typography.Text>
-            <p className="text-sm ml-3">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+            <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           </Typography.Text>
-          <div className="ml-3 space-x-2 flex items-center transition opacity-0 group-hover:opacity-100">
+          <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
             <Button type="text" icon={<IconEdit2 />}>
               Navigate
             </Button>
@@ -77,11 +77,11 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
         <IconLoader size={16} strokeWidth={2} className="animate-spin" />
       </Typography.Text>
       <Typography.Text>
-        <p className="text-sm ml-3">{loading.message}</p>
+        <p className="ml-3 text-sm">{loading.message}</p>
       </Typography.Text>
     </div>
   ) : (
-    <div className="flex items-center ml-3">
+    <div className="ml-3 flex items-center">
       {formattedBreadcrumbs.map((crumb, idx) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && (
@@ -92,7 +92,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
           <Typography.Text>
             <p
               key={crumb.name}
-              className={`text-sm truncate ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
+              className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
               style={{ maxWidth: '6rem' }}
               onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
             >
@@ -198,16 +198,12 @@ const FileExplorerHeader = ({
     onSelectBreadcrumb(columnIndex)
   }
 
-  function refreshData() {
-    PageState.fetchData(1)
-  }
-
   return (
     <div
       className="
     bg-panel-header-light dark:bg-panel-header-dark
-    border-b border-panel-border-light dark:border-panel-border-dark
-    px-3 h-[40px] flex rounded-t-md items-center justify-between z-10"
+    border-panel-border-light dark:border-panel-border-dark z-10
+    flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -271,16 +267,6 @@ const FileExplorerHeader = ({
       {/* Actions */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-1">
-          <Button
-            className="mr-2"
-            size="tiny"
-            icon={<IconRefreshCw />}
-            type="text"
-            loading={loading.isLoading}
-            onClick={refreshData}
-          >
-            Reload
-          </Button>
           <Dropdown
             overlay={[
               <Dropdown.RadioGroup key="viewOptions" value={view} onChange={onChangeView}>
@@ -324,7 +310,7 @@ const FileExplorerHeader = ({
             </Button>
           </Dropdown>
         </div>
-        <div className="border-r border-panel-border-light dark:border-panel-border-dark h-6" />
+        <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
         <div className="flex items-center space-x-1">
           <div className="hidden">
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
@@ -350,7 +336,7 @@ const FileExplorerHeader = ({
         {/* Search: Disabled for now */}
         {view === STORAGE_VIEWS.LIST && (
           <>
-            <div className="border-r border-panel-border-light dark:border-panel-border-dark h-6" />
+            <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
             <div className="flex items-center">
               {isSearching ? (
                 <Input
@@ -361,7 +347,7 @@ const FileExplorerHeader = ({
                   actions={[
                     <IconX
                       key="close"
-                      className="text-white cursor-pointer mx-2"
+                      className="mx-2 cursor-pointer text-white"
                       size={'tiny'}
                       strokeWidth={2}
                       onClick={onCancelSearch}
