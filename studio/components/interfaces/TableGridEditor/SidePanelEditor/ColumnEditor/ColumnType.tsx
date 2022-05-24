@@ -83,31 +83,37 @@ const ColumnType: FC<Props> = ({
         ---
       </Listbox.Option>
 
+      {/*
+        Weird issue with Listbox here 
+        1. Can't do render conditionally (&&) within Listbox hence why using Fragment
+        2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
+           as selecting the enumType option will not render it in the Listbox component
+      */}
       {enumTypes.length > 0 ? (
-        <>
-          <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
-            User-defined Enumerated Types
-          </Listbox.Option>
-          {
-            // @ts-ignore
-            enumTypes.map((enumType: PostgresType) => (
-              <Listbox.Option
-                key={enumType.name}
-                value={enumType.name}
-                label={enumType.name}
-                addOnBefore={() => {
-                  return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
-                }}
-              >
-                <div className="flex items-center space-x-4">
-                  <p>{enumType.name}</p>
-                </div>
-              </Listbox.Option>
-            ))
-          }
-        </>
+        <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
+          User-defined Enumerated Types
+        </Listbox.Option>
       ) : (
-        // Listbox cannot have booleans within it, hence why return as fragment (and not use &&)
+        <></>
+      )}
+
+      {enumTypes.length > 0 ? (
+        // @ts-ignore
+        enumTypes.map((enumType: PostgresType) => (
+          <Listbox.Option
+            key={enumType.name}
+            value={enumType.name}
+            label={enumType.name}
+            addOnBefore={() => {
+              return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
+            }}
+          >
+            <div className="flex items-center space-x-4">
+              <p>{enumType.name}</p>
+            </div>
+          </Listbox.Option>
+        ))
+      ) : (
         <></>
       )}
 
