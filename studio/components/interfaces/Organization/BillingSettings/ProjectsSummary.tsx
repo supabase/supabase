@@ -1,13 +1,10 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { FC, useEffect } from 'react'
 import { IconChevronRight, IconLoader } from '@supabase/ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/to-be-cleaned/Panel'
-
-dayjs.extend(utc)
 
 interface ProjectSummaryProps {
   project: any
@@ -30,12 +27,12 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
   }, [error])
 
   return (
-    <div className="w-full px-6 py-3 flex items-center">
+    <div className="flex w-full items-center px-6 py-3">
       <div className="w-[25%]">
         <p className="text-sm">{project.name}</p>
       </div>
       {loading ? (
-        <div className="w-[75%] flex items-center justify-center">
+        <div className="flex w-[75%] items-center justify-center">
           <IconLoader size={14} className="animate-spin" />
         </div>
       ) : (
@@ -43,15 +40,15 @@ const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
           <div className="w-[20%]">
             <p className="text-sm">{subscription?.tier.name ?? ''}</p>
           </div>
-          <div className="w-[40%] space-x-2 flex items-center">
+          <div className="flex w-[40%] items-center space-x-2">
             <p className="text-sm">{dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}</p>
             <p className="text-sm">-</p>
             <p className="text-sm">{dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}</p>
           </div>
-          <div className="flex items-center justify-end w-[15%]">
+          <div className="flex w-[15%] items-center justify-end">
             <Link href={`/project/${project.ref}/settings/billing`}>
-              <a className="flex items-center space-x-2 group">
-                <p className="transition group-hover:opacity-100 opacity-0 text-sm">View details</p>
+              <a className="group flex items-center space-x-2">
+                <p className="text-sm opacity-0 transition group-hover:opacity-100">View details</p>
                 <IconChevronRight />
               </a>
             </Link>
@@ -72,7 +69,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
       <h4>Projects at a glance</h4>
       <Panel
         title={
-          <div className="w-full flex items-center">
+          <div className="flex w-full items-center">
             <div className="w-[25%]">
               <p className="text-sm opacity-50">Name</p>
             </div>
@@ -91,7 +88,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
         ))}
         {projects.length === 0 && (
           <Panel.Content>
-            <p className="text-sm text-scale-1100">No projects created yet</p>
+            <p className="text-scale-1100 text-sm">No projects created yet</p>
           </Panel.Content>
         )}
       </Panel>

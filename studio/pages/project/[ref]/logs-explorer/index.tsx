@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from '@supabase/ui'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import CodeEditor from 'components/ui/CodeEditor'
 import {
   DatePickerToFrom,
@@ -20,12 +19,12 @@ import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { LogsExplorerLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { UserContent } from 'types'
+import { NextPageWithLayout, UserContent } from 'types'
 import toast from 'react-hot-toast'
 import dayjs from 'dayjs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
-export const LogsExplorerPage: NextPage = () => {
+export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, q, ite, its } = router.query
   const [editorId, setEditorId] = useState<string>(uuidv4())
@@ -119,7 +118,7 @@ export const LogsExplorerPage: NextPage = () => {
   }
 
   return (
-    <LogsExplorerLayout>
+    <>
       <div className="flex h-full flex-grow flex-col gap-4">
         <div className="rounded border">
           <LogsQueryPanel
@@ -233,8 +232,10 @@ export const LogsExplorerPage: NextPage = () => {
           )}
         </Form>
       </Modal>
-    </LogsExplorerLayout>
+    </>
   )
 }
 
-export default withAuth(observer(LogsExplorerPage))
+LogsExplorerPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+
+export default observer(LogsExplorerPage)

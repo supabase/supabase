@@ -142,8 +142,8 @@ const ColumnManagement: FC<Props> = ({
 
   return (
     <>
-      <div className="w-full table-editor-columns space-y-4">
-        <div className="w-full flex items-center justify-between">
+      <div className="table-editor-columns w-full space-y-4">
+        <div className="flex w-full items-center justify-between">
           <Typography.Title level={5}>Columns</Typography.Title>
           {isNewRecord && (
             <>
@@ -194,21 +194,21 @@ const ColumnManagement: FC<Props> = ({
 
         <div className="space-y-2">
           {/* Headers */}
-          <div className="w-full flex px-3">
+          <div className="flex w-full px-3">
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%]">
-              <h5 className="text-xs text-scale-900">Name</h5>
+              <h5 className="text-scale-900 text-xs">Name</h5>
             </div>
             <div className="w-[25%]">
-              <h5 className="text-xs text-scale-900">Type</h5>
+              <h5 className="text-scale-900 text-xs">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-xs text-scale-900">Default Value</h5>
+              <h5 className="text-scale-900 text-xs">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-scale-900 text-xs">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -216,8 +216,8 @@ const ColumnManagement: FC<Props> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
-                      'border border-scale-200 ', //border
+                      'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                      'border-scale-200 border ', //border
                     ].join(' ')}
                   >
                     <span className="text-scale-1200 text-xs">
@@ -228,7 +228,7 @@ const ColumnManagement: FC<Props> = ({
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <h5 className="text-xs text-scale-900">Primary</h5>
+              <h5 className="text-scale-900 text-xs">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
@@ -244,7 +244,7 @@ const ColumnManagement: FC<Props> = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 bg-gray-400 rounded-md px-3 py-2 ${
+                    className={`space-y-2 rounded-md bg-gray-400 px-3 py-2 ${
                       isNewRecord ? '' : '-mx-3'
                     }`}
                   >
@@ -321,7 +321,6 @@ const ColumnManagement: FC<Props> = ({
       <ForeignKeySelector
         tables={tables}
         column={selectedColumnToEditRelation as ColumnField}
-        foreignKey={selectedColumnToEditRelation?.foreignKey}
         visible={!isUndefined(selectedColumnToEditRelation)}
         closePanel={() => setSelectedColumnToEditRelation(undefined)}
         saveChanges={saveColumnForeignKey}
