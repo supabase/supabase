@@ -25,17 +25,23 @@ const ColumnType: FC<Props> = ({
   showLabel = true,
   onOptionSelect = () => {},
 }) => {
-  const isNativeDataType = POSTGRES_DATA_TYPES.includes(value)
+  // @ts-ignore
+  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
+  const isAvailableType = value ? availableTypes.includes(value) : true
 
-  if (!isNativeDataType) {
+  if (!isAvailableType) {
     return (
       <Input
         readOnly
         disabled
-        label="Type"
+        label={showLabel ? 'Type' : ''}
         layout="horizontal"
         value={value}
-        descriptionText="Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio"
+        descriptionText={
+          showLabel
+            ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
+            : ''
+        }
       />
     )
   }
@@ -77,9 +83,19 @@ const ColumnType: FC<Props> = ({
         ---
       </Listbox.Option>
 
-      <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
-        User-defined Enumerated Types
-      </Listbox.Option>
+      {/*
+        Weird issue with Listbox here 
+        1. Can't do render conditionally (&&) within Listbox hence why using Fragment
+        2. Can't wrap these 2 components within a Fragment conditional (enumTypes.length)
+           as selecting the enumType option will not render it in the Listbox component
+      */}
+      {enumTypes.length > 0 ? (
+        <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
+          User-defined Enumerated Types
+        </Listbox.Option>
+      ) : (
+        <></>
+      )}
 
       {enumTypes.length > 0 ? (
         // @ts-ignore
@@ -98,19 +114,7 @@ const ColumnType: FC<Props> = ({
           </Listbox.Option>
         ))
       ) : (
-        <Listbox.Option
-          disabled
-          key="no-enums"
-          value="no-enums"
-          label="no-enums"
-          addOnBefore={() => {
-            return <div className="mx-1 h-2 w-2 rounded-full bg-gray-500" />
-          }}
-        >
-          <div className="flex items-center space-x-4">
-            <p>No enumerated types available</p>
-          </div>
-        </Listbox.Option>
+        <></>
       )}
 
       <Listbox.Option disabled value="header-2" label="header-2">
