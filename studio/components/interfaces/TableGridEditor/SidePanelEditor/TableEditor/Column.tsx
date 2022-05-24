@@ -107,7 +107,7 @@ const Column: FC<Props> = ({
             className="table-editor-column-type lg:gap-0 "
             disabled={!isUndefined(column.foreignKey)}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: '' })
+              onUpdateColumn({ format, defaultValue: null })
             }}
           />
         </div>
@@ -131,7 +131,7 @@ const Column: FC<Props> = ({
             suggestionsWidth={410}
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.name })
+              onUpdateColumn({ defaultValue: suggestion.value })
             }
           />
         </div>
