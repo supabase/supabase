@@ -16,24 +16,39 @@ const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
   return <div className="p-4">{children}</div>
 }
 
+/**
+ * Filter tables by table name and policy name
+ *
+ * @param tables list of tables
+ * @param policies list of policies
+ * @param keywords filter keywords
+ *
+ * @returns array of PostgresTable
+ */
 const onFilterTables = (
   tables: {
     name: string
-    policies: {
-      name: string
-    }[]
+  }[],
+  policies: {
+    name: string
+    table: string
   }[],
   keywords?: string
 ) => {
   if (!keywords) return tables.slice().sort((a: any, b: any) => a.name.localeCompare(b.name))
   else {
-    let filter = keywords.toLowerCase()
-    let stringSearch = (s: string) => s.toLowerCase().indexOf(filter) != -1
+    const filter = keywords.toLowerCase()
+    const stringSearch = (s: string) => s.toLowerCase().indexOf(filter) != -1
+    const filteredPolicies = policies.filter((p: { name: string; table: string }) =>
+      stringSearch(p.name)
+    )
     return tables
       .slice()
-      .filter((x: any) => {
-        let searchTableName = stringSearch(x.name)
-        let searchPolicyName = x.policies.some((p: any) => stringSearch(p.name))
+      .filter((x: { name: string }) => {
+        const searchTableName = stringSearch(x.name)
+        const searchPolicyName = filteredPolicies.some(
+          (p: { name: string; table: string }) => p.table === x.name
+        )
         return searchTableName || searchPolicyName
       })
       .sort((a: any, b: any) => a.name.localeCompare(b.name))
@@ -44,7 +59,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const [policiesFilter, setPoliciesFilter] = useState<string | undefined>(undefined)
   const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
-  const filteredTables = onFilterTables(publicTables, policiesFilter)
+  const policies = meta.policies.list()
+  const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
 
   return (
     <>
