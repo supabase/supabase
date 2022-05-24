@@ -1257,7 +1257,7 @@ pages:
       It's especially useful when the logic rarely changes - like password resets and updates.
       
       ```sql
-      create or replace function hello_world() as $$
+      create or replace function hello_world() returns text as $$
         select 'Hello world';
       $$ language sql;
       ```
