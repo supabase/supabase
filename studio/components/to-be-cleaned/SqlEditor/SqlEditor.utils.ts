@@ -1,7 +1,7 @@
 import { SqlSnippets, UserContent } from 'types'
 import { NEW_SQL_SNIPPET_SKELETON } from './SqlEditor.constants'
 
-export const createAqlSnippetSkeleton = ({
+export const createSqlSnippetSkeleton = ({
   name,
   sql,
   owner_id,
