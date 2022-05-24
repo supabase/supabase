@@ -64,7 +64,7 @@ const ColumnDefaultValue: FC<Props> = ({
       suggestions={suggestions}
       onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       onSelectSuggestion={(suggestion: Suggestion) =>
-        onUpdateField({ defaultValue: suggestion.name })
+        onUpdateField({ defaultValue: suggestion.value })
       }
     />
   )
