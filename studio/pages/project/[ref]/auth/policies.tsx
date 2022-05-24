@@ -64,7 +64,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <div>
             <Input
               size="small"
-              placeholder="Filter tables"
+              placeholder="Filter tables and policies"
               className="block w-full text-sm placeholder-gray-400"
               value={policiesFilter}
               onChange={(e) => setPoliciesFilter(e.target.value)}
