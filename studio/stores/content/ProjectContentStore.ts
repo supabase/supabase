@@ -260,16 +260,19 @@ export default class ProjectContentStore implements IProjectContentStore {
     return { data: created, error: null }
   }
 
-  async update(id: any, updates: any, type: UserContent['type']) {
+  async update(id: any, updates: any, type?: UserContent['type']) {
     try {
       const headers = {
         'Content-Type': 'application/json',
       }
       let payload = {
         ...updates,
-        type,
         id,
       }
+      if (type) {
+        payload.type = type
+      }
+
       const url = `${this.baseUrl}?id=${id}`
       const updated = await patch<UserContent[]>(url, payload, { headers })
       if (updated.error) throw updated.error

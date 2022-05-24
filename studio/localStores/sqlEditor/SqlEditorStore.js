@@ -358,10 +358,10 @@ class SqlEditorStore {
   }
 
   renameQuery(id, model) {
-    const found = this.tabs.find((x) => x.id == id)
+    const found = this.tabs.find((x) => x.id === id)
     found?.rename(model)
 
-    const favorite = this.favorites.find((x) => x.key == id)
+    const favorite = this.favorites.find((x) => x.key === id)
     favorite?.rename(model)
   }
 
