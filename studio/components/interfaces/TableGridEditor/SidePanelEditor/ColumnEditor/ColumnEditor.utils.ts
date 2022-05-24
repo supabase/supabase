@@ -33,7 +33,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     name: name || '',
     comment: '',
     format: format || '',
-    defaultValue: '',
+    defaultValue: null,
     foreignKey: undefined,
     isNullable: true,
     isUnique: false,
@@ -53,13 +53,14 @@ export const generateColumnFieldFromPostgresColumn = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table)
   const isArray = column?.data_type === 'ARRAY'
+
   return {
     foreignKey,
     id: column?.id ?? uuidv4(),
     name: column.name,
     comment: column?.comment ?? '',
     format: isArray ? column.format.slice(1) : column.format,
-    defaultValue: unescapeLiteral(column?.default_value as string) ?? ('' as any),
+    defaultValue: unescapeLiteral(column?.default_value as string),
     isArray: isArray,
     isNullable: column.is_nullable,
     isIdentity: column.is_identity,
@@ -75,7 +76,7 @@ export const generateCreateColumnPayload = (
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
-  const defaultValue = field.defaultValue.length === 0 ? null : field.defaultValue
+  const defaultValue = field.defaultValue
   const payload: CreateColumnPayload = {
     tableId,
     isIdentity,
@@ -105,7 +106,7 @@ export const generateUpdateColumnPayload = (
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
   // Only append the properties which are getting updated
-  const defaultValue = field.defaultValue.length === 0 ? null : field.defaultValue
+  const defaultValue = field.defaultValue
   const type = field.isArray ? `${field.format}[]` : field.format
   const comment = (field.comment?.length ?? '') === 0 ? null : field.comment
 

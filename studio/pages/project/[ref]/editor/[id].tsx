@@ -34,7 +34,8 @@ const TableEditorPage: NextPage = () => {
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
   const selectedTable = !isNaN(Number(id))
-    ? tables.find((table) => table.id === Number(id))
+    ? // @ts-ignore
+      tables.find((table) => table.id === Number(id))
     : tryParseJson(Base64.decode(id))
 
   useEffect(() => {
