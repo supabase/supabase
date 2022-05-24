@@ -57,8 +57,6 @@ const SidePanelEditor: FC<Props> = ({
     (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
   )
 
-  console.log(enumTypes)
-
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
