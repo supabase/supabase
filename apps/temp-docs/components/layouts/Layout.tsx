@@ -43,10 +43,10 @@ const DocsLayout = ({
         <div className="flex flex-row">
           <SideBar menuItems={menuItems} />
           <div className="mx-auto grid w-full max-w-7xl grid-cols-12">
-            <article className="prose dark:prose-dark col-span-8 max-w-none p-8">
+            <article className="prose dark:prose-dark dark:bg-scale-200 col-span-8 max-w-none p-8">
               {children}
             </article>
-            <div className="prose dark:prose-dark col-span-4 max-w-none p-8">
+            <div className="prose dark:bg-scale-200 col-span-4 max-w-none p-8">
               <h5>On this page</h5>
               {toc
                 ? toc.json.map((item: any) => {

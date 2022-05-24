@@ -6,6 +6,7 @@ import {
   Input,
   IconChevronLeft,
   IconChevronRight,
+  IconRefreshCw,
   IconColumns,
   IconChevronsDown,
   IconSearch,
@@ -197,6 +198,10 @@ const FileExplorerHeader = ({
     onSelectBreadcrumb(columnIndex)
   }
 
+  function refreshData() {
+    PageState.fetchData(1)
+  }
+
   return (
     <div
       className="
@@ -266,6 +271,16 @@ const FileExplorerHeader = ({
       {/* Actions */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-1">
+          <Button
+            className="mr-2"
+            size="tiny"
+            icon={<IconRefreshCw />}
+            type="text"
+            loading={loading.isLoading}
+            onClick={refreshData}
+          >
+            Reload
+          </Button>
           <Dropdown
             overlay={[
               <Dropdown.RadioGroup key="viewOptions" value={view} onChange={onChangeView}>

@@ -173,7 +173,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -189,7 +189,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>
