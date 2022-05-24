@@ -270,8 +270,8 @@ const StorageExplorer = observer(({ bucket }) => {
       ref={storageExplorerRef}
       className="
         bg-bg-primary-light dark:bg-bg-primary-dark
-        border border-panel-border-light dark:border-panel-border-dark
-        w-full h-full rounded-md flex flex-col"
+        border-panel-border-light dark:border-panel-border-dark flex
+        h-full w-full flex-col rounded-md border"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
