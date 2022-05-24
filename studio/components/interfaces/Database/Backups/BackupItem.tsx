@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconDownload, IconRewind } from '@supabase/ui'
+import { Badge, Button, IconDownload } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
