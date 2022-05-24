@@ -12,7 +12,7 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constan
 import CardButton from 'components/ui/CardButton'
 
 const TabWelcome = observer(() => {
-  const [SQL, QuickStart] = partition(SQL_TEMPLATES, { type: 'template' })
+  const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const handleNewQuery = useOptimisticSqlSnippetCreate()
 
@@ -28,7 +28,7 @@ const TabWelcome = observer(() => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {SQL.map((x) => (
+          {sql.map((x) => (
             <SqlCard
               key={x.title}
               title={x.title}
@@ -55,7 +55,7 @@ const TabWelcome = observer(() => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {QuickStart.map((x) => (
+          {quickStart.map((x) => (
             <SqlCard
               key={x.title}
               title={x.title}
