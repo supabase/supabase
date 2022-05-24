@@ -11,6 +11,16 @@ describe('ColumnEditor.utils: unescapeLiteral', () => {
     const value = unescapeLiteral(mockInput)
     expect(value).toStrictEqual('tomato')
   })
+  test('should return null properly', () => {
+    const mockInput = null
+    const value = unescapeLiteral(mockInput)
+    expect(value).toStrictEqual(null)
+  })
+  test('should return empty string properly', () => {
+    const mockInput = `''::text`
+    const value = unescapeLiteral(mockInput)
+    expect(value).toStrictEqual('')
+  })
   test('should return numerical arrays properly', () => {
     const mockInput = "'{1,2,3,4}'::integer[]"
     const value = unescapeLiteral(mockInput)
