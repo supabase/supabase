@@ -1,19 +1,20 @@
 import { observer } from 'mobx-react-lite'
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import { Templates } from 'components/interfaces/Authentication'
+import { NextPageWithLayout } from 'types'
 
-const Auth = () => {
+const TemplatesPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
   return (
-    <AuthLayout title="Auth">
-      <div className="p-4">
-        <Templates project={project} />
-      </div>
-    </AuthLayout>
+    <div className="p-4">
+      <Templates project={project} />
+    </div>
   )
 }
 
-export default withAuth(observer(Auth))
+TemplatesPage.getLayout = (page) => <AuthLayout title="Auth">{page}</AuthLayout>
+
+export default observer(TemplatesPage)

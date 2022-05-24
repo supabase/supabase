@@ -1,15 +1,19 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState } from 'react'
 import { find, isUndefined } from 'lodash'
 import { Query, Dictionary } from '@supabase/grid'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { Modal } from '@supabase/ui'
+import {
+  PostgresRelationship,
+  PostgresTable,
+  PostgresColumn,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-
-import { Modal } from '@supabase/ui'
 
 interface Props {
   selectedSchema: string
@@ -49,13 +53,15 @@ const SidePanelEditor: FC<Props> = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list()
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
 
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
-    resolve: any
+    onComplete: Function
   ) => {
     let saveRowError = false
     if (isNewRecord) {
@@ -96,7 +102,7 @@ const SidePanelEditor: FC<Props> = ({
       }
     }
 
-    resolve()
+    onComplete()
     if (!saveRowError) {
       setIsEdited(false)
       closePanel()
@@ -270,7 +276,7 @@ const SidePanelEditor: FC<Props> = ({
         }}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>

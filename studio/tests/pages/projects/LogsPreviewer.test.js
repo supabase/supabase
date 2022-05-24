@@ -1,3 +1,8 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
+
 // mock the fetch function
 jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
