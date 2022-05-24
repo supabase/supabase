@@ -6,7 +6,6 @@ import { PostgresTable } from '@supabase/postgres-meta'
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'
 import { RowField } from './RowEditor.types'
 import {
-  DATE_FORMAT,
   JSON_TYPES,
   NUMERICAL_TYPES,
   DATETIME_TYPES,
@@ -24,9 +23,9 @@ export const generateRowFields = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
   return table.columns.map((column) => {
-    const defaultValue: string = (column?.default_value as string) ?? ''
+    const defaultValue = column?.default_value as string | null
     const value =
-      isNewRecord && defaultValue.includes('now()')
+      isNewRecord && defaultValue?.includes('now()')
         ? nowDateTimeValue(column.format)
         : isUndefined(row)
         ? ''
@@ -76,7 +75,7 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.isIdentity || field.defaultValue) return
-    if (!field.isNullable && !field.value) {
+    if (!field.isNullable && !field.value && field.defaultValue === null) {
       errors[field.name] = `Please assign a value for this field`
     }
   })
@@ -106,7 +105,7 @@ export const generateRowFieldsWithoutColumnMeta = (row: any): RowField[] => {
 const parseValue = (originalValue: string, format: string, dataType: string) => {
   try {
     if (originalValue === null || originalValue.length === 0) {
-      return ''
+      return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
     } else if (typeof originalValue === 'object') {
