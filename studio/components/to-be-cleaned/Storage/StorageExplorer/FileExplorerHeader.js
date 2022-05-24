@@ -17,6 +17,7 @@ import {
   IconLoader,
   Typography,
 } from '@supabase/ui'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY } from '../Storage.constants.ts'
 
 const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
@@ -125,11 +126,15 @@ const FileExplorerHeader = ({
 }) => {
   const debounceDuration = 300
   const [isEditingPath, setIsEditingPath] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
 
   const uploadButtonRef = useRef(null)
   const previousBreadcrumbs = useRef(null)
+
+  const storageExplorerStore = useStorageStore()
+  const { refetchAllOpenedFolders } = storageExplorerStore
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -196,6 +201,12 @@ const FileExplorerHeader = ({
 
   const selectBreadcrumb = (columnIndex) => {
     onSelectBreadcrumb(columnIndex)
+  }
+
+  const refreshData = async () => {
+    setIsRefreshing(true)
+    await refetchAllOpenedFolders()
+    setIsRefreshing(false)
   }
 
   return (
@@ -267,6 +278,16 @@ const FileExplorerHeader = ({
       {/* Actions */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-1">
+          <Button
+            className="mr-2"
+            size="tiny"
+            icon={<IconRefreshCw />}
+            type="text"
+            loading={isRefreshing}
+            onClick={refreshData}
+          >
+            Reload
+          </Button>
           <Dropdown
             overlay={[
               <Dropdown.RadioGroup key="viewOptions" value={view} onChange={onChangeView}>
