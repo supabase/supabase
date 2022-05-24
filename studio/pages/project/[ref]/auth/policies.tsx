@@ -19,11 +19,11 @@ const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
 /**
  * Filter tables by table name and policy name
  *
- * @param tables list of tables
+ * @param tables list of PostgresTable
  * @param policies list of policies
  * @param keywords filter keywords
  *
- * @returns array of PostgresTable
+ * @returns list of PostgresTable
  */
 const onFilterTables = (
   tables: {
