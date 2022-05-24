@@ -25,8 +25,9 @@ import Table from 'components/to-be-cleaned/Table'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
+import { ChartIntervals } from 'types'
 
-const CHART_INTERVALS = [
+const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: 'minutely',
     label: '60 minutes',
@@ -112,12 +113,12 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       <div className="">
         {startDate && endDate && (
           <>
-            <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconDatabase strokeWidth={2} size={16} />
                       </div>
                     }
@@ -148,7 +149,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconKey strokeWidth={2} size={16} />
                       </div>
                     }
@@ -179,7 +180,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconArchive strokeWidth={2} size={16} />
                       </div>
                     }
@@ -210,7 +211,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconZap strokeWidth={2} size={16} />
                       </div>
                     }
@@ -240,7 +241,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
           <div className="grid md:gap-4 lg:grid-cols-4 lg:gap-8">
             <Panel
               key="api-status-codes"
-              className="col-start-1 col-span-2"
+              className="col-span-2 col-start-1"
               wrapWithLoading={false}
             >
               <Panel.Content className="space-y-4">
@@ -267,7 +268,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
             </Panel>
             <Panel
               key="top-routes"
-              className="col-start-3 col-span-2 pb-0"
+              className="col-span-2 col-start-3 pb-0"
               bodyClassName="h-full"
               wrapWithLoading={false}
             >
@@ -286,7 +287,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                       {(pathsData?.result ?? []).map((row: PathsDatum) => (
                         <Table.tr>
                           <Table.td className="flex items-center space-x-2">
-                            <p className="font-mono text-sm text-scale-1200">{row.method}</p>
+                            <p className="text-scale-1200 font-mono text-sm">{row.method}</p>
                             <p className="font-mono text-sm">{row.path}</p>
                           </Table.td>
                           <Table.td>{row.count}</Table.td>
@@ -313,7 +314,7 @@ const PanelHeader = (props: any) => {
       <div
         className={
           'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-gray-1200' : '')
+          (props.href ? 'hover:text-gray-1200 cursor-pointer hover:opacity-100' : '')
         }
       >
         <Typography.Text>{props.icon}</Typography.Text>
