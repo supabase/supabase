@@ -10,16 +10,19 @@ import { isUndefined } from 'lodash'
 
 let store = null
 let projectRef = null
+let metaProjectRef = null
 export function useSqlEditorStore(ref, meta) {
-  if (store === null || ref !== projectRef) {
+  if ((ref && ref !== projectRef) || (meta?.projectRef && meta.projectRef !== metaProjectRef)) {
     projectRef = ref
+    metaProjectRef = meta.projectRef
     store = new SqlEditorStore(ref, meta)
   }
-  return store
-}
 
-export function createSqlEditorStore(ref, meta) {
-  return new SqlEditorStore(ref, meta)
+  if (!ref || !meta) {
+    store = null
+  }
+
+  return store
 }
 
 export const TAB_TYPES = {
