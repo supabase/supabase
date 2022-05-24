@@ -61,16 +61,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div>
-            <Input
-              size="small"
-              placeholder="Filter tables and policies"
-              className="block w-full text-sm placeholder-gray-400"
-              value={policiesFilter}
-              onChange={(e) => setPoliciesFilter(e.target.value)}
-              icon={<IconSearch size="tiny" />}
-            />
-          </div>
+          <Input
+            size="small"
+            placeholder="Filter tables and policies"
+            className="block w-64 text-sm placeholder-gray-400"
+            value={policiesFilter}
+            onChange={(e) => setPoliciesFilter(e.target.value)}
+            icon={<IconSearch size="tiny" />}
+          />
           <Button type="link">
             <a
               target="_blank"
