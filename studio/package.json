@@ -26,7 +26,7 @@
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.18",
     "@supabase/supabase-js": "^1.29.1",
-    "@supabase/ui": "0.37.0-alpha.53",
+    "@supabase/ui": "0.37.0-alpha.55",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "clipboard": "^2.0.8",
