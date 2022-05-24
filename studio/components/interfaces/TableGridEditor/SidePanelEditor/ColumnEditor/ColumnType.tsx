@@ -25,17 +25,23 @@ const ColumnType: FC<Props> = ({
   showLabel = true,
   onOptionSelect = () => {},
 }) => {
-  const isNativeDataType = POSTGRES_DATA_TYPES.includes(value)
+  // @ts-ignore
+  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
+  const isAvailableType = value ? availableTypes.includes(value) : true
 
-  if (!isNativeDataType) {
+  if (!isAvailableType) {
     return (
       <Input
         readOnly
         disabled
-        label="Type"
+        label={showLabel ? 'Type' : ''}
         layout="horizontal"
         value={value}
-        descriptionText="Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio"
+        descriptionText={
+          showLabel
+            ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
+            : ''
+        }
       />
     )
   }
@@ -60,6 +66,8 @@ const ColumnType: FC<Props> = ({
         return <div />
     }
   }
+
+  console.log('ColumnType', showLabel)
 
   return (
     <Listbox
