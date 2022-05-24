@@ -91,16 +91,24 @@ interface ContentWrapperProps {
 const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
   const { ui } = useStore()
   const router = useRouter()
+
+  const routesToIgnorePostgrestConnection = [
+    '/project/[ref]/reports',
+    '/project/[ref]/settings/general',
+    '/project/[ref]/settings/database',
+    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/update',
+    '/project/[ref]/settings/billing/update/free',
+    '/project/[ref]/settings/billing/update/pro',
+  ]
+
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-  const requiresPostgrestConnection =
-    [
-      '/project/[ref]/settings/general',
-      '/project/[ref]/reports',
-      '/project/[ref]/settings/database',
-    ].includes(router.pathname) === false
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
+
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (
