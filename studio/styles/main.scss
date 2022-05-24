@@ -213,3 +213,9 @@ div.fixed.inset-0 {
     width: 100%;
   }
 }
+
+.text-area-text-sm {
+  textarea {
+    @apply text-sm;
+  }
+}

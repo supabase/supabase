@@ -60,7 +60,7 @@ export interface ColumnField {
   name: string
   comment?: string
   format: string
-  defaultValue: string
+  defaultValue: string | null
   foreignKey: PostgresRelationship | undefined
   isNullable: boolean
   isUnique: boolean
