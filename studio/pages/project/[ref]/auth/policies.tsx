@@ -7,6 +7,7 @@ import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
@@ -16,27 +17,36 @@ const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
   return <div className="p-4">{children}</div>
 }
 
+/**
+ * Filter tables by table name and policy name
+ *
+ * @param tables list of table
+ * @param policies list of policy
+ * @param searchString filter keywords
+ *
+ * @returns list of table
+ */
 const onFilterTables = (
-  tables: {
-    name: string
-    policies: {
-      name: string
-    }[]
-  }[],
-  keywords?: string
+  tables: PostgresTable[],
+  policies: PostgresPolicy[],
+  searchString?: string
 ) => {
-  if (!keywords) return tables.slice().sort((a: any, b: any) => a.name.localeCompare(b.name))
-  else {
-    let filter = keywords.toLowerCase()
-    let stringSearch = (s: string) => s.toLowerCase().indexOf(filter) != -1
+  if (!searchString) {
+    return tables.slice().sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
+  } else {
+    const filter = searchString.toLowerCase()
+    const findSearchString = (s: string) => s.toLowerCase().includes(filter)
+    // @ts-ignore Type instantiation is excessively deep and possibly infinite
+    const filteredPolicies = policies.filter((p: PostgresPolicy) => findSearchString(p.name))
     return tables
       .slice()
-      .filter((x: any) => {
-        let searchTableName = stringSearch(x.name)
-        let searchPolicyName = x.policies.some((p: any) => stringSearch(p.name))
-        return searchTableName || searchPolicyName
+      .filter((x: PostgresTable) => {
+        const searchTableName = findSearchString(x.name)
+        if (searchTableName) return true
+        const searchPolicyName = filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
+        return searchPolicyName
       })
-      .sort((a: any, b: any) => a.name.localeCompare(b.name))
+      .sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
   }
 }
 
@@ -44,22 +54,21 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const [policiesFilter, setPoliciesFilter] = useState<string | undefined>(undefined)
   const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
-  const filteredTables = onFilterTables(publicTables, policiesFilter)
+  const policies = meta.policies.list()
+  const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div>
-            <Input
-              size="small"
-              placeholder="Filter tables"
-              className="block w-full text-sm placeholder-gray-400"
-              value={policiesFilter}
-              onChange={(e) => setPoliciesFilter(e.target.value)}
-              icon={<IconSearch size="tiny" />}
-            />
-          </div>
+          <Input
+            size="small"
+            placeholder="Filter tables and policies"
+            className="block w-64 text-sm placeholder-gray-400"
+            value={policiesFilter}
+            onChange={(e) => setPoliciesFilter(e.target.value)}
+            icon={<IconSearch size="tiny" />}
+          />
           <Button type="link">
             <a
               target="_blank"
