@@ -7,6 +7,7 @@ import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
@@ -19,39 +20,33 @@ const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
 /**
  * Filter tables by table name and policy name
  *
- * @param tables list of PostgresTable
- * @param policies list of policies
- * @param keywords filter keywords
+ * @param tables list of table
+ * @param policies list of policy
+ * @param searchString filter keywords
  *
- * @returns list of PostgresTable
+ * @returns list of table
  */
 const onFilterTables = (
-  tables: {
-    name: string
-  }[],
-  policies: {
-    name: string
-    table: string
-  }[],
-  keywords?: string
+  tables: PostgresTable[],
+  policies: PostgresPolicy[],
+  searchString?: string
 ) => {
-  if (!keywords) return tables.slice().sort((a: any, b: any) => a.name.localeCompare(b.name))
-  else {
-    const filter = keywords.toLowerCase()
-    const stringSearch = (s: string) => s.toLowerCase().indexOf(filter) != -1
-    const filteredPolicies = policies.filter((p: { name: string; table: string }) =>
-      stringSearch(p.name)
-    )
+  if (!searchString) {
+    return tables.slice().sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
+  } else {
+    const filter = searchString.toLowerCase()
+    const findSearchString = (s: string) => s.toLowerCase().includes(filter)
+    // @ts-ignore Type instantiation is excessively deep and possibly infinite
+    const filteredPolicies = policies.filter((p: PostgresPolicy) => findSearchString(p.name))
     return tables
       .slice()
-      .filter((x: { name: string }) => {
-        const searchTableName = stringSearch(x.name)
-        const searchPolicyName = filteredPolicies.some(
-          (p: { name: string; table: string }) => p.table === x.name
-        )
-        return searchTableName || searchPolicyName
+      .filter((x: PostgresTable) => {
+        const searchTableName = findSearchString(x.name)
+        if (searchTableName) return true
+        const searchPolicyName = filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
+        return searchPolicyName
       })
-      .sort((a: any, b: any) => a.name.localeCompare(b.name))
+      .sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
   }
 }
 
