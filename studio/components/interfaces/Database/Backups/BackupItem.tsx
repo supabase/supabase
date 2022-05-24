@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Typography, IconDownload } from '@supabase/ui'
+import { Badge, Button, IconDownload } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -79,19 +79,15 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   const generateSideButtons = (backup: any) => {
     if (backup.status === 'COMPLETED')
       return (
-        <div className="space-x-1 flex">
+        <div className="flex space-x-4">
           {backup.data.canRestore && (
-            <Button
-              type="secondary"
-              disabled={isRestoring || isDownloading}
-              onClick={onRestoreClick}
-            >
+            <Button type="default" disabled={isRestoring || isDownloading} onClick={onRestoreClick}>
               Restore
             </Button>
           )}
 
           <Button
-            type="secondary"
+            type="default"
             disabled={isRestoring || isDownloading}
             onClick={() => download(backup)}
             loading={isDownloading}
@@ -106,11 +102,15 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
 
   return (
     <>
-      <div className={`flex justify-between px-6 h-12 ${index ? 'border-t dark:border-dark' : ''}`}>
-        <Typography.Text className="self-center">
+      <div
+        className={`flex h-12 items-center justify-between px-6 ${
+          index ? 'dark:border-dark border-t' : ''
+        }`}
+      >
+        <p className="text-scale-1200 text-sm ">
           {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
-        </Typography.Text>
-        <div className="self-center">{generateSideButtons(backup)}</div>
+        </p>
+        <div className="">{generateSideButtons(backup)}</div>
       </div>
     </>
   )
