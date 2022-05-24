@@ -129,6 +129,7 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'graphql',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
