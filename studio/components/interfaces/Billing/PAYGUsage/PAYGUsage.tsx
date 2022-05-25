@@ -9,17 +9,18 @@ import { chargeableProducts } from './PAYGUsage.constants'
 import { DATE_FORMAT } from 'lib/constants'
 
 interface Props {
-  paygStats: PaygStats,
+  paygStats: PaygStats
   dateRange: {
-    period_start: {date: string, time_period: string}
-    period_end: {date: string, time_period: string}
+    period_start: { date: string; time_period: string }
+    period_end: { date: string; time_period: string }
     interval: string
   }
 }
 
 const PAYGUsage: FC<Props> = ({ paygStats, dateRange }) => {
-  const startDate = dateRange.period_start.date ?? dayjs().utc().startOf('month').format(DATE_FORMAT)
-  const endDate =  dateRange.period_end.date ?? dayjs().utc().endOf('month').format(DATE_FORMAT)
+  const startDate =
+    dateRange.period_start.date ?? dayjs().utc().startOf('month').format(DATE_FORMAT)
+  const endDate = dateRange.period_end.date ?? dayjs().utc().endOf('month').format(DATE_FORMAT)
 
   return (
     <div className="flex flex-col">
@@ -29,23 +30,23 @@ const PAYGUsage: FC<Props> = ({ paygStats, dateRange }) => {
         return (
           <div
             key={product.title}
-            className="rounded overflow-hidden border border-panel-border-light dark:border-panel-border-dark mb-8"
+            className="border-panel-border-light dark:border-panel-border-dark mb-8 overflow-hidden rounded border"
           >
-            <div className="w-full bg-panel-body-light dark:bg-panel-body-dark">
+            <div className="bg-panel-body-light dark:bg-panel-body-dark w-full">
               <div className="bg-panel-header-light dark:bg-panel-header-dark">
-                <div className="px-6 py-3 flex items-center justify-between rounded overflow-hidden">
+                <div className="flex items-center justify-between overflow-hidden rounded px-6 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
+                    <div className="flex h-8 w-8 items-center justify-center rounded bg-white">
                       <img width={'16'} src={product.iconUrl} />
                     </div>
-                    <Typography.Title level={5} className="font-medium mb-0">
+                    <Typography.Title level={5} className="mb-0 font-medium">
                       {product.title}
                     </Typography.Title>
                   </div>
                   {product.title !== 'Authentication' && (
                     <div className="flex items-center space-x-1">
                       <Typography.Text className="opacity-50">$</Typography.Text>
-                      <Typography.Title className="font-medium m-0" level={4}>
+                      <Typography.Title className="m-0 font-medium" level={4}>
                         {productCost.toFixed(3)}
                       </Typography.Title>
                     </div>
@@ -57,7 +58,7 @@ const PAYGUsage: FC<Props> = ({ paygStats, dateRange }) => {
                 {product.features.map((feature: ProductFeature) => (
                   <div
                     key={feature.title}
-                    className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark"
+                    className="border-panel-border-light dark:border-panel-border-dark relative border-t px-6 py-3"
                   >
                     <ChartHandler
                       hideChartType
