@@ -41,10 +41,7 @@ const ConfirmModal = ({
       <Form
         initialValues={{}}
         validateOnBlur
-        onSubmit={() => {
-          console.log('onSubmit')
-          onConfirm()
-        }}
+        onSubmit={() => onConfirm()}
         validate={() => {
           let errors = []
           return errors

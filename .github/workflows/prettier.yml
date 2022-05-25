@@ -11,19 +11,22 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
+      # disable this check while we migrate to monorepo
       - name: Run prettier
         run: |-
-          function run_check() {
-            if $(grep -q '"prettier"' "$1") ; then
-              pushd "$(dirname $1)"
-              echo "Running prettier on $(pwd)"
-              npx prettier -c '**/*.{js,jsx,ts,tsx,css,md,json}'
-              popd
-            fi
-          }
-          find . -type f -name 'package.json' ! -path '*node_modules*' -print0 | while IFS= read -r -d '' file; do
-            run_check "$file"
-          done
+          npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}' 
+        # run: |-
+        #   function run_check() {
+        #     if $(grep -q '"prettier"' "$1") ; then
+        #       pushd "$(dirname $1)"
+        #       echo "Running prettier on $(pwd)"
+        #       npx prettier -c '**/*.{js,jsx,ts,tsx,css,md,json}'
+        #       popd
+        #     fi
+        #   }
+        #   find . -type f -name 'package.json' ! -path '*node_modules*' -print0 | while IFS= read -r -d '' file; do
+        #     run_check "$file"
+        #   done
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:

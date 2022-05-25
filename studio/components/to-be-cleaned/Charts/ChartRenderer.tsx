@@ -8,20 +8,14 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  ReferenceLine,
   Cell,
   ResponsiveContainer,
 } from 'recharts'
 
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
 import { formatBytes } from 'lib/helpers'
 import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
-
-dayjs.extend(customParseFormat)
-dayjs.extend(timezone)
-dayjs.extend(utc)
 
 function dataCheck(data: any, attribute: any) {
   const hasData = data && data.find((record: any) => record[attribute])
@@ -95,7 +89,7 @@ const Header = ({
   const highlighted = (
     <h5
       className={
-        'text-xl text-scale-1200 font-normal ' + (minimalHeader ? 'text-base' : 'text-2xl')
+        'text-scale-1200 text-xl font-normal ' + (minimalHeader ? 'text-base' : 'text-2xl')
       }
     >
       {title}
@@ -103,7 +97,7 @@ const Header = ({
     </h5>
   )
   const date = (
-    <h5 className="text-xs text-scale-900">
+    <h5 className="text-scale-900 text-xs">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
@@ -114,9 +108,9 @@ const Header = ({
 
   if (minimalHeader) {
     return (
-      <div className="flex flex-row gap-x-4 items-center" style={{ minHeight: '1.8rem' }}>
+      <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
         {chartTitle}
-        <div className="flex flex-row gap-x-2 items-baseline">
+        <div className="flex flex-row items-baseline gap-x-2">
           {highlighted}
           {date}
         </div>
@@ -133,19 +127,19 @@ const Header = ({
   )
 }
 
-const NoData = () => (
+const NoData = ({ title = 'No data to show', message = 'May take 24 hours for data to show' }) => (
   <div
     className="
-      h-full w-full
-      border border-dashed border-scale-600
-      flex flex-col items-center justify-center
-      space-y-2 text-center
+      border-scale-600 flex
+      h-full w-full flex-col
+      items-center justify-center space-y-2 border
+      border-dashed text-center
     "
   >
     <IconBarChart2 className="text-scale-800" />
     <div>
-      <p className="text-scale-1100 text-xs">No data to show</p>
-      <p className="text-scale-900 text-xs">May take 24 hours for data to show</p>
+      <p className="text-scale-1100 text-xs">{title}</p>
+      <p className="text-scale-900 text-xs">{message}</p>
     </div>
   </div>
 )
@@ -175,8 +169,10 @@ export function BarChart({
   label,
   onBarClick,
   minimalHeader,
-  minimalChart,
+  chartSize = 'normal',
   className = '',
+  noDataTitle,
+  noDataMessage,
 }: any) {
   const hasData = data ? dataCheck(data, attribute) : true
 
@@ -201,7 +197,11 @@ export function BarChart({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
-  const chartHeight = minimalChart ? 96 : 160
+  const chartHeight = {
+    tiny: 76,
+    small: 96,
+    normal: 160,
+  }[chartSize as string] as number
 
   return (
     <Loading active={!data}>
@@ -229,7 +229,7 @@ export function BarChart({
                     left: 0,
                     bottom: 0,
                   }}
-                  className="overflow-visible cursor-pointer"
+                  className="cursor-pointer overflow-visible"
                   onMouseMove={onMouseMove}
                   onMouseLeave={onMouseLeave}
                   onClick={(tooltipData: any) => {
@@ -273,10 +273,12 @@ export function BarChart({
                       />
                     ))}
                   </Bar>
+
+                  <ReferenceLine y={8000000000} label="8GB Included" stroke="red" strokeDasharray="3 3" />
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="text-xs text-scale-900 flex items-center justify-between -mt-5">
+                <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
                   <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME
@@ -291,7 +293,7 @@ export function BarChart({
               )}
             </>
           ) : (
-            <NoData />
+            <NoData title={noDataTitle} message={noDataMessage} />
           )}
         </div>
       </div>
@@ -398,7 +400,7 @@ export function AreaChart({
               </RechartAreaChart>
             </ResponsiveContainer>
             {data && (
-              <div className="text-scale-900 text-xs flex items-center justify-between -mt-5">
+              <div className="text-scale-900 -mt-5 flex items-center justify-between text-xs">
                 <span>
                   {dayjs(data[0].period_start).format(
                     customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME

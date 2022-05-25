@@ -1,19 +1,14 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Badge, Checkbox, SidePanel, Input } from '@supabase/ui'
-import { PostgresTable } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
 import ColumnManagement from './ColumnManagement'
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
-import {
-  ColumnField,
-  EnumType,
-  CreateTablePayload,
-  UpdateTablePayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import { TableField, ImportContent } from './TableEditor.types'
 import {
@@ -22,12 +17,11 @@ import {
   generateTableFieldFromPostgresTable,
   formatImportedContentToColumnFields,
 } from './TableEditor.utils'
-import SidePanelEditor from '..'
 
 interface Props {
   table?: PostgresTable
   tables: PostgresTable[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   selectedSchema: string
   isDuplicating: boolean
   visible: boolean
@@ -50,7 +44,7 @@ interface Props {
 const TableEditor: FC<Props> = ({
   table,
   tables = [],
-  enumTypes = [] as EnumType[],
+  enumTypes = [] as PostgresType[],
   selectedSchema,
   isDuplicating,
   visible = false,
@@ -115,13 +109,23 @@ const TableEditor: FC<Props> = ({
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
+        const columns = tableFields.columns.map((column) => {
+          if (column.foreignKey) {
+            return {
+              ...column,
+              foreignKey: { ...column.foreignKey, source_table_name: tableFields.name },
+            }
+          }
+          return column
+        })
         const configuration = {
           tableId: table?.id,
           importContent,
           isRLSEnabled: tableFields.isRLSEnabled,
           isDuplicateRows: isDuplicateRows,
         }
-        saveChanges(payload, tableFields.columns, isNewRecord, configuration, resolve)
+
+        saveChanges(payload, columns, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -137,7 +141,7 @@ const TableEditor: FC<Props> = ({
       visible={visible}
       // @ts-ignore
       header={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
-      className={`transition-all ease-in duration-100 ${isImportingSpreadsheet ? ' mr-32' : ''}`}
+      className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
       customFooter={

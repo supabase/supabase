@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] Automatisch generierte APIs
 - [x] Dashboard
 - [x] Speicher
-- [ ] Funktionen (kommt demnächst)
+- [x] Funktionen
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentation
 
-Um die gesamte Dokumentation einzusehen, schaue auf [supabase.io/docs](https://supabase.com/docs) vorbei.
+Um die gesamte Dokumentation einzusehen, schaue auf [supabase.com/docs](https://supabase.com/docs) vorbei.
 
 ## Community & Support
 

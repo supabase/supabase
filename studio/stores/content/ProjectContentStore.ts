@@ -2,22 +2,34 @@ import { makeAutoObservable } from 'mobx'
 import { keyBy } from 'lodash'
 
 import { get, post, patch, delete_ } from 'lib/common/fetch'
-import { UserContent, UserContentMap } from 'types'
+import { LogSqlSnippets, UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
 import { API_URL } from 'lib/constants'
 
 // [Joshen] This will be the new ProjectContentStore
 // but use the one under the stores folder projectContentStore first while we transition
 
+type CustomFilter = (content: UserContent) => boolean
 export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
+  isLoaded: boolean
   error: any
+  recentLogSqlSnippets: LogSqlSnippets.Content[]
+
+  baseUrl: string
+  projectRef?: string
 
   load: () => void
+  loadPersistentData: () => Promise<void>
+  create: (x: UserContent) => { data: UserContent; error: { error: { message: string } } }
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
+  logSqlSnippets: (filter?: CustomFilter) => UserContent[]
+  addRecentLogSqlSnippet: (snippet: Partial<LogSqlSnippets.Content>) => void
+  clearRecentLogSqlSnippets: () => void
+  setProjectRef: (ref?: string) => void
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
@@ -31,15 +43,24 @@ export default class ProjectContentStore implements IProjectContentStore {
   }
 
   baseUrl: string
+  localStorageKey: string
+  recentLogSqlKey: string
+  projectRef: string
+
   data: UserContentMap = {}
+  recentLogSqlSnippets: LogSqlSnippets.Content[] = []
 
   state = this.STATES.INITIAL
   error = null
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
     const { projectRef } = options
+    this.projectRef = projectRef
     this.rootStore = rootStore
-    this.baseUrl = `${API_URL}/projects/${projectRef}/content`
+    this.localStorageKey = `project-content-${projectRef}`
+    this.recentLogSqlKey = `${this.localStorageKey}-recent-log-sql`
+    this.loadPersistentData()
+    this.baseUrl = ``
     makeAutoObservable(this)
   }
 
@@ -49,6 +70,10 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   get isInitialized() {
     return this.state !== this.STATES.INITIAL
+  }
+
+  get isLoaded() {
+    return this.state === this.STATES.LOADED
   }
 
   async fetchData() {
@@ -78,10 +103,19 @@ export default class ProjectContentStore implements IProjectContentStore {
     }
   }
 
-  async loadPersistentData() {}
+  async loadPersistentData() {
+    this.loadRecentLogSqlSnippets()
+  }
 
   async loadRemotePersistentData(userId: any) {
     const sqlSnippets = this.sqlSnippets((x: any) => x.owner_id === userId)
+  }
+
+  loadRecentLogSqlSnippets() {
+    if (typeof window === 'undefined') return
+    this.recentLogSqlSnippets = JSON.parse(
+      (window as any).localStorage.getItem(this.recentLogSqlKey) || '[]'
+    )
   }
 
   list(filter?: any) {
@@ -127,6 +161,37 @@ export default class ProjectContentStore implements IProjectContentStore {
     }
   }
 
+  addRecentLogSqlSnippet(snippet: Partial<LogSqlSnippets.Content>) {
+    if (typeof window === 'undefined') return
+    const defaults: LogSqlSnippets.Content = {
+      schema_version: '1',
+      favorite: false,
+      sql: '',
+      content_id: '',
+    }
+    this.recentLogSqlSnippets.push({ ...defaults, ...snippet })
+    ;(window as any).localStorage.setItem(
+      this.recentLogSqlKey,
+      JSON.stringify(this.recentLogSqlSnippets)
+    )
+  }
+
+  clearRecentLogSqlSnippets() {
+    if (typeof window === 'undefined') return
+    this.recentLogSqlSnippets = []
+    ;(window as any).localStorage.setItem(this.recentLogSqlKey, JSON.stringify([]))
+  }
+
+  logSqlSnippets(filter?: CustomFilter) {
+    let arr = ((Object.values(this.data)[0] as any) || []) as UserContent[]
+    let snippets = arr.filter((c) => c.type === 'log_sql')
+    if (filter) {
+      snippets = snippets.filter(filter)
+    }
+    return snippets.sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  // @ts-ignore
   async create(payload: any) {
     try {
       const headers = {
@@ -181,6 +246,13 @@ export default class ProjectContentStore implements IProjectContentStore {
       return { data: true, error: null }
     } catch (error) {
       return { data: false, error }
+    }
+  }
+
+  setProjectRef(ref?: string) {
+    if (ref) {
+      this.projectRef = ref
+      this.baseUrl = `${API_URL}/projects/${ref}/content`
     }
   }
 }

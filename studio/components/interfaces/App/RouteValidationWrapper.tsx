@@ -15,12 +15,34 @@ const RouteValidationWrapper: FC = ({ children }) => {
   const projectRef = router.query.ref
   const orgSlug = router.query.slug
 
+  /**
+   * Array of urls/routes that should be ignored
+   */
+  const excemptUrls: string[] = [
+    // project creation route, allows the page to self determine it's own route, it will redirect to the first org
+    // or prompt the user to create an organaization
+    // this is used by database.dev, usually as /new/new-project
+    '/new/[slug]',
+  ]
+
+  /**
+   * Map through all the urls that are excluded
+   * from route validation check
+   *
+   * @returns a boolean
+   */
+  function isExceptUrl() {
+    return excemptUrls.includes(router?.pathname)
+  }
+
   useEffect(() => {
+    // check if current route is excempted from route validation check
+    if (isExceptUrl()) return
+
     if (orgsInitialized && orgSlug) {
       // Check validity of organization that user is trying to access
       const organizations = app.organizations.list()
-      const organizationSlugs = organizations.map((org: Organization) => org.slug)
-      const isValidOrg = organizationSlugs.includes(orgSlug as string)
+      const isValidOrg = organizations.some((org: Organization) => org.slug === orgSlug)
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
@@ -31,11 +53,13 @@ const RouteValidationWrapper: FC = ({ children }) => {
   }, [orgsInitialized])
 
   useEffect(() => {
+    // check if current route is excempted from route validation check
+    if (isExceptUrl()) return
+
     if (projectsInitialized && projectRef) {
       // Check validity of project that the user is trying to access
       const projects = app.projects.list()
-      const projectRefs = projects.map((project: Project) => project.ref)
-      const isValidProject = projectRefs.includes(projectRef as string)
+      const isValidProject = projects.some((project: Project) => project.ref === projectRef)
 
       if (!isValidProject) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })

@@ -14,7 +14,7 @@ By default, if no password is provided, the user will be sent a "magic link" to 
 Setting up Magic Link logins for your Supabase application.
 
 - Add Magic Link authenticator to your [Supabase Project](https://app.supabase.io)
-- Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
+- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
 
 ## Add Magic Link into your Supabase Project
 
@@ -29,7 +29,7 @@ Setting up Magic Link logins for your Supabase application.
 
 Add logins using our client libraries:
 
-- [Javascript](/docs/reference/javascript/auth-signin#sign-in-with-magic-link)
+- [JavaScript](/docs/reference/javascript/auth-signin#sign-in-with-magic-link)
 - [Dart](/docs/reference/dart/auth-signin#sign-in-with-magic-link)
 
 <Tabs
@@ -83,10 +83,8 @@ async function signInWithEmail() {
 <TabItem value="dart">
 
 ```dart
-function SignInWithEmail() {
-  await supabase.auth.signIn(
-    email: 'example@email.com'
-  );
+Future<void> signInWithEmail() async {
+  await supabase.auth.signIn(email: 'example@email.com');
 }
 ```
 
@@ -115,7 +113,7 @@ async function signOut() {
 <TabItem value="dart">
 
 ```dart
-function SignOut() {
+Future<void> signOut() async {
   await supabase.auth.signOut();
 }
 ```

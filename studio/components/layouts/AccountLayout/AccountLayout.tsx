@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
 
@@ -74,6 +74,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
                 href: `/account/me`,
                 key: `/account/me`,
               },
+              {
+                isActive: router.pathname == `/account/tokens`,
+                icon: '/img/user.svg',
+                label: 'Access Tokens',
+                href: `/account/tokens`,
+                key: `/account/tokens`,
+              },
               logoutLink,
             ],
           },
@@ -93,7 +100,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/client/supabase-client',
+          href: 'https://supabase.com/docs/guides/api',
           external: true,
         },
       ],
@@ -111,7 +118,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
       <div className="flex h-full">
         <main
           style={{ maxHeight: '100vh' }}
-          className="w-full flex flex-col flex-1 overflow-y-auto"
+          className="flex w-full flex-1 flex-col overflow-y-auto"
         >
           <WithSidebar title={title} breadcrumbs={breadcrumbs} links={linksWithHeaders}>
             {children}
@@ -122,4 +129,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
   )
 }
 
-export default observer(AccountLayout)
+export default withAuth(observer(AccountLayout))
+
+export const AccountLayoutWithoutAuth = observer(AccountLayout)

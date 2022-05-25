@@ -1,23 +1,23 @@
 import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
-import { Loading } from '@supabase/ui'
+import { useRouter } from 'next/router'
+import { Loading, Button } from '@supabase/ui'
+import { Dictionary } from '@supabase/grid'
 
-import UpgradeButton from './UpgradeButton'
+import { formatBytes } from 'lib/helpers'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { useStore, useSubscriptionStats } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
-import { formatBytes } from 'lib/helpers'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { Dictionary } from '@supabase/grid'
-import { SubscriptionStats } from 'hooks'
+import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
 
 interface Props {
   project: any
   subscription: StripeSubscription
-  subscriptionStats: SubscriptionStats
-  paygStats?: Dictionary<number>
+  paygStats: PaygStats | undefined
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number
@@ -27,13 +27,16 @@ interface Props {
 const Subscription: FC<Props> = ({
   project,
   subscription,
-  subscriptionStats,
   paygStats,
   loading = false,
   showProjectName = false,
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
+  const router = useRouter()
+  const { ui } = useStore()
+  const isOrgOwner = ui.selectedOrganization?.is_owner
+
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
@@ -50,18 +53,29 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading}>
-      <div className="w-full rounded overflow-hidden border border-panel-border-light dark:border-panel-border-dark mb-8">
+      <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
-          <div className="px-6 pt-4 flex items-center justify-between">
+          <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
-              <p className="text-sm">{showProjectName ? project.name : 'Current subscription'}</p>
-              <h3 className="text-xl mb-0">{subscription?.tier.name ?? '-'}</h3>
+              <p className="text-scale-1100 text-sm">
+                {showProjectName ? project.name : 'Current subscription'}
+              </p>
+              <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            <UpgradeButton
-              paid={paid}
-              projectRef={project.ref}
-              subscriptionStats={subscriptionStats}
-            />
+            <div className="flex flex-col items-end space-y-2">
+              <Button
+                disabled={!isOrgOwner}
+                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                type="primary"
+              >
+                Change subscription
+              </Button>
+              {!isOrgOwner && (
+                <p className="text-scale-1100 text-sm">
+                  Only the organization owner can amend subscriptions
+                </p>
+              )}
+            </div>
           </div>
           {paid && (
             <div className="px-6 pt-4">
@@ -72,7 +86,7 @@ const Subscription: FC<Props> = ({
             </div>
           )}
           <div className="mt-2 px-6 pb-4">
-            <p className="text-sm text-scale-1100">
+            <p className="text-scale-1100 text-sm">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
                 pricing
@@ -84,18 +98,18 @@ const Subscription: FC<Props> = ({
           {/* Cost Breakdown */}
           {!loading && subscription && (
             <>
-              <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
+              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[40%]">
-                  <p className="text-sm">Item</p>
+                  <p className="text-scale-900 text-xs uppercase">Item</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <p className="text-sm">Amount</p>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Amount</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <p className="text-sm">Unit Price</p>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Unit Price</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <p className="text-sm">Price</p>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Price</p>
                 </div>
               </div>
               <CostBreakdownRow
@@ -115,29 +129,33 @@ const Subscription: FC<Props> = ({
               ))}
               {isPayg &&
                 chargeableProducts.map((product) =>
-                  product.features.map((feature) => {
-                    const cost = deriveFeatureCost(paygStats, feature).toFixed(3)
+                  product.features.map((feature: ProductFeature) => {
+                    const derivedCost = deriveFeatureCost(paygStats, feature)
+                    const cost = derivedCost.toFixed(2)
                     return (
                       <CostBreakdownRow
                         key={feature.attribute}
                         item={feature.title}
-                        amount={formatBytes(paygStats?.[feature.attribute] ?? 0)}
+                        freeQuota={feature.freeQuota}
+                        amount={formatBytes(
+                          paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
+                        )}
                         unitPrice={`${feature.costPerUnit}/GB`}
                         price={cost}
                       />
                     )
                   })
                 )}
-              <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
+              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[80%]">
-                  <p className="text-sm">
+                  <p className="text-scale-1100 text-sm">
                     Estimated cost for {dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}{' '}
                     - {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')} so far
                   </p>
                 </div>
-                <div className="w-[20%] flex justify-end items-center space-x-1">
+                <div className="flex w-[20%] items-center justify-end space-x-1">
                   <p className="text-scale-1100">$</p>
-                  <h3 className="text-xl m-0">{deriveTotalCost().toFixed(2)}</h3>
+                  <h3 className="m-0 text-xl">{deriveTotalCost().toFixed(2)}</h3>
                 </div>
               </div>
             </>

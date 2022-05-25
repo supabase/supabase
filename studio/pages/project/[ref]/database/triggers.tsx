@@ -14,15 +14,16 @@ import {
 } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
+import { NextPageWithLayout } from 'types'
 
-const TriggersPage: FC<any> = () => {
-  const { meta } = useStore()
+const TriggersPage: NextPageWithLayout = () => {
+  const { meta, ui } = useStore()
 
   const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
@@ -30,11 +31,13 @@ const TriggersPage: FC<any> = () => {
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
   useEffect(() => {
-    fetchTriggers()
-  }, [])
+    if (ui.selectedProject) {
+      fetchTriggers()
+    }
+  }, [ui.selectedProject])
 
   const fetchTriggers = async () => {
-    await meta.triggers.load()
+    meta.triggers.load()
   }
 
   const createTrigger = () => {
@@ -53,7 +56,7 @@ const TriggersPage: FC<any> = () => {
   }
 
   return (
-    <DatabaseLayout title="Database">
+    <>
       <TriggersList
         filterString={filterString}
         setFilterString={setFilterString}
@@ -71,11 +74,13 @@ const TriggersPage: FC<any> = () => {
         visible={showDeleteTriggerForm}
         setVisible={setShowDeleteTriggerForm}
       />
-    </DatabaseLayout>
+    </>
   )
 }
 
-export default withAuth(observer(TriggersPage))
+TriggersPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(TriggersPage)
 
 const TriggersList: FC<any> = observer(
   ({
@@ -94,7 +99,7 @@ const TriggersList: FC<any> = observer(
 
     if (meta.triggers.isLoading) {
       return (
-        <div className="w-full h-full flex items-center justify-center space-x-2">
+        <div className="flex h-full w-full items-center justify-center space-x-2">
           <IconLoader className="animate-spin" size={14} />
           <Typography.Text>Loading triggers...</Typography.Text>
         </div>
@@ -120,19 +125,19 @@ const TriggersList: FC<any> = observer(
               onClickCta={() => createTrigger()}
             >
               <AlphaPreview />
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 A PostgreSQL trigger is a function invoked automatically whenever an event
                 associated with a table occurs.
               </p>
-              <p className="text-sm text-scale-1100">
+              <p className="text-scale-1100 text-sm">
                 An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a
                 special user-defined function associated with a table.
               </p>
             </ProductEmptyState>
           </div>
         ) : (
-          <div className="w-full py-4 space-y-4">
-            <div className="flex justify-between items-center px-6">
+          <div className="w-full space-y-4 py-4">
+            <div className="flex items-center justify-between px-6">
               <Input
                 placeholder="Filter by name"
                 size="small"
@@ -143,7 +148,7 @@ const TriggersList: FC<any> = observer(
               <Button onClick={() => createTrigger()}>Create a new trigger</Button>
             </div>
             {filteredTriggers.length <= 0 && (
-              <div className="border dark:border-dark rounded p-6 max-w-lg mx-auto flex justify-center space-x-3 items-center shadow-md">
+              <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
                 <Typography.Text>No results match your filter query</Typography.Text>
                 <Button type="outline" onClick={() => setFilterString('')}>
                   Reset filter
@@ -177,8 +182,8 @@ const SchemaTable: FC<SchemaTableProps> = observer(
   ({ filterString, schema, editTrigger, deleteTrigger }) => {
     return (
       <div key={schema} className="">
-        <div className="sticky top-0 backdrop-filter backdrop-blur">
-          <div className="flex space-x-1 items-baseline py-2 px-6">
+        <div className="sticky top-0 backdrop-blur backdrop-filter">
+          <div className="flex items-baseline space-x-1 py-2 px-6">
             <Typography.Title level={5} className="opacity-50">
               schema
             </Typography.Title>
@@ -253,7 +258,7 @@ const TriggerList: FC<TriggerListProps> = observer(
             <Table.td className="hidden lg:table-cell">
               <Typography.Text>{x.table}</Typography.Text>
             </Table.td>
-            <Table.td className="space-x-2 hidden xl:table-cell">
+            <Table.td className="hidden space-x-2 xl:table-cell">
               <div className="flex flex-col">
                 <Typography.Text>{x.function_name}</Typography.Text>
                 <Typography.Text type="secondary">{x.function_schema}</Typography.Text>

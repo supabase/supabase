@@ -20,6 +20,12 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Functions',
+      items: ['reference/javascript/invoke'],
+      collapsed: true,
+    },
+    {
+      type: 'category',
       label: 'Database',
       items: ['reference/javascript/select', 'reference/javascript/insert', 'reference/javascript/update', 'reference/javascript/upsert', 'reference/javascript/delete', 'reference/javascript/rpc'],
       collapsed: true,

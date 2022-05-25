@@ -28,8 +28,11 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import { useFlag } from 'hooks'
+import { useFlag, useProjectSubscription } from 'hooks'
 useFlag.mockReturnValue(true)
+useProjectSubscription.mockReturnValue({
+  subscription: undefined,
+})
 
 beforeEach(() => {
   get.mockReset()
@@ -59,6 +62,7 @@ const MOCK_CHART_DATA = {
 test('mounts correctly', async () => {
   get.mockImplementation((url) => {
     if (url.includes('usage')) return {}
+    if (url.includes('subscription')) return {}
     return { data: MOCK_CHART_DATA }
   })
   render(<ProjectUsage project="12345" />)

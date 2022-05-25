@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] Otomatik oluşturulan API'ler
 - [x] Gösterge Paneli
 - [x] Depolama
-- [ ] Fonksiyonlar (Çok yakında)
+- [x] Fonksiyonlar
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokümantasyon
 
-Tam dokümantasyon için, ziyaret et [supabase.io/docs](https://supabase.com/docs)
+Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/docs)
 
 ## Topluluk & Destek
 

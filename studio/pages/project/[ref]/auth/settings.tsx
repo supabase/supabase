@@ -7,7 +7,7 @@ import { Button, Typography, Toggle as UIToggle } from '@supabase/ui'
 import Divider from 'components/ui/Divider'
 
 import { API_URL } from 'lib/constants'
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { authConfig } from 'stores/jsonSchema'
 import { get, patch } from 'lib/common/fetch'
 import { pluckJsonSchemaFields } from 'lib/helpers'
@@ -18,17 +18,19 @@ import Toggle from 'components/to-be-cleaned/forms/Toggle'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SecretField from 'components/to-be-cleaned/forms/SecretField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { NextPageWithLayout } from 'types'
 
-const Auth = () => {
+const Auth: NextPageWithLayout = () => {
   return (
-    <AuthLayout title="Auth">
-      <div className="p-4">
-        <Settings />
-      </div>
-    </AuthLayout>
+    <div className="p-4">
+      <Settings />
+    </div>
   )
 }
-export default withAuth(observer(Auth))
+
+Auth.getLayout = (page) => <AuthLayout title="Auth">{page}</AuthLayout>
+
+export default observer(Auth)
 
 const Settings = () => {
   const router = useRouter()
@@ -120,12 +122,17 @@ const Settings = () => {
             'URI_ALLOW_LIST',
             'JWT_EXP',
             'DISABLE_SIGNUP',
+            'PASSWORD_MIN_LENGTH',
+            'SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION',
           ])}
           model={{
             SITE_URL: model.SITE_URL || undefined,
             URI_ALLOW_LIST: model.URI_ALLOW_LIST || undefined,
             DISABLE_SIGNUP: model.DISABLE_SIGNUP,
             JWT_EXP: model.JWT_EXP || undefined,
+            PASSWORD_MIN_LENGTH: model.PASSWORD_MIN_LENGTH || undefined,
+            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION:
+              model.SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION || false,
           }}
           onSubmit={(model: any) => onFormSubmit(model)}
         >
@@ -140,6 +147,8 @@ const Settings = () => {
             errorMessage="Must be a comma separated list of exact URIs. No spaces."
           />
           <NumField name="JWT_EXP" step="1" />
+          <NumField name="PASSWORD_MIN_LENGTH" step="1" />
+          <ToggleField name="SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION" />
           <ToggleField name="DISABLE_SIGNUP" />
         </SchemaFormPanel>
       </div>
@@ -399,6 +408,7 @@ const Settings = () => {
             'EXTERNAL_AZURE_ENABLED',
             'EXTERNAL_AZURE_CLIENT_ID',
             'EXTERNAL_AZURE_SECRET',
+            'EXTERNAL_AZURE_URL',
             'EXTERNAL_BITBUCKET_ENABLED',
             'EXTERNAL_BITBUCKET_CLIENT_ID',
             'EXTERNAL_BITBUCKET_SECRET',
@@ -417,6 +427,10 @@ const Settings = () => {
             'EXTERNAL_GITLAB_ENABLED',
             'EXTERNAL_GITLAB_CLIENT_ID',
             'EXTERNAL_GITLAB_SECRET',
+            'EXTERNAL_KEYCLOAK_ENABLED',
+            'EXTERNAL_KEYCLOAK_CLIENT_ID',
+            'EXTERNAL_KEYCLOAK_SECRET',
+            'EXTERNAL_KEYCLOAK_URL',
             'EXTERNAL_LINKEDIN_ENABLED',
             'EXTERNAL_LINKEDIN_CLIENT_ID',
             'EXTERNAL_LINKEDIN_SECRET',
@@ -435,6 +449,13 @@ const Settings = () => {
             'EXTERNAL_SPOTIFY_ENABLED',
             'EXTERNAL_SPOTIFY_CLIENT_ID',
             'EXTERNAL_SPOTIFY_SECRET',
+            'EXTERNAL_WORKOS_ENABLED',
+            'EXTERNAL_WORKOS_CLIENT_ID',
+            'EXTERNAL_WORKOS_SECRET',
+            'EXTERNAL_WORKOS_URL',
+            'EXTERNAL_ZOOM_ENABLED',
+            'EXTERNAL_ZOOM_CLIENT_ID',
+            'EXTERNAL_ZOOM_SECRET',
           ])}
           model={{
             EXTERNAL_APPLE_ENABLED: model.EXTERNAL_APPLE_ENABLED,
@@ -443,6 +464,7 @@ const Settings = () => {
             EXTERNAL_AZURE_ENABLED: model.EXTERNAL_AZURE_ENABLED,
             EXTERNAL_AZURE_CLIENT_ID: model.EXTERNAL_AZURE_CLIENT_ID || undefined,
             EXTERNAL_AZURE_SECRET: model.EXTERNAL_AZURE_SECRET || undefined,
+            EXTERNAL_AZURE_URL: model.EXTERNAL_AZURE_URL || undefined,
             EXTERNAL_BITBUCKET_ENABLED: model.EXTERNAL_BITBUCKET_ENABLED,
             EXTERNAL_BITBUCKET_CLIENT_ID: model.EXTERNAL_BITBUCKET_CLIENT_ID || undefined,
             EXTERNAL_BITBUCKET_SECRET: model.EXTERNAL_BITBUCKET_SECRET || undefined,
@@ -461,6 +483,10 @@ const Settings = () => {
             EXTERNAL_GOOGLE_ENABLED: model.EXTERNAL_GOOGLE_ENABLED,
             EXTERNAL_GOOGLE_CLIENT_ID: model.EXTERNAL_GOOGLE_CLIENT_ID || undefined,
             EXTERNAL_GOOGLE_SECRET: model.EXTERNAL_GOOGLE_SECRET || undefined,
+            EXTERNAL_KEYCLOAK_ENABLED: model.EXTERNAL_KEYCLOAK_ENABLED,
+            EXTERNAL_KEYCLOAK_CLIENT_ID: model.EXTERNAL_KEYCLOAK_CLIENT_ID || undefined,
+            EXTERNAL_KEYCLOAK_SECRET: model.EXTERNAL_KEYCLOAK_SECRET || undefined,
+            EXTERNAL_KEYCLOAK_URL: model.EXTERNAL_KEYCLOAK_URL || undefined,
             EXTERNAL_LINKEDIN_ENABLED: model.EXTERNAL_LINKEDIN_ENABLED,
             EXTERNAL_LINKEDIN_CLIENT_ID: model.EXTERNAL_LINKEDIN_CLIENT_ID || undefined,
             EXTERNAL_LINKEDIN_SECRET: model.EXTERNAL_LINKEDIN_SECRET || undefined,
@@ -479,6 +505,13 @@ const Settings = () => {
             EXTERNAL_SPOTIFY_ENABLED: model.EXTERNAL_SPOTIFY_ENABLED,
             EXTERNAL_SPOTIFY_CLIENT_ID: model.EXTERNAL_SPOTIFY_CLIENT_ID || undefined,
             EXTERNAL_SPOTIFY_SECRET: model.EXTERNAL_SPOTIFY_SECRET || undefined,
+            EXTERNAL_WORKOS_ENABLED: model.EXTERNAL_WORKOS_ENABLED,
+            EXTERNAL_WORKOS_CLIENT_ID: model.EXTERNAL_WORKOS_CLIENT_ID || undefined,
+            EXTERNAL_WORKOS_SECRET: model.EXTERNAL_WORKOS_SECRET || undefined,
+            EXTERNAL_WORKOS_URL: model.EXTERNAL_WORKOS_URL || undefined,
+            EXTERNAL_ZOOM_ENABLED: model.EXTERNAL_ZOOM_ENABLED,
+            EXTERNAL_ZOOM_CLIENT_ID: model.EXTERNAL_ZOOM_CLIENT_ID || undefined,
+            EXTERNAL_ZOOM_SECRET: model.EXTERNAL_ZOOM_SECRET || undefined,
           }}
           onChangeModel={(model) => setExternalProvidersModel(model)}
           onReset={() => onFormReset()}
@@ -489,7 +522,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_APPLE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.apple.com/account/resources/identifiers/add/bundleId"
                   target="_blank"
                 >
@@ -518,7 +551,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_AZURE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app"
                   target="_blank"
                 >
@@ -539,6 +572,11 @@ const Settings = () => {
                 showInlineError
                 errorMessage="Please enter the secret."
               />
+              <AutoField
+                name="EXTERNAL_AZURE_URL"
+                showInlineError
+                errorMessage="Please enter the azure tenant url."
+              />
             </>
           )}
           <Divider light />
@@ -547,7 +585,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_BITBUCKET_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
                   target="_blank"
                 >
@@ -576,7 +614,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_DISCORD_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://discord.com/developers/applications#top"
                   target="_blank"
                 >
@@ -605,7 +643,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_FACEBOOK_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developers.facebook.com/apps/"
                   target="_blank"
                 >
@@ -634,7 +672,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITHUB_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://github.com/settings/applications/new"
                   target="_blank"
                 >
@@ -663,7 +701,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITLAB_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://gitlab.com/oauth/applications"
                   target="_blank"
                 >
@@ -692,7 +730,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GOOGLE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://console.developers.google.com/apis/credentials"
                   target="_blank"
                 >
@@ -712,6 +750,36 @@ const Settings = () => {
                 name="EXTERNAL_GOOGLE_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_KEYCLOAK_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+                <a className="text-scale-900 pl-4" href="https://www.keycloak.org/" target="_blank">
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_KEYCLOAK_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_KEYCLOAK_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+              <AutoField
+                name="EXTERNAL_KEYCLOAK_URL"
+                showInlineError
+                errorMessage="Please enter the Keycloak url."
               />
             </>
           )}
@@ -779,7 +847,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITCH_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://dev.twitch.tv/console"
                   target="_blank"
                 >
@@ -808,7 +876,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITTER_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.twitter.com/en/portal/dashboard"
                   target="_blank"
                 >
@@ -837,7 +905,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_SLACK_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://api.slack.com/apps"
                   target="_blank"
                 >
@@ -866,7 +934,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_SPOTIFY_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.spotify.com/dashboard/"
                   target="_blank"
                 >
@@ -884,6 +952,69 @@ const Settings = () => {
               />
               <SecretField
                 name="EXTERNAL_SPOTIFY_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_WORKOS_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+                <a
+                  className="text-scale-900 pl-4"
+                  href="https://dashboard.workos.com"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_WORKOS_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_WORKOS_SECRET"
+                showInlineError
+                errorMessage="Please enter the secret."
+              />
+              <AutoField
+                name="EXTERNAL_WORKOS_URL"
+                showInlineError
+                errorMessage="Please enter the WorkOS url."
+              />
+            </>
+          )}
+          <Divider light />
+          <ToggleField
+            name="EXTERNAL_ZOOM_ENABLED"
+            addOns={
+              externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
+                <a
+                  className="text-scale-900 pl-4"
+                  href="https://developers.zoom.us/"
+                  target="_blank"
+                >
+                  Create new credentials
+                </a>
+              )
+            }
+          />
+          {externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
+            <>
+              <AutoField
+                name="EXTERNAL_ZOOM_CLIENT_ID"
+                showInlineError
+                errorMessage="Please enter the client id."
+              />
+              <SecretField
+                name="EXTERNAL_ZOOM_SECRET"
                 showInlineError
                 errorMessage="Please enter the secret."
               />
@@ -939,8 +1070,8 @@ const AuditLog = ({ interval, projectRef }: any) => {
   return (
     <Panel
       title={
-        <div className=" w-full flex items-center justify-between">
-          <Typography.Title level={5} className="flex-1 block">
+        <div className=" flex w-full items-center justify-between">
+          <Typography.Title level={5} className="block flex-1">
             Audit Trail
           </Typography.Title>
           <div className="flex-1 text-right">

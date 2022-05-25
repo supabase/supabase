@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-with-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] ‫ساختن خودکار APIها
 - [x] پنل کاربری
 - [x] فضای ذخیره‌سازی
-- [ ] توابع (به زودی)
+- [x] توابع
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## مستندات
 
-برای مستندات کامل به‫ [supabase.io/docs](https://supabase.com/docs) مراجعه کنید.
+برای مستندات کامل به‫ [supabase.com/docs](https://supabase.com/docs) مراجعه کنید.
 
 ## جامعه و پشتیبانی
 

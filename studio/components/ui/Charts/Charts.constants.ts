@@ -3,17 +3,17 @@
 
 // For ChartHandler
 export const CHART_COLORS = {
-  TICK: '#6B7280',
-  AXIS: '#444444',
-  GREEN_1: 'rgba(62, 207, 142, 1.0)', // #3ECF8E
-  GREEN_2: 'rgba(62, 207, 142, 0.2)',
+  TICK: 'var(--colors-scale6)',
+  AXIS: 'var(--colors-scale6)',
+  GREEN_1: 'var(--colors-brand9)', // #3ECF8E
+  GREEN_2: 'var(--colors-brand6)',
 }
 
 export const USAGE_COLORS = {
-  200: '#3ECF8E',
-  201: '#2EBDE5',
-  400: '#889096',
-  401: '#FFB224',
-  404: '#F76808',
-  500: '#EF4444',
+  200: 'var(--colors-brand9)',
+  201: 'var(--colors-brand8)',
+  400: 'var(--colors-amber9)',
+  401: 'var(--colors-amber8)',
+  404: 'var(--colors-amber7)',
+  500: 'var(--colors-red9)',
 }

@@ -1,0 +1,37 @@
+Pricing Changelog
+
+
+### 31 March 2022
+----
+
+Edge Functions pricing announced
+
+
+### 29 March 2022
+----
+
+— Enterprise pricing plan announced
+
+— Pay as you go plan now the same as the Pro plan
+
+
+27 August 2021
+----
+
+- Changes "Dedicated support" to "Designated support".
+    - Dedicated = one individual solely focused on an account.
+    - Designated = individual who may be helping across various accounts, but still a single point of contact. May be dedicated or non-dedicated.
+
+
+28 July 2021
+----
+
+- Clarified pricing on the "Optimized database instances" to include the starting price of $50/month.
+
+
+### 29 March 2021
+----
+
+Released our Beta pricing.
+
+

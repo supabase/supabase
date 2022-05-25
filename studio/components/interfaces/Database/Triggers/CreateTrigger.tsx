@@ -20,7 +20,7 @@ import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
 import FormEmptyBox from 'components/to-be-cleaned/FormBoxEmpty'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 
 class CreateTriggerFormState {
@@ -373,30 +373,10 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
             </CreateTriggerContext.Provider>
           </div>
         ) : (
-          <NoTableState />
+          <NoTableState message="You will need to create a table first before you can make a trigger" />
         )}
       </SidePanel>
     </>
-  )
-}
-
-const NoTableState: FC = ({}) => {
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
-
-  return (
-    <ProductEmptyState
-      title="No public tables found"
-      ctaButtonLabel="Create a new table"
-      onClickCta={() => {
-        router.push(`/project/${ref}/database/tables`)
-      }}
-    >
-      <p className="text-sm text-scale-1100">
-        You will need to create a table first before you can make a trigger
-      </p>
-    </ProductEmptyState>
   )
 }
 

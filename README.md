@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -8,13 +9,19 @@
 
 [Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-- [x] Hosted Postgres Database
-- [x] Realtime subscriptions
-- [x] Authentication and authorization
-- [x] Auto-generated APIs
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Auto-generated APIs.
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+- [x] Functions.
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
+- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
-- [x] Storage
-- [ ] Functions (coming soon)
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentation
 
@@ -49,7 +56,7 @@ Supabase is a combination of open source tools. We’re building the features of
 **Architecture**
 
 Supabase is a [hosted platform](https://app.supabase.io). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/self-hosting) and [develop locally](https://supabase.com/docs/guides/local-development).
+You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
@@ -194,7 +201,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Hungarian / Magyar](/i18n/README.hu.md)
 - [Nepali / नेपाली](/i18n/README.ne.md)
 - [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italiano / Italian](/i18n/README.it.md)
+- [Italian / Italiano](/i18n/README.it.md)
 - [Japanese / 日本語](/i18n/README.jp.md)
 - [Korean / 한국어](/i18n/README.ko.md)
 - [Malay / Bahasa Malaysia](/i18n/README.ms.md)

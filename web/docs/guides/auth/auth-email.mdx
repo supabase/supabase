@@ -12,22 +12,29 @@ import TabItem from '@theme/TabItem'
 Setting up Email logins for your Supabase application.
 
 - Add Email authenticator to your [Supabase Project](https://app.supabase.io)
-- Add the login code to your application - [Javascript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
+- Add the login code to your application - [JavaScript](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart)
 
-## Add Email into your Supabase Project
+## Configure email settings
 
 - Go to your [Supabase Project Dashboard](https://app.supabase.io)
 - In the left sidebar, click the `Authentication` icon (near the top)
 - Click `Settings` from the list to go to the `Authentication Settings` page
-- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Enter the final (hosted) URL of your app under `Site URL`
 - Under `Email Auth` turn `Enable Email Signup` to ON
 - Click `Save`
+
+:::note Self hosting
+
+For self-hosting, you can update your project configuration using the files and environment variables provided.
+See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for details.
+
+:::
 
 ### Add login code to your client app
 
 Add logins using our client libraries:
 
-- [Javascript](/docs/reference/javascript/auth-signin#sign-in-with-email)
+- [JavaScript](/docs/reference/javascript/auth-signin#sign-in-with-email)
 - [Dart](/docs/reference/dart/auth-signin#sign-in-with-email)
 
 <Tabs
@@ -87,9 +94,9 @@ async function signInWithEmail() {
 <TabItem value="dart">
 
 ```dart
-function SignInWithEmail() {
+Future<void> signInWithEmail() async {
   await supabase.auth.signIn(
-    email: 'example@email.com',
+    email: 'example@email.com', 
     password: 'example-password'
   );
 }
@@ -120,8 +127,8 @@ async function signOut() {
 <TabItem value="dart">
 
 ```dart
-function SignOut() {
-  await supabase.auth.signOut();
+Future<void> signOut() async {
+   await supabase.auth.signOut();
 }
 ```
 

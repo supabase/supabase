@@ -19,7 +19,6 @@ import styles from './styles.module.css'
 import CustomCodeBlock from '../components/CustomCodeBlock'
 import GithubCard from '../components/GithubCard'
 import HowCard from '../components/HowCard'
-import { repos } from '../data/github'
 
 const heroExample = `
 const messages = supabase
@@ -502,7 +501,7 @@ function Home() {
             </div>
 
             <div className="row is-multiline">
-              {repos
+              {/*repos
                 .filter((x) =>
                   ['supabase', 'realtime', 'postgres', 'postgres-meta'].includes(x.name)
                 )
@@ -517,7 +516,7 @@ function Home() {
                       handle={props.full_name}
                     />
                   </div>
-                ))}
+                ))*/}
             </div>
             <div style={{ textAlign: 'right' }}>
               <a href="/oss">See more →</a>

@@ -40,19 +40,25 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
 
   useEffect(() => {
     ui.load()
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', matchMediaEvent)
+
+    if (window?.matchMedia('(prefers-color-scheme: dark)')?.addEventListener) {
+      // backwards compatibility for safari < v14
+      // limited support for addEventListener()
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', matchMediaEvent)
+    }
 
     autorun(() => {
       if (ui.notification) {
-        const { id, category, error, message, progress } = ui.notification
+        const { id, category, error, message, progress, duration } = ui.notification
+        const toastDuration = duration || 4000
         switch (category) {
           case 'info':
-            return toast(message, { id })
+            return toast(message, { id, duration: toastDuration })
           case 'success':
-            return toast.success(message, { id })
+            return toast.success(message, { id, duration: toastDuration })
           case 'error':
             console.error('Error:', { error, message })
-            return toast.error(message, { id })
+            return toast.error(message, { id, duration: toastDuration })
           case 'loading':
             if (progress) {
               return toast.loading(

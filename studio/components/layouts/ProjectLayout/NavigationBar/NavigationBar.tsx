@@ -3,16 +3,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
-import {
-  Button,
-  Divider,
-  IconHome,
-  Dropdown,
-  IconUser,
-  Select,
-  Typography,
-  IconSettings,
-} from '@supabase/ui'
+import { Button, IconHome, Dropdown, IconUser, IconSettings } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
@@ -24,11 +15,12 @@ interface Props {}
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
   const { ui } = useStore()
-  const projectRef = ui.selectedProject?.ref as string
+  const projectRef = ui.selectedProjectRef as string
+  const projectBaseInfo = ui.selectedProjectBaseInfo
 
   const activeRoute = router.pathname.split('/')[3]
-  const productRoutes = generateProductRoutes(projectRef)
-  const otherRoutes = generateOtherRoutes(projectRef)
+  const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
+  const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
 
   return (
     <div

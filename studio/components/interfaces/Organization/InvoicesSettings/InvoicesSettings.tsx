@@ -16,6 +16,10 @@ import Table from 'components/to-be-cleaned/Table'
 
 const PAGE_LIMIT = 10
 
+/**
+ * Eventually deprecate this - as we move on to show invoices by project on the organization billing page
+ */
+
 interface Props {
   organization: any
 }
@@ -75,6 +79,18 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
     setLoading(false)
   }
 
+  const fetchInvoice = async (invoiceId: string) => {
+    const invoice = await get(`${API_URL}/stripe/invoices/${invoiceId}`)
+    if (invoice?.invoice_pdf) {
+      window.open(invoice.invoice_pdf, '_blank')
+    } else {
+      ui.setNotification({
+        category: 'info',
+        message: 'Unable to fetch the selected invoice',
+      })
+    }
+  }
+
   return (
     <div className="my-4 container max-w-4xl space-y-1">
       <Loading active={loading}>
@@ -116,12 +132,11 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center space-x-2 justify-end">
-                          <a href={x.hosted_invoice_url} target="_blank">
-                            <Button type="outline">View invoice</Button>
-                          </a>
-                          <form method="get" action={x.invoice_pdf}>
-                            <Button type="outline" icon={<IconDownload />} htmlType="submit" />
-                          </form>
+                          <Button
+                            type="outline"
+                            icon={<IconDownload />}
+                            onClick={() => fetchInvoice(x.id)}
+                          />
                         </div>
                       </Table.td>
                     </Table.tr>

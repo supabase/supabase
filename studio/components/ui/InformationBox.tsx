@@ -12,7 +12,6 @@ interface Props {
   button?: React.ReactNode
   className?: string
   block?: boolean
-  size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 
 const InformationBox: FC<Props> = ({
@@ -26,11 +25,8 @@ const InformationBox: FC<Props> = ({
   button,
   className = '',
   block = false,
-  size = 'normal',
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(defaultVisibility)
-
-  const padding = { tiny: 'py-1', small: 'py-2', normal: 'py-3', large: 'py-4' }[size]
 
   return (
     <div

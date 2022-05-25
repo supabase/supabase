@@ -54,7 +54,6 @@ interface IVercelIntegrationStore {
   }[]
 
   isDeployButtonFlow: boolean
-  isSupabaseProjectListEmpty: boolean
   integrationComplete: boolean
   queryParams: Dictionary<string>
   projectLinkRemaining: number
@@ -95,13 +94,6 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
 
   get isDeployButtonFlow() {
     return !!this.currentProjectId
-  }
-
-  get isSupabaseProjectListEmpty() {
-    const { app } = useStore()
-    console.log('isSupabaseProjectListEmpty', app)
-    const projects = app.projects.list()
-    return projects.length == 0
   }
 
   // @ts-ignore
@@ -192,6 +184,9 @@ type VercelIntegrationProps = {} & any
 const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
   // @ts-ignore
   const _store: IVercelIntegrationStore = useLocalObservable(() => new VercelIntegrationStore())
+  const { app } = useStore()
+  const projects = app.projects.list()
+  const isSupabaseProjectListEmpty = projects.length == 0
 
   useEffect(() => {
     _store.loadInitialData()
@@ -204,7 +199,7 @@ const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
           <Connecting />
         ) : _store.isDeployButtonFlow ? (
           <IntegrationProject />
-        ) : _store.isSupabaseProjectListEmpty ? (
+        ) : isSupabaseProjectListEmpty ? (
           <ProjectLinksEmptyState />
         ) : (
           <ProjectLinks />

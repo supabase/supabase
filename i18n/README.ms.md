@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] API dihasilkan secara automatik
 - [x] Papan Pemuka
 - [x] Storan
-- [ ] Fungsi-fungsi (akan datang)
+- [x] Fungsi-fungsi
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentasi
 
-Untuk dokumentasi lengkap, layari [supabase.io/docs](https://supabase.com/docs)
+Untuk dokumentasi lengkap, layari [supabase.com/docs](https://supabase.com/docs)
 
 ## Komuniti & Sokongan
 
@@ -46,7 +49,7 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 **Seni bina semasa**
 
 Supabase ialah [platform yang dihoskan](https://app.supabase.io). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
-Anda juga boleh [host sendiri](https://supabase.com/docs/guides/self-hosting) dan [lokal](https://supabase.com/docs/guides/local-development).
+Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [lokal](https://supabase.com/docs/guides/local-development).
 
 ![Seni bina](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

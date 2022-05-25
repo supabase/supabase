@@ -25,9 +25,16 @@ import Table from 'components/to-be-cleaned/Table'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
+import { ChartIntervals } from 'types'
 
-const CHART_INTERVALS = [
-  { key: 'minutely', label: '60 minutes', startValue: 1, startUnit: 'hour', format: 'MMM D, h:ma' },
+const CHART_INTERVALS: ChartIntervals[] = [
+  {
+    key: 'minutely',
+    label: '60 minutes',
+    startValue: 1,
+    startUnit: 'hour',
+    format: 'MMM D, h:mma',
+  },
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
@@ -37,7 +44,6 @@ interface Props {
 
 const ProjectUsage: FC<Props> = ({ project }) => {
   const logsUsageCodesPaths = useFlag('logsUsageCodesPaths')
-  const logsUsageChartIntervals = useFlag('logsUsageChartIntervals')
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
@@ -59,9 +65,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     get
   )
 
-  const selectedInterval = logsUsageChartIntervals
-    ? CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
-    : CHART_INTERVALS[2]
+  const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
     .format(DATE_FORMAT)
@@ -77,33 +81,31 @@ const ProjectUsage: FC<Props> = ({ project }) => {
     if (timestampDigits < 16) {
       // pad unix timestamp with additional 0 and then forward
       const paddedTimestamp = String(timestamp) + '0'.repeat(16 - timestampDigits)
-      router.push(`/project/${ref}/settings/logs/api?te=${paddedTimestamp}`)
+      router.push(`/project/${ref}/database/api-logs?te=${paddedTimestamp}`)
     } else {
-      router.push(`/project/${ref}/settings/logs/api?te=${timestamp}`)
+      router.push(`/project/${ref}/database/api-logs?te=${timestamp}`)
     }
   }
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row items-center gap-2">
-        {logsUsageChartIntervals && (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={
-              <Dropdown.RadioGroup value={interval} onChange={setInterval}>
-                {CHART_INTERVALS.map((i) => (
-                  <Dropdown.Radio key={i.key} value={i.key}>
-                    {i.label}
-                  </Dropdown.Radio>
-                ))}
-              </Dropdown.RadioGroup>
-            }
-          >
-            <Button as="span" type="default" iconRight={<IconChevronDown />}>
-              {selectedInterval.label}
-            </Button>
-          </Dropdown>
-        )}
+        <Dropdown
+          side="bottom"
+          align="start"
+          overlay={
+            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+              {CHART_INTERVALS.map((i) => (
+                <Dropdown.Radio key={i.key} value={i.key}>
+                  {i.label}
+                </Dropdown.Radio>
+              ))}
+            </Dropdown.RadioGroup>
+          }
+        >
+          <Button as="span" type="default" iconRight={<IconChevronDown />}>
+            {selectedInterval.label}
+          </Button>
+        </Dropdown>
         <span className="text-scale-1000 text-xs">
           Statistics for past {selectedInterval.label}
         </span>
@@ -111,12 +113,12 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       <div className="">
         {startDate && endDate && (
           <>
-            <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconDatabase strokeWidth={2} size={16} />
                       </div>
                     }
@@ -147,7 +149,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconKey strokeWidth={2} size={16} />
                       </div>
                     }
@@ -178,7 +180,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconArchive strokeWidth={2} size={16} />
                       </div>
                     }
@@ -209,7 +211,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 shadow-sm rounded p-1.5">
+                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
                         <IconZap strokeWidth={2} size={16} />
                       </div>
                     }
@@ -230,7 +232,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/realtime')}
                   />
-                  <div className="py-[1.64rem]" />
                 </Panel.Content>
               </Panel>
             </div>
@@ -240,7 +241,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
           <div className="grid md:gap-4 lg:grid-cols-4 lg:gap-8">
             <Panel
               key="api-status-codes"
-              className="col-start-1 col-span-2"
+              className="col-span-2 col-start-1"
               wrapWithLoading={false}
             >
               <Panel.Content className="space-y-4">
@@ -267,7 +268,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
             </Panel>
             <Panel
               key="top-routes"
-              className="col-start-3 col-span-2 pb-0"
+              className="col-span-2 col-start-3 pb-0"
               bodyClassName="h-full"
               wrapWithLoading={false}
             >
@@ -286,7 +287,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                       {(pathsData?.result ?? []).map((row: PathsDatum) => (
                         <Table.tr>
                           <Table.td className="flex items-center space-x-2">
-                            <p className="font-mono text-sm text-scale-1200">{row.method}</p>
+                            <p className="text-scale-1200 font-mono text-sm">{row.method}</p>
                             <p className="font-mono text-sm">{row.path}</p>
                           </Table.td>
                           <Table.td>{row.count}</Table.td>
@@ -313,7 +314,7 @@ const PanelHeader = (props: any) => {
       <div
         className={
           'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'cursor-pointer hover:opacity-100 hover:text-gray-1200' : '')
+          (props.href ? 'hover:text-gray-1200 cursor-pointer hover:opacity-100' : '')
         }
       >
         <Typography.Text>{props.icon}</Typography.Text>

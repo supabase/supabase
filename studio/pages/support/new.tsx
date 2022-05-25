@@ -15,11 +15,12 @@ import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { API_URL } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useStore, withAuth } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { post, get } from 'lib/common/fetch'
 import { Project } from 'types'
 import { isUndefined } from 'lodash'
+import Connecting from 'components/ui/Loading/Loading'
 
 const DEFAULT = {
   category: {
@@ -117,6 +118,7 @@ const SupportNew = () => {
   const { ui, app } = useStore()
   const router = useRouter()
   const projectRef = router.query.ref
+  const category = router.query.category
 
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT)
   const [errors, setErrors] = useState<any>([])
@@ -136,22 +138,35 @@ const SupportNew = () => {
     },
   ]
 
+  const isInitialized = app.projects.isInitialized
   const projects = [...sortedProjects, ...projectDefaults]
 
   useEffect(() => {
-    // set project default
-    if (sortedProjects.length > 1) {
-      const selectedProject = sortedProjects.find((project: Project) => project.ref === projectRef)
-      if (!isUndefined(selectedProject)) {
-        handleOnChange({ name: 'project', value: selectedProject.ref })
+    if (isInitialized) {
+      // set project default
+      if (sortedProjects.length > 1) {
+        const selectedProject = sortedProjects.find(
+          (project: Project) => project.ref === projectRef
+        )
+        if (!isUndefined(selectedProject)) {
+          handleOnChange({ name: 'project', value: selectedProject.ref })
+        } else {
+          handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+        }
       } else {
-        handleOnChange({ name: 'project', value: sortedProjects[0].ref })
+        // set as 'No specific project'
+        handleOnChange({ name: 'project', value: projectDefaults[0].ref })
       }
-    } else {
-      // set as 'No specific project'
-      handleOnChange({ name: 'project', value: projectDefaults[0].ref })
+
+      // Set category based on query param
+      if (category) {
+        const selectedCategory = categoryOptions.find((option) => {
+          if (option.value.toLowerCase() === category) return option
+        })
+        if (selectedCategory) handleOnChange({ name: 'category', value: selectedCategory.value })
+      }
     }
-  }, [])
+  }, [isInitialized])
 
   function handleOnChange(x: any) {
     formDispatch({
@@ -163,7 +178,7 @@ const SupportNew = () => {
     if (x.name === 'project') {
       const selectedProject = projects.find((project: any) => project.ref === x.value)
       if (
-        (selectedProject?.subscription_tier ?? 'Free') === 'Free' &&
+        (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) === PRICING_TIER_PRODUCT_IDS.FREE &&
         formState.severity.value === 'Critical'
       ) {
         formDispatch({
@@ -195,17 +210,32 @@ const SupportNew = () => {
     setErrors([...errors])
 
     if (errors.length === 0) {
-      setLoading(true)
-      const response = await post(`${API_URL}/feedback/send`, {
+      const projectRef = formState.project.value
+      const payload = {
+        projectRef,
         message: formState.body.value,
         category: formState.category.value,
-        projectRef: formState.project.value,
         verified: true,
         tags: ['dashboard-support-form'],
         subject: formState.subject.value,
         severity: formState.severity.value,
-      })
+        siteUrl: '',
+        additionalRedirectUrls: '',
+      }
+
+      if (projectRef !== 'no-project') {
+        const URL = `${API_URL}/auth/${projectRef}/config`
+        const authConfig = await get(URL)
+        if (!authConfig.error) {
+          payload.siteUrl = authConfig.SITE_URL
+          payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+        }
+      }
+
+      setLoading(true)
+      const response = await post(`${API_URL}/feedback/send`, payload)
       setLoading(false)
+
       if (response.error) {
         ui.setNotification({
           category: 'error',
@@ -238,6 +268,8 @@ const SupportNew = () => {
       </div>
     )
   }
+
+  if (!isInitialized) return <Connecting />
 
   return (
     <div className="flex h-screen relative overflow-y-auto overflow-x-hidden">
@@ -343,7 +375,7 @@ const SupportNew = () => {
                           (project: any) => project.ref === formState.project.value
                         )
                         const isAllowedCritical =
-                          (selectedProject?.subscription_tier ?? 'Free') !== 'Free'
+                          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) !== PRICING_TIER_PRODUCT_IDS.FREE
                         return (
                           <Listbox.Option
                             key={`option-${option.value}`}

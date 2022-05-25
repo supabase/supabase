@@ -1,0 +1,96 @@
+---
+id: auth-api-getuser
+title: "getUser()"
+slug: auth-api-getuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Gets the user details.
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { user, error } = await supabase.auth.api.getUser(
+  'ACCESS_TOKEN_JWT',
+)
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+## Parameters
+
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      jwt
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A valid, logged-in JWT.
+
+  </div>
+  
+</li>
+
+</ul>
+
+
+## Notes
+
+- Fetches the user object from the database instead of local storage.
+- Note that user() fetches the user object from local storage which might not be the most updated.
+- Requires the user's access_token. 
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Fetch the user object using the access_token jwt.
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { user, error } = await supabase.auth.api.getUser(
+  'ACCESS_TOKEN_JWT',
+)
+```
+
+
+</TabsPanel>
+
+</Tabs>

@@ -52,7 +52,7 @@ const coolGray = {
 
 module.exports = ui({
   darkMode: 'class', // or 'media' or 'class'
-  purge: [
+  content: [
     // purge styles from app
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -77,7 +77,7 @@ module.exports = ui({
     }),
     divideColor: (theme) => ({
       ...theme('colors'),
-      DEFAULT: 'var(--colors-scale3)',
+      DEFAULT: 'var(--colors-scale6)',
       dark: 'var(--colors-scale2)',
     }),
     extend: {
@@ -222,7 +222,7 @@ module.exports = ui({
           dark: 'var(--colors-scale4)', // '#1a1a1a',
         },
         'table-border': {
-          light: 'var(--colors-scale4)', // gray[100],
+          light: 'var(--colors-scale5)', // gray[100],
           dark: 'var(--colors-scale4)', // '#1a1a1a',
         },
 
@@ -240,11 +240,11 @@ module.exports = ui({
           dark: 'var(--colors-scale3)',
         },
         'panel-border': {
-          light: 'var(--colors-scale4)',
+          light: 'var(--colors-scale5)',
           dark: 'var(--colors-scale4)',
         },
         'panel-border-interior': {
-          light: 'var(--colors-scale2)',
+          light: 'var(--colors-scale4)',
           dark: 'var(--colors-scale4)',
         },
         'panel-border-hover': {
@@ -284,6 +284,28 @@ module.exports = ui({
         //   light: green[300],
         //   dark: green[300],
         // },
+      },
+      animation: {
+        shimmer: 'shimmer 2s infinite linear',
+        sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': {
+            'background-position': '-1000px 0',
+          },
+          '100%': {
+            'background-position': '1000px 0',
+          },
+        },
+        sway: {
+          '0%, 100%': {
+            transform: 'rotate(-10deg) scale(1.5) translateY(4rem)',
+          },
+          '50%': {
+            transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
+          },
+        },
       },
     },
     fontFamily: {

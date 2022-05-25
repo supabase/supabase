@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] স্বয়ংক্রিয়ভাবে তৈরি APIs
 - [x] ড্যাশবোর্ড
 - [x] স্টোরেজ
-- [ ] ফাংশন (শীঘ্রই আসছে)
+- [x] ফাংশন
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## ডকুমেন্টেশন
 
-সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.io/docs](https://supabase.com/docs)
+সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
 কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](./DEVELOPERS.md)
 
@@ -49,7 +52,7 @@
 **স্থাপত্য**
 
 সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://app.supabase.io)। আপনি সাইন আপ করতে পারেন এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
-এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/self-hosting) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
+এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [স্থানীয়ভাবে বিকাশ](https://supabase.com/docs/guides/local-development) করতে পারেন।
 
 ![আর্কিটেকচার](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

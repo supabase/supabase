@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] 자동 생성 API
 - [x] 대시 보드
 - [x] 스토리지
-- [ ] 함수 (출시 예정)
+- [x] 함수
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 문서
 
-전체 문서는 [supabase.io/docs](https://supabase.com/docs)를 참조하세요.
+전체 문서는 [supabase.com/docs](https://supabase.com/docs)를 참조하세요.
 
 ## 커뮤니티 및 지원
 

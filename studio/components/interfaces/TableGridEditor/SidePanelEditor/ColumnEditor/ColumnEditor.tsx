@@ -2,7 +2,12 @@ import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from '@supabase/grid'
 import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
-import { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import {
+  PostgresColumn,
+  PostgresRelationship,
+  PostgresTable,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
@@ -18,18 +23,13 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
-import {
-  EnumType,
-  ColumnField,
-  CreateColumnPayload,
-  UpdateColumnPayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
   column?: PostgresColumn
   selectedTable: PostgresTable
   tables: PostgresTable[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -54,7 +54,7 @@ const ColumnEditor: FC<Props> = ({
 }) => {
   const isNewRecord = isUndefined(column)
   const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
-  const foreignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+  const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -98,7 +98,7 @@ const ColumnEditor: FC<Props> = ({
         : undefined,
       ...(!isUndefined(foreignKeyConfiguration) && {
         format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
+        defaultValue: null,
       }),
     })
     setIsEditingRelation(false)
@@ -184,7 +184,7 @@ const ColumnEditor: FC<Props> = ({
           )}
           <ColumnForeignKey
             column={columnFields}
-            originalForeignKey={foreignKey}
+            originalForeignKey={originalForeignKey}
             onSelectEditRelation={() => setIsEditingRelation(true)}
             onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
           />
@@ -198,7 +198,7 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
-            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: '' })}
+            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
@@ -263,7 +263,6 @@ const ColumnEditor: FC<Props> = ({
           <ForeignKeySelector
             tables={tables}
             column={columnFields}
-            foreignKey={foreignKey}
             visible={isEditingRelation}
             closePanel={() => setIsEditingRelation(false)}
             saveChanges={saveColumnForeignKey}

@@ -56,20 +56,22 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
       onCancel={closePanel}
       customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
     >
-      <TwoOptionToggle
-        options={['view', 'edit']}
-        activeOption={view}
-        borderOverride="border-gray-500"
-        onClickOption={onToggleClick}
-      />
+      <SidePanel.Content>
+        <TwoOptionToggle
+          options={['view', 'edit']}
+          activeOption={view}
+          borderOverride="border-gray-500"
+          onClickOption={onToggleClick}
+        />
 
-      <div className="flex-auto flex flex-col mt-4">
-        {view === 'edit' ? (
-          <Editor column={column} value={jsonStr} onChange={onInputChange} />
-        ) : (
-          <Viewer column={column} value={jsonStr} />
-        )}
-      </div>
+        <div className="mt-4 flex flex-auto flex-col space-y-2">
+          {view === 'edit' ? (
+            <Editor column={column} value={jsonStr} onChange={onInputChange} />
+          ) : (
+            <Viewer column={column} value={jsonStr} />
+          )}
+        </div>
+      </SidePanel.Content>
     </SidePanel>
   )
 }
@@ -87,7 +89,7 @@ const Editor: FC<EditorProps> = ({ column, value, onChange }) => {
     <>
       <Typography.Title level={4}>Edit JSON Field: {column}</Typography.Title>
 
-      <div className="w-full h-96 flex-grow border dark:border-dark">
+      <div className="dark:border-dark h-96 w-full flex-grow border">
         <JsonEditor onInputChange={onChange} defaultValue={value} />
       </div>
     </>

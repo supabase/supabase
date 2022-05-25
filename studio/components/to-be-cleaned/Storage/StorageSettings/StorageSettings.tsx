@@ -60,7 +60,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
         schema={{
           properties: {
             fileSizeLimit: {
-              help: 'The maximum size in bytes of a file that can be uploaded.',
+              help: 'The maximum size in bytes of a file that can be uploaded, up to 5 GB.',
               maximum: STORAGE_FILE_SIZE_LIMIT_MAX_BYTES,
               minimum: 0,
               title: 'Upload file size limit',

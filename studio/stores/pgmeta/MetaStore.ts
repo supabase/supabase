@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk, maxBy } from 'lodash'
+import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from '@supabase/grid'
 import {
   PostgresColumn,
@@ -31,13 +31,14 @@ import {
   generateUpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore from './RolesStore'
+import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
 import PublicationStore, { IPublicationStore } from './PublicationStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
 import ExtensionsStore from './ExtensionsStore'
+import TypesStore from './TypesStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
@@ -51,12 +52,13 @@ export interface IMetaStore {
   schemas: ISchemaStore
 
   hooks: IPostgresMetaInterface<any>
-  roles: IPostgresMetaInterface<any>
+  roles: IRolesStore
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
   publications: IPublicationStore
+  types: IPostgresMetaInterface<any>
 
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
@@ -113,10 +115,10 @@ export default class MetaStore implements IMetaStore {
   functions: FunctionsStore
   extensions: ExtensionsStore
   publications: PublicationStore
+  types: TypesStore
 
   connectionString?: string
   baseUrl: string
-  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -127,13 +129,13 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'graphql',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
-    this.baseUrl = `/api/pg-meta/${projectRef}`
-    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
+    this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -155,6 +157,7 @@ export default class MetaStore implements IMetaStore {
       identifier: 'name',
     })
     this.publications = new PublicationStore(rootStore, `${this.baseUrl}/publications`, headers)
+    this.types = new TypesStore(rootStore, `${this.baseUrl}/types`, headers)
 
     makeObservable(this, {
       excludedSchemas: observable,
@@ -168,7 +171,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.queryBaseUrl}/query`
+      const url = `${this.baseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
@@ -516,6 +519,7 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Add any new columns / Update any existing columns
+    let hasError = false
     for (const column of columns) {
       if (!column.id.includes(table.id.toString())) {
         this.rootStore.ui.setNotification({
@@ -546,7 +550,19 @@ export default class MetaStore implements IMetaStore {
               category: 'loading',
               message: `Updating column ${column.name} from ${updatedTable.name}`,
             })
-            await this.updateColumn(column.id, columnPayload, updatedTable, column.foreignKey)
+            const res: any = await this.updateColumn(
+              column.id,
+              columnPayload,
+              updatedTable,
+              column.foreignKey
+            )
+            if (res?.error) {
+              hasError = true
+              this.rootStore.ui.setNotification({
+                category: 'error',
+                message: `Failed to update column "${column.name}": ${res.error.message}`,
+              })
+            }
           }
         }
       }
@@ -562,7 +578,7 @@ export default class MetaStore implements IMetaStore {
       if (primaryKeys.error) throw primaryKeys.error
     }
 
-    return await this.tables.loadById(table.id)
+    return { table: await this.tables.loadById(table.id), hasError }
   }
 
   async insertRowsViaSpreadsheet(

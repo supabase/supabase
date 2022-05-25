@@ -15,7 +15,7 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import { BarChart, AreaChart } from './ChartRenderer'
 import { ChartData } from './ChartHandler.types'
-import { TooltipProps } from 'recharts'
+import { AreaProps } from 'recharts'
 
 interface Props {
   label: string
@@ -31,7 +31,10 @@ interface Props {
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
+  format?: string
+  highlightedValue?: string | number
   onBarClick?: (v: any) => void
+  areaType?: AreaProps['type']
 }
 
 /**
@@ -57,7 +60,10 @@ const ChartHandler: FC<Props> = ({
   hideChartType = false,
   data,
   isLoading,
+  format,
+  highlightedValue,
   onBarClick,
+  areaType,
 }) => {
   const router = useRouter()
   const { ref } = router.query
@@ -114,12 +120,15 @@ const ChartHandler: FC<Props> = ({
     }
   }, [startDate])
 
-  const highlightedValue =
-    provider === 'daily-stats'
-      ? chartData?.total
-      : provider === 'log-stats'
-      ? chartData?.totalGrouped?.[attribute]
-      : chartData?.totalAverage
+  highlightedValue = highlightedValue
+    ? highlightedValue
+    : provider === 'daily-stats' && !attribute.includes('ingress') && !attribute.includes('egress')
+    ? chartData?.maximum
+    : provider === 'daily-stats'
+    ? chartData?.total
+    : provider === 'log-stats'
+    ? chartData?.totalGrouped?.[attribute]
+    : chartData?.totalAverage
 
   if (loading) {
     return (
@@ -160,7 +169,7 @@ const ChartHandler: FC<Props> = ({
           data={chartData?.data ?? []}
           attribute={attribute}
           yAxisLimit={chartData?.yAxisLimit}
-          format={chartData?.format}
+          format={format || chartData?.format}
           highlightedValue={highlightedValue}
           label={label}
           customDateFormat={customDateFormat}
@@ -169,7 +178,7 @@ const ChartHandler: FC<Props> = ({
       ) : (
         <AreaChart
           data={chartData?.data ?? []}
-          format={chartData?.format}
+          format={format || chartData?.format}
           attribute={attribute}
           yAxisLimit={chartData?.yAxisLimit}
           highlightedValue={highlightedValue}

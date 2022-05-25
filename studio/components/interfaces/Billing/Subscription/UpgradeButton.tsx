@@ -11,6 +11,8 @@ import { CancellationReasons } from './SubcriptionCancellation.constants'
 
 /**
  * Generates a Stripe Billing Portal link for a project.
+ * This is now deprecated since 180422 since we have native billing
+ * Feel free to delete this file if we'd reckon we no longer need this fallback
  *
  * @param {Object}   props.projectRef        Project Ref
  * @param {Boolean}  props.paid              Tier name

@@ -20,13 +20,19 @@ export const REGIONS = {
 
 export const REGIONS_DEFAULT = REGIONS.EAST_US
 
-export const PRICING_PLANS = {
+export const PRICING_TIER_LABELS = {
   FREE: 'Free tier',
   PRO: 'Pro tier',
-  // PAYG: 'Pay as you go',
 }
 
-export const PRICING_PLANS_DEFAULT = PRICING_PLANS.FREE
+export const PRICING_TIER_PRODUCT_IDS = {
+  FREE: 'tier_free',
+  PRO: 'tier_pro',
+  PAYG: 'tier_payg',
+}
+
+export const PRICING_TIER_FREE_KEY = 'FREE'
+export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
 export const PROVIDERS = {
   AWS: {
@@ -99,10 +105,10 @@ export const PROJECT_STATUS = {
   RESTORING: 'RESTORING',
 }
 
-export const STRIPE_PRODUCT_IDS = {
-  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID,
-  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID,
-  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID,
+export const STRIPE_PRODUCT_IDS: { [x: string]: string } = {
+  FREE: process?.env?.NEXT_PUBLIC_STRIPE_FREE_TIER_ID || 'prod_Ip4vqwv3EJ7Mi0',
+  PRO: process?.env?.NEXT_PUBLIC_STRIPE_PRO_TIER_ID || 'prod_IsRLOp58Z7V4XN',
+  PAYG: process?.env?.NEXT_PUBLIC_STRIPE_PAYG_TIER_ID || 'prod_JlTbw91xcM6NY4',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
@@ -134,3 +140,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 export const DEFAULT_FREE_PROJECTS_LIMIT = 2
 
 export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB
+
+export const DEFAULT_PROJECT_API_SERVICE_ID = 1

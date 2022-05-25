@@ -52,7 +52,7 @@ const ConfirmationModal: FC<Props> = ({
           <Button block type="secondary" onClick={onSelectCancel}>
             Cancel
           </Button>
-          <Button block type="primary" danger={danger} loading={loading} onClick={onConfirm}>
+          <Button block type={danger ? 'danger' : 'primary'} loading={loading} onClick={onConfirm}>
             {loading ? buttonLoadingLabel : buttonLabel}
           </Button>
         </div>
