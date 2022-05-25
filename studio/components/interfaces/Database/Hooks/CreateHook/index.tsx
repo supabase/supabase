@@ -3,7 +3,7 @@ import { FC, useEffect, createContext } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { Dictionary } from '@supabase/grid'
-import { SidePanel } from '@supabase/ui'
+import { Badge, Input, SidePanel } from '@supabase/ui'
 import { useStore } from 'hooks'
 
 import InputName from './InputName'
@@ -408,17 +408,75 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
                 <SelectEnabledMode />
               </div>
 
-              <SidePanel.Seperator />
+              {_localState.formState.serviceHeaders.value.length > 0 && (
+                <>
+                  <SidePanel.Seperator />
+                  <div className="space-y-2 px-6">
+                    <div className="flex items-center space-x-2">
+                      <h5 className="text-scale-1200 text-base">HTTP Headers</h5>
+                      <Badge color="gray">Read only</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {_localState.formState.serviceHeaders.value.map(
+                        (serviceHeader: { name: string; value: string }) => (
+                          <div
+                            key={serviceHeader.name}
+                            className="flex items-center justify-center space-x-2"
+                          >
+                            <Input
+                              disabled
+                              className="w-full flex-1"
+                              readOnly
+                              value={serviceHeader.name}
+                            />
+                            <Input
+                              disabled
+                              className="w-full flex-1"
+                              readOnly
+                              value={serviceHeader.value}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
 
-              <div className="px-6">
-                <h5 className="text-scale-1200 text-base">HTTP Headers</h5>
-                {JSON.stringify(_localState.formState.serviceHeaders.value)}
-              </div>
-
-              <div className="px-6">
-                <h5 className="text-scale-1200 text-base">HTTP Parameters</h5>
-                {JSON.stringify(_localState.formState.serviceParams.value)}
-              </div>
+              {_localState.formState.serviceParams.value.length > 0 && (
+                <>
+                  <SidePanel.Seperator />
+                  <div className="space-y-2 px-6">
+                    <div className="flex items-center space-x-2">
+                      <h5 className="text-scale-1200 text-base">HTTP Parameters</h5>
+                      <Badge color="gray">Read only</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {_localState.formState.serviceParams.value.map(
+                        (serviceParam: { name: string; value: string }) => (
+                          <div
+                            key={serviceParam.name}
+                            className="flex items-center justify-center space-x-2"
+                          >
+                            <Input
+                              disabled
+                              className="w-full flex-1"
+                              readOnly
+                              value={serviceParam.name}
+                            />
+                            <Input
+                              disabled
+                              className="w-full flex-1"
+                              readOnly
+                              value={serviceParam.value}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           ) : (
             <>
