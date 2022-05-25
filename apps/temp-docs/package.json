@@ -17,7 +17,7 @@
     "common": "*",
     "gray-matter": "^4.0.3",
     "markdown-toc": "^1.2.0",
-    "next": "12.1.0",
+    "next": "12.1.6",
     "next-mdx-remote": "^3.0.8",
     "next-themes": "0.0.15",
     "react": "17.0.2",
