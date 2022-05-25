@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { includes } from 'lodash'
+import TooltipListener from 'components/to-be-cleaned/TooltipListener'
 
 /**
  * Hook for listening to clicks outside of the target element.
@@ -156,6 +157,7 @@ export {
   clickOutsideListener,
   useKeyboardShortcuts,
   isMounted,
+  TooltipListener,
   useWindowDimensions,
   usePrevious,
 }
