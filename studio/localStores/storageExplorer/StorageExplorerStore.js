@@ -54,6 +54,7 @@ class StorageExplorerStore {
   loaded = false
   view = STORAGE_VIEWS.COLUMNS
   sortBy = STORAGE_SORT_BY.NAME
+  sortByOrder = 'asc'
   buckets = []
   selectedBucket = {}
   selectedBucketToEdit = {}
@@ -64,7 +65,7 @@ class StorageExplorerStore {
   selectedItemsToMove = []
   selectedFilePreview = {}
 
-  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: 'asc' } }
+  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
 
   /* Supabase client */
   supabaseClient = null
@@ -203,6 +204,13 @@ class StorageExplorerStore {
 
   setSortBy = async (sortBy) => {
     this.sortBy = sortBy
+    this.closeFilePreview()
+    this.updateExplorerPreferences()
+    await this.refetchAllOpenedFolders()
+  }
+
+  setSortByOrder = async (sortByOrder) => {
+    this.sortByOrder = sortByOrder
     this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
@@ -940,7 +948,7 @@ class StorageExplorerStore {
       limit: LIMIT,
       offset: OFFSET,
       search: searchString,
-      sortBy: { column: this.sortBy, order: 'asc' },
+      sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
     const parameters = { signal: this.abortController.signal }
 
@@ -973,7 +981,7 @@ class StorageExplorerStore {
       limit: LIMIT,
       offset: column.items.length,
       search: searchString,
-      sortBy: { column: this.sortBy, order: 'asc' },
+      sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
     const parameters = { signal: this.abortController.signal }
 
@@ -1012,7 +1020,7 @@ class StorageExplorerStore {
         const options = {
           limit: LIMIT,
           offset: OFFSET,
-          sortBy: { column: this.sortBy, order: 'asc' },
+          sortBy: { column: this.sortBy, order: this.sortByOrder },
         }
 
         const { data: items, error } = await this.supabaseClient.storage
@@ -1152,7 +1160,7 @@ class StorageExplorerStore {
     }
   }
 
-  /* 
+  /*
     Recursively returns a list of items along every directory within the specified base folder
     Each item has an extra property 'prefix' which has the prefix that leads to the item
     Used specifically for any operation that deals with every file along the folder
@@ -1174,7 +1182,7 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
-    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: 'asc' } }
+    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
     const { data: folderContents } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(formattedPathToFolder, options)
@@ -1338,6 +1346,7 @@ class StorageExplorerStore {
     const preferences = {
       view: this.view,
       sortBy: this.sortBy,
+      sortByOrder: this.sortByOrder,
     }
     localStorage.setItem(localStorageKey, JSON.stringify(preferences))
     return preferences
@@ -1347,13 +1356,15 @@ class StorageExplorerStore {
     const localStorageKey = this.getLocalStorageKey()
     const preferences = localStorage.getItem(localStorageKey)
     if (preferences) {
-      const { view, sortBy } = JSON.parse(preferences)
+      const { view, sortBy, sortByOrder } = JSON.parse(preferences)
       this.view = view
       this.sortBy = sortBy
+      this.sortByOrder = sortByOrder
     } else {
-      const { view, sortBy } = this.updateExplorerPreferences()
+      const { view, sortBy, sortByOrder } = this.updateExplorerPreferences()
       this.view = view
       this.sortBy = sortBy
+      this.sortByOrder = sortByOrder
     }
   }
 }
