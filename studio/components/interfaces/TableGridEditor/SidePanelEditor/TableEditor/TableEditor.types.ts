@@ -1,4 +1,4 @@
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { ColumnField } from '../SidePanelEditor.types'
 
 export interface TableField {

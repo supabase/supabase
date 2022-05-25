@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
 import { Loading, Button } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
