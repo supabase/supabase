@@ -393,27 +393,33 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={() => setVisible(!visible)}
-      header={_localState.title}
-      className={
-        'hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out ' + '' // (showCreateFunctionSidePanel ? 'mr-16' : '')
-      }
       loading={_localState.loading}
+      header={_localState.title}
+      className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
       onConfirm={handleSubmit}
+      onCancel={() => setVisible(!visible)}
     >
       <CreateHookContext.Provider value={_localState}>
         <div className="space-y-10 py-6">
           {_localState.isEditing ? (
-            <div className="space-y-10 px-6 py-6">
-              <InputName />
-              <SelectEnabledMode />
+            <>
+              <div className="space-y-10 px-6">
+                <InputName />
+                <SelectEnabledMode />
+              </div>
 
-              {/* HTTP Headers */}
-              {JSON.stringify(_localState.formState.serviceHeaders)}
+              <SidePanel.Seperator />
 
-              {/* HTTP Params */}
-              {JSON.stringify(_localState.formState.serviceParams)}
-            </div>
+              <div className="px-6">
+                <h5 className="text-scale-1200 text-base">HTTP Headers</h5>
+                {JSON.stringify(_localState.formState.serviceHeaders.value)}
+              </div>
+
+              <div className="px-6">
+                <h5 className="text-scale-1200 text-base">HTTP Parameters</h5>
+                {JSON.stringify(_localState.formState.serviceParams.value)}
+              </div>
+            </>
           ) : (
             <>
               <div className="px-6">
