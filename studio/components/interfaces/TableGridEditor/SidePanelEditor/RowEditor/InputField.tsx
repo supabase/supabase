@@ -82,18 +82,25 @@ const InputField: FC<Props> = ({
 
   if (includes(TEXT_TYPES, field.format)) {
     return (
-      <Input.TextArea
-        layout="horizontal"
-        label={field.name}
-        descriptionText={field.comment}
-        labelOptional={field.format}
-        disabled={!isEditable}
-        error={errors[field.name]}
-        rows={5}
-        value={field.value}
-        placeholder={field.defaultValue}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-      />
+      <div className="text-area-text-sm">
+        <Input.TextArea
+          layout="horizontal"
+          label={field.name}
+          className="text-sm"
+          descriptionText={field.comment}
+          labelOptional={field.format}
+          disabled={!isEditable}
+          error={errors[field.name]}
+          rows={5}
+          value={field.value}
+          placeholder={
+            typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+              ? 'Default: Empty string'
+              : field.defaultValue
+          }
+          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+        />
+      </div>
     )
   }
 
