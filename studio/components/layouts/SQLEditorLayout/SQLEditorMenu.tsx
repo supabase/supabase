@@ -46,7 +46,6 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  console.log('TAB INFO', tabInfo)
   const router = useRouter()
   const { ref } = router.query
 
