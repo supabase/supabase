@@ -81,7 +81,7 @@ const ColumnManagement: FC<Props> = ({
           : undefined,
         ...(!isUndefined(foreignKeyConfiguration) && {
           format: foreignKeyConfiguration.column.format,
-          defaultValue: '',
+          defaultValue: null,
         }),
       })
     }
