@@ -53,7 +53,6 @@ class CreateHookFormState {
   }
 
   get requestBody() {
-    console.log('Re', formatArguments(this.serviceParams.value))
     return {
       id: this.id,
       activation: 'AFTER',
@@ -362,7 +361,6 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
         _localState.setLoading(true)
 
         const body = _localState.formState.requestBody
-        console.log('HandleSubmit', body)
 
         const response: any = _localState.isEditing
           ? await _localState.meta.hooks.update(body.id, body)
