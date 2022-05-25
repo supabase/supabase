@@ -1255,11 +1255,17 @@ pages:
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
+      
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
     examples:
       - name: Call a Postgres function
         isSpotlight: true
-        description: This is an example of invoking a Postgres function.
+        description: This is an example of invoking a Postgres function with no parameters.
         js: |
           ```js
           const { data, error } = await supabase
