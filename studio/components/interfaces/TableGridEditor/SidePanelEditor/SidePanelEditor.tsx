@@ -1,15 +1,19 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState } from 'react'
 import { find, isUndefined } from 'lodash'
 import { Query, Dictionary } from '@supabase/grid'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { Modal } from '@supabase/ui'
+import {
+  PostgresRelationship,
+  PostgresTable,
+  PostgresColumn,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-
-import { Modal } from '@supabase/ui'
 
 interface Props {
   selectedSchema: string
@@ -49,7 +53,9 @@ const SidePanelEditor: FC<Props> = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list()
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
 
   const saveRow = async (
     payload: any,

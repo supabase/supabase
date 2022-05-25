@@ -36,7 +36,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
-import { useStore, useJwtSecretUpdateStatus, withAuth } from 'hooks'
+import { useStore, useJwtSecretUpdateStatus } from 'hooks'
 
 import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -46,6 +46,7 @@ import Flag from 'components/ui/Flag/Flag'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import MultiSelect from 'components/ui/MultiSelect'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { NextPageWithLayout } from 'types'
 
 const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
@@ -71,7 +72,7 @@ const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
 
 const PageContext: any = createContext(null)
 
-const ApiSettings = () => {
+const ApiSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -99,17 +100,17 @@ const ApiSettings = () => {
   }
 
   return (
-    <SettingsLayout title="API Settings">
-      <PageContext.Provider value={PageState}>
-        <div className="content h-full w-full overflow-y-auto">
-          <ServiceList projectRef={ref} />
-        </div>
-      </PageContext.Provider>
-    </SettingsLayout>
+    <PageContext.Provider value={PageState}>
+      <div className="content h-full w-full overflow-y-auto">
+        <ServiceList projectRef={ref} />
+      </div>
+    </PageContext.Provider>
   )
 }
 
-export default withAuth(observer(ApiSettings))
+ApiSettings.getLayout = (page) => <SettingsLayout title="API Settings">{page}</SettingsLayout>
+
+export default observer(ApiSettings)
 
 const ServiceList: FC<any> = ({ projectRef }) => {
   const { ui } = useStore()
@@ -224,13 +225,12 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <article className="max-w-4xl p-4">
-        <DisplayApiSettings key="DisplayAPISettings" />
+      <div className="max-w-4xl p-4">
         <section>
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Configuration
+                Project URL
               </Typography.Title>
             }
           >
@@ -246,6 +246,21 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
             </Panel.Content>
+          </Panel>
+        </section>
+
+        <section>
+          <DisplayApiSettings key="DisplayAPISettings" />
+        </section>
+
+        <section>
+          <Panel
+            title={
+              <Typography.Title level={5} className="mb-0">
+                JWT Settings
+              </Typography.Title>
+            }
+          >
             <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
               <Input
                 label="JWT Secret"
@@ -344,8 +359,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
+
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
-      </article>
+      </div>
 
       <ConfirmModal
         danger

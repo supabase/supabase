@@ -5,7 +5,8 @@ import supabase from '~/lib/supabase'
 
 const INITIAL_VALUES = {
   companyName: '',
-  contactName: '',
+  contactFirstName: '',
+  contactLastName: '',
   contactEmail: '',
   contactPhone: '',
   companySize: '',
@@ -20,8 +21,12 @@ const validate = (values: any) => {
     errors.companyName = 'Required'
   }
 
-  if (!values.contactName) {
-    errors.contactName = 'Required'
+  if (!values.contactFirstName) {
+    errors.contactFirstName = 'Required'
+  }
+
+  if (!values.contactLastName) {
+    errors.contactLastName = 'Required'
   }
 
   if (!values.contactEmail) {
@@ -41,7 +46,9 @@ const EnterpriseContactForm = () => {
       [
         {
           company_name: values.companyName,
-          contact_name: values.contactName,
+          contact_name: `${values.contactFirstName} ${values.contactLastName}`,
+          contact_first_name: values.contactFirstName,
+          contact_last_name: values.contactLastName,
           contact_email: values.contactEmail,
           contact_phone: values.contactPhone,
           company_size: values.companySize,
@@ -76,14 +83,26 @@ const EnterpriseContactForm = () => {
               />
             </div>
 
-            <div>
-              <Input
-                label="Your Name *"
-                id="contactName"
-                name="contactName"
-                layout="vertical"
-                placeholder="Jane Doe"
-              />
+            <div className="flex space-x-4">
+              <div className="flex-1">
+                <Input
+                  label="Your First Name *"
+                  id="contactFirstName"
+                  name="contactFirstName"
+                  layout="vertical"
+                  placeholder="Jane"
+                />
+              </div>
+
+              <div className="flex-1">
+                <Input
+                  label="Your Last Name *"
+                  id="contactLastName"
+                  name="contactLastName"
+                  layout="vertical"
+                  placeholder="Doe"
+                />
+              </div>
             </div>
 
             <div>
