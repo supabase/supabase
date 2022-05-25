@@ -98,7 +98,7 @@ const ColumnEditor: FC<Props> = ({
         : undefined,
       ...(!isUndefined(foreignKeyConfiguration) && {
         format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
+        defaultValue: null,
       }),
     })
     setIsEditingRelation(false)
@@ -198,7 +198,7 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
-            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: '' })}
+            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
