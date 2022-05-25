@@ -1,31 +1,28 @@
-import useSWR from 'swr'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
 import {
+  Button,
+  Dropdown,
   IconArchive,
+  IconChevronDown,
   IconDatabase,
   IconKey,
   IconZap,
   Typography,
-  Button,
-  Dropdown,
-  IconChevronDown,
 } from '@supabase/ui'
-
-import Panel from 'components/to-be-cleaned/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
-
+import Panel from 'components/to-be-cleaned/Panel'
+import Table from 'components/to-be-cleaned/Table'
+import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
+import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
+import dayjs from 'dayjs'
 import { useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, METRICS, DATE_FORMAT } from 'lib/constants'
-import Table from 'components/to-be-cleaned/Table'
-import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
-import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
-import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
+import { API_URL, DATE_FORMAT, METRICS } from 'lib/constants'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
+import useSWR from 'swr'
 import { ChartIntervals } from 'types'
+import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -47,10 +44,12 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const [interval, setInterval] = useState<string>('hourly')
   const router = useRouter()
   const { ref } = router.query
+
   const { data, error }: any = useSWR(
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
     get
   )
+
   const { data: codesData, error: codesFetchError } = useSWR<EndpointResponse<StatusCodesDatum>>(
     logsUsageCodesPaths
       ? `${API_URL}/projects/${ref}/analytics/endpoints/usage.api-codes?interval=${interval}`
@@ -72,6 +71,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   const endDate = dayjs().format(DATE_FORMAT)
   const charts = data?.data
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
+
   const handleBarClick = (v: any, search: string) => {
     if (!v || !v.activePayload?.[0]?.payload) return
     // returns rechart internal tooltip data type
@@ -86,6 +86,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
       router.push(`/project/${ref}/database/api-logs?te=${timestamp}`)
     }
   }
+
   return (
     <div className="mx-6 space-y-6">
       <div className="flex flex-row items-center gap-2">
@@ -138,11 +139,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/rest')}
                   />
-                  <ProjectUsageMinimal
-                    projectRef={project.ref}
-                    subscription_id={project.subscription_id}
-                    filter="Database"
-                  />
                 </Panel.Content>
               </Panel>
               <Panel key="auth-chart">
@@ -169,11 +165,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/auth')}
                   />
-                  <ProjectUsageMinimal
-                    projectRef={project.ref}
-                    subscription_id={project.subscription_id}
-                    filter="Auth"
-                  />
                 </Panel.Content>
               </Panel>
               <Panel key="storage-chart">
@@ -199,11 +190,6 @@ const ProjectUsage: FC<Props> = ({ project }) => {
                     data={charts}
                     isLoading={!charts && !error ? true : false}
                     onBarClick={(v) => handleBarClick(v, '/storage')}
-                  />
-                  <ProjectUsageMinimal
-                    projectRef={project.ref}
-                    subscription_id={project.subscription_id}
-                    filter="File storage"
                   />
                 </Panel.Content>
               </Panel>
