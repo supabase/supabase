@@ -14,9 +14,9 @@ import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
 
 import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
-import { NextPageWithLayout } from 'types'
+import { ChartIntervals, NextPageWithLayout } from 'types'
 
-const CHART_INTERVALS = [
+const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: '5min',
     label: '5 min',
@@ -91,7 +91,7 @@ const PageLayout: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="py-2 space-y-6">
+    <div className="space-y-6 py-2">
       <div className="flex flex-row items-center gap-2">
         <div className="flex items-center">
           {CHART_INTERVALS.map((item, i) => {
@@ -118,14 +118,14 @@ const PageLayout: NextPageWithLayout = () => {
           })}
         </div>
 
-        <span className="text-xs text-scale-1000">
+        <span className="text-scale-1000 text-xs">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
       <div className="">
         {startDate && endDate && (
           <>
-            <div className="grid grid-cols-1 md:gap-4 md:grid-cols-2 lg:grid-cols-2 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
               <Panel key="database-chart">
                 <Panel.Content className="space-y-4">
                   {/*

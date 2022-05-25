@@ -3,6 +3,7 @@ import { Button, IconLoader } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from '../..'
+import Link from 'next/link'
 
 interface Props {
   plan: any
@@ -56,6 +57,18 @@ const PlanCTAButton: FC<Props> = ({ plan, currentPlan, onSelectPlan }) => {
   const ctaText = getButtonText(plan, currentPlan)
   const disabled =
     plan.id === STRIPE_PRODUCT_IDS.FREE && currentPlan.prod_id === STRIPE_PRODUCT_IDS.FREE
+
+  if (plan.name === 'Enterprise') {
+    return (
+      <Link href="https://supabase.com/contact/enterprise">
+        <a>
+          <Button disabled={disabled} type={type} block size="medium">
+            {ctaText}
+          </Button>
+        </a>
+      </Link>
+    )
+  }
 
   return (
     <div className="flex items-center justify-center">
