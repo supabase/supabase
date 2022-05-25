@@ -14,7 +14,7 @@ import {
 } from '@supabase/ui'
 import Divider from 'components/ui/Divider'
 
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { useStore, withAuth } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -285,7 +285,7 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full bg-panel-header-light dark:bg-panel-header-dark border 
+        className="w-full bg-panel-header-light dark:bg-panel-header-dark border
       border-border-secondary-light dark:border-border-secondary-dark rounded-sm"
       >
         <div className="flex justify-between items-center p-6">
