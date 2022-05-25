@@ -15,7 +15,6 @@ export const formatArguments = (args: { name: string; value: string }[]) => {
  */
 
 export const convertKeyValue = (value: string) => {
-  console.log('convertKeyValue', value)
   const temp = []
   if (value) {
     const obj = JSON.parse(value)
