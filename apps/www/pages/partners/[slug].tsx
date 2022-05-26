@@ -113,6 +113,22 @@ function Partner({ partner }: { partner: Partner }) {
                   Overview
                 </h2>
 
+                {partner.video && (
+                  <div
+                    className="bg-scale-1000 relative w-full rounded-b-md shadow-lg"
+                    style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
+                  >
+                    <iframe
+                      title="Demo video showcasing Supabase"
+                      className="absolute h-full w-full rounded-b-md"
+                      src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
+                      style={{ top: 0, left: 0 }}
+                      frameBorder="0"
+                      allow="autoplay; modestbranding; encrypted-media"
+                    />
+                  </div>
+                )}
+
                 <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
               </div>
 
