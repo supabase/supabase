@@ -1,7 +1,10 @@
-import { Button, Form, InputNumber, Toggle } from '@supabase/ui'
+import { Button, Form, Input, InputNumber, Toggle } from '@supabase/ui'
+import { useStore } from 'hooks'
 import React from 'react'
 
 const AutoSchemaForm = () => {
+  const { authConfig, ui } = useStore()
+
   // panel
   const Panel = ({
     children,
@@ -16,8 +19,8 @@ const AutoSchemaForm = () => {
       className="
       bg-scale-100 
       dark:bg-scale-300 
-      
-      border-scale-400 my-8 overflow-hidden rounded-md border shadow"
+    
+      border-scale-400 overflow-hidden rounded-md border shadow"
     >
       {header && (
         <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
@@ -45,26 +48,33 @@ const AutoSchemaForm = () => {
   return (
     <>
       <Form
-        id="general_form"
+        id="auth-config-general-form"
         initialValues={{
-          enable_signups: true,
-          jwt_expiry: 3600,
+          DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
+          JWT_EXP: authConfig.config.JWT_EXP,
+          SITE_URL: authConfig.config.SITE_URL,
         }}
-        onSubmit={(values: any, { setSubmitting }: any) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2))
+        onSubmit={async (values: any, { setSubmitting }: any) => {
+          const payload = values
+          payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
+          console.log('payload', payload)
+          try {
+            setSubmitting(true)
+            await authConfig.update(payload)
             setSubmitting(false)
-          }, 400)
+          } catch (error) {
+            setSubmitting(false)
+          }
         }}
         validate={(values: any) => {
           const errors: any = {}
-          if (!values.jwt_expiry) {
-            errors.jwt_expiry = 'This is required'
-          }
-          if (values.jwt_expiry > 604800) {
-            errors.jwt_expiry =
-              'The maxiumum allowed is 604,800 seconds. Use a smaller number of seconds.'
-          }
+          // if (!values.jwt_expiry) {
+          //   errors.jwt_expiry = 'This is required'
+          // }
+          // if (values.jwt_expiry > 604800) {
+          //   errors.jwt_expiry =
+          //     'The maxiumum allowed is 604,800 seconds. Use a smaller number of seconds.'
+          // }
           return errors
         }}
       >
@@ -81,7 +91,7 @@ const AutoSchemaForm = () => {
                     loading={isSubmitting}
                     type="primary"
                     htmlType="submit"
-                    form="general_form"
+                    form="auth-config-general-form"
                   >
                     Save
                   </Button>
@@ -92,24 +102,45 @@ const AutoSchemaForm = () => {
             <Section
               header={<label className="text-scale-1200 col-span-4 text-sm">User Signups</label>}
             >
-              <Toggle
-                id="enable_signups"
-                className="col-span-8"
-                label="Allow new users to sign up"
-                layout="flex"
-                descriptionText="If this is disabled, new users will not be able to sign up to your application."
-              />
+              <div className="col-span-8 flex flex-col gap-6">
+                <Toggle
+                  id="DISABLE_SIGNUP"
+                  size="small"
+                  className="col-span-8"
+                  label="Allow new users to sign up"
+                  layout="flex"
+                  descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                />
+              </div>
             </Section>
             <div className="border-scale-400 border-t"></div>
             <Section
               header={<label className="text-scale-1200 col-span-4 text-sm">User Sessions</label>}
             >
-              <InputNumber
-                className="col-span-8"
-                id="jwt_expiry"
-                label="JWT expiry limit"
-                descriptionText="How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
-              />
+              <div className="col-span-8 flex flex-col gap-6">
+                {/**
+                 *
+                 * permitted redirects
+                 * for anything on that domain
+                 *
+                 * talk to @kangming about this
+                 *
+                 */}
+                <Input
+                  id="SITE_URL"
+                  size="small"
+                  className="col-span-8"
+                  label="Site URL"
+                  descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
+                />
+                <InputNumber
+                  id="JWT_EXP"
+                  size="small"
+                  className="col-span-8"
+                  label="JWT expiry limit"
+                  descriptionText="How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
+                />
+              </div>
             </Section>
           </Panel>
         )}
