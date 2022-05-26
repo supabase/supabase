@@ -4,6 +4,7 @@ import { EmptyListState } from 'components/ui/States'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import { object, string } from 'yup'
 
 const CommaSeperatedString = () => {
   const { authConfig, ui } = useStore()
@@ -15,6 +16,10 @@ const CommaSeperatedString = () => {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [selectedDomain, setSelected] = useState('')
+
+  let newDomainSchema = object({
+    domain: string().url().required(),
+  })
 
   const DomainsForm = () => {
     const [open, setOpen] = useState(false)
@@ -47,6 +52,7 @@ const CommaSeperatedString = () => {
                 domain: '',
               }}
               validateOnBlur
+              validationSchema={newDomainSchema}
               onSubmit={async (values: any, { setSubmitting }: any) => {
                 setSubmitting(true)
                 try {
@@ -61,22 +67,6 @@ const CommaSeperatedString = () => {
                   setSubmitting(false)
                   ui.notification?.error('Failed to update domain: ', error?.message)
                 }
-              }}
-              validate={(values) => {
-                const errors: any = {}
-                if (!values.domain) {
-                  errors.domain = 'A domain is required'
-                } else if (
-                  !/^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/i.test(
-                    values.domain
-                  )
-                ) {
-                  errors.domain = 'Not a valid URL. Please use http:// or https://'
-                }
-                if (URI_ALLOW_LIST_ARRAY.includes(values.domain)) {
-                  errors.domain = 'This domain is already used as a redirect URL'
-                }
-                return errors
               }}
             >
               {({ isSubmitting }: any) => {
