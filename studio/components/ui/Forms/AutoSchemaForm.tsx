@@ -53,6 +53,8 @@ const AutoSchemaForm = () => {
           DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
           JWT_EXP: authConfig.config.JWT_EXP,
           SITE_URL: authConfig.config.SITE_URL,
+          SECURITY_REFRESH_TOKEN_REUSE_INTERVAL:
+            authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
         }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           const payload = values
@@ -139,6 +141,15 @@ const AutoSchemaForm = () => {
                   className="col-span-8"
                   label="JWT expiry limit"
                   descriptionText="How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
+                />
+                {/* // min 0 */}
+                <InputNumber
+                  id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                  size="small"
+                  min={0}
+                  className="col-span-8"
+                  label="Reuse Interval"
+                  descriptionText="Time interval where the same refresh token can be used to request for an access token."
                 />
               </div>
             </Section>

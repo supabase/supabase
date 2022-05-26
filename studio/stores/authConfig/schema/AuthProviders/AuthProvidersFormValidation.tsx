@@ -23,6 +23,11 @@ export const PROVIDER_EMAIL = {
       If disabled, only the new email is required to confirm.`,
       type: 'boolean',
     },
+    MAILER_OTP_EXP: {
+      title: 'Mailer OTP Expiration',
+      type: 'number',
+      description: 'Duration before an email otp / link expires.',
+    },
     PASSWORD_MIN_LENGTH: {
       title: 'Min password length',
       description: 'Users will not be able to use a password shorter than this.',
@@ -33,6 +38,10 @@ export const PROVIDER_EMAIL = {
     PASSWORD_MIN_LENGTH: number()
       .required('"Minimum password length" is required.')
       .min(8, 'Password length must be at least 8 characters long'),
+    MAILER_OTP_EXP: number()
+      .min(0, 'Must be more than 0')
+      .max(86400, 'Must be no more than 86400')
+      .required('This is required'),
   }),
   misc: {
     iconKey: 'email-icon2',
@@ -170,6 +179,19 @@ export const PROVIDER_PHONE = {
       description: 'Users will need to confirm their phone number before signing in.',
       type: 'boolean',
     },
+
+    SMS_OTP_EXP: {
+      title: 'SMS OTP Expiry',
+      type: 'number',
+      description: 'Duration before an SMS OTP expires',
+      descriptionOptional: 'Seconds',
+    },
+    SMS_OTP_LENGTH: {
+      title: 'SMS OTP Length',
+      type: 'number',
+      description: 'Number of digits in OTP',
+      descriptionOptional: 'Seconds',
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_PHONE_ENABLED: boolean().required(),
@@ -256,6 +278,8 @@ export const PROVIDER_PHONE = {
       then: (schema) => schema.required('"Vonage From" is required'),
       otherwise: (schema) => schema,
     }),
+    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
+    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
   }),
   misc: {
     iconKey: 'phone-icon4',
