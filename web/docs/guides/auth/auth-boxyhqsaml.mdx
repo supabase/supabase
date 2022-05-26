@@ -1,0 +1,76 @@
+---
+id: auth-boxyhqsaml
+title: 'Login with BoxyHQSAML'
+description: Add BoxyHQSAML OAuth to your Supabase project
+---
+
+To enable BoxyHQSAML Auth for your project, you need a hosted instance of https://github.com/boxyhq/jackson and add the instance url and secret verifier to your Supabase Dashboard.
+
+## Overview
+
+BoxyHQSAML OAuth consists of 3 broad steps:
+
+- Set up Jackson service.
+- Add SAML configs for your customers. Each config is identified by a unique `tenant` and `product` combination.
+- Add the `Client Secret Verifier` and `Jackson instance URL` to the Supabase Dashboard.
+
+## Steps
+
+### Deploy Jackson service
+
+Refer https://boxyhq.com/docs/jackson/deploy/service on running jackson as a service. You can host it on your preferred hosting provider.
+
+### Add SAML configuration
+
+SAML configuration can be [added](https://boxyhq.com/docs/jackson/saml-flow#21-saml-add-config-api) from the [admin ui](https://boxyhq.com/docs/jackson/admin-ui) of the jackson service. Browse to the endpoint for Jackson service to access the admin ui. Click on new and add a SAML config as shown below. 
+
+NOTE: 
+- `tenant` is a unique identifier you set from your side that relates back to your customer's tenant. This is normally an email, domain, an account id, or user-id.
+- `product` is a unique identifier you set from your side that relates back to the product your customer is using.
+
+![Add new configuration](/img/guides/auth-boxyhqsaml/boxyhqsaml-add-config.png)
+
+### Add your Jackson service credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.io)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Under `External OAuth Providers` turn `BoxyHQSAML Enabled` to ON
+- Enter the Client ID (leave default value `dummy` to pass `tenant` and `product` dynamically from client side), Secret ([Client secret Verifier](https://boxyhq.com/docs/jackson/deploy/env-variables#client_secret_verifier) for Jackson), and BoxyHQSAML URL (service endpoint for jackson).
+- Click Save.
+
+### Add login code to your client app
+
+The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers). Here we pass the `tenant` and `product` in scopes dynamically. (This can be done on the back of a form where we take the tenant/product as user input).
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'boxyhqsaml',
+},{
+    scopes: `tenant=boxyhq.com&product=saml-demo.boxyhq.com`,
+})
+```
+
+Add a function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithBoxyHQSAML() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'boxyhqsaml',
+  },{
+    scopes: `tenant=boxyhq.com&product=saml-demo.boxyhq.com`,
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Jackson Documentation](https://boxyhq.com/docs/jackson/overview)

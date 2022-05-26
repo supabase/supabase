@@ -152,6 +152,7 @@ module.exports = {
             'guides/auth/auth-twilio',
             'guides/auth/auth-vonage',
             'guides/auth/auth-messagebird',
+            'guides/auth/auth-boxyhqsaml',
           ],
         },
         {

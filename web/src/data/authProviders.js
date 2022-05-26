@@ -186,6 +186,14 @@ const authProviders = [
     platform: true,
     selfHosted: true,
   },
+  {
+    name: 'BoxyHQSAML',
+    href: '/docs/guides/auth/auth-boxyhqsaml',
+    official: false,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+  },
 ]
 
 export default authProviders
