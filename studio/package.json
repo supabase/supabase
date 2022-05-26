@@ -90,6 +90,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/crypto-js": "^4.0.2",
+    "@types/file-saver": "^2.0.2",
     "@types/lodash": "^4.14.172",
     "@types/markdown-table": "^3.0.0",
     "@types/papaparse": "^5.3.1",
