@@ -8,6 +8,7 @@ export interface Partner {
   description: string
   logo: string
   images: string[]
+  video: string
   overview: string
   website: string
   docs: string
