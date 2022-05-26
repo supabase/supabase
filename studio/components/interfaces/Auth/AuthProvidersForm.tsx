@@ -9,7 +9,9 @@ import {
   Listbox,
   Toggle,
   Menu,
+  InputNumber,
 } from '@supabase/ui'
+import { FormHeader } from 'components/ui/Forms'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
@@ -28,7 +30,7 @@ interface Provider {
   properties: {
     [x: string]: {
       title: string
-      type: 'boolean' | 'string' | 'select'
+      type: 'boolean' | 'string' | 'select' | 'number'
       description?: string
       descriptionOptional?: string
       enum: Enum[]
@@ -54,7 +56,12 @@ const AuthProvidersForm = () => {
   const providers = PROVIDERS_SCHEMAS
 
   return (
-    <div className="mx-auto my-8">
+    <div>
+      <FormHeader
+        title="Auth Providers"
+        description={`URLs that auth providers are permitted to redirect to post authentication`}
+      />
+
       <div className="-space-y-px">
         {
           // @ts-expect-error
@@ -164,143 +171,189 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
           }
         }}
       >
-        {({ isSubmitting, handleReset, values }: any) => (
-          <Collapsible.Content>
-            <div
-              className="
+        {({ isSubmitting, handleReset, values }: any) => {
+          const noChanges = JSON.stringify(INITIAL_VALUES) === JSON.stringify(values)
+
+          // if (open) {
+          //   handleReset()
+          // }
+
+          return (
+            <Collapsible.Content>
+              <div
+                className="
                   bg-scale-100 dark:bg-scale-300
                   text-scale-1200 border-scale-500 group border-t py-6 px-6
                 "
-            >
-              <div className="mx-auto my-6 max-w-md space-y-6">
-                {Object.keys(provider.properties).map((x: string) => {
-                  /**
-                   * Properties of the form
-                   */
-                  const properties = provider.properties[x]
+              >
+                <div className="mx-auto my-6 max-w-md space-y-6">
+                  {Object.keys(provider.properties).map((x: string) => {
+                    /**
+                     * Properties of the form
+                     */
+                    const properties = provider.properties[x]
 
-                  /**
-                   * Conditionally hide properties based on value of key
-                   */
-                  if (properties.show && values[properties.show.key] !== properties.show.matches) {
-                    return null
-                  }
+                    /**
+                     * Conditionally hide properties based on value of key
+                     */
+                    if (
+                      properties.show &&
+                      values[properties.show.key] !== properties.show.matches
+                    ) {
+                      return null
+                    }
 
-                  switch (properties.type) {
-                    case 'string':
-                      return (
-                        <Input
-                          size="small"
-                          layout="vertical"
-                          id={x}
-                          key={x}
-                          name={x}
-                          label={properties.title}
-                          descriptionText={
-                            properties.description ? (
-                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                {properties.description}
-                              </ReactMarkdown>
-                            ) : null
-                          }
-                          //
-                          // @ts-expect-error
-                          //
-                          // to do: change to "string" | React.ReactNode | undefined
-                          //
-                          labelOptional={
-                            properties.descriptionOptional ? (
-                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                {properties.descriptionOptional}
-                              </ReactMarkdown>
-                            ) : null
-                          }
-                        />
-                      )
-                      break
+                    switch (properties.type) {
+                      case 'string':
+                        return (
+                          <Input
+                            size="small"
+                            layout="vertical"
+                            id={x}
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            descriptionText={
+                              properties.description ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.description}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            //
+                            // @ts-expect-error
+                            //
+                            // to do: change to "string" | React.ReactNode | undefined
+                            //
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                          />
+                        )
+                        break
 
-                    case 'boolean':
-                      return (
-                        <Toggle
-                          size="small"
-                          key={x}
-                          name={x}
-                          label={properties.title}
-                          descriptionText={properties.description}
-                        />
-                      )
-                      break
+                      case 'number':
+                        return (
+                          <InputNumber
+                            size="small"
+                            layout="vertical"
+                            id={x}
+                            key={x}
+                            name={x}
+                            // style={{ width: '50%' }}
+                            label={properties.title}
+                            // @ts-expect-error
+                            descriptionText={
+                              properties.description ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.description}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            //
+                            // @ts-expect-error
+                            //
+                            // to do: change to "string" | React.ReactNode | undefined
+                            //
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                          />
+                        )
+                        break
 
-                    case 'select':
-                      return (
-                        <Listbox
-                          size="small"
-                          key={x}
-                          name={x}
-                          label={properties.title}
-                          descriptionText={properties.description}
-                          defaultValue={properties.enum[0]}
-                        >
-                          {properties.enum.map((option: Enum) => {
-                            return (
-                              <Listbox.Option
-                                id={option.value}
-                                label={option.label}
-                                value={option.value}
-                                addOnBefore={() => (
-                                  <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />
-                                )}
-                              >
-                                {option.label}
-                              </Listbox.Option>
-                            )
-                          })}
-                        </Listbox>
-                      )
-                      break
+                      case 'boolean':
+                        return (
+                          <Toggle
+                            size="small"
+                            // layout="horizontal"
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            descriptionText={properties.description}
+                          />
+                        )
+                        break
 
-                    default:
-                      break
-                  }
-                })}
-                {provider?.misc?.alert && (
-                  <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                    <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                  </Alert>
-                )}
-                {provider.misc.requiresRedirect && (
-                  <>
-                    <ReactMarkdown className="text-scale-900 text-xs">
-                      {provider.misc.helper}
-                    </ReactMarkdown>
-                    <Input
-                      label="Redirect url"
-                      readOnly
-                      value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
-                      copy
-                      disabled
-                    />
-                  </>
-                )}
-                <div className="flex items-center justify-end gap-3">
-                  <Button
-                    htmlType="reset"
-                    onClick={() => {
-                      handleReset()
-                      setOpen(false)
-                    }}
-                    type="default"
-                  >
-                    Cancel
-                  </Button>
-                  <Button htmlType="submit" loading={isSubmitting}>
-                    Save
-                  </Button>
+                      case 'select':
+                        return (
+                          <Listbox
+                            size="small"
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            descriptionText={properties.description}
+                            defaultValue={properties.enum[0]}
+                          >
+                            {properties.enum.map((option: Enum) => {
+                              return (
+                                <Listbox.Option
+                                  id={option.value}
+                                  label={option.label}
+                                  value={option.value}
+                                  addOnBefore={() => (
+                                    <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />
+                                  )}
+                                >
+                                  {option.label}
+                                </Listbox.Option>
+                              )
+                            })}
+                          </Listbox>
+                        )
+                        break
+
+                      default:
+                        break
+                    }
+                  })}
+                  {provider?.misc?.alert && (
+                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
+                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                    </Alert>
+                  )}
+                  {provider.misc.requiresRedirect && (
+                    <>
+                      <ReactMarkdown className="text-scale-900 text-xs">
+                        {provider.misc.helper}
+                      </ReactMarkdown>
+                      <Input
+                        label="Redirect url"
+                        readOnly
+                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
+                        copy
+                        disabled
+                      />
+                    </>
+                  )}
+                  <div className="flex items-center justify-end gap-3">
+                    <Button
+                      htmlType="reset"
+                      onClick={() => {
+                        handleReset()
+                        setOpen(false)
+                      }}
+                      type="default"
+                    >
+                      Cancel
+                    </Button>
+                    <Button htmlType="submit" loading={isSubmitting} disabled={noChanges}>
+                      Save
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Collapsible.Content>
-        )}
+            </Collapsible.Content>
+          )
+        }}
       </Form>
     </Collapsible>
   )

@@ -1,89 +1,40 @@
 import { Loading } from '@supabase/ui'
 import { AuthProvidersForm } from 'components/interfaces'
+import CommaSeperatedString from 'components/interfaces/Forms/CommaSeperatedString'
 import { AuthLayout } from 'components/layouts'
-import { AutoSchemaForm } from 'components/ui/Forms'
-import { useStore, withAuth } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { AutoSchemaForm, FormHeader } from 'components/ui/Forms'
+import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import useSWR from 'swr'
+import React, { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
-// const Auth = () => {
-//   return (
-//     <AuthLayout title="Auth">
-//       <div className="p-4">
-//         <WholeForm />
-//       </div>
-//     </AuthLayout>
-//   )
-// }
-
 const PageLayout: NextPageWithLayout = () => {
-  const router = useRouter()
   const { ui, authConfig } = useStore()
-
-  const URL = `${API_URL}/auth/${router.query.ref}/config`
-  // const { data: config, error }: any = useSWR(URL, get)
-
-  // console.log(authConfig)
 
   useEffect(() => {
     // temporary store loader
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  const [model, setModel] = useState<any>({})
-  const [isCustomSMTPEnabled, setCustomSMTP] = useState<boolean>(false)
-  const [externalProvidersModel, setExternalProvidersModel] = useState<any>({})
-
   if (!authConfig.isLoaded) {
     return <Loading active={true}>{''}</Loading>
   }
 
-  // if (error) {
-  //   return (
-  //     <span>
-  //       <p>Error connecting to API</p>
-  //       <p>{`${error}`}</p>
-  //     </span>
-  //   )
-  // }
-
-  // console.log(config)
-
-  // useEffect(() => {
-  //   if (config) {
-  //     const temp =
-  //       config.SMTP_ADMIN_EMAIL ||
-  //       config.SMTP_HOST ||
-  //       config.SMTP_PORT ||
-  //       config.SMTP_USER ||
-  //       config.SMTP_PASS
-  //     setCustomSMTP(temp)
-  //   }
-  //   setModel({ ...config })
-  //   setExternalProvidersModel({ ...config })
-  // }, [config])
-
   if (authConfig)
     return (
-      <div style={{ width: '820px' }} className="mx-auto">
+      <div
+        style={{ width: '820px' }}
+        className="py-18 mx-auto mb-20 flex flex-col space-y-20 py-16"
+      >
         <div>
-          <h3 className="text-scale-1200 mb-2 text-2xl">General settings</h3>
-          <p className="text-scale-900 text-sm">
-            Turn payment methods on and off in one click – no engineering time required.
-          </p>
-          <p className="text-scale-900 text-sm">
-            Use our guide to check which payment methods are compatible with your integration.
-          </p>
+          <FormHeader
+            title="General settings"
+            description={`URLs that auth providers are permitted to redirect to post authentication`}
+          />
           <AutoSchemaForm />
         </div>
 
+        <CommaSeperatedString />
         <AuthProvidersForm />
       </div>
     )
