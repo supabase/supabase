@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import ProductIcon from '../ProductIcon'
 import { Badge } from '@supabase/ui'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const Product = () => {
   const { basePath } = useRouter()
@@ -30,13 +31,11 @@ const Product = () => {
     )
     return (
       url && (
-        <a
-          key={name}
-          href={url}
-          className="hover:bg-scale-300 dark:hover:bg-scale-500 col-span-6 rounded p-3 transition"
-        >
-          {content}
-        </a>
+        <Link href={url} key={name}>
+          <a className="hover:bg-scale-300 dark:hover:bg-scale-500 col-span-6 rounded p-3 transition">
+            {content}
+          </a>
+        </Link>
       )
     )
   })
@@ -56,25 +55,24 @@ const Product = () => {
               }
               return (
                 <li className="flow-root" key={`flyout_case_${idx}`}>
-                  <a
-                    href={caseStudy.url}
-                    className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100"
-                  >
-                    <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
-                      <Image
-                        src={`${basePath}/${caseStudy.imgUrl}`}
-                        alt="caseStudyThumb"
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1 sm:ml-4">
-                      <h4 className="text-scale-1200 text-normal mb-0 text-base">
-                        {caseStudy.title}
-                      </h4>
-                      <p className="p text-sm">{caseStudy.description}</p>
-                    </div>
-                  </a>
+                  <Link href={caseStudy.url}>
+                    <a className="dark:hover:bg-dark-700 flex items-center rounded-lg border p-3 transition duration-150 ease-in-out hover:bg-gray-100">
+                      <div className="relative hidden h-20 w-32 flex-shrink-0 overflow-auto rounded-md sm:block">
+                        <Image
+                          src={`${basePath}/${caseStudy.imgUrl}`}
+                          alt="caseStudyThumb"
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1 sm:ml-4">
+                        <h4 className="text-scale-1200 text-normal mb-0 text-base">
+                          {caseStudy.title}
+                        </h4>
+                        <p className="p text-sm">{caseStudy.description}</p>
+                      </div>
+                    </a>
+                  </Link>
                 </li>
               )
             })}

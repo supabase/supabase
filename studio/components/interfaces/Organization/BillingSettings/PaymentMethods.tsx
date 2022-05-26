@@ -37,6 +37,7 @@ const PaymentMethods: FC<Props> = ({
   onPaymentMethodsDeleted,
 }) => {
   const { ui } = useStore()
+  const isOwner = ui.selectedOrganization?.is_owner ?? false
   const orgSlug = ui.selectedOrganization?.slug ?? ''
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
@@ -102,23 +103,43 @@ const PaymentMethods: FC<Props> = ({
           footer={
             !loading && (
               <div>
-                <Button
-                  key="panel-footer"
-                  type="default"
-                  icon={<IconPlus />}
-                  onClick={() => setShowAddPaymentMethodModal(true)}
-                >
-                  Add new card
-                </Button>
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      key="panel-footer"
+                      type="default"
+                      icon={<IconPlus />}
+                      disabled={!isOwner}
+                      onClick={() => setShowAddPaymentMethodModal(true)}
+                    >
+                      Add new card
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!isOwner && (
+                    <Tooltip.Content side="right">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                          'border-scale-200 w-48 border text-center', //border
+                        ].join(' ')}
+                      >
+                        <span className="text-scale-1200 text-xs">
+                          Only organization owners can update payment methods
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  )}
+                </Tooltip.Root>
               </div>
             )
           }
         >
           {loading && paymentMethods.length === 0 ? (
             <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
             </div>
           ) : paymentMethods.length >= 1 ? (
             <Panel.Content>
@@ -147,50 +168,56 @@ const PaymentMethods: FC<Props> = ({
                             <Badge color="gray">Default</Badge>
                           </div>
                         )}
-                        <p className="tabular-nums text-sm">
+                        <p className="text-sm tabular-nums">
                           Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
                         </p>
                       </div>
-                      {isDefault ? (
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
-                            <Button disabled type="outline" icon={<IconX />} />
-                          </Tooltip.Trigger>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
-                                'border border-scale-200 w-48 text-center', //border
-                              ].join(' ')}
+                      {isOwner && (
+                        <>
+                          {isDefault ? (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <Button disabled type="outline" icon={<IconX />} />
+                              </Tooltip.Trigger>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                                    'border-scale-200 w-48 border text-center', //border
+                                  ].join(' ')}
+                                >
+                                  <span className="text-scale-1200 text-xs">
+                                    Your default payment method cannot be deleted
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Root>
+                          ) : (
+                            <Dropdown
+                              size="tiny"
+                              overlay={[
+                                <Dropdown.Item
+                                  onClick={() => setSelectedMethodForDefault(paymentMethod)}
+                                >
+                                  Make default
+                                </Dropdown.Item>,
+                                <Dropdown.Item
+                                  onClick={() => setSelectedMethodToDelete(paymentMethod)}
+                                >
+                                  Delete
+                                </Dropdown.Item>,
+                              ]}
                             >
-                              <span className="text-scale-1200 text-xs">
-                                Your default payment method cannot be deleted
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      ) : (
-                        <Dropdown
-                          size="tiny"
-                          overlay={[
-                            <Dropdown.Item
-                              onClick={() => setSelectedMethodForDefault(paymentMethod)}
-                            >
-                              Make default
-                            </Dropdown.Item>,
-                            <Dropdown.Item onClick={() => setSelectedMethodToDelete(paymentMethod)}>
-                              Delete
-                            </Dropdown.Item>,
-                          ]}
-                        >
-                          <Button
-                            type="outline"
-                            icon={<IconMoreHorizontal />}
-                            loading={loading}
-                            className="hover:border-gray-500"
-                          />
-                        </Dropdown>
+                              <Button
+                                type="outline"
+                                icon={<IconMoreHorizontal />}
+                                loading={loading}
+                                className="hover:border-gray-500"
+                              />
+                            </Dropdown>
+                          )}
+                        </>
                       )}
                     </div>
                   )

@@ -234,7 +234,6 @@ export const SQL_FILTER_TEMPLATES: any = {
   },
 }
 
-
 export enum LogsTableName {
   EDGE = 'edge_logs',
   POSTGRES = 'postgres_logs',
@@ -248,7 +247,7 @@ export const LOGS_TABLES = {
   database: LogsTableName.POSTGRES,
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
-  auth: LogsTableName.AUTH
+  auth: LogsTableName.AUTH,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -469,7 +468,9 @@ export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
   helpers.find((helper) => helper.default) || helpers[0]
 
-export const TIER_QUERY_LIMITS = {
+export const TIER_QUERY_LIMITS: {
+  [x: string]: { text: string; value: 1 | 7 | 3; unit: 'day' | 'month' }
+} = {
   FREE: { text: '1 day', value: 1, unit: 'day' },
   PRO: { text: '7 days', value: 7, unit: 'day' },
   PAYG: { text: '3 months', value: 3, unit: 'month' },

@@ -138,7 +138,7 @@ Full schema here with role-based access control:
 
 ```sql
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone
+-- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
 --
 
 -- Custom types

@@ -30,7 +30,7 @@ import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { NextPageWithLayout, Project } from 'types'
 
