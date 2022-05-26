@@ -104,7 +104,7 @@ function Partner({ partner }: { partner: Partner }) {
               </Swiper>
             </div>
 
-            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0">
+            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
               <div className="lg:col-span-3">
                 <h2
                   className="text-scale-1200"
