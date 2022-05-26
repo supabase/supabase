@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import { NextPage } from 'next'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
@@ -11,8 +10,9 @@ import { BillingLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { StripeSubscription } from 'components/interfaces/Billing'
 import { ProUpgrade } from 'components/interfaces/Billing'
+import { NextPageWithLayout } from 'types'
 
-const BillingUpdatePro: NextPage = () => {
+const BillingUpdatePro: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
 
@@ -101,16 +101,16 @@ const BillingUpdatePro: NextPage = () => {
   if (!products || !subscription) return <Connecting />
 
   return (
-    <BillingLayout>
-      <ProUpgrade
-        products={products}
-        currentSubscription={subscription}
-        isLoadingPaymentMethods={isLoadingPaymentMethods}
-        paymentMethods={paymentMethods || []}
-        onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
-      />
-    </BillingLayout>
+    <ProUpgrade
+      products={products}
+      currentSubscription={subscription}
+      isLoadingPaymentMethods={isLoadingPaymentMethods}
+      paymentMethods={paymentMethods || []}
+      onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
+    />
   )
 }
 
-export default withAuth(observer(BillingUpdatePro))
+BillingUpdatePro.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
+
+export default observer(BillingUpdatePro)

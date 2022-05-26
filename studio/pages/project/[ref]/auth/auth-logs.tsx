@@ -1,17 +1,18 @@
 import { observer } from 'mobx-react-lite'
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { NextPageWithLayout } from 'types'
 
-const Auth = () => {
+const LogsPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
   return (
-    <AuthLayout title="Auth Logs">
-      {project && <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />}
-    </AuthLayout>
+    <>{project && <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />}</>
   )
 }
 
-export default withAuth(observer(Auth))
+LogsPage.getLayout = (page) => <AuthLayout title="Auth Logs">{page}</AuthLayout>
+
+export default observer(LogsPage)

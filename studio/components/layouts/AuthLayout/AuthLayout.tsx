@@ -25,7 +25,9 @@ const AuthLayout: FC<Props> = ({ title, children }) => {
 
   useEffect(() => {
     if (ui.selectedProject) {
+      meta.policies.load()
       meta.tables.load()
+      meta.roles.load()
     }
   }, [ui.selectedProject])
 
