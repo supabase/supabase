@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'yup'
+import { boolean, number, object, string } from 'yup'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -23,7 +23,17 @@ export const PROVIDER_EMAIL = {
       If disabled, only the new email is required to confirm.`,
       type: 'boolean',
     },
+    PASSWORD_MIN_LENGTH: {
+      title: 'Min password length',
+      description: 'Users will not be able to use a password shorter than this.',
+      type: 'number',
+    },
   },
+  validationSchema: object().shape({
+    PASSWORD_MIN_LENGTH: number()
+      .required('"Minimum password length" is required.')
+      .min(8, 'Password length must be at least 8 characters long'),
+  }),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
@@ -624,6 +634,7 @@ export const EXTERNAL_PROVIDER_KEYCLOAK = {
     },
     EXTERNAL_KEYCLOAK_URL: {
       title: 'Realm URL',
+      description: '',
       type: 'string',
     },
   },
@@ -888,9 +899,6 @@ export const EXTERNAL_PROVIDER_WORKOS = {
       title: 'WorkOS enabled',
       type: 'boolean',
     },
-    /**
-     * to do: not sure why we have this.
-     */
     EXTERNAL_WORKOS_URL: {
       title: 'WorkOS URL',
       type: 'string',
