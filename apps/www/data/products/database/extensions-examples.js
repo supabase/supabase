@@ -45,10 +45,10 @@ FROM order_details,
 WHERE customers.id = order_details.customer_id
 AND customers.email = 'john@supabase.io'
 
--- You can now view pg_stat_statements
+-- You can now view pg_stat_monitor
 
 SELECT * 
-FROM pg_stat_statements;
+FROM pg_stat_monitor;
 
 userid              | 16384
 dbid                | 16388
@@ -68,9 +68,9 @@ local_blks_written  | 0
 `,
     detail_title: 'Tracking execution statistics of all SQL statements',
     detail_text:
-      'The pg_stat_statements module provides a means for tracking execution statistics of all SQL statements executed by a server.',
+      'The pg_stat_monitor module provides a means for tracking execution statistics of all SQL statements executed by a server.',
     badges_label: 'Extensions used:',
-    badges: ['pg_stat_statements'],
+    badges: ['pg_stat_monitor'],
     url: '',
   },
 ]

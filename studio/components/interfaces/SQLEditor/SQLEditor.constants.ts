@@ -99,9 +99,9 @@ language sql volatile;
   {
     id: 8,
     type: 'template',
-    title: 'pg_stat_statements report',
-    description: 'Select from pg_stat_statements and view recent queries',
-    sql: `-- pg_stat_statements report
+    title: 'pg_stat_monitor report',
+    description: 'Select from pg_stat_monitor and view recent queries',
+    sql: `-- pg_stat_monitor report
 
 -- A limit of 100 has been added below
 
@@ -122,7 +122,7 @@ select
     statements.rows / statements.calls as avg_rows,
     statements.wal_bytes,
     statements.wal_records
-  from pg_stat_statements as statements
+  from pg_stat_monitor as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   order by
     total_time desc

@@ -224,7 +224,7 @@
     "comment": "prewarm relation data"
   },
   {
-    "name": "pg_stat_statements",
+    "name": "pg_stat_monitor",
     "schema": null,
     "default_version": "1.7",
     "installed_version": null,

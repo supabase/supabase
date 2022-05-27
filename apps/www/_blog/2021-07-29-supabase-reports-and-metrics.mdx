@@ -50,7 +50,7 @@ Backend as a Service? Infrastructure as a Service? We don't care about the label
 observability metrics. Supabase gives you a full Postgres cluster for every project, and now we give you the tools to diagnose and manage
 important infrastructure anomalies.
 
-All databases are now launched with `pg_stat_statements` enabled, so you can expect some useful query statistics in the future too.
+All databases are now launched with `pg_stat_monitor` enabled, so you can expect some useful query statistics in the future too.
 
 ![Supabase observability metrics](/images/blog/launch-week-sql-day-4-reports-and-metrics/reports-and-metrics-observability-screen.jpg)
 
@@ -116,7 +116,7 @@ Where to begin?
 - Multiple reports per project: we've started with just one report per project, but in the next few weeks we'll allow you to create as many as you want.
 - More metrics: we're just getting started.
   - Number of active connections to your database.
-  - Various detailed stats from `pg_stat_statements`, `pg_stat_bgwriter`, `pg_stat_database`, `pg_stat_database_conflicts`.
+  - Various detailed stats from `pg_stat_monitor`, `pg_stat_bgwriter`, `pg_stat_database`, `pg_stat_database_conflicts`.
   - System level metrics like CPU, memory and disk utilization.
 - Granularity: project statistics will come down to hourly.
 - Longer time periods: view historical data going back several months.

@@ -24,6 +24,6 @@ set statement_timeout to 60000; -- 1 minute in milliseconds
 
 ### Statement Optimization
 
-All Supabase projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/13/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
+All Supabase projects come with the [`pg_stat_monitor`](https://pgxn.org/dist/pg_stat_monitor/) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
 
 This data can further be used in conjunction with the [`explain`](https://www.postgresql.org/docs/13/using-explain.html) functionality of Postgres to optimize your usage.
