@@ -212,9 +212,9 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   /**
-   * override project creation
+   * Disable project creation override
    */
-  const projectCreationDisabled = true
+  const projectCreationDisabled = false
 
   return (
     <Panel
