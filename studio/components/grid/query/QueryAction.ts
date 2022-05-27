@@ -5,7 +5,7 @@ export interface IQueryAction {
   count: () => IQueryFilter;
   delete: (options?: { returning: boolean }) => IQueryFilter;
   insert: (
-    values: Dictionary<any> | Dictionary<any>[],
+    values: Dictionary<any>[],
     options?: { returning: boolean }
   ) => IQueryFilter;
   select: (columns?: string[]) => IQueryFilter;
