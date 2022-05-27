@@ -14,6 +14,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: inherit;
+}
+
+.rdg-cell > div[draggable="true"] {
+  @apply h-full;
 }
 
 .rdg-cell-frozen-last {
@@ -511,7 +516,7 @@
 */
 
 .sb-grid-column-header {
-  @apply flex items-center justify-between;
+  @apply flex items-center justify-between h-full;
 }
 
 .sb-grid-column-header--cursor {
