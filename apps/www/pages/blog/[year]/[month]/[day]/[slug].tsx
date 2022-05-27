@@ -13,6 +13,7 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
+import Avatar from '~/components/Avatar'
 import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -23,6 +24,7 @@ import blogStyles from './[slug].module.css'
 const components = {
   CodeBlock,
   Quote,
+  Avatar,
   code: (props: any) => {
     return <CodeBlock {...props} />
   },
