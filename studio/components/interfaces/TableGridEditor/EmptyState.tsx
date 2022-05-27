@@ -1,7 +1,8 @@
 import { FC } from 'react'
 import { Button } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useStore } from 'hooks'
+import { usePermissions, useStore } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedSchema: string
@@ -10,13 +11,18 @@ interface Props {
 
 const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const { meta } = useStore()
+  const canCreate = usePermissions(PermissionAction.TENANT_SQL_CREATE_TABLE, 'postgres.public')
   const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
 
   const renderNoTablesCTA = () => {
     return (
       <div className="flex flex-col items-center justify-center space-y-4">
         <p className="text-sm">There are no tables available in this schema</p>
-        {selectedSchema === 'public' && <Button onClick={onAddTable}>Create a new table</Button>}
+        {selectedSchema === 'public' && (
+          <Button onClick={onAddTable} disabled={!canCreate}>
+            Create a new table
+          </Button>
+        )}
       </div>
     )
   }
@@ -28,7 +34,9 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
       ) : (
         <div className="flex flex-col items-center space-y-4">
           <p className="text-sm">Select a table or create a new one</p>
-          <Button onClick={onAddTable}>Create a new table</Button>
+          <Button onClick={onAddTable} disabled={!canCreate}>
+            Create a new table
+          </Button>
         </div>
       )}
     </div>

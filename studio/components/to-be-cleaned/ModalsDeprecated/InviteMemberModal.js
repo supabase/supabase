@@ -1,9 +1,17 @@
-import { createContext, useContext, useCallback, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { debounce, isNil } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { post } from 'lib/common/fetch'
-import { Button, IconKey, IconLoader, IconUser, IconX, Input, Typography } from '@supabase/ui'
-import { Modal } from '@supabase/ui'
+import {
+  Button,
+  IconKey,
+  IconLoader,
+  IconUser,
+  IconX,
+  Input,
+  Modal,
+  Typography,
+} from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { Transition } from '@headlessui/react'
@@ -36,7 +44,7 @@ function InviteMemberModal({ organization, members = [] }) {
       if (profiles) {
         temp = profiles
           .map((profile) => {
-            const foundMember = this.members.find((x) => x.profile.id == profile.id)
+            const foundMember = this.members.find((x) => x.id == profile.id)
             return { ...profile, isMember: foundMember !== undefined }
           })
           .sort((a, b) => a.username.localeCompare(b.username))
@@ -67,6 +75,7 @@ function InviteMemberModal({ organization, members = [] }) {
   async function addMember() {
     PageState.addMemberLoading = true
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/add`, {
+      gotrue_id: PageState.selectedProfile.gotrue_id,
       org_id: orgId,
       user_id: PageState.selectedProfile.id,
     })
@@ -82,7 +91,10 @@ function InviteMemberModal({ organization, members = [] }) {
       const newMember = response
       mutateOrgMembers([...PageState.members, newMember], false)
       toggle()
-      ui.setNotification({ category: 'success', message: 'Successfully added new member' })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully added new member',
+      })
     }
   }
 
@@ -146,7 +158,10 @@ const InputSearchWithResults = observer(({ className }) => {
     setLoading(true)
     const response = await post(`${API_URL}/profile/search`, { keywords: PageState.keywords })
     if (isNil(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to search profile' })
+      ui.setNotification({
+        category: 'error',
+        message: 'Failed to search profile',
+      })
     } else if (response.error) {
       ui.setNotification({
         category: 'error',

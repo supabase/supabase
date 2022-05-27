@@ -4,18 +4,19 @@ import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
+import { Alert, Button, IconRefreshCcw, Input } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
-import { post, delete_ } from 'lib/common/fetch'
-import { useStore } from 'hooks'
+import { delete_, post } from 'lib/common/fetch'
+import { usePermissions, useStore } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { NextPageWithLayout } from 'types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
@@ -54,7 +55,11 @@ const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef
       ui.setNotification({ category: 'success', message: 'Restarting server' })
       router.push(`/project/${projectRef}`)
     } catch (error) {
-      ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: 'Unable to restart server',
+      })
       setLoading(false)
     }
     closeModal()
@@ -85,6 +90,9 @@ const GeneralSettings = observer(() => {
   const formModel = toJS(project)
   const BASIC_FIELDS = ['name']
 
+  const canReboot = usePermissions(PermissionAction.TENANT_INFRA_EXECUTE, 'reboot')
+  const canUpdateProject = usePermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+
   const handleUpdateProject = async (model: any) => {
     const response = await post(`${API_URL}/projects/${project?.ref}/update`, model)
     if (response.error) {
@@ -95,7 +103,10 @@ const GeneralSettings = observer(() => {
     } else {
       const updatedProject = response
       app.onProjectUpdated(updatedProject)
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully saved settings',
+      })
     }
   }
 
@@ -108,7 +119,12 @@ const GeneralSettings = observer(() => {
           model={formModel}
           onSubmit={(model: any) => handleUpdateProject(pluckObjectFields(model, BASIC_FIELDS))}
         >
-          <AutoField name="name" showInlineError errorMessage="Please enter a project name" />
+          <AutoField
+            name="name"
+            showInlineError
+            errorMessage="Please enter a project name"
+            disabled={!canUpdateProject}
+          />
         </SchemaFormPanel>
       </section>
 
@@ -132,40 +148,44 @@ const GeneralSettings = observer(() => {
           <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
             <Input readOnly disabled value={project?.region} label="Region" layout="horizontal" />
           </Panel.Content>
-          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
-            <div className="flex w-full items-center justify-between">
-              <div>
-                <p>Restart server</p>
-                <div style={{ maxWidth: '420px' }}>
-                  <p className="text-sm opacity-50">
-                    Your project will not be available for a few minutes.
-                  </p>
+          {canRebot && (
+            <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+              <div className="flex w-full items-center justify-between">
+                <div>
+                  <p>Restart server</p>
+                  <div style={{ maxWidth: '420px' }}>
+                    <p className="text-sm opacity-50">
+                      Your project will not be available for a few minutes.
+                    </p>
+                  </div>
                 </div>
+                {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
               </div>
-              {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
-            </div>
-          </Panel.Content>
+            </Panel.Content>
+          )}
         </Panel>
       </section>
 
-      <section>
-        <Panel title={<p className="uppercase">Danger Zone</p>}>
-          <Panel.Content>
-            <Alert
-              variant="danger"
-              withIcon
-              title="Deleting this project will also remove your database."
-            >
-              <div className="flex flex-col">
-                <p className="mb-4 block">
-                  Make sure you have made a backup if you want to keep your data.
-                </p>
-                <ProjectDeleteModal project={project} />
-              </div>
-            </Alert>
-          </Panel.Content>
-        </Panel>
-      </section>
+      {canUpdateProject && (
+        <section>
+          <Panel title={<p className="uppercase">Danger Zone</p>}>
+            <Panel.Content>
+              <Alert
+                variant="danger"
+                withIcon
+                title="Deleting this project will also remove your database."
+              >
+                <div className="flex flex-col">
+                  <p className="block mb-4">
+                    Make sure you have made a backup if you want to keep your data.
+                  </p>
+                  <ProjectDeleteModal project={project} />
+                </div>
+              </Alert>
+            </Panel.Content>
+          </Panel>
+        </section>
+      )}
     </article>
   )
 })
@@ -188,7 +208,10 @@ const ProjectDeleteModal = ({ project }: any) => {
       const response = await delete_(`${API_URL}/projects/${project.ref}`)
       if (response.error) throw response.error
       app.onProjectDeleted(response)
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted ${project.name}`,
+      })
       router.push(`/`)
     } catch (error: any) {
       setLoading(false)
