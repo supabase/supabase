@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Badge, Menu } from '@supabase/ui'
 import ProductMenuItem from './ProductMenuItem'
-import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
+import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
 interface Props {
   page?: string
@@ -26,17 +26,19 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                   }
                 />
                 <div>
-                  {group.items.map((item: ProductMenuGroupItem) => (
-                    <ProductMenuItem
-                      key={item.key}
-                      url={item.url}
-                      name={item.name}
-                      icon={item.icon}
-                      isActive={page === item.key}
-                      isExternal={item.isExternal}
-                      target={item.isExternal ? '_blank' : '_self'}
-                    />
-                  ))}
+                  {group.items
+                    .filter(({ hidden }) => !hidden)
+                    .map((item: ProductMenuGroupItem) => (
+                      <ProductMenuItem
+                        key={item.key}
+                        url={item.url}
+                        name={item.name}
+                        icon={item.icon}
+                        isActive={page === item.key}
+                        isExternal={item.isExternal}
+                        target={item.isExternal ? '_blank' : '_self'}
+                      />
+                    ))}
                 </div>
               </div>
             </div>
