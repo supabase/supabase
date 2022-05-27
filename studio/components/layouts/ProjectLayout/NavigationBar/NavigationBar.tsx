@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
-import { Button, IconHome, Dropdown, IconUser, IconSettings } from '@supabase/ui'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { useStore } from 'hooks'
-import { generateProductRoutes, generateOtherRoutes } from './NavigationBar.utils'
+import { generateOtherRoutes, generateProductRoutes } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
 interface Props {}
@@ -55,21 +55,25 @@ const NavigationBar: FC<Props> = ({}) => {
           }}
         />
         <div className="h-px w-full bg-scale-500"></div>
-        {productRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
-        ))}
+        {productRoutes
+          .filter(({ hidden }) => !hidden)
+          .map((route) => (
+            <NavigationIconButton
+              key={route.key}
+              route={route}
+              isActive={activeRoute === route.key}
+            />
+          ))}
         <div className="h-px w-full bg-scale-500"></div>
-        {otherRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
-        ))}
+        {otherRoutes
+          .filter(({ hidden }) => !hidden)
+          .map((route) => (
+            <NavigationIconButton
+              key={route.key}
+              route={route}
+              isActive={activeRoute === route.key}
+            />
+          ))}
       </ul>
       <ul className="flex flex-col space-y-2">
         <Dropdown
