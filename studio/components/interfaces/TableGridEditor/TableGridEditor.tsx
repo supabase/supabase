@@ -1,16 +1,16 @@
 import { FC, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { isUndefined, find } from 'lodash'
-import { SupabaseGrid, SupabaseGridRef, parseSupaTable, Dictionary } from '@supabase/grid'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { find, isUndefined } from 'lodash'
+import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from '@supabase/grid'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { usePermissions, useStore } from 'hooks'
 import NotFoundState from './NotFoundState'
 import GridHeaderActions from './GridHeaderActions'
 import SidePanelEditor from './SidePanelEditor'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
-import { SidePanel } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   /** Theme for the editor */
@@ -64,6 +64,11 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
+  const canAdminWrite = usePermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
+  const canInsert = usePermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
+  const canUpdate = usePermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
+  // const canEdit = canAdminWrite && canInsert && canUpdate
+  const canEdit = true
 
   const isViewSelected = Object.keys(selectedTable).length === 2
   const gridTable = !isViewSelected
@@ -135,7 +140,7 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && selectedTable.schema === 'public'}
+        editable={!isViewSelected && selectedTable.schema === 'public' && canEdit}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
