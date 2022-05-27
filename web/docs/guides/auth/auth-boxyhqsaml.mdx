@@ -22,9 +22,10 @@ Refer https://boxyhq.com/docs/jackson/deploy/service on running jackson as a ser
 
 ### Add SAML configuration
 
-SAML configuration can be [added](https://boxyhq.com/docs/jackson/saml-flow#21-saml-add-config-api) from the [admin ui](https://boxyhq.com/docs/jackson/admin-ui) of the jackson service. Browse to the endpoint for Jackson service to access the admin ui. Click on new and add a SAML config as shown below. 
+SAML configuration can be [added](https://boxyhq.com/docs/jackson/saml-flow#21-saml-add-config-api) from the [admin ui](https://boxyhq.com/docs/jackson/admin-ui) of the jackson service. Browse to the endpoint for Jackson service to access the admin ui. Click on new and add a SAML config as shown below.
 
-NOTE: 
+NOTE:
+
 - `tenant` is a unique identifier you set from your side that relates back to your customer's tenant. This is normally an email, domain, an account id, or user-id.
 - `product` is a unique identifier you set from your side that relates back to the product your customer is using.
 
@@ -36,7 +37,7 @@ NOTE:
 - In the left sidebar, click the `Authentication` icon (near the top)
 - Click `Settings` from the list to go to the `Authentication Settings` page
 - Under `External OAuth Providers` turn `BoxyHQSAML Enabled` to ON
-- Enter the Client ID (leave default value `dummy` to pass `tenant` and `product` dynamically from client side), Secret ([Client secret Verifier](https://boxyhq.com/docs/jackson/deploy/env-variables#client_secret_verifier) for Jackson), and BoxyHQSAML URL (service endpoint for jackson).
+- Enter the Client ID (leave default value `dummy` to pass `tenant` and `product` dynamically from client side), Secret ([Client secret Verifier](https://boxyhq.com/docs/jackson/deploy/env-variables#client_secret_verifier) for Jackson), and BoxyHQSAML URL (Jackson instance URL).
 - Click Save.
 
 ### Add login code to your client app
@@ -44,22 +45,28 @@ NOTE:
 The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers). Here we pass the `tenant` and `product` in scopes dynamically. (This can be done on the back of a form where we take the tenant/product as user input).
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'boxyhqsaml',
-},{
+const { user, session, error } = await supabase.auth.signIn(
+  {
+    provider: 'boxyhqsaml',
+  },
+  {
     scopes: `tenant=boxyhq.com&product=saml-demo.boxyhq.com`,
-})
+  }
+)
 ```
 
 Add a function which you can call from a button, link, or UI element.
 
 ```js
 async function signInWithBoxyHQSAML() {
-  const { user, session, error } = await supabase.auth.signIn({
-    provider: 'boxyhqsaml',
-  },{
-    scopes: `tenant=boxyhq.com&product=saml-demo.boxyhq.com`,
-  })
+  const { user, session, error } = await supabase.auth.signIn(
+    {
+      provider: 'boxyhqsaml',
+    },
+    {
+      scopes: `tenant=boxyhq.com&product=saml-demo.boxyhq.com`,
+    }
+  )
 }
 ```
 
