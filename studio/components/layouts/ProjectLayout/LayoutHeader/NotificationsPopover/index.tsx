@@ -1,5 +1,13 @@
 import { FC, Fragment } from 'react'
-import { Button, IconBell, Popover } from '@supabase/ui'
+import {
+  Button,
+  IconBell,
+  Popover,
+  Dropdown,
+  IconCheck,
+  IconMoreVertical,
+  IconXSquare,
+} from '@supabase/ui'
 import {
   Notification,
   NotificationName,
@@ -44,17 +52,34 @@ const NotificationsPopover: FC<Props> = () => {
       overlay={
         <div className="my-2 w-[500px]">
           {notifications?.map((notification, i: number) => (
-            <>
+            <Fragment key={notification.id}>
               <div className="grid grid-cols-12 py-2">
                 <div className="col-span-1 flex items-center justify-center">
                   {notification.notification_status !== NotificationStatus.Seen && (
                     <div className="h-2 w-2 rounded-full bg-green-900" />
                   )}
                 </div>
-                <div className="col-span-11 mr-5">{renderNotification(notification)}</div>
+                <div className="col-span-9">{renderNotification(notification)}</div>
+                <div className="col-span-2 flex items-center justify-center">
+                  <Dropdown
+                    side="bottom"
+                    align="end"
+                    size="small"
+                    overlay={[
+                      <Dropdown.Item key="mark-read" icon={<IconCheck size={14} />}>
+                        Mark as read
+                      </Dropdown.Item>,
+                      <Dropdown.Item key="dismiss" icon={<IconXSquare size={14} />}>
+                        Dismiss notification
+                      </Dropdown.Item>,
+                    ]}
+                  >
+                    <IconMoreVertical size={16} />
+                  </Dropdown>
+                </div>
               </div>
               {i !== notifications.length - 1 && <Popover.Seperator />}
-            </>
+            </Fragment>
           ))}
         </div>
       }
