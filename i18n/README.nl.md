@@ -32,7 +32,7 @@ Kijk voor de volledige documentatie op [supabase.com/docs](https://supabase.com/
 ## Status
 
 - [x] Alpha: We testen Supabase met een kleine groep gebruikers.
-- [x] Open Alpha: Iedereen kan een account openen op [app.supabase.io](https://app.supabase.io). Pas op, er kunnen namelijk wel wat dingen mislopen.
+- [x] Open Alpha: Iedereen kan een account openen op [app.supabase.com](https://app.supabase.com). Pas op, er kunnen namelijk wel wat dingen mislopen.
 - [x] Open Beta: Stabiel genoeg voor hobbyprojecten
 - [ ] Open: Klaar voor productie
 
@@ -48,7 +48,7 @@ Supabase is een combinatie van open-source software. Wij bouwen de functionalite
 
 **Huidige architectuur**
 
-Supabase is een [aangeboden platform](https://app.supabase.io). Je kan een account openen en er meteen gebruik van maken. Je hoeft niets extra's te installeren. Momenteel werken we ook aan een manier om Supabase lokaal te kunnen draaien. Onze focus ligt dus op deze mogelijkheid en ook op het verbeteren van de stabliteit van het platform.
+Supabase is een [aangeboden platform](https://app.supabase.com). Je kan een account openen en er meteen gebruik van maken. Je hoeft niets extra's te installeren. Momenteel werken we ook aan een manier om Supabase lokaal te kunnen draaien. Onze focus ligt dus op deze mogelijkheid en ook op het verbeteren van de stabliteit van het platform.
 
 ![Architectuur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
