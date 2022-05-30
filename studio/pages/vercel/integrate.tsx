@@ -211,8 +211,8 @@ const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
 export default withAuth(observer(VercelIntegration))
 
 const Connecting = () => (
-  <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-32 flex items-center justify-center">
+  <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
     <Typography.Text>Connecting...</Typography.Text>
@@ -225,7 +225,7 @@ const ProjectLinksEmptyState = () => (
       You haven't created a Supabase project yet. Get started by creating a new Supabase project,
       then close this window and retry adding integration.
     </Typography.Text>
-    <Typography.Link href="https://app.supabase.io">
+    <Typography.Link href="https://app.supabase.com">
       Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
     </Typography.Link>
   </div>
@@ -267,8 +267,8 @@ const IntegrationProject: FC = observer(() => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center">
-      <div className="w-full mb-8">
+    <div className="flex w-full flex-col items-center">
+      <div className="mb-8 w-full">
         <Select
           label="Vercel project"
           value={_store.selectedVercelProjectId}
@@ -285,10 +285,10 @@ const IntegrationProject: FC = observer(() => {
         </Select>
       </div>
       <div
-        className="w-full bg-panel-header-light dark:bg-panel-header-dark border 
-      border-border-secondary-light dark:border-border-secondary-dark rounded-sm"
+        className="bg-panel-header-light dark:bg-panel-header-dark border-border-secondary-light dark:border-border-secondary-dark 
+      w-full rounded-sm border"
       >
-        <div className="flex justify-between items-center p-6">
+        <div className="flex items-center justify-between p-6">
           <Typography.Title level={4} className="my-auto mr-8 capitalize">
             {name}
           </Typography.Title>
@@ -449,7 +449,7 @@ const ProjectLinks: FC = observer(() => {
   }
 
   return (
-    <div className="flex flex-col w-full space-y-6">
+    <div className="flex w-full flex-col space-y-6">
       <div>
         <Typography.Title level={4}>Link Vercel to Supabase</Typography.Title>
         <Typography.Text>
@@ -469,7 +469,7 @@ const ProjectLinks: FC = observer(() => {
         </div>
         <ProjectLinkList />
         <Divider light />
-        <div className="py-4 flex justify-end">{displayButton()}</div>
+        <div className="flex justify-end py-4">{displayButton()}</div>
       </div>
     </div>
   )
@@ -567,7 +567,7 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
       <li className="py-2">
         {console.log('re-rendered the ProjectLinkItem')}
         <div className="relative flex w-full space-x-2">
-          <div className="flex-grow w-1/2">
+          <div className="w-1/2 flex-grow">
             <Listbox
               value={vercelProjectId ?? UNDEFINED_SELECT_VALUE}
               onChange={onVercelProjectChange}
@@ -596,12 +596,12 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
               ))}
             </Listbox>
           </div>
-          <div className="flex items-center flex-shrink">
+          <div className="flex flex-shrink items-center">
             <Typography.Text type="secondary">
               <IconChevronRight />
             </Typography.Text>
           </div>
-          <div className="flex-grow w-1/2">
+          <div className="w-1/2 flex-grow">
             <Listbox
               value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
               onChange={onSupabaseProjectChange}

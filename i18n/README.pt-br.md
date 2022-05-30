@@ -32,7 +32,7 @@ Para documentação completa, visite [supabase.com/docs](https://supabase.com/do
 ## Status
 
 - [x] Alfa: Nós estamos testando Supabase com um grupo fechado de clientes.
-- [x] Alfa Público: Qualquer um pode se registrar em [app.supabase.io](https://app.supabase.io). Porém seja flexível com a gente, ainda existem alguns obstáculos.
+- [x] Alfa Público: Qualquer um pode se registrar em [app.supabase.com](https://app.supabase.com). Porém seja flexível com a gente, ainda existem alguns obstáculos.
 - [x] Beta Público: Estável o suficiente para a maioria dos casos não empresariais.
 - [ ] Público: Pronto para produção.
 
@@ -48,7 +48,7 @@ Supabase é uma combinação de ferramentas de código aberto. Nós estamos cons
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://app.supabase.io). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Nós ainda estamos criando a experiência de trabalho local - esse é o nosso foco principal, junto com a estabilidade da plataforma.
+Supabase é uma [plataforma hospedada](https://app.supabase.com). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Nós ainda estamos criando a experiência de trabalho local - esse é o nosso foco principal, junto com a estabilidade da plataforma.
 
 ![Arquitetura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

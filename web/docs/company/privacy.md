@@ -5,7 +5,7 @@ title: Privacy Policy
 
 `Last modified: 27 March 2021`
 
-Thank you for your interest in Supabase, Inc., ("**_Supabase_**," "**_we_**", "**_our_**" or "**_us_**"). Supabase provides a suite of open source tools, stitched together to build a seamless developer experience. This Privacy Notice explains how information about you, that directly identifies you, or that makes you identifiable ("**_personal information_**") is collected, used and disclosed by Supabase in connection with our website at [supabase.io](https://supabase.com) (the "**_Site_**") and our services offered in connection with the Site (collectively with the Site, the "**_Service_**").
+Thank you for your interest in Supabase, Inc., ("**_Supabase_**," "**_we_**", "**_our_**" or "**_us_**"). Supabase provides a suite of open source tools, stitched together to build a seamless developer experience. This Privacy Notice explains how information about you, that directly identifies you, or that makes you identifiable ("**_personal information_**") is collected, used and disclosed by Supabase in connection with our website at [supabase.com](https://supabase.com) (the "**_Site_**") and our services offered in connection with the Site (collectively with the Site, the "**_Service_**").
 
 We may also provide you with additional privacy notices or disclosures where the scope of the inquiry, request, or personal information we require falls outside the scope of this Privacy Notice. In that case, the additional Privacy Notice or disclosures will govern how we may process the information you provide at that time. Please note that this Privacy Notice does not cover or apply to our processing of information about our employees or contractors.
 
@@ -124,7 +124,7 @@ This Privacy Notice was last modified on 27th March 2021
 
 ## Privacy disclosures for the European economic area, United Kingdom, and Switzerland.
 
-While we are primarily based in the United States, Supabase maintains operations in Europe and may direct our services to individuals located in the European Economic Area ("**_EEA_**"), United Kingdom and Switzerland, including through our Site [supabase.io](/) (collectively, our "**_European Services_**"). The following disclosures ("**_Privacy Disclosures_**") apply to our processing of personal data in connection with our European Services.
+While we are primarily based in the United States, Supabase maintains operations in Europe and may direct our services to individuals located in the European Economic Area ("**_EEA_**"), United Kingdom and Switzerland, including through our Site [supabase.com](/) (collectively, our "**_European Services_**"). The following disclosures ("**_Privacy Disclosures_**") apply to our processing of personal data in connection with our European Services.
 
 Supabase, Inc. is the data controller responsible for the processing of personal data in connection with our European Services. This means that we determine and are responsible for how your personal information is used.
 
