@@ -119,7 +119,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://app.supabase.io" passHref>
+        <Link href="https://app.supabase.com" passHref>
           <Button as="a" size="medium" block>
             Get started
           </Button>
@@ -506,7 +506,7 @@ export default function IndexPage() {
 
                         <p className="p text-sm">Perfect for hobby projects and experiments</p>
 
-                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
                           <a>
                             <Button size="medium" type="default">
                               Get Started
@@ -525,7 +525,7 @@ export default function IndexPage() {
                           Everything you need to scale your project into production
                         </p>
 
-                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
                           <a>
                             <Button size="medium" type="default">
                               Get Started
@@ -584,7 +584,7 @@ export default function IndexPage() {
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="default" block>
                             Get started
@@ -594,7 +594,7 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="default" block>
                             Get started
