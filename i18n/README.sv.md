@@ -32,7 +32,7 @@ För fullständig dokumentation, besök [supabase.com/docs](https://supabase.com
 ## Status
 
 - [x] Alpha: Vi testar Supabase med ett begränsat antal kunder
-- [x] Offentlig alpha: Vem som helst kan anmäla sig på [app.supabase.io](https://app.supabase.io). Observera att vissa fel och problem kan uppstå.
+- [x] Offentlig alpha: Vem som helst kan anmäla sig på [app.supabase.com](https://app.supabase.com). Observera att vissa fel och problem kan uppstå.
 - [x] Offentlig beta: Stabil nog för de flesta icke-Enterprise-ändamål
 - [ ] Offentlig: Redo för produktion
 
@@ -48,7 +48,7 @@ Supabase är en samling verktyg med öppen källkod. Vi bygger funktionerna som 
 
 **Nuvarande arkitektur**
 
-Supabase är en [hostad plattform](https://app.supabase.io). Du kan registrera dig och börja använda Supabase utan att installera någonting. Vi håller fortfarande på att förbättra den lokala utvecklarupplevelsen - detta är för närvarande vårt huvudfokus, tillsammans med plattformens övergripande stabilitet.
+Supabase är en [hostad plattform](https://app.supabase.com). Du kan registrera dig och börja använda Supabase utan att installera någonting. Vi håller fortfarande på att förbättra den lokala utvecklarupplevelsen - detta är för närvarande vårt huvudfokus, tillsammans med plattformens övergripande stabilitet.
 
 ![Arkitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

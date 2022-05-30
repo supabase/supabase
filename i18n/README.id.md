@@ -32,7 +32,7 @@ Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/doc
 ## Status
 
 - [x] Alpha: Kami menguji Supabase dengan sejumlah pelanggan secara tertutup
-- [x] Public Alpha: Siapapun dapat mendaftar di [app.supabase.io](https://app.supabase.io). Namun mohon bersabar, ada beberapa masalah.
+- [x] Public Alpha: Siapapun dapat mendaftar di [app.supabase.com](https://app.supabase.com). Namun mohon bersabar, ada beberapa masalah.
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
 - [ ] Public: Siap produksi
 
@@ -48,7 +48,7 @@ Supabase adalah kombinasi dari alat-alat sumber terbuka. Kami membangun fitur-fi
 
 **Arsitektur saat ini**
 
-Supabase adalah sebuah [platform yang dihosting](https://app.supabase.io). Anda dapat mendaftar dan mulai menggunakan Supabase tanpa memasang apa pun. Kami masih membangun pengalaman pengembangan lokal yang merupakan fokus utama kami saat ini, bersama dengan stabilitas platform.
+Supabase adalah sebuah [platform yang dihosting](https://app.supabase.com). Anda dapat mendaftar dan mulai menggunakan Supabase tanpa memasang apa pun. Kami masih membangun pengalaman pengembangan lokal yang merupakan fokus utama kami saat ini, bersama dengan stabilitas platform.
 
 ![Arsitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
