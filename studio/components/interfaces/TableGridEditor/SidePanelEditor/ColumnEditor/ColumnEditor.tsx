@@ -71,6 +71,12 @@ const ColumnEditor: FC<Props> = ({
   }, [visible])
 
   const onUpdateField = (changes: Partial<ColumnField>) => {
+    // An <input> can't have null as its value, so we need to use ''
+    // and convert this '' to null before saving it
+    if (changes.defaultValue === '') {
+      changes.defaultValue = null
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
