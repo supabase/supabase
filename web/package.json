@@ -46,7 +46,7 @@
     "dotenv": "^10.0.0",
     "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.1.3"
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
   }
 }
