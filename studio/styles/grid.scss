@@ -113,14 +113,14 @@
 
   /* edit button */
   .rdg-row__select-column__edit-action {
-    @apply text-typography-body-light dark:text-typography-body-dark;
     opacity: 0;
   }
   .rdg-row:hover .rdg-row__select-column__edit-action {
     opacity: 0.5;
   }
+
   .rdg-row__select-column__edit-action:hover {
-    opacity: 1;
+    opacity: 1 !important;
   }
 
   /* select row */
@@ -450,7 +450,7 @@
 */
 
   .sb-grid-add-column {
-    @apply flex h-full;
+    @apply flex h-full w-full py-1.5;
   }
 
   /*
@@ -510,7 +510,7 @@
 */
 
   .sb-grid-select-cell__formatter {
-    @apply flex h-full items-center justify-between;
+    @apply flex h-full w-full items-center justify-between;
   }
 
   .sb-grid-select-cell__header {
