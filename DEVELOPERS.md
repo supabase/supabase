@@ -56,7 +56,7 @@ To build Supabase, you clone the source code repository:
 
 ### Choosing Directory
 
-Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.io).
+Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.com).
 
 1. Go to the [Supabase Website](https://supabase.com) directory
 
@@ -70,7 +70,7 @@ Before you start a development server, you must choose if you want to work on th
    cd web
    ```
 
-   Go to the [Supabase Studio](https://app.supabase.io) directory
+   Go to the [Supabase Studio](https://app.supabase.com) directory
 
    ```sh
    cd studio
@@ -186,7 +186,6 @@ Then edit and visit any of the following sites:
 - `/apps/temp-community-tutorials`: http://localhost:3003
   - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
 
-
 ### Shared components
 
 The monorepo has a set of shared components under `/packages`:
@@ -194,6 +193,7 @@ The monorepo has a set of shared components under `/packages`:
 - `/packages/common`: Common React code, shared between all sites.
 - `/packages/config`: All shared config
 - `/packages/tsconfig`: Shared Typescript settings
+
 ### Installing packages
 
 Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into.
@@ -210,8 +210,6 @@ You do not need to install `devDependencies` in each workspace. These can all be
 ### Development
 
 `npm run dev`
-
-
 
 ## Finally
 
