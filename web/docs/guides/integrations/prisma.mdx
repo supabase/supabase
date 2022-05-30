@@ -119,7 +119,7 @@ This will create a `prisma/migrations` folder inside your `prisma` directory and
 
 ### Confirming Realtime Functionality
 
-There is an existing issue where Prisma will create Enum Types wrapped in double quotation marks in PostgreSQL. This is not compatible with Realtime-enabled database tables whose columns rely on those Enum Types. We are working on a fix but the workaround is to alter and rename the Enum Types. You can use the following query to find all Types with double quotation marks in the `public` schema:
+There is an existing issue where Prisma will create Enum Types wrapped in double quotation marks in PostgreSQL. This is not compatible with Realtime-enabled database tables whose columns rely on those Enum Types. We are working on a fix which can be tracked on this [GitHub issue](https://github.com/supabase/supabase/issues/5685), but the workaround is to alter and rename the Enum Types. You can use the following query to find all Types with double quotation marks in the `public` schema:
 
 ```sql
 select distinct(a.atttypid::regtype)
