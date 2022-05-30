@@ -40,18 +40,6 @@ const TierLimitExceededNotification: FC<Props> = ({ notification }) => {
         </p>
         <p className="text-scale-1000 text-sm">{insertedAt}</p>
       </div>
-      <Dropdown
-        side="bottom"
-        align="end"
-        size="small"
-        overlay={[
-          <Dropdown.Item icon={<IconCheck size={14} />}>Mark as read</Dropdown.Item>,
-          <Dropdown.Item icon={<IconXSquare size={14} />}>Dismiss notification</Dropdown.Item>,
-          <Dropdown.Item icon={<IconRefreshCw size={14} />}>Restart project now</Dropdown.Item>,
-        ]}
-      >
-        <Button size="tiny" type="text" icon={<IconMoreVertical />} />
-      </Dropdown>
     </div>
   )
 }
