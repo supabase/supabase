@@ -44,29 +44,31 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       }
       hideFooter={false}
       onCancel={closePanel}
-      customFooter={<ActionBar backButtonLabel="Close" closePanel={closePanel} />}
+      customFooter={<ActionBar hideApply backButtonLabel="Close" closePanel={closePanel} />}
     >
       <SidePanel.Content>
-        {loading ? (
-          <div className="flex flex-col items-center justify-center space-y-2 h-full">
-            <IconLoader className="animate-spin" />
-            <p className="text-sm text-scale-1100">Loading reference row</p>
-          </div>
-        ) : !row ? (
-          <div className="flex flex-col items-center justify-center space-y-2 h-full">
-            <IconXCircle />
-            <p className="text-sm text-scale-1100">
-              Unable to find the corresponding row in {foreignKey?.target_table_schema}.
-              {foreignKey?.target_table_name}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {rowFields.map((field: RowField) => {
-              return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
-            })}
-          </div>
-        )}
+        <div className="py-6">
+          {loading ? (
+            <div className="flex h-full flex-col items-center justify-center space-y-2">
+              <IconLoader className="animate-spin" />
+              <p className="text-scale-1100 text-sm">Loading reference row</p>
+            </div>
+          ) : !row ? (
+            <div className="flex h-full flex-col items-center justify-center space-y-2">
+              <IconXCircle />
+              <p className="text-scale-1100 text-sm">
+                Unable to find the corresponding row in {foreignKey?.target_table_schema}.
+                {foreignKey?.target_table_name}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {rowFields.map((field: RowField) => {
+                return <InputField key={field.id} field={field} isEditable={false} errors={{}} />
+              })}
+            </div>
+          )}
+        </div>
       </SidePanel.Content>
     </SidePanel>
   )

@@ -51,7 +51,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -222,7 +222,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="row flex flex-center">
+    <div className="row flex-center flex">
       <div className="col-6 form-widget">
         <h1 className="header">Supabase + Next.js</h1>
         <p className="description">Sign in via magic link with your email below</p>
@@ -354,7 +354,7 @@ export default function Account({ session }) {
 
       <div>
         <button
-          className="button block primary"
+          className="button primary block"
           onClick={() => updateProfile({ username, website, avatar_url })}
           disabled={loading}
         >
@@ -537,4 +537,4 @@ return (
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)
