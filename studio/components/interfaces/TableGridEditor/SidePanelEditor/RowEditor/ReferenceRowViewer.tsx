@@ -44,7 +44,7 @@ const ReferenceRowViewer: FC<Props> = ({ visible, referenceRow, closePanel }) =>
       }
       hideFooter={false}
       onCancel={closePanel}
-      customFooter={<ActionBar backButtonLabel="Close" closePanel={closePanel} />}
+      customFooter={<ActionBar hideApply backButtonLabel="Close" closePanel={closePanel} />}
     >
       <SidePanel.Content>
         <div className="py-6">
