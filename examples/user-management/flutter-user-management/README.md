@@ -8,13 +8,13 @@ This example will set you up for a very common situation: users can sign up with
   - [Flutter SDK](https://flutter.dev/) - Google's UI toolkit for crafting beautiful, natively compiled applications for mobile, web, and desktop from a single codebase.
   - [supabase_flutter](https://pub.dev/packages/supabase_flutter) for user management and image storage uploading.
 - Backend:
-  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with supabase_flutter.
+  - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with supabase_flutter.
 
 ## Build from scratch
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 

@@ -8,7 +8,7 @@
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management Starter" Quickstart
 
