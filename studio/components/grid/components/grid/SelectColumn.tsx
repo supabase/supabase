@@ -1,16 +1,16 @@
-import * as React from 'react';
+import * as React from 'react'
 import {
   CalculatedColumn,
   FormatterProps,
   GroupFormatterProps,
   useRowSelection,
-} from '@supabase/react-data-grid';
-import { Button, IconMaximize2 } from '@supabase/ui';
-import { SupaRow } from '../../types';
-import { RowMenu } from '../menu';
-import { SELECT_COLUMN_KEY } from '../../constants';
-import { useFocusRef } from '../../utils';
-import { useTrackedState } from '../../store';
+} from '@supabase/react-data-grid'
+import { Button, IconMaximize2 } from '@supabase/ui'
+import { SupaRow } from '../../types'
+import { RowMenu } from '../menu'
+import { SELECT_COLUMN_KEY } from '../../constants'
+import { useFocusRef } from '../../utils'
+import { useTrackedState } from '../../store'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -23,17 +23,17 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   frozen: true,
   isLastFrozenColumn: false,
   rowGroup: false,
-  headerRenderer: props => {
+  headerRenderer: (props) => {
     return (
       <SelectCellHeader
         aria-label="Select All"
         value={props.allRowsSelected}
         onChange={props.onAllRowsSelectionChange}
       />
-    );
+    )
   },
   formatter: (props: FormatterProps<SupaRow>) => {
-    const [isRowSelected, onRowSelectionChange] = useRowSelection();
+    const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter
         aria-label="Select"
@@ -42,49 +42,49 @@ export const SelectColumn: CalculatedColumn<any, any> = {
         value={isRowSelected}
         row={props.row}
         onChange={(checked, isShiftClick) => {
-          onRowSelectionChange({ row: props.row, checked, isShiftClick });
+          onRowSelectionChange({ row: props.row, checked, isShiftClick })
         }}
         // Stop propagation to prevent row selection
         onClick={stopPropagation}
       />
-    );
+    )
   },
   groupFormatter: (props: GroupFormatterProps<SupaRow>) => {
-    const [isRowSelected, onRowSelectionChange] = useRowSelection();
+    const [isRowSelected, onRowSelectionChange] = useRowSelection()
     return (
       <SelectCellFormatter
         aria-label="Select Group"
         tabIndex={-1}
         isCellSelected={props.isCellSelected}
         value={isRowSelected}
-        onChange={checked => {
+        onChange={(checked) => {
           onRowSelectionChange({
             row: props.row,
             checked,
             isShiftClick: false,
-          });
+          })
         }}
         // Stop propagation to prevent row selection
         onClick={stopPropagation}
       />
-    );
+    )
   },
-};
+}
 
 function stopPropagation(event: React.SyntheticEvent) {
-  event.stopPropagation();
+  event.stopPropagation()
 }
 
 type SharedInputProps = Pick<
   React.InputHTMLAttributes<HTMLInputElement>,
   'disabled' | 'tabIndex' | 'onClick' | 'aria-label' | 'aria-labelledby'
->;
+>
 
 interface SelectCellFormatterProps extends SharedInputProps {
-  isCellSelected: boolean;
-  value: boolean;
-  row?: SupaRow;
-  onChange: (value: boolean, isShiftClick: boolean) => void;
+  isCellSelected: boolean
+  value: boolean
+  row?: SupaRow
+  onChange: (value: boolean, isShiftClick: boolean) => void
 }
 
 function SelectCellFormatter({
@@ -98,18 +98,18 @@ function SelectCellFormatter({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellFormatterProps) {
-  const state = useTrackedState();
-  const { onEditRow } = state;
-  const inputRef = useFocusRef<HTMLInputElement>(isCellSelected);
+  const state = useTrackedState()
+  const { onEditRow } = state
+  const inputRef = useFocusRef<HTMLInputElement>(isCellSelected)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey);
+    onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 
   function onEditClick(e: React.MouseEvent) {
-    e.stopPropagation();
+    e.stopPropagation()
     if (onEditRow && row) {
-      onEditRow(row);
+      onEditRow(row)
     }
   }
 
@@ -134,16 +134,16 @@ function SelectCellFormatter({
           className="rdg-row__select-column__edit-action"
           icon={<IconMaximize2 size="tiny" />}
           onClick={onEditClick}
-          style={{ padding: '2px' }}
+          style={{ padding: '3px' }}
         />
       )}
     </div>
-  );
+  )
 }
 
 interface SelectCellHeaderProps extends SharedInputProps {
-  value: boolean;
-  onChange: (value: boolean, isShiftClick: boolean) => void;
+  value: boolean
+  onChange: (value: boolean, isShiftClick: boolean) => void
 }
 
 function SelectCellHeader({
@@ -156,7 +156,7 @@ function SelectCellHeader({
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey);
+    onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 
   return (
@@ -174,5 +174,5 @@ function SelectCellHeader({
       />
       <RowMenu />
     </div>
-  );
+  )
 }
