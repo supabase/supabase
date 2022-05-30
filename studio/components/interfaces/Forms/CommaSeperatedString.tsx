@@ -17,8 +17,23 @@ const CommaSeperatedString = () => {
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [selectedDomain, setSelected] = useState('')
 
+  /**
+   *
+   * reges from: https://stackoverflow.com/a/68002755/4807782
+   *
+   * examples of matches:
+   *
+   * "vercel.com"
+   * "www.vercel.com"
+   * "uptime-monitor-fe.vercel.app"
+   * "https://uptime-monitor-fe.vercel.app/"
+   *
+   */
+  const domainRegex =
+    /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/gm
+
   let newDomainSchema = object({
-    domain: string().url().required(),
+    domain: string().matches(domainRegex, 'URL is not valid').required(),
   })
 
   const DomainsForm = () => {
