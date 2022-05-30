@@ -32,7 +32,7 @@ Untuk dokumentasi lengkap, layari [supabase.com/docs](https://supabase.com/docs)
 ## Status
 
 - [x] Alpha: Kami menguji Supabase dengan sejumlah pelanggan secara tertutup
-- [x] Public Alpha: Sesiapa sahaja boleh mendaftar di [app.supabase.io](https://app.supabase.io). Tetapi, mohon bersabar kerana mungkin ada masalah
+- [x] Public Alpha: Sesiapa sahaja boleh mendaftar di [app.supabase.com](https://app.supabase.com). Tetapi, mohon bersabar kerana mungkin ada masalah
 - [x] Public Beta: Cukup stabil untuk kebanyakan kes penggunaan bukan perusahaan
 - [ ] Public: Bersedia untuk pengeluaran
 
@@ -48,7 +48,7 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 
 **Seni bina semasa**
 
-Supabase ialah [platform yang dihoskan](https://app.supabase.io). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
+Supabase ialah [platform yang dihoskan](https://app.supabase.com). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
 Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [lokal](https://supabase.com/docs/guides/local-development).
 
 ![Seni bina](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
