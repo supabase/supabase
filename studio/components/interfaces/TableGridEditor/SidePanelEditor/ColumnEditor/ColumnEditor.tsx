@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from '@supabase/grid'
-import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
+import { Checkbox, SidePanel, Input } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -23,6 +23,7 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
@@ -71,9 +72,8 @@ const ColumnEditor: FC<Props> = ({
   }, [visible])
 
   const onUpdateField = (changes: Partial<ColumnField>) => {
-    // An <input> can't have null as its value, so we need to use ''
-    // and convert this '' to null before saving it
-    if (changes.defaultValue === '') {
+    const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
+    if (!isTextBasedColumn && changes.defaultValue === '') {
       changes.defaultValue = null
     }
 
