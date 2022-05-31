@@ -134,7 +134,11 @@ export function ColumnHeader<R>({
 function renderColumnIcon(type: ColumnType) {
   switch (type) {
     case 'foreign_key':
-      return <IconLink size="tiny" strokeWidth={2} />
+      return (
+        <div>
+          <IconLink size="tiny" strokeWidth={2} />
+        </div>
+      )
     default:
       return null
   }

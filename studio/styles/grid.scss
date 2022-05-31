@@ -10,7 +10,7 @@
   .rdg-cell {
     @apply flex;
     @apply border-scale-400 dark:border-scale-500 border-r border-b text-sm;
-    @apply text-typography-body-light dark:text-typography-body-dark;
+    @apply text-scale-1200;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -127,12 +127,6 @@
   .rdg-row[aria-selected='true'] {
     @apply bg-bg-secondary-light dark:bg-bg-secondary-dark;
     @apply hover:bg-bg-secondary-light dark:hover:bg-bg-secondary-dark;
-  }
-
-  .rdg-row .rdg-cell span,
-/* .rdg-row .rdg-cell svg, */
-.rdg-row .rdg-cell div {
-    @apply text-typography-body-light dark:text-typography-body-dark;
   }
 
   .tab-cursor {
@@ -466,18 +460,17 @@
   }
 
   .sb-grid-column-header__inner {
-    @apply flex items-center space-x-2 overflow-hidden overflow-ellipsis;
+    @apply flex items-center gap-2 overflow-hidden overflow-ellipsis;
   }
 
   .sb-grid-column-header__inner__name {
-    @apply overflow-hidden overflow-ellipsis text-sm;
-    @apply text-typography-body-light dark:text-typography-body-dark;
+    @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs;
   }
 
   .sb-grid-column-header__inner__format {
     @apply text-xs;
     @apply overflow-hidden overflow-ellipsis font-normal;
-    @apply text-typography-body-secondary-light dark:text-typography-body-secondary-dark;
+    @apply text-scale-1000;
   }
 
   .sb-grid-column-header__inner__primary-key {
@@ -485,8 +478,7 @@
   }
 
   .sb-grid-column-header__inner svg {
-    @apply mr-1;
-    @apply border-green-900 text-green-900 dark:border-green-900 dark:text-green-900;
+    @apply border-brand-900 text-brand-900 dark:border-brand-900 dark:text-brand-900;
   }
 
   /*

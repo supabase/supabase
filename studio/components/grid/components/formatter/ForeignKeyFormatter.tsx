@@ -34,9 +34,9 @@ export const ForeignKeyFormatter = (
 
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
-      <p className="sb-grid-foreign-key-formatter__text">
+      <span className="sb-grid-foreign-key-formatter__text">
         {value === null ? <NullValue /> : value}
-      </p>
+      </span>
       <ForeignTableModal columnName={p.column.key} defaultValue={value} onChange={onChange} />
     </div>
   )
