@@ -62,6 +62,7 @@ export default function IndexPage() {
         '2M Edge Function invocations',
         'Daily backups',
         '7-day log retention',
+        'No limit on number of projects',
         'No project pausing',
         'Email support',
       ],
