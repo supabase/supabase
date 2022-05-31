@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] Otomatik oluşturulan API'ler
 - [x] Gösterge Paneli
 - [x] Depolama
-- [ ] Fonksiyonlar (Çok yakında)
+- [x] Fonksiyonlar
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokümantasyon
 
@@ -30,7 +33,7 @@ Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/do
 ## Durum
 
 - [x] Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [x] Herkese Açık Alfa: [app.supabase.io](https://app.supabase.io) adresinden herkes kaydolabilir. Ama anlayış gösterin, birkaç karışıklık var.
+- [x] Herkese Açık Alfa: [app.supabase.com](https://app.supabase.com) adresinden herkes kaydolabilir. Ama anlayış gösterin, birkaç karışıklık var.
 - [x] Herkese Açık Beta: Kurumsal olmayan çoğu kullanım durumu için yeterince kararlı
 - [ ] Herkese açık: Üretime hazır
 
@@ -46,7 +49,7 @@ Supabase, açık kaynaklı araçların bir kombinasyonudur. Firebase'in özellik
 
 **Güncel Mimari**
 
-Supabase [barındırılan bir platformdur](https://app.supabase.io). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
+Supabase [barındırılan bir platformdur](https://app.supabase.com). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

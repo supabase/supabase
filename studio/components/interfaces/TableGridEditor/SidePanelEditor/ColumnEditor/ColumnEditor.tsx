@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from '@supabase/grid'
-import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
+import { Checkbox, SidePanel, Input } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -23,6 +23,7 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
@@ -70,7 +71,14 @@ const ColumnEditor: FC<Props> = ({
     }
   }, [visible])
 
+  if (!columnFields) return null
+
   const onUpdateField = (changes: Partial<ColumnField>) => {
+    const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
+    if (!isTextBasedColumn && changes.defaultValue === '') {
+      changes.defaultValue = null
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
@@ -98,7 +106,7 @@ const ColumnEditor: FC<Props> = ({
         : undefined,
       ...(!isUndefined(foreignKeyConfiguration) && {
         format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
+        defaultValue: null,
       }),
     })
     setIsEditingRelation(false)
@@ -123,8 +131,6 @@ const ColumnEditor: FC<Props> = ({
       }
     }
   }
-
-  if (!columnFields) return null
 
   return (
     <SidePanel
@@ -198,7 +204,7 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
-            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: '' })}
+            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">

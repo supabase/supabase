@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
@@ -18,8 +18,10 @@ import Panel from 'components/to-be-cleaned/Panel'
 import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
+import { NextPageWithLayout } from 'types'
 
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -27,18 +29,21 @@ const ProjectSettings = () => {
   const project = ui.selectedProject
 
   return (
-    <SettingsLayout title="Database">
+    <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full max-w-5xl px-4 py-4">
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
+          <ConnectionPooling />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
+
+export default observer(ProjectSettings)
 
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
@@ -218,30 +223,48 @@ const ResetDbPassword: FC<any> = () => {
         </Panel.Content>
       </Panel>
       <Modal
-        title="Reset database password"
+        hideFooter
+        header={<h5 className="text-scale-1200 text-sm">Reset database password</h5>}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingPassword}
         onCancel={() => setShowResetDbPass(false)}
-        onConfirm={() => confirmResetDbPass()}
       >
-        <div className="mb-8 w-full space-y-8">
-          <Input
-            type="password"
-            onChange={onDbPassChange}
-            error={passwordStrengthWarning}
-            // @ts-ignore
-            descriptionText={
-              <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore}
-                passwordStrengthMessage={passwordStrengthMessage}
-                password={password}
-              />
-            }
-          />
-        </div>
+        <Modal.Content>
+          <div className="w-full space-y-8 py-8">
+            <Input
+              type="password"
+              onChange={onDbPassChange}
+              error={passwordStrengthWarning}
+              // @ts-ignore
+              descriptionText={
+                <PasswordStrengthBar
+                  passwordStrengthScore={passwordStrengthScore}
+                  passwordStrengthMessage={passwordStrengthMessage}
+                  password={password}
+                />
+              }
+            />
+          </div>
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
+          <div className="flex space-x-2 pb-2">
+            <Button type="default" onClick={() => setShowResetDbPass(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              loading={isUpdatingPassword}
+              disabled={isUpdatingPassword}
+              onClick={() => confirmResetDbPass()}
+            >
+              Reset password
+            </Button>
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )
@@ -300,10 +323,11 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   const { project } = data
   const formModel = toJS(project)
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-  const uriConnString =
+const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`

@@ -26,7 +26,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
-    "@supabase/supabase-js": "^1.28.1",
+    "@supabase/supabase-js": "^1.35.3",
     "@types/jest": "^27.0.3",
     "@types/node": "^14.14.14",
     "autoprefixer": "^10.4.4",

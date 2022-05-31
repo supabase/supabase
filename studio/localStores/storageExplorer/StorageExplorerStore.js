@@ -22,7 +22,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_SORT_BY,
 } from 'components/to-be-cleaned/Storage/Storage.constants.ts'
-import { timeout, copyToClipboard } from 'lib/helpers'
+import { copyToClipboard } from 'lib/helpers'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -286,7 +286,7 @@ class StorageExplorerStore {
     if (isNull(formattedName)) {
       return
     }
-    /** 
+    /**
      * todo: move this to a util file, as renameFolder() uses same logic
      */
     if (formattedName.includes('/') || formattedName.includes('\\')) {
@@ -376,13 +376,15 @@ class StorageExplorerStore {
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
       const signedUrl = await this.fetchFilePreview(file.name)
-      const formattedUrl = `${signedUrl}?t=${new Date().toISOString()}`
-      copyToClipboard(formattedUrl, () => {
+      let formattedUrl = new URL(signedUrl)
+      formattedUrl.searchParams.set('t', new Date().toISOString())
+
+      copyToClipboard(formattedUrl.toString(), () => {
         toast(`Copied URL for ${file.name} to clipboard.`)
       })
       const fileCache = {
         id: file.id,
-        url: formattedUrl,
+        url: formattedUrl.toString(),
         expiresIn: DEFAULT_EXPIRY,
         fetchedAt: Date.now(),
       }
@@ -623,25 +625,22 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return Promise.race([
-          new Promise(async (resolve) => {
-            const { error } = await this.supabaseClient.storage
-              .from(this.selectedBucket.name)
-              .upload(formattedPathToFile, file, fileOptions)
+        return new Promise(async (resolve) => {
+          const { error } = await this.supabaseClient.storage
+            .from(this.selectedBucket.name)
+            .upload(formattedPathToFile, file, fileOptions)
 
-            this.uploadProgress = this.uploadProgress + 1 / formattedFilesToUpload.length
+          this.uploadProgress = this.uploadProgress + 1 / formattedFilesToUpload.length
 
-            if (error) {
-              numberOfFilesUploadedFail += 1
-              toast.error(`Failed to upload ${file.name}: ${error.message}`)
-              resolve()
-            } else {
-              numberOfFilesUploadedSuccess += 1
-              resolve()
-            }
-          }),
-          timeout(30000),
-        ])
+          if (error) {
+            numberOfFilesUploadedFail += 1
+            toast.error(`Failed to upload ${file.name}: ${error.message}`)
+            resolve()
+          } else {
+            numberOfFilesUploadedSuccess += 1
+            resolve()
+          }
+        })
       }
     })
 
@@ -1093,10 +1092,10 @@ class StorageExplorerStore {
 
     /**
      * Catch any folder names that contain slash or backslash
-     * 
-     * this is because slashes are used to denote 
+     *
+     * this is because slashes are used to denote
      * children/parent relationships in bucket
-     * 
+     *
      * todo: move this to a util file, as createFolder() uses same logic
      */
     if (newName.includes('/') || newName.includes('\\')) {
