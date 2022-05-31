@@ -3,7 +3,6 @@ export interface Organization {
   slug: string
   name: string
   billing_email: string
-  project_limit: number
   members: any[]
   projects: any[]
   is_owner?: boolean
@@ -38,7 +37,7 @@ export interface Project extends ProjectBase {
    * We use this status to check if a project instance is HEALTHY or not
    * If not we will show ConnectingState and run a polling until it's back online
    */
-  postgrestStatus?: 'ONLINE' | 'OFFLINE'  
+  postgrestStatus?: 'ONLINE' | 'OFFLINE'
 }
 
 export interface User {
