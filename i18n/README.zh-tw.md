@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] 自動產生的 API
 - [x] 儀表版
 - [x] Storage
-- [ ] Functions（即將推出）
+- [x] Functions
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 說明文件
 
@@ -29,7 +32,7 @@
 ## 狀態
 
 - [x] Alpha：與少部分特定客戶測試 Supabase。
-- [x] 公開 Alpha：任何人都可以在 [app.supabase.io](https://app.supabase.io) 報名。只是務必手下留情，還有一些糾結的地方。
+- [x] 公開 Alpha：任何人都可以在 [app.supabase.com](https://app.supabase.com) 報名。只是務必手下留情，還有一些糾結的地方。
 - [x] 公開 Beta：已能夠穩定在大多數非企業情境使用
 - [ ] 公開：可以在正式環境使用
 
@@ -45,7 +48,7 @@ Supabase 是一套開放原始碼工具的組合包。我們以企業等級的�
 
 **目前架構**
 
-Supabase 是[託管平台](https://app.supabase.io)。只要註冊，不必安裝任何東西，就可以開始使用 Supabase。目前還在打造本地端開發體驗：連同平台的穩定度，這是我們專注的核心。
+Supabase 是[託管平台](https://app.supabase.com)。只要註冊，不必安裝任何東西，就可以開始使用 Supabase。目前還在打造本地端開發體驗：連同平台的穩定度，這是我們專注的核心。
 
 ![架構](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

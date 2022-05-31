@@ -4,12 +4,19 @@ title: Row Level Security
 description: Secure your data using Postgres Row Level Security.
 ---
 
-When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). 
+When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
-<iframe className="w-full video-with-border" width="640" height="385" src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk" frameBorder="1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-
+<iframe
+  className="video-with-border w-full"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/Ow_Uzedfohk"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
 
 ## Policies
 
@@ -18,8 +25,8 @@ every time a table is accessed.
 You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
 
 ```sql
-create policy "Individuals can view their own todos." 
-    on todos for select 
+create policy "Individuals can view their own todos."
+    on todos for select
     using ( auth.uid() = user_id );
 ```
 
@@ -31,18 +38,39 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## Helper Functions 
+## Helper Functions
 
 Supabase provides you with a few easy functions that you can use with your policies.
 
-
-### `auth.uid()` 
+### `auth.uid()`
 
 Returns the ID of the user making the request.
 
 ### `auth.role()`
 
-Returns the role of the user making the request. In most cases this is either `authenticated` or `anon`.
+:::caution
+
+Deprecated
+
+:::
+
+The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
+
+```sql
+-- DEPRECATED
+create policy "Public profiles are viewable by everyone."
+on profiles for select using (
+  auth.role() = 'authenticated' or auth.role() = 'anon'
+);
+
+-- RECOMMENDED
+create policy "Public profiles are viewable by everyone."
+on profiles for select
+to authenticated, anon
+using (
+  true
+);
+```
 
 ### `auth.email()`
 
@@ -50,7 +78,7 @@ Returns the email of the user making the request.
 
 ## Examples
 
-Here are some examples to show you the power of PostgreSQL's RLS. 
+Here are some examples to show you the power of PostgreSQL's RLS.
 
 ### Allow read access
 
@@ -99,6 +127,19 @@ create policy "Users can update their own profiles."
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables RLS.
 3. Creates a policy which allows logged in users to update their own data.
+
+### Only anon or authenticated access
+
+You can add a Postgres role
+
+```sql
+create policy "Public profiles are viewable by everyone."
+on profiles for select
+to authenticated, anon
+using (
+  true
+);
+```
 
 ### Policies with joins
 
@@ -267,7 +308,6 @@ using (
 );
 ```
 
-
 ## Tips
 
 ### Enable Realtime for database tables
@@ -297,19 +337,18 @@ alter publication supabase_realtime add table products;
 alter publication supabase_realtime add table posts;
 ```
 
-### You don't have to use policies 
+### You don't have to use policies
 
 You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
 
 Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
 
-However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application 
-works with Postgres, then it also works with Supabase. 
+However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application
+works with Postgres, then it also works with Supabase.
 
 Tip: Make sure to enable RLS for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide, which is designed to bypass RLS.
 
-
 ### Never use a service key on the client
 
-Supabase provides special "Service" keys, which can be used to bypass all RLS. 
+Supabase provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.

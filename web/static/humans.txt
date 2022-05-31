@@ -3,9 +3,9 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
-Angelico de los Reyes
 Amy Q
 Andrew Smith
+Angelico de los Reyes
 Ant Wilson
 Ariuna K
 Beng Eu
@@ -36,6 +36,8 @@ Monica El Khoury
 Nikita Kotlyarov
 Oli R
 Paul Copplestone
+Ramiro Nuñez Dosio
+Rodrigo Mansueli Nunes
 Rory Wilding
 Shane Rice
 Stanislav M

@@ -146,6 +146,7 @@ info:
           - auth.api.resetPasswordForEmail()
       - name: 'Auth (Server Only)'
         items:
+          - auth.api.listUsers()
           - auth.api.createUser()
           - auth.api.deleteUser()
           - auth.api.generateLink()
@@ -351,10 +352,10 @@ pages:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
       - If signUp() is called for an existing confirmed user:
           - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
           - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
@@ -413,7 +414,7 @@ pages:
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
       - Specifying a `provider` will open the browser to the relevant login page.
     examples:
       - name: Sign in with email.
@@ -695,6 +696,20 @@ pages:
           const { user, error } = await supabase.auth.api.getUser(
             'ACCESS_TOKEN_JWT',
           )
+          ```
+
+  auth.api.listUsers():
+    title: 'listUsers()'
+    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Get a full list of users.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.api.listUsers()
           ```
 
   auth.api.createUser():
@@ -1240,11 +1255,17 @@ pages:
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
+      
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
     $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
     examples:
       - name: Call a Postgres function
         isSpotlight: true
-        description: This is an example of invoking a Postgres function.
+        description: This is an example of invoking a Postgres function with no parameters.
         js: |
           ```js
           const { data, error } = await supabase
@@ -1661,7 +1682,7 @@ pages:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.io](https://app.supabase.io), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: none
