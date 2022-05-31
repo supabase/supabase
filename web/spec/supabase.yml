@@ -1391,7 +1391,7 @@ pages:
             .on('UPDATE', handleRecordUpdated)
             .subscribe()
           ```
-          **Note** ``eq`` is a filter that can return events that match the filter, but as of now only works with Integers
+          **Note** ``eq`` is a filter that can return events that match the filter.
 
   removeSubscription():
     title: 'removeSubscription()'
