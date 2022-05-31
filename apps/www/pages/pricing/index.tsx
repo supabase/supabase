@@ -52,7 +52,7 @@ export default function IndexPage() {
       href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 25,
-      warning: 'per Project',
+      warning: 'per project',
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
@@ -62,6 +62,7 @@ export default function IndexPage() {
         '2M Edge Function invocations',
         'Daily backups',
         '7-day log retention',
+        'No limit on number of projects',
         'No project pausing',
         'Email support',
       ],
