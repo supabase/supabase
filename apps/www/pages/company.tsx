@@ -311,7 +311,7 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-2">
+      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
             <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
