@@ -27,9 +27,10 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
 import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
-import { ColumnField } from '../SidePanelEditor.types'
 import { ImportContent } from './TableEditor.types'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
+import { ColumnField } from '../SidePanelEditor.types'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
 
 interface Props {
   table?: Partial<PostgresTable>
@@ -91,6 +92,11 @@ const ColumnManagement: FC<Props> = ({
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
     const updatedColumns = columns.map((column: ColumnField) => {
       if (column.id === columnToUpdate.id) {
+        const isTextBasedColumn = TEXT_TYPES.includes(columnToUpdate.format)
+        if (!isTextBasedColumn && changes.defaultValue === '') {
+          changes.defaultValue = null
+        }
+
         if ('name' in changes && !isUndefined(column.foreignKey)) {
           const foreignKey: PostgresRelationship = {
             ...column.foreignKey,

@@ -30,7 +30,7 @@ export default function IndexPage() {
   const tiers = [
     {
       name: 'Free',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
@@ -49,10 +49,10 @@ export default function IndexPage() {
     },
     {
       name: 'Pro',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 25,
-      warning: '+ additional use',
+      warning: 'per project',
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
@@ -62,6 +62,7 @@ export default function IndexPage() {
         '2M Edge Function invocations',
         'Daily backups',
         '7-day log retention',
+        'No limit on number of projects',
         'No project pausing',
         'Email support',
       ],

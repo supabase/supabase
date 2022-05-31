@@ -31,19 +31,19 @@ const InformationBox: FC<Props> = ({
   return (
     <div
       className={`${block ? 'block w-full' : ''}
-      block w-full bg-scale-100 dark:bg-scale-400 py-3 border border-scale-600 dark:border-scale-500 rounded ${className}`}
+      bg-scale-100 dark:bg-scale-400 border-scale-600 dark:border-scale-500 block w-full rounded border py-3 ${className}`}
     >
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
-          <div className="flex space-x-3 w-full lg:items-center">
+          <div className="flex w-full space-x-3 lg:items-center">
             <span className="text-scale-900">{icon}</span>
             <div className="flex-grow">
-              <h5 className="text-sm text-scale-1200">{title}</h5>
+              <h5 className="text-scale-1200 text-sm">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (
             <div
-              className="cursor-pointer text-scale-900"
+              className="text-scale-900 cursor-pointer"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (
@@ -55,18 +55,18 @@ const InformationBox: FC<Props> = ({
           ) : null}
         </div>
         <div
-          className={`transition-all flex flex-col space-y-3 overflow-hidden ${
+          className={`flex flex-col space-y-3 overflow-hidden transition-all ${
             isExpanded ? 'mt-3' : ''
           }`}
           style={{ maxHeight: isExpanded ? 500 : 0 }}
         >
-          <p className="text-sm text-scale-1100">{description}</p>
+          <p className="text-scale-1100 text-sm">{description}</p>
 
           {url && (
             <a
               href={url}
               target="_blank"
-              className="text-sm transition-colors underline text-scale-1100 hover:text-scale-1200"
+              className="text-scale-1100 hover:text-scale-1200 text-sm underline transition-colors"
             >
               {urlLabel}
             </a>
