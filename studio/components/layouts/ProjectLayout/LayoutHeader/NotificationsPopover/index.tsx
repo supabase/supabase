@@ -1,25 +1,13 @@
 import { FC, Fragment } from 'react'
-import {
-  Button,
-  IconBell,
-  Popover,
-  Dropdown,
-  IconCheck,
-  IconMoreVertical,
-  IconXSquare,
-} from '@supabase/ui'
-import {
-  Notification,
-  NotificationName,
-  NotificationStatus,
-} from '@supabase/shared-types/out/notifications'
+import { Button, IconBell, Popover } from '@supabase/ui'
+import { NotificationStatus } from '@supabase/shared-types/out/notifications'
 
 import { useNotifications } from 'hooks'
-import TierLimitExceededNotification from './TierLimitExceededNotification'
-import PostgresqlInfoNotification from './PostgresqlInfoNotification'
-import PostgresqlBugfixNotification from './PostgresqlBugfixNotification'
+import NotificationRow from './NotificationRow'
 
 interface Props {}
+
+const MAX_NOTIFICATIONS_TO_SHOW = 4
 
 const NotificationsPopover: FC<Props> = () => {
   const { notifications } = useNotifications()
@@ -30,18 +18,13 @@ const NotificationsPopover: FC<Props> = () => {
       (notification) => notification.notification_status === NotificationStatus.New
     )
 
-  const renderNotification = (notification: Notification) => {
-    switch (notification.notification_name) {
-      case NotificationName.ProjectExceedingTierLimit:
-        return <TierLimitExceededNotification key={notification.id} notification={notification} />
-      case NotificationName.PostgresqlInformational:
-        return <PostgresqlInfoNotification key={notification.id} notification={notification} />
-      case NotificationName.PostgresqlBugfix:
-        return <PostgresqlBugfixNotification key={notification.id} notification={notification} />
-      default:
-        return <div key={notification.id}>Unknown</div>
+  const onOpenChange = (open: boolean) => {
+    if (!open) {
+      // Mark notifications as seen
     }
   }
+
+  if (!notifications) return <div />
 
   return (
     <Popover
@@ -49,35 +32,19 @@ const NotificationsPopover: FC<Props> = () => {
       align="end"
       side="bottom"
       sideOffset={8}
+      onOpenChange={onOpenChange}
       overlay={
-        <div className="my-2 w-[500px]">
+        <div className="mb-2 w-[550px]">
+          <div className="mb-2 flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
+            <p className="text-sm">Notifications</p>
+            <p className="text-scale-1000 hover:text-scale-1200 cursor-pointer text-sm transition">
+              See all{' '}
+              {notifications.length > MAX_NOTIFICATIONS_TO_SHOW && `(${notifications.length})`}
+            </p>
+          </div>
           {notifications?.map((notification, i: number) => (
             <Fragment key={notification.id}>
-              <div className="grid grid-cols-12 py-2">
-                <div className="col-span-1 flex items-center justify-center">
-                  {notification.notification_status !== NotificationStatus.Seen && (
-                    <div className="h-2 w-2 rounded-full bg-green-900" />
-                  )}
-                </div>
-                <div className="col-span-9">{renderNotification(notification)}</div>
-                <div className="col-span-2 flex items-center justify-center">
-                  <Dropdown
-                    side="bottom"
-                    align="end"
-                    size="small"
-                    overlay={[
-                      <Dropdown.Item key="mark-read" icon={<IconCheck size={14} />}>
-                        Mark as read
-                      </Dropdown.Item>,
-                      <Dropdown.Item key="dismiss" icon={<IconXSquare size={14} />}>
-                        Dismiss notification
-                      </Dropdown.Item>,
-                    ]}
-                  >
-                    <IconMoreVertical size={16} />
-                  </Dropdown>
-                </div>
-              </div>
+              <NotificationRow notification={notification} />
               {i !== notifications.length - 1 && <Popover.Seperator />}
             </Fragment>
           ))}
@@ -87,7 +54,7 @@ const NotificationsPopover: FC<Props> = () => {
       <div className="relative">
         <Button
           as="span"
-          type={hasNewNotifications ? 'default' : 'text'}
+          type="default"
           icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
         />
         {hasNewNotifications && (
