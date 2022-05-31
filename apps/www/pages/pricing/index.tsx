@@ -30,7 +30,7 @@ export default function IndexPage() {
   const tiers = [
     {
       name: 'Free',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
@@ -49,7 +49,7 @@ export default function IndexPage() {
     },
     {
       name: 'Pro',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 25,
       warning: 'per Project',
