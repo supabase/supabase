@@ -3,28 +3,31 @@ import { Button, IconBell, Popover } from '@supabase/ui'
 import { NotificationStatus } from '@supabase/shared-types/out/notifications'
 
 import { useNotifications } from 'hooks'
+import { patch } from 'lib/common/fetch'
 import NotificationRow from './NotificationRow'
+import { API_URL } from 'lib/constants'
 
 interface Props {}
-
-const MAX_NOTIFICATIONS_TO_SHOW = 4
 
 const NotificationsPopover: FC<Props> = () => {
   const { notifications } = useNotifications()
 
-  const hasNewNotifications =
-    notifications !== undefined &&
-    notifications.some(
-      (notification) => notification.notification_status === NotificationStatus.New
-    )
+  if (!notifications) return <div />
 
-  const onOpenChange = (open: boolean) => {
+  const hasNewNotifications = notifications.some(
+    (notification) => notification.notification_status === NotificationStatus.New
+  )
+
+  const onOpenChange = async (open: boolean) => {
     if (!open) {
       // Mark notifications as seen
+      const notificationIds = notifications
+        ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+        .map((notification) => notification.id)
+      const { data, error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
+      console.log(data, error)
     }
   }
-
-  if (!notifications) return <div />
 
   return (
     <Popover
@@ -34,20 +37,23 @@ const NotificationsPopover: FC<Props> = () => {
       sideOffset={8}
       onOpenChange={onOpenChange}
       overlay={
-        <div className="mb-2 w-[550px]">
-          <div className="mb-2 flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
+        <div className="w-[550px]">
+          <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
             <p className="text-sm">Notifications</p>
-            <p className="text-scale-1000 hover:text-scale-1200 cursor-pointer text-sm transition">
+            {/* Area for improvement: Paginate notifications and show in a side panel */}
+            {/* <p className="text-scale-1000 hover:text-scale-1200 cursor-pointer text-sm transition">
               See all{' '}
               {notifications.length > MAX_NOTIFICATIONS_TO_SHOW && `(${notifications.length})`}
-            </p>
+            </p> */}
           </div>
-          {notifications?.map((notification, i: number) => (
-            <Fragment key={notification.id}>
-              <NotificationRow notification={notification} />
-              {i !== notifications.length - 1 && <Popover.Seperator />}
-            </Fragment>
-          ))}
+          <div className="max-h-[380px] overflow-y-auto py-2">
+            {notifications.map((notification, i: number) => (
+              <Fragment key={notification.id}>
+                <NotificationRow notification={notification} />
+                {i !== notifications.length - 1 && <Popover.Seperator />}
+              </Fragment>
+            ))}
+          </div>
         </div>
       }
     >
