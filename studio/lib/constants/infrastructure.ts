@@ -21,8 +21,8 @@ export const REGIONS = {
 export const REGIONS_DEFAULT = REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
-  FREE: 'Free tier',
-  PRO: 'Pro tier',
+  FREE: 'Free',
+  PRO: 'Pro',
 }
 
 export const PRICING_TIER_PRODUCT_IDS = {

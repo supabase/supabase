@@ -64,7 +64,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
             </li>
           ))}
           <li>
-            <Link href="https://app.supabase.io">
+            <Link href="https://app.supabase.com">
               <a className={`text-scale-1100 text-sm`}>Login</a>
             </Link>
           </li>

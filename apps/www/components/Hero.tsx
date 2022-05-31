@@ -39,7 +39,7 @@ const Hero = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io" passHref>
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com" passHref>
                         <Button as="a" size="small" className="text-white">
                           Start your project
                         </Button>
@@ -53,7 +53,7 @@ const Hero = () => {
                     <div className="flex flex-col gap-4">
                       <small className="small text-xs">backed by</small>
                       <div className="w-full sm:max-w-lg lg:ml-0">
-                        <div className="flex flex-wrap sm:flex-nowrap items-center justify-start gap-y-8">
+                        <div className="flex flex-wrap items-center justify-start gap-y-8 sm:flex-nowrap">
                           <img
                             className="h-8 pr-5 sm:h-8 md:pr-10"
                             src={`${basePath}/images/logos/yc--grey.png`}

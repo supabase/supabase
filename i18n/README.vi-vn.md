@@ -39,7 +39,7 @@
 ## Trạng thái
 
 - [x] Alpha: Chúng tôi đang thử nghiệm Supabase với một nhóm người dùng kín
-- [x] Public Alpha: Bất kỳ ai cũng có thể đăng ký tại [app.supabase.io](https://app.supabase.io). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài lỗi nhỏ.
+- [x] Public Alpha: Bất kỳ ai cũng có thể đăng ký tại [app.supabase.com](https://app.supabase.com). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài lỗi nhỏ.
 - [x] Public Beta: Đủ ổn định cho hầu hết các trường hợp sử dụng không dành cho môi trường doanh nghiệp (production)
 - [ ] Public: Sẵn sàng cho môi trường doanh nghiệp (production)
 
@@ -55,7 +55,7 @@ Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính
 
 **Kiến trúc**
 
-Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://app.supabase.io). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
+Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://app.supabase.com). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
 Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting/overview) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development).
 
 ![Kiến trúc](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)

@@ -1364,3 +1364,8 @@ details summary:hover {
 .admonition.admonition-caution .admonition-heading h5 {
   color: var(--custom-color-orange-800) !important;
 }
+
+.theme-back-to-top-button {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
