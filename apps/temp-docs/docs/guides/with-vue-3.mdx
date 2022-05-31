@@ -31,7 +31,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -197,7 +197,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
 ```html title="/src/components/Auth.vue"
 <template>
-  <form class="row flex flex-center" @submit.prevent="handleLogin">
+  <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
       <h1 class="header">Supabase + Vue 3</h1>
       <p class="description">Sign in via magic link with your email below</p>
@@ -284,7 +284,7 @@ Let's create a new component for that called `Profile.vue`.
     <div>
       <input
         type="submit"
-        class="button block primary"
+        class="button primary block"
         :value="loading ? 'Loading ...' : 'Update'"
         :disabled="loading"
       />
@@ -567,4 +567,4 @@ And then we can add the widget to the Account page:
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

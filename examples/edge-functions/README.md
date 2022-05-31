@@ -10,6 +10,8 @@ The function examples are located in [`./supabase/functions`](./supabase/functio
 
 - [`browser-with-cors`](./supabase/functions/browser-with-cors/index.ts): Handle CORS headers for function invocations from browser environments.
 - [`select-from-table-with-auth-rls`](./supabase/functions/select-from-table-with-auth-rls/index.ts): Retrieve data from an authenticated user via RLS.
+- [`send-email-smtp`](./supabase/functions/send-email-smtp/index.ts): Send an email using SMTP credentials.
+- [`telegram-bot`](./supabase/functions/telegram-bot/index.ts): Webhook handler for Telegram bots using [grammY](https://grammy.dev/).
 
 ## Develop locally
 
@@ -32,7 +34,7 @@ Note: when testing locally, the select dropdown doesn't have any effect, and inv
 ## Deploy
 
 - Generate access token and log in to CLI
-  - Navigate to https://app.supabase.io/account/tokens
+  - Navigate to https://app.supabase.com/account/tokens
   - Click "Generate New Token"
   - Copy newly created token
   - Run `supabase login`
@@ -52,7 +54,7 @@ This example includes a create-react-app in the [`./app/`](./app/) directory whi
 
 - `cd app`
 - `cp .env.example .env`
-- Fill in your env vars from https://app.supabase.io/project/_/settings/api
+- Fill in your env vars from https://app.supabase.com/project/_/settings/api
 - `npm install`
 - `npm start`
 

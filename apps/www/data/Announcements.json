@@ -1,34 +1,33 @@
 [
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week III: Holiday Special",
-    "description": "Santa's little hackers have been hard at work because we've got another five days of launches ready to go.",
-    "imgUrl": "images/blog/launch-week-three/launch-week-three-og.jpg",
-    "logoUrl": "images/blog/launch-week-three/launch-week-three-og.jpg",
+    "title": "Works With Supabase - announcing our Partner Gallery",
+    "description": "Introducing our Partner Gallery - open source and made with Supabase.",
+    "imgUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
+    "logoUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/2021/11/26/supabase-launch-week-the-trilogy",
+    "url": "/blog/2022/04/20/partner-gallery-works-with-supabase",
     "postMeta": {
-      "name": "Paul Copplestone",
-      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Nov 26, 2021",
-      "readLength": 2
+      "name": "Thor Shcaeff, Alaister Young, Shane Rice",
+      "publishDate": "Apr 20, 2022",
+      "readLength": 5
     },
-    "ctaText": "View case study"
+    "ctaText": "Read blog post"
   },
   {
     "type": "Announcement",
-    "title": "Supabase $30m Series A",
-    "description": "Supabase just raised $30M, bringing our total funding to $36M. How will we spend this? Read on to find out.",
-    "imgUrl": "images/blog/series-a/supabase-series-a.png",
-    "logoUrl": "images/blog/series-a/supabase-series-a.png",
+    "title": "Supabase Launch Week IV",
+    "description": "Launch Week IV had something for everybody: Community Day, GraphQL support, Edge Functions, and more.",
+    "imgUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo-cal.png",
+    "logoUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo.png",
     "organization": "Supabase",
-    "url": "/blog/2021/10/28/supabase-series-a",
+    "url": "/blog/2022/03/25/supabase-launch-week-four",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
-      "publishDate": "Oct 28, 2021",
-      "readLength": 28
+      "publishDate": "Mar 25, 2022",
+      "readLength": 4
     },
-    "ctaText": "View case study"
+    "ctaText": "Read blog post"
   }
 ]

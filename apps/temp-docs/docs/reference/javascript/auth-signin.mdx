@@ -1,12 +1,12 @@
 ---
 id: auth-signin
-title: "signIn()"
+title: 'signIn()'
 slug: auth-signin
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
+import Tabs from '@theme/Tabs'
+import TabsPanel from '@theme/TabsPanel'
 
 Log in an existing user, or login via a third-party provider.
 
@@ -24,13 +24,11 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 ```
 
-
 </TabsPanel>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -48,12 +46,11 @@ const { user, session, error } = await supabase.auth.signIn({
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -69,7 +66,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -90,12 +87,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -111,7 +107,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -123,28 +119,16 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - A user can sign up either via email or OAuth.
 - If you provide `email` without a `password`, the user will be sent a magic link.
-- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
 - Specifying a `provider` will open the browser to the relevant login page.
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Sign in with email.
-
-
 
 <Tabs
   defaultActiveId="js"
@@ -159,7 +143,6 @@ const { user, session, error } = await supabase.auth.signIn({
   password: 'example-password',
 })
 ```
-
 
 </TabsPanel>
 
@@ -178,10 +161,9 @@ If no password is provided, the user will be sent a "magic link" to their email 
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
-  email: 'example@email.com'
+  email: 'example@email.com',
 })
 ```
-
 
 </TabsPanel>
 
@@ -201,10 +183,9 @@ Supabase supports OAuth logins.
 ```js
 const { user, session, error } = await supabase.auth.signIn({
   // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
-  provider: 'github'
+  provider: 'github',
 })
 ```
-
 
 </TabsPanel>
 
@@ -212,9 +193,8 @@ const { user, session, error } = await supabase.auth.signIn({
 
 ### Sign in with redirect.
 
-Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
 any URL path on your website (the base domain must be the same as the domain in your Auth settings).
-
 
 <Tabs
   defaultActiveId="js"
@@ -224,13 +204,15 @@ any URL path on your website (the base domain must be the same as the domain in 
 <TabsPanel id="js" label="js">
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'github'
-}, {
-  redirectTo: 'https://example.com/welcome'
-})
+const { user, session, error } = await supabase.auth.signIn(
+  {
+    provider: 'github',
+  },
+  {
+    redirectTo: 'https://example.com/welcome',
+  }
+)
 ```
-
 
 </TabsPanel>
 
@@ -241,7 +223,6 @@ const { user, session, error } = await supabase.auth.signIn({
 If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
 You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
 
-
 <Tabs
   defaultActiveId="js"
   groupId="reference/supabase-js"
@@ -250,14 +231,16 @@ You may also need to specify the scopes in the provider's OAuth app settings, de
 <TabsPanel id="js" label="js">
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
-  provider: 'github'
-}, {
-  scopes: 'repo gist notifications'
-})
+const { user, session, error } = await supabase.auth.signIn(
+  {
+    provider: 'github',
+  },
+  {
+    scopes: 'repo gist notifications',
+  }
+)
 const oAuthToken = session.provider_token // use to access provider API
 ```
-
 
 </TabsPanel>
 
@@ -266,7 +249,6 @@ const oAuthToken = session.provider_token // use to access provider API
 ### Sign in using a refresh token (e.g. in React Native).
 
 If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-
 
 <Tabs
   defaultActiveId="js"
@@ -277,20 +259,19 @@ If you are completing a sign up or login in a React Native app you can pass the 
 
 ```js
 // An example using Expo's `AuthSession`
-const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-const provider = 'google';
+const redirectUri = AuthSession.makeRedirectUri({ useProxy: false })
+const provider = 'google'
 
 AuthSession.startAsync({
   authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
   returnUrl: redirectUri,
 }).then(async (response: any) => {
-  if (!response) return;
+  if (!response) return
   const { user, session, error } = await supabase.auth.signIn({
     refreshToken: response.params?.refresh_token,
-  });
-});
+  })
+})
 ```
-
 
 </TabsPanel>
 

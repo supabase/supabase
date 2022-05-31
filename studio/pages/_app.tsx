@@ -10,6 +10,11 @@ import 'styles/contextMenu.scss'
 import 'styles/react-data-grid-logs.scss'
 import 'styles/date-picker.scss'
 
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
+
 import Head from 'next/head'
 import { AppPropsWithLayout } from 'types'
 
@@ -23,6 +28,10 @@ import { GOTRUE_ERRORS } from 'lib/constants'
 import { PortalToast, GoTrueWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(timezone)
+dayjs.extend(utc)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [rootStore] = useState(() => new RootStore())

@@ -1,101 +1,74 @@
+import React, { useState, PropsWithChildren, FC } from 'react'
 import { isEmpty } from 'lodash'
-import React, { createContext, useContext, useState, useEffect } from 'react'
 import { Button, IconSearch, Input } from '@supabase/ui'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-
-import { withAuth, useStore } from 'hooks'
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+import { PostgresRole } from '@supabase/postgres-meta'
+import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
-
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PostgresRole } from '@supabase/postgres-meta'
 
-const PageContext = createContext(null)
-
-const AuthPoliciesPage = ({}) => {
-  const PageState: any = useLocalObservable(() => ({
-    meta: null,
-    project: null,
-    policiesFilter: '',
-    selectedTableId: null,
-    tables: [],
-    tablesLoading: true,
-    get filteredTables() {
-      if (!PageState.policiesFilter)
-        return PageState.tables.slice().sort((a: any, b: any) => a.name.localeCompare(b.name))
-      else {
-        let filter = PageState.policiesFilter.toLowerCase()
-        let stringSearch = (s: string) => s.toLowerCase().indexOf(filter) != -1
-        return PageState.tables
-          .slice()
-          .filter((x: any) => {
-            let searchTableName = stringSearch(x.name)
-            let searchPolicyName = x.policies.some((p: any) => stringSearch(p.name))
-            return searchTableName || searchPolicyName
-          })
-          .sort((a: any, b: any) => a.name.localeCompare(b.name))
-      }
-    },
-    get selectedTable() {
-      if (!PageState.selectedTableId) return null
-      for (let i = 0; i < PageState.tables.length; i++) {
-        const element: any = PageState.tables[i]
-        if (element.id == PageState.selectedTableId) return element
-      }
-    },
-    onTableUpdated(table: any) {
-      for (let i = 0; i < PageState.tables.length; i++) {
-        let el: any = PageState.tables[i]
-        if (el.id == table.id) {
-          PageState.tables[i] = { ...el, ...table }
-        }
-      }
-    },
-  }))
-
-  const { meta, ui } = useStore()
-  PageState.meta = meta as any
-  PageState.project = ui.selectedProject as any
-
-  return (
-    <PageContext.Provider value={PageState}>
-      <AuthLayout title="Auth">
-        <div className="p-4">
-          <AuthPolicies />
-        </div>
-      </AuthLayout>
-    </PageContext.Provider>
-  )
+const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
+  return <div className="p-4">{children}</div>
 }
-export default withAuth(observer(AuthPoliciesPage))
 
-const AuthPolicies = observer(() => {
-  const PageState: any = useContext(PageContext)
+/**
+ * Filter tables by table name and policy name
+ *
+ * @param tables list of table
+ * @param policies list of policy
+ * @param searchString filter keywords
+ *
+ * @returns list of table
+ */
+const onFilterTables = (
+  tables: PostgresTable[],
+  policies: PostgresPolicy[],
+  searchString?: string
+) => {
+  if (!searchString) {
+    return tables.slice().sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
+  } else {
+    const filter = searchString.toLowerCase()
+    const findSearchString = (s: string) => s.toLowerCase().includes(filter)
+    // @ts-ignore Type instantiation is excessively deep and possibly infinite
+    const filteredPolicies = policies.filter((p: PostgresPolicy) => findSearchString(p.name))
+    return tables
+      .slice()
+      .filter((x: PostgresTable) => {
+        const searchTableName = findSearchString(x.name)
+        if (searchTableName) return true
+        const searchPolicyName = filteredPolicies.some((p: PostgresPolicy) => p.table === x.name)
+        return searchPolicyName
+      })
+      .sort((a: PostgresTable, b: PostgresTable) => a.name.localeCompare(b.name))
+  }
+}
 
+const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
-  const tables = meta.tables.list((table: any) => table.schema === 'public')
-
-  useEffect(() => {
-    PageState.tablesLoading = false
-    PageState.tables = tables.sort((a: any, b: any) => a.name.localeCompare(b.name))
-  }, [])
+  const [policiesFilter, setPoliciesFilter] = useState<string | undefined>(undefined)
+  const publicTables = meta.tables.list((table: { schema: string }) => table.schema === 'public')
+  const policies = meta.policies.list()
+  const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div>
-            <Input
-              size="small"
-              placeholder="Filter tables"
-              className="block w-full text-sm placeholder-gray-400"
-              value={PageState.policiesFilter}
-              onChange={(e) => (PageState.policiesFilter = e.target.value)}
-              icon={<IconSearch size="tiny" />}
-            />
-          </div>
+          <Input
+            size="small"
+            placeholder="Filter tables and policies"
+            className="block w-64 text-sm placeholder-gray-400"
+            value={policiesFilter}
+            onChange={(e) => setPoliciesFilter(e.target.value)}
+            icon={<IconSearch size="tiny" />}
+          />
           <Button type="link">
             <a
               target="_blank"
@@ -107,16 +80,26 @@ const AuthPolicies = observer(() => {
         </div>
       </div>
       <div>
-        <AuthPoliciesTables />
+        <AuthPoliciesTables hasPublicTables={publicTables.length > 0} tables={filteredTables} />
       </div>
     </>
   )
-})
+}
 
-const AuthPoliciesTables = observer(() => {
+AuthPoliciesPage.getLayout = (page) => (
+  <AuthLayout title="Auth">
+    <AuthPoliciesLayout>{page}</AuthPoliciesLayout>
+  </AuthLayout>
+)
+
+export default observer(AuthPoliciesPage)
+
+interface AuthPoliciesTablesProps {
+  hasPublicTables: boolean
+  tables: any[]
+}
+const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasPublicTables }) => {
   const { ui, meta } = useStore()
-  const PageState: any = useContext(PageContext)
-
   const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -153,18 +136,10 @@ const AuthPoliciesTables = observer(() => {
 
   const onSavePolicySuccess = async () => {
     ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
-    await refreshTables()
     closePolicyEditorModal()
   }
 
   // Methods that involve some API
-
-  const refreshTables = async () => {
-    await meta.tables.load()
-    const res: any = meta.tables.list((table: any) => table.schema === 'public')
-    if (!res.error) PageState.tables.replace(res)
-  }
-
   const onToggleRLS = async () => {
     const payload = {
       id: selectedTableToToggleRLS.id,
@@ -172,21 +147,17 @@ const AuthPoliciesTables = observer(() => {
     }
 
     const res: any = await meta.tables.update(payload.id, payload)
-    // const url = `${API_URL}/database/${router.query.ref}/tables?id=${payload.id}`
-    // const res = await patch(url, payload)
     if (res.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to toggle RLS: ${res.error.message}`,
       })
-    } else {
-      PageState.onTableUpdated(res)
     }
     closeConfirmModal()
   }
 
   const onCreatePolicy = async (payload: any) => {
-    const res = await PageState.meta.policies.create(payload)
+    const res = await meta.policies.create(payload)
     if (res.error) {
       ui.setNotification({
         category: 'error',
@@ -198,7 +169,7 @@ const AuthPoliciesTables = observer(() => {
   }
 
   const onUpdatePolicy = async (payload: any) => {
-    const res = await PageState.meta.policies.update(payload.id, payload)
+    const res = await meta.policies.update(payload.id, payload)
     if (res.error) {
       ui.setNotification({
         category: 'error',
@@ -210,8 +181,8 @@ const AuthPoliciesTables = observer(() => {
   }
 
   const onDeletePolicy = async () => {
-    const res = await PageState.meta.policies.del(selectedPolicyToDelete.id)
-    if (res.error) {
+    const res = await meta.policies.del(selectedPolicyToDelete.id)
+    if (typeof res !== 'boolean' && res.error) {
       ui.setNotification({
         category: 'error',
         message: `Error deleting policy: ${res.error.message}`,
@@ -219,14 +190,13 @@ const AuthPoliciesTables = observer(() => {
     } else {
       ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
     }
-    await refreshTables()
     closeConfirmModal()
   }
 
   return (
     <div>
-      {PageState.filteredTables.length > 0 ? (
-        PageState.filteredTables.map((table: any) => (
+      {tables.length > 0 ? (
+        tables.map((table: any) => (
           <section key={table.id}>
             <PolicyTableRow
               table={table}
@@ -241,7 +211,7 @@ const AuthPoliciesTables = observer(() => {
             />
           </section>
         ))
-      ) : PageState.tables.length > 0 ? (
+      ) : hasPublicTables ? (
         <NoSearchResults />
       ) : (
         <NoTableState message="A public schema table is required before you can create a row-level security policy" />

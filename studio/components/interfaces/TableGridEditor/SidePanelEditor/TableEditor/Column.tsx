@@ -68,7 +68,7 @@ const Column: FC<Props> = ({
   column.isArray ? (settingsCount += 1) : null
 
   return (
-    <div className="w-full flex items-center">
+    <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
           <Typography>
@@ -77,7 +77,7 @@ const Column: FC<Props> = ({
         </div>
       </div>
       <div className="w-[25%]">
-        <div className="flex items-center justify-between w-[95%]">
+        <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
@@ -107,7 +107,7 @@ const Column: FC<Props> = ({
             className="table-editor-column-type lg:gap-0 "
             disabled={!isUndefined(column.foreignKey)}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: '' })
+              onUpdateColumn({ format, defaultValue: null })
             }}
           />
         </div>
@@ -115,11 +115,15 @@ const Column: FC<Props> = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[90%]">
           <InputWithSuggestions
-            placeholder="NULL"
+            placeholder={
+              typeof column.defaultValue === 'string' && column.defaultValue.length === 0
+                ? 'Empty string'
+                : 'NULL'
+            }
             size="small"
-            value={column.defaultValue}
+            value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`bg-white dark:bg-transparent rounded lg:gap-0 ${
+            className={`rounded bg-white dark:bg-transparent lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}
@@ -127,7 +131,7 @@ const Column: FC<Props> = ({
             suggestionsWidth={410}
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.name })
+              onUpdateColumn({ defaultValue: suggestion.value })
             }
           />
         </div>
@@ -140,7 +144,7 @@ const Column: FC<Props> = ({
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
-      <div className="w-[5%] flex justify-end">
+      <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
           <>
             <Popover
@@ -148,7 +152,7 @@ const Column: FC<Props> = ({
               className="pointer-events-auto"
               header={
                 <div className="flex items-center justify-center">
-                  <h5 className="text-sm text-scale-1200">Extra options</h5>
+                  <h5 className="text-scale-1200 text-sm">Extra options</h5>
                 </div>
               }
               overlay={[
@@ -211,13 +215,13 @@ const Column: FC<Props> = ({
                 </div>,
               ]}
             >
-              <div className="group flex -space-x-1 items-center">
+              <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="py-0.5 px-2 text-xs rounded-full bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100">
+                  <div className="bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100 rounded-full py-0.5 px-2 text-xs">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 transition-colors group-hover:text-scale-1200">
+                <div className="text-scale-1100 group-hover:text-scale-1200 transition-colors">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>
@@ -226,7 +230,7 @@ const Column: FC<Props> = ({
         )}
       </div>
       {!hasImportContent && (
-        <div className="w-[5%] flex justify-end">
+        <div className="flex w-[5%] justify-end">
           <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
             <Typography>
               <IconX strokeWidth={1} />

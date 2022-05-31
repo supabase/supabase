@@ -50,18 +50,22 @@ function getPaygStats(data: any): PaygStats {
 
   let dataModified: any = []
   data.map((x: any) => {
-    dataModified.push({ ...x, total_egress_modified: x.total_egress - x.total_storage_egress })
+    dataModified.push({ ...x, total_egress_modified: x.total_egress == undefined ? 0 : x.total_egress  - x.total_storage_egress == undefined ? 0 : x.total_storage_egress })
   })
 
   chargeableProducts.forEach((product) => {
     product.features.forEach((feature) => {
+
       // calculate max
-      const max = _get(maxBy(dataModified, feature.attribute), feature.attribute)
+      const max = _get(maxBy(dataModified, feature.attribute), feature.attribute) ?? 0
+
       // calculate sum
       let sum = 0
       dataModified.map((x: any) => {
-        sum = sum + x[feature.attribute]
+        const featureAttribute = x[feature.attribute] == undefined ? 0 : x[feature.attribute]
+        sum = sum + featureAttribute
       })
+
       // set sum and max under attribute name
       paygStats[feature.attribute] = {
         sum,

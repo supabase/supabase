@@ -1,8 +1,4 @@
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { TIMESTAMP_TYPES, DATE_TYPES, TIME_TYPES } from '../../SidePanelEditor.constants'
-
-dayjs.extend(customParseFormat)
 
 export function getColumnType(format: string) {
   if (isDateColumn(format)) {
