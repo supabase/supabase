@@ -160,55 +160,17 @@ Let's start building the React app from scratch.
 We can use the [Ionic CLI](https://ionicframework.com/docs/cli) to initialize
 an app called `supabase-ionic-react`:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm install -g @ionic/cli
 ionic start supabase-ionic-react blank --type react
 cd supabase-ionic-react
 ```
 
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add -g @ionic/cli
-ionic start supabase-ionic-react blank --type react
-cd supabase-ionic-react
-```
-
-</TabItem>
-</Tabs>
-
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
-
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
 
 ```bash
 npm install @supabase/supabase-js
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add @supabase/supabase-js
-```
-
-</TabItem>
-</Tabs>
 
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
