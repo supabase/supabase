@@ -62,7 +62,6 @@ export default function IndexPage() {
         '2M Edge Function invocations',
         'Daily backups',
         '7-day log retention',
-        'No limit on number of projects',
         'No project pausing',
         'Email support',
       ],
@@ -166,7 +165,7 @@ export default function IndexPage() {
 
           <div
             className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
-          
+
             lg:px-8
           "
           >
@@ -175,23 +174,23 @@ export default function IndexPage() {
                 <div
                   key={tier.name}
                   className="
-                  flex 
-                  flex-col 
+                  flex
+                  flex-col
                   overflow-hidden
-                  rounded 
-                  border 
+                  rounded
+                  border
                   "
                 >
                   <div className="dark:bg-scale-300 h-48 bg-white px-8 pt-6">
                     <h3
                       className="
-                        text-scale-1200 
-                        mb-2 
-                        inline-flex 
-                        rounded-full 
-                        text-sm 
-                        font-normal 
-                        tracking-wide 
+                        text-scale-1200
+                        mb-2
+                        inline-flex
+                        rounded-full
+                        text-sm
+                        font-normal
+                        tracking-wide
                         lg:text-xl"
                       id="tier-standard"
                     >
@@ -199,12 +198,12 @@ export default function IndexPage() {
                     </h3>
                     <div
                       className="
-                      text-scale-1200 flex items-baseline 
-                      text-5xl 
-                      font-normal 
-                      lg:text-4xl 
+                      text-scale-1200 flex items-baseline
+                      text-5xl
+                      font-normal
+                      lg:text-4xl
                       xl:text-4xl
-                      
+
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
@@ -231,13 +230,13 @@ export default function IndexPage() {
                   <div
                     className="
                     dark:border-scale-400 bg-scale-100 dark:bg-scale-300 flex
-                    
-                    h-full 
-                    flex-1 
+
+                    h-full
+                    flex-1
                     flex-col
-                    
-                    justify-between 
-                    space-y-6 
+
+                    justify-between
+                    space-y-6
 
                     border-t
                     px-8
