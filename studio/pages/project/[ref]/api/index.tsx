@@ -5,7 +5,7 @@ import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
 import { DocsLayout } from 'components/layouts'
@@ -18,10 +18,11 @@ import TablesIntroduction from 'components/to-be-cleaned/Docs/Pages/Tables/Intro
 import UserManagement from 'components/to-be-cleaned/Docs/Pages/UserManagement'
 import RpcIntroduction from 'components/to-be-cleaned/Docs/Pages/Rpc/Introduction'
 import Description from 'components/to-be-cleaned/Docs/Description'
+import { NextPageWithLayout } from 'types'
 
 const PageContext = createContext(null)
 
-const PageConfig = () => {
+const PageConfig: NextPageWithLayout = () => {
   const PageState: any = useLocalObservable(() => ({
     projectRef: '',
     jsonSchema: {},
@@ -59,13 +60,14 @@ const PageConfig = () => {
 
   return (
     <PageContext.Provider value={PageState}>
-      <DocsLayout title="API">
-        <DocView project={project} />
-      </DocsLayout>
+      <DocView project={project} />
     </PageContext.Provider>
   )
 }
-export default withAuth(observer(PageConfig))
+
+PageConfig.getLayout = (page) => <DocsLayout title="API">{page}</DocsLayout>
+
+export default observer(PageConfig)
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -99,7 +101,7 @@ const DocView: FC<any> = observer(({}) => {
 
   if (error || jsonSchemaError)
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Text type="danger">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
@@ -108,7 +110,7 @@ const DocView: FC<any> = observer(({}) => {
     )
   if (!data || !jsonSchema || !PageState.jsonSchema)
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Building docs ...</Typography.Title>
       </div>
     )
@@ -130,7 +132,7 @@ const DocView: FC<any> = observer(({}) => {
   return (
     <div className="Docs h-full w-full overflow-y-auto" key={PAGE_KEY}>
       <div className="Docs--inner-wrapper">
-        <div className="sticky top-0 w-full flex flex-row-reverse z-40 ">
+        <div className="sticky top-0 z-40 flex w-full flex-row-reverse ">
           <div className="bg-scale-100 dark:bg-scale-300" style={{ width: '50%' }}>
             <div className="z-0 flex ">
               <button
@@ -138,9 +140,9 @@ const DocView: FC<any> = observer(({}) => {
                 onClick={() => setSelectedLang('js')}
                 className={`${
                   selectedLang == 'js'
-                    ? 'text-scale-1200 font-medium bg-scale-300 dark:bg-scale-200'
+                    ? 'text-scale-1200 bg-scale-300 dark:bg-scale-200 font-medium'
                     : 'text-scale-900 bg-scale-100 dark:bg-scale-100'
-                } relative inline-flex items-center p-1 px-2 border-r border-scale-200 text-sm hover:text-scale-1200 focus:outline-none transition`}
+                } border-scale-200 hover:text-scale-1200 relative inline-flex items-center border-r p-1 px-2 text-sm transition focus:outline-none`}
               >
                 JavaScript
               </button>
@@ -149,22 +151,22 @@ const DocView: FC<any> = observer(({}) => {
                 onClick={() => setSelectedLang('bash')}
                 className={`${
                   selectedLang == 'bash'
-                    ? 'text-scale-1200 font-medium bg-scale-300 dark:bg-scale-200'
+                    ? 'text-scale-1200 bg-scale-300 dark:bg-scale-200 font-medium'
                     : 'text-scale-900 bg-scale-100 dark:bg-scale-100'
-                } relative inline-flex items-center p-1 px-2 border-r border-scale-200 text-sm hover:text-scale-1200 focus:outline-none transition`}
+                } border-scale-200 hover:text-scale-1200 relative inline-flex items-center border-r p-1 px-2 text-sm transition focus:outline-none`}
               >
                 Bash
               </button>
               {selectedLang == 'bash' && (
                 <div className="flex">
-                  <div className="flex items-center gap-2 text-xs text-scale-900 p-1 pl-2">
+                  <div className="text-scale-900 flex items-center gap-2 p-1 pl-2 text-xs">
                     <IconKey size={12} strokeWidth={1.5} />
                     <span>Project API key :</span>
                   </div>
                   <Dropdown
                     align="end"
                     side="bottom"
-                    className="text-sm text-scale-900 border-none cursor-pointer p-0 pl-2 pr-8 bg-transparent"
+                    className="text-scale-900 cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm"
                     overlay={
                       <>
                         <Dropdown.Item onClick={() => setShowApiKey(DEFAULT_KEY)}>
@@ -295,7 +297,7 @@ const RpcContent = ({
   return (
     <>
       <h2 className="text-scale-1200 mt-0">
-        <span className="text-2xl px-6">{meta.id}</span>
+        <span className="px-6 text-2xl">{meta.id}</span>
       </h2>
 
       <div className="doc-section">
@@ -322,7 +324,7 @@ const RpcContent = ({
       </div>
       {rpcParams.length > 0 && (
         <div>
-          <h3 className="text-scale-1200 capitalize mt-0 px-6">Function Arguments</h3>
+          <h3 className="text-scale-1200 mt-0 px-6 capitalize">Function Arguments</h3>
           {rpcParams.map((x) => {
             return (
               <div className="doc-section">
@@ -373,7 +375,7 @@ const ResourceContent = ({
   return (
     <>
       <h2 className="text-scale-1200mt-0">
-        <span className="text-2xl px-6 py-2">{resourceId}</span>
+        <span className="px-6 py-2 text-2xl">{resourceId}</span>
       </h2>
 
       <div className="doc-section">
@@ -424,7 +426,7 @@ const ResourceContent = ({
       )}
       {methods.includes('GET') && (
         <>
-          <h3 className="text-scale-1200 px-6 mt-4">Read rows</h3>
+          <h3 className="text-scale-1200 mt-4 px-6">Read rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -461,7 +463,7 @@ const ResourceContent = ({
           </div>
           <div className="doc-section">
             <article className="text ">
-              <h4 className="text-white mt-0">Filtering</h4>
+              <h4 className="mt-0 text-white">Filtering</h4>
               <p>Supabase provides a wide range of filters.</p>
               <p>
                 <a href="https://supabase.com/docs/client/using-filters" target="_blank">
@@ -480,7 +482,7 @@ const ResourceContent = ({
       )}
       {methods.includes('POST') && (
         <>
-          <h3 className="text-scale-1200 px-6 mt-4">Insert rows</h3>
+          <h3 className="text-scale-1200 mt-4 px-6">Insert rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -515,7 +517,7 @@ const ResourceContent = ({
       )}
       {methods.includes('PATCH') && (
         <>
-          <h3 className="text-scale-1200 px-6 mt-4">Update rows</h3>
+          <h3 className="text-scale-1200 mt-4 px-6">Update rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -543,7 +545,7 @@ const ResourceContent = ({
       )}
       {methods.includes('DELETE') && (
         <>
-          <h3 className="text-scale-1200 px-6 mt-4">Delete rows</h3>
+          <h3 className="text-scale-1200 mt-4 px-6">Delete rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -566,7 +568,7 @@ const ResourceContent = ({
         </>
       )}
       <>
-        <h3 className="text-scale-1200 px-6 mt-4">Subscribe to changes</h3>
+        <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
         <div className="doc-section">
           <article className="text ">
             <p>
@@ -609,7 +611,7 @@ const ResourceContent = ({
         </div>
       </>
       <>
-        <h3 className="text-scale-1200 px-6 mt-4">Much more</h3>
+        <h3 className="text-scale-1200 mt-4 px-6">Much more</h3>
         <div className="doc-section py-4">
           <article className="text ">
             <p>

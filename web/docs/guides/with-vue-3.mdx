@@ -31,7 +31,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project 
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -152,6 +152,14 @@ Let's start building the Vue 3 app from scratch.
 We can quickly use [Vite with Vue 3 Template](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to initialize
 an app called `supabase-vue-3`:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 # npm 6.x
 npm init @vitejs/app supabase-vue-3 --template vue
@@ -162,11 +170,41 @@ npm init @vitejs/app supabase-vue-3 -- --template vue
 cd supabase-vue-3
 ```
 
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn init @vitejs/app supabase-vue-3 --template vue
+
+cd supabase-vue-3
+```
+
+</TabItem>
+</Tabs>
+
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
 
 ```bash
 npm install @supabase/supabase-js
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
 
 And finally we want to save the environment variables in a `.env`. 
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -189,7 +227,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/assets/main.css` to make the app look nice. 
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ```javascript title="src/main.js"
 import { createApp } from "vue"
@@ -449,9 +487,27 @@ export default {
 
 Once that's done, run this in a terminal window:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm run dev
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn dev
+```
+
+</TabItem>
+</Tabs>
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
@@ -601,4 +657,4 @@ And then we can add the widget to the Account page:
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

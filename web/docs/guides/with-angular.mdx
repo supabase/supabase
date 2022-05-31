@@ -41,7 +41,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -167,9 +167,27 @@ cd supabase-angular
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm install @supabase/supabase-js
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn add @supabase/supabase-js
+```
+
+</TabItem>
+</Tabs>
 
 And finally we want to save the environment variables in the `environment.ts` file.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -457,9 +475,27 @@ export class AppComponent implements OnInit {
 
 Once that's done, run this in a terminal window:
 
+<Tabs
+defaultValue="NPM"
+values={[
+  {label: 'npm', value: 'NPM'},
+  {label: 'Yarn', value: 'YARN'},
+]}>
+<TabItem value="NPM">
+
 ```bash
 npm run start
 ```
+
+</TabItem>
+<TabItem value="YARN">
+
+```bash
+yarn start
+```
+
+</TabItem>
+</Tabs>
 
 And then open the browser to [localhost:4200](http://localhost:4200) and you should see the completed app.
 
@@ -578,4 +614,4 @@ template: `
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

@@ -11,7 +11,7 @@ import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
 
-import BouncerSettings from './Pooling/BouncerSettings'
+import ConnectionPooling from './Pooling/ConnectionPooling'
 
 import CreateTrigger from './Triggers/CreateTrigger'
 import DeleteTrigger from './Triggers/DeleteTrigger'
@@ -28,7 +28,7 @@ export {
   PublicationsList,
   PublicationsTables,
   BackupsList,
-  BouncerSettings,
+  ConnectionPooling,
   CreateTrigger,
   DeleteTrigger,
   CreateFunction,

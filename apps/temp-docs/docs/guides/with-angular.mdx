@@ -40,7 +40,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -259,7 +259,7 @@ import { SupabaseService } from './supabase.service'
 @Component({
   selector: 'app-auth',
   template: `
-    <div class="row flex flex-center">
+    <div class="row flex-center flex">
       <form class="col-6 form-widget">
         <h1 class="header">Supabase + Angular</h1>
         <p class="description">Sign in via magic link with your email below</p>
@@ -328,7 +328,7 @@ import { Session } from '@supabase/supabase-js'
 
       <div>
         <button
-          class="button block primary"
+          class="button primary block"
           (click)="updateProfile(username.value, website.value)"
           [disabled]="loading"
         >
@@ -539,4 +539,4 @@ template: `
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)
