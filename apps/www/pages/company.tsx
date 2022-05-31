@@ -247,7 +247,7 @@ const Investors = () => {
             <>
               <p>
                 <p className="text-lg">
-                  We've raised over $36 million in funding, backed by some of the world's leading
+                  We've raised over $116 million in funding, backed by some of the world's leading
                   investors.
                 </p>
               </p>
