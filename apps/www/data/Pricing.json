@@ -293,7 +293,7 @@
         "tiers": {
           "free": "1 day",
           "pro": "7 days",
-          "enterprise": "3 months"
+          "enterprise": "90 days"
         }
       },
       {
