@@ -52,7 +52,7 @@ export default function IndexPage() {
       href: '#',
       from: true,
       priceMonthly: 25,
-      warning: '+ additional use',
+      warning: 'per Project',
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
