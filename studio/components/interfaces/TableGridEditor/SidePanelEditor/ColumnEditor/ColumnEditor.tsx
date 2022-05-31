@@ -71,6 +71,8 @@ const ColumnEditor: FC<Props> = ({
     }
   }, [visible])
 
+  if (!columnFields) return null
+
   const onUpdateField = (changes: Partial<ColumnField>) => {
     const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
     if (!isTextBasedColumn && changes.defaultValue === '') {
@@ -129,8 +131,6 @@ const ColumnEditor: FC<Props> = ({
       }
     }
   }
-
-  if (!columnFields) return null
 
   return (
     <SidePanel
