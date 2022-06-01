@@ -4,7 +4,7 @@ import { Notification, NotificationStatus } from '@supabase/shared-types/out/not
 
 import { useStore } from 'hooks'
 import { Project } from 'types'
-import { formatNotificationText } from './NotificationRows.utils'
+import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 import NotificationActions from './NotificationActions'
 
 interface Props {
@@ -19,22 +19,24 @@ const NotificationRow: FC<Props> = ({ notification }) => {
   const availableActions = notification.meta?.actions_available ?? []
 
   return (
-    <div className="grid grid-cols-12 py-2">
-      <div className="col-span-1 flex justify-center">
+    <div className="flex py-2">
+      <div className="flex w-[50px] justify-center">
         {notification.notification_status !== NotificationStatus.Seen && (
           <div className="mt-1.5 h-2 w-2 rounded-full bg-green-900" />
         )}
       </div>
-      <div className={availableActions.length > 0 ? 'col-span-7' : 'col-span-10'}>
+      <div className="mr-8 flex items-center space-x-4">
         <div className="space-y-1">
           <p className="text-sm">{formatNotificationText(project, notification)}</p>
+          <p className="text-sm">{formatNotificationCTAText(availableActions)}</p>
           <p className="text-scale-1000 text-sm">{insertedAt}</p>
         </div>
+        <div className="col-span-3 flex items-center justify-end">
+          {availableActions.length > 0 && (
+            <NotificationActions availableActions={availableActions} />
+          )}
+        </div>
       </div>
-      <div className="col-span-3 flex items-center justify-end">
-        {availableActions.length > 0 && <NotificationActions availableActions={availableActions} />}
-      </div>
-      <div className="col-span-1" />
     </div>
   )
 }
