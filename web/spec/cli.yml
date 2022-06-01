@@ -295,6 +295,8 @@ pages:
 
       Flags:
 
+      `--env-file`: Path to an env file to be populated to the Function environment.
+
       `--no-verify-jwt`: Disable JWT verification for the Function.
     examples:
       - name: Usage
