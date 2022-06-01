@@ -14,7 +14,7 @@ Note: you have to enable `DISABLE EMAIL CONFIRMATIONS` under your Supabase proje
 
 #### Database schema
 
-Go to [app.supabase.io](https://app.supabase.io/), create a new organization and project if you haven't had one.  
+Go to [app.supabase.com](https://app.supabase.com/), create a new organization and project if you haven't had one.  
 Run this sql query to create required tables.
 
 ```sql
@@ -44,7 +44,7 @@ Then set each variable on `.env.local`:
 - `NEXT_PUBLIC_SUPABASE_URL` should be the **API URL**
 - `NEXT_PUBLIC_SUPABASE_KEY` should be the **anon** key
 
-You can get these values from your project dashboard at [app.supabase.io](https://app.supabase.io/).
+You can get these values from your project dashboard at [app.supabase.com](https://app.supabase.com/).
 
 The **anon** key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data.
 

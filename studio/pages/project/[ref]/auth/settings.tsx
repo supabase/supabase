@@ -14,7 +14,6 @@ import { pluckJsonSchemaFields } from 'lib/helpers'
 import { AuthLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
-import Toggle from 'components/to-be-cleaned/forms/Toggle'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SecretField from 'components/to-be-cleaned/forms/SecretField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -124,6 +123,7 @@ const Settings = () => {
             'DISABLE_SIGNUP',
             'PASSWORD_MIN_LENGTH',
             'SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION',
+            'SECURITY_REFRESH_TOKEN_REUSE_INTERVAL',
           ])}
           model={{
             SITE_URL: model.SITE_URL || undefined,
@@ -131,10 +131,11 @@ const Settings = () => {
             DISABLE_SIGNUP: model.DISABLE_SIGNUP,
             JWT_EXP: model.JWT_EXP || undefined,
             PASSWORD_MIN_LENGTH: model.PASSWORD_MIN_LENGTH || undefined,
-            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION:
+            SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: model.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL || undefined,
+            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: 
               model.SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION || false,
-          }}
-          onSubmit={(model: any) => onFormSubmit(model)}
+            }}
+            onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
             name="SITE_URL"
@@ -147,7 +148,8 @@ const Settings = () => {
             errorMessage="Must be a comma separated list of exact URIs. No spaces."
           />
           <NumField name="JWT_EXP" step="1" />
-          <NumField name="PASSWORD_MIN_LENGTH" step="1" />
+          <NumField name="PASSWORD_MIN_LENGTH" step="1" min={6} max={10} />
+          <NumField name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL" step="1" min={0}/>
           <ToggleField name="SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION" />
           <ToggleField name="DISABLE_SIGNUP" />
         </SchemaFormPanel>
@@ -157,6 +159,7 @@ const Settings = () => {
           title="Email Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'MAILER_SECURE_EMAIL_CHANGE_ENABLED',
+            'MAILER_OTP_EXP',
             'SMTP_ADMIN_EMAIL',
             'SMTP_HOST',
             'SMTP_PORT',
@@ -167,6 +170,7 @@ const Settings = () => {
           ])}
           model={{
             MAILER_SECURE_EMAIL_CHANGE_ENABLED: model.MAILER_SECURE_EMAIL_CHANGE_ENABLED,
+            MAILER_OTP_EXP: model.MAILER_OTP_EXP || undefined,
             SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : '',
             SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : '',
             SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : '',
@@ -191,7 +195,7 @@ const Settings = () => {
             checked={model.EXTERNAL_EMAIL_ENABLED}
             descriptionText={authConfig.properties.EXTERNAL_EMAIL_ENABLED.help}
           />
-
+          <NumField name="MAILER_OTP_EXP" step="1" min={0} max={86400}/>
           <UIToggle
             layout="horizontal"
             className="mb-4"
@@ -272,6 +276,8 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
+            'SMS_OTP_EXP',
+            'SMS_OTP_LENGTH',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
@@ -285,6 +291,8 @@ const Settings = () => {
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
+            SMS_OTP_EXP: model.SMS_OTP_EXP || undefined,
+            SMS_OTP_LENGTH: model.SMS_OTP_LENGTH || undefined,
             SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY || undefined,
             SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER || undefined,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
@@ -318,6 +326,8 @@ const Settings = () => {
                   showInlineError
                   errorMessage="Please enter the phone provider."
                 />
+                <NumField name="SMS_OTP_EXP" step="1" min={0}/>
+                <NumField name="SMS_OTP_LENGTH" step="1" min={6} max={10}/>
                 {smsProviderModel?.SMS_PROVIDER === 'messagebird' ? (
                   <>
                     <SecretField
