@@ -19,7 +19,7 @@
     "@docusaurus/preset-classic": "^2.0.0-beta.18",
     "@kiwicopple/prism-react-renderer": "https://github.com/kiwicopple/prism-react-renderer.git",
     "@octokit/core": "^3.5.1",
-    "docusaurus-theme-search-typesense": "^0.4.0-2",
+    "docusaurus-theme-search-typesense": "github:burmecia/docusaurus-theme-search-typesense",
     "jsrsasign": "^10.4.1",
     "mermaid": "^8.13.8",
     "react": "^17.0.2",
@@ -46,7 +46,7 @@
     "dotenv": "^10.0.0",
     "js-yaml": "^3.14.0",
     "minimist": "^1.2.5",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.1.3"
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
   }
 }

@@ -184,7 +184,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'going-into-prod', 'guides/platform/metrics'],
+      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod'],
     },
     {
       type: 'category',
@@ -206,6 +206,7 @@ module.exports = {
         'guides/integrations/prisma',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
+        'guides/integrations/supertokens',
         'guides/integrations/vercel',
       ],
     },
