@@ -24,8 +24,10 @@ const NotificationsPopover: FC<Props> = () => {
       const notificationIds = notifications
         ?.filter((notification) => notification.notification_status === NotificationStatus.New)
         .map((notification) => notification.id)
-      const { data, error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-      console.log(data, error)
+      if (notificationIds.length > 0) {
+        const { data, error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
+        console.log(data, error)
+      }
     }
   }
 
@@ -37,7 +39,7 @@ const NotificationsPopover: FC<Props> = () => {
       sideOffset={8}
       onOpenChange={onOpenChange}
       overlay={
-        <div className="w-[550px]">
+        <div className="w-[540px]">
           <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
             <p className="text-sm">Notifications</p>
             {/* Area for improvement: Paginate notifications and show in a side panel */}
@@ -47,12 +49,20 @@ const NotificationsPopover: FC<Props> = () => {
             </p> */}
           </div>
           <div className="max-h-[380px] overflow-y-auto py-2">
-            {notifications.map((notification, i: number) => (
-              <Fragment key={notification.id}>
-                <NotificationRow notification={notification} />
-                {i !== notifications.length - 1 && <Popover.Seperator />}
-              </Fragment>
-            ))}
+            {notifications.length === 0 ? (
+              <div className="py-2 px-4">
+                <p className="text-scale-1000 text-sm">No notifications available</p>
+              </div>
+            ) : (
+              <>
+                {notifications.map((notification, i: number) => (
+                  <Fragment key={notification.id}>
+                    <NotificationRow notification={notification} />
+                    {i !== notifications.length - 1 && <Popover.Seperator />}
+                  </Fragment>
+                ))}
+              </>
+            )}
           </div>
         </div>
       }
