@@ -21,14 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Native Scanner
-        uses: peaudecastor/boost-security-scanner-github@v2
+        uses: boostsecurityio/boostsec-scanner-github@v3
         env:
-          BOOST_CLI_URL: https://assets.build.boostsecurity.io
           BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
         with:
           action: scan
-          api_endpoint: https://api.boostsecurity.net
           api_token: ${{ secrets.BOOST_API_KEY }}
-          additional_args: --disable-telemetry --api-version v2
-          cli_version: 3.0.0.rc483
-          scanner_version: 3.0.0.rc483
