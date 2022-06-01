@@ -2,7 +2,7 @@ import { Loading } from '@supabase/ui'
 import { AuthProvidersForm } from 'components/interfaces'
 import CommaSeperatedString from 'components/interfaces/Forms/CommaSeperatedString'
 import { AuthLayout } from 'components/layouts'
-import { AutoSchemaForm, FormHeader } from 'components/ui/Forms'
+import { AutoSchemaForm, FormHeader, FormsContainer } from 'components/ui/Forms'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import React, { useEffect } from 'react'
@@ -22,10 +22,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   if (authConfig)
     return (
-      <div
-        style={{ width: '820px' }}
-        className="py-18 mx-auto mb-20 flex flex-col space-y-20 py-16"
-      >
+      <FormsContainer>
         <div>
           <FormHeader
             title="General settings"
@@ -36,7 +33,7 @@ const PageLayout: NextPageWithLayout = () => {
 
         <CommaSeperatedString />
         <AuthProvidersForm />
-      </div>
+      </FormsContainer>
     )
 }
 

@@ -39,11 +39,18 @@ const AutoSchemaForm = () => {
     children: React.ReactNode
     header?: React.ReactNode
   }) => (
-    <div className="grid grid-cols-12 px-8 py-2">
+    <div className="grid grid-cols-12 gap-6 px-8 py-2">
       {header}
       {children}
     </div>
   )
+
+  const SectionLabel = ({ children }: { children: React.ReactNode | string }) => {
+    return <label className="text-scale-1200 col-span-12 text-sm lg:col-span-4">{children}</label>
+  }
+  const SectionContent = ({ children }: { children: React.ReactNode | string }) => {
+    return <div className="col-span-12 flex flex-col gap-6 lg:col-span-8">{children}</div>
+  }
 
   return (
     <>
@@ -101,10 +108,8 @@ const AutoSchemaForm = () => {
               </>
             }
           >
-            <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Signups</label>}
-            >
-              <div className="col-span-8 flex flex-col gap-6">
+            <Section header={<SectionLabel>User Signups</SectionLabel>}>
+              <SectionContent>
                 <Toggle
                   id="DISABLE_SIGNUP"
                   size="small"
@@ -113,19 +118,17 @@ const AutoSchemaForm = () => {
                   layout="flex"
                   descriptionText="If this is disabled, new users will not be able to sign up to your application."
                 />
-              </div>
+              </SectionContent>
             </Section>
             <div className="border-scale-400 border-t"></div>
-            <Section
-              header={<label className="text-scale-1200 col-span-4 text-sm">User Sessions</label>}
-            >
-              <div className="col-span-8 flex flex-col gap-6">
+            <Section header={<SectionLabel>User Sessions</SectionLabel>}>
+              <SectionContent>
                 {/**
                  *
                  * permitted redirects
                  * for anything on that domain
                  *
-                 * talk to @kangming about this
+                 * check with @kangming about this
                  *
                  */}
                 <Input
@@ -151,7 +154,7 @@ const AutoSchemaForm = () => {
                   label="Reuse Interval"
                   descriptionText="Time interval where the same refresh token can be used to request for an access token."
                 />
-              </div>
+              </SectionContent>
             </Section>
           </Panel>
         )}
