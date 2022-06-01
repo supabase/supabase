@@ -40,24 +40,28 @@ const DocsLayout = ({
 
       <main>
         <NavBar currentPage={currentPage} />
-        <div className="flex flex-row">
+        <div className="flex w-full flex-row">
           <SideBar menuItems={menuItems} />
-          <div className="mx-auto grid w-full max-w-7xl grid-cols-12">
-            <article className="prose dark:prose-dark dark:bg-scale-200 col-span-8 max-w-none p-8">
-              {children}
-            </article>
-            <div className="prose dark:bg-scale-200 col-span-4 max-w-none p-8">
-              <h5>On this page</h5>
-              {toc
-                ? toc.json.map((item: any) => {
-                    return (
-                      <li>
-                        <a href={`#${item.slug}`}>{item.content}</a>
-                      </li>
-                    )
-                  })
-                : 'Please note: No TOC on this page'}
+          <div className="docs-width flex w-full grid-cols-12 justify-between p-4 pb-8">
+            <div className="w-full p-4">
+              <article className="prose dark:prose-dark dark:bg-scale-200 width-full">
+                {children}
+              </article>
             </div>
+            {toc && (
+              <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height w-1/4 border-l px-4">
+                <h5>On this page</h5>
+                <ul className='list-none pl-2 text-[0.8rem]'>
+                {toc.json.map((item: any, i: number) => {
+                  return (
+                    <li key={i}>
+                      <a href={`#${item.slug}`}>{item.content}</a>
+                    </li>
+                  )
+                })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
         <Footer />
