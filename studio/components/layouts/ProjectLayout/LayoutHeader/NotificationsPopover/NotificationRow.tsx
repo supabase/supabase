@@ -9,9 +9,10 @@ import NotificationActions from './NotificationActions'
 
 interface Props {
   notification: Notification
+  onSelectRestartProject: (project: Project, notification: Notification) => void
 }
 
-const NotificationRow: FC<Props> = ({ notification }) => {
+const NotificationRow: FC<Props> = ({ notification, onSelectRestartProject }) => {
   const { app } = useStore()
   const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
 
@@ -33,7 +34,11 @@ const NotificationRow: FC<Props> = ({ notification }) => {
         </div>
         <div className="col-span-3 flex items-center justify-end">
           {availableActions.length > 0 && (
-            <NotificationActions availableActions={availableActions} />
+            <NotificationActions
+              project={project}
+              availableActions={availableActions}
+              onSelectRestartProject={() => onSelectRestartProject(project, notification)}
+            />
           )}
         </div>
       </div>
