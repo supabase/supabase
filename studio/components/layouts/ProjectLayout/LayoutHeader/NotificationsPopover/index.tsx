@@ -1,4 +1,5 @@
 import { FC, Fragment, useState } from 'react'
+import { useRouter } from 'next/router'
 import { Button, IconBell, Popover } from '@supabase/ui'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 
@@ -12,6 +13,7 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 interface Props {}
 
 const NotificationsPopover: FC<Props> = () => {
+  const router = useRouter()
   const { app, ui } = useStore()
   const { notifications } = useNotifications()
 
@@ -20,7 +22,7 @@ const NotificationsPopover: FC<Props> = () => {
 
   if (!notifications) return <div />
 
-  const hasNewNotifications = notifications.some(
+  const hasNewNotifications = notifications?.some(
     (notification) => notification.notification_status === NotificationStatus.New
   )
 
@@ -59,6 +61,7 @@ const NotificationsPopover: FC<Props> = () => {
     } else {
       app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
       ui.setNotification({ category: 'success', message: `Restarting project` })
+      router.push(`/project/${ref}`)
     }
 
     setProjectToRestart(undefined)
