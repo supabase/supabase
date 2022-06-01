@@ -390,7 +390,7 @@ article header {
 /* Sidebar */
 
 .navbar__logo {
-  max-width: 200px;
+  max-width: 128px;
 }
 
 @media (max-width: 750px) {
@@ -1368,4 +1368,28 @@ details summary:hover {
 .theme-back-to-top-button {
   width: 2.5rem !important;
   height: 2.5rem !important;
+}
+
+/*
+* typesense doc search input
+*/
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module {
+  padding: 0 !important;
+}
+
+.searchBox_node_modules-docusaurus-theme-search-typesense-src-theme-SearchBar-styles-module {
+  position: relative !important;
+  right: 0 !important;
+  padding: 0 !important;
+  margin-left: 16px;
+}
+
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module button {
+  padding: 8px 14px !important;
+  font-size: inherit !important;
+}
+
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module svg {
+  width: 16px;
+  height: 16px;
 }
