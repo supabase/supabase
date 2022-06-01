@@ -11,6 +11,10 @@ body {
   color: #333 !important;
 }
 
+a {
+  text-decoration: none !important;
+}
+
 .thin-scrollbar {
   scrollbar-width: thin;
 }
