@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 import { Button, Divider, IconDownload, IconPlus, IconX, IconTrash, Typography } from '@supabase/ui'
-import FileSaver from 'file-saver'
+import { saveAs } from 'file-saver'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
@@ -115,7 +115,7 @@ const RowHeader: React.FC<RowHeaderProps> = ({}) => {
     const rows = allRows.filter((x) => selectedRows.has(x.idx))
     const csv = exportRowsToCsv(state.table!.columns, rows)
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    FileSaver.saveAs(csvData, `${state.table!.name}_rows.csv`)
+    saveAs(csvData, `${state.table!.name}_rows.csv`)
   }
 
   function deselectRows() {

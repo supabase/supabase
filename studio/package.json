@@ -37,7 +37,6 @@
     "file-saver": "^2.0.5",
     "immutability-helper": "^3.1.1",
     "p-queue": "6.6.2",
-
     "lodash": "^4.17.21",
     "lottie-react": "^2.1.0",
     "markdown-table": "=2.0.0",

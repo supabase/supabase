@@ -2,7 +2,7 @@ import { Button, Dropdown, IconChevronDown, Divider, IconEdit, IconTrash } from 
 import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 import { exportRowsToCsv } from '../../utils'
-import FileSaver from 'file-saver'
+import { saveAs } from 'file-saver'
 import { showConfirmAlert } from '../common'
 
 type RowMenuProps = {}
@@ -37,13 +37,13 @@ const RowMenu: React.FC<RowMenuProps> = ({}) => {
     const rows = allRows.filter((x) => selectedRows.has(x.idx))
     const csv = exportRowsToCsv(state.table!.columns, rows)
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    FileSaver.saveAs(csvData, `${state.table!.name}_rows.csv`)
+    saveAs(csvData, `${state.table!.name}_rows.csv`)
   }
 
   function onAllRowsExportCsv() {
     const csv = exportRowsToCsv(state.table!.columns, allRows)
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    FileSaver.saveAs(csvData, `${state.table!.name}_allRows.csv`)
+    saveAs(csvData, `${state.table!.name}_allRows.csv`)
   }
 
   return (
