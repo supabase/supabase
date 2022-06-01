@@ -51,14 +51,14 @@ const DocsLayout = ({
             {toc && (
               <div className="prose border-scale-400 dark:bg-scale-200 thin-scrollbar table-of-contents-height w-1/4 border-l px-4">
                 <h5>On this page</h5>
-                <ul className='list-none pl-2 text-[0.8rem]'>
-                {toc.json.map((item: any, i: number) => {
-                  return (
-                    <li key={i}>
-                      <a href={`#${item.slug}`}>{item.content}</a>
-                    </li>
-                  )
-                })}
+                <ul className="list-none pl-2 text-[0.8rem]">
+                  {toc.json.map((item: any, i: number) => {
+                    return (
+                      <li key={i}>
+                        <a href={`#${item.slug}`}>{item.content}</a>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             )}
