@@ -164,7 +164,7 @@
     "author_url": "https://github.com/geromegrignon",
     "author_img": "https://avatars.githubusercontent.com/u/32737308",
     "repo_name": "angular-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/angular-todo-list",
+    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/angular-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   }
