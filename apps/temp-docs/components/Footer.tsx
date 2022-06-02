@@ -1,4 +1,3 @@
-import { Typography } from '@supabase/ui'
 import Link from 'next/link'
 import footer from '../data/footer.json'
 import { useTheme } from './Providers'
@@ -16,7 +15,7 @@ const Footer = () => {
       </h2>
       <div className="xl:grid xl:grid-cols-3 xl:gap-8">
         <div className="space-y-8 xl:col-span-1">
-          <Link href="#">
+          <Link href="/">
             <a>
               <img
                 className="w-40"
@@ -26,14 +25,22 @@ const Footer = () => {
             </a>
           </Link>
           <div className="flex space-x-5">
-            <a href="https://twitter.com/supabase" className="text-scale-900 hover:text-scale-1100">
+            <a
+              href="https://twitter.com/supabase"
+              target="_blank"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">Twitter</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
               </svg>
             </a>
 
-            <a href="https://github.com/supabase" className="text-scale-900 hover:text-scale-1100">
+            <a
+              href="https://github.com/supabase"
+              target="_blank"
+              className="text-scale-900 hover:text-scale-1100"
+            >
               <span className="sr-only">GitHub</span>
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -46,6 +53,7 @@ const Footer = () => {
 
             <a
               href="https://discord.supabase.com/"
+              target="_blank"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">Discord</span>
@@ -60,6 +68,7 @@ const Footer = () => {
 
             <a
               href="https://youtube.com/c/supabase"
+              target="_blank"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">Youtube</span>
@@ -78,21 +87,22 @@ const Footer = () => {
                   <ul className="mt-4 space-y-2">
                     {segment.links.map((link: any, idx: number) => (
                       <li key={`${segment.title}_link_${idx}`}>
-                        <a
-                          href={link.url}
-                          className={`text-sm ${
-                            link.url
-                              ? 'text-scale-1000 dark:text-scale-1000'
-                              : 'text-scale-300 dark:text-scale-300'
-                          } hover:text-scale-900 dark:hover:text-scale-500`}
-                        >
-                          {link.text}
-                          {!link.url && (
-                            <span className="dark:text-dark-300 block text-sm text-gray-300">
-                              Coming soon
-                            </span>
-                          )}
-                        </a>
+                        <Link href={link.url}>
+                          <a
+                            className={`text-sm ${
+                              link.url
+                                ? 'text-scale-1000 dark:text-scale-1000'
+                                : 'text-scale-300 dark:text-scale-300'
+                            } hover:text-brand-900 dark:hover:text-brand-1100 transition`}
+                          >
+                            {link.text}
+                            {!link.url && (
+                              <span className="dark:text-dark-300 block text-sm text-gray-300">
+                                Coming soon
+                              </span>
+                            )}
+                          </a>
+                        </Link>
                       </li>
                     ))}
                   </ul>

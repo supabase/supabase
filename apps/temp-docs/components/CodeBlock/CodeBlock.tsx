@@ -1,12 +1,12 @@
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import monokaiCustomTheme from './CodeBlock.utils'
-import CodeBlockStyles from './CodeBlock.module.css'
-import { Button, IconCopy } from '@supabase/ui'
+import { Button, IconCheck, IconCopy } from '@supabase/ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import { useState } from 'react'
 
 interface Props {
   lang: 'js' | 'sql' | 'py'
@@ -18,6 +18,15 @@ interface Props {
 }
 
 function CodeBlock(props: Props) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 1000)
+  }
+
   let lang = props.lang
     ? props.lang
     : props.className
@@ -38,7 +47,7 @@ function CodeBlock(props: Props) {
       <SyntaxHighlighter
         language={lang}
         style={monokaiCustomTheme}
-        className={'code-block dark:border-dark rounded-lg border border-gray-600'}
+        className={'code-block border-scale-600 rounded-lg border'}
         customStyle={{
           padding: 0,
           fontSize: large ? 18 : 12,
@@ -51,23 +60,29 @@ function CodeBlock(props: Props) {
           paddingTop: '128px',
         }}
         lineNumberStyle={{
-          minWidth: '48px',
+          minWidth: '44px',
           background: '#1e1e1e',
-          paddingLeft: '21px',
+          paddingLeft: '4px',
+          paddingRight: '4px',
           marginRight: '12px',
           color: '#828282',
+          textAlign: 'center',
           fontSize: large ? 14 : 12,
           paddingTop: '4px',
           paddingBottom: '4px',
         }}
       >
-        {props.children}
+        {props.children?.trimEnd()}
       </SyntaxHighlighter>
       {!props.hideCopy && props.children ? (
         <div className="dark absolute right-2 top-2">
           <CopyToClipboard text={props.children}>
-            <Button type="outline" className="dark:bg-dark-800" icon={<IconCopy />}>
-              Copy
+            <Button
+              type="default"
+              icon={copied ? <IconCheck /> : <IconCopy />}
+              onClick={() => handleCopy()}
+            >
+              {copied ? 'Copied' : 'Copy'}
             </Button>
           </CopyToClipboard>
         </div>
