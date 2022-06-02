@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
