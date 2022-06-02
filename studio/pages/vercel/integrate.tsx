@@ -14,7 +14,7 @@ import {
 } from '@supabase/ui'
 import Divider from 'components/ui/Divider'
 
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { useStore, withAuth } from 'hooks'
 import { API_URL } from 'lib/constants'
