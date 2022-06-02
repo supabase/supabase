@@ -23,14 +23,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (authConfig)
     return (
       <FormsContainer>
-        <div>
-          <FormHeader
-            title="General settings"
-            description={`URLs that auth providers are permitted to redirect to post authentication`}
-          />
-          <AutoSchemaForm />
-        </div>
-
+        <AutoSchemaForm />
         <CommaSeperatedString />
         <AuthProvidersForm />
       </FormsContainer>

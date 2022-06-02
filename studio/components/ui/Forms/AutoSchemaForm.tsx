@@ -1,163 +1,134 @@
 import { Button, Form, Input, InputNumber, Toggle } from '@supabase/ui'
+
 import { useStore } from 'hooks'
 import React from 'react'
+import { boolean, number, object, string } from 'yup'
+import {
+  FormActions,
+  FormHeader,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from './'
 
 const AutoSchemaForm = () => {
-  const { authConfig, ui } = useStore()
+  const { authConfig } = useStore()
 
-  // panel
-  const Panel = ({
-    children,
-    header,
-    footer,
-  }: {
-    children: React.ReactNode
-    header?: React.ReactNode
-    footer?: React.ReactNode
-  }) => (
-    <div
-      className="
-      bg-scale-100 
-      dark:bg-scale-300 
-    
-      border-scale-400 overflow-hidden rounded-md border shadow"
-    >
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 border-scale-400 border-b px-8 py-4">
-          {header}
-        </div>
-      )}
-      <div className="space-y-6 py-6">{children}</div>
-      {footer}
-    </div>
-  )
-
-  const Section = ({
-    children,
-    header,
-  }: {
-    children: React.ReactNode
-    header?: React.ReactNode
-  }) => (
-    <div className="grid grid-cols-12 gap-6 px-8 py-2">
-      {header}
-      {children}
-    </div>
-  )
-
-  const SectionLabel = ({ children }: { children: React.ReactNode | string }) => {
-    return <label className="text-scale-1200 col-span-12 text-sm lg:col-span-4">{children}</label>
+  const INITIAL_VALUES = {
+    DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
+    JWT_EXP: authConfig.config.JWT_EXP,
+    SITE_URL: authConfig.config.SITE_URL,
+    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
   }
-  const SectionContent = ({ children }: { children: React.ReactNode | string }) => {
-    return <div className="col-span-12 flex flex-col gap-6 lg:col-span-8">{children}</div>
-  }
+
+  const schema = object({
+    DISABLE_SIGNUP: boolean().required(),
+    SITE_URL: string().required('Must have a Site URL'),
+    JWT_EXP: number()
+      .max(604800, 'Must be less than 604800')
+      .required('Must have a JWT expiry value'),
+    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
+      .min(0, 'Must be a value more than 0')
+      .required('Must have a Reuse Interval value'),
+  })
 
   return (
     <>
       <Form
         id="auth-config-general-form"
-        initialValues={{
-          DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
-          JWT_EXP: authConfig.config.JWT_EXP,
-          SITE_URL: authConfig.config.SITE_URL,
-          SECURITY_REFRESH_TOKEN_REUSE_INTERVAL:
-            authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
-        }}
-        onSubmit={async (values: any, { setSubmitting }: any) => {
-          const payload = values
+        initialValues={INITIAL_VALUES}
+        onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
+          const payload = { ...values }
           payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-          console.log('payload', payload)
           try {
             setSubmitting(true)
             await authConfig.update(payload)
             setSubmitting(false)
+            resetForm({ values: values, initialValues: values })
           } catch (error) {
             setSubmitting(false)
           }
         }}
-        validate={(values: any) => {
-          const errors: any = {}
-          // if (!values.jwt_expiry) {
-          //   errors.jwt_expiry = 'This is required'
-          // }
-          // if (values.jwt_expiry > 604800) {
-          //   errors.jwt_expiry =
-          //     'The maxiumum allowed is 604,800 seconds. Use a smaller number of seconds.'
-          // }
-          return errors
-        }}
+        validationSchema={schema}
       >
-        {({ isSubmitting, handleReset, values }: any) => (
-          <Panel
-            footer={
-              <>
+        {({ isSubmitting, handleReset, values, initialValues }: any) => {
+          const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+          return (
+            <>
+              <Button onClick={() => handleReset()} htmlType="button">
+                reset form
+              </Button>
+              <FormHeader
+                title="General settings"
+                description={`URLs that auth providers are permitted to redirect to post authentication`}
+              />
+
+              <FormPanel
+                disabled={true}
+                footer={
+                  <>
+                    <FormActions
+                      handleReset={handleReset}
+                      isSubmitting={isSubmitting}
+                      hasChanges={hasChanges}
+                    />
+                    {hasChanges && 'Need to save changes'}
+                  </>
+                }
+              >
+                <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
+                  <FormSectionContent>
+                    {/* <div className="flex flex-col justify-between space-y-2">
+                      <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+                    </div>
+                    <div className="shimmering-loader mx-1 w-1/3 rounded py-3"></div> */}
+                    <Toggle
+                      id="DISABLE_SIGNUP"
+                      size="small"
+                      label="Allow new users to sign up"
+                      layout="flex"
+                      descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    />
+                  </FormSectionContent>
+                </FormSection>
                 <div className="border-scale-400 border-t"></div>
-                <div className="flex justify-end gap-2 py-3 px-6">
-                  <Button type="default" htmlType="reset" onClick={() => handleReset()}>
-                    Cancel
-                  </Button>
-                  <Button
-                    loading={isSubmitting}
-                    type="primary"
-                    htmlType="submit"
-                    form="auth-config-general-form"
-                  >
-                    Save
-                  </Button>
-                </div>
-              </>
-            }
-          >
-            <Section header={<SectionLabel>User Signups</SectionLabel>}>
-              <SectionContent>
-                <Toggle
-                  id="DISABLE_SIGNUP"
-                  size="small"
-                  className="col-span-8"
-                  label="Allow new users to sign up"
-                  layout="flex"
-                  descriptionText="If this is disabled, new users will not be able to sign up to your application."
-                />
-              </SectionContent>
-            </Section>
-            <div className="border-scale-400 border-t"></div>
-            <Section header={<SectionLabel>User Sessions</SectionLabel>}>
-              <SectionContent>
-                {/**
-                 *
-                 * permitted redirects
-                 * for anything on that domain
-                 *
-                 * check with @kangming about this
-                 *
-                 */}
-                <Input
-                  id="SITE_URL"
-                  size="small"
-                  className="col-span-8"
-                  label="Site URL"
-                  descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
-                />
-                <InputNumber
-                  id="JWT_EXP"
-                  size="small"
-                  className="col-span-8"
-                  label="JWT expiry limit"
-                  descriptionText="How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
-                />
-                {/* // min 0 */}
-                <InputNumber
-                  id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                  size="small"
-                  min={0}
-                  className="col-span-8"
-                  label="Reuse Interval"
-                  descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                />
-              </SectionContent>
-            </Section>
-          </Panel>
-        )}
+                <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
+                  <FormSectionContent>
+                    {/**
+                     *
+                     * permitted redirects
+                     * for anything on that domain
+                     *
+                     * check with @kangming about this
+                     *
+                     */}
+                    <Input
+                      id="SITE_URL"
+                      size="small"
+                      label="Site URL"
+                      descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
+                    />
+                    <InputNumber
+                      id="JWT_EXP"
+                      size="small"
+                      label="JWT expiry limit"
+                      descriptionText="How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
+                    />
+                    {/* // min 0 */}
+                    <InputNumber
+                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                      size="small"
+                      min={0}
+                      label="Reuse Interval"
+                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
+                    />
+                  </FormSectionContent>
+                </FormSection>
+              </FormPanel>
+            </>
+          )
+        }}
       </Form>
     </>
   )
