@@ -96,6 +96,14 @@ test('can display log data and metadata', async () => {
     ],
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+    },
+  )
+
   fireEvent.click(await screen.findByText(/some-event-happened-id/))
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
