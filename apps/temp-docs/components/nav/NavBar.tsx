@@ -10,8 +10,8 @@ import {
 } from '@supabase/ui'
 import Image from 'next/image'
 import Link from 'next/link'
-import styles from '../../styles/Home.module.css'
 import { useTheme } from '../Providers'
+import ThemeToggle from '../ThemeToggle'
 
 const NavBar = ({ currentPage }: { currentPage: string }) => {
   const [mounted, setMounted] = useState(false)
@@ -32,16 +32,14 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   ]
 
   return (
-    <nav
-      className={`dark:border-scale-400 dark:bg-scale-200 sticky top-0 z-10 flex h-[72px] justify-between border-b bg-white p-4 backdrop-blur backdrop-filter`}
-    >
+    <nav className="dark:border-scale-400 dark:bg-scale-200 sticky top-0 z-10 flex h-[72px] items-center justify-between border-b bg-white p-4 backdrop-blur backdrop-filter">
       <div className="flex items-center">
-        <button className="mr-2 block lg:hidden">
-          <IconMenu />
+        <button className="mr-4 block stroke-2 lg:hidden">
+          <IconMenu className="text-scale-1100" />
         </button>
         {mounted && (
           <Link href="/">
-            <a>
+            <a className="flex items-center">
               <Image
                 className="cursor-pointer"
                 src={isDarkMode ? `/supabase-dark.svg` : `/supabase-light.svg`}
@@ -53,7 +51,7 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           </Link>
         )}
 
-        <ul className={`${styles.navLinks} flex`}>
+        <ul className="ml-8 hidden space-x-8 lg:flex">
           {pageLinks.map((p) => (
             <li key={`${p.text}-${p.link}`}>
               <Link href={p.link}>
@@ -70,17 +68,20 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
           </li>
         </ul>
       </div>
-      <div className={`${styles.navRight} flex items-center`}>
-        <Link href="https://github.com/supabase/supabase">
-          <a>
-            <IconGitHub className="text-scale-1100" />
-          </a>
-        </Link>
-        <Link href="https://twitter.com/supabase">
-          <a>
-            <IconTwitter className="text-scale-1100" />
-          </a>
-        </Link>
+      <div className="flex items-center space-x-6">
+        <div className="hidden items-center space-x-6 md:flex">
+          <Link href="https://github.com/supabase/supabase">
+            <a target="_blank">
+              <IconGitHub className="text-scale-1100 stroke-2" />
+            </a>
+          </Link>
+          <Link href="https://twitter.com/supabase">
+            <a target="_blank">
+              <IconTwitter className="text-scale-1100 stroke-2" />
+            </a>
+          </Link>
+          <ThemeToggle />
+        </div>
         <Input
           placeholder="Search"
           icon={<IconSearch />}
