@@ -8,6 +8,7 @@
 
 body {
   @apply bg-white dark:bg-[#1c1c1c] !important;
+  scroll-behavior: smooth;
 }
 
 ::selection {
