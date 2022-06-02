@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { SidePanel, Typography, Listbox, IconHelpCircle } from '@supabase/ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 

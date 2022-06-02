@@ -33,7 +33,7 @@ Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/do
 ## Durum
 
 - [x] Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [x] Herkese Açık Alfa: [app.supabase.io](https://app.supabase.io) adresinden herkes kaydolabilir. Ama anlayış gösterin, birkaç karışıklık var.
+- [x] Herkese Açık Alfa: [app.supabase.com](https://app.supabase.com) adresinden herkes kaydolabilir. Ama anlayış gösterin, birkaç karışıklık var.
 - [x] Herkese Açık Beta: Kurumsal olmayan çoğu kullanım durumu için yeterince kararlı
 - [ ] Herkese açık: Üretime hazır
 
@@ -49,7 +49,7 @@ Supabase, açık kaynaklı araçların bir kombinasyonudur. Firebase'in özellik
 
 **Güncel Mimari**
 
-Supabase [barındırılan bir platformdur](https://app.supabase.io). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
+Supabase [barındırılan bir platformdur](https://app.supabase.com). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
