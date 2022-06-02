@@ -2,7 +2,7 @@ import { FC, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, find } from 'lodash'
-import { SupabaseGrid, SupabaseGridRef, parseSupaTable, Dictionary } from '@supabase/grid'
+import { SupabaseGrid, SupabaseGridRef, parseSupaTable, Dictionary } from 'components/grid'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
