@@ -1,5 +1,5 @@
 import { find, isUndefined, isEqual, isNull } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import {
   PostgresColumn,
   PostgresRelationship,

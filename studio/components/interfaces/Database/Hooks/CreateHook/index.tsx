@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx'
 import { FC, useEffect, createContext } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { Badge, Input, SidePanel } from '@supabase/ui'
 import { useStore } from 'hooks'
 
