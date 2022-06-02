@@ -15,7 +15,7 @@ interface Props {}
 const NotificationsPopover: FC<Props> = () => {
   const router = useRouter()
   const { app, ui } = useStore()
-  const { notifications } = useNotifications()
+  const { notifications, refresh } = useNotifications()
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
@@ -33,8 +33,9 @@ const NotificationsPopover: FC<Props> = () => {
         ?.filter((notification) => notification.notification_status === NotificationStatus.New)
         .map((notification) => notification.id)
       if (notificationIds.length > 0) {
-        const { data, error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-        console.log(data, error)
+        const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
+        if (error) console.error('Failed to update notifications', error)
+        refresh()
       }
     }
   }
