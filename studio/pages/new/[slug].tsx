@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader } from '@supabase/ui'
+import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader, Alert } from '@supabase/ui'
 
 import { getURL, passwordStrength } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
@@ -363,19 +363,36 @@ const Wizard: NextPageWithLayout = () => {
                       <a className="underline" target="_blank" href="https://supabase.com/pricing">
                         More details
                       </a>
+                      {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                        <Alert
+                          title="Your payment method will be charged"
+                          variant="warning"
+                          withIcon
+                          className="mt-3"
+                        >
+                          <p>
+                            By creating a new Pro Project, there will be an immediate charge of $25
+                            once the project has been created.
+                          </p>
+                        </Alert>
+                      )}
                     </>
                   }
                 >
-                  {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => (
-                    <Listbox.Option key={k} label={v} value={k}>
-                      {`${v}${k === 'PRO' ? ' - $25/month' : ''}`}
-                    </Listbox.Option>
-                  ))}
+                  {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                    const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                    return (
+                      <Listbox.Option key={k} label={label} value={k}>
+                        {label}
+                      </Listbox.Option>
+                    )
+                  })}
                 </Listbox>
 
                 {isSelectFreeTier && isOverFreeProjectLimit && (
                   <FreeProjectLimitWarning limit={freeProjectsLimit} />
                 )}
+
                 {!isSelectFreeTier && isEmptyPaymentMethod && (
                   <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
                 )}
