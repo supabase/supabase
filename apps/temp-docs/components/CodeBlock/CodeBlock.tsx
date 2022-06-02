@@ -77,7 +77,11 @@ function CodeBlock(props: Props) {
       {!props.hideCopy && props.children ? (
         <div className="dark absolute right-2 top-2">
           <CopyToClipboard text={props.children}>
-            <Button type="default" icon={copied ? <IconCheck /> : <IconCopy />} onClick={() => handleCopy()}>
+            <Button
+              type="default"
+              icon={copied ? <IconCheck /> : <IconCopy />}
+              onClick={() => handleCopy()}
+            >
               {copied ? 'Copied' : 'Copy'}
             </Button>
           </CopyToClipboard>
