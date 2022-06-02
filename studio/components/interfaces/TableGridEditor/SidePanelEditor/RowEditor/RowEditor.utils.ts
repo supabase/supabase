@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { find, isUndefined, compact, includes, isEqual, omitBy, isNull, isString } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4, minifyJSON, tryParseJson } from 'lib/helpers'

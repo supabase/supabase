@@ -56,7 +56,7 @@ export default function IndexPage() {
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
-        '50GB bandwith',
+        '50GB bandwidth',
         '3GB file uploads',
         'Social OAuth providers',
         '2M Edge Function invocations',
