@@ -9,8 +9,7 @@ const AWSMarketplaceSubscription: FC<Props> = ({ organization }) => {
   return (
     <div className="flex flex-col space-y-4">
       <Typography.Text>
-        This organization is subscribed via AWS Marketplace, with a limit of{' '}
-        {organization.project_limit} projects and expiring on{' '}
+        This organization is subscribed via AWS Marketplace. The subscription expires on{' '}
         {organization.aws_marketplace.Entitlements[0].ExpirationDate.slice(0, 10)}.
       </Typography.Text>
 
