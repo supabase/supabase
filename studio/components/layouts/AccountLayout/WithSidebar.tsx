@@ -37,10 +37,10 @@ const WithSidebar: FC<Props> = ({
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
-          className="
-            bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark hide-scrollbar dark:border-dark h-screen w-64
-            overflow-auto border-r
-          "
+          className={[
+            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
+            'hide-scrollbar dark:border-dark h-screen w-64 overflow-auto border-r',
+          ].join(' ')}
           style={sidebarStyle}
         >
           {title && (
