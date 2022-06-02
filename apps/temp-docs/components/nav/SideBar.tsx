@@ -6,7 +6,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
   const { asPath } = useRouter()
   return (
     <div className="dark:bg-scale-200 dark:border-scale-400 thin-scrollbar sidebar-width sticky top-0 flex h-screen overflow-y-scroll border-r py-4">
-      <Menu>
+      <Menu className="w-full">
         <div>
           {Object.keys(menuItems).map((key) => {
             return (
@@ -21,10 +21,7 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                           {item.sections.map((section) => (
                             <Link href={section.link} key={`${item.text}-${section.text}`}>
                               <a>
-                                <Menu.Item
-                                  active={asPath == section.link}
-                                  showActiveBar={asPath === section.link}
-                                >
+                                <Menu.Item active={asPath == section.link}>
                                   {section.text}
                                 </Menu.Item>
                               </a>
@@ -34,11 +31,14 @@ const SideBar = ({ menuItems }: { menuItems: any }) => {
                       ) : (
                         <Link href={item.link}>
                           <a>
-                            <Menu.Item
-                              active={asPath === item.link}
-                              showActiveBar={asPath === item.link}
-                            >
-                              {item.text}
+                            <Menu.Item active={asPath === item.link}>
+                              <div
+                                className={
+                                  asPath === item.link ? 'text-brand-900' : 'text-scale-1000'
+                                }
+                              >
+                                {item.text}
+                              </div>
                             </Menu.Item>
                           </a>
                         </Link>
