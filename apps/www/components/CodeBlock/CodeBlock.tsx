@@ -64,7 +64,7 @@ function CodeBlock(props: CodeBlockProps) {
       const style = shouldHighlightLine ? {} : { filter: 'grayscale(75%)', opacity: 0.5 }
 
       return {
-        class: classNames(
+        className: classNames(
           CodeBlockStyles['code-line'],
           shouldHighlightLines && shouldHighlightLine && CodeBlockStyles['code-line--flash']
         ),
