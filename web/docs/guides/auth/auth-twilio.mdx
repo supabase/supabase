@@ -89,11 +89,11 @@ The SMS message sent to a phone containing an OTP code can be customized. This i
 
 Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
 
-Use the variable `.Code` in the template to display the code.
+Use the variable `.Code` in the template to display the OTP code. Here's an ![example in the SMS template](/img/guides/auth-twilio/9.png).
 
 ### Using OTP with password based logins
 
-In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whoever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
+In this scenario we'll be using the user's mobile phone number and a corrsesponding password as an alternative to signing up with an email address. Note: Please deeply consider the potential security implications when signing up with a combination ofphone and passsword. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor auth, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
