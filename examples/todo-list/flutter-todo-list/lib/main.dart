@@ -9,9 +9,9 @@ import 'package:todosupabase/screens/todo.dart';
 
 void main() async {
   await Supabase.initialize(
-      url: 'https://newknrbzotfpvatooqxz.supabase.co',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ld2tucmJ6b3RmcHZhdG9vcXh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTQwMjM2ODYsImV4cCI6MTk2OTU5OTY4Nn0.KI6TzzzailhNRfRAeJMIDtMVZSBZbaliDK2K_J0VVn8');
+      url: 'YOUR_SUPABASE_URL',
+      anonKey: 'YOUR_SUPABASE_KEY',
+  );
   runApp(const MyApp());
 }
 
