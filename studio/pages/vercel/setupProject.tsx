@@ -5,7 +5,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
 import { Button, Input, Listbox, Typography } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

@@ -32,7 +32,7 @@ Pentru documentația completă vizitați [supabase.com/docs](https://supabase.co
 ## Status
 
 - [x] Alpha: Testăm Supabase cu o listă restrânsă de clienți
-- [x] Alpha public: Oricine poate să se înscrie la [app.supabase.io](https://app.supabase.io). Fiți îngăduitori cu noi, există câteva imperfecțiuni.
+- [x] Alpha public: Oricine poate să se înscrie la [app.supabase.com](https://app.supabase.com). Fiți îngăduitori cu noi, există câteva imperfecțiuni.
 - [x] Beta public: Suficient de stabil pentru majoritatea proiectelor mici sau medii.
 - [ ] Public: Pregătit pentru producție
 
@@ -48,7 +48,7 @@ Supabase este o combinație de unelte open source. Construim trăsăturile din F
 
 **Arhitectura actuală**
 
-Supabase este o [platformă găzduită](https://app.supabase.io). Puteți să vă înscrieți și să începeți să folosiți Supabase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
+Supabase este o [platformă găzduită](https://app.supabase.com). Puteți să vă înscrieți și să începeți să folosiți Supabase fără a instala orice. Experiența de developare locală încă mai este în dezvoltare, acesta fiind lucrul la care ne concentrăm cel mai mult, împreună cu stabilitatea platformei.
 
 ![Arhitectură](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 
