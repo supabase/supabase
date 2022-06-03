@@ -30,7 +30,7 @@ const NotificationsPopover: FC<Props> = () => {
     if (!open) {
       // Mark notifications as seen
       const notificationIds = notifications
-        ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+        .filter((notification) => notification.notification_status === NotificationStatus.New)
         .map((notification) => notification.id)
       if (notificationIds.length > 0) {
         const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
@@ -112,7 +112,7 @@ const NotificationsPopover: FC<Props> = () => {
           </div>
         }
       >
-        <div className="relative">
+        <div className="relative flex">
           <Button
             as="span"
             id="notification-button"
