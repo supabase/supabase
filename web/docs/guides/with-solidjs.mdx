@@ -522,7 +522,7 @@ return (
     <Avatar
       url={avatar_url}
       size={150}
-      onUpload={(url) => {
+      onUpload={(e, url) => {
         setAvatarUrl(url)
         updateProfile(e)
       }}
