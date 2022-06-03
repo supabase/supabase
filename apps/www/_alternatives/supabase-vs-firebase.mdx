@@ -18,31 +18,31 @@ Now owned by Google, Firebase is a collection of tools aimed at mobile and web d
 
 Firestore allows you to store “documents”. These are collections of key:value pairs where the value can be another sub-document. Document based storage is perfect for unstructured data, since two documents in a collection do not necessarily need to have the same structure.
 
-Firebase also offers other things that web developers find useful, like an auth service for user management, and wrappers for other Google services such as Cloud Functions, and File Storage.
+Firebase also offers other things that web developers find useful like an auth service for user management, and wrappers for other Google services such as Cloud Functions, and File Storage.
 
 ## What is Supabase?
 
-Supabase is an open source firebase alternative, but instead of being built around a document-based datastore, Supabase offers a relational database management system - called PostgreSQL. This comes with a few advantages:
+Supabase is an open source firebase alternative, but instead of being built around a document-based datastore, Supabase offers a relational database management system called PostgreSQL. This comes with a few advantages:
 
 - It’s open source, so there is zero lock in.
 - You can query it with SQL, a proven and powerful query language.
 - It has a long track record of being used at scale.
-- It’s the database of choice for transactional workloads (think apps and websites, or other things that require near-instant responses to queries)
-- It comes with decades of [useful postgres extensions and plug-ins](https://supabase.com/docs/guides/database/extensions)
+- It’s the database of choice for transactional workloads (think apps and websites, or other things that require near-instant responses to queries).
+- It comes with decades of [useful postgres extensions and plug-ins](https://supabase.com/docs/guides/database/extensions).
 
 At Supabase we’ve always been huge fans of Firebase - so we started adding a few things on top of PostgreSQL in an attempt to reach feature parity, including:
 
-- Auto-generated API - [query your data straight from the client](https://supabase.com/docs/guides/api#rest-api-2)
-- Realtime - [changes in your data will be streamed directly to your application](https://supabase.com/docs/reference/dart/subscribe)
-- Auth - [a simple to integrate auth system and SQL based rules engine](https://supabase.com/auth)
-- Functions - [javascript and typescript functions that deploy out globally](https://supabase.com/edge-functions)
-- Storage - [hosting images, videos, and pdfs easily](https://supabase.com/storage)
+- Auto-generated API - [query your data straight from the client](https://supabase.com/docs/guides/api#rest-api-2).
+- Realtime - [changes in your data will be streamed directly to your application](https://supabase.com/docs/reference/dart/subscribe).
+- Auth - [a simple to integrate auth system and SQL based rules engine](https://supabase.com/auth).
+- Functions - [javascript and typescript functions that deploy out globally](https://supabase.com/edge-functions).
+- Storage - [hosting images, videos, and pdfs easily](https://supabase.com/storage).
 
 ## How are they similar?
 
-Both Firebase and Supabase are based on the idea of bringing a superior developer experience to databases. With both platforms you can spin up a new project from directly inside the browser, without the need to download any extra tools or software to your machine. Both platforms come with a useful dashboard UI for debugging your data in realtime, which is especially useful for fast iterations when in development.
+Both Firebase and Supabase are based on the idea of bringing a superior developer experience to databases. With both platforms you can spin up a new project from directly inside the browser without the need to download any extra tools or software to your machine. Both platforms come with a useful dashboard UI for debugging your data in realtime, which is especially useful for fast iterations when in development.
 
-Both Firebase and Supabase have invested heavily in client side libraries so you can communicate with your database, directly from the client. Firebase has their [Firebase Javascript SDK](https://github.com/firebase/firebase-js-sdk) and Supabase has [supabase-js an isomorphic client](https://github.com/supabase/supabase-js/) that can be used both on the client also on the server in a node-js environment.
+Both Firebase and Supabase have invested heavily in client side libraries so you can communicate with your database directly from the client. Firebase has their [Firebase Javascript SDK](https://github.com/firebase/firebase-js-sdk) and Supabase has [supabase-js an isomorphic client](https://github.com/supabase/supabase-js/) that can be used both on the client also on the server in a node-js environment.
 
 ## How are they different?
 
@@ -50,7 +50,7 @@ Firebase and Supabase differ in several ways. The main one being that Firebase i
 
 ### Open Source
 
-Supabase is fully open source, meaning that along with the hosted cloud platform, you can also take the Supabase stack, and host it inside your own cloud or run it locally on your machine. The primary benefit here is no vendor lock in, which can be a frustrating problem for some Firebase users.
+Supabase is fully open source. This means that along with the hosted cloud platform, you can also take the Supabase stack and host it inside your own cloud or run it locally on your machine. The primary benefit here is no vendor lock in, which can be a frustrating problem for some Firebase users.
 
 ### Pricing
 
@@ -58,16 +58,14 @@ Supabase is fully open source, meaning that along with the hosted cloud platform
 
 ### Scaling
 
-One scaling limitation you might face when using Firestore - is the 1 document per second limitation on writes. It can be hard to architect around this issue for users who want to be able to sustain high write loads from a single client. Supabase is built on Postgres which is a well battle tested at scale, to help scale the number of connections, every deployment comes with an instance with PgBouncer, a [Postgres connection pooler perfect for use in Serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) environments.
+One scaling limitation you might face when using Firestore - is the 1 document per second limitation on writes. It can be hard to architect around this issue for users who want to be able to sustain high write loads from a single client. Supabase is built on Postgres which is a well battle tested at scale, to help scale the number of connections. Every deployment comes with an instance with PgBouncer, a [Postgres connection pooler perfect for use in Serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) environments.
 
 ## How do I migrate from Firebase to Supabase?
 
-Since Firebase is documents based, migrating into a relational database requires you to map your data structure across into a SQL schema. Luckily we’ve built a [handy conversion tool to do it for you](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore).
+Since Firebase is document based, migrating into a relational database requires you to map your data structure across into a SQL schema. Luckily we’ve built a [handy conversion tool to do it for you](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore).
 
 We also have a tool for [migrating Firebase Auth to Supabase Auth](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth). And one for [migrating Firebase Storage files to Supabase Storage](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage).
 
 These are by far the most complete Firebase to Postgres migration tools available anywhere on the web.
 
-If you require Enterprise level support with your project or migration, please get in touch using our [Enterprise contact form](https://supabase.com/contact/enterprise).
-
-[Try Supabase for free today](https://app.supabase.io).
+You can [try Supabase for free](https://app.supabase.io). If you require Enterprise level support with your project or migration, please get in touch using our [Enterprise contact form](https://supabase.com/contact/enterprise).
