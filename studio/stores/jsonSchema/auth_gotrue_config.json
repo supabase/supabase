@@ -33,6 +33,7 @@
     "SMS_PROVIDER",
     "SMS_TEMPLATE",
     "MAILER_AUTOCONFIRM",
+    "MAILER_OTP_EXP",
     "MAILER_URLPATHS_INVITE",
     "MAILER_URLPATHS_CONFIRMATION",
     "MAILER_URLPATHS_RECOVERY",
@@ -376,6 +377,12 @@
       "title": "Subject",
       "type": "string"
     },
+    "MAILER_OTP_EXP": {
+      "title": "Mailer Otp Expiration",
+      "type": "integer",
+      "help": "Duration before an email otp / link expires."
+    },
+    
     "MAILER_SUBJECTS_CONFIRMATION": {
       "title": "Subject",
       "type": "string"
@@ -436,10 +443,25 @@
       "type": "boolean",
       "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
     },
+    "SECURITY_REFRESH_TOKEN_REUSE_INTERVAL": {
+      "title": "Reuse Interval",
+      "type": "integer",
+      "help": "Time interval where the same refresh token can be used to request for an access token."
+    },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",
       "type": "boolean",
       "help": "If enabled, users need to confirm their phone number before signing in."
+    },
+    "SMS_OTP_EXP": {
+      "title": "Sms Otp Expiration",
+      "type": "integer",
+      "help": "Duration before an sms otp expires."
+    },
+    "SMS_OTP_LENGTH": {
+      "title": "Sms Otp Length",
+      "type": "integer",
+      "help": "Number of digits in otp."
     },
     "SMS_PROVIDER": {
       "title": "Sms provider",

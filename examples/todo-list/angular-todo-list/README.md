@@ -4,13 +4,13 @@
   - [Angular](https://angular.io)
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Deploy your own
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
 
 ### 2. Run "Todo List" Quickstart
 
@@ -42,7 +42,7 @@ run `ng serve`
 
 ### 5. Deploy the Angular client
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2todo-list%2Fangular-todo-list&env=ANGULAR_APP_SUPABASE_URL,ANGULAR_APP_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&project-name=supabase-todo-list&repo-name=supabase-todo-list)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2todo-list%2Fangular-todo-list&env=ANGULAR_APP_SUPABASE_URL,ANGULAR_APP_SUPABASE_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.com&project-name=supabase-todo-list&repo-name=supabase-todo-list)
 
 Here, we recommend forking this repo so you can deploy through Vercel by clicking the button above. When you click the button, replace the repo URL with your fork's URL.
 
@@ -52,7 +52,7 @@ You will be asked for a `ANGULAR_APP_SUPABASE_URL` and `ANGULAR_APP_SUPABASE_KEY
 
 ![Change auth settings](https://user-images.githubusercontent.com/1811651/101840012-39be3800-3af8-11eb-8c32-73f2fae6299e.png)
 
-On [app.supabase.io](https://app.supabase.io), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
+On [app.supabase.com](https://app.supabase.com), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
 
 Here, you can also enable external oauth providers, such as Google and GitHub.
 

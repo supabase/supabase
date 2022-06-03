@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { Form, Input, Button, Select } from '@supabase/ui'
 
 import { useStore } from 'hooks'

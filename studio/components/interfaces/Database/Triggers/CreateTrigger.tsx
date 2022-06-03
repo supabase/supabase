@@ -14,7 +14,7 @@ import {
   Badge,
   Button,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 

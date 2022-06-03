@@ -90,57 +90,6 @@ const usageLimits = {
       },
     ],
   },
-  auth: {
-    title: 'Auth',
-    icon_src: '/img/key.svg',
-    features: [
-      {
-        title: 'Users',
-        tiers: {
-          free: {
-            description: (stats: UsageStats) => `${((stats.authUsers / 10000) * 100).toFixed(2)}%`,
-            render: (stats: UsageStats) => (
-              <SparkBar
-                value={stats.authUsers}
-                max={10000}
-                type={'horizontal'}
-                barClass={'bg-brand-900'}
-                labelBottom={stats.authUsers.toLocaleString()}
-                labelTop={`${Number(10000).toLocaleString()}`}
-              />
-            ),
-          },
-          pro: {
-            description: (stats: UsageStats) =>
-              `${((stats.authUsers / 100000) * 100).toFixed(2)}%`,
-            render: (stats: UsageStats) => (
-              <SparkBar
-                value={stats.authUsers}
-                max={100000}
-                type={'horizontal'}
-                barClass={'bg-brand-900'}
-                labelBottom={stats.authUsers.toLocaleString()}
-                labelTop={`${Number(100000).toLocaleString()}`}
-              />
-            ),
-          },
-        },
-      },
-      {
-        title: 'Auth confirmation emails',
-        tiers: {
-          free: {
-            description: () => `${Number(1000).toLocaleString()}/month`,
-            render: null,
-          },
-          pro: {
-            description: () => `${Number(30000).toLocaleString()}/month`,
-            render: null,
-          },
-        },
-      },
-    ],
-  },
   storage: {
     title: 'File storage',
     icon_src: '/img/archive.svg',
@@ -226,15 +175,15 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
       <div className="">
         {Object.values(usageLimits).map((product) => (
           <div
-            className="rounded overflow-hidden border border-panel-border-light dark:border-panel-border-dark mb-8"
+            className="border-panel-border-light dark:border-panel-border-dark mb-8 overflow-hidden rounded border"
             key={product.title}
           >
-            <table className="w-full bg-panel-body-light dark:bg-panel-body-dark">
+            <table className="bg-panel-body-light dark:bg-panel-body-dark w-full">
               <thead className="bg-panel-header-light dark:bg-panel-header-dark">
-                <tr className="rounded overflow-hidden">
-                  <th className="px-6 py-3 text-left w-1/4">
+                <tr className="overflow-hidden rounded">
+                  <th className="w-1/4 px-6 py-3 text-left">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded bg-white">
                         <img width={'16'} src={product.icon_src} />
                       </div>
                       <Typography.Title level={5} className="mb-0">
@@ -242,10 +191,10 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
                       </Typography.Title>
                     </div>
                   </th>
-                  <th className="p-3 text-xs leading-4 font-medium text-gray-400 text-left hidden lg:table-cell">
+                  <th className="hidden p-3 text-left text-xs font-medium leading-4 text-gray-400 lg:table-cell">
                     {/* Plan Limits */}
                   </th>
-                  <th className="p-3 text-xs leading-4 font-medium text-gray-400 text-left">
+                  <th className="p-3 text-left text-xs font-medium leading-4 text-gray-400">
                     {/* Usage */}
                   </th>
                 </tr>
@@ -255,16 +204,16 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
                 {product.features.map((feature) => {
                   return (
                     <tr
-                      className="border-t border-panel-border-light dark:border-panel-border-dark"
+                      className="border-panel-border-light dark:border-panel-border-dark border-t"
                       key={feature.title}
                     >
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-typography-body-light dark:text-typography-body-dark">
+                      <td className="text-typography-body-light dark:text-typography-body-dark whitespace-nowrap px-6 py-3 text-sm">
                         {feature.title}
                       </td>
-                      <td className="p-3 whitespace-nowrap text-sm text-typography-body-light dark:text-typography-body-dark hidden lg:table-cell w-1/5">
+                      <td className="text-typography-body-light dark:text-typography-body-dark hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell">
                         {feature.tiers[tier]?.description(stats)}
                       </td>
-                      <td className="px-6 py-3 text-sm text-typography-body-light dark:text-typography-body-dark ">
+                      <td className="text-typography-body-light dark:text-typography-body-dark px-6 py-3 text-sm ">
                         {/* @ts-ignore */}
                         {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
                       </td>
@@ -317,7 +266,7 @@ export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, 
                       {feature.tiers[tier]?.render && feature.title !== 'Transfer limits' ? (
                         <h5 className="text-scale-900 text-sm">{feature.title}</h5>
                       ) : null}
-                      <div className="text-sm text-typography-body-light dark:text-typography-body-dark">
+                      <div className="text-typography-body-light dark:text-typography-body-dark text-sm">
                         {/* @ts-ignore */}
                         {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
                       </div>

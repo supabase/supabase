@@ -109,7 +109,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
               </div>
             )}
           </div>
-          {paygStats && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
+          {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
         <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
