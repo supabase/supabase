@@ -30,8 +30,6 @@ const slug = require('rehype-slug')
 const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
-  console.log('slug', slug)
-  console.log('gfm', gfm)
   const paths = getAllPostSlugs('_alternatives')
   return {
     paths,
@@ -99,9 +97,5 @@ function BlogPostPage(props: any) {
 
   return <LayoutComparison components={components} props={props} gfm={gfm} slug={slug} />
 }
-
-// function BlogPostPage() {
-//   return <h1>blog post</h1>
-// }
 
 export default BlogPostPage
