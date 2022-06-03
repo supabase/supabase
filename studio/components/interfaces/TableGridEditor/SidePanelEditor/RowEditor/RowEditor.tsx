@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, partition, isEmpty } from 'lodash'
 import { SidePanel } from '@supabase/ui'
-import { Dictionary, Query } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
