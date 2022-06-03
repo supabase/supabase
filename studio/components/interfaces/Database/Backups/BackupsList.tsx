@@ -55,12 +55,10 @@ const BackupsList: FC<Props> = ({}) => {
   return (
     <div className="space-y-6">
       {!sortedBackups?.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
-        <div className="block w-full rounded border border-green-500 border-opacity-50 bg-green-500 bg-opacity-5 p-3">
+        <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
           <div className="flex space-x-3">
-            <div>
-              <IconInfo className="text-green-500" size="large" />
-            </div>
-            <p>No backups created yet. Check again tomorrow.</p>
+            <IconInfo size={20} strokeWidth={1.5} />
+            <p className="text-sm">No backups created yet. Check again tomorrow.</p>
           </div>
         </div>
       ) : (
