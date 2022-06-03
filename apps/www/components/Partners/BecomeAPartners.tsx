@@ -73,8 +73,8 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
 
         <Form initialValues={INITIAL_VALUES} validate={validate} onSubmit={handleFormSubmit}>
           {({ isSubmitting }: any) => (
-            <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-              <div className="col-span-2 h-24">
+            <div className="flex flex-col space-y-4">
+              <div>
                 <Select
                   id="type"
                   name="type"
@@ -89,27 +89,29 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </Select>
               </div>
 
-              <div className="h-24">
-                <Input
-                  label="First Name *"
-                  id="first"
-                  name="first"
-                  layout="vertical"
-                  placeholder="Jane"
-                />
+              <div className="flex space-x-4">
+                <div className="flex-1">
+                  <Input
+                    label="First Name *"
+                    id="first"
+                    name="first"
+                    layout="vertical"
+                    placeholder="Jane"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <Input
+                    label="Last Name *"
+                    id="last"
+                    name="last"
+                    layout="vertical"
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
 
-              <div className="h-24">
-                <Input
-                  label="Last Name *"
-                  id="last"
-                  name="last"
-                  layout="vertical"
-                  placeholder="Doe"
-                />
-              </div>
-
-              <div className="h-24">
+              <div>
                 <Input
                   label="Company Name"
                   id="company"
@@ -119,7 +121,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <InputNumber
                   label="Company Size"
                   id="size"
@@ -129,7 +131,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <Input
                   label="Job Title"
                   id="title"
@@ -139,7 +141,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <Input
                   label="Business email *"
                   id="email"
@@ -149,7 +151,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <Input
                   label="Phone Number"
                   id="phone"
@@ -159,7 +161,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <Select
                   label="Country / Main Timezone"
                   id="country"
