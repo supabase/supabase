@@ -24,7 +24,7 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, withAuth, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
@@ -60,6 +60,7 @@ const Wizard: NextPageWithLayout = () => {
   const { app, ui } = useStore()
 
   const subscriptionStats = useSubscriptionStats()
+  const projectCreationDisabled = useFlag('disableProjectCreation')
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -191,11 +192,6 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/project/${response.ref}/building`)
     }
   }
-
-  /**
-   * Disable project creation override
-   */
-  const projectCreationDisabled = false
 
   return (
     <Panel
