@@ -32,7 +32,7 @@
 ## ステータス
 
 - [x] Alpha: 限られたユーザーで Supabase をテストしています。
-- [x] Public Alpha: 誰でも[app.supabase.io](https://app.supabase.io)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
+- [x] Public Alpha: 誰でも[app.supabase.com](https://app.supabase.com)から登録ができます。ただし、バグなどがある可能性がありますので、ご容赦ください。
 - [x] Public Beta: 企業以外のほとんどのユースケースに耐えうる十分な安定性を確保。
 - [ ] Public: 実用的な用途に対応
 
@@ -48,7 +48,7 @@ Supabase は、オープンソースのツールを組み合わせてできて�
 
 **現在のアーキテクチャ**
 
-Supabase は[ホスティングされたプラットフォーム](https://app.supabase.io)です。登録するだけで、何もインストールせずに使い始めることができます。
+Supabase は[ホスティングされたプラットフォーム](https://app.supabase.com)です。登録するだけで、何もインストールせずに使い始めることができます。
 更に現在ローカルでの開発環境を整えており、これはプラットフォームの安定性と並んで今最優先で進めているプロジェクトになります。
 
 ![アーキテクチャー](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)

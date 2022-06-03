@@ -124,18 +124,3 @@
     flex-direction: column;
   }
 }
-
-.navbar {
-  height: 60px;
-}
-.sidebar {
-  width: 300px;
-}
-
-.navLinks li {
-  margin-left: 2.5em;
-}
-.navRight > * {
-  margin-left: 1em;
-  margin-right: 1em;
-}

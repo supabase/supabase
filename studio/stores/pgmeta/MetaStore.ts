@@ -1,7 +1,8 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
-import { Query } from '@supabase/grid'
+import { Query } from 'components/grid/query/Query'
+
 import {
   PostgresColumn,
   PostgresTable,

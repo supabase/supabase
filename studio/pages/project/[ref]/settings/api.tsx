@@ -31,6 +31,8 @@ import {
   IconRefreshCw,
   IconChevronDown,
   IconLoader,
+  IconEye,
+  IconEyeOff,
 } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
@@ -117,6 +119,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const router = useRouter()
   const { ref } = router.query
 
+  const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [customToken, setCustomToken] = useState<string>('')
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
@@ -389,7 +392,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Button>
             <Button
               type="primary"
-              disabled={customToken.length < 32}
+              disabled={
+                customToken.length < 32 || customToken.includes('@') || customToken.includes('$')
+              }
               loading={isSubmittingJwtSecretUpdateRequest}
               onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
             >
@@ -413,10 +418,19 @@ const ServiceList: FC<any> = ({ projectRef }) => {
               onChange={(e: any) => setCustomToken(e.target.value)}
               value={customToken}
               icon={<IconKey />}
-              type="password"
+              type={showCustomTokenInput ? 'text' : 'password'}
               className="w-full text-left"
               label="Custom JWT secret"
-              descriptionText="Must be at least 32 characters long"
+              descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
+              actions={
+                <div className="mr-1 flex items-center justify-center">
+                  <Button
+                    type="default"
+                    icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
+                    onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
+                  />
+                </div>
+              }
             />
           </div>
         </Modal.Content>
