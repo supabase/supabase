@@ -3,7 +3,7 @@ import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -38,11 +38,6 @@ const ProUpgrade: FC<Props> = ({
   isLoadingPaymentMethods,
   onSelectBack,
 }) => {
-  /**
-   * Feature flags
-   */
-  const nativeBilling = useFlag('nativeBilling')
-
   const { app, ui } = useStore()
   const router = useRouter()
 
@@ -222,7 +217,7 @@ const ProUpgrade: FC<Props> = ({
                       onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                     />
                   </div>
-                  {nativeBilling && projectRegion !== 'af-south-1' && (
+                  {projectRegion !== 'af-south-1' && (
                     <>
                       <Divider light />
                       <ComputeSizeSelection
