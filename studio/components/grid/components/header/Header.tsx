@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ onAddColumn, onAddRow, headerActions })
   const { selectedRows } = state
 
   return (
-    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 justify-between px-5">
+    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5">
       {selectedRows.size > 0 ? (
         <RowHeader />
       ) : (
@@ -126,47 +126,39 @@ const RowHeader: React.FC<RowHeaderProps> = ({}) => {
   }
 
   return (
-    <>
-      <Button
-        type="text"
-        style={{ padding: '4px' }}
-        icon={<IconX size="tiny" strokeWidth={2} />}
-        onClick={deselectRows}
-      />
-      <div>
-        <Typography.Text small type="secondary" className="row_header__selected-rows">
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3">
+        <Button
+          type="default"
+          style={{ padding: '3px' }}
+          icon={<IconX size="tiny" strokeWidth={2} />}
+          onClick={deselectRows}
+        />
+        <span className="text-scale-1200 text-xs">
           {selectedRows.size > 1
             ? `${selectedRows.size} rows selected`
             : `${selectedRows.size} row selected`}
-        </Typography.Text>
+        </span>
       </div>
-      <Button
-        type="primary"
-        size="tiny"
-        // style={{ padding: '4px 8px' }}
-
-        icon={<IconDownload />}
-        onClick={onRowsExportCsv}
-      >
-        Export to csv
-      </Button>
-      {editable && (
-        <>
-          <Divider type="vertical" className="sb-grid-header__inner__divider" light />
-          <Button
-            type="default"
-            size="tiny"
-            // style={{ padding: '4px 8px' }}
-
-            icon={<IconTrash size="tiny" />}
-            onClick={onRowsDelete}
-          >
-            {selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
-          </Button>
-        </>
-      )}
-    </>
+      <div className="flex items-center gap-2">
+        <Button type="primary" size="tiny" icon={<IconDownload />} onClick={onRowsExportCsv}>
+          Export to csv
+        </Button>
+        {editable && (
+          <>
+            <Button
+              type="default"
+              size="tiny"
+              icon={<IconTrash size="tiny" />}
+              onClick={onRowsDelete}
+            >
+              {selectedRows.size > 1
+                ? `Delete ${selectedRows.size} rows`
+                : `Delete ${selectedRows.size} row`}
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
   )
 }

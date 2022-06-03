@@ -1,6 +1,6 @@
 import React from 'react'
 import Main from '.'
-import '../styles/tailwind.css'
+import '../styles/main.css'
 
 const Index = () => {
   return <Main />
