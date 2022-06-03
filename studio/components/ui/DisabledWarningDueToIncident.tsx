@@ -1,13 +1,18 @@
+import { FC } from 'react'
 import { IconAlertCircle } from '@supabase/ui'
 import InformationBox from 'components/ui/InformationBox'
 
-const AddonUpdateDisabledWarning = () => {
+interface Props {
+  title: string
+}
+
+const DisabledWarningDueToIncident: FC<Props> = ({ title }) => {
   return (
     <InformationBox
       icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
       defaultVisibility={true}
       hideCollapse
-      title="Updating database add-ons is currently disabled"
+      title={title}
       description={
         <div className="space-y-3">
           <p className="text-sm leading-normal">
@@ -22,4 +27,4 @@ const AddonUpdateDisabledWarning = () => {
   )
 }
 
-export default AddonUpdateDisabledWarning
+export default DisabledWarningDueToIncident

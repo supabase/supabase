@@ -29,10 +29,10 @@ import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
-  ProjectCreationDisabledWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
 
@@ -231,7 +231,7 @@ const Wizard: NextPageWithLayout = () => {
         </Panel.Content>
         {projectCreationDisabled ? (
           <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
-            <ProjectCreationDisabledWarning />
+            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
           <>

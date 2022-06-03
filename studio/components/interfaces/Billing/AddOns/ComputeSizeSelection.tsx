@@ -4,7 +4,7 @@ import { Badge, Button, Radio } from '@supabase/ui'
 
 import { useStore, useFlag } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
-import AddonUpdateDisabledWarning from './AddonUpdateDisabledWarning'
+import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 
 interface Props {
   computeSizes: any[]
@@ -29,7 +29,7 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
         </p>
       </div>
       {addonUpdateDisabled ? (
-        <AddonUpdateDisabledWarning />
+        <DisabledWarningDueToIncident title="Updating database add-ons is currently disabled" />
       ) : (
         <Radio.Group type="cards" className="billing-compute-radio">
           {computeSizes.map((option: any) => {
