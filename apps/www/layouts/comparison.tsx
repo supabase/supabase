@@ -1,18 +1,14 @@
-import { Badge, Divider, IconChevronLeft, IconFile } from '@supabase/ui'
+import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-import ReactMarkdown from 'react-markdown'
+import { Gfm } from 'remark-gfm'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { generateReadingTime } from '~/lib/helpers'
-import authors from 'lib/authors.json'
-
-import blogStyles from './[slug].module.css'
-import { Gfm } from 'remark-gfm'
 
 interface Props {
   components: React.ReactNode
