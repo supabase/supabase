@@ -42,18 +42,20 @@ class _SignUpPageState extends State<SignUpPage> {
               _passwordController,
             ),
             boxSmall(),
-            buttonCustom("Sign Up", () {
-              AuthSupabase.createAccount(
+            buttonCustom(
+                text: "Sign Up",
+                onPressed: () async {
+                  var value = await AuthSupabase.createAccount(
                       email: _emailController.text,
-                      password: _passwordController.text)
-                  .then((value) {
-                if (value == true) {
-                  CrudSupabase.addUser(
-                      name: _nameController.text, email: _emailController.text);
-                  Navigator.pushNamed(context, "/signin");
-                }
-              });
-            }, true)
+                      password: _passwordController.text);
+                  if (value == true) {
+                    CrudSupabase.addUser(
+                        name: _nameController.text,
+                        email: _emailController.text);
+                    Navigator.pushReplacementNamed(context, "/signin");
+                  }
+                },
+                filled: true)
           ],
         ),
       ),

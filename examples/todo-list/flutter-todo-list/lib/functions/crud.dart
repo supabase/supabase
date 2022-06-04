@@ -77,12 +77,10 @@ class CrudSupabase {
 
   static Future<dynamic> addUser(
       {required String name, required String email}) async {
-    final res = await AuthSupabase.client.from('Users').insert([
-      {
-        "name": name,
-        "email": email,
-      }
-    ]).execute();
+    final res = await AuthSupabase.client.from('Users').insert({
+      "name": name,
+      "email": email,
+    }).execute();
     print("adding number");
     final data = res.data;
     final error = res.error;

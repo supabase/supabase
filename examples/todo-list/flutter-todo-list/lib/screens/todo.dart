@@ -78,12 +78,13 @@ class _TodoPageState extends State<TodoPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
-        title: Text('Hey ${userName.split(" ")[0]}, add todo'),
+        title: Text('Hey $userName, add todo'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              AuthSupabase.logOut(context);
+            onPressed: () async {
+              await AuthSupabase.logOut(context);
+              Navigator.pop(context, '/');
             },
           ),
         ],
