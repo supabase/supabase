@@ -184,7 +184,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod', 'guides/platfrom/performance'],
+      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod', 'guides/platform/performance'],
     },
     {
       type: 'category',
