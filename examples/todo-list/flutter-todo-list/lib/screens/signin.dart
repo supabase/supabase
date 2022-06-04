@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:todosupabase/constant.dart';
 import 'package:todosupabase/functions/auth.dart';
-import 'package:todosupabase/functions/crud.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -26,17 +25,17 @@ class _SignInPageState extends State<SignInPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            boxLarge(),
+            largeGap,
             textFeildCustom(
               "Email",
               _emailController,
             ),
-            boxSmall(),
+            smallGap,
             textFeildCustom(
               "Password",
               _passwordController,
             ),
-            boxSmall(),
+            smallGap,
             loading
                 ? Container(
                     height: 50,
@@ -49,8 +48,8 @@ class _SignInPageState extends State<SignInPage> {
                       child: CircularProgressIndicator(),
                     ),
                   )
-                : buttonCustom(
-                    text: "Sign In",
+                : OutlinedButton(
+                    child: const Text("Sign In"),
                     onPressed: () async {
                       setState(() {
                         loading = true;
@@ -69,7 +68,7 @@ class _SignInPageState extends State<SignInPage> {
                             message: "Invalid Email or Password");
                       }
                     },
-                    filled: true)
+                  )
           ],
         ),
       ),

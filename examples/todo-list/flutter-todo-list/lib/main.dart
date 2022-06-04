@@ -25,6 +25,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       darkTheme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            primary: Colors.white,
+            side: const BorderSide(color: Colors.white, width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(16),
+          ),
+        ),
         textTheme: const TextTheme(
           bodyText1: TextStyle(color: Colors.white),
           bodyText2: TextStyle(color: Colors.white),
@@ -61,20 +71,20 @@ class MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            boxLarge(),
-            buttonCustom(
-                text: "Sign In",
-                onPressed: () {
-                  Navigator.pushNamed(context, "/signin");
-                },
-                filled: false),
-            boxSmall(),
-            buttonCustom(
-                text: "Sign Up",
-                onPressed: () {
-                  Navigator.pushNamed(context, "/signup");
-                },
-                filled: false)
+            largeGap,
+            OutlinedButton(
+              child: const Text("Sign In"),
+              onPressed: () {
+                Navigator.pushNamed(context, "/signin");
+              },
+            ),
+            smallGap,
+            OutlinedButton(
+              child: const Text("Sign Up"),
+              onPressed: () {
+                Navigator.pushNamed(context, "/signup");
+              },
+            )
           ],
         ),
       ),
