@@ -49,22 +49,27 @@ class _SignInPageState extends State<SignInPage> {
                       child: CircularProgressIndicator(),
                     ),
                   )
-                : buttonCustom("Sign In", () {
-                    setState(() {
-                      loading = true;
-                    });
-                    AuthSupabase.loginUser(
-                            email: _emailController.text,
-                            password: _passwordController.text)
-                        .then((value) {
+                : buttonCustom(
+                    text: "Sign In",
+                    onPressed: () async {
+                      setState(() {
+                        loading = true;
+                      });
+                      var value = await AuthSupabase.loginUser(
+                          email: _emailController.text,
+                          password: _passwordController.text);
                       setState(() {
                         loading = false;
                       });
                       if (value != null) {
-                        Navigator.pushNamed(context, '/todo');
+                        Navigator.pushReplacementNamed(context, '/todo');
+                      } else {
+                        snackbarAlert(
+                            context: context,
+                            message: "Invalid Email or Password");
                       }
-                    });
-                  }, true)
+                    },
+                    filled: true)
           ],
         ),
       ),

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 boxSmall() => const SizedBox(height: 20);
 boxLarge() => const SizedBox(height: 40);
 
-Widget buttonCustom(String text, Function() onPressed, bool filled) {
+Widget buttonCustom(
+    {required String text,
+    required Function() onPressed,
+    required bool filled}) {
   return GestureDetector(
     onTap: onPressed,
     child: Container(
@@ -99,4 +103,15 @@ Future<void> displayTextInputDialog(
           ),
         );
       });
+}
+
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackbarAlert(
+    {required BuildContext context, required String message}) {
+  return ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.red,
+    ),
+  );
 }

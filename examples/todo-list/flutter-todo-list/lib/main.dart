@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todosupabase/constant.dart';
+import 'package:todosupabase/functions/auth.dart';
 import 'package:todosupabase/screens/signup.dart';
 import 'package:todosupabase/screens/signin.dart';
 import 'package:todosupabase/screens/todo.dart';
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
           bodyText2: TextStyle(color: Colors.white),
         ),
       ),
-      initialRoute: "/",
+      initialRoute:
+          AuthSupabase.client.auth.currentSession != null ? "/todo" : "/",
       routes: {
         "/": (context) => const MyHomePage(),
         "/signup": (context) => const SignUpPage(),
@@ -60,13 +62,19 @@ class MyHomePageState extends State<MyHomePage> {
           children: [
             SvgPicture.asset("assets/supabase-dark.svg", width: 200),
             boxLarge(),
-            buttonCustom("Sign In", () {
-              Navigator.pushNamed(context, "/signin");
-            }, false),
+            buttonCustom(
+                text: "Sign In",
+                onPressed: () {
+                  Navigator.pushNamed(context, "/signin");
+                },
+                filled: false),
             boxSmall(),
-            buttonCustom("Sign Up", () {
-              Navigator.pushNamed(context, "/signup");
-            }, false)
+            buttonCustom(
+                text: "Sign Up",
+                onPressed: () {
+                  Navigator.pushNamed(context, "/signup");
+                },
+                filled: false)
           ],
         ),
       ),
