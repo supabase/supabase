@@ -18,44 +18,46 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            largeGap,
-            textFeildCustom(
-              "Full Name",
-              _nameController,
-            ),
-            smallGap,
-            textFeildCustom(
-              "Email",
-              _emailController,
-            ),
-            smallGap,
-            textFeildCustom(
-              "Password",
-              _passwordController,
-            ),
-            smallGap,
-            OutlinedButton(
-              child: const Text("Sign Up"),
-              onPressed: () async {
-                var value = await AuthSupabase.createAccount(
-                    email: _emailController.text,
-                    password: _passwordController.text);
-                if (value == true) {
-                  CrudSupabase.addUser(
-                      name: _nameController.text, email: _emailController.text);
-                  Navigator.pushReplacementNamed(context, "/signin");
-                }
-              },
-            )
-          ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              largeGap,
+              textFeildCustom(
+                "Full Name",
+                _nameController,
+              ),
+              smallGap,
+              textFeildCustom(
+                "Email",
+                _emailController,
+              ),
+              smallGap,
+              textFeildCustom(
+                "Password",
+                _passwordController,
+              ),
+              smallGap,
+              ElevatedButton(
+                child: const Text("Sign Up"),
+                onPressed: () async {
+                  var value = await AuthSupabase.createAccount(
+                      email: _emailController.text,
+                      password: _passwordController.text);
+                  if (value == true) {
+                    CrudSupabase.addUser(
+                        name: _nameController.text,
+                        email: _emailController.text);
+                    Navigator.pushReplacementNamed(context, "/signin");
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

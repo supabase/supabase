@@ -22,13 +22,25 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      darkTheme: ThemeData(
+      theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             primary: Colors.white,
             side: const BorderSide(color: Colors.white, width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.all(16),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.white,
+            onPrimary: Colors.black,
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -63,29 +75,30 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            largeGap,
-            OutlinedButton(
-              child: const Text("Sign In"),
-              onPressed: () {
-                Navigator.pushNamed(context, "/signin");
-              },
-            ),
-            smallGap,
-            OutlinedButton(
-              child: const Text("Sign Up"),
-              onPressed: () {
-                Navigator.pushNamed(context, "/signup");
-              },
-            )
-          ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              largeGap,
+              OutlinedButton(
+                child: const Text("Sign In"),
+                onPressed: () {
+                  Navigator.pushNamed(context, "/signin");
+                },
+              ),
+              smallGap,
+              OutlinedButton(
+                child: const Text("Sign Up"),
+                onPressed: () {
+                  Navigator.pushNamed(context, "/signup");
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
