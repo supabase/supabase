@@ -1,37 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-boxSmall() => const SizedBox(height: 20);
-boxLarge() => const SizedBox(height: 40);
-
-Widget buttonCustom(
-    {required String text,
-    required Function() onPressed,
-    required bool filled}) {
-  return GestureDetector(
-    onTap: onPressed,
-    child: Container(
-      height: 50,
-      width: 300,
-      decoration: BoxDecoration(
-        color: filled ? Colors.white : Colors.transparent,
-        border: Border.all(
-          color: Colors.white,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-              color: filled ? Colors.black : Colors.white,
-              fontWeight: FontWeight.bold),
-        ),
-      ),
-    ),
-  );
-}
+const smallGap = SizedBox(height: 20);
+const largeGap = SizedBox(height: 40);
 
 Widget textFeildCustom(String hintText, TextEditingController ctlr) {
   return SizedBox(
@@ -74,7 +44,7 @@ Future<void> displayTextInputDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add a todo'),
+          title: const Text('Add a todo'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -89,7 +59,7 @@ Future<void> displayTextInputDialog(
                 decoration:
                     const InputDecoration(hintText: "Add Due Date in DD/MM"),
               ),
-              boxSmall(),
+              smallGap,
               MaterialButton(
                 onPressed: onTab,
                 child: const Text("Add Task",
@@ -97,7 +67,7 @@ Future<void> displayTextInputDialog(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     )),
-                color: Color(0xff33b27b),
+                color: const Color(0xff33b27b),
               )
             ],
           ),

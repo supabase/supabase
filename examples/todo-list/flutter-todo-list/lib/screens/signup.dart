@@ -26,40 +26,38 @@ class _SignUpPageState extends State<SignUpPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            boxLarge(),
+            largeGap,
             textFeildCustom(
               "Full Name",
               _nameController,
             ),
-            boxSmall(),
+            smallGap,
             textFeildCustom(
               "Email",
               _emailController,
             ),
-            boxSmall(),
+            smallGap,
             textFeildCustom(
               "Password",
               _passwordController,
             ),
-            boxSmall(),
-            buttonCustom(
-                text: "Sign Up",
-                onPressed: () async {
-                  var value = await AuthSupabase.createAccount(
-                      email: _emailController.text,
-                      password: _passwordController.text);
-                  if (value == true) {
-                    CrudSupabase.addUser(
-                        name: _nameController.text,
-                        email: _emailController.text);
-                    Navigator.pushReplacementNamed(context, "/signin");
-                  }
-                },
-                filled: true)
+            smallGap,
+            OutlinedButton(
+              child: const Text("Sign Up"),
+              onPressed: () async {
+                var value = await AuthSupabase.createAccount(
+                    email: _emailController.text,
+                    password: _passwordController.text);
+                if (value == true) {
+                  CrudSupabase.addUser(
+                      name: _nameController.text, email: _emailController.text);
+                  Navigator.pushReplacementNamed(context, "/signin");
+                }
+              },
+            )
           ],
         ),
       ),
     );
-    ;
   }
 }
