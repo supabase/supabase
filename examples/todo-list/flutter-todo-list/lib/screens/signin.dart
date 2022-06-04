@@ -17,59 +17,60 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset("assets/supabase-dark.svg", width: 200),
-            largeGap,
-            textFeildCustom(
-              "Email",
-              _emailController,
-            ),
-            smallGap,
-            textFeildCustom(
-              "Password",
-              _passwordController,
-            ),
-            smallGap,
-            loading
-                ? Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : OutlinedButton(
-                    child: const Text("Sign In"),
-                    onPressed: () async {
-                      setState(() {
-                        loading = true;
-                      });
-                      var value = await AuthSupabase.loginUser(
-                          email: _emailController.text,
-                          password: _passwordController.text);
-                      setState(() {
-                        loading = false;
-                      });
-                      if (value != null) {
-                        Navigator.pushReplacementNamed(context, '/todo');
-                      } else {
-                        snackbarAlert(
-                            context: context,
-                            message: "Invalid Email or Password");
-                      }
-                    },
-                  )
-          ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              largeGap,
+              textFeildCustom(
+                "Email",
+                _emailController,
+              ),
+              smallGap,
+              textFeildCustom(
+                "Password",
+                _passwordController,
+              ),
+              smallGap,
+              loading
+                  ? Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : ElevatedButton(
+                      child: const Text("Sign In"),
+                      onPressed: () async {
+                        setState(() {
+                          loading = true;
+                        });
+                        var value = await AuthSupabase.loginUser(
+                            email: _emailController.text,
+                            password: _passwordController.text);
+                        setState(() {
+                          loading = false;
+                        });
+                        if (value != null) {
+                          Navigator.pushReplacementNamed(context, '/todo');
+                        } else {
+                          snackbarAlert(
+                              context: context,
+                              message: "Invalid Email or Password");
+                        }
+                      },
+                    )
+            ],
+          ),
         ),
       ),
     );

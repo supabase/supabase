@@ -24,9 +24,9 @@ class _TodoPageState extends State<TodoPage> {
       userName = nameVal[0]['name'];
     });
     List<dynamic> value = await CrudSupabase.getTodo();
-    value.forEach((element) {
+    for (var element in value) {
       todos.add(element);
-    });
+    }
     setState(() {
       loading = false;
     });
@@ -34,9 +34,8 @@ class _TodoPageState extends State<TodoPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     initFunc();
+    super.initState();
   }
 
   @override
@@ -49,32 +48,6 @@ class _TodoPageState extends State<TodoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xff33b27b),
-        onPressed: () {
-          displayTextInputDialog(context, () async {
-            await CrudSupabase.addTodo(
-              task: _taskEditingController.text,
-              due: _dueEditingController.text,
-            );
-            Navigator.pop(context);
-            setState(() {
-              loading = true;
-            });
-
-            List<dynamic> value = await CrudSupabase.getTodo();
-            todos.clear();
-            setState(() {});
-            value.forEach((element) {
-              todos.add(element);
-            });
-            setState(() {
-              loading = false;
-            });
-          }, _taskEditingController, _dueEditingController);
-        },
-        child: const Icon(Icons.add),
-      ),
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
@@ -117,9 +90,9 @@ class _TodoPageState extends State<TodoPage> {
                                   await CrudSupabase.getTodo();
                               todos.clear();
                               setState(() {});
-                              value.forEach((element) {
+                              for (var element in value) {
                                 todos.add(element);
-                              });
+                              }
                               setState(() {
                                 loading = false;
                               });
@@ -127,11 +100,11 @@ class _TodoPageState extends State<TodoPage> {
                           },
                           title: Text(
                             todos[index]["task"],
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                           subtitle: Text(
                             todos[index]["due"],
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                           leading: GestureDetector(
                             onTap: () async {
@@ -144,9 +117,9 @@ class _TodoPageState extends State<TodoPage> {
                                   await CrudSupabase.getTodo();
                               todos.clear();
                               setState(() {});
-                              value.forEach((element) {
+                              for (var element in value) {
                                 todos.add(element);
-                              });
+                              }
                               setState(() {
                                 loading = false;
                               });
@@ -168,9 +141,9 @@ class _TodoPageState extends State<TodoPage> {
                                   await CrudSupabase.getTodo();
                               todos.clear();
                               setState(() {});
-                              value.forEach((element) {
+                              for (var element in value) {
                                 todos.add(element);
-                              });
+                              }
                               setState(() {
                                 loading = false;
                               });
@@ -202,6 +175,32 @@ class _TodoPageState extends State<TodoPage> {
                         );
                       },
                     )),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xff33b27b),
+        onPressed: () {
+          displayTextInputDialog(context, () async {
+            await CrudSupabase.addTodo(
+              task: _taskEditingController.text,
+              due: _dueEditingController.text,
+            );
+            Navigator.pop(context);
+            setState(() {
+              loading = true;
+            });
+
+            List<dynamic> value = await CrudSupabase.getTodo();
+            todos.clear();
+            setState(() {});
+            for (var element in value) {
+              todos.add(element);
+            }
+            setState(() {
+              loading = false;
+            });
+          }, _taskEditingController, _dueEditingController);
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
