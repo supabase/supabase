@@ -49,12 +49,23 @@ class MyApp extends StatelessWidget {
         ),
         inputDecorationTheme: InputDecorationTheme(
           labelStyle: const TextStyle(color: Colors.white),
-          border: OutlineInputBorder(
+          focusColor: Colors.green,
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(
               color: Colors.white,
               width: 2,
             ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Colors.green,
+              width: 2,
+            ),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         textTheme: const TextTheme(

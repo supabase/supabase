@@ -26,14 +26,16 @@ class _SignInPageState extends State<SignInPage> {
             children: [
               SvgPicture.asset("assets/supabase-dark.svg", width: 200),
               largeGap,
-              textFeildCustom(
-                "Email",
-                _emailController,
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(label: Text('Email')),
+                keyboardType: TextInputType.emailAddress,
               ),
               smallGap,
-              textFeildCustom(
-                "Password",
-                _passwordController,
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(label: Text('Password')),
+                obscureText: true,
               ),
               smallGap,
               loading

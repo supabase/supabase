@@ -3,37 +3,6 @@ import 'package:flutter/material.dart';
 const smallGap = SizedBox(height: 20);
 const largeGap = SizedBox(height: 40);
 
-Widget textFeildCustom(String hintText, TextEditingController ctlr) {
-  return SizedBox(
-    height: 70,
-    width: 300,
-    child: TextField(
-      controller: ctlr,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Colors.white,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: Colors.white,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: Colors.white,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-    ),
-  );
-}
-
 Future<void> displayTextInputDialog(
   BuildContext context,
   Function()? onTab,
