@@ -11,7 +11,7 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoPageState extends State<TodoPage> {
-  String userName = "";
+  String userName = '';
   bool loading = true;
   List<dynamic> todos = [];
   final TextEditingController _taskEditingController = TextEditingController();
