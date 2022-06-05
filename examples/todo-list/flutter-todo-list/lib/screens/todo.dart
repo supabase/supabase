@@ -17,9 +17,10 @@ class _TodoPageState extends State<TodoPage> {
   final TextEditingController _taskEditingController = TextEditingController();
   final TextEditingController _dueEditingController = TextEditingController();
 
-  void initFunc() async {
+  Future<void> initFunc() async {
     var nameVal = await CrudSupabase.getUser(
-        email: AuthSupabase.client.auth.currentUser!.email.toString());
+      email: AuthSupabase.client.auth.currentUser!.email.toString(),
+    );
     setState(() {
       userName = nameVal[0]['name'];
     });
@@ -43,6 +44,50 @@ class _TodoPageState extends State<TodoPage> {
     super.dispose();
     _taskEditingController.dispose();
     _dueEditingController.dispose();
+  }
+
+  Future<void> displayTextInputDialog({
+    required BuildContext context,
+    void Function()? onTab,
+    required TextEditingController taskCtrl,
+    required TextEditingController dueCtrl,
+  }) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add a todo'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: taskCtrl,
+                decoration:
+                    const InputDecoration(hintText: 'Add title of todo'),
+              ),
+              TextField(
+                controller: dueCtrl,
+                keyboardType: TextInputType.datetime,
+                decoration:
+                    const InputDecoration(hintText: 'Add Due Date in DD/MM'),
+              ),
+              smallGap,
+              MaterialButton(
+                onPressed: onTab,
+                child: const Text(
+                  'Add Task',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                color: const Color(0xff33b27b),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -69,7 +114,7 @@ class _TodoPageState extends State<TodoPage> {
               width: double.infinity,
               child: todos.isEmpty
                   ? const Center(
-                      child: Text("No Task, add new task"),
+                      child: Text('No Task, add new task'),
                     )
                   : ListView.builder(
                       itemCount: todos.length,
@@ -77,33 +122,39 @@ class _TodoPageState extends State<TodoPage> {
                         return ListTile(
                           //Long Press to edit
                           onLongPress: () {
-                            displayTextInputDialog(context, () async {
-                              await CrudSupabase.editTask(
-                                  id: todos[index]["id"].toString(),
+                            displayTextInputDialog(
+                              context: context,
+                              taskCtrl: _taskEditingController,
+                              dueCtrl: _dueEditingController,
+                              onTab: () async {
+                                await CrudSupabase.editTask(
+                                  id: todos[index]['id'].toString(),
                                   due: _dueEditingController.text,
-                                  task: _taskEditingController.text);
-                              Navigator.pop(context);
-                              setState(() {
-                                loading = true;
-                              });
-                              List<dynamic> value =
-                                  await CrudSupabase.getTodo();
-                              todos.clear();
-                              setState(() {});
-                              for (var element in value) {
-                                todos.add(element);
-                              }
-                              setState(() {
-                                loading = false;
-                              });
-                            }, _taskEditingController, _dueEditingController);
+                                  task: _taskEditingController.text,
+                                );
+                                Navigator.pop(context);
+                                setState(() {
+                                  loading = true;
+                                });
+                                List<dynamic> value =
+                                    await CrudSupabase.getTodo();
+                                todos.clear();
+                                setState(() {});
+                                for (var element in value) {
+                                  todos.add(element);
+                                }
+                                setState(() {
+                                  loading = false;
+                                });
+                              },
+                            );
                           },
                           title: Text(
-                            todos[index]["task"],
+                            todos[index]['task'],
                             style: const TextStyle(color: Colors.white),
                           ),
                           subtitle: Text(
-                            todos[index]["due"],
+                            todos[index]['due'],
                             style: const TextStyle(color: Colors.white),
                           ),
                           leading: GestureDetector(
@@ -112,7 +163,8 @@ class _TodoPageState extends State<TodoPage> {
                                 loading = true;
                               });
                               await CrudSupabase.deleteTodo(
-                                  id: todos[index]["id"].toString());
+                                id: todos[index]['id'].toString(),
+                              );
                               List<dynamic> value =
                                   await CrudSupabase.getTodo();
                               todos.clear();
@@ -135,8 +187,9 @@ class _TodoPageState extends State<TodoPage> {
                                 loading = true;
                               });
                               await CrudSupabase.taskDone(
-                                  id: todos[index]["id"].toString(),
-                                  value: !todos[index]["done"]);
+                                id: todos[index]['id'].toString(),
+                                value: !todos[index]['done'],
+                              );
                               List<dynamic> value =
                                   await CrudSupabase.getTodo();
                               todos.clear();
@@ -156,12 +209,12 @@ class _TodoPageState extends State<TodoPage> {
                                   color: const Color(0xff33b27b),
                                   width: 2,
                                 ),
-                                color: todos[index]["done"]
+                                color: todos[index]['done']
                                     ? const Color(0xff33b27b)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child: todos[index]["done"]
+                              child: todos[index]['done']
                                   ? const Center(
                                       child: Icon(
                                         Icons.done,
@@ -174,32 +227,38 @@ class _TodoPageState extends State<TodoPage> {
                           ),
                         );
                       },
-                    )),
+                    ),
+            ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xff33b27b),
-        onPressed: () {
-          displayTextInputDialog(context, () async {
-            await CrudSupabase.addTodo(
-              task: _taskEditingController.text,
-              due: _dueEditingController.text,
-            );
-            Navigator.pop(context);
-            setState(() {
-              loading = true;
-            });
-
-            List<dynamic> value = await CrudSupabase.getTodo();
-            todos.clear();
-            setState(() {});
-            for (var element in value) {
-              todos.add(element);
-            }
-            setState(() {
-              loading = false;
-            });
-          }, _taskEditingController, _dueEditingController);
-        },
         child: const Icon(Icons.add),
+        onPressed: () {
+          displayTextInputDialog(
+            context: context,
+            taskCtrl: _taskEditingController,
+            dueCtrl: _dueEditingController,
+            onTab: () async {
+              await CrudSupabase.addTodo(
+                task: _taskEditingController.text,
+                due: _dueEditingController.text,
+              );
+              Navigator.pop(context);
+              setState(() {
+                loading = true;
+              });
+
+              List<dynamic> value = await CrudSupabase.getTodo();
+              todos.clear();
+              setState(() {});
+              for (var element in value) {
+                todos.add(element);
+              }
+              setState(() {
+                loading = false;
+              });
+            },
+          );
+        },
       ),
     );
   }

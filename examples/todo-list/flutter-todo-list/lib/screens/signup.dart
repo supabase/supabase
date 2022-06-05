@@ -18,6 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 300),
@@ -25,19 +26,19 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              SvgPicture.asset('assets/supabase-dark.svg', width: 200),
               largeGap,
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  label: Text('Full Name'),
+                  label: Text('Username'),
                 ),
               ),
               smallGap,
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  label: Text('Full Name'),
+                  label: Text('Email'),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -51,16 +52,18 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               smallGap,
               ElevatedButton(
-                child: const Text("Sign Up"),
+                child: const Text('Sign Up'),
                 onPressed: () async {
-                  var value = await AuthSupabase.createAccount(
-                      email: _emailController.text,
-                      password: _passwordController.text);
+                  final value = await AuthSupabase.createAccount(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                  );
                   if (value == true) {
                     CrudSupabase.addUser(
-                        name: _nameController.text,
-                        email: _emailController.text);
-                    Navigator.pushReplacementNamed(context, "/signin");
+                      name: _nameController.text,
+                      email: _emailController.text,
+                    );
+                    Navigator.pushReplacementNamed(context, '/signin');
                   }
                 },
               )

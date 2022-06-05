@@ -17,6 +17,7 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 300),
@@ -24,7 +25,7 @@ class _SignInPageState extends State<SignInPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              SvgPicture.asset('assets/supabase-dark.svg', width: 200),
               largeGap,
               TextFormField(
                 controller: _emailController,
@@ -33,7 +34,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               smallGap,
               TextFormField(
-                controller: _emailController,
+                controller: _passwordController,
                 decoration: const InputDecoration(label: Text('Password')),
                 obscureText: true,
               ),
@@ -51,14 +52,15 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     )
                   : ElevatedButton(
-                      child: const Text("Sign In"),
+                      child: const Text('Sign In'),
                       onPressed: () async {
                         setState(() {
                           loading = true;
                         });
                         var value = await AuthSupabase.loginUser(
-                            email: _emailController.text,
-                            password: _passwordController.text);
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        );
                         setState(() {
                           loading = false;
                         });
