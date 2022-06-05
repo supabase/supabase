@@ -27,10 +27,16 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               SvgPicture.asset("assets/supabase-dark.svg", width: 200),
               largeGap,
-              textFeildCustom(
-                "Full Name",
-                _nameController,
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  label: Text('Full Name'),
+                ),
               ),
+              // textFeildCustom(
+              //   "Full Name",
+              //   _nameController,
+              // ),
               smallGap,
               textFeildCustom(
                 "Email",

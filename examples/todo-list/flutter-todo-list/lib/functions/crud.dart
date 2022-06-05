@@ -1,9 +1,9 @@
-import 'dart:convert';
-
 import 'package:todosupabase/functions/auth.dart';
 
 class CrudSupabase {
-  static Future<dynamic> getUser({required String email}) async {
+  static Future<dynamic> getUser({
+    required String email,
+  }) async {
     final res = await AuthSupabase.client
         .from('Users')
         .select()
