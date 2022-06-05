@@ -33,19 +33,21 @@ class _SignUpPageState extends State<SignUpPage> {
                   label: Text('Full Name'),
                 ),
               ),
-              // textFeildCustom(
-              //   "Full Name",
-              //   _nameController,
-              // ),
               smallGap,
-              textFeildCustom(
-                "Email",
-                _emailController,
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  label: Text('Full Name'),
+                ),
+                keyboardType: TextInputType.emailAddress,
               ),
               smallGap,
-              textFeildCustom(
-                "Password",
-                _passwordController,
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  label: Text('Password'),
+                ),
+                obscureText: true,
               ),
               smallGap,
               ElevatedButton(
