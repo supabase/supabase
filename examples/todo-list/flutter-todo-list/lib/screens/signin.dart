@@ -65,9 +65,8 @@ class _SignInPageState extends State<SignInPage> {
                         if (value != null) {
                           Navigator.pushReplacementNamed(context, '/todo');
                         } else {
-                          snackbarAlert(
-                              context: context,
-                              message: "Invalid Email or Password");
+                          context
+                              .showErrorSnackbar('Invalid Email or Password');
                         }
                       },
                     )
