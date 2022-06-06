@@ -4,7 +4,7 @@ import { useFlag } from 'hooks'
 import { IconExternalLink } from '@supabase/ui'
 
 const AppBannerWrapper: FC = ({ children }) => {
-  const ongoingIncident = true
+  const ongoingIncident = useFlag('ongoingIncident')
 
   return (
     <div className="flex flex-col">
