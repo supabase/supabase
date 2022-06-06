@@ -644,6 +644,7 @@ export default function IndexPage() {
                 </Link>
               </div>
               <div className="mt-16">
+                {/* @ts-ignore */}
                 <Accordion
                   type="default"
                   openBehaviour="multiple"
