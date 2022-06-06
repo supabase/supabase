@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem'
 
 ## Overview
 
-In this guide we'll show you how to authenticate your users with SMS based One-Time Password(OTP) tokens.
+In this guide we'll show you how to authenticate your users with SMS based One-Time Password (OTP) tokens.
 
 There are two reasons to use Supabase SMS OTP tokens:
 
@@ -93,7 +93,7 @@ Use the variable `.Code` in the template to display the OTP code. Here's an ![ex
 
 ### Using OTP with password based logins
 
-In this scenario we'll be using the user's mobile phone number and a corrsesponding password as an alternative to signing up with an email address. Note: Please deeply consider the potential security implications when signing up with a combination ofphone and passsword. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor auth, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
+In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: Please deeply consider the potential security implications when signing up with a combination ofphone and passsword. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor auth, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
