@@ -1,6 +1,6 @@
 ---
 id: connecting-to-postgres
-title: "Connecting"
+title: 'Connecting'
 description: There are various ways to connect to your Postgres database.
 ---
 
@@ -8,31 +8,27 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 ## Types of Connection
 
-- HTTP connections using the API.  
+- HTTP connections using the API.
 - Direct connections using Postgres' standard connection system.
 - Connection pooling using PgBouncer.
 
+### API vs Direct vs Connection Pooling
 
-### Direct vs Connection Pooling
+- The API is an auto-generated REST inteface. You should use this for all browser and application interactions.
+- A "direct connection" is when a connection is made to the database using Postgres' native connection implementation. You should use this for tools which are always alive - usually installed on a long-running server.
+- A "connection pool" is a system (external to Postgres) which keeps connections "open". You should use this for serverless functions and tools which disconnect from the database frequently.
 
-A "direct connection" is when a connection is made to the database using Postgres' native connection implementation. 
-
-A "connection pool" is a system (external to Postgres)
-which manage connections, rather than Postgres' native system.
-
-Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections. 
+Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections.
 You can use these simple questions to determine which connection method to use:
 
 - Are you connecting to a database and _maintaining_ a connection? If yes, use a direct connection.
 - Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? If yes, use a connection pool.
 
-
 ## API
 
-Supabase provides an auto-updating [API](/docs/guides/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). 
+Supabase provides an auto-updating [API](/docs/guides/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating).
 
-
-### Interfaces 
+### Interfaces
 
 We provides several types of API to suit your preferences and use-case:
 
@@ -60,12 +56,11 @@ values={[
 ```
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
 </Tabs>
-
 
 ## Direct connections
 
@@ -73,25 +68,13 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ### Finding your connection string
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Settings" section.
-2. Click "Database".
-3. Find your Connection Info and Connection String.
-```
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Find your Connection Info and Connection String. Direct connections are on port `5432`.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/postgres-connection.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
 
 ## Connection Pool
 
@@ -104,9 +87,7 @@ A "connection pool" is a system (external to Postgres) which manages connections
 When a client makes a request, PgBouncer "allocates" an available connection to the client.
 When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
-
 ![Connection pooling](/img/guides/database/connection-pool.png)
-
 
 ### Pool modes
 
@@ -114,16 +95,16 @@ Pool Mode determines how PgBouncer handles a connection.
 
 #### Session
 
-When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool. 
+When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool.
 
 All PostgreSQL features can be used with this option.
 
 #### Transaction
 
-This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client 
-could be executed over two different connections. 
+This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client
+could be executed over two different connections.
 
-Some session-based PostgreSQL features such as prepared statements are not available with this option. 
+Some session-based PostgreSQL features such as prepared statements are not available with this option.
 A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
 
 #### Statement
@@ -132,22 +113,10 @@ This is the most granular option. Connections are returned to the pool after eve
 
 ### Finding the connection pool config
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Database" section.
-2. Click "Connection Pooling".
-3. Find your Connection Info and Connection String.
-```
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Find your Connection Info and Connection String. Connection pooling is on port `6543`.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/pgbouncer-connection.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/postgres-connection.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
