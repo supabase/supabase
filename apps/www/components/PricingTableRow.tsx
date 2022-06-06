@@ -28,7 +28,7 @@ const IncludedCheck = (props: any) => (
 const Minus = (props: any) => (
   <>
     <svg
-      className="text-scale-1200 h-5 w-5 dark:text-white"
+      className="text-scale-600 h-5 w-5"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
       fill="currentColor"
@@ -71,29 +71,31 @@ export const PricingTableRowDesktop = (props: any) => {
         return (
           <tr className="divide-scale-600 dark:divide-scale-400 divide-x">
             <th
-              className="text-scale-1200 flex items-center px-6 py-5 text-left text-sm font-normal dark:text-white"
+              className="text-scale-1200 flex items-center px-6 py-3 text-left text-sm font-normal dark:text-white"
               scope="row"
             >
-              <span>{feat.title} </span>
+              <span>{feat.title}</span>
               {feat.tooltip && (
                 <span
-                  className="hover:text-scale-800 ml-2 cursor-pointer dark:hover:text-white"
+                  className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-colors"
                   data-tip={feat.tooltip}
                 >
-                  <IconHelpCircle size="small" />
+                  <IconHelpCircle size={14} strokeWidth={2} />
                 </span>
               )}
             </th>
 
             {Object.values(feat.tiers).map((tier: any, i) => {
               return (
-                <td key={i} className="px-6 py-5">
+                <td key={i} className="px-6">
                   {typeof tier === 'boolean' && tier === true ? (
                     <IncludedCheck tier={tier} />
                   ) : typeof tier === 'boolean' && tier === false ? (
-                    <Minus tier={tier} />
+                    <div className="text-scale-900">
+                      <Minus tier={tier} />
+                    </div>
                   ) : (
-                    <span className="text-scale-1200 block text-sm dark:text-white">{tier}</span>
+                    <span className="text-scale-1200 block text-xs dark:text-white">{tier}</span>
                   )}
                 </td>
               )
