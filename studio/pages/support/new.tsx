@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
 import { post, get } from 'lib/common/fetch'
 import { Project } from 'types'
 import { isUndefined } from 'lodash'
@@ -125,6 +125,9 @@ const SupportNew = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [sent, setSent] = useState<boolean>(false)
 
+  const ongoingIncident = useFlag('ongoingIncident')
+  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
   /*
    * Get all orgs and projects from global store
    */
@@ -178,7 +181,8 @@ const SupportNew = () => {
     if (x.name === 'project') {
       const selectedProject = projects.find((project: any) => project.ref === x.value)
       if (
-        (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) === PRICING_TIER_PRODUCT_IDS.FREE &&
+        (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) ===
+          PRICING_TIER_PRODUCT_IDS.FREE &&
         formState.severity.value === 'Critical'
       ) {
         formDispatch({
@@ -250,7 +254,7 @@ const SupportNew = () => {
 
   const Success = () => {
     return (
-      <div className="w-100 px-6 space-y-4">
+      <div className="w-100 space-y-4 px-6">
         <div className="relative flex">
           <IconCheck size={24} background={'brand'} />
         </div>
@@ -272,8 +276,11 @@ const SupportNew = () => {
   if (!isInitialized) return <Connecting />
 
   return (
-    <div className="flex h-screen relative overflow-y-auto overflow-x-hidden">
-      <div className="max-w-2xl mx-auto my-8 px-4 lg:px-6">
+    <div
+      className="relative flex overflow-y-auto overflow-x-hidden"
+      style={{ height: maxHeight, maxHeight }}
+    >
+      <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
         <Button
           type="text"
           className="opacity-50 hover:opacity-100"
@@ -285,14 +292,14 @@ const SupportNew = () => {
         >
           Go back
         </Button>
-        <div className="py-8 space-y-12">
+        <div className="space-y-12 py-8">
           <div className="flex items-center space-x-3">
-            <SVG src={`/img/supabase-logo.svg`} className="w-4 h-4" />
+            <SVG src={`/img/supabase-logo.svg`} className="h-4 w-4" />
             <Typography.Title level={4} className="m-0">
               Supabase support
             </Typography.Title>
           </div>
-          <div className="bg-panel-body-light dark:bg-panel-body-dark py-8 rounded border dark:border-dark shadow-md space-y-12 min-w-full">
+          <div className="bg-panel-body-light dark:bg-panel-body-dark dark:border-dark min-w-full space-y-12 rounded border py-8 shadow-md">
             {sent ? (
               <Success />
             ) : (
@@ -319,7 +326,7 @@ const SupportNew = () => {
                               return (
                                 <>
                                   <span>{option.label}</span>
-                                  <span className="opacity-50 block text-xs">
+                                  <span className="block text-xs opacity-50">
                                     {option.description}
                                   </span>
                                 </>
@@ -351,7 +358,7 @@ const SupportNew = () => {
                               return (
                                 <div>
                                   <span>{option.name}</span>
-                                  <span className="opacity-50 block text-xs">
+                                  <span className="block text-xs opacity-50">
                                     {organization?.name}
                                   </span>
                                 </div>
@@ -375,7 +382,8 @@ const SupportNew = () => {
                           (project: any) => project.ref === formState.project.value
                         )
                         const isAllowedCritical =
-                          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) !== PRICING_TIER_PRODUCT_IDS.FREE
+                          (selectedProject?.subscription_tier ?? PRICING_TIER_PRODUCT_IDS.FREE) !==
+                          PRICING_TIER_PRODUCT_IDS.FREE
                         return (
                           <Listbox.Option
                             key={`option-${option.value}`}
@@ -386,7 +394,7 @@ const SupportNew = () => {
                               return (
                                 <>
                                   <span>{option.label}</span>
-                                  <span className="opacity-50 block text-xs">
+                                  <span className="block text-xs opacity-50">
                                     {option.description}
                                   </span>
                                 </>
