@@ -3,6 +3,7 @@ import { partition, isEmpty, isUndefined } from 'lodash'
 import {
   Alert,
   Button,
+  IconArrowUpRight,
   IconEdit,
   IconHelpCircle,
   IconKey,
@@ -318,11 +319,21 @@ const ColumnManagement: FC<Props> = ({
           </DragDropContext>
         </div>
 
+        <div className="flex items-center justify-between">
         {!hasImportContent && (
           <Button type="default" onClick={() => onAddColumn()}>
             Add column
           </Button>
         )}
+        <p className='text-sm text-scale-1100'>
+          <a href="https://supabase.com/pricing" target="_blank" className="underline flex items-center gap-1">
+            Learn more about data types <IconArrowUpRight size={14} className="text-scale-1200" strokeWidth={1.5} />
+          </a>
+        </p>
+        </div>
+
+
+
       </div>
       <ForeignKeySelector
         tables={tables}
