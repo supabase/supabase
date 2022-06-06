@@ -3,7 +3,7 @@ import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { getURL } from 'lib/helpers'
@@ -38,11 +38,6 @@ const ProUpgrade: FC<Props> = ({
   isLoadingPaymentMethods,
   onSelectBack,
 }) => {
-  /**
-   * Feature flags
-   */
-  const nativeBilling = useFlag('nativeBilling')
-
   const { app, ui } = useStore()
   const router = useRouter()
 
@@ -169,14 +164,14 @@ const ProUpgrade: FC<Props> = ({
         enter="transition ease-out duration-300"
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
-        className="w-full flex items-start justify-between"
+        className="flex w-full items-start justify-between"
       >
         <>
           <div className="2xl:min-w-5xl mx-auto mt-10">
-            <div className="relative px-5 space-y-4">
+            <div className="relative space-y-4 px-5">
               <BackButton onClick={() => onSelectBack()} />
               <div className="space-y-8">
-                <h4 className="text-lg text-scale-900">Change your project's subscription</h4>
+                <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
                 <div
                   className="space-y-8 overflow-scroll pb-8"
                   style={{ height: 'calc(100vh - 9rem - 57px)' }}
@@ -187,7 +182,7 @@ const ProUpgrade: FC<Props> = ({
                         <h3 className="text-xl">
                           Welcome to <span className="text-brand-900">Pro</span>
                         </h3>
-                        <p className="text-base text-scale-1100">
+                        <p className="text-scale-1100 text-base">
                           Your new subscription will begin immediately after payment
                         </p>
                       </>
@@ -196,24 +191,24 @@ const ProUpgrade: FC<Props> = ({
                         <h3 className="text-3xl">
                           Managing your <span className="text-brand-900">Pro</span> plan
                         </h3>
-                        <p className="text-base text-scale-1100">
+                        <p className="text-scale-1100 text-base">
                           Your billing cycle will reset after payment
                         </p>
                       </>
                     )}
                   </div>
-                  <div className="flex items-center justify-between gap-16 border rounded px-6 py-4 bg-panel-body-light dark:bg-panel-body-dark drop-shadow-sm border-panel-border-light border-panel-border-dark">
+                  <div className="bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light border-panel-border-dark flex items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm">
                     <div>
                       <div className="flex items-center space-x-2">
                         <p>Enable spend cap</p>
                         <IconHelpCircle
                           size={16}
                           strokeWidth={1.5}
-                          className="cursor-pointer opacity-50 hover:opacity-100 transition"
+                          className="cursor-pointer opacity-50 transition hover:opacity-100"
                           onClick={() => setShowSpendCapHelperModal(true)}
                         />
                       </div>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-scale-1100 text-sm">
                         If enabled, additional resources will not be charged on a per-usage basis
                       </p>
                     </div>
@@ -222,12 +217,11 @@ const ProUpgrade: FC<Props> = ({
                       onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
                     />
                   </div>
-                  {nativeBilling && projectRegion !== 'af-south-1' && (
+                  {projectRegion !== 'af-south-1' && (
                     <>
                       <Divider light />
                       <ComputeSizeSelection
                         computeSizes={computeSizes || []}
-                        currentComputeSize={currentComputeSize}
                         selectedComputeSize={selectedComputeSize}
                         onSelectOption={onSelectComputeSizeOption}
                       />
@@ -274,7 +268,7 @@ const ProUpgrade: FC<Props> = ({
         header="Enabling spend cap"
         onCancel={() => setShowSpendCapHelperModal(false)}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
             <div className="space-y-4">
               <p className="text-sm">
@@ -289,11 +283,11 @@ const ProUpgrade: FC<Props> = ({
               </p>
               {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
               {/* Maybe ideate this in Figma first but this is good enough for now */}
-              <div className="border border-scale-600 bg-scale-500 rounded">
+              <div className="border-scale-600 bg-scale-500 rounded border">
                 <div className="flex items-center px-4 pt-2 pb-1">
-                  <p className="w-[50%] text-sm text-scale-1100">Item</p>
-                  <p className="w-[25%] text-sm text-scale-1100">Limit</p>
-                  <p className="w-[25%] text-sm text-scale-1100">Rate</p>
+                  <p className="text-scale-1100 w-[50%] text-sm">Item</p>
+                  <p className="text-scale-1100 w-[25%] text-sm">Limit</p>
+                  <p className="text-scale-1100 w-[25%] text-sm">Rate</p>
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
