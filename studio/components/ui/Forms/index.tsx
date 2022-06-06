@@ -1,5 +1,5 @@
 export * from './FormsContainer'
-export * from './AutoSchemaForm'
+export * from '../../interfaces/Auth/AutoSchemaForm'
 export * from './FormHeader'
 export * from './FormSection'
 export * from './FormPanel'
