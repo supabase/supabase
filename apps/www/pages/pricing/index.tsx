@@ -245,7 +245,7 @@ export default function IndexPage() {
                     py-6
                   "
                   >
-                    {tier.preface && <p className="text-scale-1200 text-base">{tier.preface}</p>}
+                    {tier.preface && <p className="text-scale-1100 text-sm">{tier.preface}</p>}
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                     <ul role="list" className="dark:divide-scale-400 divide-y">
                       {tier.features.map((feature) => (
