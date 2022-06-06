@@ -58,7 +58,7 @@ Supabase is fully open source. This means that along with the hosted cloud platf
 
 ### Scaling
 
-One scaling limitation you might face when using Firestore - is the 1 document per second limitation on writes. It can be hard to architect around this issue for users who want to be able to sustain high write loads from a single client. Supabase is built on Postgres which is a well battle tested at scale, to help scale the number of connections. Every deployment comes with an instance with PgBouncer, a [Postgres connection pooler perfect for use in Serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) environments.
+One scaling limitation you might face when using Firestore - is the 1 document per second limitation on writes. It can be hard to architect around this issue for users who want to be able to sustain high write loads from a single client. Supabase is built on Postgres which is a tested at scale. Every deployment comes with an instance with PgBouncer, a [Postgres connection pooler perfect for use in Serverless computing](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) environments.
 
 ## How do I migrate from Firebase to Supabase?
 
