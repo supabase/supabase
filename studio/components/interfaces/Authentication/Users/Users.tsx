@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Select } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import UsersList from './UsersList'
@@ -24,7 +24,7 @@ const Users = () => {
   }
 
   function onVerifiedFilterChange(e: any) {
-    PageState.filterVerified = e.target.value
+    PageState.filterVerified = e
     onSearchUser()
   }
 
@@ -52,7 +52,7 @@ const Users = () => {
   return (
     <div className="">
       <div className="flex justify-between px-6 pt-6 pb-2">
-        <div className="relative flex space-x-1">
+        <div className="relative flex space-x-4">
           <Input
             size="small"
             value={PageState.filterInputValue}
@@ -73,18 +73,23 @@ const Users = () => {
               ),
             ]}
           />
-          <Select
+          <Listbox
             size="small"
-            value={PageState.filterVerified}            
+            value={PageState.filterVerified}
             onChange={onVerifiedFilterChange}
-            name='verified'
-            id='verified'
-            icon={<IconSearch size="tiny" />}
+            name="verified"
+            id="verified"
           >
-            <Select.Option value="">All Users</Select.Option>
-            <Select.Option value="verified">Verified Users</Select.Option>
-            <Select.Option value="unverified">Un-Verified Users</Select.Option>
-          </Select>
+            <Listbox.Option label="All Users" value="">
+              All Users
+            </Listbox.Option>
+            <Listbox.Option label="Verified Users" value="verified">
+              Verified Users
+            </Listbox.Option>
+            <Listbox.Option label="Un-Verified Users" value="unverified">
+              Un-Verified Users
+            </Listbox.Option>
+          </Listbox>
         </div>
         <div className="flex items-center">
           <Button
