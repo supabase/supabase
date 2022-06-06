@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input } from '@supabase/ui'
+import { Checkbox, SidePanel, Input, IconArrowUpRight } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -206,6 +206,16 @@ const ColumnEditor: FC<Props> = ({
             disabled={!isUndefined(columnFields?.foreignKey)}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
+
+          <div className="text-sm grid md:grid-cols-12 md:gap-x-4 ">
+            <p className='text-scale-1100 col-span-7 col-start-5 -mt-4'>
+              <a href="https://supabase.com/pricing" target="_blank" className="underline flex items-center gap-1">
+                Learn more about data types <IconArrowUpRight size={14} className="text-scale-1200" strokeWidth={1.5} />
+              </a>
+
+            </p>
+          </div>
+
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
               {columnFields.format.includes('int') && (
