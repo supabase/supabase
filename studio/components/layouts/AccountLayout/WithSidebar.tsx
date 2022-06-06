@@ -37,15 +37,15 @@ const WithSidebar: FC<Props> = ({
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
-          className="
-            w-64 h-screen overflow-auto bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark hide-scrollbar
-            border-r dark:border-dark
-          "
+          className={[
+            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
+            'hide-scrollbar dark:border-dark h-screen w-64 overflow-auto border-r',
+          ].join(' ')}
           style={sidebarStyle}
         >
           {title && (
             <div className="mb-2">
-              <div className="max-h-12 h-12 flex items-center border-b dark:border-dark px-6">
+              <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6">
                 <Typography.Title level={4} className="mb-0">
                   {title}
                 </Typography.Title>
@@ -74,9 +74,9 @@ const WithSidebar: FC<Props> = ({
           </div>
         </div>
       )}
-      <div className="flex-1 flex flex-col h-screen">
+      <div className="flex h-screen flex-1 flex-col">
         <LayoutHeader breadcrumbs={breadcrumbs} />
-        <div className="flex-grow flex-1 overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-auto">{children}</div>
       </div>
     </div>
   )
@@ -85,10 +85,10 @@ export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return links.map((x: any) => (
-    <div key={x.heading} className="py-5 border-b dark:border-dark px-6">
+    <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
       <Menu.Group title={x.heading} />
       {x.versionLabel && (
-        <div className="px-3 mb-1">
+        <div className="mb-1 px-3">
           <Badge color="yellow">{x.versionLabel}</Badge>
         </div>
       )}
@@ -156,7 +156,7 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
         onClick={onClick || (() => {})}
         icon={external && <IconArrowUpRight size={'tiny'} />}
       >
-        {isSubitem ? <Typography.Text small>{label}</Typography.Text> : label}
+        {isSubitem ? <p className="text-sm">{label}</p> : label}
       </Menu.Item>
     )
   }
@@ -165,15 +165,18 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
     <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
         <button
-          className="cursor-pointer flex space-x-2 items-center outline-none focus-visible:ring-1 ring-scale-1200 focus-visible:z-10 group py-1 font-normal border-scale-500 group-hover:border-scale-900"
+          className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
           onClick={onClick || (() => {})}
         >
           {external && (
-            <span className="transition truncate text-sm text-scale-900 group-hover:text-scale-1100">
+            <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
               <IconArrowUpRight size={'tiny'} />
             </span>
           )}
-          <span className="transition truncate text-sm w-full text-scale-1100 group-hover:text-scale-1200">
+          <span
+            title={label}
+            className="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
+          >
             {isSubitem ? <p>{label}</p> : label}
           </span>
         </button>
