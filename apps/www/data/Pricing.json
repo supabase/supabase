@@ -87,8 +87,8 @@
         }
       },
       {
-        "title": "Social 0Auth MAUs",
-        "tooltip": "Monthly Active Users using Social 0Auth login providers",
+        "title": "MAUs",
+        "tooltip": "Monthly Active Users; a user that has made an API request in the last month.",
         "tiers": {
           "free": "Up to 50,000 MAUs",
           "pro": "100,000 included, then $0.00325 per MAU",
