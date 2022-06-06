@@ -42,14 +42,14 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.5.21
     depends_on:
-      - db
+      - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
 
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?search_path=auth
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
@@ -81,10 +81,10 @@ services:
     container_name: supabase-rest
     image: postgrest/postgrest:v9.0.0
     depends_on:
-      - db
+      - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
     environment:
-      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: public,storage, graphql_public
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
@@ -94,13 +94,13 @@ services:
     container_name: supabase-realtime
     image: supabase/realtime:v0.22.4
     depends_on:
-      - db
+      - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: postgres
-      DB_USER: postgres
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_SSL: "false"
       PORT: 4000
@@ -118,7 +118,7 @@ services:
     container_name: supabase-storage
     image: supabase/storage-api:v0.10.0
     depends_on:
-      - db
+      - db # Disable this if you are using an external Postgres database
       - rest
     restart: unless-stopped
     environment:
@@ -126,7 +126,7 @@ services:
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
       POSTGREST_URL: http://rest:3000
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGOPTIONS: -c search_path=storage,public
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
@@ -142,13 +142,14 @@ services:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.29.0
     depends_on:
-      - db
+      - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
     environment:
       PG_META_PORT: 8080
-      PG_META_DB_HOST: db
+      PG_META_DB_HOST: ${POSTGRES_HOST}
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
+  # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
     image: supabase/postgres:14.1.0.21
