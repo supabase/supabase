@@ -15,7 +15,7 @@ import {
   Toggle,
 } from '@supabase/ui'
 import { AuthLayout } from 'components/layouts'
-import AutoSchemaForm from 'components/ui/Forms/AutoSchemaForm'
+import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
 import { withAuth } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import React, { useReducer, useState } from 'react'

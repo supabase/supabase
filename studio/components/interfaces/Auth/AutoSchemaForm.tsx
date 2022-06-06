@@ -1,5 +1,4 @@
-import { Button, Form, Input, InputNumber, Toggle } from '@supabase/ui'
-
+import { Form, Input, InputNumber, Toggle } from '@supabase/ui'
 import { useStore } from 'hooks'
 import React from 'react'
 import { boolean, number, object, string } from 'yup'
@@ -10,10 +9,10 @@ import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
-} from './'
+} from '../../ui/Forms'
 
 const AutoSchemaForm = () => {
-  const { authConfig } = useStore()
+  const { authConfig, ui } = useStore()
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -45,8 +44,16 @@ const AutoSchemaForm = () => {
             setSubmitting(true)
             await authConfig.update(payload)
             setSubmitting(false)
+            ui.setNotification({
+              category: 'success',
+              message: `Updated settings`,
+            })
             resetForm({ values: values, initialValues: values })
           } catch (error) {
+            ui.setNotification({
+              category: 'error',
+              message: `Failed to update settings`,
+            })
             setSubmitting(false)
           }
         }}
@@ -56,25 +63,21 @@ const AutoSchemaForm = () => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
           return (
             <>
-              <Button onClick={() => handleReset()} htmlType="button">
-                reset form
-              </Button>
               <FormHeader
                 title="General settings"
                 description={`URLs that auth providers are permitted to redirect to post authentication`}
               />
-
               <FormPanel
                 disabled={true}
                 footer={
-                  <>
+                  <div className="flex justify-between py-4 px-8">
                     <FormActions
                       handleReset={handleReset}
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
+                      helper={'Learn more about global Auth settings'}
                     />
-                    {hasChanges && 'Need to save changes'}
-                  </>
+                  </div>
                 }
               >
                 <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
