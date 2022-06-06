@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { CSSProperties, FC, ReactNode } from 'react'
-import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
+import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
+import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
+import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 
 interface Props {
@@ -11,7 +12,6 @@ interface Props {
   header?: ReactNode
   subitems?: any[]
   subitemsParentKey?: number
-  sidebarStyle?: CSSProperties
   hideSidebar?: boolean
   customSidebarContent?: ReactNode
   children: ReactNode
@@ -22,7 +22,6 @@ const WithSidebar: FC<Props> = ({
   header,
   breadcrumbs = [],
   children,
-  sidebarStyle,
   links,
   subitems,
   subitemsParentKey,
@@ -32,16 +31,19 @@ const WithSidebar: FC<Props> = ({
   const noContent = !links && !customSidebarContent
   const linksHaveHeaders = links && links[0].heading
 
+  const ongoingIncident = useFlag('ongoingIncident')
+  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
   return (
-    <div className={`flex `}>
+    <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
+          style={{ height: maxHeight, maxHeight }}
           className={[
-            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark',
-            'hide-scrollbar dark:border-dark h-screen w-64 overflow-auto border-r',
+            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark h-full',
+            'hide-scrollbar dark:border-dark w-64 overflow-auto border-r',
           ].join(' ')}
-          style={sidebarStyle}
         >
           {title && (
             <div className="mb-2">
@@ -74,7 +76,7 @@ const WithSidebar: FC<Props> = ({
           </div>
         </div>
       )}
-      <div className="flex h-screen flex-1 flex-col">
+      <div className="flex flex-1 flex-col">
         <LayoutHeader breadcrumbs={breadcrumbs} />
         <div className="flex-1 flex-grow overflow-auto">{children}</div>
       </div>

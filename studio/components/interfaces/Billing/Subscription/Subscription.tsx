@@ -3,9 +3,10 @@ import dayjs from 'dayjs'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
 import { Loading, Button } from '@supabase/ui'
+
 import { formatBytes } from 'lib/helpers'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
@@ -34,6 +35,7 @@ const Subscription: FC<Props> = ({
   const router = useRouter()
   const { ui } = useStore()
   const isOrgOwner = ui.selectedOrganization?.is_owner
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const addOns = subscription?.addons ?? []
@@ -62,16 +64,24 @@ const Subscription: FC<Props> = ({
             </div>
             <div className="flex flex-col items-end space-y-2">
               <Button
-                disabled={!isOrgOwner}
+                disabled={!isOrgOwner || projectUpdateDisabled}
                 onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
                 type="primary"
               >
                 Change subscription
               </Button>
-              {!isOrgOwner && (
-                <p className="text-scale-1100 text-sm">
+              {!isOrgOwner ? (
+                <p className="text-scale-1100 text-xs">
                   Only the organization owner can amend subscriptions
                 </p>
+              ) : projectUpdateDisabled ? (
+                <p className="text-scale-1100 text-right text-xs">
+                  Subscription changes are currently disabled
+                  <br />
+                  Our engineers are working on a fix
+                </p>
+              ) : (
+                <div />
               )}
             </div>
           </div>
