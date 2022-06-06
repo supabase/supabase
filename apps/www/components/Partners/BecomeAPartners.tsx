@@ -89,7 +89,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </Select>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex space-x-2">
                 <div className="flex-1">
                   <Input
                     label="First Name *"
@@ -111,46 +111,50 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </div>
               </div>
 
-              <div>
-                <Input
-                  label="Company Name"
-                  id="company"
-                  name="company"
-                  layout="vertical"
-                  placeholder="Supa Inc."
-                />
+              <div className="flex space-x-2">
+                <div className="flex-1">
+                  <Input
+                    label="Company Name"
+                    id="company"
+                    name="company"
+                    layout="vertical"
+                    placeholder="Supa Inc."
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <InputNumber
+                    label="Company Size"
+                    id="size"
+                    name="size"
+                    layout="vertical"
+                    placeholder="1"
+                  />
+                </div>
               </div>
 
-              <div>
-                <InputNumber
-                  label="Company Size"
-                  id="size"
-                  name="size"
-                  layout="vertical"
-                  placeholder="1"
-                />
-              </div>
+              <div className="flex space-x-2">
+                <div className="flex-1">
+                  <Input
+                    label="Job Title"
+                    id="title"
+                    name="title"
+                    layout="vertical"
+                    placeholder="CEO"
+                  />
+                </div>
 
-              <div>
-                <Input
-                  label="Job Title"
-                  id="title"
-                  name="title"
-                  layout="vertical"
-                  placeholder="CEO"
-                />
+                <div className="flex-1">
+                  <Input
+                    label="Business email *"
+                    id="email"
+                    name="email"
+                    layout="vertical"
+                    placeholder="janedoe@example.sg"
+                  />
+                </div>
               </div>
-
-              <div>
-                <Input
-                  label="Business email *"
-                  id="email"
-                  name="email"
-                  layout="vertical"
-                  placeholder="janedoe@example.sg"
-                />
-              </div>
-
+              
               <div>
                 <Input
                   label="Phone Number"
