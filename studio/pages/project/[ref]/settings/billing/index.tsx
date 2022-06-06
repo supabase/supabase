@@ -14,8 +14,7 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 import { NextPageWithLayout } from 'types'
 
-type ProjectBillingProps = {} & any
-const ProjectBilling: NextPageWithLayout = ({ store }: ProjectBillingProps) => {
+const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 

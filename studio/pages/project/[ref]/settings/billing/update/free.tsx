@@ -2,25 +2,29 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { useStore, useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import { ExitSurvey, StripeSubscription } from 'components/interfaces/Billing'
-import { NextPageWithLayout } from 'types'
 
 const BillingUpdateFree: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const projectRef = ui.selectedProject?.ref
 
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
 
   useEffect(() => {
-    if (projectRef) {
+    if (projectUpdateDisabled) {
+      router.push(`/project/${projectRef}/settings/billing/update`)
+    } else if (projectRef) {
       getStripeProducts()
       getSubscription()
     }

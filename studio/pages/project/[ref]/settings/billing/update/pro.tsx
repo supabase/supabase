@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
@@ -19,6 +19,8 @@ const BillingUpdatePro: NextPageWithLayout = () => {
   const projectRef = ui.selectedProject?.ref
   const orgSlug = ui.selectedOrganization?.slug
 
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
@@ -34,7 +36,9 @@ const BillingUpdatePro: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
-    if (projectRef) {
+    if (projectUpdateDisabled) {
+      router.push(`/project/${projectRef}/settings/billing/update`)
+    } else if (projectRef) {
       getStripeProducts()
       getSubscription()
     }
