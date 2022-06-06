@@ -82,6 +82,7 @@ const Column: FC<Props> = ({
             value={column.name}
             size="small"
             disabled={hasImportContent}
+            placeholder="column name"
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
