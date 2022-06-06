@@ -68,7 +68,7 @@ module.exports = {
         },
         {
           label: 'Reference',
-          to: '/docs/reference/javascript/supabase-client',
+          to: '/docs/reference',
           activeBasePath: '/docs/reference/',
           position: 'left',
         },
