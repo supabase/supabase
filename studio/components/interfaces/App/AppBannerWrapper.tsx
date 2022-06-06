@@ -11,8 +11,8 @@ const AppBannerWrapper: FC = ({ children }) => {
       {ongoingIncident && (
         <Link href="https://status.supabase.com">
           <a target="_blank">
-            <div className="hover:bg-green-1000 flex cursor-pointer items-center justify-center space-x-2 bg-green-900 py-3 transition">
-              <p className="text-scale-1200 text-sm font-medium">
+            <div className="hover:bg-green-1000 flex cursor-pointer items-center justify-center space-x-2 bg-green-900 py-3 transition text-scale-400 dark:text-scale-1200">
+              <p className="text-sm font-medium">
                 We are currently investigating a technical issue, follow status.supabase.com for
                 updates
               </p>
