@@ -9,7 +9,7 @@ interface Props {
 const DisabledWarningDueToIncident: FC<Props> = ({ title }) => {
   return (
     <InformationBox
-      icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+      icon={<IconAlertCircle size={20} strokeWidth={1.5} />}
       defaultVisibility={true}
       hideCollapse
       title={title}

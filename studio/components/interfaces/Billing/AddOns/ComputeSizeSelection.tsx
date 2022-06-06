@@ -15,7 +15,7 @@ interface Props {
 const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, onSelectOption }) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProjectRef
-  const addonUpdateDisabled = useFlag('disableProjectAddonUpdates')
+  const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   return (
     <div className="space-y-4">

@@ -60,7 +60,7 @@ const Wizard: NextPageWithLayout = () => {
   const { app, ui } = useStore()
 
   const subscriptionStats = useSubscriptionStats()
-  const projectCreationDisabled = useFlag('disableProjectCreation')
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -208,7 +208,9 @@ const Wizard: NextPageWithLayout = () => {
             Cancel
           </Button>
           <div className="items-center space-x-3">
-            <span className="text-scale-900 text-xs">You can rename your project later</span>
+            {!projectCreationDisabled && (
+              <span className="text-scale-900 text-xs">You can rename your project later</span>
+            )}
             <Button
               onClick={onClickNext}
               loading={newProjectedLoading}
