@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Select } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import UsersList from './UsersList'
@@ -23,6 +23,11 @@ const Users = () => {
     PageState.filterInputValue = e.target.value
   }
 
+  function onVerifiedFilterChange(e: any) {
+    PageState.filterVerified = e.target.value
+    onSearchUser()
+  }
+
   function onFilterKeyPress(e: any) {
     // enter key
     if (e.keyCode == 13) onSearchUser()
@@ -30,6 +35,7 @@ const Users = () => {
 
   function onSearchUser() {
     PageState.filterKeywords = PageState.filterInputValue
+    PageState.filterVerified = PageState.filterVerified
     PageState.fetchData(1)
   }
 
@@ -67,6 +73,18 @@ const Users = () => {
               ),
             ]}
           />
+          <Select
+            size="small"
+            value={PageState.filterVerified}            
+            onChange={onVerifiedFilterChange}
+            name='verified'
+            id='verified'
+            icon={<IconSearch size="tiny" />}
+          >
+            <Select.Option value="">All Users</Select.Option>
+            <Select.Option value="verified">Verified Users</Select.Option>
+            <Select.Option value="unverified">Un-Verified Users</Select.Option>
+          </Select>
         </div>
         <div className="flex items-center">
           <Button
@@ -82,9 +100,9 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="overflow-visible mt-4 px-6">
-        <div className="relative section-block--body rounded">
-          <div className="align-middle inline-block min-w-full">
+      <section className="mt-4 overflow-visible px-6">
+        <div className="section-block--body relative rounded">
+          <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
         </div>

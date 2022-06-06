@@ -17,6 +17,7 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
     projectKpsVersion: undefined,
     filterInputValue: '',
     filterKeywords: '',
+    filterVerified: '',
     users: [],
     totalUsers: 0,
     usersLoading: true,
@@ -27,6 +28,7 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
         limit: this.pageLimit,
         offset: (this.page - 1) * this.pageLimit,
         keywords: this.filterKeywords,
+        verified: this.filterVerified
       }
     },
     get fromRow() {
