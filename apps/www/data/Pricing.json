@@ -46,6 +46,14 @@
         }
       },
       {
+        "title": "Point in time recovery",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
         "title": "Pausing",
         "tooltip": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard",
         "tiers": {
@@ -326,7 +334,7 @@
         "title": "Metrics endpoint",
         "tiers": {
           "free": false,
-          "pro": false,
+          "pro": true,
           "enterprise": true
         }
       },

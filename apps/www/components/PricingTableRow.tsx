@@ -95,7 +95,7 @@ export const PricingTableRowDesktop = (props: any) => {
                       <Minus tier={tier} />
                     </div>
                   ) : (
-                    <span className="text-scale-1200 block text-xs dark:text-white">{tier}</span>
+                    <span className="text-scale-1200 block text-sm dark:text-white">{tier}</span>
                   )}
                 </td>
               )
@@ -115,7 +115,7 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full">
-        <caption className="bg-scale-50 dark:bg-dark-900 border-scale-200 dark:border-scale-600 text-scale-1200 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-scale-50 dark:bg-dark-900 border-scale-400 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <span className="text-scale-1200 font-normal">{category.title}</span>
@@ -131,16 +131,16 @@ export const PricingTableRowMobile = (props: any) => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-scale-600 divide-y">
+        <tbody className="divide-scale-400 divide-y">
           {category.features.map((feat: any, i: number) => {
             return (
-              <tr key={i} className="border-t">
-                <th className="text-scale-1100 px-4 py-5 text-left text-sm font-normal" scope="row">
+              <tr key={i} className="border-scale-400 border-t">
+                <th className="text-scale-1100 px-4 py-3 text-left text-sm font-normal" scope="row">
                   <span>
                     <p>{feat.title}</p>
                   </span>
                 </th>
-                <td className="py-5 pr-4 text-right">
+                <td className="py-3 pr-4 text-right">
                   {typeof feat.tiers[tier] === 'boolean' && feat.tiers[tier] === true ? (
                     <div className="inline-block">
                       <IncludedCheck tier={tier} />
