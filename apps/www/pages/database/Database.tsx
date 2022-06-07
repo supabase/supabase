@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconX, Space, Tabs } from '@supabase/ui'
+import { Badge, Button, IconArrowUpRight, IconX, Tabs } from '@supabase/ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
