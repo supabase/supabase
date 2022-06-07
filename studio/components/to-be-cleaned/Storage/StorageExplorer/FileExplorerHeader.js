@@ -213,7 +213,7 @@ const FileExplorerHeader = ({
     <div
       className="
     bg-panel-header-light dark:bg-panel-header-dark
-    border-panel-border-light dark:border-panel-border-dark z-10
+    border-panel-border-light dark:border-panel-border-dark
     flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
     >
       {/* Navigation */}
