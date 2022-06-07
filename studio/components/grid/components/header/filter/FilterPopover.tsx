@@ -48,7 +48,7 @@ const Filter: FC = () => {
     <div className="space-y-2 py-2">
       <div className="space-y-2">
         {state.filters.map((_, index) => (
-          <FilterRow key={`filter-${index}`} filterIdx={index} now={Date.now()} />
+          <FilterRow key={`filter-${index}`} filterIdx={index} />
         ))}
         {state.filters.length == 0 && (
           <div className="space-y-1 px-3">
