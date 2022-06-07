@@ -5,9 +5,17 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 25 May 2022 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 31 May 2022 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2022/06/07/beta-update-may-2022</guid>
+  <title>Supabase Beta May 2022</title>
+  <link>https://supabase.com/blog/2022/06/07/beta-update-may-2022</link>
+  <description>Product and community updates including wildcard auth redirects, edge functions with webhooks, and Prometheus endpoints for everybody.</description>
+  <pubDate>Tue, 31 May 2022 16:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2022/05/26/how-supabase-accelerates-development-of-all-pull-together</guid>
   <title>How Mike Lyndon is using Supabase to accelerate development of AllPullTogether</title>
