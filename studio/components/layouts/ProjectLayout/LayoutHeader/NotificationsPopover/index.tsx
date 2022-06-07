@@ -20,7 +20,7 @@ const NotificationsPopover: FC<Props> = () => {
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <div />
+  if (!notifications) return <></>
 
   const hasNewNotifications = notifications?.some(
     (notification) => notification.notification_status === NotificationStatus.New

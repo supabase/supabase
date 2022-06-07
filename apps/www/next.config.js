@@ -654,6 +654,11 @@ module.exports = withMDX({
         source: '/learn-more',
         destination: '/?utm_source=event&utm_medium=billboard&utm_campaign=aws-atlanta',
       },
+      {
+        permanent: true,
+        source: '/docs/reference/javascript/supabase-client',
+        destination: '/docs/reference',
+      },
     ]
   },
 })
