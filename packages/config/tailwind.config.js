@@ -18,6 +18,7 @@ module.exports = ui({
     '../../packages/common/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
     './components/**/*.tsx',
+    './layouts/**/*.tsx',
     './pages/**/*.tsx',
     './_blog/*.mdx',
     // purge styles from supabase ui theme
