@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { FC, ReactNode, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
@@ -30,6 +30,8 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
 }: PropsWithChildren<Props>) => {
+  const ongoingIncident = useFlag('ongoingIncident')
+
   return (
     <>
       <Head>
@@ -47,8 +49,8 @@ const ProjectLayout = ({
         </MenuBarWrapper>
 
         <main
-          style={{ maxHeight: '100vh' }}
           className="flex w-full flex-1 flex-col overflow-x-hidden"
+          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
           <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
