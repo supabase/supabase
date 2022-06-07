@@ -43,7 +43,6 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
                 // @ts-ignore
                 description={
                   <div>
-                    <p>{option.description}</p>
                     <p>{option.metadata.features}</p>
                   </div>
                 }
