@@ -11,7 +11,7 @@ export const useNotifications = () => {
   const refresh = () => mutate()
 
   return {
-    notifications: anyError ? [] : data,
+    notifications: anyError ? undefined : data,
     isLoading: !anyError && !data,
     isError: !!anyError,
     refresh,
