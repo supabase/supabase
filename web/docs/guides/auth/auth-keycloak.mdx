@@ -11,9 +11,14 @@ To enable Keycloak Auth for your project, you need to set up an Keycloak OAuth a
 
 ## Overview
 
+To get started with Keycloak, you can run it in a docker container with: `docker run -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -p 8080:8080 jboss/keycloak:latest` 
+
+This guide will be assuming that you are running keycloak in a docker container as described in the command above.
+
 Keycloak OAuth consists of five broad steps:
 
 - Create a new client in your specified keycloak realm.
+- Obtain the `issuer` from the "OpenID Endpoint Configuration". This will be used as the `Keycloak URL`.
 - Ensure that the new client has the "Client Protocol" set to "openid-connect" and the "Access Type" is set to "confidential".
 - The `Client ID` of the client created will be used as the `client id`.
 - Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
@@ -23,12 +28,13 @@ Keycloak OAuth consists of five broad steps:
 
 ### Access your Keycloak Admin console
 
-- To get started with Keycloak, you can run it in a docker container with: `docker run -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -p 8080:8080 jboss/keycloak:latest` 
-- Login by visiting `http://localhost:8080` and clicking on "Administration Console". 
+- Login by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console". 
 
 ### Create a Keycloak Realm
 
 - Once you've logged in to the Keycloak console, you can add a realm from the side panel. The default realm should be named "Master".
+- After you've added a new realm, you can retrieve the `issuer` from the "OpenID Endpoint Configuration" endpoint. The `issuer` will be used as the `Keycloak URL`. 
+- You can find this endpoint from the realm settings under the "General Tab" or visit [`http://localhost:8080/auth/realms/my_realm_name/.well-known/openid-configuration`](http://localhost:8080/auth/realms/my_realm_name/.well-known/openid-configuration)
 
 ![Add a Keycloak Realm.](/img/guides/auth-keycloak/keycloak-create-realm.png)
 
