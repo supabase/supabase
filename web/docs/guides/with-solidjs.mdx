@@ -68,7 +68,7 @@ values={[
 <TabItem value="UI">
 
 ```sh
-1. Go to the "SQL" section.
+1. Go to the "SQL Editor" section.
 2. Click "User Management Starter".
 3. Click "Run".
 ```
@@ -426,14 +426,13 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```jsx title="src/Avatar.jsx"
 import { createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
-// import VisuallyHidden from '@reach/visually-hidden'
 
 export default (props) => {
   const [avatarUrl, setAvatarUrl] = createSignal(null)
   const [uploading, setUploading] = createSignal(false)
 
   createEffect(() => {
-    if (props.url) downloadImage(props.url)
+    if (props.url()) downloadImage(props.url())
   })
 
   const downloadImage = async (path) => {
@@ -468,7 +467,7 @@ export default (props) => {
         throw uploadError
       }
 
-      props.onUpload(filePath)
+      props.onUpload(event, filePath)
     } catch (error) {
       alert(error.message)
     } finally {
@@ -523,9 +522,9 @@ return (
     <Avatar
       url={avatar_url}
       size={150}
-      onUpload={(url) => {
+      onUpload={(e, url) => {
         setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
+        updateProfile(e)
       }}
     />
     {/* ... */}

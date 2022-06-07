@@ -349,6 +349,10 @@ li + li {
   font-size: 0.9rem;
 }
 
+.alert--warning .admonition-icon svg {
+  fill: var(--custom-color-orange-600);
+}
+
 .navbar__brand strong {
   font-family: var(--ifm-heading-font-family);
   font-size: 1.5rem;

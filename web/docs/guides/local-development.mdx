@@ -236,8 +236,21 @@ supabase db push
 
 ### Deploying Edge Functions
 
-Coming soon!
+You can deploy any Edge Functions using [`functions deploy`](/docs/reference/cli/supabase-functions-deploy):
 
+```sh
+supabase functions deploy <function_name>
+```
+
+## Limitations
+	
+The local development environment is not as feature-complete as the Plaform. Here are some of the differences:
+	
+- The Storage interface is coming soon.
+- The Functions interface is coming soon.
+- Logs are not supported though the interface (however you can accesss them via the docker containers).
+- You cannot update your project settings via the Dashboard - this can be done using the CLI instead.
+	
 ## Next steps
 
 - Got a question? [Ask in our Discussions](https://github.com/supabase/supabase/discussions).

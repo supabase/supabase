@@ -7,9 +7,10 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader, Alert } from '@supabase/ui'
+import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
 
-import { getURL, passwordStrength } from 'lib/helpers'
+import { NextPageWithLayout } from 'types'
+import { passwordStrength } from 'lib/helpers'
 import { post } from 'lib/common/fetch'
 import {
   API_URL,
@@ -23,42 +24,22 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, withAuth, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
-import InformationBox from 'components/ui/InformationBox'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
-import { NextPageWithLayout } from 'types'
+import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import {
+  FreeProjectLimitWarning,
+  NotOrganizationOwnerWarning,
+  EmptyPaymentMethodWarning,
+} from 'components/interfaces/Organization/NewProject'
 
 interface StripeCustomer {
   paymentMethods: any
   customer: any
   error?: any
-}
-
-const DisabledBox = () => {
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="Project creation is currently disabled"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              Our engineers are currently working on a fix. You can follow updates on{' '}
-              <a className="text-brand-900" href="https://status.supabase.com/">
-                https://status.supabase.com/
-              </a>
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
 }
 
 async function fetchStripeAccount(stripeCustomerId: string) {
@@ -79,6 +60,7 @@ const Wizard: NextPageWithLayout = () => {
   const { app, ui } = useStore()
 
   const subscriptionStats = useSubscriptionStats()
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -211,11 +193,6 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
-  /**
-   * Disable project creation override
-   */
-  const projectCreationDisabled = false
-
   return (
     <Panel
       hideHeaderStyling
@@ -231,7 +208,9 @@ const Wizard: NextPageWithLayout = () => {
             Cancel
           </Button>
           <div className="items-center space-x-3">
-            <span className="text-scale-900 text-xs">You can rename your project later</span>
+            {!projectCreationDisabled && (
+              <span className="text-scale-900 text-xs">You can rename your project later</span>
+            )}
             <Button
               onClick={onClickNext}
               loading={newProjectedLoading}
@@ -254,7 +233,7 @@ const Wizard: NextPageWithLayout = () => {
         </Panel.Content>
         {projectCreationDisabled ? (
           <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
-            <DisabledBox />
+            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
           <>
@@ -432,80 +411,3 @@ const PageLayout = withAuth(
 Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 
 export default observer(Wizard)
-
-const NotOrganizationOwnerWarning = () => {
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="You do not have permission to create a project"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              Only the organization owner can create new projects. Contact your organization owner
-              to create a new project for this organization.
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
-}
-
-const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="Your account has reached its free project limit"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              {`Your account can only have up to ${limit} free projects - to create another free project, you'll need to delete an existing free project first. Otherwise, you may create a project on the Pro tier instead.`}
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
-}
-
-const EmptyPaymentMethodWarning = observer(
-  ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
-    const { ui } = useStore()
-    const slug = ui.selectedOrganization?.slug
-
-    const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState<boolean>(false)
-
-    return (
-      <div className="mt-4">
-        <InformationBox
-          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-          defaultVisibility={true}
-          hideCollapse
-          title="Your organization has no payment methods"
-          description={
-            <div className="space-y-3">
-              <p className="text-sm leading-normal">
-                You need to add a payment method for your organization before creating a paid
-                project.
-              </p>
-              <Button type="secondary" onClick={() => setShowAddPaymentMethodModal(true)}>
-                Add a payment method
-              </Button>
-            </div>
-          }
-        />
-        <AddNewPaymentMethodModal
-          visible={showAddPaymentMethodModal}
-          returnUrl={`${getURL()}/new/${slug}`}
-          onCancel={() => setShowAddPaymentMethodModal(false)}
-        />
-      </div>
-    )
-  }
-)
