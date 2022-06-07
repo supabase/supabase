@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { find, isUndefined } from 'lodash'
+import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
 import { Modal } from '@supabase/ui'
 import {
@@ -78,27 +78,30 @@ const SidePanelEditor: FC<Props> = ({
         onRowCreated(res[0])
       }
     } else {
-      if (selectedTable!.primary_keys.length > 0) {
-        const updateQuery = new Query()
-          .from(selectedTable!.name, selectedTable!.schema)
-          .update(payload, { returning: true })
-          .match(configuration.identifiers)
-          .toSql()
+      const hasChanges = !isEmpty(payload)
+      if (hasChanges) {
+        if (selectedTable!.primary_keys.length > 0) {
+          const updateQuery = new Query()
+            .from(selectedTable!.name, selectedTable!.schema)
+            .update(payload, { returning: true })
+            .match(configuration.identifiers)
+            .toSql()
 
-        const res: any = await meta.query(updateQuery)
-        if (res.error) {
-          saveRowError = true
-          ui.setNotification({ category: 'error', message: res.error?.message })
+          const res: any = await meta.query(updateQuery)
+          if (res.error) {
+            saveRowError = true
+            ui.setNotification({ category: 'error', message: res.error?.message })
+          } else {
+            onRowUpdated(res[0], configuration.rowIdx)
+          }
         } else {
-          onRowUpdated(res[0], configuration.rowIdx)
+          saveRowError = true
+          ui.setNotification({
+            category: 'error',
+            message:
+              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
+          })
         }
-      } else {
-        saveRowError = true
-        ui.setNotification({
-          category: 'error',
-          message:
-            "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-        })
       }
     }
 
