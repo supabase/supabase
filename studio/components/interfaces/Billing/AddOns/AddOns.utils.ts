@@ -7,7 +7,6 @@ export const formatComputeSizes = (computeSizes: any[]) => {
   const microOption = {
     id: '',
     name: 'Micro Add-on',
-    description: 'Basic set up to get started',
     metadata: {
       default_price_id: undefined,
       supabase_prod_id: 'addon_instance_micro',
