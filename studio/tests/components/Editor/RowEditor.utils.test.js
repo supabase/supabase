@@ -1,7 +1,7 @@
 import { validateFields } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
 describe('RowEditor.utils: validateFields', () => {
-  test('should non-nullable fields correctly', () => {
+  test('should validate for non-nullable fields correctly', () => {
     const mockFields = [
       {
         name: 'name',
@@ -11,15 +11,31 @@ describe('RowEditor.utils: validateFields', () => {
         isNullable: false,
       },
       {
-        name: 'number',
+        name: 'age',
         value: 0,
-        format: 'text',
+        format: 'int8',
         defaultValue: null,
         isNullable: false,
       },
+      {
+        name: 'height',
+        value: '',
+        format: 'int2',
+        defaultValue: null,
+        isNullable: false,
+      },
+      {
+        name: 'weight',
+        value: '',
+        format: 'int2',
+        defaultValue: null,
+        isNullable: true,
+      },
     ]
     const res = validateFields(mockFields)
-    console.log('res', res)
     expect(res).toHaveProperty('name')
+    expect(res).not.toHaveProperty('age')
+    expect(res).toHaveProperty('height')
+    expect(res).not.toHaveProperty('weight')
   })
 })
