@@ -10,11 +10,10 @@ import { updateFilterValueDebounced } from './Filter.utils';
  * if not filterText state will not updated on delete filter
  */
 type FilterRowProps = {
-  filterIdx: number;
-  now: number;
+  filterIdx: number
 };
 
-const FilterRow: React.FC<FilterRowProps> = ({ filterIdx, now }) => {
+const FilterRow: React.FC<FilterRowProps> = ({ filterIdx }) => {
   const state = useTrackedState();
   const dispatch = useDispatch();
   const filter = state.filters[filterIdx];
@@ -28,7 +27,7 @@ const FilterRow: React.FC<FilterRowProps> = ({ filterIdx, now }) => {
   React.useEffect(() => {
     const filter = state.filters[filterIdx];
     setFilterValue(filter.value);
-  }, [filterIdx, now]);
+  }, [filterIdx]);
 
   function onColumnChange(column: string | number) {
     dispatch({
