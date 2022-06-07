@@ -415,8 +415,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
     description: 'Build a basic slack clone with Row Level Security.',
     sql: `
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/nextjs-slack-clone
---
+-- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
 
 -- Custom types
 create type public.app_permission as enum ('channels.delete', 'messages.delete');
@@ -614,10 +613,10 @@ values
     sql: `
 --
 -- For use with:
--- https://github.com/supabase/supabase/tree/master/examples/nextjs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/react-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/sveltejs-todo-list or
--- https://github.com/supabase/supabase/tree/master/examples/vue3-ts-todo-list
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list or
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list or
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list or
+-- https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list
 --
 
 create table todos (

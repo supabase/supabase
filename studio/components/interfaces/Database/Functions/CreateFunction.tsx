@@ -13,7 +13,7 @@ import {
   IconPlus,
   Toggle,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 
 import { useStore } from 'hooks'

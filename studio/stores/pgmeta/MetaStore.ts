@@ -1,7 +1,8 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
-import { Query } from '@supabase/grid'
+import { Query } from 'components/grid/query/Query'
+
 import {
   PostgresColumn,
   PostgresTable,
@@ -119,7 +120,6 @@ export default class MetaStore implements IMetaStore {
 
   connectionString?: string
   baseUrl: string
-  queryBaseUrl: string
   excludedSchemas = [
     'auth',
     'extensions',
@@ -130,13 +130,13 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'graphql',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
-    this.baseUrl = `/api/pg-meta/${projectRef}`
-    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
+    this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -172,7 +172,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.queryBaseUrl}/query`
+      const url = `${this.baseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 

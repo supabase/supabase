@@ -4,25 +4,25 @@ title: Local Development
 description: How to use Supabase on your local development machine.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
+import Tabs from '@theme/Tabs'
+import TabsPanel from '@theme/TabsPanel'
 
 Supabase provides a CLI so that you can develop your application locally, rather than connecting to a live project.
 
 ## Before you begin
 
-If you're using the CLI, please record your steps! You can help us improve by adding missing details and fixing errors. 
+If you're using the CLI, please record your steps! You can help us improve by adding missing details and fixing errors.
 
 Our CLI is still under heavy development, and is missing some features:
 
 - The self-hosted version of Supabase does not include a UI yet.
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) 
-([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
+  We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui)
+  ([more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)).
 
 In the meantime, here are some suggested tools for interacting with your Postgres Database:
 
-- `pgadmin`: https://www.pgadmin.org 
-- `dbeaver`: https://dbeaver.com 
+- `pgadmin`: https://www.pgadmin.org
+- `dbeaver`: https://dbeaver.com
 - `BeeKeeper`: https://beekeeperstudio.io
 - `HeidiSQL`: https://heidisql.com
 - `Table Plus`: https://www.tableplus.io
@@ -30,6 +30,7 @@ In the meantime, here are some suggested tools for interacting with your Postgre
 ## Prerequisites
 
 You will need to have these in your environment:
+
 - Git
 - Docker (make sure the daemon is up and running)
 - Supabase CLI (instructions [here](https://github.com/supabase/cli))
@@ -62,7 +63,6 @@ service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb
 
 #### Accessing Services Directly
 
-
 <Tabs
 defaultActiveId="Postgres"
 values={[
@@ -76,7 +76,7 @@ values={[
 postgresql://postgres:postgres@localhost:5432/postgres
 ```
 
-The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) 
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
 or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
 
 For example:
@@ -93,8 +93,8 @@ psql 'postgresql://postgres:postgres@localhost:5432/postgres'
 http://localhost:54321
 ```
 
-All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)). 
-If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header. 
+All of the services are accessible through the API Gateway [Kong](https://github.com/Kong/kong)).
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
 You can learn more about these JWT headers in our [Resources](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
 
 ```sh
@@ -108,14 +108,12 @@ http://localhost:54321/v1/storage/v1/        # Storage
 http://localhost:54321/v1/auth/v1/           # Auth (GoTrue)
 ```
 
-
 </TabsPanel>
 </Tabs>
 
-
 ## Example application
 
-Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application. 
+Now that we've learned how to install and start Supabase locally, let's see how you can use it with a frontend application.
 This quick-start guide will show you, how you can configure a React app which uses the Supabase stack.
 
 ```bash
@@ -125,8 +123,8 @@ npx create-react-app react-demo --use-npm
 # move into the new folder
 cd react-demo
 
-# set up Supabase 
-supabase init 
+# set up Supabase
+supabase init
 
 # Save the install supabase-js library
 npm install --save @supabase/supabase-js
@@ -169,4 +167,4 @@ You can also use the CLI to manage your migrations. Follow the the tour [here](h
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - CLI repository: [GitHub](https://github.com/supabase/cli).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

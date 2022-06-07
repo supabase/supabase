@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { NextPage } from 'next'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { Button, IconClock, IconSave, Loading } from '@supabase/ui'
@@ -9,30 +8,34 @@ import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplor
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
-import { LogSqlSnippets } from 'types'
+import { LogSqlSnippets, NextPageWithLayout } from 'types'
 
-export const LogsSavedPage: NextPage = () => {
+export const LogsSavedPage: NextPageWithLayout = () => {
   const { content, ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
 
-  useEffect(()=>{
+  useEffect(() => {
     content.loadPersistentData()
   }, [ui.selectedProjectRef])
   const recent = content.recentLogSqlSnippets.slice().reverse()
 
   return (
-    <LogsExplorerLayout>
-        <div className="flex flex-col gap-3">
-          {recent.length > 0 && (
+    <>
+      <div className="flex flex-col gap-3">
+        {recent.length > 0 && (
           <>
             <div className="flex flex-row justify-end">
-              <Button size="tiny" type="default" onClick={()=>{
-                content.clearRecentLogSqlSnippets()
-              }}>
+              <Button
+                size="tiny"
+                type="default"
+                onClick={() => {
+                  content.clearRecentLogSqlSnippets()
+                }}
+              >
                 Clear
               </Button>
-             </div>
+            </div>
             <Table
               head={
                 <>
@@ -42,30 +45,34 @@ export const LogsSavedPage: NextPage = () => {
               }
               body={
                 <>
-                  {recent.map((item: LogSqlSnippets.Content) => <RecentQueriesItem key={item.sql} item={item} />)}
+                  {recent.map((item: LogSqlSnippets.Content) => (
+                    <RecentQueriesItem key={item.sql} item={item} />
+                  ))}
                 </>
               }
             />
-        </>
+          </>
         )}
       </div>
       {recent.length === 0 && (
         <>
-          <div className="items-center flex flex-col gap-1 my-auto justify-center h-full flex-grow">
+          <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
             <IconClock className="animate-bounce" />
-            <h3 className="text-lg text-scale-1200">No Recent Queries Yet</h3>
-            <p className="text-sm text-scale-900">
+            <h3 className="text-scale-1200 text-lg">No Recent Queries Yet</h3>
+            <p className="text-scale-900 text-sm">
               Your recent queries run from the{' '}
               <Link href={`/project/${ref}/logs-explorer`}>
-                <span className="font-bold underline text-white cursor-pointer">Query</span>
+                <span className="cursor-pointer font-bold text-white underline">Query</span>
               </Link>{' '}
               tab will show here.
             </p>
           </div>
         </>
       )}
-    </LogsExplorerLayout>
+    </>
   )
 }
 
-export default withAuth(observer(LogsSavedPage))
+LogsSavedPage.getLayout = (page) => <LogsExplorerLayout>{page}</LogsExplorerLayout>
+
+export default observer(LogsSavedPage)

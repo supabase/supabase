@@ -4,6 +4,7 @@ import { Button } from '@supabase/ui'
 interface ActionBarProps {
   loading?: boolean
   disableApply?: boolean
+  hideApply?: boolean
   children?: any
   applyButtonLabel?: string
   backButtonLabel?: string
@@ -13,6 +14,7 @@ interface ActionBarProps {
 const ActionBar: FC<ActionBarProps> = ({
   loading = false,
   disableApply = false,
+  hideApply = false,
   children = undefined,
   applyButtonLabel = 'Apply',
   backButtonLabel = 'Back',
@@ -32,7 +34,7 @@ const ActionBar: FC<ActionBarProps> = ({
 
   return (
     <div className="border-scale-500 flex w-full justify-between space-x-3 border-t px-3 py-4">
-      <Button size="small" onClick={closePanel} type="default">
+      <Button size="small" onClick={closePanel} type="default" htmlType="button">
         {backButtonLabel}
       </Button>
 
@@ -48,12 +50,14 @@ const ActionBar: FC<ActionBarProps> = ({
         >
           {applyButtonLabel}
         </Button>
-      ) : (
+      ) : !hideApply ? (
         // New solution, when using the Form component, loading is handled by the Form itself
         // Does not require applyFunction() callback
-        <Button size="small" disabled={disableApply} loading={loading}>
+        <Button size="small" disabled={disableApply} loading={loading} htmlType="submit">
           {applyButtonLabel}
         </Button>
+      ) : (
+        <div />
       )}
     </div>
   )

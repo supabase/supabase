@@ -11,7 +11,7 @@ import {
   SidePanel,
   Typography,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import SqlEditor from 'components/to-be-cleaned/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
