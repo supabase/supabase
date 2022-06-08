@@ -50,10 +50,10 @@ test('Manual refresh', async () => {
 })
 test('Datepicker dropdown', async () => {
   render(<PreviewFilterPanel />)
-  clickDropdown(await screen.findByText(/Last hour/))
+  clickDropdown(await screen.findByText(/Last day/))
   userEvent.click(await screen.findByText(/Last 3 hours/))
   await screen.findByText(/Last 3 hours/)
-  await expect(screen.findByText(/Last hour/)).rejects.toThrow()
+  await expect(screen.findByText(/Last day/)).rejects.toThrow()
 })
 
 test.todo('timestamp to/from filter default value')
@@ -93,3 +93,11 @@ test.todo('timestamp to/from filter value change')
 //   await screen.findByText('Custom')
 //   await screen.findByTitle(/Clear timestamp filter/)
 // })
+
+
+
+test('shortened count to K', async () => {
+  render(<PreviewFilterPanel newCount={1234} />)
+  await screen.findByText(/1\.2K/)
+})
+

@@ -2,32 +2,37 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useProfile, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { NextPageWithLayout } from 'types'
 
-const User = () => {
+const User: NextPageWithLayout = () => {
   return (
-    <AccountLayout
-      title="Supabase"
-      breadcrumbs={[
-        {
-          key: `supabase-settings`,
-          label: 'Preferences',
-        },
-      ]}
-    >
-      <div className="my-2">
-        <ProfileCard />
-      </div>
-    </AccountLayout>
+    <div className="my-2">
+      <ProfileCard />
+    </div>
   )
 }
 
-export default withAuth(User)
+User.getLayout = (page) => (
+  <AccountLayout
+    title="Supabase"
+    breadcrumbs={[
+      {
+        key: `supabase-settings`,
+        label: 'Preferences',
+      },
+    ]}
+  >
+    {page}
+  </AccountLayout>
+)
+
+export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
@@ -50,7 +55,7 @@ const ProfileCard = observer(() => {
   }
 
   return (
-    <article className="p-4 max-w-4xl">
+    <article className="max-w-4xl p-4">
       <section>
         <GithubProfile />
       </section>

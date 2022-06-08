@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] 자동 생성 API
 - [x] 대시 보드
 - [x] 스토리지
-- [ ] 함수 (출시 예정)
+- [x] 함수
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 문서
 
-전체 문서는 [supabase.io/docs](https://supabase.com/docs)를 참조하세요.
+전체 문서는 [supabase.com/docs](https://supabase.com/docs)를 참조하세요.
 
 ## 커뮤니티 및 지원
 
@@ -29,7 +32,7 @@
 ## 상태
 
 - [x] Alpha: 제한된 사용자를 대상으로 테스트
-- [x] Public Alpha: 누구나[app.supabase.io](https://app.supabase.io)에서 등록 할 수 있습니다. 그러나, 버그 등이 있을 수 있으므로 양해 바랍니다.
+- [x] Public Alpha: 누구나[app.supabase.com](https://app.supabase.com)에서 등록 할 수 있습니다. 그러나, 버그 등이 있을 수 있으므로 양해 바랍니다.
 - [x] Public Beta: 기업을 제외한 대부분의 유스 케이스에 적합할 정도로 안정적
 - [ ] Public: 제품 준비중
 
@@ -45,7 +48,7 @@ Supabase는 오픈 소스 툴들을 조합한 것입니다. 엔터프라이즈 �
 
 **현재 아키텍쳐**
 
-Supabase는 [호스팅 플랫폼](https://app.supabase.io)입니다. 아무것도 설치하지 않고 가입하고 Supabase 사용을 시작할 수 있습니다.
+Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 아무것도 설치하지 않고 가입하고 Supabase 사용을 시작할 수 있습니다.
 또한 현재 로컬 개발 환경을 갖추고 있으며, 이는 플랫폼의 안정성과 함께 지금 최우선으로 진행하고 있는 프로젝트입니다.
 
 ![아키텍쳐](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)

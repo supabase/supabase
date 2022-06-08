@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -20,7 +21,7 @@
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/www/public/images/github/supabase-dashboard.png)
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentation
 
@@ -38,7 +39,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.io](https://app.supabase.io). But go easy on us, there are a few kinks
+- [x] Public Alpha: Anyone can sign up over at [app.supabase.com](https://app.supabase.com). But go easy on us, there are a few kinks
 - [x] Public Beta: Stable enough for most non-enterprise use-cases
 - [ ] Public: Production-ready
 
@@ -54,8 +55,8 @@ Supabase is a combination of open source tools. We’re building the features of
 
 **Architecture**
 
-Supabase is a [hosted platform](https://app.supabase.io). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/self-hosting) and [develop locally](https://supabase.com/docs/guides/local-development).
+Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
+You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

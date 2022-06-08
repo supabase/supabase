@@ -1,25 +1,17 @@
 import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import {
-  Alert,
-  Button,
-  IconDownloadCloud,
-  IconEye,
-  IconEyeOff,
-  IconLoader,
-  Input,
-  Typography,
-} from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
-
+import { isDefaultLogPreviewFormat } from './Logs.utils'
 // column renders
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
+import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -31,6 +23,24 @@ interface Props {
   showDownload?: boolean
 }
 type LogMap = { [id: string]: LogData }
+
+interface FormatterArg {
+  column: {
+    key: string
+    name: string
+    resizable: boolean
+    header: string
+    minWidth: number
+    idx: number
+    frozen: boolean
+    isLastFrozenColumn: boolean
+    rowGroup: boolean
+    sortable: boolean
+  }
+  isCellSelected: boolean
+  onRowChange: Function
+  row: any
+}
 
 /**
  * Logs table view with focus side panel
@@ -47,16 +57,23 @@ const LogTable = ({
   error,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+  const firstRow: LogData | undefined = data?.[0] as LogData
   const columnNames = Object.keys(data[0] || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
   const DEFAULT_COLUMNS = columnNames.map((v) => {
     let formatter = undefined
-    const firstRow: any = data[0]
-    const value = firstRow?.[v]
-    if (typeof value === 'object') {
-      formatter = () => `[Object]`
+
+    formatter = (received: FormatterArg) => {
+      const value = received.row?.[v]
+      if (value && typeof value === 'object') {
+        return `[Object]`
+      } else if (value === null) {
+        return 'NULL'
+      } else {
+        return String(value)
+      }
     }
     return { key: v, name: v, resizable: true, formatter, header: v, minWidth: 128 }
   })
@@ -160,7 +177,11 @@ const LogTable = ({
         break
 
       default:
-        columns = DEFAULT_COLUMNS
+        if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
+          columns = DefaultPreviewColumnRenderer
+        } else {
+          columns = DEFAULT_COLUMNS
+        }
         break
     }
   }
@@ -204,23 +225,20 @@ const LogTable = ({
   return (
     <>
       <section
-        className={'flex flex-1 flex-col  ' + (!queryType ? 'shadow-lg' : '')}
+        className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
         {!queryType && (
           <div>
             <div
               className="
-        w-full bg-scale-100 dark:bg-scale-300 
-
-       rounded-tl rounded-tr
-       border-t
-       border-l
-       border-r
-
-
-        flex items-center justify-between
-        px-5 py-2
+            w-full bg-scale-100 dark:bg-scale-300 
+            rounded-tl rounded-tr
+            border-t
+            border-l
+            border-r
+            flex items-center justify-between
+            px-5 py-2
       "
             >
               <div className="flex items-center gap-2">
@@ -248,9 +266,7 @@ const LogTable = ({
             </div>
           </div>
         )}
-        <div
-          className={'flex flex-row flex-grow h-full ' + (!queryType ? 'border-l border-r' : '')}
-        >
+        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
@@ -267,8 +283,9 @@ const LogTable = ({
               !isLoading ? (
                 <>
                   <div className="py-4 w-full h-full flex-col space-y-12">
-                    <div
-                      className={`transition-all
+                    {!error && (
+                      <div
+                        className={`transition-all
                       duration-500
                       delay-200
                       
@@ -284,46 +301,51 @@ const LogTable = ({
                       
                       justify-center
                     `}
-                    >
-                      <div className="flex flex-col gap-1">
-                        <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
-                        <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
-                          <div className="absolute right-1 -bottom-4">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
+                      >
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
+                              <div className="absolute right-1 -bottom-4">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-6 w-6"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                          <div className="flex flex-col gap-1 px-5">
+                            <h3 className="text-lg text-scale-1200">No results</h3>
+                            <p className="text-sm text-scale-900">
+                              Try another search, or adjusting the filters
+                            </p>
+                          </div>
+                        </>
                       </div>
-                      <div className="flex flex-col gap-1 px-5">
-                        <h3 className="text-lg text-scale-1200">No results</h3>
-                        <p className="text-sm text-scale-900">
-                          Try another search, or adjusting the filters
-                        </p>
-                      </div>
-                    </div>
+                    )}
                     {error && (
                       <div className="flex justify-center px-5">
                         <Alert
                           variant="danger"
                           title="Sorry! An error occured when fetching data."
                           withIcon
-                          className="max-w-xl"
+                          className="w-1/2"
                         >
                           <Input.TextArea
-                            size="small"
-                            value={JSON.stringify(error, null, 2)}
+                            size="tiny"
+                            value={
+                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
+                            }
                             borderless
                             className="font-mono w-full mt-4"
                             copy

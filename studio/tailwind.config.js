@@ -137,6 +137,9 @@ module.exports = ui({
           },
         },
       }),
+      fontSize: {
+        grid: '13px',
+      },
       colors: {
         // gray: { ...gray },
         // green: { ...green },

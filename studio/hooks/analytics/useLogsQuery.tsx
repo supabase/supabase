@@ -1,9 +1,12 @@
-import { cleanQuery, genQueryParams } from 'components/interfaces/Settings/Logs'
+import {
+  EXPLORER_DATEPICKER_HELPERS,
+  genQueryParams,
+  getDefaultHelper,
+} from 'components/interfaces/Settings/Logs'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
-import useSWRInfinite, { SWRInfiniteKeyLoader } from 'swr/infinite/dist/infinite'
 import { API_URL } from 'lib/constants'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import { get } from 'lib/common/fetch'
 interface Data {
   params: LogsEndpointParams
@@ -14,19 +17,19 @@ interface Data {
 interface Handlers {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
+  setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
 
 const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
 ): [Data, Handlers] => {
+  const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
-    project: projectRef,
     sql: '',
-    rawSql: '',
-    // timestamp_start: '',
-    // timestamp_end: '',
-    ...initialParams,
+    project: projectRef,
+    iso_timestamp_start: initialParams.iso_timestamp_start ? initialParams.iso_timestamp_start :  defaultHelper.calcFrom(),
+    iso_timestamp_end: initialParams.iso_timestamp_end ? initialParams.iso_timestamp_end :  defaultHelper.calcTo(),
   })
 
   const queryParams = genQueryParams(params as any)
@@ -36,7 +39,9 @@ const useLogsQuery = (
     isValidating: isLoading,
     mutate,
   } = useSWR<Logs>(
-    params.sql ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}` : null,
+    params.sql
+      ? `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`
+      : null,
     get,
     { revalidateOnFocus: false }
   )
@@ -46,12 +51,12 @@ const useLogsQuery = (
     error = data?.error
   }
   const changeQuery = (newQuery = '') => {
-    setParams((prev) => ({ ...prev, sql: cleanQuery(newQuery), rawSql: newQuery }))
+    setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
   return [
     { params, isLoading, logData: data?.result ? data?.result : [], error },
-    { changeQuery, runQuery: () => mutate() },
+    { changeQuery, runQuery: () => mutate(), setParams },
   ]
 }
 export default useLogsQuery

@@ -1,0 +1,8 @@
+{
+  "redirects": [
+    {
+      "source": "/careers",
+      "destination": "https://boards.greenhouse.io/supabase"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { Button, Select, Input, IconLink, Typography, IconArrowRight } from '@su
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'
-import { TEXT_TYPES, JSON_TYPES, TIMESTAMP_TYPES } from '../SidePanelEditor.constants'
+import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
 
 interface Props {
   field: RowField
@@ -72,7 +72,7 @@ const InputField: FC<Props> = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button type="default" onClick={onViewForeignKey} icon={<IconLink />}>
+          <Button type="default" htmlType="button" onClick={onViewForeignKey} icon={<IconLink />}>
             View data
           </Button>
         }
@@ -82,18 +82,25 @@ const InputField: FC<Props> = ({
 
   if (includes(TEXT_TYPES, field.format)) {
     return (
-      <Input.TextArea
-        layout="horizontal"
-        label={field.name}
-        descriptionText={field.comment}
-        labelOptional={field.format}
-        disabled={!isEditable}
-        error={errors[field.name]}
-        rows={5}
-        value={field.value}
-        placeholder={field.defaultValue}
-        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
-      />
+      <div className="text-area-text-sm">
+        <Input.TextArea
+          layout="horizontal"
+          label={field.name}
+          className="text-sm"
+          descriptionText={field.comment}
+          labelOptional={field.format}
+          disabled={!isEditable}
+          error={errors[field.name]}
+          rows={5}
+          value={field.value}
+          placeholder={
+            typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+              ? 'Default: Empty string'
+              : field.defaultValue
+          }
+          onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+        />
+      </div>
     )
   }
 
@@ -112,6 +119,7 @@ const InputField: FC<Props> = ({
         actions={
           <Button
             type="default"
+            htmlType="button"
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
             icon={<IconLink />}
           >
@@ -122,7 +130,7 @@ const InputField: FC<Props> = ({
     )
   }
 
-  if (includes(TIMESTAMP_TYPES, field.format)) {
+  if (includes(DATETIME_TYPES, field.format)) {
     return (
       <DateTimeInput
         name={field.name}

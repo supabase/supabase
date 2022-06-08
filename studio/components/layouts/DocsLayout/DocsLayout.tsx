@@ -1,15 +1,23 @@
 import { ReactElement, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
+  const router = useRouter()
   const { meta, ui } = useStore()
   const { data, isLoading, error } = meta.openApi
+
+  const getPage = () => {
+    const { page, resource } = router.query
+    if (!page && !resource) return 'introduction'
+    return (page || resource || '') as string
+  }
 
   useEffect(() => {
     if (ui.selectedProject) {
@@ -34,11 +42,16 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
       title={title || 'API Docs'}
       isLoading={isLoading}
       product="API Docs"
-      productMenu={<ProductMenu menu={generateDocsMenu(projectRef, tableNames, functionNames)} />}
+      productMenu={
+        <ProductMenu
+          page={getPage()}
+          menu={generateDocsMenu(projectRef, tableNames, functionNames)}
+        />
+      }
     >
       {children}
     </ProjectLayout>
   )
 }
 
-export default observer(DocsLayout)
+export default withAuth(observer(DocsLayout))

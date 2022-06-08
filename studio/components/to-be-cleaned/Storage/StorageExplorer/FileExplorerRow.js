@@ -119,7 +119,7 @@ const FileExplorerRow = ({
             <input
               autoFocus
               ref={inputRef}
-              className="storage-row-input text-sm ml-3 p-0 px-1 h-full"
+              className="storage-row-input text-sm ml-3 p-0 px-1 h-full bg-inherit"
               type="text"
               value={itemName}
               onChange={(event) => setItemName(event.target.value)}
@@ -180,7 +180,7 @@ const FileExplorerRow = ({
       <div
         className={`
         storage-row px-4 flex items-center justify-between hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark
-        ${isOpened ? 'bg-bg-secondary-light dark:bg-bg-alt-dark' : ''} ${
+        ${isOpened ? 'bg-scale-400' : ''} ${
           isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''
         } ${view === STORAGE_VIEWS.LIST ? 'min-w-min' : ''}
         ${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}

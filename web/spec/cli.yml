@@ -85,9 +85,9 @@ pages:
 
       ### Generating a new access token
 
-      - Navigate to https://app.supabase.io/account/tokens
+      - Navigate to https://app.supabase.com/account/tokens
       - Generate New Token
-      - Copy newly created token and past
+      - Copy newly created token and paste
 
     examples:
       - name: Usage
@@ -269,6 +269,8 @@ pages:
 
       Flags:
 
+      `--no-verify-jwt`: Disable JWT verification for the Function.
+
       `--project-ref`: Project ref of the Supabase project.
     examples:
       - name: Usage
@@ -290,6 +292,12 @@ pages:
   supabase functions serve:
     description: |
       Serve a Function locally.
+
+      Flags:
+
+      `--env-file`: Path to an env file to be populated to the Function environment.
+
+      `--no-verify-jwt`: Disable JWT verification for the Function.
     examples:
       - name: Usage
         sh: |

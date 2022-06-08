@@ -1,37 +1,45 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import { Alert, Button, Input, Typography, IconRefreshCcw } from '@supabase/ui'
+import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { NextPageWithLayout } from 'types'
 
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   return (
-    <SettingsLayout title="General">
-      <div className="content w-full h-full overflow-y-auto">
+    <div>
+      <div className="content h-full w-full overflow-y-auto">
         <div className="mx-auto w-full">
           <GeneralSettings />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
 
-const RestartServerButton: FC<any> = ({ projectRef }: any) => {
-  const { ui } = useStore()
+export default observer(ProjectSettings)
+
+interface RestartServerButtonProps {
+  projectId: number
+  projectRef: string
+}
+const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef, projectId }) => {
+  const { ui, app } = useStore()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -42,8 +50,9 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
     setLoading(true)
     try {
       await post(`${API_URL}/projects/${projectRef}/restart`, {})
-      ui.setNotification({ category: 'info', message: 'Requested server restart' })
-      setLoading(false)
+      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+      ui.setNotification({ category: 'success', message: 'Restarting server' })
+      router.push(`/project/${projectRef}`)
     } catch (error) {
       ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
       setLoading(false)
@@ -68,7 +77,7 @@ const RestartServerButton: FC<any> = ({ projectRef }: any) => {
       </Button>
     </>
   )
-}
+})
 
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
@@ -91,7 +100,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="p-4 max-w-4xl">
+    <article className="max-w-4xl p-4">
       <section>
         <SchemaFormPanel
           title="General"
@@ -106,9 +115,9 @@ const GeneralSettings = observer(() => {
       <section>
         <Panel
           title={
-            <Typography.Title key="panel-title" level={5} className="mb-0">
+            <h5 key="panel-title" className="mb-0 text-base">
               Infrastructure
-            </Typography.Title>
+            </h5>
           }
         >
           <Panel.Content>
@@ -120,42 +129,37 @@ const GeneralSettings = observer(() => {
               layout="horizontal"
             />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
             <Input readOnly disabled value={project?.region} label="Region" layout="horizontal" />
           </Panel.Content>
-          <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="w-full flex items-center justify-between">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+            <div className="flex w-full items-center justify-between">
               <div>
-                <Typography.Text className="block">Restart Server</Typography.Text>
+                <p>Restart server</p>
                 <div style={{ maxWidth: '420px' }}>
-                  <p className="opacity-50 text-sm">
+                  <p className="text-sm opacity-50">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
               </div>
-              <RestartServerButton projectRef={project?.ref} />
+              {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
         </Panel>
       </section>
 
       <section>
-        <Panel title={<Typography.Text className="uppercase">Danger Zone</Typography.Text>}>
+        <Panel title={<p className="uppercase">Danger Zone</p>}>
           <Panel.Content>
             <Alert
               variant="danger"
               withIcon
-              // @ts-ignore
-              title={
-                <Typography.Text>
-                  Deleting this project will also remove your database.
-                </Typography.Text>
-              }
+              title="Deleting this project will also remove your database."
             >
               <div className="flex flex-col">
-                <Typography.Text className="block mb-4">
+                <p className="mb-4 block">
                   Make sure you have made a backup if you want to keep your data.
-                </Typography.Text>
+                </p>
                 <ProjectDeleteModal project={project} />
               </div>
             </Alert>
@@ -181,7 +185,7 @@ const ProjectDeleteModal = ({ project }: any) => {
   async function handleDeleteProject() {
     setLoading(true)
     try {
-      const response = await delete_(`${API_URL}/projects/${project.ref}/remove`)
+      const response = await delete_(`${API_URL}/projects/${project.ref}`)
       if (response.error) throw response.error
       app.onProjectDeleted(response)
       ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })

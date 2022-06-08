@@ -1,9 +1,8 @@
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import dayjs from 'dayjs'
 import { LogData } from '.'
-import utc from 'dayjs/plugin/utc'
 import { useMemo } from 'react'
-dayjs.extend(utc)
+
 interface Props {
   data?: LogData[]
   onBarClick: (timestamp: number) => void
@@ -21,7 +20,8 @@ const LogEventChart: React.FC<Props> = ({ data, onBarClick }) => {
       data={aggregated}
       attribute="count"
       label="Events"
-      onBarClick={(v: any) => {
+      onBarClick={(v?: {activePayload?: {payload: any}[]}) => {
+        if (!v || !v?.activePayload?.[0]?.payload) return
         const timestamp = v.activePayload[0].payload.timestamp
         // 60s before
         onBarClick((Number(timestamp) + 60) * 1000 * 1000)

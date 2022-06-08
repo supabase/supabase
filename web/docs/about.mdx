@@ -14,6 +14,7 @@ import JavascriptLogo from '@site/static/img/libraries/javascript-icon.svg'
 import NextjsDarkLogo from '@site/static/img/libraries/nextjs-dark-icon.svg'
 import NextjsLightLogo from '@site/static/img/libraries/nextjs-light-icon.svg'
 import ReactLogo from '@site/static/img/libraries/react-icon.svg'
+import SolidJSLogo from '@site/static/img/libraries/solidjs-icon.svg'
 import RedwoodJsLogo from '@site/static/img/libraries/redwoodjs-icon.svg'
 import SvelteLogo from '@site/static/img/libraries/svelte-icon.svg'
 import VuejsLogo from '@site/static/img/libraries/vuejs-icon.svg'
@@ -31,13 +32,13 @@ const frameworks = [
   {
     name: 'Expo',
     logo: ExpoLogo,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/expo-todo-list',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/expo-todo-list',
   },
   { name: 'Flutter', logo: DartLogo, href: '/docs/guides/with-flutter' },
   {
-    name: 'Javascript',
+    name: 'JavaScript',
     logo: JavascriptLogo,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/javascript-auth',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/auth/javascript-auth',
   },
   {
     name: 'Next.js',
@@ -50,6 +51,7 @@ const frameworks = [
   },
   { name: 'React', logo: ReactLogo, href: '/docs/guides/with-react' },
   { name: 'RedwoodJS', logo: RedwoodJsLogo, href: '/docs/guides/with-redwoodjs' },
+  { name: 'SolidJS', logo: SolidJSLogo, href: '/docs/guides/with-solidjs' },
   { name: 'Svelte', logo: SvelteLogo, href: '/docs/guides/with-svelte' },
   { name: 'Vue', logo: VuejsLogo, href: '/docs/guides/with-vue-3' },
 ]
@@ -78,7 +80,16 @@ It provides all the backend services you need to build a product. You can use it
         </div>
       </Link>
     </div>
-    {/* Auth */}
+    {/* Functions */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/functions" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Edge Functions</h4>
+          <p>Server-side Typescript functions, distributed globally.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Storage */}
     <div class="col col--6">
       <Link class="card" to="/docs/guides/storage" style={{ height: '100%' }}>
         <div class="card__body">
@@ -96,12 +107,22 @@ It provides all the backend services you need to build a product. You can use it
         </div>
       </Link>
     </div>
+    {/* Observability */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/guides/platform/logs" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Observability</h4>
+          <p>Monitor and debug your infrastucture.</p>
+        </div>
+      </Link>
+    </div>
+    {/*  */}
   </div>
 </div>
 
 ## Getting started
 
-Visit [app.supabase.io](https://app.supabase.io) to get started with the hosted platform or visit the [self-hosting](/docs/guides/hosting/overview) docs to learn how to host Supabase yourself.
+Visit [app.supabase.com](https://app.supabase.com) to get started with the hosted platform or visit the [self-hosting](/docs/guides/hosting/overview) docs to learn how to host Supabase yourself.
 
 Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
 

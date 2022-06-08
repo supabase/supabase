@@ -12,8 +12,8 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
   const DetailedRow = ({ label, value }: { label: string; value: string | React.ReactNode }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
-        <span className="text-scale-1200 text-base col-span-8">{value}</span>
+        <p className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</p>
+        <p className="text-scale-1200 text-base col-span-8 whitespace-pre-wrap">{value}</p>
       </div>
     )
   }
@@ -23,12 +23,9 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
 
-        <div
-          className="text-xs text-wrap font-mono text-scale-1200 mt-2"
-          dangerouslySetInnerHTML={{
-            __html: log.event_message,
-          }}
-        />
+        <div className="text-xs text-wrap font-mono text-scale-1200 mt-2  whitespace-pre-wrap overflow-x-auto">
+          {log.event_message}
+        </div>
       </div>
       <LogsDivider />
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>

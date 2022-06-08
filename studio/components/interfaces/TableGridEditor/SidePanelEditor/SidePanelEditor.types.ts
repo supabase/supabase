@@ -60,7 +60,7 @@ export interface ColumnField {
   name: string
   comment?: string
   format: string
-  defaultValue: string
+  defaultValue: string | null
   foreignKey: PostgresRelationship | undefined
   isNullable: boolean
   isUnique: boolean
@@ -74,12 +74,6 @@ export interface ColumnField {
 //   table: PostgresTable
 //   column: PostgresColumn
 // }
-
-export interface EnumType {
-  id: number
-  name: string
-  values: any[]
-}
 
 export interface PostgresDataTypeOption {
   name: string
