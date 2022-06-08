@@ -8,10 +8,10 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-Tables are where you store your data. 
+Tables are where you store your data.
 
 
-Tables are similar to excel spreadsheets. They contain columns and rows. 
+Tables are similar to excel spreadsheets. They contain columns and rows.
 For example, this table has 3 "columns" (`id`, `name`, `description`) and 4 "rows" of data:
 
 | `id`    | `name` | `description` |
@@ -26,14 +26,14 @@ There are a few important differences from a spreadsheet, but it's a good starti
 ## Creating Tables
 
 
-When creating a table, it's best practice to add columns at the same time. 
+When creating a table, it's best practice to add columns at the same time.
 
 ![Tables and columns](/img/guides/database/tables-columns.png)
 
-You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table. 
+You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
-Supabase provides several options for creating tables. You can use the Dashboard or create them directly using SQL. 
-We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database 
+Supabase provides several options for creating tables. You can use the Dashboard or create them directly using SQL.
+We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database
 and run the SQL queries yourself.
 
 
@@ -76,19 +76,47 @@ create table movies (
 
 It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
 
-## Columns 
+## Columns
 
 You must define the "data type" when you create a column.
 
 
 ### Data types
 
-Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) 
+Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions)
 if the default types don't fit your needs.
 
+Here's a list of the data types that are available to use in the dashboard.
+
+| `Name`                                        | `Description`              | `Example`                                                       |
+| ------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
+| int2       | Can contain numbers between -32,768 and 32,767 | For storing numbers like ages of people, distance between places or numbers you know will be fairly small.  |
+| int4       | Can contain numbers between -2,147,483,648 and +2,147,483,648  | For storing numbers like the population of small towns or cities that you know will be less than about 2 billion. |
+| int8       | Can contain numbers between 9,223,372,036,854,775,808 and +9,223,372,036,854,775,808 | For storing numbers larger than about 2 billion. Like the number of people who live in the Northern vs Southern hemisphere or the total number of COVID-19 vaccinations administered. |
+| float4     | Can contain numbers with up to 6 decimal places   | For storing things like temperature (22.5 degrees Celsius) or distance (10.25kms)|
+| float8     | Can contain numbers with up to 15 decimal places   | For storing numbers with a high level of precision, like scientific or mathematical data.  |
+| numeric    | Can contain 131, 072 digits before the decimal point and 16, 383 digits after the decimal point. | For storing number that require very high precision. Use the numeric type when you need more precision than float4 or float8 offer. |
+| json       | Can contain JSON data.  | For storing data that logically belongs together, like a person’s street address. Useful for when you want to store dynamic fields and not have every field specified as a row in your table.  |
+| jsonb      | The JSONB type stores your JSON input as a binary code instead of as an exact copy of the JSON data. JSONB is faster, more efficient and supports indexing.    |  Not sure what the json vs jsonb recommendation should be. I think we should make one though. It’s really not clear from my reading.      |
+| text       | Can contain strings of any length. | For storing any kind of textual data. Examples include text contents of recipes or blog posts. This is the general purpose data type for textual content.    |
+| varchar    | Can contain strings with a fixed length | For storing a string where you would want to limit the length to 255 characters.     |
+| uuid       | Can store a universal unique identifier. | For storing unique IDs, like when you need to store a reference to another table row.  |
+| date       | Can store a data value without time. |  For storing dates like birthdays or holidays.  |
+| time       | Can store the time of day |  For storing things like when a process starts and stops.  |
+| timez      | Can store the time of day, along with a timezone. | For storing things like event start times,  like an Apple event starting at 10a.m. Pacific Time. |
+| timestamp  | Can store the date and time without a timezone.  | For storing times like: May 1st, 2022 at 10a.m.  |
+| timestampz | Can store the date and time with a timezone.  | For storing times like: May 1st, 2022 at 10a.m, Pacific Time. |
+| bool       | Can store boolean values  | For storing things like user_is_subscribed or show_homepage_ad. |
+
+
+
+
+
+
+Here's a complete list of all of the default data types provided by Postgres.
 <details>
 <summary>Show/Hide default data types</summary>
-  
+
 
 | `Name`                                        | `Aliases`              | `Description`                                                       |
 | ------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
@@ -141,17 +169,17 @@ if the default types don't fit your needs.
 
 <br />
 
-You can "cast" columns from one type to another, however there can be some incompatibilities between types. 
+You can "cast" columns from one type to another, however there can be some incompatibilities between types.
 For example, if you cast a `timestamp` to a `date`, you will lose all the time information that was previously saved.
 
-### Primary Keys 
+### Primary Keys
 
 A table can have a "primary key" - a unique identifier for every row of data. A few tips for Primary Keys:
 
 
 - It's recommended to create a Primary Key for every table in your database.
 - You can use any column as a primary key, as long as it is unique for every row.
-- It's common to use a `uuid` type or a numbered `identity` column as your primary key. 
+- It's common to use a `uuid` type or a numbered `identity` column as your primary key.
 
 ```sql
 create table movies (
@@ -161,9 +189,9 @@ create table movies (
 
 In the example above, we have:
 
-1. created a column called `id` 
+1. created a column called `id`
 1. assigned the data type `bigint`
-1. instructed the database that this should be `generated always as identity`, which means that Postgres will automatically assign a unique number to this column. 
+1. instructed the database that this should be `generated always as identity`, which means that Postgres will automatically assign a unique number to this column.
 1. Becuase it's unique, we can also use it as our `primary key`.
 
 We could also use `generated by default as identity`, which would allow us to insert our own unique values.
@@ -174,9 +202,9 @@ create table movies (
 );
 ```
 
-## Loading data 
+## Loading data
 
-There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](/docs/guides/api). 
+There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](/docs/guides/api).
 Use the "Bulk Loading" instructions if you are loading large data sets.
 
 ### Basic data loading
@@ -191,7 +219,7 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-insert into movies 
+insert into movies
   (name, description)
 values
   ('The Empire Strikes Back', 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'),
@@ -204,12 +232,12 @@ values
 ```sql
 const { data, error } = await supabase
   .from('movies')
-  .insert([{ 
-    name: 'The Empire Strikes Back', 
-    description: 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.' 
-  }, { 
-    name: 'Return of the Jedi', 
-    description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.' 
+  .insert([{
+    name: 'The Empire Strikes Back',
+    description: 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'
+  }, {
+    name: 'Return of the Jedi',
+    description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
   }])
 ```
 
@@ -219,21 +247,21 @@ const { data, error } = await supabase
 ```sql
 final res = await supabase
   .from('movies')
-  .insert([{ 
-    name: 'The Empire Strikes Back', 
-    description: 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.' 
-  }, { 
-    name: 'Return of the Jedi', 
-    description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.' 
+  .insert([{
+    name: 'The Empire Strikes Back',
+    description: 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'
+  }, {
+    name: 'Return of the Jedi',
+    description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
   }]).execute();
 ```
 
 </TabItem>
 </Tabs>
 
-### Bulk data loading 
+### Bulk data loading
 
-When inserting large data sets it's best to use PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command. 
+When inserting large data sets it's best to use PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
 This loads data directly from a file into a table. There are several file formats available for copying data: text, csv, binary, JSON, etc.
 
 For example, if you wanted to load a CSV file into your movies table:
@@ -243,7 +271,7 @@ For example, if you wanted to load a CSV file into your movies table:
 "Return of the Jedi", "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
 ```
 
-You would [connect](/docs/guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the COPY command: 
+You would [connect](/docs/guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the COPY command:
 
 ```bash
 psql -h DATABASE_URL -p 5432 postgres -U postgres \
@@ -257,9 +285,9 @@ Tables can be "joined" together using Foreign Keys.
 
 ![Foreign Keys](/img/guides/database/foreign-keys.png)
 
-This is where the "Relational" naming comes from, as data typically forms some sort of relationship. 
+This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
-In our "movies" example above, we might want to add a "category" for each movie (for example, "Action", or "Documentary"). 
+In our "movies" example above, we might want to add a "category" for each movie (for example, "Action", or "Documentary").
 Let's create a new table called `categories` and "link" our `movies` table.
 
 ```sql
@@ -268,7 +296,7 @@ create table categories (
   name text -- category name
 );
 
-alter table movies 
+alter table movies
   add column category_id bigint references categories;
 ```
 
@@ -323,15 +351,15 @@ allowFullScreen
 </Tabs>
 
 
-## Schemas 
+## Schemas
 
 Tables belong to `schemas`. Schemas are a way of organizing your tables, often for security reasons.
 
 ![Schemas and tables](/img/guides/database/schema-tables.png)
 
-If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema. 
+If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
 
-We can create schemas for organizing tables. For example, we might want a private schema which is hidden from our API: 
+We can create schemas for organizing tables. For example, we might want a private schema which is hidden from our API:
 
 
 ```sql
