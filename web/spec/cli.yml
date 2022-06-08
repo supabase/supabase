@@ -85,7 +85,7 @@ pages:
 
       ### Generating a new access token
 
-      - Navigate to https://app.supabase.io/account/tokens
+      - Navigate to https://app.supabase.com/account/tokens
       - Generate New Token
       - Copy newly created token and paste
 
@@ -294,6 +294,8 @@ pages:
       Serve a Function locally.
 
       Flags:
+
+      `--env-file`: Path to an env file to be populated to the Function environment.
 
       `--no-verify-jwt`: Disable JWT verification for the Function.
     examples:

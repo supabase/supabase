@@ -8,6 +8,7 @@ import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
+import NotificationsPopover from './NotificationsPopover'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
@@ -15,13 +16,11 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   return (
     <div
-      className={`py-2 px-5 max-h-12 h-12 flex justify-between items-center ${
-        headerBorder ? 'border-b dark:border-dark' : ''
+      className={`flex h-12 max-h-12 items-center justify-between py-2 px-5 ${
+        headerBorder ? 'dark:border-dark border-b' : ''
       }`}
     >
-      {/* <div className="PageHeader"> */}
-      {/* <div className="flex justify-between"> */}
-      <div className="text-sm flex items-center -ml-2">
+      <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
         {selectedOrganization ? (
           <>
@@ -54,7 +53,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         ) : (
           <Link href="/">
             <a
-              className={`text-xs text-scale-1200 px-2 py-1 focus:outline-none focus:bg-transparent cursor-pointer`}
+              className={`text-scale-1200 cursor-pointer px-2 py-1 text-xs focus:bg-transparent focus:outline-none`}
             >
               Supabase
             </a>
@@ -63,10 +62,13 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
-      <div className="flex space-x-2">
+      <div className="flex items-center space-x-6">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && <HelpPopover />}
-        {IS_PLATFORM && <FeedbackDropdown />}
+        <div className="flex items-center space-x-2">
+          {IS_PLATFORM && <HelpPopover />}
+          {IS_PLATFORM && <FeedbackDropdown />}
+        </div>
+        {IS_PLATFORM && <NotificationsPopover />}
       </div>
     </div>
     // </div>

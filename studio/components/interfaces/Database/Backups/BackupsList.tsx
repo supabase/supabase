@@ -54,8 +54,8 @@ const BackupsList: FC<Props> = ({}) => {
 
   return (
     <div className="space-y-6">
-      {!sortedBackups.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
-        <div className="block w-full bg-green-500 bg-opacity-5 p-3 border border-green-500 border-opacity-50 rounded">
+      {!sortedBackups?.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
+        <div className="block w-full rounded border border-green-500 border-opacity-50 bg-green-500 bg-opacity-5 p-3">
           <div className="flex space-x-3">
             <div>
               <IconInfo className="text-green-500" size="large" />
@@ -65,15 +65,9 @@ const BackupsList: FC<Props> = ({}) => {
         </div>
       ) : (
         <Panel>
-          {!sortedBackups && (
-            <div className="text-center p-4">
-              <img className="loading-spinner" src="/img/spinner.gif"></img>
-            </div>
-          )}
-          {sortedBackups &&
-            sortedBackups.map((x: any, i: number) => {
-              return <BackupItem key={x.id} projectRef={projectRef} backup={x} index={i} />
-            })}
+          {sortedBackups?.map((x: any, i: number) => {
+            return <BackupItem key={x.id} projectRef={projectRef} backup={x} index={i} />
+          })}
         </Panel>
       )}
     </div>

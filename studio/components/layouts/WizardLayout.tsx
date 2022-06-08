@@ -1,12 +1,15 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { IconChevronRight } from '@supabase/ui'
-import { withAuth } from 'hooks'
+import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
 
 const WizardLayout: FC<any> = ({ organization, project, children }) => {
+  const ongoingIncident = useFlag('ongoingIncident')
+  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
       <Header organization={organization} project={project} />
       <div className="overflow-auto">
         <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
