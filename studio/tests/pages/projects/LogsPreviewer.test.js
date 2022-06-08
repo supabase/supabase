@@ -1,3 +1,8 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
+
 // mock the fetch function
 jest.mock('lib/common/fetch')
 import { get } from 'lib/common/fetch'
@@ -56,6 +61,17 @@ LogsPreviewer.mockImplementation((props) => {
   )
 })
 
+jest.mock('hooks/queries/useProjectSubscription')
+import useProjectSubscription from 'hooks/queries/useProjectSubscription'
+useProjectSubscription = jest.fn()
+useProjectSubscription.mockImplementation((ref) => ({
+  subscription: {
+    tier: {
+      supabase_prod_id: 'tier_free',
+    },
+  },
+}))
+
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { getToggleByText } from '../../helpers'
@@ -80,6 +96,14 @@ test('can display log data and metadata', async () => {
     ],
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+    },
+  )
+
   fireEvent.click(await screen.findByText(/some-event-happened-id/))
   await screen.findByText(/my_key/)
   await screen.findByText(/something_value/)
@@ -170,40 +194,36 @@ test('te= query param will populate the timestamp to input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
-  const isoString = newDate.toISOString()
-  const unixMicro = newDate.getTime() * 1000 //microseconds
+  const iso = newDate.toISOString()
   const router = defaultRouterMock()
-  router.query = { ...router.query, te: unixMicro }
+  router.query = { ...router.query, ite: iso }
   useRouter.mockReturnValue(router)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`timestamp_end=${encodeURIComponent(unixMicro)}`)
+      expect.stringContaining(`iso_timestamp_end=${encodeURIComponent(iso)}`)
     )
   })
   userEvent.click(await screen.findByText('Custom'))
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_end=' + unixMicro))
 })
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
   const newDate = new Date()
   newDate.setMinutes(new Date().getMinutes() - 20)
-  const unixMicro = newDate.getTime() * 1000 //microseconds
+  const iso = newDate.toISOString()
   const router = defaultRouterMock()
-  router.query = { ...router.query, ts: unixMicro }
+  router.query = { ...router.query, its: iso }
   useRouter.mockReturnValue(router)
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
   await waitFor(() => {
     expect(get).toHaveBeenCalledWith(
-      expect.stringContaining(`timestamp_start=${encodeURIComponent(unixMicro)}`)
+      expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`)
     )
   })
   userEvent.click(await screen.findByText('Custom'))
   await screen.findByText(new RegExp(newDate.getFullYear()))
-  await screen.findByText(/Apply/)
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('timestamp_start=' + unixMicro))
 })
 
 test('load older btn will fetch older logs', async () => {
@@ -284,14 +304,12 @@ test('bug: nav backwards with params change results in ui changing', async () =>
   await screen.findByDisplayValue('simple-query')
 })
 
-test("bug: nav to explorer preserves newlines", async ()=>{
-  render(
-    <LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />
-  )
+test('bug: nav to explorer preserves newlines', async () => {
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   const router = useRouter()
   userEvent.click(await screen.findByText(/Explore/))
-  await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent("\n")))
-}
+  await expect(router.push).toBeCalledWith(expect.stringContaining(encodeURIComponent('\n')))
+})
 test('filters alter generated query', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   userEvent.click(await screen.findByRole('button', { name: 'Status' }))

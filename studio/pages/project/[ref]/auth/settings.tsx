@@ -7,28 +7,29 @@ import { Button, Typography, Toggle as UIToggle } from '@supabase/ui'
 import Divider from 'components/ui/Divider'
 
 import { API_URL } from 'lib/constants'
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { authConfig } from 'stores/jsonSchema'
 import { get, patch } from 'lib/common/fetch'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { AuthLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
-import Toggle from 'components/to-be-cleaned/forms/Toggle'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SecretField from 'components/to-be-cleaned/forms/SecretField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { NextPageWithLayout } from 'types'
 
-const Auth = () => {
+const Auth: NextPageWithLayout = () => {
   return (
-    <AuthLayout title="Auth">
-      <div className="p-4">
-        <Settings />
-      </div>
-    </AuthLayout>
+    <div className="p-4">
+      <Settings />
+    </div>
   )
 }
-export default withAuth(observer(Auth))
+
+Auth.getLayout = (page) => <AuthLayout title="Auth">{page}</AuthLayout>
+
+export default observer(Auth)
 
 const Settings = () => {
   const router = useRouter()
@@ -121,6 +122,8 @@ const Settings = () => {
             'JWT_EXP',
             'DISABLE_SIGNUP',
             'PASSWORD_MIN_LENGTH',
+            'SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION',
+            'SECURITY_REFRESH_TOKEN_REUSE_INTERVAL',
           ])}
           model={{
             SITE_URL: model.SITE_URL || undefined,
@@ -128,8 +131,11 @@ const Settings = () => {
             DISABLE_SIGNUP: model.DISABLE_SIGNUP,
             JWT_EXP: model.JWT_EXP || undefined,
             PASSWORD_MIN_LENGTH: model.PASSWORD_MIN_LENGTH || undefined,
-          }}
-          onSubmit={(model: any) => onFormSubmit(model)}
+            SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: model.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL || undefined,
+            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: 
+              model.SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION || false,
+            }}
+            onSubmit={(model: any) => onFormSubmit(model)}
         >
           <AutoField
             name="SITE_URL"
@@ -139,10 +145,12 @@ const Settings = () => {
           <AutoField
             name="URI_ALLOW_LIST"
             showInlineError
-            errorMessage="Must be a comma separated list of exact URIs. No spaces."
+            errorMessage="Must be a comma separated list of URIs. No spaces."
           />
           <NumField name="JWT_EXP" step="1" />
-          <NumField name="PASSWORD_MIN_LENGTH" step="1" />
+          <NumField name="PASSWORD_MIN_LENGTH" step="1" min={6} max={10} />
+          <NumField name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL" step="1" min={0}/>
+          <ToggleField name="SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION" />
           <ToggleField name="DISABLE_SIGNUP" />
         </SchemaFormPanel>
       </div>
@@ -151,6 +159,7 @@ const Settings = () => {
           title="Email Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'MAILER_SECURE_EMAIL_CHANGE_ENABLED',
+            'MAILER_OTP_EXP',
             'SMTP_ADMIN_EMAIL',
             'SMTP_HOST',
             'SMTP_PORT',
@@ -161,6 +170,7 @@ const Settings = () => {
           ])}
           model={{
             MAILER_SECURE_EMAIL_CHANGE_ENABLED: model.MAILER_SECURE_EMAIL_CHANGE_ENABLED,
+            MAILER_OTP_EXP: model.MAILER_OTP_EXP || undefined,
             SMTP_ADMIN_EMAIL: isCustomSMTPEnabled ? model.SMTP_ADMIN_EMAIL : '',
             SMTP_HOST: isCustomSMTPEnabled ? model.SMTP_HOST : '',
             SMTP_PORT: isCustomSMTPEnabled ? model.SMTP_PORT : '',
@@ -185,7 +195,7 @@ const Settings = () => {
             checked={model.EXTERNAL_EMAIL_ENABLED}
             descriptionText={authConfig.properties.EXTERNAL_EMAIL_ENABLED.help}
           />
-
+          <NumField name="MAILER_OTP_EXP" step="1" min={0} max={86400}/>
           <UIToggle
             layout="horizontal"
             className="mb-4"
@@ -266,6 +276,8 @@ const Settings = () => {
           title="Phone Auth"
           schema={pluckJsonSchemaFields(authConfig, [
             'SMS_PROVIDER',
+            'SMS_OTP_EXP',
+            'SMS_OTP_LENGTH',
             'SMS_TWILIO_ACCOUNT_SID',
             'SMS_TWILIO_AUTH_TOKEN',
             'SMS_TWILIO_MESSAGE_SERVICE_SID',
@@ -279,6 +291,8 @@ const Settings = () => {
           ])}
           model={{
             SMS_PROVIDER: model.SMS_PROVIDER,
+            SMS_OTP_EXP: model.SMS_OTP_EXP || undefined,
+            SMS_OTP_LENGTH: model.SMS_OTP_LENGTH || undefined,
             SMS_TEXTLOCAL_API_KEY: model.SMS_TEXTLOCAL_API_KEY || undefined,
             SMS_TEXTLOCAL_SENDER: model.SMS_TEXTLOCAL_SENDER || undefined,
             SMS_TWILIO_ACCOUNT_SID: model.SMS_TWILIO_ACCOUNT_SID || undefined,
@@ -312,6 +326,8 @@ const Settings = () => {
                   showInlineError
                   errorMessage="Please enter the phone provider."
                 />
+                <NumField name="SMS_OTP_EXP" step="1" min={0}/>
+                <NumField name="SMS_OTP_LENGTH" step="1" min={6} max={10}/>
                 {smsProviderModel?.SMS_PROVIDER === 'messagebird' ? (
                   <>
                     <SecretField
@@ -516,7 +532,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_APPLE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.apple.com/account/resources/identifiers/add/bundleId"
                   target="_blank"
                 >
@@ -545,7 +561,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_AZURE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app"
                   target="_blank"
                 >
@@ -579,7 +595,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_BITBUCKET_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/"
                   target="_blank"
                 >
@@ -608,7 +624,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_DISCORD_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://discord.com/developers/applications#top"
                   target="_blank"
                 >
@@ -637,7 +653,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_FACEBOOK_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developers.facebook.com/apps/"
                   target="_blank"
                 >
@@ -666,7 +682,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITHUB_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://github.com/settings/applications/new"
                   target="_blank"
                 >
@@ -695,7 +711,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GITLAB_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://gitlab.com/oauth/applications"
                   target="_blank"
                 >
@@ -724,7 +740,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_GOOGLE_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://console.developers.google.com/apis/credentials"
                   target="_blank"
                 >
@@ -752,11 +768,7 @@ const Settings = () => {
             name="EXTERNAL_KEYCLOAK_ENABLED"
             addOns={
               externalProvidersModel.EXTERNAL_KEYCLOAK_ENABLED && (
-                <a
-                  className="pl-4 text-scale-900"
-                  href="https://www.keycloak.org/"
-                  target="_blank"
-                >
+                <a className="text-scale-900 pl-4" href="https://www.keycloak.org/" target="_blank">
                   Create new credentials
                 </a>
               )
@@ -845,7 +857,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITCH_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://dev.twitch.tv/console"
                   target="_blank"
                 >
@@ -874,7 +886,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_TWITTER_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.twitter.com/en/portal/dashboard"
                   target="_blank"
                 >
@@ -903,7 +915,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_SLACK_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://api.slack.com/apps"
                   target="_blank"
                 >
@@ -932,7 +944,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_SPOTIFY_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developer.spotify.com/dashboard/"
                   target="_blank"
                 >
@@ -961,7 +973,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_WORKOS_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://dashboard.workos.com"
                   target="_blank"
                 >
@@ -995,7 +1007,7 @@ const Settings = () => {
             addOns={
               externalProvidersModel.EXTERNAL_ZOOM_ENABLED && (
                 <a
-                  className="pl-4 text-scale-900"
+                  className="text-scale-900 pl-4"
                   href="https://developers.zoom.us/"
                   target="_blank"
                 >
@@ -1068,8 +1080,8 @@ const AuditLog = ({ interval, projectRef }: any) => {
   return (
     <Panel
       title={
-        <div className=" w-full flex items-center justify-between">
-          <Typography.Title level={5} className="flex-1 block">
+        <div className=" flex w-full items-center justify-between">
+          <Typography.Title level={5} className="block flex-1">
             Audit Trail
           </Typography.Title>
           <div className="flex-1 text-right">

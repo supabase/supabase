@@ -9,12 +9,12 @@ import TabItem from '@theme/TabItem'
 
 ## Overview
 
-In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
+In this guide we'll show you how to authenticate your users with SMS based One-Time Password (OTP) tokens.
 
 There are two reasons to use Supabase SMS OTP tokens:
 
-- You want users to log in with mobile + password, and the mobile should be verified via SMS
-- You want users to log in with mobile ONLY (i.e. passwordless login)
+- You want users to log in with mobile number + password, and the mobile number should be verified via SMS
+- You want users to log in with mobile number ONLY (i.e. passwordless login)
 
 We'll cover:
 
@@ -24,8 +24,8 @@ We'll cover:
 
 What you'll need:
 
-- A twilio account (sign up here: https://www.twilio.com/try-twilio)
-- A Supabase project (create one here: https://app.supabase.io)
+- A Twilio account (sign up here: https://www.twilio.com/try-twilio)
+- A Supabase project (create one here: https://app.supabase.com)
 - A mobile phone capable of receiving SMS
 
 ## Video
@@ -55,7 +55,7 @@ Select 'SMS', 'Identity & Verification', and 'With code' as options on the welco
 
 ![Form Fields](/img/guides/auth-twilio/3.png)
 
-When you're back on the https://www.twilio.com/console screen, you need to scroll down and click 'Get a trial phone number' - this is the number that you'll be sending SMSs from.
+When you're back on the [Twilio console screen](https://www.twilio.com/console), you need to scroll down and click 'Get a trial phone number' - this is the number that you'll be sending SMSs from.
 
 ![Get a trial phone number](/img/guides/auth-twilio/4.png)
 
@@ -69,9 +69,9 @@ You should now be able to see all three values you'll need to get started:
 
 ![All the credentials you'll need](/img/guides/auth-twilio/6.png)
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/settings).
 
-You should see an option to enable Phone Signup.
+You should see an option to enable Phone Signup:
 
 ![Enable Phone Sign-Up](/img/guides/auth-twilio/7.png)
 
@@ -87,20 +87,22 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
 
-Use the variable `.Code` in the template to display the code.
+Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template. 
+
+![example in the SMS template](/img/guides/auth-twilio/9.png)
 
 ### Using OTP with password based logins
 
-In this use scenario we'll be using the user's mobile phone number as an alternative to an email address when signing up along with a password. You may want to think hard about the permanency of this however. It is not uncommon for mobile phone numbers to be recycled by phone networks when users cancel their phone contracts or move countries, therefore granting access to the user's account to whoever takes over the phone number in the future. Soon we'll add multi-factor auth, which will mitigate this risk, but for now you may want to give some thought to allowing your users to recover their account by some other means in an emergency.
+In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
 <Tabs
 defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
 <TabItem value="JS">
@@ -135,7 +137,7 @@ You should present a form to the user so they can input the 6 digit pin, then se
 <Tabs
 defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
 <TabItem value="JS">
@@ -182,7 +184,7 @@ Also now that the mobile has been verified, the user can use the number and pass
 <Tabs
 defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
 <TabItem value="JS">
@@ -219,7 +221,7 @@ In javascript we can use the `signIn` method with a single parameter: `phone`
 <Tabs
 defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
 <TabItem value="JS">
@@ -250,7 +252,7 @@ The second step is the same as the previous section, you need to collect the 6-d
 <Tabs
 defaultValue="JS"
 values={[
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
 ]}>
 <TabItem value="JS">
@@ -295,5 +297,5 @@ The user does not have a password therefore will need to sign in via this method
 ## Resources
 
 - [Twilio Signup](https://www.twilio.com/try-twilio)
-- [Supabase Dashboard](https://app.supabase.io)
+- [Supabase Dashboard](https://app.supabase.com)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)

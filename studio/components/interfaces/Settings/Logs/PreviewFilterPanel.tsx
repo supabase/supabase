@@ -9,9 +9,7 @@ import {
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
-import { Filters, LogSearchCallback, LogTemplate } from '.'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
+import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
 import DatePickers from './Logs.DatePickers'
@@ -36,8 +34,6 @@ interface Props {
   onFiltersChange: (filters: Filters) => void
   filters: Filters
 }
-
-dayjs.extend(utc)
 
 /**
  * Logs control panel header + wrapper
@@ -78,17 +74,17 @@ const PreviewFilterPanel: FC<Props> = ({
           {newCount > 0 && (
             <div
               className={[
-                'absolute flex items-center justify-center -top-3 right-3',
-                'h-4 w-4 z-50',
+                'absolute -top-3 right-3 flex items-center justify-center',
+                'z-50 h-4 w-4',
               ].join(' ')}
             >
               <div className="absolute z-20">
                 <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
-                  {newCount}
+                  {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                 </Typography.Text>
               </div>
-              <div className="bg-green-800 rounded-full w-full h-full animate-ping opacity-60"></div>
-              <div className="absolute z-60 top-0 right-0 bg-green-900 opacity-80 rounded-full w-full h-full"></div>
+              <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+              <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
             </div>
           )}
           <IconRefreshCw size={10} />
@@ -101,15 +97,14 @@ const PreviewFilterPanel: FC<Props> = ({
       Refresh
     </Button>
   )
-
-  const handleSearch = (partial: Partial<{ query: string; to: string; from: string }>) =>
-    onSearch({ query: search, ...partial })
+  const handleSearch = (partial: Partial<Parameters<LogSearchCallback>[0]>) =>
+    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
 
   return (
     <div
-      className={'flex items-center justify-between w-full' + (condensedLayout ? ' px-5 pt-4' : '')}
+      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-5 pt-4' : '')}
     >
-      <div className="flex flex-row gap-4 items-center">
+      <div className="flex flex-row items-center gap-4">
         <form
           id="log-panel-search"
           onSubmit={(e) => {
@@ -147,11 +142,10 @@ const PreviewFilterPanel: FC<Props> = ({
         </form>
 
         <DatePickers
-          onChange={async (e: { to: string; from: string }) => {
-            handleSearch(e)
-          }}
+          onChange={handleSearch}
           to={defaultToValue}
           from={defaultFromValue}
+          helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
 
         <div>

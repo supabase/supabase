@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { Button, IconChevronRight, IconMaximize2, IconPlay } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
 import { useRouter } from 'next/router'
 
 interface Props {
@@ -15,7 +14,6 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
   const router = useRouter()
   const { ref } = router.query
 
-  console.log('item in component', item)
   return (
     <>
       <Table.tr key={item.id} className="expandable-tr">
@@ -47,7 +45,9 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
             type="alternative"
             iconRight={<IconPlay size={10} />}
             onClick={() =>
-              router.push(`/project/${ref}/logs-explorer?sql=${encodeURIComponent(item.content.sql)}`)
+              router.push(
+                `/project/${ref}/logs-explorer?sql=${encodeURIComponent(item.content.sql)}`
+              )
             }
           >
             Run

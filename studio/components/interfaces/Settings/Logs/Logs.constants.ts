@@ -1,4 +1,7 @@
-import { FilterTableSet, LogTemplate } from '.'
+import dayjs from 'dayjs'
+import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
+
+export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
 
 export const TEMPLATES: LogTemplate[] = [
   {
@@ -185,10 +188,8 @@ export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
   database: 'Database',
 }
 
-
-
 const _SQL_FILTER_COMMON = {
-  'search_query': (value: string) => `regexp_contains(event_message, '${value}')`
+  search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
 }
 
 export const SQL_FILTER_TEMPLATES: any = {
@@ -228,17 +229,17 @@ export const SQL_FILTER_TEMPLATES: any = {
     'severity.info': `metadata.level = 'info'`,
     'severity.debug': `metadata.level = 'debug'`,
   },
+  auth_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
-
-// export const cleanQuery = (str: string) => str.replaceAll(/\n/g, ' ')
-export const cleanQuery = (str: string) => str.replace(/\n/g, ' ')
-// .replace(/\n.*\-\-.*(\n)?$?/, "")
 
 export enum LogsTableName {
   EDGE = 'edge_logs',
   POSTGRES = 'postgres_logs',
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
+  AUTH = 'auth_logs',
 }
 
 export const LOGS_TABLES = {
@@ -246,6 +247,7 @@ export const LOGS_TABLES = {
   database: LogsTableName.POSTGRES,
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
+  auth: LogsTableName.AUTH,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -253,6 +255,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
@@ -423,4 +426,52 @@ export const FILTER_OPTIONS: FilterTableSet = {
 export const LOGS_TAILWIND_CLASSES = {
   log_selection_x_padding: 'px-8',
   space_y: 'px-6',
+}
+
+export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
+  {
+    text: 'Last hour',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last day',
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+]
+export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
+  {
+    text: 'Last day',
+    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
+    text: 'Last 3 days',
+    calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 7 days',
+    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
+  },
+]
+
+export const getDefaultHelper = (helpers: DatetimeHelper[]) =>
+  helpers.find((helper) => helper.default) || helpers[0]
+
+export const TIER_QUERY_LIMITS: {
+  [x: string]: { text: string; value: 1 | 7 | 3; unit: 'day' | 'month' }
+} = {
+  FREE: { text: '1 day', value: 1, unit: 'day' },
+  PRO: { text: '7 days', value: 7, unit: 'day' },
+  PAYG: { text: '3 months', value: 3, unit: 'month' },
 }

@@ -1,0 +1,53 @@
+---
+id: going-into-prod
+title: Going into Prod Checklist
+description: 'Things to do before making your app publicly available'
+---
+
+# Going into Prod Checklist
+
+After developing your project, and deciding it's time to Go Live With Real Users, you should run through this checklist to ensure that your project is:
+
+- secure
+- won't falter under the expected load
+- remains available whilst in production
+
+## Security
+
+- Ensure RLS is enabled
+    - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is unlikely to be what you want in the majority of cases.
+    - [Learn more about RLS](/docs/guides/auth/row-level-security)
+- Ensure replication is disabled for tables containing sensitive data:
+    - Today, Realtime does not respect RLS policies and any client with your anon key can listen to changes on tables where replication is enabled.
+    - Go to the Database > Replication page in the Supabase Dashboard to manage these settings
+    - We are launching [RLS for realtime](https://github.com/supabase/walrus) soon, but in the meantime you should only use it for tables containing public data (scoreboards, blog posts, etc.)
+- Enable 2FA on Github
+    - Since your Github account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
+- Ensure email confirmations are enabled in the Auth > Settings page
+- Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). (grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.)
+- Think hard about how *you* would abuse your service as an attacker, and mitigate
+- Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats)
+
+## Performance
+
+- Ensure that you have suitable indices to cater to your common query patterns
+    - [learn more about indexes in postgres](https://www.enterprisedb.com/postgres-tutorials/overview-postgresql-indexes)
+    - pg_stat_statements can help you [identify hot or slow queries](https://www.virtual-dba.com/blog/postgresql-performance-identifying-hot-and-slow-queries/)
+- Perform load testing (preferably on a staging env)
+    - tools like [k6](https://k6.io/) can simulate traffic from many different users
+- If you find you require more resources, contact support@supabase.io to upgrade to PAYG for bigger servers
+
+## Availability
+
+- Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Auth > Settings)
+    - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
+    - the default rate limit for auth emails provided by Supabase is 30 new users per hour, if doing a major public announcement you will likely require more than this
+- If your application is on the free tier and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources
+    - you can restore paused projects from the Supabase dashboard
+    - upgrade to Pro to guarantee that your project will not be paused for inactivity
+- Database backups are not available for download on the free tier
+    - You can set up your own backup systems using tools like [pg_dump](https://www.postgresqltutorial.com/postgresql-backup-database/) or [wal-g](https://github.com/wal-g/wal-g)
+    - Nightly backups for Pro tier projects are available on the Supabase dashboard for up to 7 days
+- upgrading to the Supabase Pro Tier will give you access to email support on support@supabase.io
+
+This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [Github](https://github.com/supabase/supabase).

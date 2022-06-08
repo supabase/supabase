@@ -76,40 +76,40 @@ const EmptyFunctions = () => {
     //   comment: 'Link this project',
     // },
     {
-      command: 'supabase functions new hello',
-      description: ' creates a function stub at ./functions/hello/hello.ts',
+      command: 'supabase functions new hello-world',
+      description: ' creates a function stub at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions new hello
+            <span className="text-brand-1100">supabase</span> functions new hello-world
           </>
         )
       },
       comment: 'Create a function',
     },
     {
-      command: `supabase functions deploy hello --project-ref ${ref}`,
-      description: 'Deploys function at ./functions/hello/index.ts',
+      command: `supabase functions deploy hello-world --project-ref ${ref}`,
+      description: 'Deploys function at ./functions/hello-world/index.ts',
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions deploy hello --project-ref{' '}
-            {ref}
+            <span className="text-brand-1100">supabase</span> functions deploy hello-world
+            --project-ref {ref}
           </>
         )
       },
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
-      description: 'Invokes the hello function',
+      description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/hello' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            .functions.supabase.co/hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
             {`--data '{"name":"Functions"}'`}
           </>
         )
@@ -122,14 +122,12 @@ const EmptyFunctions = () => {
       <div className="grid py-12 lg:grid-cols-12 gap-y-12 lg:gap-x-16 max-w-7xl">
         <div className="col-span-5 space-y-4">
           <p className="max-w-lg text-base text-scale-1200">
-            Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
-            management.
+            Scalable functions to run your code with no server management.
           </p>
           <p className="max-w-lg text-sm text-scale-1100">
-            No servers to provision, manage, or upgrade Automatically scale based on the load
-            Integrated monitoring, logging, and debugging capability Built-in security at role and
-            per function level based on the principle of least privilege Key networking capabilities
-            for hybrid and multi-cloud scenarios
+            Edge Functions are server-side Typescript functions, distributed globally at the edge -
+            close to your users. They can be used for listening to webhooks or integrating your
+            Supabase project with third-parties.
           </p>
           <div className="flex gap-2">
             <Link passHref href="https://supabase.com/docs/guides/functions">

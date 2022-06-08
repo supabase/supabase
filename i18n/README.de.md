@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] Automatisch generierte APIs
 - [x] Dashboard
 - [x] Speicher
-- [ ] Funktionen (kommt demnächst)
+- [x] Funktionen
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentation
 
-Um die gesamte Dokumentation einzusehen, schaue auf [supabase.io/docs](https://supabase.com/docs) vorbei.
+Um die gesamte Dokumentation einzusehen, schaue auf [supabase.com/docs](https://supabase.com/docs) vorbei.
 
 ## Community & Support
 
@@ -30,7 +33,7 @@ Um die gesamte Dokumentation einzusehen, schaue auf [supabase.io/docs](https://s
 ## Status
 
 - [x] Alpha: Wir testen Supabase mit einer eingeschränkten Anzahl an Kunden.
-- [x] Public Alpha: Jeder kann sich bei [app.supabase.io](https://app.supabase.io) anmelden. Aber sei gnädig, der Feinschliff fehlt noch.
+- [x] Public Alpha: Jeder kann sich bei [app.supabase.com](https://app.supabase.com) anmelden. Aber sei gnädig, der Feinschliff fehlt noch.
 - [x] Public Beta: Stabil genug für die meisten Use-Cases außerhalb des Enterprise-Bereiches.
 - [ ] Public: Bereit für Produktion
 
@@ -46,7 +49,7 @@ Supabase ist eine Kombination von Open-Source Tools. Wir bauen die Features von 
 
 **Aktuelle Architektur**
 
-Supabase ist eine [gehostete Plattform](https://app.supabase.io).
+Supabase ist eine [gehostete Plattform](https://app.supabase.com).
 Du kannst dich bei Supabase anmelden und sofort loslegen, ohne etwas zu installieren.
 Du kannst Supabase auch selbst hosten und lokal entwickeln.
 

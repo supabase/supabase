@@ -66,7 +66,7 @@ The functions we'll cover in this guide are:
 Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
 
 ```sql
-select to_tsvector("green eggs and ham")
+select to_tsvector('green eggs and ham')
 
 -- Returns 'egg':2 'green':1 'ham':4
 ``` 
@@ -91,7 +91,7 @@ Take the following example:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
@@ -99,7 +99,7 @@ values={[
 ```sql
 select * 
 from books 
-where name = 'Harry';
+where title = 'Harry';
 ```
 
 </TabItem>
@@ -109,7 +109,7 @@ where name = 'Harry';
 const { data, error } = await supabase
   .from('books')
   .select()
-  .eq('name', 'Harry')
+  .eq('title', 'Harry')
 ```
 
 </TabItem>
@@ -120,7 +120,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .eq('name', 'Harry')
+  .eq('title', 'Harry')
   .execute();
 ```
 
@@ -135,7 +135,7 @@ example above:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
@@ -143,7 +143,7 @@ values={[
 ```sql
 select * 
 from books 
-where to_tsvector(name) @@ to_tsquery('Harry');
+where to_tsvector(title) @@ to_tsquery('Harry');
 ```
 
 </TabItem>
@@ -153,7 +153,7 @@ where to_tsvector(name) @@ to_tsquery('Harry');
 const { data, error } = await supabase
   .from('books')
   .select()
-  .textSearch('name', `'Harry'`)
+  .textSearch('title', `'Harry'`)
 ```
 
 </TabItem>
@@ -163,7 +163,7 @@ const { data, error } = await supabase
 final result = await client
   .from('books')
   .select()
-  .textSearch('name', "'Harry'")
+  .textSearch('title', "'Harry'")
   .execute();
 ```
 
@@ -180,7 +180,7 @@ To find all `books` where the `description` contain the word `big`:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
@@ -269,7 +269,7 @@ To find all `books` where `description` contains BOTH of the words `little` and 
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
@@ -324,7 +324,7 @@ To find all `books` where `description` contain ANY of the words `little` or `bi
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
@@ -429,7 +429,7 @@ Now that we've created and populated our index, we can search it using the same 
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
   {label: 'Data', value: 'Data'},
 ]}>
@@ -490,7 +490,7 @@ For example, to find the phrase `big dreams`, where the a match for "big" is fol
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
@@ -535,7 +535,7 @@ We can also use the `<->` to find words within a certain distance of eachother. 
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">
@@ -583,7 +583,7 @@ For example, to find records that have the word `big` but not `little`:
 defaultValue="SQL"
 values={[
   {label: 'SQL', value: 'SQL'},
-  {label: 'Javascript', value: 'JS'},
+  {label: 'JavaScript', value: 'JS'},
   {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="SQL">

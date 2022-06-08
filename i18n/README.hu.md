@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@ A [Supabase](https://supabase.com) egy nyílt forráskódú Firebase alternatív
 - [x] Automatikusan generált API-ok
 - [x] Kezelőfelület
 - [x] Tárhely
-- [ ] Funkciók (hamarosan)
+- [x] Funkciók
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentáció
 
-A teljes dokumentációért látogasson el a [supabase.io/docs](https://supabase.com/docs) oldalra.
+A teljes dokumentációért látogasson el a [supabase.com/docs](https://supabase.com/docs) oldalra.
 
 ## Közösség & Támogatás
 
@@ -30,7 +33,7 @@ A teljes dokumentációért látogasson el a [supabase.io/docs](https://supabase
 ## Állapot
 
 - [x] Alfa: Teszteljük a Supabase-t egy zárt körű felhasználóbázissal
-- [x] Publikus Alfa: Bárki feliratkozhat a [app.supabase.io](https://app.supabase.io) oldalon. De lehet lesz pár hiba
+- [x] Publikus Alfa: Bárki feliratkozhat a [app.supabase.com](https://app.supabase.com) oldalon. De lehet lesz pár hiba
 - [x] Publikus Béta: Elég stabil a nem vállalati felhasználásra
 - [ ] Publikus: Gyártás kész
 
@@ -46,8 +49,8 @@ A Supabase nyílt forráskódú eszközök kombinációja.A Firebase funkcióit 
 
 **Jelenlegi architektúra**
 
-Supabase egy [hosztolt platform](https://app.supabase.io). Regisztrálással letöltés nélkül is elkezdheted használni.
-De [hosztolhatod magadnak](https://supabase.com/docs/guides/self-hosting) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
+Supabase egy [hosztolt platform](https://app.supabase.com). Regisztrálással letöltés nélkül is elkezdheted használni.
+De [hosztolhatod magadnak](https://supabase.com/docs/guides/hosting/overview) és akár [fejlesztheted helyileg](https://supabase.com/docs/guides/local-development).
 
 ![Architektúra](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

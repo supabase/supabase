@@ -1,28 +1,40 @@
+import React from "react"
+
 interface Metadata {
   [key: string]: string | number | Object | Object[]
 }
-export type LogSearchCallback = (filters: { query: string; to?: string; from?: string; fromMicro?: number, toMicro?: number }) => void
 
+export type DatePickerToFrom = { to: string | null; from: string | null }
+
+export type LogSearchCallback = (
+  filters: {
+    query: string
+  } & DatePickerToFrom
+) => void
+
+export interface LogsWarning {
+  text: string | React.ReactNode
+  link?: string
+  linkText?: string
+}
 export interface LogsEndpointParams {
-  // project ref
-  project: string
-  // micro unix timestamp
-  timestamp_start?: string
-  // micro timestamp
-  timestamp_end?: string
-  period_start?: string
-  period_end?: string
-  sql: string
-  rawSql: string
+  project: string // project ref
+  iso_timestamp_start?: string
+  iso_timestamp_end?: string
+  sql?: string
 }
 
-export interface LogData {
+export interface CustomLogData {
+  [other: string]: unknown
+}
+
+export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
   metadata: Metadata
-  [other: string]: unknown
 }
+export type LogData = CustomLogData & PreviewLogData
 
 export interface LogTemplate {
   label?: string
@@ -47,7 +59,7 @@ export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge'
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | "auth"
 
 export type Mode = 'simple' | 'custom'
 
@@ -64,7 +76,6 @@ export interface FilterObject {
   // `te` for timestamp start value.
   te?: string
 }
-
 
 export interface FilterSet {
   label: string
@@ -90,4 +101,11 @@ export interface Filters {
 export type Override = {
   key: string
   value: string | string[] | undefined
+}
+
+export interface DatetimeHelper {
+  text: string
+  calcTo: () => string
+  calcFrom: () => string
+  default?: boolean
 }

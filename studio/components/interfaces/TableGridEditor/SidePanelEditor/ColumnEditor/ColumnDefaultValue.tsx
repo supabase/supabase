@@ -1,17 +1,18 @@
 import React, { FC } from 'react'
 import { isNil } from 'lodash'
 import { Select } from '@supabase/ui'
+import { PostgresType } from '@supabase/postgres-meta'
 
 import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
-import { ColumnField, EnumType } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import { Suggestion } from './ColumnEditor.types'
 import { getSelectedEnumValues } from './ColumnEditor.utils'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
 
 interface Props {
   columnFields: ColumnField
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
@@ -27,17 +28,18 @@ const ColumnDefaultValue: FC<Props> = ({
     isNil(columnFields.format) && !POSTGRES_DATA_TYPES.includes(columnFields.format)
 
   if (isUserDefinedEnum) {
+    const enumValues = getSelectedEnumValues(columnFields.format, enumTypes)
     return (
       <Select
         label="Default Value"
         layout="horizontal"
-        value={columnFields.defaultValue}
+        value={columnFields.defaultValue ?? ''}
         onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       >
         <Select.Option key="empty-enum" value="">
           ---
         </Select.Option>
-        {getSelectedEnumValues(columnFields.format, enumTypes).map((value: string) => (
+        {enumValues.map((value: string) => (
           <Select.Option key={value} value={value}>
             {value}
           </Select.Option>
@@ -51,13 +53,18 @@ const ColumnDefaultValue: FC<Props> = ({
       label="Default Value"
       layout="horizontal"
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
-      placeholder="NULL"
+      placeholder={
+        typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
+          ? 'Empty string'
+          : 'NULL'
+      }
       value={columnFields?.defaultValue ?? ''}
+      format={columnFields?.format}
       suggestionsHeader="Suggested expressions"
       suggestions={suggestions}
       onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       onSelectSuggestion={(suggestion: Suggestion) =>
-        onUpdateField({ defaultValue: suggestion.name })
+        onUpdateField({ defaultValue: suggestion.value })
       }
     />
   )

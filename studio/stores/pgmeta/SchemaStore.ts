@@ -6,8 +6,6 @@ import { ResponseError } from 'types'
 
 export interface ISchemaStore extends IPostgresMetaInterface<PostgresSchema> {
   getViews: (schema: string) => Promise<any | { error: ResponseError }>
-  getEnums: () => Promise<any | { error: ResponseError }>
-  // getEnumValues: (id: string) => Promise<any | { error: ResponseError }>
 }
 export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
   constructor(
@@ -29,15 +27,4 @@ export default class SchemaStore extends PostgresMetaInterface<PostgresSchema> {
     `
     return await this.rootStore.meta.query(query)
   }
-
-  async getEnums() {
-    const query = `SELECT "oid" as "id", "typname" as "name" FROM pg_type WHERE typcategory = 'E';`
-    return await this.rootStore.meta.query(query)
-  }
-
-  // [Joshen] I realised we probably don't need this (yet) for table editor
-  // async getEnumValues(id: string) {
-  //   const query = `SELECT enumlabel FROM pg_enum WHERE enumtypid = ${id};`
-  //   return await this.rootStore.meta.query(query)
-  // }
 }

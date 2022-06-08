@@ -31,21 +31,24 @@ import {
   IconRefreshCw,
   IconChevronDown,
   IconLoader,
+  IconEye,
+  IconEyeOff,
 } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
-import { useStore, useJwtSecretUpdateStatus, withAuth } from 'hooks'
+import { useStore, useJwtSecretUpdateStatus } from 'hooks'
+
+import Panel from 'components/to-be-cleaned/Panel'
+import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
 import { SettingsLayout } from 'components/layouts'
 import Flag from 'components/ui/Flag/Flag'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-
-import Panel from 'components/to-be-cleaned/Panel'
-import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
+import MultiSelect from 'components/ui/MultiSelect'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { NextPageWithLayout } from 'types'
 
 const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
@@ -55,6 +58,7 @@ const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
     'failed to update configuration for database admin API',
   [JwtSecretUpdateError.PostgreSQLRestartFailed]: 'failed to restart PostgreSQL service',
   [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update Supabase API key',
+  [JwtSecretUpdateError.APIGatewayUpdateFailed]: 'failed to update API Gateway',
 }
 
 const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
@@ -65,11 +69,12 @@ const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
     'updated configuration for API services',
   [JwtSecretUpdateProgress.UpdatedDatabaseAdminAPIConfiguration]:
     'updated configuration for database admin API',
+  [JwtSecretUpdateProgress.UpdatedAPIGatewayConfiguration]: 'updated configuration for API Gateway',
 }
 
 const PageContext: any = createContext(null)
 
-const ApiSettings = () => {
+const ApiSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -97,23 +102,24 @@ const ApiSettings = () => {
   }
 
   return (
-    <SettingsLayout title="API Settings">
-      <PageContext.Provider value={PageState}>
-        <div className="content w-full h-full overflow-y-auto">
-          <ServiceList projectRef={ref} />
-        </div>
-      </PageContext.Provider>
-    </SettingsLayout>
+    <PageContext.Provider value={PageState}>
+      <div className="content h-full w-full overflow-y-auto">
+        <ServiceList projectRef={ref} />
+      </div>
+    </PageContext.Provider>
   )
 }
 
-export default withAuth(observer(ApiSettings))
+ApiSettings.getLayout = (page) => <SettingsLayout title="API Settings">{page}</SettingsLayout>
+
+export default observer(ApiSettings)
 
 const ServiceList: FC<any> = ({ projectRef }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
 
+  const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [customToken, setCustomToken] = useState<string>('')
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
@@ -174,14 +180,14 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
   if (error || isJwtSecretUpdateStatusError) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Error loading API settings</Typography.Title>
       </div>
     )
   }
   if (!data || isJwtSecretUpdateStatusLoading) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Loading...</Typography.Title>
       </div>
     )
@@ -222,13 +228,12 @@ const ServiceList: FC<any> = ({ projectRef }) => {
 
   return (
     <>
-      <article className="p-4 max-w-4xl">
-        <DisplayApiSettings key="DisplayAPISettings" />
+      <div className="max-w-4xl p-4">
         <section>
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Configuration
+                Project URL
               </Typography.Title>
             }
           >
@@ -244,7 +249,22 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
             </Panel.Content>
-            <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6">
+          </Panel>
+        </section>
+
+        <section>
+          <DisplayApiSettings key="DisplayAPISettings" />
+        </section>
+
+        <section>
+          <Panel
+            title={
+              <Typography.Title level={5} className="mb-0">
+                JWT Settings
+              </Typography.Title>
+            }
+          >
+            <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
               <Input
                 label="JWT Secret"
                 readOnly
@@ -266,7 +286,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
               />
               <Flag name="jwtSecretUpdate">
                 <div className="space-y-3">
-                  <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark">
+                  <div className="dark:bg-bg-alt-dark bg-bg-alt-light dark:border-dark rounded-md border p-3 px-6 shadow-sm">
                     {isUpdatingJwtSecret ? (
                       <div className="flex items-center space-x-2">
                         <IconLoader className="animate-spin" size={14} />
@@ -276,10 +296,10 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                       </div>
                     ) : (
                       <div className="w-full space-y-2">
-                        <div className="w-full flex items-center justify-between">
+                        <div className="flex w-full items-center justify-between">
                           <div className="flex flex-col space-y-1">
                             <Typography.Text>Generate a new JWT secret</Typography.Text>
-                            <p className="opacity-50 text-sm">
+                            <p className="text-sm opacity-50">
                               A random secret will be created, or you can create your own.
                             </p>
                           </div>
@@ -342,8 +362,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Panel.Content>
           </Panel>
         </section>
+
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
-      </article>
+      </div>
 
       <ConfirmModal
         danger
@@ -371,7 +392,9 @@ const ServiceList: FC<any> = ({ projectRef }) => {
             </Button>
             <Button
               type="primary"
-              disabled={customToken.length < 32}
+              disabled={
+                customToken.length < 32 || customToken.includes('@') || customToken.includes('$')
+              }
               loading={isSubmittingJwtSecretUpdateRequest}
               onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
             >
@@ -381,8 +404,8 @@ const ServiceList: FC<any> = ({ projectRef }) => {
         }
       >
         <Modal.Content>
-          <div className="py-4 space-y-2">
-            <p className="text-sm text-scale-1100">
+          <div className="space-y-2 py-4">
+            <p className="text-scale-1100 text-sm">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>
@@ -395,10 +418,19 @@ const ServiceList: FC<any> = ({ projectRef }) => {
               onChange={(e: any) => setCustomToken(e.target.value)}
               value={customToken}
               icon={<IconKey />}
-              type="password"
+              type={showCustomTokenInput ? 'text' : 'password'}
               className="w-full text-left"
               label="Custom JWT secret"
-              descriptionText="Must be at least 32 characters long"
+              descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
+              actions={
+                <div className="mr-1 flex items-center justify-center">
+                  <Button
+                    type="default"
+                    icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
+                    onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
+                  />
+                </div>
+              }
             />
           </div>
         </Modal.Content>
@@ -492,7 +524,7 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
       >
         <div className="space-y-6 py-4">
           {schema.length >= 1 && (
-            <MultiSelectUI
+            <MultiSelect
               options={schema}
               // value must be passed as array of strings
               value={updates.db_schema.replace(/ /g, '').split(',')}

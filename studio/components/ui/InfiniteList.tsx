@@ -23,7 +23,7 @@ interface ItemProps {
 
 const Item: FC<ItemProps> = memo(({ data, index, style }) => {
   const { items, itemProps, ItemComponent } = data
-  const item = items[index]
+  const item = index < items.length ? items[index] : undefined
 
   return item ? (
     <div style={style}>
@@ -52,7 +52,9 @@ const InfiniteList = ({
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
 
   // Every row is loaded except for our loading indicator row
-  const isItemLoaded = (index: number) => !hasNextPage || !!items[index]
+  const isItemLoaded = (index: number) => {
+    return !hasNextPage || index < items.length
+  }
 
   const itemCount = hasNextPage ? items.length + 1 : items.length
   const itemData = createItemData(items, { itemProps, ItemComponent })
@@ -63,8 +65,8 @@ const InfiniteList = ({
         <AutoSizer>
           {({ height, width }) => (
             <InfiniteLoader
-              isItemLoaded={isItemLoaded}
               itemCount={itemCount}
+              isItemLoaded={isItemLoaded}
               loadMoreItems={loadMoreItems}
             >
               {({ onItemsRendered, ref }) => (

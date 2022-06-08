@@ -1,5 +1,6 @@
 import { trimEnd, groupBy, difference } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
+import { StoragePolicyFormField } from './Storage.types'
 
 export const shortHash = (str: string) => {
   let hash = 0
@@ -87,12 +88,34 @@ export const groupPoliciesByBucket = (policies: any[]) => {
 
 /* End: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
 
-export const createPayloadForNewPolicy = (
+export const createPayloadsForAddPolicy = (
+  bucketName = '',
+  policyFormFields: StoragePolicyFormField,
+  addSuffixToPolicyName = true
+) => {
+  const { name: policyName, definition, allowedOperations, roles } = policyFormFields
+  const formattedDefinition = definition.replace(/\s+/g, ' ').trim()
+
+  return allowedOperations.map((operation: any, idx: number) => {
+    return createPayloadForNewPolicy(
+      idx,
+      bucketName,
+      policyName,
+      formattedDefinition,
+      operation,
+      roles,
+      addSuffixToPolicyName
+    )
+  })
+}
+
+const createPayloadForNewPolicy = (
   idx: number,
   bucketName: string,
   policyName: string,
   definition: string,
   operation: string,
+  roles: string[],
   addSuffixToPolicyName: boolean
 ) => {
   const hashedBucketName = shortHash(bucketName)
@@ -104,27 +127,8 @@ export const createPayloadForNewPolicy = (
     command: operation,
     schema: 'storage',
     table: 'objects',
+    roles: roles.length > 0 ? roles : undefined,
   }
-}
-
-export const createPayloadsForAddPolicy = (
-  bucketName = '',
-  policyFormFields: any = {},
-  addSuffixToPolicyName = true
-) => {
-  const { name: policyName, definition, allowedOperations } = policyFormFields
-  const formattedDefinition = definition.replace(/\s+/g, ' ').trim()
-
-  return allowedOperations.map((operation: any, idx: number) => {
-    return createPayloadForNewPolicy(
-      idx,
-      bucketName,
-      policyName,
-      formattedDefinition,
-      operation,
-      addSuffixToPolicyName
-    )
-  })
 }
 
 // Used in the policy editor to highlight which library methods are allowed depending on which operations are allowed
@@ -145,6 +149,7 @@ export const createSQLStatementForCreatePolicy = (
   policyName: string,
   definition: string,
   operation: string,
+  selectedRoles: string[],
   addSuffixToPolicyName: boolean
 ) => {
   const hashedBucketName = shortHash(bucketName)
@@ -152,9 +157,14 @@ export const createSQLStatementForCreatePolicy = (
     ? `${policyName} ${hashedBucketName}_${idx}`
     : policyName
   const description = `Add policy for the ${operation} operation under the policy "${policyName}"`
+  const roles = selectedRoles.length === 0 ? ['public'] : selectedRoles
+
   const statement = `
-  CREATE POLICY "${formattedPolicyName}" ON storage.objects FOR ${operation}
-  ${operation === 'INSERT' ? 'WITH CHECK' : 'USING'} (${definition});
+    CREATE POLICY "${formattedPolicyName}"
+    ON storage.objects
+    FOR ${operation}
+    TO ${roles.join(', ')}
+    ${operation === 'INSERT' ? 'WITH CHECK' : 'USING'} (${definition});
 `
     .replace(/\s+/g, ' ')
     .trim()
@@ -163,10 +173,10 @@ export const createSQLStatementForCreatePolicy = (
 
 export const createSQLPolicies = (
   bucketName: string,
-  policyFormFields: any,
+  policyFormFields: StoragePolicyFormField,
   addSuffixToPolicyName = true
 ) => {
-  const { name: policyName, definition, allowedOperations } = policyFormFields
+  const { name: policyName, definition, allowedOperations, roles } = policyFormFields
   const policies = allowedOperations.map((operation: any, idx: number) =>
     createSQLStatementForCreatePolicy(
       idx,
@@ -174,6 +184,7 @@ export const createSQLPolicies = (
       policyName,
       definition,
       operation,
+      roles,
       addSuffixToPolicyName
     )
   )

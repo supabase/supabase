@@ -1,0 +1,68 @@
+---
+id: auth-signout
+title: "signOut()"
+slug: auth-signout
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Inside a browser context, `signOut()` will remove the logged in user from the browser session
+and log them out - removing all items from localstorage and then trigger a "SIGNED_OUT" event.
+
+For server-side management, you can disable sessions by passing a JWT through to `auth.api.signOut(JWT: string)`
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { error } = await supabase.auth.signOut()
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### Sign out
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { error } = await supabase.auth.signOut()
+```
+
+
+</TabsPanel>
+
+</Tabs>

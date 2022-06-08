@@ -12,6 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      # remove ./studio/pages/api folder before deploying to vercel
+      - uses: JesseTG/rm@v1.0.2
+        with:
+          path: ./studio/pages/api
       - uses: amondnet/vercel-action@v19
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required

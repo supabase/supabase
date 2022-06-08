@@ -49,7 +49,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -68,7 +68,7 @@ values={[
 <TabItem value="UI">
 
 ```sh
-1. Go to the "SQL" section.
+1. Go to the "SQL Editor" section.
 2. Click "User Management Starter".
 3. Click "Run".
 ```
@@ -168,7 +168,7 @@ We can use [Create React App](https://create-react-app.dev/docs/getting-started/
 an app called `supabase-react`:
 
 ```bash
-npx create-react-app supabase-react --use-npm
+npx create-react-app supabase-react
 cd supabase-react
 ```
 
@@ -199,7 +199,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
 
@@ -386,7 +386,7 @@ import { supabase } from './supabaseClient'
 import Auth from './Auth'
 import Account from './Account'
 
-export default () => {
+export default function App() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
@@ -420,6 +420,7 @@ And then open the browser to [localhost:3000](http://localhost:3000) and you sho
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Add @reach/visually-hidden
+
 The upload widget uses one additional npm library. You can install it like so: `npm install @reach/visually-hidden`.
 
 ### Create an upload widget
@@ -431,7 +432,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import VisuallyHidden from '@reach/visually-hidden'
 
-export default ({ url, size, onUpload }) => {
+export default function Avatar({ url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
 
@@ -488,18 +489,20 @@ export default ({ url, size, onUpload }) => {
         style={{ height: size, width: size }}
       />
       {uploading ? "Uploading..." : (
-        <label className="button primary block" htmlFor="single">
-          Upload an avatar
-        </label>
-        <VisuallyHidden>
-          <input
-            type="file"
-            id="single"
-            accept="image/*"
-            onChange={uploadAvatar}
-            disabled={uploading}
-          />
-        </VisuallyHidden>
+        <>
+          <label className="button primary block" htmlFor="single">
+            Upload an avatar
+          </label>
+          <VisuallyHidden>
+            <input
+              type="file"
+              id="single"
+              accept="image/*"
+              onChange={uploadAvatar}
+              disabled={uploading}
+            />
+          </VisuallyHidden>
+        </>
       )}
     </div>
   )
@@ -537,4 +540,4 @@ return (
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)
