@@ -1,7 +1,8 @@
 <div style="direction: rtl;" dir="rtl">
 
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -16,7 +17,9 @@
 - [x] واجهات برمجة التطبيقات التي يتم إنشاؤها تلقائيا.
 - [x] لوحة الإدارة.
 - [x] التخزين.
-- [ ] الدوال (مفردها دالّة).
+- [x] الدوال.
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## الشرح
 
@@ -32,7 +35,7 @@
 ## الحالة
 
 - [x] طور الألفا: نحن نختبر Supabase مع مجموعة مغلقة من العملاء
-- [x] طور الألفا العام: يمكن لأي شخص الاشتراك في [app.supabase.io] (https://app.supabase.io). لكن تحلى بالصبر ، فهناك بعض العقد الصغيرة.
+- [x] طور الألفا العام: يمكن لأي شخص الاشتراك في [app.supabase.com] (https://app.supabase.com). لكن تحلى بالصبر ، فهناك بعض العقد الصغيرة.
 - [x] طور البيتا العام: مستقر بدرجة كافية لمعظم حالات الاستخدام غير المتعلقة بالمؤسسات
 - [ ] الطور العام: جاهز للإنتاج
 
@@ -46,7 +49,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 **الهيكلة الحالية**
 
-(supabase) هي [منصة مستضافة](https://app.supabase.io), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
+(supabase) هي [منصة مستضافة](https://app.supabase.com), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

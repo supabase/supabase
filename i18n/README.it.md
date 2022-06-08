@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] API generate automaticamente
 - [x] Cruscotto
 - [x] Archiviazione
-- [ ] Funzioni (in arrivo)
+- [x] Funzioni
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentazione
 
@@ -29,7 +32,7 @@ Per ottenere la documentazione completa, visitare il sito [supabase.com/docs](ht
 ## Stato
 
 - [x] Alfa: Stiamo testando Supabase con una ristretta cerchia di utenti
-- [x] Alfa Pubblica: Chiunque puó iscriversi a [app.supabase.io](https://app.supabase.io). Ma andateci piano, ci potrebbero essere degli inconvenienti.
+- [x] Alfa Pubblica: Chiunque puó iscriversi a [app.supabase.com](https://app.supabase.com). Ma andateci piano, ci potrebbero essere degli inconvenienti.
 - [x] Beta Pubblica: Abbastanza stabile per i casi d'uso a livello non professionale
 - [ ] Pubblico: Pronto per la produzione
 
@@ -45,7 +48,7 @@ Supabase è un insieme di strumenti con sorgente aperto. Stiamo sviluppando le f
 
 **Architettura attuale**
 
-Supabase è una [piattaforma ospitata](https://app.supabase.io). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo interamente in locale - attualmente é il nostro obiettivo primario, così come lo è la stabilità della piattaforma stessa.
+Supabase è una [piattaforma ospitata](https://app.supabase.com). Ci si può iscrivere ed iniziare ad utilizzare Supabase senza la necessità di installare qualcosa. Ci impegnamo nel creare un'esperienza di sviluppo interamente in locale - attualmente é il nostro obiettivo primario, così come lo è la stabilità della piattaforma stessa.
 
 ![Architettura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

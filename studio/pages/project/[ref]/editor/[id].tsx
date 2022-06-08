@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
@@ -34,7 +34,8 @@ const TableEditorPage: NextPage = () => {
   const projectRef = ui.selectedProject?.ref
   const tables: PostgresTable[] = meta.tables.list()
   const selectedTable = !isNaN(Number(id))
-    ? tables.find((table) => table.id === Number(id))
+    ? // @ts-ignore
+      tables.find((table) => table.id === Number(id))
     : tryParseJson(Base64.decode(id))
 
   useEffect(() => {
@@ -173,7 +174,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -189,7 +190,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>
