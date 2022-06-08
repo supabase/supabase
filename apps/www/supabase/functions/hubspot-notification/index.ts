@@ -1,12 +1,9 @@
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 
 const FUNCTION_SECRET = Deno.env.get('FUNCTION_SECRET')
-const HUBSPOT_API_KEY = Deno.env.get('HUBSPOT_API_KEY')
-const OWNER_ID = Deno.env.get('OWNER_ID')
-const ENTERPRISE_PIPELINE = Deno.env.get('ENTERPRISE_PIPELINE')
-const PARTNERS_PIPELINE = Deno.env.get('PARTNERS_PIPELINE')
-const ENTERPRISE_DEAL_STAGE = Deno.env.get('ENTERPRISE_DEAL_STAGE')
-const PARTNERS_DEAL_STAGE = Deno.env.get('PARTNERS_DEAL_STAGE')
+const HUBSPOT_PORTAL = Deno.env.get('HUBSPOT_PORTAL')
+const PARTNER_FORM_ID = Deno.env.get('PARTNER_FORM_ID')
+const ENTERPRISE_FORM_ID = Deno.env.get('ENTERPRISE_FORM_ID')
 
 serve(async (req) => {
   const requestSecret = req.headers.get('x-function-secret')
@@ -17,14 +14,51 @@ serve(async (req) => {
 
   const input = await req.json()
 
-  const firstName = input.record.contact_first_name || input.record.first
-  const lastName = input.record.contact_last_name || input.record.last
+  const supabase_table_id = input.record.id
+  const country = input.record.country
+  const form_note = input.record.details
   const company = input.record.company_name || input.record.company
+  const company_size = input.record.company_size || input.record.size
   const email = input.record.contact_email || input.record.email
   const phone = input.record.contact_phone || input.record.phone
+  const lastName = input.record.contact_last_name || input.record.last
+  const firstName = input.record.contact_first_name || input.record.first
+  const jobtitle = input.record.title
+  const website = input.record.website
+  const partner_gallery_type = input.record.type
 
-  const contactResponse = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/contacts?hapikey=${HUBSPOT_API_KEY}`,
+  let formData: object = {
+    supabase_table_id,
+    country,
+    form_note,
+    company,
+    company_size,
+    email,
+    phone,
+    lastName,
+    firstName,
+  }
+
+  if (input.table === 'partner_contacts') {
+    formData = {
+      ...formData,
+      jobtitle,
+      website,
+      partner_gallery_type,
+    }
+  }
+
+  const fields: { objectTypeId: '0-1'; name: string; value: string }[] = []
+  for (const [key, value] of Object.entries(formData)) {
+    fields.push({ objectTypeId: '0-1', name: key, value: value })
+  }
+
+  const formId = input.table === 'partner_contacts' ? PARTNER_FORM_ID : ENTERPRISE_FORM_ID
+
+  // Using HubSpot's submit data to a form API
+  // https://legacydocs.hubspot.com/docs/methods/forms/submit_form
+  const formResponse = await fetch(
+    `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL}/${formId}`,
     {
       method: 'POST',
       headers: {
@@ -32,143 +66,18 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        properties: {
-          company,
-          email,
-          firstname: firstName,
-          lastname: lastName,
-          phone,
-        },
+        fields,
       }),
     }
   )
 
-  const body = await contactResponse.json()
+  // Will create a deal using HubSpot's workflow tool instead of via API
 
-  let contactId: string | null = null
-
-  if (contactResponse.ok) {
-    contactId = body.id
-  } else {
-    if (body.status === 'error' && body.category === 'CONFLICT') {
-      // fetch existing contact
-      const contactAssociateResponse = await fetch(
-        `https://api.hubapi.com/crm/v3/objects/contacts/${email}?idProperty=email&hapikey=${HUBSPOT_API_KEY}`
-      )
-
-      const body = await contactAssociateResponse.json()
-
-      if (contactAssociateResponse.ok) {
-        contactId = body.id
-      } else {
-        console.log(`Failed to fetch contact`, body)
-        return new Response(`Failed to fetch contact`, { status: 500 })
-      }
-    } else {
-      console.log(`Failed to create contact`, body)
-      return new Response(`Failed to create contact`, { status: 500 })
-    }
-  }
-
-  const noteContent = Object.entries(input.record).reduce(
-    (acc, [key, value]) => acc + `${key}: ${value || 'NOT_PROVIDED'}<br />`,
-    ''
-  )
-
-  // Add note
-  const noteResponse = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/notes?hapikey=${HUBSPOT_API_KEY}`,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        properties: {
-          hs_timestamp: Date.now(),
-          hs_note_body: noteContent,
-          hubspot_owner_id: OWNER_ID,
-        },
-      }),
-    }
-  )
-
-  const noteBody = await noteResponse.json()
-
-  if (!noteResponse.ok) {
-    console.log(`Failed to add note`, noteBody)
-    return new Response(`Failed to add note`, { status: 500 })
-  }
-
-  const noteId = noteBody.id
-
-  // Associate note with contact
-  const noteAssociateResponse = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/notes/${noteId}/associations/contacts/${contactId}/note_to_contact?hapikey=${HUBSPOT_API_KEY}`,
-    {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }
-  )
-
-  if (!noteAssociateResponse.ok) {
-    console.log(`Failed to associate note`, await noteAssociateResponse.json())
-    return new Response(`Failed to associate note`, { status: 500 })
-  }
-
-  // Create deal
-  const dealCloseDate = new Date()
-  dealCloseDate.setDate(dealCloseDate.getDate() + 28) // 28 days
-
-  const dealResponse = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/deals?hapikey=${HUBSPOT_API_KEY}`,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        properties: {
-          closedate: dealCloseDate.toISOString(),
-          dealname: company || `${firstName} ${lastName}`,
-          dealstage:
-            input.table === 'enterprise_contacts' ? ENTERPRISE_DEAL_STAGE : PARTNERS_DEAL_STAGE,
-          hubspot_owner_id: OWNER_ID,
-          pipeline: input.table === 'enterprise_contacts' ? ENTERPRISE_PIPELINE : PARTNERS_PIPELINE,
-        },
-      }),
-    }
-  )
-
-  const dealBody = await dealResponse.json()
-
-  if (!dealResponse.ok) {
-    console.log(`Failed to create deal`, dealBody)
-    return new Response(`Failed to create deal: ` + dealBody.message, { status: 500 })
-  }
-
-  const dealId = dealBody.id
-
-  // Associate contact with a deal
-  const dealAssociateResponse = await fetch(
-    `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}/associations/deals/${dealId}/contact_to_deal?hapikey=${HUBSPOT_API_KEY}`,
-    {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    }
-  )
-
-  if (!dealAssociateResponse.ok) {
-    console.log(`Failed to associate contact with deal`, await dealAssociateResponse.json())
-    return new Response(`Failed to associate contact with deal`, { status: 500 })
+  if (!formResponse.ok) {
+    console.log(`Failed to submit form data to HubSpot`, await formResponse.json())
+    return new Response(`Failed to submit form data to HubSpot`, {
+      status: 500,
+    })
   }
 
   return new Response(JSON.stringify({ done: true }), {
