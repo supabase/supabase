@@ -11,6 +11,7 @@ const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
+    'reference',
     {
       type: 'category',
       label: 'JavaScript',
@@ -184,7 +185,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod'],
+      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod', 'guides/platform/performance'],
     },
     {
       type: 'category',

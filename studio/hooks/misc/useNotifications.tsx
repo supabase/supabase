@@ -6,7 +6,8 @@ import { API_URL } from 'lib/constants'
 
 export const useNotifications = () => {
   const { data, error, mutate } = useSWR<Notification[]>(`${API_URL}/notifications`, get)
-  const anyError = error !== undefined
+
+  const anyError = (data as any)?.error || error !== undefined
   const refresh = () => mutate()
 
   return {

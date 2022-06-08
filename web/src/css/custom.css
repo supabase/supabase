@@ -463,6 +463,11 @@ a.card:hover {
   box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
 }
 
+.menu > .menu__list > .menu__list-item > .menu__link {
+  margin-left: 0.5rem;
+  pointer-events: all !important;
+}
+
 /*
  * Docs
  */
