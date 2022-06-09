@@ -48,8 +48,8 @@ const ConfirmationModal: FC<Props> = ({
       size={size}
       onCancel={onSelectCancel}
       customFooter={
-        <div className="flex items-center w-full space-x-3">
-          <Button block type="secondary" onClick={onSelectCancel}>
+        <div className="flex w-full items-center space-x-3">
+          <Button block type="default" onClick={onSelectCancel}>
             Cancel
           </Button>
           <Button block type={danger ? 'danger' : 'primary'} loading={loading} onClick={onConfirm}>
