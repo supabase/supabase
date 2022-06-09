@@ -7,7 +7,7 @@ import {
   IconArrowRight,
   IconArrowLeft,
 } from '@supabase/ui';
-import { DropdownControl } from '../../common';
+import { DropdownControl, showConfirmAlert } from '../../common';
 import { useDispatch, useTrackedState } from '../../../store';
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
@@ -32,17 +32,38 @@ const Pagination: React.FC<PaginationProps> = () => {
   const [page, setPage] = React.useState(state.page);
   const maxPages = Math.ceil(state.totalRows / state.rowsPerPage);
   const totalPages = state.totalRows > 0 ? maxPages : 1;
+  const { selectedRows } = state;
 
   React.useEffect(() => {
     if (state.page != page) setPage(state.page);
   }, [state.page, page]);
 
   function onPreviousPage() {
-    if (state.page > 1) {
+    if (state.page <= maxPages) {
       const previousPage = state.page - 1;
       setPage(previousPage);
       dispatch({ type: 'SET_PAGE', payload: previousPage });
     }
+  }
+
+  if (selectedRows.size >= 1) {
+    showConfirmAlert({
+      title: 'Confirm next page',
+      message: 'The currently selected lines will be deselected, do you want to proceed?',
+      onConfirm: async () => {
+        if (state.page > 1) {
+          const previousPage = state.page - 1;
+          setPage(previousPage);
+          dispatch({ type: 'SET_PAGE', payload: previousPage });
+        }
+        dispatch({
+          type: 'SELECTED_ROWS_CHANGE',
+          payload: { selectedRows: new Set() },
+        });
+      },
+    })
+  } else {
+    onPreviousPage();
   }
 
   function onNextPage() {
@@ -51,6 +72,22 @@ const Pagination: React.FC<PaginationProps> = () => {
       setPage(nextPage);
       dispatch({ type: 'SET_PAGE', payload: nextPage });
     }
+  }
+    
+  if (selectedRows.size >= 1) {
+    showConfirmAlert({
+      title: 'Confirm next page',
+      message: 'The currently selected lines will be deselected, do you want to proceed?',
+      onConfirm: async () => {
+        onNextPage();
+        dispatch({
+          type: 'SELECTED_ROWS_CHANGE',
+          payload: { selectedRows: new Set() },
+        });
+      },
+    });
+  } else {
+    onNextPage();
   }
 
   function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
