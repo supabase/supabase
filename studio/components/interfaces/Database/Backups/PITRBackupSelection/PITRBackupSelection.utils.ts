@@ -18,3 +18,10 @@ export const getTimezoneOffsetText = (timezone: Timezone) => {
 export const getTimezoneOffset = (timezone: Timezone) => {
   return timezone.text.split(')')[0].slice(4)
 }
+
+export const convertTimeStringtoUnixMs = (datetime: string, timezone: Timezone) => {
+  // Datetime in the format of YYYY-MM-DDTHH:mm:ss (from datetime-local input)
+  const timezoneOffset = getTimezoneOffset(timezone)
+  const datetimestringWithTimezone = `${datetime}${timezoneOffset}`
+  return dayjs(datetimestringWithTimezone).valueOf()
+}
