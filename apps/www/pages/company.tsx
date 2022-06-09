@@ -313,7 +313,7 @@ const Press = () => {
         <SectionHeader title={'Press'} />
       </div>
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
-        {PressData.filter((x) => x.type == 'article').map((x) => 
+        {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link href={x.href} key={x.href}>
             <a target="_blank">
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
@@ -326,12 +326,12 @@ const Press = () => {
               </Card>
             </a>
           </Link>
-        )}
+        ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <Link href={x.href} key={x.href}>
-            <a target="_blank" className='w-full'>
+            <a target="_blank">
               <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
