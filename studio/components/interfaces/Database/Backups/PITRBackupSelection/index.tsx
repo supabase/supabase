@@ -8,8 +8,8 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { ALL_TIMEZONES } from './PITRBackupSelection.constants'
 import {
   getClientTimezone,
-  getTimezoneOffset,
   getTimezoneOffsetText,
+  convertTimeStringtoUnixMs,
 } from './PITRBackupSelection.utils'
 
 interface Props {}
@@ -87,19 +87,33 @@ const PITRBackupSelection: FC<Props> = () => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    // Validation
     if (!recoveryPoint) {
       setErrors({ recoveryPoint: 'Please enter a date to recovery your project from' })
     } else {
-      setErrors(undefined)
-      setShowConfirmation(true)
+      const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
+      const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
+        configuration.physicalBackupData
+      const isOutOfRange =
+        recoveryTimeTargetUnix < earliestPhysicalBackupDateUnix ||
+        recoveryTimeTargetUnix > latestPhysicalBackupDateUnix
+
+      if (isOutOfRange) {
+        setErrors({
+          recoveryPoint: 'Selected date is out of range for available points of recovery',
+        })
+      } else {
+        setErrors(undefined)
+        setShowConfirmation(true)
+      }
     }
   }
 
   const onConfirmRestore = async () => {
+    if (!recoveryPoint) return
+
     // To unix milliseconds
-    const timezoneOffset = getTimezoneOffset(selectedTimezone)
-    const recoveryPointWithTimezone = `${recoveryPoint}${timezoneOffset}`
-    const recoveryTimeTargetUnix = dayjs(recoveryPointWithTimezone).valueOf()
+    const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
     console.log('Confirm restore', { recoveryTimeTargetUnix, region: configuration.region })
   }
 
