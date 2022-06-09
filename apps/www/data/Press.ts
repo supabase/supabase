@@ -48,6 +48,18 @@ const data: PressItem[] = [
     title: 'PodRocket',
     publisher: 'LogRocket',
   },
+  {
+    type: 'podcast',
+    href: 'https://changelog.com/podcast/476',
+    title: 'Changelog',
+    publisher: 'Changelog',
+  },
+  {
+    type: 'podcast',
+    href: 'https://www.se-radio.net/2022/05/episode-511-ant-wilson-on-supabase-postgres-as-a-service/',
+    title: 'SE Radio',
+    publisher: 'SE Radio',
+  },
 ]
 
 export default data
