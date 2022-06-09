@@ -19,6 +19,15 @@ const data: Investor[] = [
     linkedIn: null,
   },
   {
+    name: 'Felicis',
+    round: 'SEED',
+    title: 'Investment Firms & Funds',
+    img: '/images/logos/felicis.png',
+    lead: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
     name: 'Mozilla',
     round: 'SEED',
     title: 'Mozilla',
