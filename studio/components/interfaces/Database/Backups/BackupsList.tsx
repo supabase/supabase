@@ -1,6 +1,6 @@
-import React, { FC, useState, useEffect } from 'react'
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconInfo } from '@supabase/ui'
+import { IconInfo } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
@@ -12,35 +12,13 @@ import Panel from 'components/to-be-cleaned/Panel'
 interface Props {}
 
 const BackupsList: FC<Props> = ({}) => {
-  const { ui, app } = useStore()
+  const { ui, backups } = useStore()
   const projectRef = ui.selectedProject?.ref || 'default'
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [projectData, setProjectData] = useState<any>([])
+  if (backups.isLoading) return <Loading />
 
-  useEffect(() => {
-    retrieveBackups()
-  }, [])
-
-  const retrieveBackups = async () => {
-    setIsLoading(true)
-    const projectData = (await app.database.getBackups(projectRef)) as any
-    setProjectData(projectData)
-    setIsLoading(false)
-  }
-
-  if (isLoading) return <Loading />
-  if (projectData.error) {
-    return (
-      <div>
-        <Typography.Text type="secondary">Error loading backups</Typography.Text>
-      </div>
-    )
-  }
-
-  // Data Loaded
-  const { backups, tierId } = projectData
-  const sortedBackups = backups.sort((a: any, b: any) => b.id - a.id)
+  const { tierId } = backups.configuration
+  const sortedBackups = backups.list()
 
   if (tierId === STRIPE_PRODUCT_IDS.FREE) {
     return (
