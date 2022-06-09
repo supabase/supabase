@@ -150,7 +150,7 @@ const discussions = ({ data }: any) => {
     <Layout meta={{ title: meta_title, description: meta_description }} currentPage={'Discussions'}>
       <div className="mb-16 space-y-8">
         <div className="flex items-center justify-between">
-          <h2 className="my-4 text-4xl">Supabase Discussions</h2>
+          <h2 className="my-4 text-4xl">Discussions</h2>
           <Link href="https://github.com/supabase/supabase/discussions/new">
             <a
               target="_blank"
