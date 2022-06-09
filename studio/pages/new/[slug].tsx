@@ -11,7 +11,7 @@ import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/
 
 import { NextPageWithLayout } from 'types'
 import { passwordStrength } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
+import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   PROVIDERS,
@@ -36,24 +36,6 @@ import {
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
 
-interface StripeCustomer {
-  paymentMethods: any
-  customer: any
-  error?: any
-}
-
-async function fetchStripeAccount(stripeCustomerId: string) {
-  try {
-    const customer = await post(`${API_URL}/stripe/customer`, {
-      stripe_customer_id: stripeCustomerId,
-    })
-    if (customer.error) throw customer.error
-    return customer
-  } catch (error: any) {
-    return { error }
-  }
-}
-
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = router.query
@@ -70,7 +52,7 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+  const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
@@ -81,9 +63,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
-  const isEmptyPaymentMethod = stripeCustomer
-    ? stripeCustomer.paymentMethods?.data?.length <= 0
-    : undefined
+  const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
@@ -129,17 +109,17 @@ const Wizard: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
-    async function loadStripeAccountAsync(id: string) {
-      const res = await fetchStripeAccount(id)
-      if (!res.error) {
-        setStripeCustomer(res)
+    async function getPaymentMethods(slug: string) {
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (!error) {
+        setPaymentMethods(paymentMethods)
       }
     }
 
-    if (stripeCustomerId) {
-      loadStripeAccountAsync(stripeCustomerId)
+    if (slug) {
+      getPaymentMethods(slug as string)
     }
-  }, [stripeCustomerId])
+  }, [slug])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
