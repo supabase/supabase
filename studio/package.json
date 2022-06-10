@@ -50,6 +50,7 @@
     "path-to-regexp": "^6.2.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.2",
+    "react-auth-code-input": "^3.2.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-contexify": "^5.0.0",
     "react-csv": "^2.0.3",
