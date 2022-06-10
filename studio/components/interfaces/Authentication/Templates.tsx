@@ -61,9 +61,10 @@ const Templates: FC<any> = ({ project }) => {
           }}
           onSubmit={(model: any) => onFormSubmit(model)}
         >
-          <AutoField
+          <LongTextField
             showInlineError
             name="SMS_TEMPLATE"
+            rows={2}
             readOnly={!IS_PLATFORM}
             inputClassName="font-mono"
             errorMessage="Please enter an sms body."
