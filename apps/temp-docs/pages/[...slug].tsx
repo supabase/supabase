@@ -1,4 +1,3 @@
-import { ReactElement } from 'react'
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
 import Layout from '../components/layouts/Layout'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -17,7 +16,7 @@ export default function Doc({
   toc,
 }: {
   meta: { title: string; description: string }
-  content: ReactElement
+  content: any
   toc: any
 }) {
   const { asPath } = useRouter()
@@ -39,9 +38,7 @@ export default function Doc({
   return (
     // @ts-ignore
     <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
-      {/* @ts-ignore */}
       <MDXProvider components={components}>
-        {/* @ts-ignore */}
         <MDXRemote {...content} components={components} />
       </MDXProvider>
     </Layout>
