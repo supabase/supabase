@@ -4,15 +4,12 @@ title: Client Libraries
 description: 'Supabase provides client libraries in several languages.'
 ---
 
+import Tabs from '@theme/Tabs'
+import TabsPanel from '@theme/TabsPanel'
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
-
-
-The [Supabase Client](/docs/reference/javascript/supabase-client) makes it simple for developers to build secure and scalable products. 
+The [Supabase Client](/docs/reference/javascript/supabase-client) makes it simple for developers to build secure and scalable products.
 
 ## Auth
-
 
 Create new users using [`signUp()`](/docs/reference/javascript/auth-signup). By default, the user will need to verify their email address before logging in.<br/>
 If confirmations are disabled the response will contain an access token and also a confirmed_at value, otherwise it will just contain a confirmation_sent_at attribute.
@@ -31,7 +28,6 @@ const { error, data } = await supabase.auth.signUp({
 })
 ```
 
-
 </TabsPanel>
 <TabsPanel id="py" label="py">
 
@@ -47,7 +43,6 @@ user = supabase.auth.sign_up(
     password='example-password',
 )
 ```
-
 
 </TabsPanel>
   
@@ -70,8 +65,6 @@ void main() async {
 
 </Tabs>
 
-
-
 Existing users can log in using [`signIn()`](/docs/reference/javascript/auth-signin).
 
 <Tabs
@@ -84,10 +77,9 @@ Existing users can log in using [`signIn()`](/docs/reference/javascript/auth-sig
 ```js
 const { error, data } = await supabase.auth.signIn({
   email: 'example@email.com',
-  password: 'example-password'
+  password: 'example-password',
 })
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -104,7 +96,6 @@ user = supabase.auth.sign_in(
     password='example-password'
 )
 ```
-
 
 </TabsPanel>
   
@@ -127,7 +118,6 @@ void main() async {
 
 </Tabs>
 
-
 If there is an email, but no password passed to [`signIn()`](/docs/reference/javascript/auth-signin), the user will receive a magic link.
 
 <Tabs
@@ -139,10 +129,9 @@ If there is an email, but no password passed to [`signIn()`](/docs/reference/jav
 
 ```js
 const { error, data } = await supabase.auth.signIn({
-  email: 'example@email.com'
+  email: 'example@email.com',
 })
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -158,7 +147,6 @@ user = supabase.auth.sign_in(
     email='example@email.com'
 )
 ```
-
 
 </TabsPanel>
   
@@ -181,9 +169,7 @@ void main() async {
 
 </Tabs>
 
-
 Third party logins are also handled through [`signIn()`](/docs/reference/javascript/auth-signin).
-
 
 <Tabs
   groupId="libraries"
@@ -195,10 +181,9 @@ Third party logins are also handled through [`signIn()`](/docs/reference/javascr
 ```js
 const { user, error } = await supabase.auth.signIn({
   // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
-  provider: 'github'
+  provider: 'github',
 })
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -206,7 +191,6 @@ const { user, error } = await supabase.auth.signIn({
 ```py
 # Not yet implemented
 ```
-
 
 </TabsPanel>
   
@@ -232,7 +216,6 @@ void main() async {
 
 Since Postgres is a Relational database, the client makes it simple to query tables and fetch related data in one round-trip, using [`select()`](/docs/reference/javascript/select).
 
-
 <Tabs
   groupId="libraries"
   defaultActiveId="js"
@@ -241,16 +224,13 @@ Since Postgres is a Relational database, the client makes it simple to query tab
 <TabsPanel id="js" label="js">
 
 ```js
-const { data, error } = await supabase
-  .from('countries')
-  .select(`
+const { data, error } = await supabase.from('countries').select(`
     name,
     cities (
       name
     )
   `)
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -265,7 +245,6 @@ supabase: Client = create_client(url, key)
 
 data = supabase.table('countries').select('name').execute()
 ```
-
 
 </TabsPanel>
   
@@ -289,9 +268,7 @@ void main() async {
 
 </Tabs>
 
-
 You can do advanced [filtering](/docs/reference/javascript/using-filters) to extract only the data that you need.
-
 
 <Tabs
   groupId="libraries"
@@ -308,7 +285,6 @@ const { data, error } = await supabase
   .limit(10)
 ```
 
-
 </TabsPanel>
 <TabsPanel id="py" label="py">
 
@@ -317,7 +293,6 @@ data = supabase.table('cities').select('name, country_id').eq('name', 'Germany')
 # Assert we pulled real data.
 assert len(data.get("data", [])) > 0
 ```
-
 
 </TabsPanel>
   
@@ -343,10 +318,7 @@ void main() async {
 
 </Tabs>
 
-
 You can create data easily using [`insert()`](/docs/reference/javascript/insert).
-
-
 
 <Tabs
   groupId="libraries"
@@ -356,14 +328,11 @@ You can create data easily using [`insert()`](/docs/reference/javascript/insert)
 <TabsPanel id="js" label="js">
 
 ```js
-const { data, error } = await supabase
-  .from('cities')
-  .insert([
-    { name: 'The Shire', country_id: 554 },
-    { name: 'Rohan', country_id: 555 },
-  ])
+const { data, error } = await supabase.from('cities').insert([
+  { name: 'The Shire', country_id: 554 },
+  { name: 'Rohan', country_id: 555 },
+])
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -373,14 +342,13 @@ data = supabase.table('cities').insert({'name': 'Gotham', 'country_id': 556 }).e
 # assert if insert response is a success
 assert data.get("status_code") in (200, 201)
 
-# bulk insert 
+# bulk insert
 data = supabase.table('cities').insert([
 {'name': 'Gotham', 'country_id': 556 },
 {'name': 'The Shire', 'country_id': 557 }
 ]).execute()
 
 ```
-
 
 </TabsPanel>
   
@@ -407,11 +375,9 @@ void main() async {
 
 </Tabs>
 
-
 ## Realtime Changes
 
 The Supabase client makes it simple to listen to realtime database changes, using [`subscribe()`](/docs/reference/javascript/subscribe).
-
 
 <Tabs
   groupId="libraries"
@@ -423,12 +389,11 @@ The Supabase client makes it simple to listen to realtime database changes, usin
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('*', payload => {
+  .on('*', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
 
 </TabsPanel>
 <TabsPanel id="py" label="py">
@@ -436,7 +401,6 @@ const mySubscription = supabase
 ```py
 # Not yet implemented
 ```
-
 
 </TabsPanel>
   
@@ -464,9 +428,7 @@ void main() async {
 
 </Tabs>
 
-
 You can even [listen to Row Level changes](/docs/reference/javascript/subscribe#listening-to-row-level-changes).
-
 
 <Tabs
   groupId="libraries"
@@ -482,14 +444,12 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
 </TabsPanel>
 <TabsPanel id="py" label="py">
 
 ```py
 # Not yet implemented
 ```
-
 
 </TabsPanel>
   
@@ -517,9 +477,7 @@ void main() async {
 
 </Tabs>
 
-
-
 ## Next steps
 
 - View the [Client Docs](/docs/reference/javascript/supabase-client)
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

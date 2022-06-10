@@ -15,6 +15,7 @@ async function generate() {
     'pages/*/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
+    '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
     '!pages/_*.js',
@@ -33,6 +34,7 @@ async function generate() {
               .replace('pages', '')
               // add a `/` for blog posts
               .replace('_blog', '/blog')
+              .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
               // replace the paths for nested 'index' based routes
@@ -41,6 +43,9 @@ async function generate() {
               .replace('/storage/Storage', '/storage')
 
             let route = path === '/index' ? '' : path
+
+            if (route === '/alternatives/[slug]') return null
+            if (route === '/partners/[slug]') return null
 
             //
             // blog specific urls

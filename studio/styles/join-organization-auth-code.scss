@@ -1,0 +1,19 @@
+// For the org/[ref]/join confirmation after a user has been invited to an org
+.join-auth-code-container {
+	input + input {
+		@apply ml-2
+	}
+
+	> input {
+		@apply text-center;
+		@apply text-xl;
+
+		&:nth-child(5n+1) {
+			@apply ml-6
+		}
+	}
+
+	input:first-child {
+		@apply ml-0
+	}
+}

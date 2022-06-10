@@ -18,8 +18,6 @@ import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import dayjs from 'dayjs'
 
-import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
 interface Data {
   logData: LogData[]
   error: string | Object | null

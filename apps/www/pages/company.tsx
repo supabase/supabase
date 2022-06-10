@@ -247,7 +247,7 @@ const Investors = () => {
             <>
               <p>
                 <p className="text-lg">
-                  We've raised over $36 million in funding, backed by some of the world's leading
+                  We've raised over $116 million in funding, backed by some of the world's leading
                   investors.
                 </p>
               </p>
@@ -256,7 +256,7 @@ const Investors = () => {
         />
       </div>
 
-      <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-3">
+      <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
             <div
@@ -311,7 +311,7 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-2">
+      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <a href={x.href} key={x.href} target="_blank">
             <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">

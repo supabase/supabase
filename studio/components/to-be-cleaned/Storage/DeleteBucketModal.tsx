@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import TextConfirmModal from '../ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 
 interface Props {
   visible: boolean
