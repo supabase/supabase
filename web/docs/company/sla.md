@@ -62,7 +62,7 @@ Issue resulting in a situation meaning major functionality is impacted and
 significant performance degradation is experienced. Issue impacts significant proportion of user base and / or major 
 Supabase functionality.  
 
-### 3. Normal)
+### 3. Normal
 
 **Minor Feature or Functional Issue / General Question**
 

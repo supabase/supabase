@@ -54,7 +54,7 @@ async function fetchUser(req: NextApiRequest, res: NextApiResponse): Promise<any
 
   const token = req.headers.authorization
   if (!token) {
-    return res.status(401).end('Unauthorized: missing access token')
+    throw new Error('missing access token')
   }
   let { user: gotrue_user, error: authError } = await getAuthUser(token)
   if (authError) {

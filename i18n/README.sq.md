@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] API të gjeneruara automatikisht
 - [x] Pult
 - [x] Magazin / Hapsirë
-- [ ] Funksionet (së shpejti)
+- [x] Funksionet
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentimi
 
@@ -29,7 +32,7 @@ Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/do
 ## Statusi
 
 - [x] Alfa: Ne po testojmë Supabase me një grup të mbyllur klientësh
-- [x] Publike Alpha: Gjithkush mund të regjistrohet në [app.supabase.io](https://app.supabase.io). Por shkoni lehtë për ne, ka disa ngërçe
+- [x] Publike Alpha: Gjithkush mund të regjistrohet në [app.supabase.com](https://app.supabase.com). Por shkoni lehtë për ne, ka disa ngërçe
 - [x] Publike Beta: Mjaft e qëndrueshme për shumicën e rasteve të përdorimit për jo ndërmarrjet
 - [ ] Publike: Gati për Prodhim / Publikim
 
@@ -45,7 +48,7 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 **Arkitektura Aktuale**
 
-Supabase është një [platform hostimi](https://app.supabase.io). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
+Supabase është një [platform hostimi](https://app.supabase.com). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
 ![Arkitektura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

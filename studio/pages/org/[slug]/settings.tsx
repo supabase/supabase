@@ -1,5 +1,5 @@
 import { createContext, useEffect, useContext, useState } from 'react'
-import { useRouter } from 'next/router'
+import router, { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { pluckJsonSchemaFields, pluckObjectFields, timeout } from 'lib/helpers'
@@ -32,7 +32,7 @@ import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/to-be-cleaned/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { NextPageWithLayout, Project } from 'types'
 
@@ -59,10 +59,12 @@ const OrgSettingsLayout = withAuth(
       get filteredMembers() {
         const temp = this.members.filter((x: any) => {
           let profile = x.profile
-          return (
-            profile.username.includes(this.membersFilterString) ||
-            profile.primary_email.includes(this.membersFilterString)
-          )
+          if(profile) {
+            return (
+              profile.username.includes(this.membersFilterString) ||
+              profile.primary_email.includes(this.membersFilterString)
+              )
+            }
         })
         return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
       },
@@ -125,15 +127,16 @@ export default observer(OrgSettings)
 const OrganizationSettings = observer(() => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
+
   const {
-    members,
+    members,// members retrieved here
     products,
     isError: isOrgDetailError,
   } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
 
   useEffect(() => {
     if (!isOrgDetailError) {
-      PageState.members = members ?? []
+      PageState.members = members ?? [] // members retrieved here
       PageState.products = products ?? []
     }
   }, [members, products, isOrgDetailError])
@@ -150,9 +153,38 @@ const OrganizationSettings = observer(() => {
 const TabsView = observer(() => {
   const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
-
+  console.log(router)
   const organization = ui.selectedOrganization
   const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
+
+  // useEffect(() => {
+  //   if (window.location.hash) {
+  //     console.log('has hash')
+  //     changeTab(window.location.hash.slice(1).toUpperCase());
+  //     console.log(window.location.hash.slice(1).toUpperCase())
+  //   }
+  // },[])
+
+  // function onHashChangeStart() {
+  //   console.log('route changed')
+  //   changeTab(window.location.hash);
+  // }
+
+//   useEffect(() => {
+//     const onHashChangeStart = () => {
+//         console.log(`Path changing`);
+//     };
+
+//     router.events.on("hashChangeStart", onHashChangeStart);
+
+//     return () => {
+//         router.events.off("hashChangeStart", onHashChangeStart);
+//     };
+// }, [router.events]);
+
+  // function changeTab(id: any) {
+  //   //router.push(`/org/${toJS(PageState.organization.slug)}/settings#${id.toLowerCase()}`)
+  // }
 
   return (
     <>
@@ -472,6 +504,7 @@ const invite_status = 'pending';
 
 const MembersView = observer(() => {
   const PageState: any = useContext(PageContext)
+  console.log(toJS(PageState.members))
 
   return (
     <div className="rounded">
@@ -509,11 +542,12 @@ const MembersView = observer(() => {
                 </Table.td>
 
                 <Table.td>
-                  {!x.is_owner && invite_status === 'pending' && <Badge color="yellow">Pending</Badge>}
+                  {x.profile.expired ? <Badge color="red">Expired</Badge> : <Badge color="yellow">Invited</Badge>}
                 </Table.td>
 
                 <Table.td>
                   <Typography.Text type="secondary">
+                    {console.log(x)}
                     {x.is_owner ? 'Owner' : 'Developer'}
                   </Typography.Text>
                 </Table.td>

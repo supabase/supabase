@@ -11,11 +11,11 @@ export default function AuthProviders() {
             <Card>
               <div className="flex justify-between gap-10">
                 <p>{x.name}</p>
-                <p className="text-tiny flex items-center font-normal uppercase text-white">
+                <p className="flex items-center text-xs font-normal uppercase text-white">
                   {x.official ? (
-                    <span className="rounded bg-green-600 py-1 px-2">Official</span>
+                    <span className="bg-brand-800 rounded py-1 px-2">Official</span>
                   ) : (
-                    <span className="rounded bg-gray-500 p-1">Unofficial</span>
+                    <span className="bg-scale-500 rounded p-1">Unofficial</span>
                   )}
                 </p>
               </div>

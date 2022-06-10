@@ -1,11 +1,10 @@
-import { FC, ReactNode, useEffect, useState } from 'react'
+import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
 import Error from 'components/ui/Error'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-// import SQLEditorMenu from './SQLEditorMenu'
-import SQLEditorMenuOld from './SQLEditorMenuOld'
+import SQLEditorMenu from './SQLEditorMenu'
 
 interface Props {
   title: string
@@ -28,7 +27,7 @@ const SQLEditorLayout: FC<Props> = ({ title, children }) => {
       isLoading={content.isLoading}
       title={title || 'SQL'}
       product="SQL Editor"
-      productMenu={<SQLEditorMenuOld />}
+      productMenu={<SQLEditorMenu />}
     >
       {children}
     </ProjectLayout>
