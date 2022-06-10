@@ -3,40 +3,27 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { useStore, useFlag } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-
-import { BillingLayout } from 'components/layouts'
-import Connecting from 'components/ui/Loading/Loading'
-import { StripeSubscription } from 'components/interfaces/Billing'
-import { ProUpgrade } from 'components/interfaces/Billing'
 import { NextPageWithLayout } from 'types'
+import { API_URL } from 'lib/constants'
+import { get } from 'lib/common/fetch'
 
-const BillingUpdatePro: NextPageWithLayout = () => {
+import Connecting from 'components/ui/Loading/Loading'
+import { BillingLayout } from 'components/layouts'
+import { StripeSubscription } from 'components/interfaces/Billing'
+import EnterpriseUpdate from 'components/interfaces/Billing/EnterpriseUpdate'
+
+const BillingUpdateEnterprise: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
 
   const projectRef = ui.selectedProject?.ref
   const orgSlug = ui.selectedOrganization?.slug
-
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
-
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
-
-  const isEnterprise =
-    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
-
-  useEffect(() => {
-    // User added a new payment method
-    if (router.query.setup_intent && router.query.redirect_status) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
-    }
-  }, [])
 
   useEffect(() => {
     if (projectUpdateDisabled) {
@@ -53,18 +40,10 @@ const BillingUpdatePro: NextPageWithLayout = () => {
     }
   }, [orgSlug])
 
-  useEffect(() => {
-    if (isEnterprise) {
-      router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
-    }
-  }, [subscription])
-
   const getStripeProducts = async () => {
     try {
-      setIsLoadingProducts(true)
       const products = await get(`${API_URL}/stripe/products`)
       setProducts(products)
-      setIsLoadingProducts(false)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -101,6 +80,7 @@ const BillingUpdatePro: NextPageWithLayout = () => {
 
       const subscription = await get(`${API_URL}/projects/${projectRef}/subscription`)
       if (subscription.error) throw subscription.error
+
       setSubscription(subscription)
     } catch (error: any) {
       ui.setNotification({
@@ -111,24 +91,18 @@ const BillingUpdatePro: NextPageWithLayout = () => {
     }
   }
 
-  if (!products || !subscription || isEnterprise)
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <Connecting />
-      </div>
-    )
+  if (!products || !subscription) return <Connecting />
 
   return (
-    <ProUpgrade
+    <EnterpriseUpdate
       products={products}
       currentSubscription={subscription}
       isLoadingPaymentMethods={isLoadingPaymentMethods}
       paymentMethods={paymentMethods || []}
-      onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
     />
   )
 }
 
-BillingUpdatePro.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
+BillingUpdateEnterprise.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
 
-export default observer(BillingUpdatePro)
+export default observer(BillingUpdateEnterprise)
