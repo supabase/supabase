@@ -37,8 +37,11 @@ export default function Doc({
   }
 
   return (
+    // @ts-ignore
     <Layout meta={meta} toc={toc} menuItems={menuItems[page]} currentPage={page}>
+      {/* @ts-ignore */}
       <MDXProvider components={components}>
+        {/* @ts-ignore */}
         <MDXRemote {...content} components={components} />
       </MDXProvider>
     </Layout>
