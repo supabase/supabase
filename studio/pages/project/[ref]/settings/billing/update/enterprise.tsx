@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { useStore, useFlag } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { API_URL } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 
 import Connecting from 'components/ui/Loading/Loading'
@@ -25,6 +25,9 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
 
+  const isEnterprise =
+    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   useEffect(() => {
     if (projectUpdateDisabled) {
       router.push(`/project/${projectRef}/settings/billing/update`)
@@ -39,6 +42,12 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
       getPaymentMethods()
     }
   }, [orgSlug])
+
+  useEffect(() => {
+    if (subscription !== undefined && !isEnterprise) {
+      router.push(`/project/${projectRef}/settings/billing/update`)
+    }
+  }, [subscription])
 
   const getStripeProducts = async () => {
     try {
@@ -91,7 +100,7 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
     }
   }
 
-  if (!products || !subscription) {
+  if (!products || !subscription || !isEnterprise) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <Connecting />

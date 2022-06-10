@@ -21,12 +21,10 @@ const BillingUpdatePro: NextPageWithLayout = () => {
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
-  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
-
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
   const isEnterprise =
     subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -61,10 +59,8 @@ const BillingUpdatePro: NextPageWithLayout = () => {
 
   const getStripeProducts = async () => {
     try {
-      setIsLoadingProducts(true)
       const products = await get(`${API_URL}/stripe/products`)
       setProducts(products)
-      setIsLoadingProducts(false)
     } catch (error: any) {
       ui.setNotification({
         error,
