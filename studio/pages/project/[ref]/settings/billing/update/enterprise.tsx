@@ -91,7 +91,13 @@ const BillingUpdateEnterprise: NextPageWithLayout = () => {
     }
   }
 
-  if (!products || !subscription) return <Connecting />
+  if (!products || !subscription) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Connecting />
+      </div>
+    )
+  }
 
   return (
     <EnterpriseUpdate
