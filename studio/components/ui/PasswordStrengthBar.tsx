@@ -46,7 +46,11 @@ const PasswordStrengthBar = ({
       >
         {passwordStrengthMessage
           ? passwordStrengthMessage
-          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'} {' '} <button className='underline hover:decoration-2' onClick={generateStrongPassword}>Generate a password</button>.
+          : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
+          {' '}
+          <button className='underline hover:decoration-2' onClick={generateStrongPassword}>
+            Generate a password
+          </button>
       </Typography.Text>
     </>
   )
