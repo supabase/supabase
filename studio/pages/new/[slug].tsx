@@ -290,7 +290,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
-                    copy
+                    copy={dbPass.length > 0}
                     layout="horizontal"
                     label="Database Password"
                     type="password"
