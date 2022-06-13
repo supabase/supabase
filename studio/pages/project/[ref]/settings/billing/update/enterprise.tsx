@@ -2,24 +2,28 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { NextPageWithLayout } from 'types'
 import { useStore, useFlag } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
-import { BillingLayout } from 'components/layouts'
-import { ExitSurvey, StripeSubscription } from 'components/interfaces/Billing'
 import Connecting from 'components/ui/Loading/Loading'
+import { BillingLayout } from 'components/layouts'
+import { StripeSubscription } from 'components/interfaces/Billing'
+import EnterpriseUpdate from 'components/interfaces/Billing/EnterpriseUpdate'
 
-const BillingUpdateFree: NextPageWithLayout = () => {
+const BillingUpdateEnterprise: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
-  const projectRef = ui.selectedProject?.ref
 
+  const projectRef = ui.selectedProject?.ref
+  const orgSlug = ui.selectedOrganization?.slug
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
   const [subscription, setSubscription] = useState<StripeSubscription>()
+  const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
+  const [paymentMethods, setPaymentMethods] = useState<any>()
 
   const isEnterprise =
     subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -34,8 +38,14 @@ const BillingUpdateFree: NextPageWithLayout = () => {
   }, [projectRef])
 
   useEffect(() => {
-    if (isEnterprise) {
-      router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    if (orgSlug) {
+      getPaymentMethods()
+    }
+  }, [orgSlug])
+
+  useEffect(() => {
+    if (subscription !== undefined && !isEnterprise) {
+      router.push(`/project/${projectRef}/settings/billing/update`)
     }
   }, [subscription])
 
@@ -52,6 +62,25 @@ const BillingUpdateFree: NextPageWithLayout = () => {
     }
   }
 
+  const getPaymentMethods = async () => {
+    const orgSlug = ui.selectedOrganization?.slug ?? ''
+    try {
+      setIsLoadingPaymentMethods(true)
+      const { data: paymentMethods, error } = await get(
+        `${API_URL}/organizations/${orgSlug}/payments`
+      )
+      if (error) throw error
+      setIsLoadingPaymentMethods(false)
+      setPaymentMethods(paymentMethods)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get available payment methods: ${error.message}`,
+      })
+    }
+  }
+
   const getSubscription = async () => {
     try {
       if (!ui.selectedProject?.subscription_id) {
@@ -60,6 +89,7 @@ const BillingUpdateFree: NextPageWithLayout = () => {
 
       const subscription = await get(`${API_URL}/projects/${projectRef}/subscription`)
       if (subscription.error) throw subscription.error
+
       setSubscription(subscription)
     } catch (error: any) {
       ui.setNotification({
@@ -70,26 +100,24 @@ const BillingUpdateFree: NextPageWithLayout = () => {
     }
   }
 
-  const freeTier = products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
-
-  if (isEnterprise)
+  if (!products || !subscription || !isEnterprise) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <Connecting />
       </div>
     )
+  }
 
   return (
-    <div className="mx-auto my-10 max-w-5xl">
-      <ExitSurvey
-        freeTier={freeTier}
-        subscription={subscription}
-        onSelectBack={() => router.push(`/project/${projectRef}/settings/billing/update`)}
-      />
-    </div>
+    <EnterpriseUpdate
+      products={products}
+      currentSubscription={subscription}
+      isLoadingPaymentMethods={isLoadingPaymentMethods}
+      paymentMethods={paymentMethods || []}
+    />
   )
 }
 
-BillingUpdateFree.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
+BillingUpdateEnterprise.getLayout = (page) => <BillingLayout>{page}</BillingLayout>
 
-export default observer(BillingUpdateFree)
+export default observer(BillingUpdateEnterprise)

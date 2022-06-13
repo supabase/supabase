@@ -11,6 +11,7 @@ export interface StripeSubscription {
 export interface StripeProduct {
   name: string
   prod_id: string
+  price_id?: string
   unit_amount: number
   supabase_prod_id: string
 }
