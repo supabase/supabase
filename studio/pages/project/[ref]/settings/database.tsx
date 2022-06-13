@@ -5,6 +5,7 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
+import generator from 'generate-password'
 import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -201,6 +202,17 @@ const ResetDbPassword: FC<any> = () => {
     }
   }
 
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setPassword(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <>
       <Panel>
@@ -244,6 +256,7 @@ const ResetDbPassword: FC<any> = () => {
                   passwordStrengthScore={passwordStrengthScore}
                   passwordStrengthMessage={passwordStrengthMessage}
                   password={password}
+                  generateStrongPassword={generateStrongPassword}
                 />
               }
             />
@@ -327,7 +340,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-const uriConnString =
+  const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`

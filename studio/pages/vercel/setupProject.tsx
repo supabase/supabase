@@ -6,6 +6,7 @@ import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
 import { Button, Input, Listbox, Typography } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
+import generator from 'generate-password'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -136,8 +137,8 @@ const SetupProject = () => {
 export default observer(SetupProject)
 
 const Connecting = () => (
-  <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-32 flex items-center justify-center">
+  <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
     <Typography.Text>
@@ -188,6 +189,17 @@ const CreateProject = observer(() => {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
+  }
+
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
   }
 
   async function createSupabaseProject(dbSql: string) {
@@ -281,6 +293,7 @@ const CreateProject = observer(() => {
               passwordStrengthScore={passwordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
+              generateStrongPassword={generateStrongPassword}
             />
           }
         />
