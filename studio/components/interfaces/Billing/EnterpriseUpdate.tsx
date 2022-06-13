@@ -152,7 +152,7 @@ const EnterpriseUpdate: FC<Props> = ({
               <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
               <div
                 className="space-y-8 overflow-scroll pb-8"
-                style={{ height: 'calc(100vh - 9rem - 57px)' }}
+                style={{ height: 'calc(100vh - 6.4rem - 57px)' }}
               >
                 <h3 className="text-xl">
                   Managing your <span className="text-brand-900">Enterprise</span> plan
