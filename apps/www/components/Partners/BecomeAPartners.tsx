@@ -89,7 +89,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </Select>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 sm:space-x-4">
                 <div className="flex-1">
                   <Input
                     label="First Name *"
@@ -111,7 +111,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </div>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 sm:space-x-4">
                 <div className="flex-1">
                   <Input
                     label="Company Name"
@@ -133,7 +133,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </div>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 sm:space-x-4">
                 <div className="flex-1">
                   <Input
                     label="Job Title"
