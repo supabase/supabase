@@ -154,7 +154,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                   />
                 </div>
               </div>
-              
+
               <div>
                 <Input
                   label="Phone Number"
