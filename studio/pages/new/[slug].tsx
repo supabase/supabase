@@ -7,6 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import generator from 'generate-password'
 import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
 
 import { NextPageWithLayout } from 'types'
@@ -173,6 +174,19 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  // [Joshen] Refactor: DB Password could be a common component
+  // used in multiple pages with repeated logic
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <Panel
       hideHeaderStyling
@@ -217,7 +231,7 @@ const Wizard: NextPageWithLayout = () => {
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-b border-t">
+            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -242,7 +256,7 @@ const Wizard: NextPageWithLayout = () => {
             </Panel.Content>
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b border-t">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -258,6 +272,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                   <Input
                     id="password"
+                    copy={dbPass.length > 0}
                     layout="horizontal"
                     label="Database Password"
                     type="password"
@@ -269,6 +284,7 @@ const Wizard: NextPageWithLayout = () => {
                         passwordStrengthScore={passwordStrengthScore}
                         password={dbPass}
                         passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generateStrongPassword}
                       />
                     }
                     error={passwordStrengthWarning}
