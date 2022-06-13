@@ -287,6 +287,7 @@ const CreateProject = observer(() => {
           type="password"
           placeholder="Type in a strong password"
           value={dbPass}
+          copy={dbPass.length > 0}
           onChange={onDbPassChange}
           descriptionText={
             <PasswordStrengthBar

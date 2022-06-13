@@ -208,7 +208,7 @@ const ResetDbPassword: FC<any> = () => {
       numbers: true,
       uppercase: true,
     })
-
+    console.log('generateStrongPassword', password)
     setPassword(password)
     delayedCheckPasswordStrength(password)
   }
@@ -248,6 +248,8 @@ const ResetDbPassword: FC<any> = () => {
           <div className="w-full space-y-8 py-8">
             <Input
               type="password"
+              value={password}
+              copy={password.length > 0}
               onChange={onDbPassChange}
               error={passwordStrengthWarning}
               // @ts-ignore
