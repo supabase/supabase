@@ -7,6 +7,7 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import generator from 'generate-password'
 import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
 
 import { NextPageWithLayout } from 'types'
@@ -35,7 +36,6 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
-import generator from 'generate-password';
 
 interface StripeCustomer {
   paymentMethods: any
@@ -194,12 +194,14 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  // [Joshen] Refactor: DB Password could be a common component
+  // used in multiple pages with repeated logic
   function generateStrongPassword() {
     const password = generator.generate({
       length: 16,
       numbers: true,
-      uppercase: true
-    });
+      uppercase: true,
+    })
 
     setDbPass(password)
     delayedCheckPasswordStrength(password)
@@ -215,13 +217,13 @@ const Wizard: NextPageWithLayout = () => {
         </div>
       }
       footer={
-        <div key="panel-footer" className="flex items-center justify-between w-full">
+        <div key="panel-footer" className="flex w-full items-center justify-between">
           <Button type="default" onClick={() => Router.push('/')}>
             Cancel
           </Button>
           <div className="items-center space-x-3">
             {!projectCreationDisabled && (
-              <span className="text-xs text-scale-900">You can rename your project later</span>
+              <span className="text-scale-900 text-xs">You can rename your project later</span>
             )}
             <Button
               onClick={onClickNext}
@@ -236,7 +238,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <>
         <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-scale-900">
+          <p className="text-scale-900 text-sm">
             Your project will have its own dedicated instance and full postgres database.
             <br />
             An API will be set up so you can easily interact with your new database.
@@ -244,12 +246,12 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="pb-8 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="space-y-4 border-t border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -274,7 +276,7 @@ const Wizard: NextPageWithLayout = () => {
             </Panel.Content>
             {canCreateProject && (
               <>
-                <Panel.Content className="border-t border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -287,7 +289,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -309,7 +311,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                   <Listbox
                     layout="horizontal"
                     label="Region"
