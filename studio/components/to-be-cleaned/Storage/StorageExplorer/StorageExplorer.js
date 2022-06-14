@@ -40,6 +40,8 @@ const StorageExplorer = observer(({ bucket }) => {
     setView,
     sortBy,
     setSortBy,
+    sortByOrder,
+    setSortByOrder,
     currentBucketName,
     copyFileURLToClipboard,
     openBucket,
@@ -78,14 +80,24 @@ const StorageExplorer = observer(({ bucket }) => {
     const currentFolder = openedFolders[currentFolderIdx]
 
     if (itemSearchString) {
-      await fetchFolderContents(
-        currentFolder.id,
-        currentFolder.name,
-        currentFolderIdx,
-        itemSearchString
-      )
-    } else if (currentFolder) {
-      await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+      if (!currentFolder) {
+        // At root of bucket
+        await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+      } else {
+        await fetchFolderContents(
+          currentFolder.id,
+          currentFolder.name,
+          currentFolderIdx,
+          itemSearchString
+        )
+      }
+    } else {
+      if (!currentFolder) {
+        // At root of bucket
+        await fetchFolderContents(bucket.id, bucket.name, -1)
+      } else {
+        await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+      }
     }
   }, [itemSearchString])
 
@@ -258,6 +270,8 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const onChangeSortBy = (sortBy) => setSortBy(sortBy)
 
+  const onChangeSortByOrder = (sortByOrder) => setSortByOrder(sortByOrder)
+
   const onToggleSearch = (bool) => {
     setIsSearching(bool)
     if (bool === false) {
@@ -270,13 +284,14 @@ const StorageExplorer = observer(({ bucket }) => {
       ref={storageExplorerRef}
       className="
         bg-bg-primary-light dark:bg-bg-primary-dark
-        border border-panel-border-light dark:border-panel-border-dark
-        w-full h-full rounded-md flex flex-col"
+        border-panel-border-light dark:border-panel-border-dark flex
+        h-full w-full flex-col rounded-md border"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
           view={view}
           sortBy={sortBy}
+          sortByOrder={sortByOrder}
           loading={loading}
           breadcrumbs={columns.map((column) => column.name)}
           backDisabled={columns.length <= 1}
@@ -285,6 +300,7 @@ const StorageExplorer = observer(({ bucket }) => {
           setItemSearchString={setItemSearchString}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onChangeSortByOrder={onChangeSortByOrder}
           onToggleSearch={onToggleSearch}
           onFilesUpload={onFilesUpload}
           onSelectBack={onSelectBack}
@@ -325,6 +341,7 @@ const StorageExplorer = observer(({ bucket }) => {
           onSelectCreateFolder={onSelectCreateFolder}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onChangeSortByOrder={onChangeSortByOrder}
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }

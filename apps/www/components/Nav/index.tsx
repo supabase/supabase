@@ -270,14 +270,14 @@ const Nav = () => {
                   Star us on GitHub
                 </Button>
 
-                <Link href="https://app.supabase.io/">
+                <Link href="https://app.supabase.com/">
                   <a>
                     <Button type="default" className="hidden lg:block">
                       Sign in
                     </Button>
                   </a>
                 </Link>
-                <Link href="https://app.supabase.io/">
+                <Link href="https://app.supabase.com/">
                   <a>
                     <Button className="hidden text-white lg:block">Start your project</Button>
                   </a>
@@ -328,7 +328,7 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="space-y-1 pt-2 pb-4">
-                  <Link href="https://app.supabase.io/">
+                  <Link href="https://app.supabase.com/">
                     <a className="text-scale-900 block pl-3 pr-4 text-base font-medium dark:text-white">
                       Sign in
                     </a>

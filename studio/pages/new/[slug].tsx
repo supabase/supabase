@@ -7,10 +7,12 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { Button, Listbox, IconUsers, IconAlertCircle, Input, IconLoader } from '@supabase/ui'
+import generator from 'generate-password'
+import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
 
-import { getURL, passwordStrength } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
+import { NextPageWithLayout } from 'types'
+import { passwordStrength } from 'lib/helpers'
+import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   PROVIDERS,
@@ -23,32 +25,17 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, withAuth, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
-import InformationBox from 'components/ui/InformationBox'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
-import { NextPageWithLayout } from 'types'
-
-interface StripeCustomer {
-  paymentMethods: any
-  customer: any
-  error?: any
-}
-
-async function fetchStripeAccount(stripeCustomerId: string) {
-  try {
-    const customer = await post(`${API_URL}/stripe/customer`, {
-      stripe_customer_id: stripeCustomerId,
-    })
-    if (customer.error) throw customer.error
-    return customer
-  } catch (error: any) {
-    return { error }
-  }
-}
+import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import {
+  FreeProjectLimitWarning,
+  NotOrganizationOwnerWarning,
+  EmptyPaymentMethodWarning,
+} from 'components/interfaces/Organization/NewProject'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -56,6 +43,7 @@ const Wizard: NextPageWithLayout = () => {
   const { app, ui } = useStore()
 
   const subscriptionStats = useSubscriptionStats()
+  const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -65,7 +53,7 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+  const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
@@ -76,9 +64,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
-  const isEmptyPaymentMethod = stripeCustomer
-    ? stripeCustomer.paymentMethods?.data?.length <= 0
-    : undefined
+  const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
@@ -124,17 +110,17 @@ const Wizard: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
-    async function loadStripeAccountAsync(id: string) {
-      const res = await fetchStripeAccount(id)
-      if (!res.error) {
-        setStripeCustomer(res)
+    async function getPaymentMethods(slug: string) {
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (!error) {
+        setPaymentMethods(paymentMethods)
       }
     }
 
-    if (stripeCustomerId) {
-      loadStripeAccountAsync(stripeCustomerId)
+    if (slug) {
+      getPaymentMethods(slug as string)
     }
-  }, [stripeCustomerId])
+  }, [slug])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -188,6 +174,19 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  // [Joshen] Refactor: DB Password could be a common component
+  // used in multiple pages with repeated logic
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <Panel
       hideHeaderStyling
@@ -203,7 +202,9 @@ const Wizard: NextPageWithLayout = () => {
             Cancel
           </Button>
           <div className="items-center space-x-3">
-            <span className="text-scale-900 text-xs">You can rename your project later</span>
+            {!projectCreationDisabled && (
+              <span className="text-scale-900 text-xs">You can rename your project later</span>
+            )}
             <Button
               onClick={onClickNext}
               loading={newProjectedLoading}
@@ -224,139 +225,162 @@ const Wizard: NextPageWithLayout = () => {
             <br />
           </p>
         </Panel.Content>
-
-        <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-b border-t">
-          {organizations.length > 0 && (
-            <Listbox
-              label="Organization"
-              layout="horizontal"
-              value={currentOrg?.slug}
-              onChange={(slug) => router.push(`/new/${slug}`)}
-            >
-              {organizations.map((x: any) => (
-                <Listbox.Option
-                  key={x.id}
-                  label={x.name}
-                  value={x.slug}
-                  addOnBefore={() => <IconUsers />}
-                >
-                  {x.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
-          )}
-
-          {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
-        </Panel.Content>
-
-        {canCreateProject && (
+        {projectCreationDisabled ? (
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
+            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
+          </Panel.Content>
+        ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b border-t">
-              <Input
-                id="project-name"
-                layout="horizontal"
-                label="Name"
-                type="text"
-                placeholder="Project name"
-                value={projectName}
-                onChange={onProjectNameChange}
-                autoFocus
-              />
-            </Panel.Content>
-
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
-              <Input
-                id="password"
-                layout="horizontal"
-                label="Database Password"
-                type="password"
-                placeholder="Type in a strong password"
-                value={dbPass}
-                onChange={onDbPassChange}
-                descriptionText={
-                  <PasswordStrengthBar
-                    passwordStrengthScore={passwordStrengthScore}
-                    password={dbPass}
-                    passwordStrengthMessage={passwordStrengthMessage}
-                  />
-                }
-                error={passwordStrengthWarning}
-              />
-            </Panel.Content>
-
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
-              <Listbox
-                layout="horizontal"
-                label="Region"
-                type="select"
-                value={dbRegion}
-                // @ts-ignore
-                onChange={(value: string) => onDbRegionChange(value)}
-                descriptionText="Select a region close to you for the best performance."
-              >
-                {Object.keys(REGIONS).map((option: string, i) => {
-                  const label = Object.values(REGIONS)[i]
-                  return (
+            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
+              {organizations.length > 0 && (
+                <Listbox
+                  label="Organization"
+                  layout="horizontal"
+                  value={currentOrg?.slug}
+                  onChange={(slug) => router.push(`/new/${slug}`)}
+                >
+                  {organizations.map((x: any) => (
                     <Listbox.Option
-                      key={option}
-                      label={label}
-                      value={label}
-                      addOnBefore={({ active, selected }: any) => (
-                        <img
-                          className="w-5 rounded-sm"
-                          src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
-                        />
-                      )}
+                      key={x.id}
+                      label={x.name}
+                      value={x.slug}
+                      addOnBefore={() => <IconUsers />}
                     >
-                      <span className="text-scale-1200">{label}</span>
+                      {x.name}
                     </Listbox.Option>
-                  )
-                })}
-              </Listbox>
+                  ))}
+                </Listbox>
+              )}
+
+              {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
             </Panel.Content>
+            {canCreateProject && (
+              <>
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
+                  <Input
+                    id="project-name"
+                    layout="horizontal"
+                    label="Name"
+                    type="text"
+                    placeholder="Project name"
+                    value={projectName}
+                    onChange={onProjectNameChange}
+                    autoFocus
+                  />
+                </Panel.Content>
+
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                  <Input
+                    id="password"
+                    copy={dbPass.length > 0}
+                    layout="horizontal"
+                    label="Database Password"
+                    type="password"
+                    placeholder="Type in a strong password"
+                    value={dbPass}
+                    onChange={onDbPassChange}
+                    descriptionText={
+                      <PasswordStrengthBar
+                        passwordStrengthScore={passwordStrengthScore}
+                        password={dbPass}
+                        passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generateStrongPassword}
+                      />
+                    }
+                    error={passwordStrengthWarning}
+                  />
+                </Panel.Content>
+
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                  <Listbox
+                    layout="horizontal"
+                    label="Region"
+                    type="select"
+                    value={dbRegion}
+                    // @ts-ignore
+                    onChange={(value: string) => onDbRegionChange(value)}
+                    descriptionText="Select a region close to you for the best performance."
+                  >
+                    {Object.keys(REGIONS).map((option: string, i) => {
+                      const label = Object.values(REGIONS)[i]
+                      return (
+                        <Listbox.Option
+                          key={option}
+                          label={label}
+                          value={label}
+                          addOnBefore={({ active, selected }: any) => (
+                            <img
+                              className="w-5 rounded-sm"
+                              src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                            />
+                          )}
+                        >
+                          <span className="text-scale-1200">{label}</span>
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                </Panel.Content>
+              </>
+            )}
+            {currentOrg?.is_owner && (
+              <Panel.Content className="Form section-block--body has-inputs-centered ">
+                <Listbox
+                  label="Pricing Plan"
+                  layout="horizontal"
+                  value={dbPricingTierKey}
+                  // @ts-ignore
+                  onChange={onDbPricingPlanChange}
+                  // @ts-ignore
+                  descriptionText={
+                    <>
+                      Select a plan that suits your needs.&nbsp;
+                      <a className="underline" target="_blank" href="https://supabase.com/pricing">
+                        More details
+                      </a>
+                      {!isSelectFreeTier && !isEmptyPaymentMethod && (
+                        <Alert
+                          title="Your payment method will be charged"
+                          variant="warning"
+                          withIcon
+                          className="mt-3"
+                        >
+                          <p>
+                            By creating a new Pro Project, there will be an immediate charge of $25
+                            once the project has been created.
+                          </p>
+                        </Alert>
+                      )}
+                    </>
+                  }
+                >
+                  {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => {
+                    const label = `${v}${k === 'PRO' ? ' - $25/month' : ' - $0/month'}`
+                    return (
+                      <Listbox.Option key={k} label={label} value={k}>
+                        {label}
+                      </Listbox.Option>
+                    )
+                  })}
+                </Listbox>
+
+                {isSelectFreeTier && isOverFreeProjectLimit && (
+                  <FreeProjectLimitWarning limit={freeProjectsLimit} />
+                )}
+
+                {!isSelectFreeTier && isEmptyPaymentMethod && (
+                  <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
+                )}
+              </Panel.Content>
+            )}
+            {subscriptionStats.isLoading && (
+              <Panel.Content>
+                <div className="flex items-center justify-center py-10">
+                  <IconLoader size={16} className="animate-spin" />
+                </div>
+              </Panel.Content>
+            )}
           </>
-        )}
-
-        {currentOrg?.is_owner && (
-          <Panel.Content className="Form section-block--body has-inputs-centered ">
-            <Listbox
-              label="Pricing Plan"
-              layout="horizontal"
-              value={dbPricingTierKey}
-              // @ts-ignore
-              onChange={onDbPricingPlanChange}
-              // @ts-ignore
-              descriptionText={
-                <>
-                  Select a plan that suits your needs.&nbsp;
-                  <a className="underline" target="_blank" href="https://supabase.com/pricing">
-                    More details
-                  </a>
-                </>
-              }
-            >
-              {Object.entries(PRICING_TIER_LABELS).map(([k, v]) => (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {`${v}${k === 'PRO' ? ' - $25/month' : ''}`}
-                </Listbox.Option>
-              ))}
-            </Listbox>
-
-            {isSelectFreeTier && isOverFreeProjectLimit && (
-              <FreeProjectLimitWarning limit={freeProjectsLimit} />
-            )}
-            {!isSelectFreeTier && isEmptyPaymentMethod && (
-              <EmptyPaymentMethodWarning stripeCustomerId={stripeCustomerId} />
-            )}
-          </Panel.Content>
-        )}
-
-        {subscriptionStats.isLoading && (
-          <Panel.Content>
-            <div className="flex items-center justify-center py-10">
-              <IconLoader size={16} className="animate-spin" />
-            </div>
-          </Panel.Content>
         )}
       </>
     </Panel>
@@ -383,80 +407,3 @@ const PageLayout = withAuth(
 Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
 
 export default observer(Wizard)
-
-const NotOrganizationOwnerWarning = () => {
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="You do not have permission to create a project"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              Only the organization owner can create new projects. Contact your organization owner
-              to create a new project for this organization.
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
-}
-
-const FreeProjectLimitWarning = ({ limit }: { limit: number }) => {
-  return (
-    <div className="mt-4">
-      <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-        defaultVisibility={true}
-        hideCollapse
-        title="Your account has reached its free project limit"
-        description={
-          <div className="space-y-3">
-            <p className="text-sm leading-normal">
-              {`Your account can only have up to ${limit} free projects - to create another free project, you'll need to delete an existing free project first. Otherwise, you may create a project on the Pro tier instead.`}
-            </p>
-          </div>
-        }
-      />
-    </div>
-  )
-}
-
-const EmptyPaymentMethodWarning = observer(
-  ({ stripeCustomerId }: { stripeCustomerId: string | undefined }) => {
-    const { ui } = useStore()
-    const slug = ui.selectedOrganization?.slug
-
-    const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState<boolean>(false)
-
-    return (
-      <div className="mt-4">
-        <InformationBox
-          icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
-          defaultVisibility={true}
-          hideCollapse
-          title="Your organization has no payment methods"
-          description={
-            <div className="space-y-3">
-              <p className="text-sm leading-normal">
-                You need to add a payment method for your organization before creating a paid
-                project.
-              </p>
-              <Button type="secondary" onClick={() => setShowAddPaymentMethodModal(true)}>
-                Add a payment method
-              </Button>
-            </div>
-          }
-        />
-        <AddNewPaymentMethodModal
-          visible={showAddPaymentMethodModal}
-          returnUrl={`${getURL()}/new/${slug}`}
-          onCancel={() => setShowAddPaymentMethodModal(false)}
-        />
-      </div>
-    )
-  }
-)

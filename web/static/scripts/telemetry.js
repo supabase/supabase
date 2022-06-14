@@ -1,6 +1,6 @@
 function telemetry() {
   setTimeout(function () {
-    return fetch('https://app.supabase.io/api/telemetry/page', {
+    return fetch('https://api.supabase.io/platform/telemetry/page', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

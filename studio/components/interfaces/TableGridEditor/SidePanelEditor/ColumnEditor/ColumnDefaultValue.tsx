@@ -33,7 +33,7 @@ const ColumnDefaultValue: FC<Props> = ({
       <Select
         label="Default Value"
         layout="horizontal"
-        value={columnFields.defaultValue}
+        value={columnFields.defaultValue ?? ''}
         onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       >
         <Select.Option key="empty-enum" value="">
@@ -53,14 +53,18 @@ const ColumnDefaultValue: FC<Props> = ({
       label="Default Value"
       layout="horizontal"
       description="Can either be a literal or an expression (e.g uuid_generate_v4())"
-      placeholder="NULL"
+      placeholder={
+        typeof columnFields.defaultValue === 'string' && columnFields.defaultValue.length === 0
+          ? 'Empty string'
+          : 'NULL'
+      }
       value={columnFields?.defaultValue ?? ''}
       format={columnFields?.format}
       suggestionsHeader="Suggested expressions"
       suggestions={suggestions}
       onChange={(event: any) => onUpdateField({ defaultValue: event.target.value })}
       onSelectSuggestion={(suggestion: Suggestion) =>
-        onUpdateField({ defaultValue: suggestion.name })
+        onUpdateField({ defaultValue: suggestion.value })
       }
     />
   )

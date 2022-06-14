@@ -47,7 +47,7 @@ export const getURL = () => {
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
       ? process.env.VERCEL_URL
-      : 'https://app.supabase.io'
+      : 'https://app.supabase.com'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -135,7 +135,7 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
 }
 
 export const formatBytes = (bytes: any, decimals = 2) => {
-  if (bytes === 0) return '0 bytes'
+  if (bytes === 0 || bytes === undefined) return '0 bytes'
 
   const k = 1000
   const dm = decimals < 0 ? 0 : decimals
