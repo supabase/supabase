@@ -68,8 +68,8 @@ module.exports = {
         },
         {
           label: 'Reference',
-          to: '/docs/reference/javascript/supabase-client',
-          activeBasePath: '/docs/reference/',
+          to: '/docs/reference',
+          activeBasePath: '/docs/reference',
           position: 'left',
         },
         { href: 'https://app.supabase.com', label: 'Login', position: 'left' },

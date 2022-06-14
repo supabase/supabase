@@ -15,8 +15,7 @@ import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.typ
 import { Project } from '../../../../../types'
 import { NextPageWithLayout } from 'types'
 
-type ProjectBillingProps = {} & any
-const ProjectBilling: NextPageWithLayout = ({ store }: ProjectBillingProps) => {
+const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 

@@ -145,7 +145,7 @@ const Settings = () => {
           <AutoField
             name="URI_ALLOW_LIST"
             showInlineError
-            errorMessage="Must be a comma separated list of exact URIs. No spaces."
+            errorMessage="Must be a comma separated list of URIs. No spaces."
           />
           <NumField name="JWT_EXP" step="1" />
           <NumField name="PASSWORD_MIN_LENGTH" step="1" min={6} max={10} />

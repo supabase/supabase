@@ -67,12 +67,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/partners/[slug]</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -646,6 +640,26 @@
 
   <url>
     <loc>https://supabase.com/blog/2022/04/20/partner-gallery-works-with-supabase</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc
+      >https://supabase.com/blog/2022/05/26/how-supabase-accelerates-development-of-all-pull-together</loc
+    >
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/alternatives/supabase-vs-firebase</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/alternatives/supabase-vs-heroku-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
