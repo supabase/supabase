@@ -25,7 +25,7 @@ const Layout = ({
       </Head>
       <main>
         <NavBar currentPage={currentPage} />
-        <article className="text-scale-1200 mx-auto max-w-7xl">{children}</article>
+        <article className="text-scale-1200 mx-4 md:mx-8 xl:mx-auto xl:max-w-7xl">{children}</article>
         <Footer />
       </main>
     </>

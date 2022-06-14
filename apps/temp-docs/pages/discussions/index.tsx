@@ -149,23 +149,23 @@ const discussions = ({ data }: any) => {
   return (
     <Layout meta={{ title: meta_title, description: meta_description }} currentPage={'Discussions'}>
       <div className="mb-16 space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="my-4 text-4xl">Discussions</h2>
+        <div className="flex items-center justify-between mt-4">
+          <h2 className="text-3xl md:text-4xl">Discussions</h2>
           <Link href="https://github.com/supabase/supabase/discussions/new">
             <a
               target="_blank"
-              className="rounded-lg bg-[#34b17b] px-4 py-2 text-sm text-white transition duration-150 hover:bg-[#40cf8e]"
+              className="rounded-lg bg-[#34b17b] px-4 py-2 text-xs md:text-sm text-white transition duration-150 hover:bg-[#40cf8e]"
             >
               New Discussion
             </a>
           </Link>
         </div>
-        <div className="flex justify-around space-x-4">
+        <div className="md:flex justify-around space-y-4 md:space-y-0 md:space-x-4">
           {data.repository.pinnedDiscussions.edges.map((discussion: any) => {
             const item = discussion.node
             return (
               <div
-                className="border-scale-600 bg-scale-400 w-1/3 rounded-xl border px-4 py-4"
+                className="border-scale-600 bg-scale-400 md:w-1/3 rounded-xl border px-4 py-4"
                 key={item.id}
               >
                 <Link href={`/discussions/${item.discussion.number}`}>
@@ -199,22 +199,22 @@ const discussions = ({ data }: any) => {
         <div className="space-y-6">
           {data.repository.discussions.nodes.map((discussion: any) => {
             return (
-              <div className="border-scale-600 border-b" key={discussion.id}>
+              <div className="border-scale-600 border-b pb-6 md:pb-0" key={discussion.id}>
                 <Link href={`/discussions/${discussion.number}`}>
-                  <a className="mx-6 mb-6 flex items-center justify-between">
+                  <a className="md:mx-6 mb-6 md:flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="item-center flex items-center space-x-6">
-                        <div className="item-center bg-scale-400 border-scale-600 flex h-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2">
+                      <div className="item-center flex items-center md:space-x-6">
+                        <div className="hidden item-center bg-scale-400 border-scale-600 md:flex h-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2">
                           <IconArrowUp className="stroke-2" height={15} />
                           <span>{discussion.upvoteCount}</span>
                         </div>
-                        <div className="rounded-lg bg-gray-400 py-4 px-5">
+                        <div className="rounded-lg bg-gray-400 px-3 py-2 md:px-5 md:py-4">
                           {getEmoji(discussion.category.emoji)}
                         </div>
                       </div>
                       <div className="ml-6">
-                        <h2 className="text-lg font-semibold">{discussion.title}</h2>
-                        <span className="text-scale-1000 text-sm">
+                        <h2 className="text-base md:text-lg font-semibold md:max-w-sm lg:max-w-4xl">{discussion.title}</h2>
+                        <span className="text-scale-1000 text-xs">
                           <Link href={discussion.author.url}>
                             <a>{discussion.author.login}</a>
                           </Link>
@@ -225,7 +225,7 @@ const discussions = ({ data }: any) => {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 ml-16 mt-2 md:ml-0 md:mt-0">
                       <div className="flex items-center -space-x-2">
                         {/* TODO: this is a hack because I couldn't find a participant query for graphql. could be replaced with a proper solution. */}
                         {discussion.comments.totalCount === 0 ? (
