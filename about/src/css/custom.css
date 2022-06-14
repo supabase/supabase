@@ -1032,6 +1032,7 @@ h4.method-list-item-label {
 h4.method-list-item-label .method-list-item-label-name {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
+  margin-right: 4px;
   padding: var(--ifm-code-padding-vertical) 0;
 }
 h4.method-list-item-label .method-list-item-label-badge {

@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { IconAlertCircle, Loading, Typography } from '@supabase/ui'
 import { SettingsLoadingStateProps } from './SettingsLoadingState.types'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 export const SettingsLoadingState: FC<SettingsLoadingStateProps> = ({ isError, errorMessage }) => {
   return (
