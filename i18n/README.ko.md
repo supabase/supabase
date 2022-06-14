@@ -25,16 +25,16 @@
 
 ## 커뮤니티 및 지원
 
-- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions) 어떤 때 사용하는지：데이터베이스의 모범 사례를 구축하고 토론하는데 도움이 됩니다.
-- [GitHub Issue](https://github.com/supabase/supabase/issues) 어떤 때 사용하는지: Supabase에서 사용하면서 발생한 버그와 오류가 발생할 때.
-- [Email 지원](https://supabase.com/docs/support#business-support) 어떤 때 사용하는지: 데이터베이스 또는 인프라 문제
+- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions)：데이터베이스의 모범 사례를 구축하고 토론하는데 도움이 됩니다.
+- [GitHub Issue](https://github.com/supabase/supabase/issues) : Supabase에서 사용하면서 발생한 버그와 오류가 발생할 때.
+- [Email 지원](https://supabase.com/docs/support#business-support): 데이터베이스 또는 인프라 문제
 
 ## 상태
 
 - [x] Alpha: 제한된 사용자를 대상으로 테스트
 - [x] Public Alpha: 누구나[app.supabase.com](https://app.supabase.com)에서 등록 할 수 있습니다. 그러나, 버그 등이 있을 수 있으므로 양해 바랍니다.
 - [x] Public Beta: 기업을 제외한 대부분의 유스 케이스에 적합할 정도로 안정적
-- [ ] Public: 제품 준비중
+- [ ] Public: 프로덕션 준비 완료
 
 현재 Public Beta를 실시하고 있습니다. 주요 업데이트에 대한 알림을 받으려면 이 저장소의 "releases"를 Watch 해주세요.
 
