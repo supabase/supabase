@@ -60,7 +60,7 @@ const InformationBox: FC<Props> = ({
           }`}
           style={{ maxHeight: isExpanded ? 500 : 0 }}
         >
-          <p className="text-scale-1100 text-sm">{description}</p>
+          <div className="text-scale-1100 text-sm">{description}</div>
 
           {url && (
             <a
