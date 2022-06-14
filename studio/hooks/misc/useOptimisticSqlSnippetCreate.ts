@@ -33,20 +33,6 @@ export function useOptimisticSqlSnippetCreate() {
           category: 'error',
           message: `Failed to create new query: ${error.message}`,
         })
-
-        /* roll back to the previous state */
-
-        // select the previously selected tab
-        sqlEditorStore.selectTab(previouslySelectedTabId)
-
-        // remove the new query from the content store
-        if (data.id) {
-          contentStore.delOptimistically(data.id)
-        }
-
-        // update the tabs in the sql editor storage to match the content store
-        const tabs = sqlEditorStore.tabsFromContentStore(contentStore, user?.id)
-        sqlEditorStore.loadTabs(tabs, false)
       }
     },
     [user, sqlEditorStore, contentStore]

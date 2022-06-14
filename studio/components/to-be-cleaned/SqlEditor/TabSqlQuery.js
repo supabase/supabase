@@ -1,31 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
+import Editor from '@monaco-editor/react'
 import DataGrid from '@supabase/react-data-grid'
-import Split from 'react-split'
-import { CSVLink } from 'react-csv'
 import {
   Button,
-  IconHeart,
+  Dropdown,
   IconChevronDown,
   IconChevronUp,
+  IconHeart,
+  IconRefreshCcw,
   Typography,
-  Dropdown,
 } from '@supabase/ui'
-import Editor from '@monaco-editor/react'
-
-import { copyToClipboard, timeout } from 'lib/helpers'
+import { useKeyboardShortcuts, useStore, useWindowDimensions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { copyToClipboard, timeout } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-
+import { debounce } from 'lodash'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
+import React, { useEffect, useRef, useState } from 'react'
+import { CSVLink } from 'react-csv'
+import Split from 'react-split'
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
-import Telemetry from 'lib/telemetry'
-import { useStore } from 'hooks'
-import { debounce } from 'lodash'
-import { useWindowDimensions, useKeyboardShortcuts } from 'hooks'
-
 const TabSqlQuery = observer(() => {
+  const { content: contentStore } = useStore()
   const sqlEditorStore = useSqlStore()
   const { height: screenHeight } = useWindowDimensions()
   const snapOffset = 50
@@ -48,6 +46,21 @@ const TabSqlQuery = observer(() => {
     sqlEditorStore.activeTab.setSplitSizes(sizes)
   }
 
+  async function updateSqlSnippet(value) {
+    if (sqlEditorStore.activeTab) {
+      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
+        content: {
+          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
+          content_id: sqlEditorStore.activeTab.id,
+          sql: value,
+          favorite: sqlEditorStore.activeTab.favorite,
+        },
+      })
+    } else {
+      console.warn('No active tab found while updating SQL snippet')
+    }
+  }
+
   return (
     <div className="flex h-full flex-col">
       <Split
@@ -61,9 +74,12 @@ const TabSqlQuery = observer(() => {
         collapsed={sqlEditorStore.activeTab.utilityTabHeight == 0 ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
-        <MonacoEditor error={sqlEditorStore.activeTab.sqlQueryError} />
+        <MonacoEditor
+          error={sqlEditorStore.activeTab.sqlQueryError}
+          updateSqlSnippet={updateSqlSnippet}
+        />
         <div>
-          <UtilityPanel />
+          <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
         </div>
       </Split>
     </div>
@@ -71,12 +87,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error }) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { content: contentStore } = useStore()
-
+const MonacoEditor = ({ error, updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -153,6 +164,9 @@ const MonacoEditor = ({ error }) => {
     editor?.focus()
   }
 
+  // changes are stored in debouncer before running persistData()
+  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
+
   async function handleEditorChange(value) {
     // update sqlEditorStore with new value immediately
     // this is so any SQL run will be whatever is currently in monaco editor
@@ -160,27 +174,6 @@ const MonacoEditor = ({ error }) => {
 
     // debounce changes
     debounceUpdateSqlSnippet(value)
-  }
-
-  // changes are stored in debouncer before running persistData()
-  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
-
-  async function updateSqlSnippet(value) {
-    //
-    // this will need to be refactored but for now
-    // we still use the old sqlEditorStore to handle db updates
-    if (sqlEditorStore.activeTab) {
-      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
-        content: {
-          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
-          content_id: sqlEditorStore.activeTab.id,
-          sql: value,
-          favorite: sqlEditorStore.activeTab.favorite,
-        },
-      })
-    } else {
-      console.warn('No active tab found while updating SQL snippet')
-    }
   }
 
   return (
@@ -207,15 +200,15 @@ const MonacoEditor = ({ error }) => {
   )
 }
 
-const UtilityPanel = observer(() => {
+const UtilityPanel = observer(({ updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
 
   return (
     <>
       <div className="flex justify-between overflow-visible px-6 py-2">
         <ResultsDropdown />
-        <div className="inline-flex justify-end">
-          <UtilityActions />
+        <div className="inline-flex items-center justify-end">
+          <UtilityActions updateSqlSnippet={updateSqlSnippet} />
         </div>
       </div>
       <div className="p-0 pt-0 pb-0">
@@ -270,7 +263,60 @@ const ResultsDropdown = observer(() => {
   )
 })
 
-const UtilityActions = observer(() => {
+const SavingIndicator = observer(({ updateSqlSnippet }) => {
+  const sqlEditorStore = useSqlStore()
+  const { content } = useStore()
+
+  const dotColorClasses =
+    content.savingState === 'IDLE'
+      ? 'bg-green-900 ring-green-800'
+      : content.savingState === 'CREATING' || content.savingState === 'UPDATING'
+      ? 'bg-gray-900 ring-gray-700'
+      : 'bg-red-900 ring-red-800'
+
+  const retry = () => {
+    const [item] = content.list((item) => item.id === sqlEditorStore.selectedTabId)
+
+    if (content.savingState === 'CREATING_FAILED' && item) {
+      content.save(toJS(item))
+    }
+
+    if (content.savingState === 'UPDATING_FAILED' && item) {
+      updateSqlSnippet(sqlEditorStore.activeTab.query)
+    }
+  }
+
+  return (
+    <div className="mx-2 flex items-center gap-2">
+      {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
+        <Button
+          type="text"
+          size="tiny"
+          shadow={false}
+          icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+          onClick={retry}
+        >
+          Retry
+        </Button>
+      )}
+
+      <span
+        className={
+          'inline-flex h-2 w-2 rounded-full ring-1 transition-colors duration-200 ' +
+          dotColorClasses
+        }
+      />
+      <span className="text-scale-1000 text-sm">
+        {content.savingState === 'IDLE' && 'All changes saved'}
+        {(content.savingState === 'CREATING' || content.savingState === 'UPDATING') && 'Saving...'}
+        {content.savingState === 'CREATING_FAILED' && 'Failed to create'}
+        {content.savingState === 'UPDATING_FAILED' && 'Failed to save'}
+      </span>
+    </div>
+  )
+})
+
+const UtilityActions = observer(({ updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
 
   useKeyboardShortcuts(
@@ -290,6 +336,7 @@ const UtilityActions = observer(() => {
 
   return (
     <>
+      <SavingIndicator updateSqlSnippet={updateSqlSnippet} />
       {IS_PLATFORM && <FavoriteButton />}
       <SizeToggleButton />
       <Button
