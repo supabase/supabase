@@ -15,8 +15,8 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import Panel from 'components/to-be-cleaned/Panel'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
+import Panel from 'components/ui/Panel'
+import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
@@ -49,7 +49,7 @@ export default observer(ProjectSettings)
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const { ref } = router.query
+  const ref = router.query.ref as string;
 
   return (
     <>
@@ -360,12 +360,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
       <div className="">
         <section className="mt-6 space-y-6">
           <Panel
-            title={[
+            title={
               <Typography.Title key="panel-title" level={5} className="mb-0">
                 Connection info
-              </Typography.Title>,
+              </Typography.Title>
               // <Title level={4}>Connection info</Title>
-            ]}
+            }
           >
             <Panel.Content className="space-y-6">
               <Input
