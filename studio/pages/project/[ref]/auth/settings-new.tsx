@@ -1,8 +1,7 @@
-import { Loading } from '@supabase/ui'
 import { AuthProvidersForm } from 'components/interfaces'
-import CommaSeperatedString from 'components/interfaces/Forms/CommaSeperatedString'
+import RedirectDomains from 'components/interfaces/Auth/RedirectDomains'
 import { AuthLayout } from 'components/layouts'
-import { AutoSchemaForm, FormHeader, FormsContainer } from 'components/ui/Forms'
+import { AutoSchemaForm, FormsContainer } from 'components/ui/Forms'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import React, { useEffect } from 'react'
@@ -16,22 +15,17 @@ const PageLayout: NextPageWithLayout = () => {
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  if (!authConfig.isLoaded) {
-    return <Loading active={true}>{''}</Loading>
-  }
-
   if (authConfig)
     return (
       <FormsContainer>
         <AutoSchemaForm />
-        <CommaSeperatedString />
+        <RedirectDomains />
         <AuthProvidersForm />
       </FormsContainer>
     )
 }
 
 PageLayout.getLayout = (page) => {
-  // console.log()
   return <AuthLayout>{page}</AuthLayout>
 }
 

@@ -1,12 +1,13 @@
 import { Button, Form, IconGlobe, IconTrash, Input, Modal } from '@supabase/ui'
 import { FormHeader } from 'components/ui/Forms'
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { EmptyListState } from 'components/ui/States'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { object, string } from 'yup'
 
-const CommaSeperatedString = () => {
+const RedirectDomains = () => {
   const { authConfig, ui } = useStore()
 
   const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
@@ -36,7 +37,7 @@ const CommaSeperatedString = () => {
     domain: string().matches(domainRegex, 'URL is not valid').required(),
   })
 
-  const DomainsForm = () => {
+  const Main = () => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -51,14 +52,7 @@ const CommaSeperatedString = () => {
             size="small"
             visible={open}
             onCancel={() => setOpen(!open)}
-            header={
-              <div className="text-scale-1200 flex items-center gap-2">
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-sm">Add a new domain</h3>
-                </div>
-              </div>
-            }
-            contentStyle={{ padding: 0 }}
+            header={<h3 className="text-sm">Add a new domain</h3>}
             hideFooter
           >
             <Form
@@ -124,24 +118,38 @@ const CommaSeperatedString = () => {
     )
   }
 
-  console.log('RENDER DOMAINS')
+  const ValueContainer = ({ children }: { children: React.ReactNode }) => (
+    <div
+      className="
+        bg-scale-100 dark:bg-scale-300 border-scale-500 text-scale-1200 flex items-center 
+        justify-between gap-2
+        border px-6 
+        py-4 text-sm
+        first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl
+      "
+    >
+      {children}
+    </div>
+  )
 
   return (
     <div>
-      <DomainsForm />
+      <Main />
       <div className="-space-y-px">
-        {URI_ALLOW_LIST_ARRAY.length > 0 ? (
+        {!authConfig.isLoaded ? (
+          <>
+            <ValueContainer>
+              <HorizontalShimmerWithIcon />
+            </ValueContainer>
+            <ValueContainer>
+              <HorizontalShimmerWithIcon />
+            </ValueContainer>
+          </>
+        ) : URI_ALLOW_LIST_ARRAY.length > 0 ? (
           URI_ALLOW_LIST_ARRAY.map((domain: string) => {
             return (
               <>
-                <div
-                  className="bg-scale-100 dark:bg-scale-300 border-scale-500 text-scale-1200 flex items-center 
-              justify-between gap-2
-              border px-6 
-              py-4 text-sm
-            first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl
-            "
-                >
+                <ValueContainer>
                   <div className="flex items-center gap-2 font-mono">
                     <span className="text-scale-900">
                       <IconGlobe strokeWidth={2} size={14} />
@@ -158,7 +166,7 @@ const CommaSeperatedString = () => {
                   >
                     Remove
                   </Button>
-                </div>
+                </ValueContainer>
               </>
             )
           })
@@ -184,14 +192,7 @@ const CommaSeperatedString = () => {
         size="small"
         visible={deleteOpen}
         onCancel={() => setDeleteOpen(!open)}
-        header={
-          <div className="text-scale-1200 flex items-center gap-2">
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-sm">Remove domain</h3>
-            </div>
-          </div>
-        }
-        contentStyle={{ padding: 0 }}
+        header={<h3 className="text-sm">Remove domain</h3>}
         hideFooter
       >
         <div className="mb-4 space-y-4 pt-4">
@@ -245,4 +246,4 @@ const CommaSeperatedString = () => {
   )
 }
 
-export default observer(CommaSeperatedString)
+export default observer(RedirectDomains)
