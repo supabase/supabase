@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Button, IconPlus, IconFilter, Popover } from '@supabase/ui'
+import { uuidv4 } from 'lib/helpers'
 import { useDispatch, useTrackedState } from '../../../store'
 import FilterRow from './FilterRow'
 
@@ -20,7 +21,6 @@ const FilterPopover: FC = () => {
             <IconFilter strokeWidth={1.5} />
           </div>
         }
-        // style={{ padding: '4px 8px' }}
       >
         {btnText}
       </Button>
@@ -37,6 +37,7 @@ const Filter: FC = () => {
     dispatch({
       type: 'ADD_FILTER',
       payload: {
+        id: uuidv4(),
         column: state.table?.columns[0].name,
         operator: '=',
         value: '',
@@ -47,8 +48,8 @@ const Filter: FC = () => {
   return (
     <div className="space-y-2 py-2">
       <div className="space-y-2">
-        {state.filters.map((_, index) => (
-          <FilterRow key={`filter-${index}`} filterIdx={index} now={Date.now()} />
+        {state.filters.map((filter, index) => (
+          <FilterRow key={`filter-${filter.id}`} filterIdx={index} now={Date.now()} />
         ))}
         {state.filters.length == 0 && (
           <div className="space-y-1 px-3">
