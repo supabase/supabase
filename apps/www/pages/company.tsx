@@ -316,11 +316,13 @@ const Press = () => {
         {PressData.filter((x) => x.type == 'article').map((x) => (
           <Link href={x.href} key={x.href}>
             <a target="_blank">
-              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
+              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
                     <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                    <p className="text-scale-1100 text-base">{x.title}</p>
+                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                      {x.title}
+                    </p>
                   </div>
                 </Space>
               </Card>
@@ -332,11 +334,13 @@ const Press = () => {
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
           <Link href={x.href} key={x.href}>
             <a target="_blank">
-              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
+              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
                 <Space className="h-40 justify-between" direction="vertical">
                   <div>
                     <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                    <p className="text-scale-1100 text-base">{x.title}</p>
+                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                      {x.title}
+                    </p>
                   </div>
                 </Space>
               </Card>
