@@ -1449,7 +1449,7 @@ pages:
       - name: Upload file using `ArrayBuffer` from base64 file data
         js: |
           ```js
-          import {decode} from 'base64-arraybuffer'
+          import { decode } from 'base64-arraybuffer'
 
           const { data, error } = await supabase
             .storage
