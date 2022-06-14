@@ -26,7 +26,7 @@ ON ${schema}.${table}
 FOR SELECT USING (
   true
 );`.trim(),
-    name: 'Enable access to all users',
+    name: 'Enable read access for all users',
     definition: 'true',
     check: '',
     command: 'SELECT',

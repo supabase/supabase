@@ -10,6 +10,11 @@ export const STORAGE_SORT_BY = {
   LAST_ACCESSED_AT: 'last_accessed_at',
 }
 
+export const STORAGE_SORT_BY_ORDER = {
+  ASC: 'asc',
+  DESC: 'desc',
+}
+
 export const STORAGE_ROW_TYPES = {
   BUCKET: 'BUCKET',
   FILE: 'FILE',

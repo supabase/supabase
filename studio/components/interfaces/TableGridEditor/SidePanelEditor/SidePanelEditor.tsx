@@ -1,15 +1,19 @@
-import { FC, useState, useEffect } from 'react'
-import { find, isUndefined } from 'lodash'
-import { Query, Dictionary } from '@supabase/grid'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { FC, useState } from 'react'
+import { find, isEmpty, isUndefined } from 'lodash'
+import { Query, Dictionary } from 'components/grid'
+import { Modal } from '@supabase/ui'
+import {
+  PostgresRelationship,
+  PostgresTable,
+  PostgresColumn,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-
-import { Modal } from '@supabase/ui'
 
 interface Props {
   selectedSchema: string
@@ -49,7 +53,9 @@ const SidePanelEditor: FC<Props> = ({
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-  const enumTypes = meta.types.list()
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
 
   const saveRow = async (
     payload: any,
@@ -72,27 +78,30 @@ const SidePanelEditor: FC<Props> = ({
         onRowCreated(res[0])
       }
     } else {
-      if (selectedTable!.primary_keys.length > 0) {
-        const updateQuery = new Query()
-          .from(selectedTable!.name, selectedTable!.schema)
-          .update(payload, { returning: true })
-          .match(configuration.identifiers)
-          .toSql()
+      const hasChanges = !isEmpty(payload)
+      if (hasChanges) {
+        if (selectedTable!.primary_keys.length > 0) {
+          const updateQuery = new Query()
+            .from(selectedTable!.name, selectedTable!.schema)
+            .update(payload, { returning: true })
+            .match(configuration.identifiers)
+            .toSql()
 
-        const res: any = await meta.query(updateQuery)
-        if (res.error) {
-          saveRowError = true
-          ui.setNotification({ category: 'error', message: res.error?.message })
+          const res: any = await meta.query(updateQuery)
+          if (res.error) {
+            saveRowError = true
+            ui.setNotification({ category: 'error', message: res.error?.message })
+          } else {
+            onRowUpdated(res[0], configuration.rowIdx)
+          }
         } else {
-          onRowUpdated(res[0], configuration.rowIdx)
+          saveRowError = true
+          ui.setNotification({
+            category: 'error',
+            message:
+              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
+          })
         }
-      } else {
-        saveRowError = true
-        ui.setNotification({
-          category: 'error',
-          message:
-            "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-        })
       }
     }
 

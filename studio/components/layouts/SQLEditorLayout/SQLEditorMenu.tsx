@@ -46,6 +46,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
     ui: { profile: user },
     content: contentStore,
   } = useStore()
+
   const sqlEditorStore: any = useSqlStore()
 
   const [tabId, setTabId] = useState('')

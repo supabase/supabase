@@ -119,7 +119,7 @@ This will create a `prisma/migrations` folder inside your `prisma` directory and
 
 ### Confirming Realtime Functionality
 
-There is an existing issue where Prisma will create Enum Types wrapped in double quotation marks in PostgreSQL. This is not compatible with Realtime-enabled database tables whose columns rely on those Enum Types. We are working on a fix but the workaround is to alter and rename the Enum Types. You can use the following query to find all Types with double quotation marks in the `public` schema:
+There is an existing issue where Prisma will create Enum Types wrapped in double quotation marks in PostgreSQL. This is not compatible with Realtime-enabled database tables whose columns rely on those Enum Types. We are working on a fix which can be tracked on this [GitHub issue](https://github.com/supabase/supabase/issues/5685), but the workaround is to alter and rename the Enum Types. You can use the following query to find all Types with double quotation marks in the `public` schema:
 
 ```sql
 select distinct(a.atttypid::regtype)
@@ -147,7 +147,7 @@ When running migrations you need to use the non pooled connection URL (like the 
 
 ```env
 # prisma/.env
-postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:6543/postgres?pgbouncer=true&connection_limtit=1
+postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:6543/postgres?pgbouncer=true&connection_limit=1
 ```
 
 Prisma Migrate uses database transactions to check out the current state of the database and the migrations table. However, the Migration Engine is designed to use a single connection to the database, and does not support connection pooling with PgBouncer. If you attempt to run Prisma Migrate commands in any environment that uses PgBouncer for connection pooling, you might see the following error:

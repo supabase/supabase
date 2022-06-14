@@ -21,14 +21,15 @@ export const REGIONS = {
 export const REGIONS_DEFAULT = REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
-  FREE: 'Free tier',
-  PRO: 'Pro tier',
+  FREE: 'Free',
+  PRO: 'Pro',
 }
 
 export const PRICING_TIER_PRODUCT_IDS = {
   FREE: 'tier_free',
   PRO: 'tier_pro',
   PAYG: 'tier_payg',
+  ENTERPRISE: 'tier_enterprise',
 }
 
 export const PRICING_TIER_FREE_KEY = 'FREE'

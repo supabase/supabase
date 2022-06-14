@@ -1,7 +1,8 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
-import { Query } from '@supabase/grid'
+import { Query } from 'components/grid/query/Query'
+
 import {
   PostgresColumn,
   PostgresTable,
@@ -132,6 +133,7 @@ export default class MetaStore implements IMetaStore {
     'realtime',
     'storage',
     'supabase_functions',
+    'graphql',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {

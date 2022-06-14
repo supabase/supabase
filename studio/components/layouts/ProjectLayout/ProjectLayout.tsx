@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { FC, ReactNode, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
@@ -30,6 +30,8 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
 }: PropsWithChildren<Props>) => {
+  const ongoingIncident = useFlag('ongoingIncident')
+
   return (
     <>
       <Head>
@@ -47,8 +49,8 @@ const ProjectLayout = ({
         </MenuBarWrapper>
 
         <main
-          style={{ maxHeight: '100vh' }}
           className="flex w-full flex-1 flex-col overflow-x-hidden"
+          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
           <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
@@ -91,16 +93,24 @@ interface ContentWrapperProps {
 const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
   const { ui } = useStore()
   const router = useRouter()
+
+  const routesToIgnorePostgrestConnection = [
+    '/project/[ref]/reports',
+    '/project/[ref]/settings/general',
+    '/project/[ref]/settings/database',
+    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/update',
+    '/project/[ref]/settings/billing/update/free',
+    '/project/[ref]/settings/billing/update/pro',
+  ]
+
   const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-  const requiresPostgrestConnection =
-    [
-      '/project/[ref]/settings/general',
-      '/project/[ref]/reports',
-      '/project/[ref]/settings/database',
-    ].includes(router.pathname) === false
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
+
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (
