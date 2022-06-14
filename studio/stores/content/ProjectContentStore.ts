@@ -15,6 +15,7 @@ export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
   isLoaded: boolean
+  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
   error: any
   recentLogSqlSnippets: LogSqlSnippets.Content[]
 
@@ -75,6 +76,7 @@ export default class ProjectContentStore implements IProjectContentStore {
   recentLogSqlSnippets: LogSqlSnippets.Content[] = []
 
   state = this.STATES.INITIAL
+  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
   error = null
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
@@ -85,6 +87,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     this.recentLogSqlKey = `${this.localStorageKey}-recent-log-sql`
     this.loadPersistentData()
     this.baseUrl = ``
+    this.savingState = 'IDLE'
     makeAutoObservable(this)
   }
 
@@ -220,14 +223,20 @@ export default class ProjectContentStore implements IProjectContentStore {
    */
   async save(payload: UserContent) {
     try {
+      this.savingState = 'CREATING'
+
       const headers = {
         'Content-Type': 'application/json',
       }
       const created = await post<UserContent>(this.baseUrl, payload, { headers })
       if (created.error) throw created.error
 
+      this.savingState = 'IDLE'
+
       return { data: created as UserContent, error: null }
     } catch (error) {
+      this.savingState = 'CREATING_FAILED'
+
       return { data: null, error: error as { message: string } }
     }
   }
@@ -262,6 +271,8 @@ export default class ProjectContentStore implements IProjectContentStore {
 
   async update(id: any, updates: any, type?: UserContent['type']) {
     try {
+      this.savingState = 'UPDATING'
+
       const headers = {
         'Content-Type': 'application/json',
       }
@@ -279,9 +290,12 @@ export default class ProjectContentStore implements IProjectContentStore {
 
       const localUpdate = { ...this.data[id], ...payload }
       this.data[id] = localUpdate
+      this.savingState = 'IDLE'
 
       return { data: localUpdate, error: null }
     } catch (error) {
+      this.savingState = 'UPDATING_FAILED'
+
       return { data: null, error }
     }
   }
