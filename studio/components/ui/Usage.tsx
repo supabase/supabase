@@ -6,18 +6,19 @@ import { useProjectSubscription, useStore } from 'hooks'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 import SparkBar from 'components/ui/SparkBar'
+import ShimmeringLoader from './ShimmeringLoader'
 
 interface ApiUsageStats {
-  authUsers: string | null;
-  bucketSize: string | null;
-  dbSize: string | null;
-  dbTables: string | null;
+  authUsers: string | null
+  bucketSize: string | null
+  dbSize: string | null
+  dbTables: string | null
 }
 interface UsageStats {
-  authUsers: number;
-  bucketSize: number;
-  dbSize: number;
-  dbTables: number;
+  authUsers: number
+  bucketSize: number
+  dbSize: number
+  dbTables: number
 }
 
 const GB = 1000000000
@@ -48,7 +49,7 @@ const usageLimits = {
             description: (stats: UsageStats) =>
               `${((stats.dbSize / (500 * MB)) * 100).toFixed(2)} %`,
             render: (stats: UsageStats) => {
-              const bytes: number = stats.dbSize;
+              const bytes: number = stats.dbSize
               const usage = {
                 gb: bytes / GB,
                 mb: bytes / MB,
@@ -106,9 +107,7 @@ const usageLimits = {
                 max={1 * 1024}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
-                labelBottom={
-                  `${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                }
+                labelBottom={`${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`}
                 labelTop={`${(1 * 1024).toLocaleString()} MB`}
               />
             ),
@@ -122,9 +121,7 @@ const usageLimits = {
                 max={100 * 1024}
                 type={'horizontal'}
                 barClass={'bg-brand-900'}
-                labelBottom={
-                  `${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`
-                }
+                labelBottom={`${(stats.bucketSize / (1024 * 1024)).toLocaleString()} MB`}
                 labelTop={`${Number(100).toLocaleString()} GB`}
               />
             ),
@@ -149,8 +146,8 @@ const usageLimits = {
 }
 
 interface ProjectUsageProps {
-  projectRef?: string;
-  subscription_id?: string;
+  projectRef?: string
+  subscription_id?: string
 }
 
 const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) => {
@@ -200,27 +197,33 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
                 </tr>
               </thead>
 
-              <tbody className="">
-                {product.features.map((feature) => {
-                  return (
-                    <tr
-                      className="border-panel-border-light dark:border-panel-border-dark border-t"
-                      key={feature.title}
-                    >
-                      <td className="text-typography-body-light dark:text-typography-body-dark whitespace-nowrap px-6 py-3 text-sm">
-                        {feature.title}
-                      </td>
-                      <td className="text-typography-body-light dark:text-typography-body-dark hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell">
-                        {feature.tiers[tier]?.description(stats)}
-                      </td>
-                      <td className="text-typography-body-light dark:text-typography-body-dark px-6 py-3 text-sm ">
-                        {/* @ts-ignore */}
-                        {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
+              {stats === undefined ? (
+                <div className="w-96 px-4 pt-1 pb-4">
+                  <ShimmeringLoader />
+                </div>
+              ) : (
+                <tbody className="">
+                  {product.features.map((feature) => {
+                    return (
+                      <tr
+                        className="border-panel-border-light dark:border-panel-border-dark border-t"
+                        key={feature.title}
+                      >
+                        <td className="text-typography-body-light dark:text-typography-body-dark whitespace-nowrap px-6 py-3 text-sm">
+                          {feature.title}
+                        </td>
+                        <td className="text-typography-body-light dark:text-typography-body-dark hidden w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell">
+                          {feature.tiers[tier]?.description(stats)}
+                        </td>
+                        <td className="text-typography-body-light dark:text-typography-body-dark px-6 py-3 text-sm ">
+                          {/* @ts-ignore */}
+                          {feature.tiers[tier]?.render ? feature.tiers[tier].render(stats) : null}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              )}
             </table>
           </div>
         ))}
@@ -232,17 +235,24 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
 export default ProjectUsage
 
 interface ProjectUsageMinimalProps extends ProjectUsageProps {
-  filter: string;
+  filter: string
 }
 
-export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, subscription_id, filter }) => {
-  const { data: apiStats, error: usageError } = useSWR<ApiUsageStats>(`${API_URL}/projects/${projectRef}/usage`, get)
+export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({
+  projectRef,
+  subscription_id,
+  filter,
+}) => {
+  const { data: apiStats, error: usageError } = useSWR<ApiUsageStats>(
+    `${API_URL}/projects/${projectRef}/usage`,
+    get
+  )
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
   const stats: UsageStats = {
     authUsers: Number(apiStats?.authUsers),
     bucketSize: Number(apiStats?.bucketSize),
     dbSize: Number(apiStats?.dbSize),
-    dbTables: Number(apiStats?.dbTables)
+    dbTables: Number(apiStats?.dbTables),
   }
 
   if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG) {
