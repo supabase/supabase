@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useState, useEffect } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import { isNil } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { post } from 'lib/common/fetch'
@@ -7,18 +7,22 @@ import { Modal } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore } from 'hooks'
+import { toJS } from 'mobx'
 
 /**
  * Modal to invite member to Organization
  *
- * @param {Object}          organization        // organization detail
- * @param {Array}           members             // organization members list
+ * @param {Object}          organization          // organization detail
+ * @param {Array}           members               // organization members list
+ * @param {Object}          user                  // current user detail
  */
 
 const PageContext = createContext(null)
-function InviteMemberModal({ organization, members = [] }) {
+
+function InviteMemberModal({ organization, members = [], user }: any) {
+
   const PageState = useLocalObservable(() => ({
-    members: [],
+    members:  [],
     addMemberLoading: false,
     emailAddress: '',
     emailIsValid() {
@@ -47,11 +51,10 @@ function InviteMemberModal({ organization, members = [] }) {
 
   async function addMember() {
     PageState.addMemberLoading = true
-    PageState.emailAddress = ''
 
-    const response = await post(`${API_URL}/organizations/${orgSlug}/members/add`, {
-      org_id: orgId,
-      email: PageState.emailAddress
+    const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
+      invited_email: PageState.emailAddress,
+      owner_id: toJS(user.id)
     })
     if (isNil(response)) {
       ui.setNotification({ category: 'error', message: 'Failed to add member' })
