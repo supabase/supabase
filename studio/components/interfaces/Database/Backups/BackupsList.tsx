@@ -1,13 +1,14 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconInfo } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import BackupItem from './BackupItem'
 import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import Panel from 'components/to-be-cleaned/Panel'
+
+import BackupItem from './BackupItem'
+import BackupsError from './BackupsError'
+import BackupsEmpty from './BackupsEmpty'
 
 interface Props {}
 
@@ -16,11 +17,12 @@ const BackupsList: FC<Props> = ({}) => {
   const projectRef = ui.selectedProject?.ref || 'default'
 
   if (backups.isLoading) return <Loading />
+  if (backups.error) return <BackupsError />
 
-  const { tierId } = backups.configuration
+  const { tierKey } = backups.configuration
   const sortedBackups = backups.list()
 
-  if (tierId === STRIPE_PRODUCT_IDS.FREE) {
+  if (tierKey === 'FREE') {
     return (
       <UpgradeToPro
         primaryText="Free Plan does not include project backups."
@@ -32,13 +34,8 @@ const BackupsList: FC<Props> = ({}) => {
 
   return (
     <div className="space-y-6">
-      {!sortedBackups?.length && tierId !== STRIPE_PRODUCT_IDS.FREE ? (
-        <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
-          <div className="flex space-x-3">
-            <IconInfo size={20} strokeWidth={1.5} />
-            <p className="text-sm">No backups created yet. Check again tomorrow.</p>
-          </div>
-        </div>
+      {!sortedBackups?.length && tierKey !== 'FREE' ? (
+        <BackupsEmpty />
       ) : (
         <Panel>
           {sortedBackups?.map((x: any, i: number) => {

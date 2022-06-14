@@ -1,10 +1,14 @@
 import dayjs from 'dayjs'
 import { FC, FormEvent, useState } from 'react'
-import { IconInfo, IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
+import { IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
 
 import { useStore, useFlag } from 'hooks'
+import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+
+import BackupsError from '../BackupsError'
+import BackupsEmpty from '../BackupsEmpty'
 import { ALL_TIMEZONES } from './PITRBackupSelection.constants'
 import {
   getClientTimezone,
@@ -26,22 +30,19 @@ const PITRBackupSelection: FC<Props> = () => {
   const [recoveryPoint, setRecoveryPoint] = useState<string>()
 
   // Mock new properties, to delete after BE is fully ready
-  const configuration = {
-    ...backups.configuration,
-    region: 'ap-southeast-1',
-    walg_enabled: true,
-    physicalBackupData: {
-      earliestPhysicalBackupDateUnix: 1654054628338,
-      latestPhysicalBackupDateUnix: 1654065771390,
-    },
-  }
+  const { configuration } = backups
+  console.log('Configuration', configuration)
 
   const projectRef = ui.selectedProject?.ref ?? 'default'
   const hasPhysicalBackups =
     configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
     configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null
 
-  if (!isAvailable) {
+  if (backups.isLoading) {
+    return <Loading />
+  } else if (backups.error) {
+    return <BackupsError />
+  } else if (!isAvailable) {
     return (
       <div className="flex items-center justify-center rounded border border-gray-500 bg-gray-300 py-8">
         <p className="text-scale-1000 text-sm">Coming soon</p>
@@ -57,14 +58,7 @@ const PITRBackupSelection: FC<Props> = () => {
       />
     )
   } else if (!hasPhysicalBackups) {
-    return (
-      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
-        <div className="flex space-x-3">
-          <IconInfo size={20} strokeWidth={1.5} />
-          <p className="text-sm">No backups created yet. Check again tomorrow.</p>
-        </div>
-      </div>
-    )
+    return <BackupsEmpty />
   }
 
   const timezoneOptions =
