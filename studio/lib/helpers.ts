@@ -167,7 +167,7 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
 
 type PasswordStrengthResponse = {
   message: string
-  warning: string | null
+  warning: string
   strength: number
 }
 export async function passwordStrength(value: string): Promise<PasswordStrengthResponse> {
