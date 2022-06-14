@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 
@@ -203,7 +203,6 @@ const Function: React.FC<FunctionProps> = ({ id, completeStatement, name, onClic
         leaveTo="transform opacity-0"
       >
         <div className="h-64 mt-4 border dark:border-dark">
-          {/* @ts-ignore */}
           <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
         </div>
       </Transition>

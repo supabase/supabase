@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react'
+import { ReactElement } from 'react'
 import Head from 'next/head'
 import NavBar from '../nav/NavBar'
 import SideBar from '../nav/SideBar'
@@ -12,8 +12,8 @@ const DocsLayout = ({
   currentPage,
 }: {
   meta: { title: string; description: string }
-  children: string
-  toc: any
+  children: ReactElement
+  toc?: any
   menuItems: any
   currentPage: string
 }) => {
