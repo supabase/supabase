@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { Button } from '@supabase/ui';
 import router, {useRouter} from 'next/router';
 import { useOrganizationDetail, useStore } from 'hooks'
-import { post, } from 'lib/common/fetch'
+import { getAccessToken, get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Transition } from '@headlessui/react';
 
@@ -51,11 +51,12 @@ const InviteCodeInput = () => {
     };
 
     async function handleSubmitForm( e: any ) {
+        const access_token = getAccessToken()
         e.preventDefault();
         setIsSubmitting( true )
 
         // Need proper endpoint
-        const response = await post( `${API_URL}/organizations/${slug}/join?code=${result}`, {} )
+        const response = await get( `${API_URL}/organizations/${slug}/join?token=${result}`, {} )
         if ( response.error ) {
             ui.setNotification( {
                 category: 'error',
@@ -64,20 +65,21 @@ const InviteCodeInput = () => {
             setIsSubmitting( false )
         } else {
             setIsSubmitting( false )
-            router.push( '/' )
+            // router.push( '/' )
         }
     }
+
+
 
     return (
         <form onSubmit={handleSubmitForm} ref={AuthInputFormRef}>
             <div>
-                <AuthCode ref={AuthInputRef} allowedCharacters='alpha' onChange={handleOnChange} length={15} autoFocus={true} containerClassName="join-auth-code-container flex items-center max-w-full" inputClassName="w-[44px]" />
+                <AuthCode ref={AuthInputRef} allowedCharacters='alphanumeric' onChange={handleOnChange} length={15} autoFocus={true} containerClassName="join-auth-code-container flex items-center max-w-full" inputClassName="w-[34px]" />
 
                 <div className='flex items-center gap-2 mt-8'>
                     <Button disabled={!isValidInviteCode} htmlType="submit" loading={isSubmitting} size="small">
                         Join this organization
                     </Button>
-
 
                         <Transition
                             show={isInputDirty}
