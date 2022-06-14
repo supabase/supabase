@@ -20,7 +20,7 @@ const RedirectDomains = () => {
 
   /**
    *
-   * reges from: https://stackoverflow.com/a/68002755/4807782
+   * regex from: https://stackoverflow.com/a/68002755/4807782
    *
    * examples of matches:
    *
