@@ -7,7 +7,7 @@ export default function AuthProviders() {
     <div className="grid gap-4 md:grid-cols-2">
       {authProviders.map((x: any) => (
         <div key={x.name}>
-          <Link href={x.href}>
+          <Link passHref href={x.href}>
             <Card>
               <div className="flex justify-between gap-10">
                 <p>{x.name}</p>

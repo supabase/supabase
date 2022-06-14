@@ -14,6 +14,8 @@
   - [Shared components](#shared-components)
   - [Installing packages](#installing-packages)
   - [Development](#development)
+- [Common Tasks](#common-tasks)
+  - [Adding redirects](#adding-redirects)
 - [Finally](#finally)
 - [Community Channels](#community-channels)
 
@@ -210,6 +212,12 @@ You do not need to install `devDependencies` in each workspace. These can all be
 ### Development
 
 `npm run dev`
+
+## Common Tasks
+
+### Adding Redirects
+
+To add a redirect, simple create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
 
 ## Finally
 

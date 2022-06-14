@@ -13,12 +13,12 @@ import {
   ComputeSizeSelection,
   StripeSubscription,
   AddNewPaymentMethodModal,
-} from '..'
+} from './'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionPreview } from '../Billing.types'
-import UpdateSuccess from '../UpdateSuccess'
-import { formatComputeSizes } from '../AddOns/AddOns.utils'
-import { formSubscriptionUpdatePayload } from './ProUpgrade.utils'
+import { SubscriptionPreview } from './Billing.types'
+import { formSubscriptionUpdatePayload } from './Billing.utils'
+import UpdateSuccess from './UpdateSuccess'
+import { formatComputeSizes } from './AddOns/AddOns.utils'
 import BackButton from 'components/ui/BackButton'
 
 // Do not allow compute size changes for af-south-1
@@ -88,10 +88,6 @@ const ProUpgrade: FC<Props> = ({
   useEffect(() => {
     getSubscriptionPreview()
   }, [selectedComputeSize, isSpendCapEnabled])
-
-  const onSelectComputeSizeOption = (option: any) => {
-    setSelectedComputeSize(option)
-  }
 
   const getSubscriptionPreview = async () => {
     if (!selectedTier) return
@@ -166,92 +162,93 @@ const ProUpgrade: FC<Props> = ({
         enterTo="transform opacity-100 translate-x-0"
         className="flex w-full items-start justify-between"
       >
-        <>
-          <div className="2xl:min-w-5xl mx-auto mt-10">
-            <div className="relative space-y-4 px-5">
-              <BackButton onClick={() => onSelectBack()} />
-              <div className="space-y-8">
-                <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
-                <div
-                  className="space-y-8 overflow-scroll pb-8"
-                  style={{ height: 'calc(100vh - 9rem - 57px)' }}
-                >
-                  <div className="space-y-2">
-                    {!isManagingProSubscription ? (
-                      <>
-                        <h3 className="text-xl">
-                          Welcome to <span className="text-brand-900">Pro</span>
-                        </h3>
-                        <p className="text-scale-1100 text-base">
-                          Your new subscription will begin immediately after payment
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="text-3xl">
-                          Managing your <span className="text-brand-900">Pro</span> plan
-                        </h3>
-                        <p className="text-scale-1100 text-base">
-                          Your billing cycle will reset after payment
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  <div className="bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light border-panel-border-dark flex items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <p>Enable spend cap</p>
-                        <IconHelpCircle
-                          size={16}
-                          strokeWidth={1.5}
-                          className="cursor-pointer opacity-50 transition hover:opacity-100"
-                          onClick={() => setShowSpendCapHelperModal(true)}
-                        />
-                      </div>
-                      <p className="text-scale-1100 text-sm">
-                        If enabled, additional resources will not be charged on a per-usage basis
-                      </p>
-                    </div>
-                    <Toggle
-                      checked={isSpendCapEnabled}
-                      onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
-                    />
-                  </div>
-                  {projectRegion !== 'af-south-1' && (
+        <div className="2xl:min-w-5xl mx-auto mt-10">
+          <div className="relative space-y-4 px-5">
+            <BackButton onClick={() => onSelectBack()} />
+            <div className="space-y-8">
+              <h4 className="text-scale-900 text-lg">Change your project's subscription</h4>
+              <div
+                className="space-y-8 overflow-scroll pb-8"
+                style={{ height: 'calc(100vh - 9rem - 57px)' }}
+              >
+                <div className="space-y-2">
+                  {!isManagingProSubscription ? (
                     <>
-                      <Divider light />
-                      <ComputeSizeSelection
-                        computeSizes={computeSizes || []}
-                        selectedComputeSize={selectedComputeSize}
-                        onSelectOption={onSelectComputeSizeOption}
-                      />
+                      <h3 className="text-xl">
+                        Welcome to <span className="text-brand-900">Pro</span>
+                      </h3>
+                      <p className="text-scale-1100 text-base">
+                        Your new subscription will begin immediately after payment
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-3xl">
+                        Managing your <span className="text-brand-900">Pro</span> plan
+                      </h3>
+                      <p className="text-scale-1100 text-base">
+                        Your billing cycle will reset after payment
+                      </p>
                     </>
                   )}
                 </div>
+                <div className="bg-panel-body-light dark:bg-panel-body-dark border-panel-border-light border-panel-border-dark flex items-center justify-between gap-16 rounded border px-6 py-4 drop-shadow-sm">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <p>Enable spend cap</p>
+                      <IconHelpCircle
+                        size={16}
+                        strokeWidth={1.5}
+                        className="cursor-pointer opacity-50 transition hover:opacity-100"
+                        onClick={() => setShowSpendCapHelperModal(true)}
+                      />
+                    </div>
+                    <p className="text-scale-1100 text-sm">
+                      If enabled, additional resources will not be charged on a per-usage basis
+                    </p>
+                  </div>
+                  <Toggle
+                    checked={isSpendCapEnabled}
+                    onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                  />
+                </div>
+                {projectRegion !== 'af-south-1' && (
+                  <>
+                    <Divider light />
+                    <ComputeSizeSelection
+                      computeSizes={computeSizes || []}
+                      currentComputeSize={
+                        isManagingProSubscription ? currentComputeSize : undefined
+                      }
+                      selectedComputeSize={selectedComputeSize}
+                      onSelectOption={setSelectedComputeSize}
+                    />
+                  </>
+                )}
               </div>
             </div>
           </div>
-          <div className="w-[32rem]">
-            <PaymentSummaryPanel
-              isRefreshingPreview={isRefreshingPreview}
-              subscriptionPreview={subscriptionPreview}
-              currentPlan={currentSubscription.tier}
-              selectedPlan={selectedTier}
-              isSpendCapEnabled={isSpendCapEnabled}
-              currentComputeSize={currentComputeSize}
-              selectedComputeSize={selectedComputeSize}
-              paymentMethods={paymentMethods}
-              isLoadingPaymentMethods={isLoadingPaymentMethods}
-              selectedPaymentMethod={selectedPaymentMethod}
-              onSelectPaymentMethod={setSelectedPaymentMethod}
-              onSelectAddNewPaymentMethod={() => {
-                setShowAddPaymentMethodModal(true)
-              }}
-              onConfirmPayment={onConfirmPayment}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        </>
+        </div>
+        <div className="w-[32rem]">
+          <PaymentSummaryPanel
+            isRefreshingPreview={isRefreshingPreview}
+            subscriptionPreview={subscriptionPreview}
+            currentPlan={currentSubscription.tier}
+            selectedPlan={selectedTier}
+            isSpendCapEnabled={isSpendCapEnabled}
+            currentComputeSize={currentComputeSize}
+            selectedComputeSize={selectedComputeSize}
+            paymentMethods={paymentMethods}
+            isLoadingPaymentMethods={isLoadingPaymentMethods}
+            selectedPaymentMethod={selectedPaymentMethod}
+            onSelectPaymentMethod={setSelectedPaymentMethod}
+            onSelectAddNewPaymentMethod={() => {
+              setShowAddPaymentMethodModal(true)
+            }}
+            onConfirmPayment={onConfirmPayment}
+            isSubmitting={isSubmitting}
+          />
+        </div>
       </Transition>
 
       <AddNewPaymentMethodModal
