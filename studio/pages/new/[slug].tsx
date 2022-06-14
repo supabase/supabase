@@ -190,7 +190,7 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      loading={app.organizations.isInitialized}
+      loading={!app.organizations.isInitialized}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
