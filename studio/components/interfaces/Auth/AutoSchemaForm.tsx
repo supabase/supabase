@@ -1,6 +1,10 @@
-import { Form, Input, InputNumber, Toggle } from '@supabase/ui'
+import { Form, Input, InputNumber, Loading, Toggle } from '@supabase/ui'
 import { useStore } from 'hooks'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
 import React from 'react'
+import { useState } from 'react'
+import { useEffect } from 'react'
 import { boolean, number, object, string } from 'yup'
 import {
   FormActions,
@@ -11,8 +15,10 @@ import {
   FormSectionLabel,
 } from '../../ui/Forms'
 
-const AutoSchemaForm = () => {
+const AutoSchemaForm = observer(() => {
   const { authConfig, ui } = useStore()
+
+  // const [isLoaded, setIsLoaded] = useState(false)
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -31,6 +37,8 @@ const AutoSchemaForm = () => {
       .min(0, 'Must be a value more than 0')
       .required('Must have a Reuse Interval value'),
   })
+
+  const isLoaded = authConfig.isLoaded
 
   return (
     <>
@@ -59,8 +67,19 @@ const AutoSchemaForm = () => {
         }}
         validationSchema={schema}
       >
-        {({ isSubmitting, handleReset, values, initialValues }: any) => {
+        {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+          /**
+           * Tracks changes in form
+           */
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+
+          /**
+           * Form is reset once remote data is loaded in store
+           */
+          useEffect(() => {
+            resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
+          }, [authConfig.isLoaded])
+
           return (
             <>
               <FormHeader
@@ -81,11 +100,7 @@ const AutoSchemaForm = () => {
                 }
               >
                 <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
-                  <FormSectionContent>
-                    {/* <div className="flex flex-col justify-between space-y-2">
-                      <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
-                    </div>
-                    <div className="shimmering-loader mx-1 w-1/3 rounded py-3"></div> */}
+                  <FormSectionContent loading={!isLoaded}>
                     <Toggle
                       id="DISABLE_SIGNUP"
                       size="small"
@@ -97,7 +112,7 @@ const AutoSchemaForm = () => {
                 </FormSection>
                 <div className="border-scale-400 border-t"></div>
                 <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
-                  <FormSectionContent>
+                  <FormSectionContent loading={!isLoaded}>
                     {/**
                      *
                      * permitted redirects
@@ -135,6 +150,6 @@ const AutoSchemaForm = () => {
       </Form>
     </>
   )
-}
+})
 
 export { AutoSchemaForm }
