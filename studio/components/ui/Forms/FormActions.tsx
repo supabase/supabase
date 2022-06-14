@@ -24,7 +24,12 @@ const FormActions = ({ isSubmitting, handleReset, hasChanges = undefined, helper
     <div className="flex w-full items-center justify-between gap-2">
       {helper && <span className="text-scale-900 text-xs">{helper}</span>}
       <div className="flex justify-between gap-2">
-        <Button type="default" htmlType="reset" onClick={() => handleReset()}>
+        <Button
+          disabled={!hasChanges && hasChanges !== undefined}
+          type="default"
+          htmlType="reset"
+          onClick={() => handleReset()}
+        >
           Cancel
         </Button>
         <Button
