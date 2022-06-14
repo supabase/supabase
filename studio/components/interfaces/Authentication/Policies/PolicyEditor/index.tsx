@@ -68,10 +68,10 @@ const PolicyEditor: FC<Props> = ({
             operation={operation}
             definition={definition}
             check={check}
-            onUpdatePolicyUsing={(definition: string | null) =>
+            onUpdatePolicyUsing={(definition: string | undefined) =>
               onUpdatePolicyFormFields({ definition })
             }
-            onUpdatePolicyCheck={(check: string | null) => onUpdatePolicyFormFields({ check })}
+            onUpdatePolicyCheck={(check: string | undefined) => onUpdatePolicyFormFields({ check })}
           />
         </Modal.Content>
       </div>
