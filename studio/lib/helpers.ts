@@ -140,7 +140,7 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
 }
 
 export const formatBytes = (bytes: any, decimals = 2) => {
-  if (bytes === 0) return '0 bytes'
+  if (bytes === 0 || bytes === undefined) return '0 bytes'
 
   const k = 1000
   const dm = decimals < 0 ? 0 : decimals

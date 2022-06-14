@@ -653,7 +653,9 @@ export default function IndexPage() {
                   {pricingFaq.map((faq, i) => {
                     return (
                       <Accordion.Item key={i} header={faq.question} id={`faq--${i.toString()}`}>
-                        <ReactMarkdown className="text-scale-1100">{faq.answer}</ReactMarkdown>
+                        <ReactMarkdown className="text-scale-1100 prose max-w-full">
+                          {faq.answer}
+                        </ReactMarkdown>
                       </Accordion.Item>
                     )
                   })}
