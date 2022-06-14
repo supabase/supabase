@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from '@supabase/ui'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { PostgresPolicy } from '@supabase/postgres-meta'
 
 interface Props {

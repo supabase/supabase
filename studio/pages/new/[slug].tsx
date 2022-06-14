@@ -7,11 +7,12 @@ import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import generator from 'generate-password'
 import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
 
 import { NextPageWithLayout } from 'types'
 import { passwordStrength } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
+import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   PROVIDERS,
@@ -27,7 +28,7 @@ import {
 import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import {
@@ -35,24 +36,6 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
-
-interface StripeCustomer {
-  paymentMethods: any
-  customer: any
-  error?: any
-}
-
-async function fetchStripeAccount(stripeCustomerId: string) {
-  try {
-    const customer = await post(`${API_URL}/stripe/customer`, {
-      stripe_customer_id: stripeCustomerId,
-    })
-    if (customer.error) throw customer.error
-    return customer
-  } catch (error: any) {
-    return { error }
-  }
-}
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -70,7 +53,7 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+  const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
@@ -81,9 +64,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
-  const isEmptyPaymentMethod = stripeCustomer
-    ? stripeCustomer.paymentMethods?.data?.length <= 0
-    : undefined
+  const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
@@ -129,17 +110,17 @@ const Wizard: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
-    async function loadStripeAccountAsync(id: string) {
-      const res = await fetchStripeAccount(id)
-      if (!res.error) {
-        setStripeCustomer(res)
+    async function getPaymentMethods(slug: string) {
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (!error) {
+        setPaymentMethods(paymentMethods)
       }
     }
 
-    if (stripeCustomerId) {
-      loadStripeAccountAsync(stripeCustomerId)
+    if (slug) {
+      getPaymentMethods(slug as string)
     }
-  }, [stripeCustomerId])
+  }, [slug])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -193,10 +174,23 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  // [Joshen] Refactor: DB Password could be a common component
+  // used in multiple pages with repeated logic
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <Panel
       hideHeaderStyling
-      isLoading={app.organizations.isInitialized}
+      loading={!app.organizations.isInitialized}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
@@ -237,7 +231,7 @@ const Wizard: NextPageWithLayout = () => {
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-b border-t">
+            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -262,7 +256,7 @@ const Wizard: NextPageWithLayout = () => {
             </Panel.Content>
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b border-t">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -278,6 +272,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                   <Input
                     id="password"
+                    copy={dbPass.length > 0}
                     layout="horizontal"
                     label="Database Password"
                     type="password"
@@ -289,6 +284,7 @@ const Wizard: NextPageWithLayout = () => {
                         passwordStrengthScore={passwordStrengthScore}
                         password={dbPass}
                         passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generateStrongPassword}
                       />
                     }
                     error={passwordStrengthWarning}

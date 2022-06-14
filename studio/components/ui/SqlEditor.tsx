@@ -1,9 +1,18 @@
-import Editor, { useMonaco } from '@monaco-editor/react'
+import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { FC, useEffect, useRef } from 'react'
 import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 
-const SqlEditor: FC<any> = ({
+interface Props {
+  contextmenu?: boolean;
+  defaultValue?: string;
+  language?: string;
+  onInputChange?: OnChange;
+  queryId?: string;
+  readOnly?: boolean;
+}
+
+const SqlEditor: FC<Props> = ({
   queryId,
   language = 'pgsql',
   defaultValue = '',

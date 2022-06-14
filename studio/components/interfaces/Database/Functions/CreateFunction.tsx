@@ -17,8 +17,8 @@ import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 
 import { useStore } from 'hooks'
-import Panel from 'components/to-be-cleaned/Panel'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import Panel from 'components/ui/Panel'
+import SqlEditor from 'components/ui/SqlEditor'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 class CreateFunctionFormState {
@@ -721,10 +721,8 @@ const InputDefinition: FC = observer(({}) => {
         </p>
       </div>
       <div className="h-40 border dark:border-dark">
-        {/* @ts-ignore */}
         <SqlEditor
           defaultValue={_localState!.formState.definition.value}
-          // @ts-ignore
           onInputChange={(value: string | undefined) => {
             _localState!.onFormChange({
               key: 'definition',

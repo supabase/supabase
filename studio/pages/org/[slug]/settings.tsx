@@ -27,7 +27,7 @@ import { AccountLayoutWithoutAuth } from 'components/layouts'
 import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -250,11 +250,11 @@ const OrgDeletePanel = observer(() => {
   if (!PageState.isOrgOwner) return null
   return (
     <Panel
-      title={[
+      title={
         <Typography.Text key="panel-title" className="uppercase">
           Danger Zone
-        </Typography.Text>,
-      ]}
+        </Typography.Text>
+      }
     >
       <Panel.Content>
         <Alert

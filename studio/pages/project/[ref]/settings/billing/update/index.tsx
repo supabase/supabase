@@ -5,7 +5,12 @@ import { Button, Modal } from '@supabase/ui'
 
 import { useStore, useSubscriptionStats } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, DEFAULT_FREE_PROJECTS_LIMIT, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import {
+  API_URL,
+  DEFAULT_FREE_PROJECTS_LIMIT,
+  PRICING_TIER_PRODUCT_IDS,
+  STRIPE_PRODUCT_IDS,
+} from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -30,12 +35,21 @@ const BillingUpdate: NextPageWithLayout = () => {
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [selectedPlan, setSelectedPlan] = useState<any>()
 
+  const isEnterprise =
+    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   useEffect(() => {
     if (projectRef) {
       getStripeProducts()
       getSubscription()
     }
   }, [projectRef])
+
+  useEffect(() => {
+    if (isEnterprise) {
+      router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    }
+  }, [subscription])
 
   // [Joshen] Perhaps we shift this fetch into the global mobx tree
   // Since all the pages require this data, makes more sense to load it once at the layout
@@ -92,7 +106,7 @@ const BillingUpdate: NextPageWithLayout = () => {
     }
   }
 
-  if (isLoadingProducts) {
+  if (isLoadingProducts || isEnterprise) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <Connecting />
