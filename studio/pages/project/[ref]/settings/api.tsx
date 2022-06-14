@@ -40,7 +40,7 @@ import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
 import { useStore, useJwtSecretUpdateStatus } from 'hooks'
 
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
 import { SettingsLayout } from 'components/layouts'
