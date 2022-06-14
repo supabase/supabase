@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Toggle } from '@supabase/ui'
+import { Badge, IconLoader, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -82,25 +82,25 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   return (
     <div
       className="
-        border border-panel-border-light dark:border-panel-border-dark
-        shadow-sm
+        border-panel-border-light dark:border-panel-border-dark flex
+        flex-col
         overflow-hidden
         rounded
-        flex flex-col
+        border shadow-sm
       "
     >
       <div
         className="
-          p-4 px-6 flex 
-          bg-panel-header-light dark:bg-panel-header-dark
-          border-b border-panel-border-light dark:border-panel-border-dark
+          bg-panel-header-light dark:bg-panel-header-dark border-panel-border-light 
+          dark:border-panel-border-dark flex
+          border-b p-4 px-6
         "
       >
-        <h3 className="m-0 h-5 uppercase flex-1 truncate text-base text-scale-1200 truncate">
+        <h3 className="text-scale-1200 m-0 h-5 flex-1 truncate text-base uppercase">
           {extension.name}
         </h3>
         {loading ? (
-          <img className="loading-spinner" src="/img/spinner.gif"></img>
+          <IconLoader className="animate-spin" size={16} />
         ) : (
           <Toggle
             size="tiny"
@@ -113,16 +113,16 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
         className="
         bg-panel-header-light dark:bg-panel-header-dark
           bg-panel-secondary-light dark:bg-panel-secondary-dark 
-          flex flex-col h-full"
+          flex h-full flex-col"
       >
         <div className="p-4 px-6">
-          <p className="text-sm text-scale-1100">
+          <p className="text-scale-1100 text-sm">
             <span className="flex-grow capitalize">{extension.comment}</span>
           </p>
         </div>
         {isOn && extension.schema && (
           <div className="p-4 px-6">
-            <p className="text-sm text-scale-1100">
+            <p className="text-scale-1100 text-sm">
               <span className="flex-grow">
                 Schema: <Badge>{`${extension.schema}`}</Badge>
               </span>

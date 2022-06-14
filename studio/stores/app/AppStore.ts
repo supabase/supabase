@@ -60,8 +60,9 @@ export default class AppStore implements IAppStore {
   onProjectUpdated(project: any) {
     if (project && project.id) {
       const clone = cloneDeep(this.projects.data[project.id])
-      clone.name = project.name
-      clone.status = project.status
+      // only update available param
+      if (project.name) clone.name = project.name
+      if (project.status) clone.status = project.status
       this.projects.data[project.id] = clone
     }
   }

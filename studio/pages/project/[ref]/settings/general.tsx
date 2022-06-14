@@ -9,26 +9,29 @@ import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
 import Panel from 'components/to-be-cleaned/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { NextPageWithLayout } from 'types'
 
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   return (
-    <SettingsLayout title="General">
+    <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="mx-auto w-full">
           <GeneralSettings />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
+
+export default observer(ProjectSettings)
 
 interface RestartServerButtonProps {
   projectId: number

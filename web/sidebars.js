@@ -11,6 +11,7 @@ const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
+    'reference',
     {
       type: 'category',
       label: 'JavaScript',
@@ -184,7 +185,7 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'going-into-prod', 'guides/platform/metrics'],
+      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod', 'guides/platform/performance'],
     },
     {
       type: 'category',
@@ -200,12 +201,14 @@ module.exports = {
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/clerk',
+        'guides/integrations/dashibase',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
         'guides/integrations/prisma',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
+        'guides/integrations/supertokens',
         'guides/integrations/vercel',
       ],
     },

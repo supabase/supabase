@@ -30,7 +30,7 @@ export default function IndexPage() {
   const tiers = [
     {
       name: 'Free',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
@@ -49,14 +49,14 @@ export default function IndexPage() {
     },
     {
       name: 'Pro',
-      href: '#',
+      href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 25,
-      warning: '+ additional use',
+      warning: 'per project',
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
-        '50GB bandwith',
+        '50GB bandwidth',
         '3GB file uploads',
         'Social OAuth providers',
         '2M Edge Function invocations',
@@ -119,7 +119,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://app.supabase.io" passHref>
+        <Link href="https://app.supabase.com" passHref>
           <Button as="a" size="medium" block>
             Get started
           </Button>
@@ -165,7 +165,7 @@ export default function IndexPage() {
 
           <div
             className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
-          
+
             lg:px-8
           "
           >
@@ -174,23 +174,23 @@ export default function IndexPage() {
                 <div
                   key={tier.name}
                   className="
-                  flex 
-                  flex-col 
+                  flex
+                  flex-col
                   overflow-hidden
-                  rounded 
-                  border 
+                  rounded
+                  border
                   "
                 >
                   <div className="dark:bg-scale-300 h-48 bg-white px-8 pt-6">
                     <h3
                       className="
-                        text-scale-1200 
-                        mb-2 
-                        inline-flex 
-                        rounded-full 
-                        text-sm 
-                        font-normal 
-                        tracking-wide 
+                        text-scale-1200
+                        mb-2
+                        inline-flex
+                        rounded-full
+                        text-sm
+                        font-normal
+                        tracking-wide
                         lg:text-xl"
                       id="tier-standard"
                     >
@@ -198,12 +198,12 @@ export default function IndexPage() {
                     </h3>
                     <div
                       className="
-                      text-scale-1200 flex items-baseline 
-                      text-5xl 
-                      font-normal 
-                      lg:text-4xl 
+                      text-scale-1200 flex items-baseline
+                      text-5xl
+                      font-normal
+                      lg:text-4xl
                       xl:text-4xl
-                      
+
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
@@ -230,13 +230,13 @@ export default function IndexPage() {
                   <div
                     className="
                     dark:border-scale-400 bg-scale-100 dark:bg-scale-300 flex
-                    
-                    h-full 
-                    flex-1 
+
+                    h-full
+                    flex-1
                     flex-col
-                    
-                    justify-between 
-                    space-y-6 
+
+                    justify-between
+                    space-y-6
 
                     border-t
                     px-8
@@ -506,7 +506,7 @@ export default function IndexPage() {
 
                         <p className="p text-sm">Perfect for hobby projects and experiments</p>
 
-                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
                           <a>
                             <Button size="medium" type="default">
                               Get Started
@@ -525,7 +525,7 @@ export default function IndexPage() {
                           Everything you need to scale your project into production
                         </p>
 
-                        <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                        <Link href="https://app.supabase.com" as="https://app.supabase.com">
                           <a>
                             <Button size="medium" type="default">
                               Get Started
@@ -584,7 +584,7 @@ export default function IndexPage() {
                     </th>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="default" block>
                             Get started
@@ -594,7 +594,7 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://app.supabase.io" as="https://app.supabase.io">
+                      <Link href="https://app.supabase.com" as="https://app.supabase.com">
                         <a>
                           <Button size="medium" type="default" block>
                             Get started
