@@ -13,11 +13,18 @@ export function useOrganizationDetail(slug: string) {
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
   const {data: inviteData, error: inviteError} = useSWR<any>(pendingInviteUrl, get)
 
-
-  if (data && inviteData) {
+  if (data && inviteData.length > 0) {
     // remap invite data to look like existing members data
     const reMappedInvitedata = inviteData.map((x: any) => (
-      {is_owner: false, invited_at: x.invited_at, invited_id: x.invited_id, profile: {username: '', primary_email: x.invited_email}}
+      {
+        is_owner: false,
+        invited_at: x.invited_at,
+        invited_id: x.invited_id,
+        profile: {
+          username: '',
+          primary_email: x.invited_email
+        }
+      }
     ))
 
     members = [...members, ...reMappedInvitedata]
@@ -27,11 +34,10 @@ export function useOrganizationDetail(slug: string) {
 
   function mutateOrgMembers(updatedMembers: Member[], revalidate?: boolean) {
     mutate(url, { members: updatedMembers }, revalidate ?? true)
+    mutate(pendingInviteUrl, {}, revalidate ?? true)
   }
 
-  console.log('all members', members)
-
-return {
+  return {
     members: members as Member[],
     products,
     isLoading: !anyError && !data,
