@@ -142,7 +142,7 @@
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light break-words dark:border-table-border-dark;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light truncate dark:border-table-border-dark;
 }
 
 .table-container tbody td:first-child {
