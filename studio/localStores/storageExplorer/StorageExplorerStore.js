@@ -65,7 +65,11 @@ class StorageExplorerStore {
   selectedItemsToMove = []
   selectedFilePreview = {}
 
-  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
+  DEFAULT_OPTIONS = {
+    limit: LIMIT,
+    offset: OFFSET,
+    sortBy: { column: this.sortBy, order: this.sortByOrder },
+  }
 
   /* Supabase client */
   supabaseClient = null
@@ -87,7 +91,11 @@ class StorageExplorerStore {
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
-    this.abortController = new AbortController()
+
+    // ignore when in a non-browser environment
+    if (typeof window !== 'undefined') {
+      this.abortController = new AbortController()
+    }
   }
 
   initStore(projectRef, url, serviceKey) {
@@ -1182,7 +1190,11 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
-    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
+    const options = {
+      limit: LIMIT,
+      offset: OFFSET,
+      sortBy: { column: this.sortBy, order: this.sortByOrder },
+    }
     const { data: folderContents } = await this.supabaseClient.storage
       .from(this.selectedBucket.name)
       .list(formattedPathToFolder, options)
