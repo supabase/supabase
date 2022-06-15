@@ -6,7 +6,7 @@ import { useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { TAX_IDS } from './TaxID.constants'
 
 interface Props {

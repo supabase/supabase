@@ -4,119 +4,8 @@ info:
   id: reference/supabase-js
   title: Supabase Client
   description: |
-    Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
 
-    <table style={{tableLayout: 'fixed', whiteSpace: 'nowrap' }}>
-      <tr>
-        <th>Language</th>
-        <th>Client</th>
-        <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
-      </tr>
-      <tr>
-        <th></th>
-        <th>Supabase</th>
-        <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-        <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-        <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-        <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
-        <th><a href="https://github.com/supabase/edge-functions" target="_blank" rel="noopener noreferrer">Edge Functions</a></th>
-      </tr>
-      <th colspan="7">⚡️ Official ⚡️</th>
-      <tr>
-        <td>JavaScript (TypeScript)</td>
-        <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-        <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-        <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-        <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-        <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-        <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
-      </tr>
-      <th colspan="7">💚 Community 💚</th>
-      <tr>
-        <td>C#</td>
-        <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
-        <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
-        <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-        <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Dart (Flutter)</td>
-        <td>
-          <a href="https://github.com/supabase-community/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a><br />
-          <a href="https://github.com/supabase-community/supabase-dart" target="_blank" rel="noopener noreferrer">supabase-dart</a>
-        </td>
-        <td><a href="https://github.com/supabase-community/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-        <td><a href="https://github.com/supabase-community/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-        <td><a href="https://github.com/supabase-community/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-        <td><a href="https://github.com/supabase-community/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
-      </tr>
-      <tr>
-        <td>Go</td>
-        <td>-</td>
-        <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
-        <td>-</td>
-        <td>-</td>
-        <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Java</td>
-        <td>-</td>
-        <td>-</td>
-        <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Kotlin</td>
-        <td>-</td>
-        <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Python</td>
-        <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
-        <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
-        <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
-        <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Ruby</td>
-        <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
-        <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Rust</td>
-        <td>-</td>
-        <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Swift</td>
-        <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
-        <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
-        <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-        <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-        <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-        <td>-</td>
-      </tr>
-    </table>
+    Supabase JavaScript.
 
   definition: spec/combined.json
   libraries:
@@ -128,7 +17,6 @@ info:
     sidebar:
       - name: 'Getting Started'
         items:
-          - index
           - Installing
           - Initializing
           - Generating Types
@@ -346,8 +234,6 @@ pages:
       response.data // Response data will be of type Array<any>.
       ```
 
-
-      
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -458,7 +344,7 @@ pages:
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
            
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the base domain must be the same as the domain in your Auth settings).
+          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
           const { user, session, error } = await supabase.auth.signIn({
@@ -1255,7 +1141,7 @@ pages:
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
-      
+
       ```sql
       create or replace function hello_world() returns text as $$
         select 'Hello world';
@@ -1390,6 +1276,8 @@ pages:
           ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        notes: | 
+          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
           const mySubscription = supabase
@@ -1561,7 +1449,7 @@ pages:
       - name: Upload file using `ArrayBuffer` from base64 file data
         js: |
           ```js
-          import {decode} from 'base64-arraybuffer'
+          import { decode } from 'base64-arraybuffer'
 
           const { data, error } = await supabase
             .storage
