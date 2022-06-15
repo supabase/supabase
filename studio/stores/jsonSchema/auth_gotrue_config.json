@@ -58,7 +58,7 @@
     "URI_ALLOW_LIST": {
       "title": "Additional redirect URLs",
       "type": "string",
-      "help": "A comma separated list of *exact* URLs that auth providers are permitted to redirect to post authentication."
+      "help": "A comma separated list of URLs that auth providers are permitted to redirect to post authentication. Wildcards allowed (e.g. https://*.domain.com)"
     },
     "DISABLE_SIGNUP": {
       "title": "Disable signup",
