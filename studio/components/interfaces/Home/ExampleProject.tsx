@@ -16,7 +16,7 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
 
   return (
     <Link href={url}>
-      <a>
+      <a target='_blank'>
         <div
           className={[
             'group relative',
