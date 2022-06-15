@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { FC, FormEvent, useState } from 'react'
+import { useRouter } from 'next/router'
 import { IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
 
 import { useStore, useFlag } from 'hooks'
@@ -15,12 +16,23 @@ import {
   getTimezoneOffsetText,
   convertTimeStringtoUnixMs,
 } from './PITRBackupSelection.utils'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 
 interface Props {}
 
 const PITRBackupSelection: FC<Props> = () => {
+  const router = useRouter()
   const { ui, backups } = useStore()
   const isAvailable = useFlag('pitrBackups')
+
+  if (!isAvailable) {
+    return (
+      <div className="flex items-center justify-center rounded border border-gray-500 bg-gray-300 py-8">
+        <p className="text-scale-1000 text-sm">Coming soon</p>
+      </div>
+    )
+  }
 
   const [searchString, setSearchString] = useState<string>('')
   const [selectedTimezone, setSelectedTimezone] = useState<any>(getClientTimezone())
@@ -29,26 +41,20 @@ const PITRBackupSelection: FC<Props> = () => {
   const [errors, setErrors] = useState<any>()
   const [recoveryPoint, setRecoveryPoint] = useState<string>()
 
-  // Mock new properties, to delete after BE is fully ready
   const { configuration } = backups
-  console.log('Configuration', configuration)
-
   const projectRef = ui.selectedProject?.ref ?? 'default'
-  const hasPhysicalBackups =
-    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
-    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null
 
   if (backups.isLoading) {
     return <Loading />
   } else if (backups.error) {
     return <BackupsError />
-  } else if (!isAvailable) {
-    return (
-      <div className="flex items-center justify-center rounded border border-gray-500 bg-gray-300 py-8">
-        <p className="text-scale-1000 text-sm">Coming soon</p>
-      </div>
-    )
-  } else if (!configuration.walg_enabled) {
+  }
+
+  const hasPhysicalBackups =
+    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
+    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null
+
+  if (!configuration.walg_enabled) {
     // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
     return (
       <UpgradeToPro
@@ -88,6 +94,7 @@ const PITRBackupSelection: FC<Props> = () => {
       const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
       const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
         configuration.physicalBackupData
+
       const isOutOfRange =
         recoveryTimeTargetUnix < earliestPhysicalBackupDateUnix ||
         recoveryTimeTargetUnix > latestPhysicalBackupDateUnix
@@ -108,7 +115,31 @@ const PITRBackupSelection: FC<Props> = () => {
 
     // To unix milliseconds
     const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
-    console.log('Confirm restore', { recoveryTimeTargetUnix, region: configuration.region })
+
+    try {
+      post(`${API_URL}/database/${projectRef}/backups/pitr`, {
+        recovery_time_target_unix: recoveryTimeTargetUnix,
+        region: configuration.region,
+      }).then(() => {
+        setTimeout(() => {
+          setShowConfirmation(false)
+          ui.setNotification({
+            category: 'success',
+            message: `Restoring database back to ${dayjs(recoveryPoint).format(
+              'DD MMM YYYY, HH:mm:ss'
+            )} (
+            ${getTimezoneOffsetText(selectedTimezone)})`,
+          })
+          router.push('/project/[id]', `/project/${projectRef}`)
+        }, 3000)
+      })
+    } catch (error) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Point in time recovery for project failed`,
+      })
+    }
   }
 
   return (
