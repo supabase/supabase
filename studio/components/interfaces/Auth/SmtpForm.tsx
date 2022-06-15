@@ -232,7 +232,10 @@ const SmtpForm = observer(() => {
                       label="Enable Custom SMTP"
                       layout="flex"
                       onChange={() => {
-                        // resetForm({ values: values, initialValues: INITIAL_VALUES })
+                        resetForm({
+                          values: values,
+                          initialValues: generateInitialValues(authConfig.config),
+                        })
                         setEnableSmtp(!enableSmtp)
                       }}
                       descriptionText="Emails will be sent using your custom SMTP provider"
