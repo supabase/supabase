@@ -113,6 +113,10 @@
   border-spacing: 0;
 }
 
+.table-container table span {
+  @apply truncate;
+}
+
 .table-container thead th {
   @apply text-scale-900 font-normal text-sm;
   @apply bg-table-header-light dark:bg-table-header-dark;
@@ -142,7 +146,7 @@
 }
 
 .table-container tbody td {
-  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light truncate dark:border-table-border-dark;
+  @apply border-b p-3 px-4 text-sm text-gray-1100 border-table-border-light dark:border-table-border-dark;
 }
 
 .table-container tbody td:first-child {
