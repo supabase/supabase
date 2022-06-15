@@ -36,10 +36,8 @@ const User = () => {
 
     async function handleSubmitForm() {
         setIsSubmitting( true )
-
         // curl -X GET 'http://localhost:8080/platform/organizations/slug/members/join?token=XXX'
         const response = await get( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
-
         if ( response.error ) {
             ui.setNotification( {
                 category: 'error',
