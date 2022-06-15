@@ -13,7 +13,7 @@ import { get, patch } from 'lib/common/fetch'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { AuthLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SecretField from 'components/to-be-cleaned/forms/SecretField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -132,7 +132,7 @@ const Settings = () => {
             JWT_EXP: model.JWT_EXP || undefined,
             PASSWORD_MIN_LENGTH: model.PASSWORD_MIN_LENGTH || undefined,
             SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: model.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL || undefined,
-            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: 
+            SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION:
               model.SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION || false,
             }}
             onSubmit={(model: any) => onFormSubmit(model)}

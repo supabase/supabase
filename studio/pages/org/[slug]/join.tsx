@@ -1,118 +1,62 @@
+import React from 'react'
+import { observer } from 'mobx-react-lite'
+import { useProfile, useStore, withAuth } from 'hooks'
 import { AccountLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
-import AuthCode, { AuthCodeRef } from 'react-auth-code-input';
+import { toJS } from 'mobx'
+import { Button, Typography } from '@supabase/ui';
 import { useState } from 'react';
-import { useRef } from 'react';
-import { Button } from '@supabase/ui';
 import router, {useRouter} from 'next/router';
-import { useOrganizationDetail, useStore } from 'hooks'
-import { post, } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { Transition } from '@headlessui/react';
+import Link from 'next/link';
 
-const JoinOrg: NextPageWithLayout = () => {
-     const router = useRouter();
-     const slug = router.query.slug;
-    return (
-        <div className="mt-8 space-y-4 p-4 pt-0">
+
+const User = () => {
+    const router = useRouter()
+    const { ui } = useStore()
+    const user = ui.profile
+    const [isSubmitting, setIsSubmitting] = useState( false )
+    console.log('router', router.query)
+    console.log('join-a user:', toJS(user))
+
+  return (
+    <div className="flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center bg-secondary px-3">
+        <div className="mt-16 space-y-4 p-12 max-w-md mx-auto border-2 rounded-md ">
             <div className="space-y-4">
+            <Link href="/">
+                <a className="flex items-center gap-4">
+                    <img
+                    src="/img/supabase-logo.svg"
+                    alt="Supabase"
+                    className="h-[30px] block cursor-pointer rounded"
+                    />
+                <Typography.Title level={3} className="mb-0">Supabase</Typography.Title>
+
+            </a>
+        </Link>
+
                 <h2 className="text-xl">Join organization</h2>
                 <p className="text-md">We sent an invite code to <u>your@email.com</u> to join this organization.</p>
             </div>
 
-            <div className='mt-12'>
-                <p className="text-md my-6">Enter or paste the code to join:</p>
-                <div className='mb-6'>
-                    <InviteCodeInput />
-                </div>
+            <div className='flex items-center gap-2 mt-8'>
+                <Button htmlType="submit" loading={isSubmitting} size="small">
+                    Join this organization
+                </Button>
 
-                <p className='mt-8 text-scale-900 text-sm'>Didn't get the email? <u>Resend the code</u></p>
+                <Button htmlType="submit" loading={isSubmitting} size="small" type="text">
+                    Decline
+                </Button>
             </div>
         </div>
-    )
+    </div>
+  )
 }
 
-const InviteCodeInput = () => {
-    const router = useRouter();
-    const slug = router.query.slug;
-    const { ui } = useStore()
-    const [result, setResult] = useState<string | null>();
-    const [isValidInviteCode, setIsValidInviteCode] = useState( false );
-    const [isInputDirty, setIsInputDirty] = useState( false );
-    const [isSubmitting, setIsSubmitting] = useState( false )
-    const AuthInputRef = useRef<AuthCodeRef>( null );
-    const AuthInputFormRef = useRef<HTMLFormElement>( null );
+
+export default withAuth(observer(User))
 
 
-    function handleOnChange( res: string ) {
-        res.length < 15 ? setIsValidInviteCode(false) : setIsValidInviteCode(true)
-        res.length > 0 ? setIsInputDirty(true) : setIsInputDirty(false)
-        setResult( res );
-    };
-
-    async function handleSubmitForm( e: any ) {
-        e.preventDefault();
-        setIsSubmitting( true )
-
-        // Need proper endpoint
-        const response = await post( `${API_URL}/organizations/${slug}/join?code=${result}`, {} )
-        if ( response.error ) {
-            ui.setNotification( {
-                category: 'error',
-                message: `Failed to join organization: ${response.error.message}`,
-            } )
-            setIsSubmitting( false )
-        } else {
-            setIsSubmitting( false )
-            router.push( '/' )
-        }
-    }
-
-    return (
-        <form onSubmit={handleSubmitForm} ref={AuthInputFormRef}>
-            <div>
-                <AuthCode ref={AuthInputRef} allowedCharacters='alpha' onChange={handleOnChange} length={15} autoFocus={true} containerClassName="join-auth-code-container flex items-center max-w-full" inputClassName="w-[44px]" />
-
-                <div className='flex items-center gap-2 mt-8'>
-                    <Button disabled={!isValidInviteCode} htmlType="submit" loading={isSubmitting} size="small">
-                        Join this organization
-                    </Button>
 
 
-                        <Transition
-                            show={isInputDirty}
-                            enter="transition ease-out duration-500"
-                            enterFrom="transform opacity-0 -translate-x-10"
-                            enterTo="transform opacity-100 translate-x-0"
-                        >
-                            <Button
-                                htmlType="reset"
-                                type='text'
-                                size="small"
-                                onClick={() => AuthInputRef.current?.clear()}
-                                >
-                                Clear
-                            </Button>
-                        </Transition>
 
-                </div>
-            </div>
-        </form>
-    );
-}
 
-JoinOrg.getLayout = ( page ) => (
-    <AccountLayout
-        title="Join Org"
-        breadcrumbs={[
-            {
-                key: `join-org`,
-                label: 'Join Org',
-            },
-        ]}
-    >
-        {page}
-    </AccountLayout>
-)
-
-export default JoinOrg

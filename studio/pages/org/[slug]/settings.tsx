@@ -29,7 +29,7 @@ import { AccountLayoutWithoutAuth } from 'components/layouts'
 import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -39,6 +39,16 @@ import { NextPageWithLayout, Project } from 'types'
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
 const PageContext = createContext(null)
+
+// Invite is expired if older than 24hrs
+function inviteExpired(timestamp: Date) {
+  const inviteDate = new Date(timestamp);
+  const now = new Date();
+  var timeBetween = now.valueOf() - inviteDate.valueOf()
+  if(timeBetween / 1000 / 60 / 60 < 24) {
+    return true;
+  }
+}
 
 const OrgSettingsLayout = withAuth(
   observer(({ children }) => {
@@ -64,9 +74,13 @@ const OrgSettingsLayout = withAuth(
               profile.username.includes(this.membersFilterString) ||
               profile.primary_email.includes(this.membersFilterString)
               )
-            }
+          }
+          if (x.invited_email) {
+            return x.invited_email.includes(this.membersFilterString)
+          }
         })
-        return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
+        //return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
+        return temp
       },
       initData(organization: any, user: any, projects: any) {
         this.organization = organization
@@ -80,7 +94,7 @@ const OrgSettingsLayout = withAuth(
         app.onOrgDeleted(this.organization)
       },
     }))
-
+    console.log('pagestate', toJS(PageState))
     useEffect(() => {
       // User added a new payment method
       if (router.query.setup_intent && router.query.redirect_status) {
@@ -129,7 +143,7 @@ const OrganizationSettings = observer(() => {
   const { ui } = useStore()
 
   const {
-    members,// members retrieved here
+    members,
     products,
     isError: isOrgDetailError,
   } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
@@ -153,7 +167,7 @@ const OrganizationSettings = observer(() => {
 const TabsView = observer(() => {
   const { ui, app } = useStore()
   const [selectedTab, setSelectedTab] = useState('GENERAL')
-  console.log(router)
+
   const organization = ui.selectedOrganization
   const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
 
@@ -237,6 +251,7 @@ const GeneralSettings = observer(() => {
   // remove warning null value for controlled input
   if (!formModel.billing_email) formModel.billing_email = ''
   const BASIC_FIELDS = ['name', 'billing_email']
+  console.log(organizations)
 
   const handleUpdateOrg = async (model: any) => {
     const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, model)
@@ -284,11 +299,11 @@ const OrgDeletePanel = observer(() => {
   if (!PageState.isOrgOwner) return null
   return (
     <Panel
-      title={[
+      title={
         <Typography.Text key="panel-title" className="uppercase">
           Danger Zone
-        </Typography.Text>,
-      ]}
+        </Typography.Text>
+      }
     >
       <Panel.Content>
         <Alert
@@ -460,6 +475,7 @@ const TeamSettings = observer(() => {
               <InviteMemberModal
                 organization={PageState.organization}
                 members={PageState.members}
+                user={PageState.user}
               />
             </div>
           ) : (
@@ -498,13 +514,8 @@ const MembersFilterInput = observer(() => {
   )
 })
 
-// Hardcode an invite_status until this is added to the table
-// will become Pagestate.filteredMembers[0].profile.invite_status
-const invite_status = 'pending';
-
 const MembersView = observer(() => {
   const PageState: any = useContext(PageContext)
-  console.log(toJS(PageState.members))
 
   return (
     <div className="rounded">
@@ -522,7 +533,7 @@ const MembersView = observer(() => {
                 <Table.td>
                   <div className="flex items-center space-x-4">
                     <div>
-                      {invite_status === 'pending' ?
+                      {x.invited_id ?
                         ( <span className='border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2'><IconUser size={18} strokeWidth={2} /></span> )
                         : (
                           <img
@@ -534,24 +545,32 @@ const MembersView = observer(() => {
 
                     </div>
                     <div>
-                      <Typography.Text>{x.profile.username}</Typography.Text>
-                      <br />
-                      <Typography.Text type="secondary">{x.profile.primary_email}</Typography.Text>
+                    {x.profile.username && (
+                      <>
+                        <Typography.Text>{x.profile.username}</Typography.Text>
+                        <br />
+                      </>
+                    ) }
+                      <Typography.Text type="secondary">{x.profile ? x.profile.primary_email : ''}</Typography.Text>
                     </div>
                   </div>
                 </Table.td>
 
                 <Table.td>
-                  {x.profile.expired ? <Badge color="red">Expired</Badge> : <Badge color="yellow">Invited</Badge>}
+                  {x.invited_id && (
+                    <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
+                       {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                    </Badge>
+                  )}
                 </Table.td>
 
                 <Table.td>
                   <Typography.Text type="secondary">
-                    {console.log(x)}
                     {x.is_owner ? 'Owner' : 'Developer'}
                   </Typography.Text>
                 </Table.td>
                 <Table.td>
+                  {console.log('x', toJS(x))}
                   {PageState.isOrgOwner && !x.is_owner && (
                     // @ts-ignore
                     <OwnerDropdown members={PageState.members} member={x} />
@@ -592,10 +611,6 @@ const OwnerDropdown = observer(({ members, member }: any) => {
   const [ownerTransferIsVisble, setOwnerTransferIsVisble] = useState(false)
 
   const { id: orgId, slug: orgSlug, stripe_customer_id, name: orgName } = PageState.organization
-
-  function toggleDropDown() {
-    setIsOpen(!isOpen)
-  }
 
   async function handleMemberDelete() {
     setIsOpen(false)
@@ -650,6 +665,43 @@ const OwnerDropdown = observer(({ members, member }: any) => {
     }
   }
 
+  async function handleResendInvite(id: number) {
+    console.log('invite id', id);
+    setLoading(true)
+
+    const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`, {})
+
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to resend invitation: ${response.error.message}`,
+      })
+      setLoading(false)
+    } else {
+      const updatedMembers = [...members]
+      mutateOrgMembers(updatedMembers)
+      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+    }
+  }
+
+  async function handleRevokeInvitation(id: number) {
+    setLoading(true)
+
+    const response = await delete_(`${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`, {})
+
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to resend invitation: ${response.error.message}`,
+      })
+      setLoading(false)
+    } else {
+      const updatedMembers = [...members]
+      mutateOrgMembers(updatedMembers)
+      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
+    }
+  }
+
   return (
     <div className="flex items-center justify-end">
       <Dropdown
@@ -657,16 +709,43 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         align="end"
         overlay={
           <>
-            <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
-              <div className="flex flex-col">
-                <p>Make owner</p>
-                <p className="block opacity-50">Transfer ownership of "{orgName}"</p>
-              </div>
-            </Dropdown.Item>
-            <Dropdown.Seperator />
-            <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
-              Remove member
-            </Dropdown.Item>
+            {!member.invited_at && (
+              <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
+                <div className="flex flex-col">
+                  <p>Make owner</p>
+                  <p className="block opacity-50">Transfer ownership of "{orgName}"</p>
+                </div>
+              </Dropdown.Item>
+            )}
+
+            {member.invited_at && (
+              <>
+                <Dropdown.Item onClick={() => handleRevokeInvitation(member.invited_id)}>
+                  <div className="flex flex-col">
+                    <p>Cancel invitation</p>
+                    <p className="block opacity-50">Revoke this invitation.</p>
+                  </div>
+                </Dropdown.Item>
+
+                {!inviteExpired(member.invited_at) && (
+                  <Dropdown.Item onClick={() => handleResendInvite(member.invited_id)}>
+                    <div className="flex flex-col">
+                      <p>Resend invitation</p>
+                      <p className="block opacity-50">Invites expire after 24hrs.</p>
+                    </div>
+                  </Dropdown.Item>
+                )}
+              </>
+            )}
+
+            {!inviteExpired(member.invited_at) && (
+              <>
+                <Dropdown.Seperator />
+                <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
+                  Remove member
+                </Dropdown.Item>
+              </>
+            )}
           </>
         }
       >
@@ -692,7 +771,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
         text={
           <span>
             By transferring this organization, it will be solely owned by{' '}
-            <span className="font-medium dark:text-white">{member.profile.username}</span>, they
+            <span className="font-medium dark:text-white">{member.profile?.username}</span>, they
             will also be able to remove you from the organization as a member
           </span>
         }
