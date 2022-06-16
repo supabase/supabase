@@ -1,16 +1,13 @@
-import {
-  CalculatedColumn,
-  HeaderRendererProps,
-} from '@supabase/react-data-grid';
+import { CalculatedColumn, HeaderRendererProps } from '@supabase/react-data-grid'
 
 export interface Dictionary<T> {
-  [Key: string]: T;
+  [Key: string]: T
 }
 
 export interface Sort {
-  column: string;
-  ascending?: boolean;
-  nullsFirst?: boolean;
+  column: string
+  ascending?: boolean
+  nullsFirst?: boolean
 }
 
 export type FilterOperator =
@@ -25,23 +22,24 @@ export type FilterOperator =
   | '!~~'
   | '!~~*'
   | 'in'
-  | 'is';
+  | 'is'
 
 export interface Filter {
-  column: string;
-  operator: FilterOperator;
-  value: any;
+  id: string
+  column: string
+  operator: FilterOperator
+  value: any
 }
 
 export interface SavedState {
-  filters: Filter[];
-  gridColumns: CalculatedColumn<any, any>[];
-  sorts: Sort[];
+  filters: Filter[]
+  gridColumns: CalculatedColumn<any, any>[]
+  sorts: Sort[]
 }
 
 export interface DragItem {
-  index: number;
-  key: string;
+  index: number
+  key: string
 }
 
 export type ColumnType =
@@ -56,10 +54,10 @@ export type ColumnType =
   | 'primary_key'
   | 'text'
   | 'time'
-  | 'unknown';
+  | 'unknown'
 
 export interface ColumnHeaderProps<R> extends HeaderRendererProps<R> {
-  columnType: ColumnType;
-  isPrimaryKey: Boolean | undefined;
-  format: string;
+  columnType: ColumnType
+  isPrimaryKey: Boolean | undefined
+  format: string
 }

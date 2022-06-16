@@ -1,8 +1,19 @@
 import { Loading } from '@supabase/ui'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
-function Panel(props: any) {
-  let headerClasses = []
+interface Props {
+  bodyClassName?: string;
+  children?: ReactNode;
+  className?: string;
+  footer?: JSX.Element | false;
+  hideHeaderStyling?: boolean;
+  loading?: boolean;
+  noMargin?: boolean;
+  title?: JSX.Element | false;
+  wrapWithLoading?: boolean;
+}
+function Panel(props: Props) {
+  let headerClasses: string[] = []
 
   if (!props.hideHeaderStyling) {
     headerClasses = [
@@ -49,13 +60,13 @@ function Panel(props: any) {
     return content
   }
 
-  return <Loading active={props.loading}>{content}</Loading>
+  return <Loading active={Boolean(props.loading)}>{content}</Loading>
 }
 
-function Content(props: any) {
+function Content({children, className}: {children: ReactNode; className?: string | false}) {
   let classes = ['px-6 py-4']
-  if (props.className) classes.push(props.className)
-  return <div className={classes.join(' ')}>{props.children}</div>
+  if (className) classes.push(className)
+  return <div className={classes.join(' ')}>{children}</div>
 }
 
 Panel.Content = Content
