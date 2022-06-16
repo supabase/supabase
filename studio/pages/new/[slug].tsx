@@ -28,7 +28,7 @@ import {
 import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import {
@@ -190,7 +190,7 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      isLoading={app.organizations.isInitialized}
+      loading={!app.organizations.isInitialized}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
