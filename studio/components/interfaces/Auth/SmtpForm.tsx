@@ -20,6 +20,12 @@ const SmtpForm = observer(() => {
   const { authConfig, ui } = useStore()
   const [enableSmtp, setEnableSmtp] = useState(false)
 
+  // let enableSmtp = false
+
+  // function setEnableSmtp(value: boolean) {
+  //   enableSmtp = value
+  // }
+
   function generateInitialValues(config: any) {
     return {
       ENABLE_SMTP: enableSmtp,
@@ -36,15 +42,6 @@ const SmtpForm = observer(() => {
   // const INITIAL_VALUES = generateInitialValues(authConfig.config)
 
   function checkSmtpState(config: any, resetForm: () => void) {
-    console.log(
-      config.SMTP_ADMIN_EMAIL,
-      config.SMTP_SENDER_NAME,
-      config.SMTP_USER,
-      config.SMTP_HOST,
-      config.SMTP_PASS,
-      config.SMTP_PORT,
-      config.SMTP_MAX_FREQUENCY
-    )
     if (
       config.SMTP_ADMIN_EMAIL &&
       config.SMTP_SENDER_NAME &&
@@ -56,11 +53,11 @@ const SmtpForm = observer(() => {
     ) {
       console.log('TRUE')
       setEnableSmtp(true)
-      resetForm()
+      return resetForm
     } else {
       console.log('FALSE')
       setEnableSmtp(false)
-      resetForm()
+      return resetForm
     }
   }
 
@@ -174,10 +171,14 @@ const SmtpForm = observer(() => {
               message: `Updated settings`,
             })
             console.log('payload', payload)
-            resetForm({
-              values: !enableSmtp ? generateInitialValues(payload) : payload,
-              initialValues: generateInitialValues(payload),
-            })
+
+            checkSmtpState(
+              payload,
+              resetForm({
+                values: !enableSmtp ? generateInitialValues(payload) : payload,
+                initialValues: generateInitialValues(payload),
+              })
+            )
           } catch (error) {
             ui.setNotification({
               category: 'error',
@@ -216,7 +217,14 @@ const SmtpForm = observer(() => {
                 footer={
                   <div className="flex justify-between py-4 px-8">
                     <FormActions
-                      handleReset={handleReset}
+                      handleReset={() => {
+                        checkSmtpState(authConfig.config, () =>
+                          resetForm({
+                            values: generateInitialValues(authConfig.config),
+                            initialValues: generateInitialValues(authConfig.config),
+                          })
+                        )
+                      }}
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
                       helper={'Learn more about global Auth settings'}
@@ -231,9 +239,10 @@ const SmtpForm = observer(() => {
                       size="small"
                       label="Enable Custom SMTP"
                       layout="flex"
+                      checked={enableSmtp}
                       onChange={() => {
                         resetForm({
-                          values: values,
+                          values: generateInitialValues(authConfig.config),
                           initialValues: generateInitialValues(authConfig.config),
                         })
                         setEnableSmtp(!enableSmtp)
@@ -242,8 +251,9 @@ const SmtpForm = observer(() => {
                     />
                   </FormSectionContent>
                 </FormSection>
-                <div className="border-scale-400 border-t"></div>
+
                 <FormSection
+                  visible={enableSmtp}
                   header={<FormSectionLabel>Sender details</FormSectionLabel>}
                   disabled={!enableSmtp}
                 >
@@ -264,8 +274,9 @@ const SmtpForm = observer(() => {
                     />
                   </FormSectionContent>
                 </FormSection>
-                <div className="border-scale-400 border-t"></div>
+
                 <FormSection
+                  visible={enableSmtp}
                   disabled={!enableSmtp}
                   header={
                     <FormSectionLabel>
