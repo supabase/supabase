@@ -46,8 +46,16 @@
         }
       },
       {
+        "title": "Point in time recovery",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
         "title": "Pausing",
-        "tooltip": "Unused projects that have no activity or API requests will be shut down. They can be reactivated by logging into the dashboard",
+        "tooltip": "Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard",
         "tiers": {
           "free": "Paused after 1 week inactivity",
           "pro": "Never",
@@ -55,11 +63,11 @@
         }
       },
       {
-        "title": "Transfer limits",
+        "title": "Database egress",
         "tooltip": "Good news, only download operations are counted towards the limit",
         "tiers": {
           "free": "Up to 2GB",
-          "pro": "50GB included, then $0.09 per GB",
+          "pro": "50GB included per month, then $0.09 per GB",
           "enterprise": "Unlimited"
         }
       }
@@ -76,6 +84,15 @@
           "free": "Unlimited",
           "pro": "Unlimited",
           "enterprise": "Unlimited"
+        }
+      },
+      {
+        "title": "MAUs",
+        "tooltip": "Monthly Active Users; a user that has made an API request in the last month.",
+        "tiers": {
+          "free": "Up to 50,000 MAUs",
+          "pro": "100,000 included, then $0.00325 per MAU",
+          "enterprise": "1,000,000 included, then $0.00325 per MAU"
         }
       },
       {
@@ -150,7 +167,7 @@
         }
       },
       {
-        "title": "Transfer limits",
+        "title": "Storage egress",
         "tooltip": "Good news, only download operations are counted towards the limit",
         "tiers": {
           "free": "Up to 2 GB",
@@ -168,6 +185,7 @@
       },
       {
         "title": "Max file upload size",
+        "tooltip": "You can change the upload size in the dashboard",
         "tiers": {
           "free": "Up to 50MB",
           "pro": "Up to 5GB",
@@ -183,16 +201,16 @@
       {
         "title": "Runtime hours",
         "tiers": {
-          "free": "100 hours",
-          "pro": "1,000 hours",
+          "free": "100 hours per month",
+          "pro": "1,000 hours per month",
           "enterprise": "Unlimited"
         }
       },
       {
         "title": "Invocations",
         "tiers": {
-          "free": "500K",
-          "pro": "2 Million",
+          "free": "500K per month",
+          "pro": "2 Million per month",
           "enterprise": "Unlimited"
         }
       },
@@ -308,7 +326,7 @@
         "title": "Metrics endpoint",
         "tiers": {
           "free": false,
-          "pro": false,
+          "pro": true,
           "enterprise": true
         }
       },
@@ -338,6 +356,22 @@
       },
       {
         "title": "On Boarding Support",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Designated customer success engineer ",
+        "tiers": {
+          "free": false,
+          "pro": false,
+          "enterprise": true
+        }
+      },
+      {
+        "title": "Security Questionnaire Help",
         "tiers": {
           "free": false,
           "pro": false,

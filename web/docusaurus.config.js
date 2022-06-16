@@ -68,8 +68,8 @@ module.exports = {
         },
         {
           label: 'Reference',
-          to: '/docs/reference/javascript/supabase-client',
-          activeBasePath: '/docs/reference/',
+          to: '/docs/reference',
+          activeBasePath: '/docs/reference',
           position: 'left',
         },
         { href: 'https://app.supabase.com', label: 'Login', position: 'left' },
@@ -204,7 +204,7 @@ module.exports = {
       },
     ],
   ],
-  scripts: [{ src: '/scripts/telemetry.js' }],
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Button, Modal, Menu, IconExternalLink, IconTrash } from '@supabase/ui'
+import { uuidv4 } from 'lib/helpers'
 import { useTrackedState } from '../../../store'
 import { Dictionary, Filter } from '../../../types'
 import { RowItem } from './RowItem'
@@ -30,6 +31,7 @@ export const ForeignTableModal: React.FC<ForeignTableModalProps> = ({
 
     if (defaultValue && columnDefinition) {
       fetchData({
+        id: uuidv4(),
         column: columnDefinition.targetColumnName!,
         operator: '=',
         value: defaultValue,
