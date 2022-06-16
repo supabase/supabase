@@ -26,7 +26,7 @@ const User = () => {
     const {slug, token} = router.query
     const { ui } = useStore()
     const [isSubmitting, setIsSubmitting] = useState( false )
-	const [tokenValidationInfo, setTokenValidationInfo] = useState<tokenInfo>()
+    const [tokenValidationInfo, setTokenValidationInfo] = useState<tokenInfo>()
     const {
         token_does_not_exist,
         email_match,
@@ -38,14 +38,13 @@ const User = () => {
 
     async function fetchTokenInfo() {
         const response = await get( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
-		setTokenValidationInfo(response);
-        console.log({response})
+        setTokenValidationInfo(response);
     }
 
     useEffect(() => {
-		if(router.query.token) {
-			fetchTokenInfo()
-		}
+        if(router.query.token) {
+            fetchTokenInfo()
+        }
     }, [] )
 
 
