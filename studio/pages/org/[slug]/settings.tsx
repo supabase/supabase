@@ -169,6 +169,7 @@ const TabsView = observer(() => {
   const [selectedTab, setSelectedTab] = useState('GENERAL')
 
   const organization = ui.selectedOrganization
+  console.log(toJS(organization))
   const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
 
   // useEffect(() => {
@@ -268,7 +269,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="container my-4 max-w-4xl space-y-8">
+    <article className="container max-w-4xl my-4 space-y-8">
       <SchemaFormPanel
         title="General"
         schema={pluckJsonSchemaFields(organizations, BASIC_FIELDS)}
@@ -352,8 +353,8 @@ const OrgDeleteModal = observer(() => {
         onCancel={toggle}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
-            <span className="text-scale-900 text-xs">Are you sure?</span>
+            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
+            <span className="text-xs text-scale-900">Are you sure?</span>
           </div>
         }
         size="small"
@@ -392,9 +393,9 @@ const OrgDeleteModal = observer(() => {
           }}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
+            <div className="py-3 space-y-4">
               <Modal.Content>
-                <p className="text-scale-900 text-sm">
+                <p className="text-sm text-scale-900">
                   This action <span className="text-scale-1200">cannot</span> be undone. This will
                   permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
                   organization and remove all of its projects.
@@ -467,7 +468,7 @@ const TeamSettings = observer(() => {
 
   return (
     <>
-      <div className="container my-4 max-w-4xl space-y-8">
+      <div className="container max-w-4xl my-4 space-y-8">
         <div className="flex justify-between">
           <MembersFilterInput />
           {PageState.isOrgOwner ? (
@@ -487,7 +488,7 @@ const TeamSettings = observer(() => {
           )}
         </div>
       </div>
-      <div className="container my-4 max-w-4xl space-y-8">
+      <div className="container max-w-4xl my-4 space-y-8">
         <MembersView />
       </div>
     </>
@@ -535,11 +536,11 @@ const MembersView = observer(() => {
                   <div className="flex items-center space-x-4">
                     <div>
                       {x.invited_id ?
-                        ( <span className='border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2'><IconUser size={18} strokeWidth={2} /></span> )
+                        ( <span className='flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark'><IconUser size={18} strokeWidth={2} /></span> )
                         : ( <img
                               src={`https://github.com/${x.profile?.username}.png?size=80`}
                               width="40"
-                              className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                              className="border rounded-full border-border-secondary-light dark:border-border-secondary-dark"
                             />
                         )}
 
