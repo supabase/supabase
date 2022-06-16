@@ -513,7 +513,7 @@ const MembersView = observer(() => {
 
                     </div>
                     <div>
-                    {x.profile?.username && (
+                    {x.profile?.username && !x.invited_id && (
                       <>
                         <Typography.Text>{x.profile?.username}</Typography.Text>
                         <br />
