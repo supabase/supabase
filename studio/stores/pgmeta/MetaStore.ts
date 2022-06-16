@@ -61,6 +61,8 @@ export interface IMetaStore {
   publications: IPublicationStore
   types: IPostgresMetaInterface<any>
 
+  projectRef?: string
+
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
   formatQuery: (value: string) => Promise<any | { error: ResponseError }>
@@ -118,6 +120,7 @@ export default class MetaStore implements IMetaStore {
   publications: PublicationStore
   types: TypesStore
 
+  projectRef?: string
   connectionString?: string
   baseUrl: string
   excludedSchemas = [
@@ -136,6 +139,7 @@ export default class MetaStore implements IMetaStore {
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
+    this.projectRef = projectRef
     this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}

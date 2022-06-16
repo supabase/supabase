@@ -1,4 +1,5 @@
 import { Modal, Button, Space } from '@supabase/ui'
+import { MouseEventHandler } from 'react'
 import { FC, useState, useEffect } from 'react'
 
 interface Props {
@@ -34,7 +35,9 @@ const ConfirmationModal: FC<Props> = ({
 
   const [loading, setLoading] = useState(false)
 
-  const onConfirm = () => {
+  const onConfirm: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     setLoading(true)
     onSelectConfirm()
   }
@@ -48,7 +51,7 @@ const ConfirmationModal: FC<Props> = ({
       size={size}
       onCancel={onSelectCancel}
       customFooter={
-        <div className="flex items-center w-full space-x-3">
+        <div className="flex w-full items-center space-x-3">
           <Button block type="secondary" onClick={onSelectCancel}>
             Cancel
           </Button>

@@ -31,7 +31,9 @@ const PolicyEditor: FC<Props> = ({
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
   const check = policyFormFields?.check ?? ''
-  const selectedRoles = policyFormFields?.roles ?? []
+
+  // Filter out default public role (public if no roles selected)
+  const selectedRoles = (policyFormFields?.roles ?? []).filter((role: string) => role !== 'public')
 
   return (
     <div className="">
