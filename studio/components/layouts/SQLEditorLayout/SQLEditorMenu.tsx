@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import {
   Button,
@@ -12,19 +11,16 @@ import {
   IconLoader,
   IconTrash,
   IconChevronDown,
-  Loading,
   Modal,
   IconEdit2,
 } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
-import { useStore } from 'hooks'
-import { useProjectContentStore } from 'stores/projectContentStore'
+import { useOptimisticSqlSnippetCreate, useStore } from 'hooks'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
-import { createSqlSnippet } from 'components/to-be-cleaned/SqlEditor/SqlEditor.utils'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
@@ -46,11 +42,12 @@ const OpenQueryItem = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const {
+    ui: { profile: user },
+    content: contentStore,
+  } = useStore()
 
   const sqlEditorStore: any = useSqlStore()
-  const contentStore: any = useProjectContentStore(ref)
 
   const [tabId, setTabId] = useState('')
   const [renameModalOpen, setRenameModalOpen] = useState(false)
@@ -109,9 +106,14 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         buttonLabel="Confirm"
         visible={deleteModalOpen}
         onSelectConfirm={async () => {
-          await contentStore.del(id)
-          await contentStore.load()
           sqlEditorStore.closeTab(id)
+
+          await contentStore.del(id)
+
+          sqlEditorStore.loadTabs(
+            sqlEditorStore.tabsFromContentStore(contentStore, user?.id),
+            false
+          )
         }}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
@@ -124,39 +126,11 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const SideBarContent = observer(() => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { ui } = useStore()
-  const { profile: user } = ui
-
   const sqlEditorStore: any = useSqlStore()
-  const contentStore: any = useProjectContentStore(ref)
 
   const [filterString, setFilterString] = useState('')
-  const [loadingNewQuery, setLoadingNewQuery] = useState(false)
 
-  async function handleNewQuery() {
-    try {
-      setLoadingNewQuery(true)
-      // create new sql snippet, this also reloads the project_content store
-      // @ts-ignore
-      const snippet = await createSqlSnippet({ router })
-
-      // reload the local sqlEditorStore
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user?.id)
-
-      // select tab with new snippet
-      if (snippet) sqlEditorStore.selectTab(snippet.id)
-      setLoadingNewQuery(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
-      setLoadingNewQuery(false)
-    }
-  }
+  const handleNewQuery = useOptimisticSqlSnippetCreate()
 
   const getStartedTabs = (sqlEditorStore?.tabs ?? []).filter((tab: any) => {
     return tab.type === TAB_TYPES.WELCOME
@@ -191,7 +165,6 @@ const SideBarContent = observer(() => {
               type="default"
               style={{ justifyContent: 'start' }}
               onClick={() => handleNewQuery()}
-              loading={loadingNewQuery}
             >
               New query
             </Button>
@@ -237,37 +210,35 @@ const SideBarContent = observer(() => {
                 })}
               </div>
             )}
-            <Loading active={contentStore.isInitialized}>
-              <div className="space-y-6 px-3">
-                {favouriteTabs.length >= 1 && (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Favorites" />
-                    <div className="space-y-1">
-                      {favouriteTabs.map((tabInfo: any) => {
-                        const { id } = tabInfo || {}
-                        return <OpenQueryItem key={id} tabInfo={tabInfo} />
-                      })}
-                    </div>
+            <div className="space-y-6 px-3">
+              {favouriteTabs.length >= 1 && (
+                <div className="editor-product-menu">
+                  <Menu.Group title="Favorites" />
+                  <div className="space-y-1">
+                    {favouriteTabs.map((tabInfo: any) => {
+                      const { id } = tabInfo || {}
+                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                    })}
                   </div>
-                )}
-                {queryTabs.length >= 1 && (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="SQL snippets" />
-                    <div className="space-y-1">
-                      {queryTabs.map((tabInfo: any) => {
-                        const { id } = tabInfo || {}
-                        return <OpenQueryItem key={id} tabInfo={tabInfo} />
-                      })}
-                    </div>
+                </div>
+              )}
+              {queryTabs.length >= 1 && (
+                <div className="editor-product-menu">
+                  <Menu.Group title="SQL snippets" />
+                  <div className="space-y-1">
+                    {queryTabs.map((tabInfo: any) => {
+                      const { id } = tabInfo || {}
+                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                    })}
                   </div>
-                )}
-                {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
-                  <div className="px-4">
-                    <p className="text-sm">No queries found</p>
-                  </div>
-                )}
-              </div>
-            </Loading>
+                </div>
+              )}
+              {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
+                <div className="px-4">
+                  <p className="text-sm">No queries found</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </Menu>

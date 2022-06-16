@@ -29,11 +29,11 @@ We're sure that once you start using Postgres, you'll love it more than any othe
 
 ### Do you support `[some other database]`?
 
-We only support PostgreSQL. It's unlikely we'll ever move away from Postgres; however, you can [vote on a new database](https://github.com/supabase/supabase/issues/6) if you want us to start development.
+We only support PostgreSQL. It's unlikely we'll ever move away from Postgres; however, you can [vote on a new database](https://github.com/supabase/supabase/discussions/6) if you want us to start development.
 
 ### Do you have a library for `[some other language]`?
 
 We officially support [JavaScript](/docs/reference/javascript/supabase-client) and [Dart](/docs/reference/dart/installing). 
 
-You can find community-supported libraries in our [GitHub Community](https://github.com/supabase-community), and you can also help us to identify the most popular languages by [voting for a new client library](https://github.com/supabase/supabase/issues/5).
+You can find community-supported libraries in our [GitHub Community](https://github.com/supabase-community), and you can also help us to identify the most popular languages by [voting for a new client library](https://github.com/supabase/supabase/discussions/5).
 

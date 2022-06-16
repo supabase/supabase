@@ -1,7 +1,7 @@
 import { FC, Fragment, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button, IconBell, Popover } from '@supabase/ui'
-import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
+import { Notification, NotificationStatus, ActionType } from '@supabase/shared-types/out/notifications'
 
 import { Project } from 'types'
 import { useNotifications, useStore } from 'hooks'
@@ -44,12 +44,21 @@ const NotificationsPopover: FC<Props> = () => {
     if (!projectToRestart || !targetNotification) return
 
     const { id } = targetNotification
+
     const { id: projectId, ref, region } = projectToRestart
+    const serviceNamesByActionName: Record<string, string> = {
+      [ActionType.PgBouncerRestart]: 'pgbouncer',
+      [ActionType.SchedulePostgresRestart]: 'postgresql'
+    }
+    const services: string[] = targetNotification.meta.actions_available
+      .map((action) => action.action_type)
+      .filter((actionName) => Object.keys(serviceNamesByActionName).indexOf(actionName) !== -1)
+      .map((actionName) => serviceNamesByActionName[actionName])
     const { error } = await post(`${API_URL}/projects/${ref}/restart-services`, {
       restartRequest: {
         region,
         source_notification_id: id,
-        services: ['postgresql'],
+        services: services,
       },
     })
 
@@ -61,7 +70,7 @@ const NotificationsPopover: FC<Props> = () => {
       })
     } else {
       app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
-      ui.setNotification({ category: 'success', message: `Restarting project` })
+      ui.setNotification({ category: 'success', message: `Restarting services` })
       router.push(`/project/${ref}`)
     }
 
