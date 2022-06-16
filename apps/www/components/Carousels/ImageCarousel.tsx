@@ -1,5 +1,5 @@
+import { Button, IconCornerRightUp, Tabs } from '@supabase/ui'
 import { useRouter } from 'next/router'
-import { Tabs, Button, IconCornerRightUp, IconArrowUpRight } from '@supabase/ui'
 import { useState } from 'react'
 
 // Import Swiper React components
@@ -8,19 +8,18 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
-import ImageCarouselStyles from './ImageCarousel.module.css'
-import Link from 'next/link'
 import Image from 'next/image'
 import TextLink from '../TextLink'
+import ImageCarouselStyles from './ImageCarousel.module.css'
 
 interface Content {
   title: string
   label?: string
   img_url?: string
-  video_url?: string
   text?: string
   cta?: string
   url?: string
+  youtube_id?: string
 }
 
 interface ImageCarouselProps {
@@ -116,16 +115,17 @@ function ImageCarousel(props: ImageCarouselProps) {
                         height="960"
                       />
                     )}
-                    {content.video_url && (
-                      <video
-                        src={`${basePath}/${content.video_url}`}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                      >
-                        Your browser does not support the video tag
-                      </video>
+                    {content.youtube_id && (
+                      <div className="relative w-full" style={{ padding: '56.25% 0 0 0' }}>
+                        <iframe
+                          title="Demo video showcasing Supabase"
+                          className="absolute h-full w-full rounded-b-md"
+                          src={`https://www.youtube-nocookie.com/embed/${content.youtube_id}?playlist=${content.youtube_id}&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1`}
+                          style={{ top: 0, left: 0 }}
+                          frameBorder="0"
+                          allow="autoplay; modestbranding; encrypted-media"
+                        />
+                      </div>
                     )}
                   </SwiperSlide>
                 )
