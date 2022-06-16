@@ -1,12 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { useOrganizationDetail, useProfile, useStore, withAuth } from 'hooks'
-import { AccountLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
-import { toJS } from 'mobx'
+import { useStore, withAuth } from 'hooks'
 import { Button, Typography } from '@supabase/ui';
 import { useState } from 'react';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
@@ -47,7 +44,6 @@ const User = () => {
         }
     }, [] )
 
-
     async function handleJoinOrganization() {
         setIsSubmitting( true )
         const response = await post( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
@@ -65,7 +61,6 @@ const User = () => {
 
     async function handleDeclineJoinOrganization() {
         setIsSubmitting( true )
-        // http://localhost:8080/platform/organizations/:slug/members/invite?token=token
         const response = await delete_(`${API_URL}/organizations/${slug}/members/invite?invited_id=${invite_id}`, {})
         if ( response.error ) {
             ui.setNotification( {
