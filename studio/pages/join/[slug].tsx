@@ -110,8 +110,12 @@ const User = () => {
                     </div>
                 )}
 
+                {!tokenValidationInfo && (
+                    <div className='pt-4 mt-4 border-t'>That invite token is invalid.</div>
+                )}
+
                 {tokenValidationInfo && !email_match && (
-                    <div className='pt-4 mt-4 border-t'>Sign to that account to accept this invitation.</div>
+                    <div className='pt-4 mt-4 border-t'>Sign in to that account to accept this invitation.</div>
                 )}
 
                 {expired_token || token_does_not_exist && (
