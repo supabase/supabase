@@ -172,35 +172,6 @@ const TabsView = observer(() => {
   console.log(toJS(organization))
   const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
 
-  // useEffect(() => {
-  //   if (window.location.hash) {
-  //     console.log('has hash')
-  //     changeTab(window.location.hash.slice(1).toUpperCase());
-  //     console.log(window.location.hash.slice(1).toUpperCase())
-  //   }
-  // },[])
-
-  // function onHashChangeStart() {
-  //   console.log('route changed')
-  //   changeTab(window.location.hash);
-  // }
-
-//   useEffect(() => {
-//     const onHashChangeStart = () => {
-//         console.log(`Path changing`);
-//     };
-
-//     router.events.on("hashChangeStart", onHashChangeStart);
-
-//     return () => {
-//         router.events.off("hashChangeStart", onHashChangeStart);
-//     };
-// }, [router.events]);
-
-  // function changeTab(id: any) {
-  //   //router.push(`/org/${toJS(PageState.organization.slug)}/settings#${id.toLowerCase()}`)
-  // }
-
   return (
     <>
       <div className="space-y-3">
