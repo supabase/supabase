@@ -21,7 +21,8 @@ export function useOrganizationDetail(slug: string) {
         invited_at: x.invited_at,
         invited_id: x.invited_id,
         profile: {
-          username: '',
+          // Use the first letter of the email to allow for member list sorting
+          username: x.invited_email.slice(0,1),
           primary_email: x.invited_email
         }
       }
