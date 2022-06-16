@@ -79,8 +79,7 @@ const OrgSettingsLayout = withAuth(
             return x.invited_email.includes(this.membersFilterString)
           }
         })
-        //return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
-        return temp
+        return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
       },
       initData(organization: any, user: any, projects: any) {
         this.organization = organization
