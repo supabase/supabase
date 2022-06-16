@@ -29,6 +29,13 @@ const components = {
     return <CodeBlock {...props} />
   },
   ImageGrid,
+  img: (props: any) => {
+    return (
+      <div className="next-image--dynamic-fill">
+        <Image {...props} layout="fill" className="custom-img" />
+      </div>
+    )
+  },
 }
 
 // plugins for next-mdx-remote
