@@ -223,3 +223,22 @@ table {
 .sbui-typography a {
   @apply break-words;
 }
+
+/*
+* sets the image in @Next/Image components
+* to respect the height of the content
+*
+*/
+.next-image--dynamic-fill {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+.next-image--dynamic-fill > span {
+  position: relative !important;
+}
+.next-image--dynamic-fill img {
+  object-fit: contain;
+  width: 100% !important;
+  position: relative !important;
+  height: unset !important;
+}
