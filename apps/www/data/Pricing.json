@@ -151,14 +151,6 @@
           "pro": "100 / hour",
           "enterprise": "Contact Us"
         }
-      },
-      {
-        "title": "Advanced security features",
-        "tiers": {
-          "free": false,
-          "pro": false,
-          "enterprise": "Contact Us"
-        }
       }
     ]
   },
