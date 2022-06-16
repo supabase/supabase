@@ -1,32 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import DataGrid from '@supabase/react-data-grid'
 import Split from 'react-split'
+import Editor from '@monaco-editor/react'
+import DataGrid from '@supabase/react-data-grid'
+import { toJS } from 'mobx'
 import { CSVLink } from 'react-csv'
+import { debounce } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
-  IconHeart,
+  Dropdown,
+  IconAlertCircle,
+  IconCheck,
   IconChevronDown,
   IconChevronUp,
+  IconHeart,
+  IconLoader,
+  IconRefreshCcw,
   Typography,
-  Dropdown,
 } from '@supabase/ui'
-import Editor from '@monaco-editor/react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { copyToClipboard, timeout } from 'lib/helpers'
+import { useKeyboardShortcuts, useStore, useWindowDimensions, usePrevious } from 'hooks'
+import Telemetry from 'lib/telemetry'
 import { IS_PLATFORM } from 'lib/constants'
+import { copyToClipboard, timeout } from 'lib/helpers'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-import { useProjectContentStore } from 'stores/projectContentStore'
-
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
-import Telemetry from 'lib/telemetry'
-import { useStore } from 'hooks'
-import { debounce } from 'lodash'
-import { useWindowDimensions, useKeyboardShortcuts } from 'hooks'
-
 const TabSqlQuery = observer(() => {
+  const { content: contentStore } = useStore()
   const sqlEditorStore = useSqlStore()
   const { height: screenHeight } = useWindowDimensions()
   const snapOffset = 50
@@ -49,8 +51,23 @@ const TabSqlQuery = observer(() => {
     sqlEditorStore.activeTab.setSplitSizes(sizes)
   }
 
+  async function updateSqlSnippet(value) {
+    if (sqlEditorStore.activeTab) {
+      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
+        content: {
+          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
+          content_id: sqlEditorStore.activeTab.id,
+          sql: value,
+          favorite: sqlEditorStore.activeTab.favorite,
+        },
+      })
+    } else {
+      console.warn('No active tab found while updating SQL snippet')
+    }
+  }
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <Split
         style={{ height: '100%' }}
         direction="vertical"
@@ -62,9 +79,12 @@ const TabSqlQuery = observer(() => {
         collapsed={sqlEditorStore.activeTab.utilityTabHeight == 0 ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
-        <MonacoEditor error={sqlEditorStore.activeTab.sqlQueryError} />
+        <MonacoEditor
+          error={sqlEditorStore.activeTab.sqlQueryError}
+          updateSqlSnippet={updateSqlSnippet}
+        />
         <div>
-          <UtilityPanel />
+          <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
         </div>
       </Split>
     </div>
@@ -72,12 +92,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error }) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const contentStore = useProjectContentStore(ref)
-
+const MonacoEditor = ({ error, updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -154,6 +169,9 @@ const MonacoEditor = ({ error }) => {
     editor?.focus()
   }
 
+  // changes are stored in debouncer before running persistData()
+  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
+
   async function handleEditorChange(value) {
     // update sqlEditorStore with new value immediately
     // this is so any SQL run will be whatever is currently in monaco editor
@@ -163,29 +181,8 @@ const MonacoEditor = ({ error }) => {
     debounceUpdateSqlSnippet(value)
   }
 
-  // changes are stored in debouncer before running persistData()
-  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
-
-  async function updateSqlSnippet(value) {
-    //
-    // this will need to be refactored but for now
-    // we still use the old sqlEditorStore to handle db updates
-    if (sqlEditorStore.activeTab) {
-      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
-        content: {
-          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
-          content_id: sqlEditorStore.activeTab.id,
-          sql: value,
-          favorite: sqlEditorStore.activeTab.favorite,
-        },
-      })
-    } else {
-      console.warn('No active tab found while updating SQL snippet')
-    }
-  }
-
   return (
-    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
+    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -208,15 +205,15 @@ const MonacoEditor = ({ error }) => {
   )
 }
 
-const UtilityPanel = observer(() => {
+const UtilityPanel = observer(({ updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
 
   return (
     <>
       <div className="flex justify-between overflow-visible px-6 py-2">
         <ResultsDropdown />
-        <div className="inline-flex justify-end">
-          <UtilityActions />
+        <div className="inline-flex items-center justify-end">
+          <UtilityActions updateSqlSnippet={updateSqlSnippet} />
         </div>
       </div>
       <div className="p-0 pt-0 pb-0">
@@ -271,7 +268,101 @@ const ResultsDropdown = observer(() => {
   )
 })
 
-const UtilityActions = observer(() => {
+const SavingIndicator = observer(({ updateSqlSnippet }) => {
+  const { content } = useStore()
+  const sqlEditorStore = useSqlStore()
+  const previousState = usePrevious(content.savingState)
+  const [showSavedText, setShowSavedText] = useState(false)
+
+  useEffect(() => {
+    let cancel = false
+
+    if (
+      (previousState === 'CREATING' || previousState === 'UPDATING') &&
+      content.savingState === 'IDLE'
+    ) {
+      setShowSavedText(true)
+      setTimeout(() => {
+        if (!cancel) setShowSavedText(false)
+      }, 3000)
+    }
+
+    return () => (cancel = true)
+  }, [content.savingState])
+
+  const retry = () => {
+    const [item] = content.list((item) => item.id === sqlEditorStore.selectedTabId)
+
+    if (content.savingState === 'CREATING_FAILED' && item) {
+      content.save(toJS(item))
+    }
+
+    if (content.savingState === 'UPDATING_FAILED' && item) {
+      updateSqlSnippet(sqlEditorStore.activeTab.query)
+    }
+  }
+
+  return (
+    <div className="mx-2 flex items-center gap-2">
+      {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
+        <Button
+          type="text"
+          size="tiny"
+          shadow={false}
+          icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
+          onClick={retry}
+        >
+          Retry
+        </Button>
+      )}
+      {(content.savingState === 'CREATING' || content.savingState === 'UPDATING') && (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">Saving changes...</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      )}
+      {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
+        <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
+      )}
+      {showSavedText && (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconCheck className="text-brand-800" size={14} strokeWidth={3} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border ',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">All changes saved</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      )}
+      <span className="text-scale-1000 text-sm">
+        {content.savingState === 'CREATING_FAILED' && 'Failed to create'}
+        {content.savingState === 'UPDATING_FAILED' && 'Failed to save'}
+      </span>
+    </div>
+  )
+})
+
+const UtilityActions = observer(({ updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
 
   useKeyboardShortcuts(
@@ -291,6 +382,7 @@ const UtilityActions = observer(() => {
 
   return (
     <>
+      <SavingIndicator updateSqlSnippet={updateSqlSnippet} />
       {IS_PLATFORM && <FavoriteButton />}
       <SizeToggleButton />
       <Button
@@ -352,14 +444,10 @@ const SizeToggleButton = observer(() => {
 })
 
 const FavoriteButton = observer(() => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { ui } = useStore()
+  const { ui, content: contentStore } = useStore()
   const { profile: user } = ui
 
   const sqlEditorStore = useSqlStore()
-  const contentStore = useProjectContentStore(ref)
 
   const [loading, setLoading] = useState(false)
 
@@ -397,8 +485,9 @@ const FavoriteButton = observer(() => {
       /*
        * reload sql data in store and re-select tab
        */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
       sqlEditorStore.selectTab(id)
+
       setLoading(false)
     } catch (error) {
       ui.setNotification({
@@ -434,7 +523,7 @@ const FavoriteButton = observer(() => {
       /*
        * reload sql data in store and re-select tab
        */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
+      sqlEditorStore.loadTabs(sqlEditorStore.tabsFromContentStore(contentStore, user?.id), false)
       sqlEditorStore.selectTab(id)
       setLoading(false)
     } catch (error) {
@@ -479,14 +568,14 @@ const UtilityTabResults = observer(() => {
   if (sqlEditorStore.activeTab.isExecuting) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 border-0 font-mono text-sm">Running...</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.errorResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text>
-          <p className="px-6 py-4 m-0 border-0 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
         </Typography.Text>
       </div>
     )
@@ -494,7 +583,7 @@ const UtilityTabResults = observer(() => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text type="secondary">
-          <p className="px-6 py-4 m-0 border-0 ">
+          <p className="m-0 border-0 px-6 py-4 ">
             Click <Typography.Text code>RUN</Typography.Text> to execute your query.
           </p>
         </Typography.Text>
@@ -530,7 +619,7 @@ const Results = ({ results }) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <Typography.Text type="danger">
-          <p className="px-6 py-4 m-0 font-mono border-0"> {`ERROR: ${results.error}`}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono"> {`ERROR: ${results.error}`}</p>
         </Typography.Text>
       </div>
     )
@@ -538,7 +627,7 @@ const Results = ({ results }) => {
   if (!results.length) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 font-mono border-0 text-sm">Success. No rows returned</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
       </div>
     )
   }
@@ -547,7 +636,7 @@ const Results = ({ results }) => {
     return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
   }
   const columnRender = (name) => {
-    return <div className="flex items-center justify-center font-mono h-full">{name}</div>
+    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
   const columns = Object.keys(results[0]).map((key) => ({
     key,
