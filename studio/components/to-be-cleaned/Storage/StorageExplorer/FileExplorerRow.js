@@ -119,7 +119,7 @@ const FileExplorerRow = ({
             <input
               autoFocus
               ref={inputRef}
-              className="storage-row-input text-sm ml-3 p-0 px-1 h-full"
+              className="storage-row-input text-sm ml-3 p-0 px-1 h-full bg-inherit"
               type="text"
               value={itemName}
               onChange={(event) => setItemName(event.target.value)}

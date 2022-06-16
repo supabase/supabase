@@ -8,13 +8,15 @@ import { Typography } from '@supabase/ui'
 interface Props {
   passwordStrengthScore: number
   passwordStrengthMessage: string
-  password: string
+  password: string,
+  generateStrongPassword: () => void
 }
 
 const PasswordStrengthBar = ({
   passwordStrengthScore = 0,
   passwordStrengthMessage = '',
   password = '',
+  generateStrongPassword
 }: Props) => {
   return (
     <>
@@ -25,7 +27,7 @@ const PasswordStrengthBar = ({
           aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           role="progressbar"
-          className="mb-2 bg-bg-alt-light dark:bg-bg-alt-dark rounded overflow-hidden transition-all border dark:border-dark"
+          className="mb-2 overflow-hidden transition-all border rounded bg-bg-alt-light dark:bg-bg-alt-dark dark:border-dark"
         >
           <div
             style={{
@@ -45,6 +47,9 @@ const PasswordStrengthBar = ({
         {passwordStrengthMessage
           ? passwordStrengthMessage
           : 'This is the password to your postgres database, so it must be a strong password and hard to guess.'}
+          {' '} <button className='underline hover:decoration-2' onClick={generateStrongPassword}>
+            Generate a password
+          </button>
       </Typography.Text>
     </>
   )
