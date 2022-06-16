@@ -3,6 +3,8 @@ import { FC, FormEvent, useState } from 'react'
 import { useRouter } from 'next/router'
 import { IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
 
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore, useFlag } from 'hooks'
 import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -16,14 +18,12 @@ import {
   getTimezoneOffsetText,
   convertTimeStringtoUnixMs,
 } from './PITRBackupSelection.utils'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 
 interface Props {}
 
 const PITRBackupSelection: FC<Props> = () => {
   const router = useRouter()
-  const { ui, backups } = useStore()
+  const { app, ui, backups } = useStore()
   const isAvailable = useFlag('pitrBackups')
 
   if (!isAvailable) {
@@ -42,6 +42,7 @@ const PITRBackupSelection: FC<Props> = () => {
   const [recoveryPoint, setRecoveryPoint] = useState<string>()
 
   const { configuration } = backups
+  const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
 
   if (backups.isLoading) {
@@ -123,6 +124,7 @@ const PITRBackupSelection: FC<Props> = () => {
       }).then(() => {
         setTimeout(() => {
           setShowConfirmation(false)
+          app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'success',
             message: `Restoring database back to ${dayjs(recoveryPoint).format(
@@ -130,7 +132,7 @@ const PITRBackupSelection: FC<Props> = () => {
             )} (
             ${getTimezoneOffsetText(selectedTimezone)})`,
           })
-          router.push('/project/[id]', `/project/${projectRef}`)
+          router.push(`/project/${projectRef}`)
         }, 3000)
       })
     } catch (error) {
