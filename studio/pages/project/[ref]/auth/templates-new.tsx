@@ -1,4 +1,4 @@
-import { SmtpForm } from 'components/interfaces'
+import { EmailTemplates, SmtpForm } from 'components/interfaces'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import { useStore } from 'hooks'
@@ -16,8 +16,9 @@ const PageLayout: NextPageWithLayout = () => {
 
   if (authConfig) {
     return (
-      <FormsContainer>
+      <FormsContainer header="Email">
         <SmtpForm />
+        <EmailTemplates />
       </FormsContainer>
     )
   }
