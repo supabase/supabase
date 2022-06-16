@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Loading, Button } from '@supabase/ui'
 
 import { formatBytes } from 'lib/helpers'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { useStore, useFlag } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
@@ -38,9 +38,10 @@ const Subscription: FC<Props> = ({
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
-
   const basePlanCost = subscription?.tier.unit_amount / 100
 
   const deriveTotalCost = (): number => {
@@ -63,13 +64,25 @@ const Subscription: FC<Props> = ({
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
             <div className="flex flex-col items-end space-y-2">
-              <Button
-                disabled={!isOrgOwner || projectUpdateDisabled}
-                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
-                type="primary"
-              >
-                Change subscription
-              </Button>
+              {isEnterprise ? (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() =>
+                    router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
+                  }
+                  type="primary"
+                >
+                  Change add-ons
+                </Button>
+              ) : (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                  type="primary"
+                >
+                  Change subscription
+                </Button>
+              )}
               {!isOrgOwner ? (
                 <p className="text-scale-1100 text-xs">
                   Only the organization owner can amend subscriptions

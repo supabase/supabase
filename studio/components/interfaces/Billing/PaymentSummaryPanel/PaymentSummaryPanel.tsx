@@ -11,7 +11,7 @@ import {
 } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -61,12 +61,19 @@ const PaymentSummaryPanel: FC<Props> = ({
   const projectRegion = ui.selectedProject?.region
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
-    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
+    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG &&
+      selectedPlan &&
+      currentPlan.prod_id !== selectedPlan.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
-  const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
+
+  // If it's enterprise we only only changing of add-ons
+  const hasChangesToPlan = isEnterprise
+    ? isChangingComputeSize
+    : subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
     if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {

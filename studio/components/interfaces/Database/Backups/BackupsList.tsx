@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import Loading from 'components/ui/Loading'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 import BackupItem from './BackupItem'
 import BackupsError from './BackupsError'
