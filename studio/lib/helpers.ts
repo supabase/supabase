@@ -1,3 +1,4 @@
+import { v4 as _uuidV4 } from 'uuid'
 import { post } from 'lib/common/fetch'
 import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
 
@@ -32,14 +33,8 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
-// https://stackoverflow.com/a/2117523
-// a "good enough" unique ID that typescript is happy with, and doesn't have external dependencies
 export const uuidv4 = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
+  return _uuidV4()
 }
 
 export const timeout = (ms: number) => {
