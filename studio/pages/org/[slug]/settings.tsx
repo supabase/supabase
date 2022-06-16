@@ -94,7 +94,7 @@ const OrgSettingsLayout = withAuth(
         app.onOrgDeleted(this.organization)
       },
     }))
-    console.log('pagestate', toJS(PageState))
+    //console.log('pagestate', toJS(PageState))
     useEffect(() => {
       // User added a new payment method
       if (router.query.setup_intent && router.query.redirect_status) {
@@ -251,7 +251,7 @@ const GeneralSettings = observer(() => {
   // remove warning null value for controlled input
   if (!formModel.billing_email) formModel.billing_email = ''
   const BASIC_FIELDS = ['name', 'billing_email']
-  console.log(organizations)
+  //console.log(organizations)
 
   const handleUpdateOrg = async (model: any) => {
     const response = await patch(`${API_URL}/organizations/${PageState.organization.slug}`, model)
@@ -530,24 +530,24 @@ const MembersView = observer(() => {
           body={[
             PageState.filteredMembers.map((x: any) => (
               <Table.tr key={x.id}>
+                {/* {console.log({x})} */}
                 <Table.td>
                   <div className="flex items-center space-x-4">
                     <div>
                       {x.invited_id ?
                         ( <span className='border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2'><IconUser size={18} strokeWidth={2} /></span> )
-                        : (
-                          <img
-                            src={`https://github.com/${x.profile.username}.png?size=80`}
-                            width="40"
-                            className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
-                          />
+                        : ( <img
+                              src={`https://github.com/${x.profile?.username}.png?size=80`}
+                              width="40"
+                              className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                            />
                         )}
 
                     </div>
                     <div>
-                    {x.profile.username && (
+                    {x.profile?.username && (
                       <>
-                        <Typography.Text>{x.profile.username}</Typography.Text>
+                        <Typography.Text>{x.profile?.username}</Typography.Text>
                         <br />
                       </>
                     ) }
@@ -570,7 +570,7 @@ const MembersView = observer(() => {
                   </Typography.Text>
                 </Table.td>
                 <Table.td>
-                  {console.log('x', toJS(x))}
+                  {/* {console.log('x', toJS(x))} */}
                   {PageState.isOrgOwner && !x.is_owner && (
                     // @ts-ignore
                     <OwnerDropdown members={PageState.members} member={x} />
@@ -666,7 +666,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
   }
 
   async function handleResendInvite(id: number) {
-    console.log('invite id', id);
+    // console.log('invite id', id);
     setLoading(true)
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`, {})
