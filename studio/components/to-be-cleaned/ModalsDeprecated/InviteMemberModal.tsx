@@ -9,6 +9,26 @@ import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore } from 'hooks'
 import { toJS } from 'mobx'
 
+
+
+/**
+ * Endpoints (delete when finished)
+ *
+ * Delete invite
+ * curl -X DELETE "http://localhost:8080/platform/organizations/:slug/members/invite?invited_id=:id" -H "Authorization: Bearer access_token_jwt"
+ *
+ * Get all pending invites
+ * curl -X GET "http://localhost:8080/platform/organizations/:slug/members/invite" -H "Authorization: Bearer access_token_jwt"
+ *
+ * Send an invitation
+ * curl -X POST "http://localhost:8080/platform/organizations/slug/members/invite" -H "Content-Type: application/json" -d '{"invited_email": "", "owner_id": ""}' -H "Authorization: Bearer ..."
+ *
+ * Verify an invitation
+ * curl -X GET 'http://localhost:8080/platform/organizations/slug/members/join?token=XXX'
+ *
+ */
+
+
 /**
  * Modal to invite member to Organization
  *
@@ -66,9 +86,9 @@ function InviteMemberModal({ organization, members = [], user }: any) {
       PageState.addMemberLoading = false
     } else {
       const newMember = response
-      mutateOrgMembers([...PageState.members, newMember], false)
+      mutateOrgMembers([...PageState.members, newMember])
+      ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
       toggle()
-      ui.setNotification({ category: 'success', message: 'Successfully added new member' })
     }
   }
 
