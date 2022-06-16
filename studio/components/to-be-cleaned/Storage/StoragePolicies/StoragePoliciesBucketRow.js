@@ -9,7 +9,7 @@ import {
   IconMoreVertical,
 } from '@supabase/ui'
 import { isEmpty } from 'lodash'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 const PolicyRow = ({
   policy,
