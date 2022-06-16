@@ -33,7 +33,8 @@ const User = () => {
         authorized_user,
         expired_token,
         organization_name,
-        invite_id } = tokenValidationInfo || {}
+        invite_id
+    } = tokenValidationInfo || {}
 
     async function fetchTokenInfo() {
         const response = await get( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
