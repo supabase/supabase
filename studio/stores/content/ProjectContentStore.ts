@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx'
 import { keyBy } from 'lodash'
 
+import { uuidv4 } from 'lib/helpers'
 import { get, post, patch, delete_ } from 'lib/common/fetch'
 import { LogSqlSnippets, UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
@@ -14,15 +15,22 @@ export interface IProjectContentStore {
   isLoading: boolean
   isInitialized: boolean
   isLoaded: boolean
+  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
   error: any
   recentLogSqlSnippets: LogSqlSnippets.Content[]
 
   baseUrl: string
   projectRef?: string
 
-  load: () => void
+  load: () => Promise<UserContentMap | undefined>
   loadPersistentData: () => Promise<void>
-  create: (x: UserContent) => { data: UserContent; error: { error: { message: string } } }
+  save: (
+    content: UserContent
+  ) => Promise<{ data: UserContent; error: null } | { data: null; error: { message: string } }>
+  create: (
+    content: UserContent
+  ) => Promise<{ data: UserContent; error: null } | { data: null; error: { message: string } }>
+  createOptimistically: (content: UserContent) => { data: UserContent; error: null }
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
@@ -30,6 +38,23 @@ export interface IProjectContentStore {
   addRecentLogSqlSnippet: (snippet: Partial<LogSqlSnippets.Content>) => void
   clearRecentLogSqlSnippets: () => void
   setProjectRef: (ref?: string) => void
+  update: (
+    id: any,
+    updates: any,
+    type: UserContent['type']
+  ) => Promise<
+    | {
+        data: UserContent
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  >
+
+  del(id: any): Promise<{ data: boolean; error: unknown }>
+  delOptimistically(id: string): { data: boolean; error: null }
 }
 
 export default class ProjectContentStore implements IProjectContentStore {
@@ -51,6 +76,7 @@ export default class ProjectContentStore implements IProjectContentStore {
   recentLogSqlSnippets: LogSqlSnippets.Content[] = []
 
   state = this.STATES.INITIAL
+  savingState: 'IDLE' | 'CREATING' | 'CREATING_FAILED' | 'UPDATING' | 'UPDATING_FAILED'
   error = null
 
   constructor(rootStore: IRootStore, options: { projectRef: string }) {
@@ -61,6 +87,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     this.recentLogSqlKey = `${this.localStorageKey}-recent-log-sql`
     this.loadPersistentData()
     this.baseUrl = ``
+    this.savingState = 'IDLE'
     makeAutoObservable(this)
   }
 
@@ -84,7 +111,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     if (response.error) {
       throw response.error
     }
-    this.data = keyBy(response, 'id')
+    this.data = keyBy(response.data ?? response, 'id')
     return response
   }
 
@@ -191,37 +218,84 @@ export default class ProjectContentStore implements IProjectContentStore {
     return snippets.sort((a, b) => a.name.localeCompare(b.name))
   }
 
-  // @ts-ignore
-  async create(payload: any) {
+  /**
+   * Creates a new content item, but does not update local store
+   */
+  async save(payload: UserContent) {
     try {
+      this.savingState = 'CREATING'
+
       const headers = {
         'Content-Type': 'application/json',
       }
-      const created = await post(this.baseUrl, payload, { headers })
+      const created = await post<UserContent>(this.baseUrl, payload, { headers })
       if (created.error) throw created.error
-      this.data[created['id']] = created
-      return { data: created, error: null }
+
+      this.savingState = 'IDLE'
+
+      return { data: created as UserContent, error: null }
     } catch (error) {
-      return { data: null, error }
+      this.savingState = 'CREATING_FAILED'
+
+      return { data: null, error: error as { message: string } }
     }
   }
 
-  async update(id: any, updates: any, type: UserContent['type']) {
+  /**
+   * Creates a new content item, and updates local store
+   */
+  async create(payload: UserContent) {
+    const { data, error } = await this.save(payload)
+
+    if (error) {
+      return { data: null, error }
+    }
+
+    if (data && data['id']) {
+      this.data[data['id']] = data
+    }
+
+    return { data: data as UserContent, error: null }
+  }
+
+  /**
+   * Creates a new content item locally in store without saving to the server
+   */
+  createOptimistically(payload: UserContent) {
+    const created = { ...payload, id: uuidv4() }
+
+    this.data[created.id] = created
+
+    return { data: created, error: null }
+  }
+
+  async update(id: any, updates: any, type?: UserContent['type']) {
     try {
+      this.savingState = 'UPDATING'
+
       const headers = {
         'Content-Type': 'application/json',
       }
       let payload = {
         ...updates,
-        type,
         id,
       }
+      if (type) {
+        payload.type = type
+      }
+
       const url = `${this.baseUrl}?id=${id}`
-      const updated = await patch(url, payload, { headers })
+      const updated = await patch<UserContent[]>(url, payload, { headers })
       if (updated.error) throw updated.error
-      this.data[id] = updated
-      return { data: updated, error: null }
+
+      const localUpdate = { ...this.data[id], ...payload }
+      this.data[id] = localUpdate
+      this.savingState = 'IDLE'
+
+      return { data: localUpdate, error: null }
     } catch (error) {
+      this.savingState = 'UPDATING_FAILED'
+
       return { data: null, error }
     }
   }
@@ -247,6 +321,11 @@ export default class ProjectContentStore implements IProjectContentStore {
     } catch (error) {
       return { data: false, error }
     }
+  }
+
+  delOptimistically(id: string) {
+    delete this.data[id]
+    return { data: true, error: null }
   }
 
   setProjectRef(ref?: string) {

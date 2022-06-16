@@ -1,58 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
-import {
-  useSqlEditorStore,
-  SqlEditorContext,
-  useSqlStore,
-  TAB_TYPES,
-} from 'localStores/sqlEditor/SqlEditorStore'
+import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 import TabWelcome from 'components/to-be-cleaned/SqlEditor/TabWelcome'
 import TabSqlQuery from 'components/to-be-cleaned/SqlEditor/TabSqlQuery'
 import getPgsqlCompletionProvider from 'components/to-be-cleaned/SqlEditor/PgsqlCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/to-be-cleaned/SqlEditor/PgsqlSignatureHelpProvider'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { SQLEditorLayout } from 'components/layouts'
-import BaseLayout from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-const PageConfig = () => {
-  const { meta, ui } = useStore()
-  const { profile: user } = ui
-
-  useEffect(() => {
-    if (ui.selectedProject !== undefined) {
-      loadPersistantData()
-    }
-  }, [ui.selectedProject])
-
-  /*
-   * Load persited data
-   */
-  async function loadPersistantData() {
-    if (sqlEditorStore === undefined) return
-    await sqlEditorStore.loadRemotePersistentData(contentStore, (user as any)?.id)
-  }
-
-  if (ui.selectedProject === undefined) {
-    return <BaseLayout children={undefined} />
-  }
-
-  const contentStore: any = useProjectContentStore(ui.selectedProject.ref)
-  const sqlEditorStore: any = useSqlEditorStore(ui.selectedProject.ref, meta)
-
-  return (
-    <SqlEditorContext.Provider value={sqlEditorStore}>
-      <SQLEditorLayout title="SQL">
-        <SqlEditor />
-      </SQLEditorLayout>
-    </SqlEditorContext.Provider>
-  )
-}
-
-export default withAuth(observer(PageConfig))
-
-const SqlEditor = observer(() => {
+const SqlEditor: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
   const { isDarkTheme } = ui
   const sqlEditorStore: any = useSqlStore()
@@ -142,4 +100,8 @@ const SqlEditor = observer(() => {
   }
 
   return <>{renderTabContent()}</>
-})
+}
+
+SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+
+export default observer(SqlEditor)

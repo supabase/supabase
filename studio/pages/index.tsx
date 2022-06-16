@@ -105,9 +105,7 @@ Home.getLayout = (page) => <IndexLayout>{page}</IndexLayout>
 export default observer(Home)
 
 // detect for redirect from 3rd party service like vercel, aws...
-function isRedirectFromThirdPartyService(router: NextRouter) {
-  return router.query.next !== undefined || router.query['x-amzn-marketplace-token'] !== undefined
-}
+const isRedirectFromThirdPartyService = (router: NextRouter) => router.query.next !== undefined
 
 const UnauthorizedLanding = () => {
   const router = useRouter()
@@ -148,8 +146,6 @@ const IndexLayout = withAuth(
           router.push(`/vercel/integrate?${params.toString()}`)
         } else if (router.query?.next?.includes('new-project')) {
           router.push('/new/project')
-        } else if (router.query['x-amzn-marketplace-token'] != undefined) {
-          router.push(`/account/associate?${params.toString()}`)
         } else if (
           typeof router.query?.next === 'string' &&
           router.query?.next?.startsWith('project/_/')
