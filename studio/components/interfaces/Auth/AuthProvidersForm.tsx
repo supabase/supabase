@@ -52,25 +52,23 @@ interface Provider {
   }
 }
 
-const ProviderCollapsibleClasses = `
-  bg-scale-100 dark:bg-scale-300 
-  hover:bg-scale-200 dark:hover:bg-scale-500
-  data-open:bg-scale-200 dark:data-open:bg-scale-500 
-  border-scale-300 
-
-  dark:border-scale-500 hover:border-scale-500 
-  dark:hover:border-scale-700 data-open:border-scale-700
-
-  data-open:pb-px col-span-12 mx-auto
-  -space-y-px overflow-hidden
-  border shadow  
-  
-  transition
-  first:rounded-tl
-  first:rounded-tr
-  last:rounded-bl
-  last:rounded-br 
-  hover:z-50`
+const ProviderCollapsibleClasses = [
+  'bg-scale-100 dark:bg-scale-300 ',
+  'hover:bg-scale-200 dark:hover:bg-scale-500',
+  'data-open:bg-scale-200 dark:data-open:bg-scale-500 ',
+  'border-scale-300 ',
+  'dark:border-scale-500 hover:border-scale-500 ',
+  'dark:hover:border-scale-700 data-open:border-scale-700',
+  'data-open:pb-px col-span-12 mx-auto',
+  '-space-y-px overflow-hidden',
+  'border shadow',
+  'transition',
+  'first:rounded-tl',
+  'first:rounded-tr',
+  'last:rounded-bl',
+  'last:rounded-br',
+  'hover:z-50',
+]
 
 const AuthProvidersForm = () => {
   const providers = PROVIDERS_SCHEMAS
@@ -86,7 +84,7 @@ const AuthProvidersForm = () => {
       <div className="-space-y-px">
         {!authConfig.isLoaded
           ? providers.map((i) => (
-              <div className={ProviderCollapsibleClasses + ' p-3 px-6'}>
+              <div className={ProviderCollapsibleClasses.join(' ')}>
                 <HorizontalShimmerWithIcon />
               </div>
             ))
@@ -117,7 +115,11 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
   })
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className={ProviderCollapsibleClasses}>
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className={ProviderCollapsibleClasses.join(' ')}
+    >
       <Collapsible.Trigger asChild>
         <button
           type="button"
