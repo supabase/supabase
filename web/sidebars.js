@@ -196,6 +196,7 @@ module.exports = {
         'guides/platform/metrics',
         'going-into-prod',
         'guides/platform/performance',
+        'guides/platform/permissions'
       ],
     },
     {
