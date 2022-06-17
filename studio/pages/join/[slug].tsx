@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
-import { Button, Typography } from '@supabase/ui'
+import { Button, IconAlertCircle, Typography } from '@supabase/ui'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -24,6 +24,7 @@ const User = () => {
   const { ui } = useStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>()
+  const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
   const {
     token_does_not_exist,
     email_match,
@@ -38,7 +39,10 @@ const User = () => {
 
     async function fetchTokenInfo() {
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`, {})
-      if (!cancel) setTokenValidationInfo(response)
+      if (!cancel) {
+        setTokenValidationInfo(response)
+        setTokenInfoLoaded(true)
+      }
     }
 
     if (router.query.token) {
@@ -101,20 +105,23 @@ const User = () => {
           </Link>
 
           <h2 className="text-xl">
-            Join {organization_name ? organization_name : 'a new organization'}
+            Join {organization_name && email_match ? organization_name : 'a new organization'}
           </h2>
+
           {!token_does_not_exist ? (
             <p className="text-md">
               You have been invited to join{' '}
-              {organization_name ? organization_name : 'a new organization'} organization at
-              Supabase.
+              {organization_name && email_match
+                ? `${organization_name}'s organization`
+                : 'a new organization'}{' '}
+              at Supabase.
             </p>
           ) : (
             <div className="w-96" />
           )}
         </div>
 
-        {authorized_user && !expired_token && email_match && (
+        {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
           <div className="flex items-center gap-2">
             <Button
               onClick={handleJoinOrganization}
@@ -136,15 +143,21 @@ const User = () => {
           </div>
         )}
 
-        <div className="mt-4 border-t pt-4">
-          {token_does_not_exist
-            ? 'Invite token is invalid.'
-            : !email_match
-            ? 'Sign in to that account to accept this invitation.'
-            : expired_token
-            ? 'Invite token has expired, please request a new one from the organization owner.'
-            : ''}
-        </div>
+        {tokenInfoLoaded && (
+          <div className="mt-4 flex gap-4 border-t pt-4 text-sm">
+            {token_does_not_exist ||
+              !email_match ||
+              (expired_token && <IconAlertCircle size={24} strokeWidth={2} />)}
+
+            {token_does_not_exist
+              ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
+              : !email_match
+              ? 'The email address does not match. Are you signed in with right GitHub account?'
+              : expired_token
+              ? 'The invite token has expired. Please request a new one from the organization owner.'
+              : ''}
+          </div>
+        )}
       </div>
     </div>
   )

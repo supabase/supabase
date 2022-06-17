@@ -1,5 +1,5 @@
 import { createContext, useEffect, useContext, useState } from 'react'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { pluckJsonSchemaFields, pluckObjectFields, timeout } from 'lib/helpers'
