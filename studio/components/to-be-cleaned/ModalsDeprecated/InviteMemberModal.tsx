@@ -8,8 +8,7 @@ import { Modal } from '@supabase/ui'
 import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore } from 'hooks'
 import { toJS } from 'mobx'
-
-
+import { Member } from 'types'
 
 /**
  * Endpoints (delete when finished)
@@ -28,7 +27,6 @@ import { toJS } from 'mobx'
  *
  */
 
-
 /**
  * Modal to invite member to Organization
  *
@@ -40,16 +38,17 @@ import { toJS } from 'mobx'
 const PageContext = createContext(null)
 
 function InviteMemberModal({ organization, members = [], user }: any) {
-
   const PageState = useLocalObservable(() => ({
-    members:  [],
+    members: [],
     addMemberLoading: false,
     emailAddress: '',
     emailIsValid() {
       return String(this.emailAddress)
         .toLowerCase()
-        .match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
-    }
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )
+    },
   }))
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
@@ -74,7 +73,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
       invited_email: PageState.emailAddress,
-      owner_id: toJS(user.id)
+      owner_id: toJS(user.id),
     })
     if (isNil(response)) {
       ui.setNotification({ category: 'error', message: 'Failed to add member' })
@@ -85,14 +84,25 @@ function InviteMemberModal({ organization, members = [], user }: any) {
       })
       PageState.addMemberLoading = false
     } else {
-      const newMember = response
+      const newMember: Member = {
+        // [Joshen] Setting a random id for now to fit the Member interface
+        id: 0,
+        invited_at: response.invited_at,
+        is_owner: false,
+        profile: {
+          id: 0,
+          primary_email: response.invited_email,
+          username: response.invited_email[0],
+        },
+      }
       mutateOrgMembers([...PageState.members, newMember])
+
       ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
       toggle()
     }
   }
 
-  function onEmailInputChange(e) {
+  function onEmailInputChange(e: any) {
     PageState.emailAddress = e.target.value
   }
 
@@ -110,7 +120,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         layout="vertical"
         hideFooter
       >
-        <div className="w-full py-4 space-y-4">
+        <div className="w-full space-y-4 py-4">
           <Modal.Content>
             <div className="text-center">
               <Input
@@ -121,7 +131,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
                 onChange={onEmailInputChange}
                 value={PageState.emailAddress}
                 className="w-full"
-                />
+              />
             </div>
           </Modal.Content>
           <Modal.Seperator />
