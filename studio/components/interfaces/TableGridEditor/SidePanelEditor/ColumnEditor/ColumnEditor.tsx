@@ -209,10 +209,9 @@ const ColumnEditor: FC<Props> = ({
 
           <div className="text-sm grid md:grid-cols-12 md:gap-x-4 ">
             <p className='text-scale-1100 col-span-7 col-start-5 -mt-4'>
-              <a href="https://supabase.com/pricing" target="_blank" className="underline inline-block gap-1 p-2 rounded-sm">
+              <a href="https://supabase.com/docs/guides/database/tables#data-types" target="_blank" className="underline inline-block gap-1 p-2 rounded-sm">
                 Learn more about data types
               </a>
-
             </p>
           </div>
 
