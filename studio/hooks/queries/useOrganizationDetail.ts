@@ -11,22 +11,20 @@ export function useOrganizationDetail(slug: string) {
 
   // Get pending invite users
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
-  const {data: inviteData, error: inviteError} = useSWR<any>(pendingInviteUrl, get)
+  const { data: inviteData, error: inviteError } = useSWR<any>(pendingInviteUrl, get)
 
-  if (data && inviteData.length > 0) {
+  if (inviteData && inviteData.length > 0) {
     // remap invite data to look like existing members data
-    const reMappedInvitedata = inviteData.map((x: any) => (
-      {
-        is_owner: false,
-        invited_at: x.invited_at,
-        invited_id: x.invited_id,
-        profile: {
-          // Use the first letter of the email to allow for member list sorting
-          username: x.invited_email.slice(0,1),
-          primary_email: x.invited_email
-        }
-      }
-    ))
+    const reMappedInvitedata = inviteData.map((x: any) => ({
+      is_owner: false,
+      invited_at: x.invited_at,
+      invited_id: x.invited_id,
+      profile: {
+        // Use the first letter of the email to allow for member list sorting
+        username: x.invited_email.slice(0, 1),
+        primary_email: x.invited_email,
+      },
+    }))
 
     members = [...members, ...reMappedInvitedata]
   }
