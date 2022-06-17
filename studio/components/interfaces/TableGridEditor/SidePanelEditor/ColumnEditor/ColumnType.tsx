@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input, IconArrowUpRight } from '@supabase/ui'
+import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
 import { PostgresType } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
@@ -68,7 +68,6 @@ const ColumnType: FC<Props> = ({
   }
 
   return (
-    <>
       <Listbox
         label={showLabel ? 'Type' : ''}
         layout={showLabel ? 'horizontal' : 'vertical'}
@@ -136,7 +135,6 @@ const ColumnType: FC<Props> = ({
           </Listbox.Option>
         ))}
       </Listbox>
-    </>
   )
 }
 
