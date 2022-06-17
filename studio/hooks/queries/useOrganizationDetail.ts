@@ -15,7 +15,7 @@ export function useOrganizationDetail(slug: string) {
 
   if (inviteData && inviteData.length > 0) {
     // remap invite data to look like existing members data
-    const reMappedInvitedata = inviteData.map((x: any) => ({
+    const invitedMembers = inviteData.map((x: any) => ({
       is_owner: false,
       invited_at: x.invited_at,
       invited_id: x.invited_id,
@@ -26,7 +26,7 @@ export function useOrganizationDetail(slug: string) {
       },
     }))
 
-    members = [...members, ...reMappedInvitedata]
+    members = [...members, ...invitedMembers]
   }
 
   const anyError = data?.error || error || inviteError
