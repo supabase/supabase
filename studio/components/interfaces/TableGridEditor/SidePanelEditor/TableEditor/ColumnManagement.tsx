@@ -319,20 +319,17 @@ const ColumnManagement: FC<Props> = ({
         </div>
 
         <div className="flex items-center justify-between">
-        {!hasImportContent && (
-          <Button type="default" onClick={() => onAddColumn()}>
-            Add column
-          </Button>
-        )}
-        <p className='text-sm text-scale-1100'>
-          <a href="https://supabase.com/pricing" target="_blank" className="underline flex items-center gap-1">
-            Learn more about data types
-          </a>
-        </p>
+          {!hasImportContent && (
+            <Button type="default" onClick={() => onAddColumn()}>
+              Add column
+            </Button>
+          )}
+          <p className='text-sm text-scale-1100'>
+            <a href="https://supabase.com/docs/guides/database/tables#data-types" target="_blank" className="underline flex items-center gap-1">
+              Learn more about data types
+            </a>
+          </p>
         </div>
-
-
-
       </div>
       <ForeignKeySelector
         tables={tables}
