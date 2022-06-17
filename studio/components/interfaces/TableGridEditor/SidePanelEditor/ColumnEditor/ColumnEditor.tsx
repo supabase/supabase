@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, IconArrowUpRight } from '@supabase/ui'
+import { Checkbox, SidePanel, Input } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -209,8 +209,8 @@ const ColumnEditor: FC<Props> = ({
 
           <div className="text-sm grid md:grid-cols-12 md:gap-x-4 ">
             <p className='text-scale-1100 col-span-7 col-start-5 -mt-4'>
-              <a href="https://supabase.com/pricing" target="_blank" className="underline flex items-center gap-1">
-                Learn more about data types <IconArrowUpRight size={14} className="text-scale-1200" strokeWidth={1.5} />
+              <a href="https://supabase.com/pricing" target="_blank" className="underline inline-block gap-1 p-2 rounded-sm">
+                Learn more about data types
               </a>
 
             </p>

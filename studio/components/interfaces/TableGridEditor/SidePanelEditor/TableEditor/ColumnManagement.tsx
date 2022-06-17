@@ -3,7 +3,6 @@ import { partition, isEmpty, isUndefined } from 'lodash'
 import {
   Alert,
   Button,
-  IconArrowUpRight,
   IconEdit,
   IconHelpCircle,
   IconKey,
@@ -327,7 +326,7 @@ const ColumnManagement: FC<Props> = ({
         )}
         <p className='text-sm text-scale-1100'>
           <a href="https://supabase.com/pricing" target="_blank" className="underline flex items-center gap-1">
-            Learn more about data types <IconArrowUpRight size={14} className="text-scale-1200" strokeWidth={1.5} />
+            Learn more about data types
           </a>
         </p>
         </div>
