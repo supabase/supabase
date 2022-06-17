@@ -30,22 +30,15 @@ const components = {
   },
   ImageGrid,
   img: (props: any) => {
-    const classes = [
-      'next-image--dynamic-fill',
-      'from-brand-500 to-brand-500',
-      'rounded border bg-gradient-to-r via-blue-500',
-    ]
-
     return (
       <div
         className="
           next-image--dynamic-fill 
-          to-scale-300  
-          from-scale-400 rounded-md
-          border bg-gradient-to-r
+          rounded-md
+          border 
       "
       >
-        <Image {...props} className="next-image--dynamic-fill " layout="fill" priority={1} />
+        <Image {...props} layout="fill" priority={true} loading="eager" />
       </div>
     )
   },
@@ -248,6 +241,8 @@ function BlogPostPage(props: any) {
                                       width="100%"
                                       height="100%"
                                       layout="responsive"
+                                      priority={true}
+                                      loading="eager"
                                     />
                                   </div>
                                 )}
@@ -277,6 +272,8 @@ function BlogPostPage(props: any) {
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
                         objectFit="cover"
+                        priority={true}
+                        loading="eager"
                       />
                     </div>
                   )}
