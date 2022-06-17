@@ -35,6 +35,7 @@ import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteM
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { NextPageWithLayout, Project } from 'types'
+import Image from 'next/image'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
@@ -507,9 +508,10 @@ const MembersView = observer(() => {
                           <IconUser size={18} strokeWidth={2} />
                         </span>
                       ) : (
-                        <img
+                        <Image
                           src={`https://github.com/${x.profile?.username}.png?size=80`}
                           width="40"
+                          height="40"
                           className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
                         />
                       )}

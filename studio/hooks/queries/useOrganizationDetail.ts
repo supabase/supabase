@@ -13,7 +13,7 @@ export function useOrganizationDetail(slug: string) {
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
   const { data: inviteData, error: inviteError } = useSWR<any>(pendingInviteUrl, get)
 
-  if (inviteData && inviteData.length > 0) {
+  if (data && inviteData && inviteData.length > 0) {
     // remap invite data to look like existing members data
     const invitedMembers = inviteData.map((x: any) => ({
       is_owner: false,
