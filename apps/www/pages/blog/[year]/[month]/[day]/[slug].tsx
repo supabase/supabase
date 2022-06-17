@@ -40,16 +40,12 @@ const components = {
       <div
         className="
           next-image--dynamic-fill 
-            to-scale-400  
-            from-scale-500 rounded-md
-            border bg-gradient-to-r
+          to-scale-300  
+          from-scale-400 rounded-md
+          border bg-gradient-to-r
       "
       >
-        <Image
-          {...props}
-          className="next-image--dynamic-fill to-brand-1000 from-brand-900 rounded-md border bg-gradient-to-r"
-          layout="fill"
-        />
+        <Image {...props} className="next-image--dynamic-fill " layout="fill" priority={1} />
       </div>
     )
   },
