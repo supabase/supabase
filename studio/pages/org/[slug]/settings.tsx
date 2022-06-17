@@ -42,11 +42,11 @@ const PageContext = createContext(null)
 
 // Invite is expired if older than 24hrs
 function inviteExpired(timestamp: Date) {
-  const inviteDate = new Date(timestamp);
-  const now = new Date();
+  const inviteDate = new Date(timestamp)
+  const now = new Date()
   var timeBetween = now.valueOf() - inviteDate.valueOf()
-  if(timeBetween / 1000 / 60 / 60 < 24) {
-    return true;
+  if (timeBetween / 1000 / 60 / 60 < 24) {
+    return true
   }
 }
 
@@ -69,11 +69,11 @@ const OrgSettingsLayout = withAuth(
       get filteredMembers() {
         const temp = this.members.filter((x: any) => {
           let profile = x.profile
-          if(profile) {
+          if (profile) {
             return (
               profile.username.includes(this.membersFilterString) ||
               profile.primary_email.includes(this.membersFilterString)
-              )
+            )
           }
           if (x.invited_email) {
             return x.invited_email.includes(this.membersFilterString)
@@ -237,7 +237,7 @@ const GeneralSettings = observer(() => {
   }
 
   return (
-    <article className="container max-w-4xl my-4 space-y-8">
+    <article className="container my-4 max-w-4xl space-y-8">
       <SchemaFormPanel
         title="General"
         schema={pluckJsonSchemaFields(organizations, BASIC_FIELDS)}
@@ -321,8 +321,8 @@ const OrgDeleteModal = observer(() => {
         onCancel={toggle}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
-            <span className="text-xs text-scale-900">Are you sure?</span>
+            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
+            <span className="text-scale-900 text-xs">Are you sure?</span>
           </div>
         }
         size="small"
@@ -361,9 +361,9 @@ const OrgDeleteModal = observer(() => {
           }}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="py-3 space-y-4">
+            <div className="space-y-4 py-3">
               <Modal.Content>
-                <p className="text-sm text-scale-900">
+                <p className="text-scale-900 text-sm">
                   This action <span className="text-scale-1200">cannot</span> be undone. This will
                   permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
                   organization and remove all of its projects.
@@ -436,7 +436,7 @@ const TeamSettings = observer(() => {
 
   return (
     <>
-      <div className="container max-w-4xl my-4 space-y-8">
+      <div className="container my-4 max-w-4xl space-y-8">
         <div className="flex justify-between">
           <MembersFilterInput />
           {PageState.isOrgOwner ? (
@@ -456,7 +456,7 @@ const TeamSettings = observer(() => {
           )}
         </div>
       </div>
-      <div className="container max-w-4xl my-4 space-y-8">
+      <div className="container my-4 max-w-4xl space-y-8">
         <MembersView />
       </div>
     </>
@@ -502,24 +502,28 @@ const MembersView = observer(() => {
                 <Table.td>
                   <div className="flex items-center space-x-4">
                     <div>
-                      {x.invited_id ?
-                        ( <span className='flex p-2 border-2 rounded-full border-border-secondary-light dark:border-border-secondary-dark'><IconUser size={18} strokeWidth={2} /></span> )
-                        : ( <img
-                              src={`https://github.com/${x.profile?.username}.png?size=80`}
-                              width="40"
-                              className="border rounded-full border-border-secondary-light dark:border-border-secondary-dark"
-                            />
-                        )}
-
+                      {x.invited_id ? (
+                        <span className="border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2">
+                          <IconUser size={18} strokeWidth={2} />
+                        </span>
+                      ) : (
+                        <img
+                          src={`https://github.com/${x.profile?.username}.png?size=80`}
+                          width="40"
+                          className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                        />
+                      )}
                     </div>
                     <div>
-                    {x.profile?.username && !x.invited_id && (
-                      <>
-                        <Typography.Text>{x.profile?.username}</Typography.Text>
-                        <br />
-                      </>
-                    ) }
-                      <Typography.Text type="secondary">{x.profile ? x.profile.primary_email : ''}</Typography.Text>
+                      {x.profile?.username && !x.invited_id && (
+                        <>
+                          <Typography.Text>{x.profile?.username}</Typography.Text>
+                          <br />
+                        </>
+                      )}
+                      <Typography.Text type="secondary">
+                        {x.profile ? x.profile.primary_email : ''}
+                      </Typography.Text>
                     </div>
                   </div>
                 </Table.td>
@@ -527,7 +531,7 @@ const MembersView = observer(() => {
                 <Table.td>
                   {x.invited_id && (
                     <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
-                       {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                      {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
                     </Badge>
                   )}
                 </Table.td>
@@ -635,7 +639,10 @@ const OwnerDropdown = observer(({ members, member }: any) => {
   async function handleResendInvite(id: number) {
     setLoading(true)
 
-    const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`, {})
+    const response = await post(
+      `${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`,
+      {}
+    )
 
     if (response.error) {
       ui.setNotification({
@@ -653,7 +660,10 @@ const OwnerDropdown = observer(({ members, member }: any) => {
   async function handleRevokeInvitation(id: number) {
     setLoading(true)
 
-    const response = await delete_(`${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`, {})
+    const response = await delete_(
+      `${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`,
+      {}
+    )
 
     if (response.error) {
       ui.setNotification({
