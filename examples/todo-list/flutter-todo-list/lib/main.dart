@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todosupabase/constant.dart';
-import 'package:todosupabase/functions/auth.dart';
 import 'package:todosupabase/screens/signup.dart';
 import 'package:todosupabase/screens/signin.dart';
 import 'package:todosupabase/screens/todo.dart';
@@ -23,13 +21,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: appTheme,
-      initialRoute:
-          AuthSupabase.client.auth.currentSession != null ? "/todo" : "/",
+      initialRoute: client.auth.currentSession != null ? '/todo' : '/',
       routes: {
-        "/": (context) => const MyHomePage(),
-        "/signup": (context) => const SignUpPage(),
-        "/signin": (context) => const SignInPage(),
-        "/todo": (context) => const TodoPage(),
+        '/': (context) => const MyHomePage(),
+        '/signup': (context) => const SignUpPage(),
+        '/signin': (context) => const SignInPage(),
+        '/todo': (context) => const TodoPage(),
       },
     );
   }
@@ -53,19 +50,22 @@ class MyHomePageState extends State<MyHomePage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SvgPicture.asset("assets/supabase-dark.svg", width: 200),
+              Image.asset(
+                'assets/supabase-logo.png',
+                height: 40,
+              ),
               largeGap,
               OutlinedButton(
-                child: const Text("Sign In"),
+                child: const Text('Sign In'),
                 onPressed: () {
-                  Navigator.pushNamed(context, "/signin");
+                  Navigator.pushNamed(context, '/signin');
                 },
               ),
               smallGap,
               OutlinedButton(
-                child: const Text("Sign Up"),
+                child: const Text('Sign Up'),
                 onPressed: () {
-                  Navigator.pushNamed(context, "/signup");
+                  Navigator.pushNamed(context, '/signup');
                 },
               )
             ],

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:todosupabase/constant.dart';
-import 'package:todosupabase/functions/auth.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -14,6 +12,15 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool loading = false;
+  Future<String?> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    final res = await client.auth.signIn(email: email, password: password);
+    final user = res.data?.user;
+    return user?.id;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +32,10 @@ class _SignInPageState extends State<SignInPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SvgPicture.asset('assets/supabase-dark.svg', width: 200),
+              Image.asset(
+                'assets/supabase-logo.png',
+                height: 40,
+              ),
               largeGap,
               TextFormField(
                 controller: _emailController,
@@ -57,7 +67,7 @@ class _SignInPageState extends State<SignInPage> {
                         setState(() {
                           loading = true;
                         });
-                        var value = await AuthSupabase.loginUser(
+                        var value = await loginUser(
                           email: _emailController.text,
                           password: _passwordController.text,
                         );

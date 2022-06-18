@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const smallGap = SizedBox(height: 20);
 const largeGap = SizedBox(height: 40);
-
+final client = Supabase.instance.client;
 final appTheme = ThemeData.dark().copyWith(
   scaffoldBackgroundColor: Colors.black,
   appBarTheme: const AppBarTheme(

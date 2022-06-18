@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:todosupabase/constant.dart';
-import 'package:todosupabase/functions/auth.dart';
-import 'package:todosupabase/functions/crud.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -15,6 +12,30 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+
+  Future<bool> createAccount({
+    required String email,
+    required String password,
+  }) async {
+    final res = await client.auth.signUp(email, password);
+    final error = res.error;
+    if (error == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<dynamic> addUser({
+    required String name,
+    required String email,
+  }) async {
+    final res = await client.from('Users').insert({
+      'name': name,
+      'email': email,
+    }).execute();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +47,10 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SvgPicture.asset('assets/supabase-dark.svg', width: 200),
+              Image.asset(
+                'assets/supabase-logo.png',
+                height: 40,
+              ),
               largeGap,
               TextFormField(
                 controller: _nameController,
@@ -54,12 +78,12 @@ class _SignUpPageState extends State<SignUpPage> {
               ElevatedButton(
                 child: const Text('Sign Up'),
                 onPressed: () async {
-                  final value = await AuthSupabase.createAccount(
+                  final value = await createAccount(
                     email: _emailController.text,
                     password: _passwordController.text,
                   );
                   if (value == true) {
-                    CrudSupabase.addUser(
+                    addUser(
                       name: _nameController.text,
                       email: _emailController.text,
                     );
