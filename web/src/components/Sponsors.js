@@ -41,13 +41,13 @@ export default function Sponsors() {
     <div >
     
           {tiers.map(
-            (t) =>
+            (t,index) =>
               !!t.transactions.length && (
-                <>
+                <div key={index}>
                   <h4 className="">{t.heading}</h4>
                   <div className="row is-multiline" style={{ paddingLeft: 15 }}>
-                    {t.transactions.map((x) => (
-                      <div className="col col--4" key={x.sponsor}>
+                    {t.transactions.map((x, index) => (
+                      <div className="col col--4" key={index}>
                         <a className="avatar" href={`https://github.com/${x.sponsor}`}>
                           <img
                             className="avatar__photo avatar__photo--sm"
@@ -61,7 +61,7 @@ export default function Sponsors() {
                     ))}
                   </div>
                   <br />
-                </>
+                </div>
               )
           )}
           
