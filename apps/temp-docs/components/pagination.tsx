@@ -9,7 +9,7 @@ const pagination = () => {
     <ul className="flex justify-center space-x-1 text-xs font-medium">
       <li>
         <Link href="/discussions?page=1">
-          <a className="inline-flex h-8 w-8 items-center justify-center rounded border border-scale-600 bg-scale-300">
+          <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-3 w-3"
@@ -30,7 +30,11 @@ const pagination = () => {
         return (
           <li key={i}>
             <Link href={`/discussions?page=${i}`}>
-              <a className={`inline-flex h-8 w-8 items-center justify-center rounded border border-scale-600 ${page === i ? "bg-brand-900" : "bg-scale-300"}`}>
+              <a
+                className={`border-scale-600 inline-flex h-8 w-8 items-center justify-center rounded border ${
+                  page === i ? 'bg-brand-900' : 'bg-scale-300'
+                }`}
+              >
                 {i}
               </a>
             </Link>
@@ -39,7 +43,7 @@ const pagination = () => {
       })}
       <li>
         <Link href="/discussions?page=1">
-          <a className="inline-flex h-8 w-8 items-center justify-center rounded border border-scale-600 bg-scale-300">
+          <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-3 w-3"
