@@ -21,7 +21,8 @@ export const TEMPLATES: LogTemplate[] = [
     description: 'Count of commits made by users on the database',
     mode: 'custom',
     searchString: `select
-    p.user_name, count(*) as count
+  p.user_name, 
+  count(*) as count
 from postgres_logs
   left join unnest(metadata) as m on true
   left join unnest(m.parsed) as p on true
@@ -29,14 +30,16 @@ where
   regexp_contains(event_message, 'COMMIT')
 group by
   p.user_name
-    `,
+  `,
     for: ['database'],
   },
   {
     label: 'Metadata IP',
     description: 'List all IP addresses that used the Supabase API',
     mode: 'custom',
-    searchString: `select timestamp, h.x_real_ip
+    searchString: `select
+  cast(timestamp as datetime) as timestamp, 
+  h.x_real_ip
 from edge_logs
   left join unnest(metadata) as m on true
   left join unnest(m.request) as r on true
@@ -50,7 +53,8 @@ where h.x_real_ip is not null
     description: 'List all ISO 3166-1 alpha-2 country codes that used the Supabase API',
     mode: 'custom',
     searchString: `select 
-  cf.country, count(*) as count
+  cf.country, 
+  count(*) as count
 from edge_logs
   left join unnest(metadata) as m on true
   left join unnest(m.request) as r on true
@@ -67,7 +71,7 @@ order by
     mode: 'custom',
     description: 'List all Supabase API requests that are slow',
     searchString: `select
-  timestamp, 
+  cast(timestamp as datetime) as timestamp, 
   event_message,
   r.origin_time
 from edge_logs
@@ -85,8 +89,8 @@ limit 100
     label: '500 Request Codes',
     description: 'List all Supabase API requests that responded witha 5XX status code',
     mode: 'custom',
-    searchString: `SELECT
-  timestamp, 
+    searchString: `select
+  cast(timestamp as datetime) as timestamp, 
   event_message,
   r.status_code
 from edge_logs
@@ -104,7 +108,7 @@ limit 100
     label: 'Top Paths',
     description: 'List the most requested Supabase API paths',
     mode: 'custom',
-    searchString: `SELECT
+    searchString: `select
   r.path as path,
   r.search as params,
   count(timestamp) as c
@@ -124,8 +128,8 @@ limit 100
     label: 'REST Requests',
     description: 'List all PostgREST requests',
     mode: 'custom',
-    searchString: `SELECT
-  timestamp,
+    searchString: `select
+  cast(timestamp as datetime) as timestamp,
   event_message
 from edge_logs
   cross join unnest(metadata) as m 
@@ -142,14 +146,13 @@ limit 100
     label: 'Errors',
     description: 'List all Postgres error messages with ERROR, FATAL, or PANIC severity',
     mode: 'custom',
-    searchString: `SELECT
-  t.timestamp,
+    searchString: `select
+  cast(t.timestamp as datetime) as timestamp,
   p.error_severity,
   event_message
-from
-  postgres_logs as t
-    cross join unnest(metadata) as m
-    cross join unnest(m.parsed) as p
+from postgres_logs as t
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as p
 where
   p.error_severity in ('ERROR', 'FATAL', 'PANIC')
 order by
@@ -165,10 +168,9 @@ limit 100
   count(t.timestamp) as count,
   p.user_name,
   p.error_severity
-from
-  postgres_logs as t
-    cross join unnest(metadata) as m
-    cross join unnest(m.parsed) as p
+from postgres_logs as t
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as p
 where
   p.error_severity in ('ERROR', 'FATAL', 'PANIC')
 group by
