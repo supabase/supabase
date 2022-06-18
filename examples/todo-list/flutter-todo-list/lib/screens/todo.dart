@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:todosupabase/constant.dart';
-import 'package:todosupabase/functions/auth.dart';
-import 'package:todosupabase/functions/crud.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({Key? key}) : super(key: key);
@@ -16,15 +14,90 @@ class _TodoPageState extends State<TodoPage> {
   List<dynamic> todos = [];
   final TextEditingController _taskEditingController = TextEditingController();
   final TextEditingController _dueEditingController = TextEditingController();
+  Future logOut(BuildContext context) async {
+    await client.auth.signOut();
+  }
+
+  // GET THE USER DETAILS
+  Future<dynamic> getUser({required String email}) async {
+    final res =
+        await client.from('Users').select().eq('email', email).execute();
+    final data = res.data;
+    return data;
+  }
+
+  // GETR THE TODOS
+  Future<List<dynamic>> getTodo() async {
+    final res = await client
+        .from('Todo')
+        .select('*')
+        .eq('email', client.auth.currentUser!.email.toString())
+        .order('id')
+        .execute();
+    final data = res.data;
+    return data;
+  }
+
+  // ADD A Todo IN THE DB
+  Future<dynamic> addTodo({
+    required String task,
+    required String due,
+  }) async {
+    final res = await client.from('Todo').insert({
+      'email': client.auth.currentUser!.email.toString(),
+      'task': task,
+      'due': due,
+      'done': false
+    }).execute();
+    final data = res.data;
+    return data;
+  }
+
+  // DELETE A Todo IN THE DB
+  Future<void> deleteTodo({required String id}) async {
+    try {
+      await client.from('Todo').delete().eq('id', id).execute();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // toggle a Todo IN THE DB
+  Future<void> taskDone({
+    required String id,
+    required bool value,
+  }) async {
+    final res = await client
+        .from('Todo')
+        .update({'done': value})
+        .eq('id', id)
+        .execute();
+    final data = res.data;
+    return data;
+  }
+
+  // Edit a Todo IN THE DB
+  Future<void> editTask({
+    required String id,
+    required String due,
+    required String task,
+  }) async {
+    final res = await client
+        .from('Todo')
+        .update({'due': due, 'task': task})
+        .eq('id', id)
+        .execute();
+    final data = res.data;
+    return data;
+  }
 
   Future<void> initFunc() async {
-    var nameVal = await CrudSupabase.getUser(
-      email: AuthSupabase.client.auth.currentUser!.email.toString(),
-    );
+    var nameVal =
+        await getUser(email: client.auth.currentUser!.email.toString());
     setState(() {
       userName = nameVal[0]['name'];
     });
-    List<dynamic> value = await CrudSupabase.getTodo();
+    List<dynamic> value = await getTodo();
     for (var element in value) {
       todos.add(element);
     }
@@ -101,7 +174,7 @@ class _TodoPageState extends State<TodoPage> {
           IconButton(
             icon: const Icon(Icons.exit_to_app),
             onPressed: () async {
-              await AuthSupabase.logOut(context);
+              await logOut(context);
               Navigator.pop(context, '/');
             },
           ),
@@ -109,9 +182,8 @@ class _TodoPageState extends State<TodoPage> {
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : SizedBox(
-              height: double.infinity,
-              width: double.infinity,
+          : ConstrainedBox(
+              constraints: const BoxConstraints(),
               child: todos.isEmpty
                   ? const Center(
                       child: Text('No Task, add new task'),
@@ -127,7 +199,7 @@ class _TodoPageState extends State<TodoPage> {
                               taskCtrl: _taskEditingController,
                               dueCtrl: _dueEditingController,
                               onTab: () async {
-                                await CrudSupabase.editTask(
+                                await editTask(
                                   id: todos[index]['id'].toString(),
                                   due: _dueEditingController.text,
                                   task: _taskEditingController.text,
@@ -136,8 +208,7 @@ class _TodoPageState extends State<TodoPage> {
                                 setState(() {
                                   loading = true;
                                 });
-                                List<dynamic> value =
-                                    await CrudSupabase.getTodo();
+                                List<dynamic> value = await getTodo();
                                 todos.clear();
                                 setState(() {});
                                 for (var element in value) {
@@ -162,11 +233,10 @@ class _TodoPageState extends State<TodoPage> {
                               setState(() {
                                 loading = true;
                               });
-                              await CrudSupabase.deleteTodo(
+                              await deleteTodo(
                                 id: todos[index]['id'].toString(),
                               );
-                              List<dynamic> value =
-                                  await CrudSupabase.getTodo();
+                              List<dynamic> value = await getTodo();
                               todos.clear();
                               setState(() {});
                               for (var element in value) {
@@ -186,12 +256,11 @@ class _TodoPageState extends State<TodoPage> {
                               setState(() {
                                 loading = true;
                               });
-                              await CrudSupabase.taskDone(
+                              await taskDone(
                                 id: todos[index]['id'].toString(),
                                 value: !todos[index]['done'],
                               );
-                              List<dynamic> value =
-                                  await CrudSupabase.getTodo();
+                              List<dynamic> value = await getTodo();
                               todos.clear();
                               setState(() {});
                               for (var element in value) {
@@ -238,7 +307,7 @@ class _TodoPageState extends State<TodoPage> {
             taskCtrl: _taskEditingController,
             dueCtrl: _dueEditingController,
             onTab: () async {
-              await CrudSupabase.addTodo(
+              await addTodo(
                 task: _taskEditingController.text,
                 due: _dueEditingController.text,
               );
@@ -247,7 +316,7 @@ class _TodoPageState extends State<TodoPage> {
                 loading = true;
               });
 
-              List<dynamic> value = await CrudSupabase.getTodo();
+              List<dynamic> value = await getTodo();
               todos.clear();
               setState(() {});
               for (var element in value) {
