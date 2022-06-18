@@ -63,11 +63,11 @@ export default function Oss() {
         <div className="container">
           <h2>Community Maintainers</h2>
 
-          <ul class="pills">
+          <ul style={{overflow: "auto"}} className="pills">
             {maintainerPills.map((x) => (
               <li
                 key={x}
-                class={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
+                className={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
                 onClick={() => setActivePill(x)}
               >
                 {x}
