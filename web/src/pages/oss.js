@@ -2,7 +2,6 @@ import React from 'react'
 import { Octokit } from '@octokit/core'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import sponsors from '../data/sponsors.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
 
