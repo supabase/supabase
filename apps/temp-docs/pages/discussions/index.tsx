@@ -4,8 +4,13 @@ import Layout from '../../components/layouts/Layout'
 import { IconArrowUp, IconCheckCircle } from '@supabase/ui'
 import Image from 'next/image'
 import Link from 'next/link'
+import Pagination from '../../components/pagination'
 
-export async function getStaticProps() {
+export async function getStaticProps(context: { query: { page: number } }) {
+  const Page: any = context.query?.page || 1
+  const page = parseInt(Page)
+  console.log(page)
+
   const httpLink = createHttpLink({
     uri: 'https://api.github.com/graphql',
   })
@@ -51,7 +56,7 @@ export async function getStaticProps() {
             }
             totalCount
           }
-          discussions(first: 10) {
+          discussions(first: ${page}0) {
             nodes {
               id
               number
@@ -268,6 +273,9 @@ const discussions = ({ data }: any) => {
               </div>
             )
           })}
+        </div>
+        <div>
+          <Pagination />
         </div>
       </div>
     </Layout>
