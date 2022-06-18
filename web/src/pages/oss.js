@@ -108,9 +108,8 @@ export default function Oss() {
             {repos.length < 1 && <div>
             </div>}
             {repos.length >= 1 && repos.map((props, idx) => (
-              <div className={'col col--6'}>
+              <div className={'col col--6'} key={idx}>
                 <GithubCard
-                  key={idx}
                   title={props.name}
                   description={props.description}
                   href={props.html_url}
