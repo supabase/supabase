@@ -9,7 +9,6 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoPageState extends State<TodoPage> {
-  String userName = '';
   bool loading = true;
   List<dynamic> todos = [];
   final TextEditingController _taskEditingController = TextEditingController();
@@ -18,20 +17,12 @@ class _TodoPageState extends State<TodoPage> {
     await client.auth.signOut();
   }
 
-  // GET THE USER DETAILS
-  Future<dynamic> getUser({required String email}) async {
-    final res =
-        await client.from('Users').select().eq('email', email).execute();
-    final data = res.data;
-    return data;
-  }
-
   // GETR THE TODOS
   Future<List<dynamic>> getTodo() async {
     final res = await client
-        .from('Todo')
+        .from('todos')
         .select('*')
-        .eq('email', client.auth.currentUser!.email.toString())
+        .eq('user_id', client.auth.currentUser!.id)
         .order('id')
         .execute();
     final data = res.data;
@@ -43,8 +34,8 @@ class _TodoPageState extends State<TodoPage> {
     required String task,
     required String due,
   }) async {
-    final res = await client.from('Todo').insert({
-      'email': client.auth.currentUser!.email.toString(),
+    final res = await client.from('todos').insert({
+      'user_id': client.auth.currentUser!.id,
       'task': task,
       'due': due,
       'done': false
@@ -56,7 +47,7 @@ class _TodoPageState extends State<TodoPage> {
   // DELETE A Todo IN THE DB
   Future<void> deleteTodo({required String id}) async {
     try {
-      await client.from('Todo').delete().eq('id', id).execute();
+      await client.from('todos').delete().eq('id', id).execute();
     } catch (e) {
       print(e);
     }
@@ -68,7 +59,7 @@ class _TodoPageState extends State<TodoPage> {
     required bool value,
   }) async {
     final res = await client
-        .from('Todo')
+        .from('todos')
         .update({'done': value})
         .eq('id', id)
         .execute();
@@ -83,7 +74,7 @@ class _TodoPageState extends State<TodoPage> {
     required String task,
   }) async {
     final res = await client
-        .from('Todo')
+        .from('todos')
         .update({'due': due, 'task': task})
         .eq('id', id)
         .execute();
@@ -92,11 +83,6 @@ class _TodoPageState extends State<TodoPage> {
   }
 
   Future<void> initFunc() async {
-    var nameVal =
-        await getUser(email: client.auth.currentUser!.email.toString());
-    setState(() {
-      userName = nameVal[0]['name'];
-    });
     List<dynamic> value = await getTodo();
     for (var element in value) {
       todos.add(element);
@@ -169,7 +155,7 @@ class _TodoPageState extends State<TodoPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
-        title: Text('Hey $userName, add todo'),
+        title: Text('Supabase Todo'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.exit_to_app),
