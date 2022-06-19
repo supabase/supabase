@@ -12,7 +12,6 @@ class _TodoPageState extends State<TodoPage> {
   bool loading = true;
   List<dynamic> todos = [];
   final TextEditingController _taskEditingController = TextEditingController();
-  final TextEditingController _dueEditingController = TextEditingController();
   Future logOut(BuildContext context) async {
     await client.auth.signOut();
   }
@@ -32,13 +31,10 @@ class _TodoPageState extends State<TodoPage> {
   // ADD A Todo IN THE DB
   Future<dynamic> addTodo({
     required String task,
-    required String due,
   }) async {
     final res = await client.from('todos').insert({
       'user_id': client.auth.currentUser!.id,
       'task': task,
-      'due': due,
-      'done': false
     }).execute();
     final data = res.data;
     return data;
@@ -70,12 +66,11 @@ class _TodoPageState extends State<TodoPage> {
   // Edit a Todo IN THE DB
   Future<void> editTask({
     required String id,
-    required String due,
     required String task,
   }) async {
     final res = await client
         .from('todos')
-        .update({'due': due, 'task': task})
+        .update({'task': task})
         .eq('id', id)
         .execute();
     final data = res.data;
@@ -102,14 +97,12 @@ class _TodoPageState extends State<TodoPage> {
   void dispose() {
     super.dispose();
     _taskEditingController.dispose();
-    _dueEditingController.dispose();
   }
 
   Future<void> displayTextInputDialog({
     required BuildContext context,
     void Function()? onTab,
     required TextEditingController taskCtrl,
-    required TextEditingController dueCtrl,
   }) async {
     return showDialog(
       context: context,
@@ -123,12 +116,6 @@ class _TodoPageState extends State<TodoPage> {
                 controller: taskCtrl,
                 decoration:
                     const InputDecoration(hintText: 'Add title of todo'),
-              ),
-              TextField(
-                controller: dueCtrl,
-                keyboardType: TextInputType.datetime,
-                decoration:
-                    const InputDecoration(hintText: 'Add Due Date in DD/MM'),
               ),
               smallGap,
               MaterialButton(
@@ -183,11 +170,9 @@ class _TodoPageState extends State<TodoPage> {
                             displayTextInputDialog(
                               context: context,
                               taskCtrl: _taskEditingController,
-                              dueCtrl: _dueEditingController,
                               onTab: () async {
                                 await editTask(
                                   id: todos[index]['id'].toString(),
-                                  due: _dueEditingController.text,
                                   task: _taskEditingController.text,
                                 );
                                 Navigator.pop(context);
@@ -210,10 +195,7 @@ class _TodoPageState extends State<TodoPage> {
                             todos[index]['task'],
                             style: const TextStyle(color: Colors.white),
                           ),
-                          subtitle: Text(
-                            todos[index]['due'],
-                            style: const TextStyle(color: Colors.white),
-                          ),
+
                           leading: GestureDetector(
                             onTap: () async {
                               setState(() {
@@ -291,11 +273,9 @@ class _TodoPageState extends State<TodoPage> {
           displayTextInputDialog(
             context: context,
             taskCtrl: _taskEditingController,
-            dueCtrl: _dueEditingController,
             onTab: () async {
               await addTodo(
                 task: _taskEditingController.text,
-                due: _dueEditingController.text,
               );
               Navigator.pop(context);
               setState(() {
