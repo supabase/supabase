@@ -26,16 +26,6 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  Future<dynamic> addUser({
-    required String name,
-    required String email,
-  }) async {
-    final res = await client.from('Users').insert({
-      'name': name,
-      'email': email,
-    }).execute();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,10 +73,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     password: _passwordController.text,
                   );
                   if (value == true) {
-                    addUser(
-                      name: _nameController.text,
-                      email: _emailController.text,
-                    );
                     Navigator.pushReplacementNamed(context, '/signin');
                   }
                 },
