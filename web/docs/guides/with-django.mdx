@@ -6,7 +6,7 @@ description: Learn how to use Supabase in your Django App.
 
 ## Intro
 
-TODO
+Here we present a brief overview of how to use Django to build a simple Todo list application.
 
 Note: Django support is community supported and it is very much in an Alpha phase.
 
@@ -128,28 +128,64 @@ values={[
 
 ## Building the App
 
-Let's start building the Django from scratch.
+Let's first set up a virtual environment and install Django.
 
-### Initialize a Django app
+```bash
+virtualenv .env
+source .env/bin/activate
+pip3 install django
+```
 
-TODO
+```bash
+django-admin startproject supatodo
+````
 
-Now let's create a helper file to initialize the Supabase client.
-We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
-These variables will be exposed on the browser, and that's completely fine since we have
-[Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+### Configuring the Database
 
-### Set up a Login component
+Head over to `settings.py` and configure the `DATABASES` setting to the following
 
-TODO
+```python3
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'supatodo',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db.<your_project_ref>.supabase.co',
+        'PORT': '5432',
+    }
+}
+```
 
-### Account page
+### Setting up the models
 
-TODO
+Next, let us insert models here
+
+
+### Creating migrations
+
+```python3 manage.py makemigrations &&python3 manage.py migrate```
+
+We should now have migrations generated so let's do a quick verification of our database state
+
+```bash
+psql -Atx <your_connection_string>
+```
+```
+\dt public.supatodos
+```
+You should see a schema of this form.
+
+### Displaying the frontend
+
+<Insert how to configure routes >
+<Insert how to use django templating language to render todos>
+
 
 ## Next steps
 
-At this stage you have a fully functional application!
+At this stage you have a fully functional application! There are multiple other functions of Supabase-py that we haven't explored such as [authentication](https://github.com/supabase-community/gotrue-py), [functions](https://github.com/supabase-community/functions-py) ,and [storage](https://github.com/supabase-community/storage-py). Feel free to extend on this example(or start a new one) and file a Pull Request of your own.
+As a community effort, we welcome contributions to the [Supabase Python Library](https://github.com/supabase-community/supabase-py) be it through documentation, features, or other relevant Pull Requests.
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
 - Sign in: [app.supabase.io](https://app.supabase.io)
