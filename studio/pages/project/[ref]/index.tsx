@@ -7,11 +7,14 @@ import { IS_PLATFORM } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { NextPageWithLayout } from 'types'
+import { toJS } from 'mobx'
+import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
 
   const project = ui.selectedProject
+  console.log(toJS(project))
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
       ? project?.name
@@ -22,7 +25,10 @@ const Home: NextPageWithLayout = () => {
       <div className="mx-6 flex items-center space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
       </div>
-      {IS_PLATFORM && <ProjectUsageSection />}
+
+      {project && project?.status == 'INACTIVE' && <h2>hello everyone</h2>}
+
+      {/* {IS_PLATFORM && project?.status !== 'INACTIVE' && <ProjectUsageSection />} */}
       <div className="space-y-8">
         <div className="mx-6">
           <Typography.Title level={4}>Client libraries</Typography.Title>

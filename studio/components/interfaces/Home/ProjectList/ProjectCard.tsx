@@ -19,16 +19,23 @@ const ProjectCard: FC<Props> = ({
   onSelectDelete,
   rewriteHref,
 }) => {
+  console.log({ rewriteHref })
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
   return (
     <li className="col-span-1">
       <CardButton
-        linkHref={rewriteHref ? rewriteHref : paused ? '' : `/project/${projectRef}`}
+        linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
-          <div className="flex flex-row gap-1 w-full justify-between w-full">
-            <span className="truncate flex-shrink">{name}</span>
+          <div className="flex w-full w-full flex-row justify-between gap-1">
+            <span className="flex-shrink truncate">{name}</span>
+          </div>
+        }
+        description={''}
+        footer={
+          <div className="flex items-end justify-between">
+            <span className="text-scale-900 text-sm lowercase">{desc}</span>
             {paused && (
               <div className="grow text-right">
                 <Badge color="scale">
@@ -39,15 +46,9 @@ const ProjectCard: FC<Props> = ({
                 </Badge>
               </div>
             )}
-          </div>
-        }
-        description={''}
-        footer={
-          <div className="lowercase flex justify-between items-end">
-            <span className="text-sm text-scale-900">{desc}</span>
-            {paused && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
+
+            {/*<div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2">
                   <Button
                     size="tiny"
                     type="primary"
@@ -63,8 +64,7 @@ const ProjectCard: FC<Props> = ({
                     Delete
                   </Button>
                 </div>
-              </div>
-            )}
+              </div>*/}
           </div>
         }
       ></CardButton>
