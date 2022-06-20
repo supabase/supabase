@@ -7,30 +7,13 @@ import { useOrganizationDetail, useStore } from 'hooks'
 import { toJS } from 'mobx'
 import { Member } from 'types'
 
-/**
- * Endpoints (delete when finished)
- *
- * Delete invite
- * curl -X DELETE "http://localhost:8080/platform/organizations/:slug/members/invite?invited_id=:id" -H "Authorization: Bearer access_token_jwt"
- *
- * Get all pending invites
- * curl -X GET "http://localhost:8080/platform/organizations/:slug/members/invite" -H "Authorization: Bearer access_token_jwt"
- *
- * Send an invitation
- * curl -X POST "http://localhost:8080/platform/organizations/slug/members/invite" -H "Content-Type: application/json" -d '{"invited_email": "", "owner_id": ""}' -H "Authorization: Bearer ..."
- *
- * Verify an invitation
- * curl -X GET 'http://localhost:8080/platform/organizations/slug/members/join?token=XXX'
- *
- */
-
 function InviteMemberModal({ organization, members = [], user }: any) {
   const initialValues = { email: '' }
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
   const [isOpen, setIsOpen] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
-  const [memberList, setMemberList] = useState([])
+  const [memberList, setMemberList] = useState<Member[]>([])
   const [addMemberLoading, setAddMemberLoading] = useState(false)
 
   const { slug: orgSlug } = organization
