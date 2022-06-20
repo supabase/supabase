@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import { Alert, Button, Input, IconRefreshCcw } from '@supabase/ui'
+import { Alert, Button, Input, IconRefreshCcw, IconPause } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
@@ -79,6 +79,52 @@ const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef
   )
 })
 
+interface PauseProjectButtonProps {
+  projectId: number
+  projectRef: string
+}
+const PauseProjectButton: FC<PauseProjectButtonProps> = observer(({ projectRef, projectId }) => {
+  const { ui, app } = useStore()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
+
+  const requestPauseProject = async () => {
+    setLoading(true)
+    try {
+      await post(`${API_URL}/projects/${projectRef}/restart`, {})
+      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+      ui.setNotification({ category: 'success', message: 'Restarting server' })
+      router.push(`/project/${projectRef}`)
+    } catch (error) {
+      ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
+      setLoading(false)
+    }
+    closeModal()
+  }
+
+  return (
+    <>
+      <ConfirmModal
+        danger
+        visible={isModalOpen}
+        title="Pause this project?"
+        description={`Are you sure you want to pause this project? It will not be accessible until you unpause it.`}
+        buttonLabel="Pause project"
+        buttonLoadingLabel="Pausing project"
+        onSelectCancel={closeModal}
+        onSelectConfirm={requestPauseProject}
+      />
+      <Button type="default" icon={<IconPause />} onClick={openModal} loading={loading}>
+        Pause Project
+      </Button>
+    </>
+  )
+})
+
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
   const project = ui.selectedProject
@@ -109,6 +155,7 @@ const GeneralSettings = observer(() => {
           onSubmit={(model: any) => handleUpdateProject(pluckObjectFields(model, BASIC_FIELDS))}
         >
           <AutoField name="name" showInlineError errorMessage="Please enter a project name" />
+          eeeee
         </SchemaFormPanel>
       </section>
 
@@ -143,6 +190,19 @@ const GeneralSettings = observer(() => {
                 </div>
               </div>
               {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
+            </div>
+          </Panel.Content>
+          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+            <div className="flex w-full items-center justify-between">
+              <div>
+                <p>Pause project</p>
+                <div style={{ maxWidth: '420px' }}>
+                  <p className="text-sm opacity-50">
+                    Your project will not be accessible while it is paused.
+                  </p>
+                </div>
+              </div>
+              {project && <PauseProjectButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
         </Panel>
