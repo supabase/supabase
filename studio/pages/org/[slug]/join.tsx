@@ -22,9 +22,9 @@ const User = () => {
   const router = useRouter()
   const { slug, token } = router.query
   const { ui } = useStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState( false )
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>()
-  const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
+  const [tokenInfoLoaded, setTokenInfoLoaded] = useState( false )
   const {
     token_does_not_exist,
     email_match,
@@ -34,56 +34,56 @@ const User = () => {
     invite_id,
   } = tokenValidationInfo || {}
 
-  useEffect(() => {
+  useEffect( () => {
     let cancel = false
 
     async function fetchTokenInfo() {
-      const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`, {})
-      if (!cancel) {
-        setTokenValidationInfo(response)
-        setTokenInfoLoaded(true)
+      const response = await get( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
+      if ( !cancel ) {
+        setTokenValidationInfo( response )
+        setTokenInfoLoaded( true )
       }
     }
 
-    if (router.query.token) {
+    if ( router.query.token ) {
       fetchTokenInfo()
     }
 
     return () => {
       cancel = true
     }
-  }, [])
+  }, [] )
 
   async function handleJoinOrganization() {
-    setIsSubmitting(true)
-    const response = await post(`${API_URL}/organizations/${slug}/members/join?token=${token}`, {})
-    if (response.error) {
-      ui.setNotification({
+    setIsSubmitting( true )
+    const response = await post( `${API_URL}/organizations/${slug}/members/join?token=${token}`, {} )
+    if ( response.error ) {
+      ui.setNotification( {
         category: 'error',
         message: `Failed to join organization: ${response.error.message}`,
-      })
-      setIsSubmitting(false)
+      } )
+      setIsSubmitting( false )
     } else {
-      setIsSubmitting(false)
-      router.push('/')
+      setIsSubmitting( false )
+      router.push( '/' )
     }
   }
 
   async function handleDeclineJoinOrganization() {
-    setIsSubmitting(true)
+    setIsSubmitting( true )
     const response = await delete_(
       `${API_URL}/organizations/${slug}/members/invite?invited_id=${invite_id}`,
       {}
     )
-    if (response.error) {
-      ui.setNotification({
+    if ( response.error ) {
+      ui.setNotification( {
         category: 'error',
         message: `Failed to decline invitation: ${response.error.message}`,
-      })
-      setIsSubmitting(false)
+      } )
+      setIsSubmitting( false )
     } else {
-      setIsSubmitting(false)
-      router.push('/')
+      setIsSubmitting( false )
+      router.push( '/' )
     }
   }
 
@@ -145,17 +145,15 @@ const User = () => {
 
         {tokenInfoLoaded && (
           <div className="mt-4 flex gap-4 border-t pt-4 text-sm">
-            {token_does_not_exist ||
-              !email_match ||
-              (expired_token && <IconAlertCircle size={24} strokeWidth={2} />)}
+            {token_does_not_exist || !email_match || expired_token && <IconAlertCircle size={24} strokeWidth={2} />}
 
             {token_does_not_exist
               ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
               : !email_match
-              ? 'The email address does not match. Are you signed in with right GitHub account?'
-              : expired_token
-              ? 'The invite token has expired. Please request a new one from the organization owner.'
-              : ''}
+                ? 'The email address does not match. Are you signed in with right GitHub account?'
+                : expired_token
+                  ? 'The invite token has expired. Please request a new one from the organization owner.'
+                  : ''}
           </div>
         )}
       </div>
@@ -163,4 +161,4 @@ const User = () => {
   )
 }
 
-export default withAuth(observer(User))
+export default withAuth( observer( User ) )
