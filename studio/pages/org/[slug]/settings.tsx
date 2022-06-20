@@ -34,7 +34,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { NextPageWithLayout, Project } from 'types'
+import { Member, NextPageWithLayout, Project } from 'types'
 import Image from 'next/image'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
@@ -150,7 +150,7 @@ const OrganizationSettings = observer(() => {
 
   useEffect(() => {
     if (!isOrgDetailError) {
-      PageState.members = members ?? [] // members retrieved here
+      PageState.members = members ?? []
       PageState.products = products ?? []
     }
   }, [members, products, isOrgDetailError])
@@ -638,13 +638,13 @@ const OwnerDropdown = observer(({ members, member }: any) => {
     }
   }
 
-  async function handleResendInvite(id: number) {
+  async function handleResendInvite(member: Member) {
     setLoading(true)
 
-    const response = await post(
-      `${API_URL}/organizations/${orgSlug}/members/invite?invited_id=${id}`,
-      {}
-    )
+    const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
+      invited_email: member.profile.primary_email,
+      owner_id: member.invited_id
+    })
 
     if (response.error) {
       ui.setNotification({
@@ -656,6 +656,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
       const updatedMembers = [...members]
       mutateOrgMembers(updatedMembers)
       ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+      setLoading(false)
     }
   }
 
@@ -670,7 +671,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
     if (response.error) {
       ui.setNotification({
         category: 'error',
-        message: `Failed to resend invitation: ${response.error.message}`,
+        message: `Failed to revoke invitation: ${response.error.message}`,
       })
       setLoading(false)
     } else {
@@ -706,7 +707,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
                 </Dropdown.Item>
 
                 {!inviteExpired(member.invited_at) && (
-                  <Dropdown.Item onClick={() => handleResendInvite(member.invited_id)}>
+                  <Dropdown.Item onClick={() => handleResendInvite(member)}>
                     <div className="flex flex-col">
                       <p>Resend invitation</p>
                       <p className="block opacity-50">Invites expire after 24hrs.</p>
