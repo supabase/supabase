@@ -1,5 +1,6 @@
-import { Alert, Form, Input, InputNumber, Loading, Tabs, Toggle } from '@supabase/ui'
+import { Alert, Form, IconInfo, Input, InputNumber, Loading, Tabs, Toggle } from '@supabase/ui'
 import CodeEditor from 'components/ui/CodeEditor'
+import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -168,18 +169,35 @@ const EmailTemplates = observer(() => {
                             })}
                           </FormSectionContent>
                         </FormSection>
-                        <FormSection className="grid-cols-12 !border-t-0">
+                        <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
                           <FormSectionContent loading={!isLoaded} fullWidth>
                             {messageProperty && (
-                              <CodeEditor
-                                id="code-id"
-                                loading={!isLoaded}
-                                language="html"
-                                className="h-96 overflow-hidden rounded border"
-                                defaultValue={authConfig?.config?.[messageSlug] || ''}
-                                onInputChange={(e) => console.log(e)}
-                                options={{ wordWrap: 'off', contextmenu: false }}
-                              />
+                              <>
+                                <FormSectionLabel>
+                                  <span>{messageProperty.title}</span>
+                                </FormSectionLabel>
+                                <InformationBox
+                                  title={'Message variables'}
+                                  hideCollapse={false}
+                                  defaultVisibility={true}
+                                  description={
+                                    messageProperty.description && (
+                                      <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
+                                    )
+                                  }
+                                />
+                                <div className="relative">
+                                  <CodeEditor
+                                    id="code-id"
+                                    loading={!isLoaded}
+                                    language="html"
+                                    className="!mb-0 h-96 overflow-hidden rounded border"
+                                    defaultValue={authConfig?.config?.[messageSlug] || ''}
+                                    onInputChange={(e) => console.log(e)}
+                                    options={{ wordWrap: 'off', contextmenu: false }}
+                                  />
+                                </div>
+                              </>
                             )}
                             <div className="col-span-12 flex w-full justify-between">
                               <FormActions
