@@ -64,7 +64,7 @@ const TableEditor: FC<Props> = ({
   const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = isNewRecord
     ? false
-    : realtimeEnabledTables.some((t: any) => t.id === table.id)
+    : realtimeEnabledTables.some((t: any) => t.id === table?.id)
 
   const [errors, setErrors] = useState<any>({})
   const [tableFields, setTableFields] = useState<TableField>()
