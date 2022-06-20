@@ -181,7 +181,6 @@ class _TodoPageState extends State<TodoPage> {
                                 });
                                 List<dynamic> value = await getTodo();
                                 todos.clear();
-                                setState(() {});
                                 for (var element in value) {
                                   todos.add(element);
                                 }
