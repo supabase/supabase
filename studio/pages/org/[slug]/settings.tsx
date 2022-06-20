@@ -591,7 +591,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
 
     confirmAlert({
       title: 'Confirm to remove',
-      message: `This is permanent! Are you sure you want to remove ${member.profile.username} ?`,
+      message: `This is permanent! Are you sure you want to remove ${member.profile.primary_email}?`,
       onAsyncConfirm: async () => {
         setLoading(true)
         const response = await delete_(`${API_URL}/organizations/${orgSlug}/members/remove`, {
@@ -643,7 +643,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
       invited_email: member.profile.primary_email,
-      owner_id: member.invited_id
+      owner_id: member.invited_id,
     })
 
     if (response.error) {
@@ -707,17 +707,20 @@ const OwnerDropdown = observer(({ members, member }: any) => {
                 </Dropdown.Item>
 
                 {!inviteExpired(member.invited_at) && (
-                  <Dropdown.Item onClick={() => handleResendInvite(member)}>
-                    <div className="flex flex-col">
-                      <p>Resend invitation</p>
-                      <p className="block opacity-50">Invites expire after 24hrs.</p>
-                    </div>
-                  </Dropdown.Item>
+                  <>
+                    <Dropdown.Seperator />
+                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                      <div className="flex flex-col">
+                        <p>Resend invitation</p>
+                        <p className="block opacity-50">Invites expire after 24hrs.</p>
+                      </div>
+                    </Dropdown.Item>
+                  </>
                 )}
               </>
             )}
 
-            {!inviteExpired(member.invited_at) && (
+            {!member.invited_at && (
               <>
                 <Dropdown.Seperator />
                 <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
