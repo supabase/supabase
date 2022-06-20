@@ -16,7 +16,7 @@ export function useSubscriptionStats() {
 
   return {
     total_paid_projects: data?.total_paid_projects ?? 0,
-    total_free_projects: data?.total_free_projects ?? 0,
+    total_free_projects: data?.total_free_projects ?? 0, // set this to force limit locally
     total_pro_projects: data?.total_pro_projects ?? 0,
     total_payg_projects: data?.total_payg_projects ?? 0,
     isLoading: !anyError && !data,
