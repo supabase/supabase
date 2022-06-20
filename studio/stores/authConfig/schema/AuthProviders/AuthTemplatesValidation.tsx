@@ -14,8 +14,12 @@ export const CONFIRMATION: FormSchema = {
       type: 'string',
     },
     MAILER_TEMPLATES_CONFIRMATION_CONTENT: {
-      title: 'Message',
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
       type: 'code',
+      description: ` 
+- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+`,
     },
   },
   validationSchema: object().shape({
@@ -39,8 +43,12 @@ export const INVITE: FormSchema = {
       type: 'string',
     },
     MAILER_TEMPLATES_INVITE_CONTENT: {
-      title: 'Message',
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
       type: 'code',
+      description: ` 
+- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+`,
     },
   },
   validationSchema: object().shape({
@@ -64,8 +72,12 @@ export const MAGIC_LINK: FormSchema = {
       type: 'string',
     },
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT: {
-      title: 'Message',
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
       type: 'code',
+      description: ` 
+- \`{{ .ConfirmationURL }}\` : URL to confirm the message
+`,
     },
   },
   validationSchema: object().shape({
@@ -89,8 +101,12 @@ export const EMAIL_CHANGE: FormSchema = {
       type: 'string',
     },
     MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: {
-      title: 'Message',
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
       type: 'code',
+      description: ` 
+- \`{{ .ConfirmationURL }}\` : URL to confirm the email change
+`,
     },
   },
   validationSchema: object().shape({
@@ -114,8 +130,12 @@ export const RECOVERY: FormSchema = {
       type: 'string',
     },
     MAILER_TEMPLATES_RECOVERY_CONTENT: {
-      title: 'Message',
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
       type: 'code',
+      description: ` 
+- \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
+`,
     },
   },
   validationSchema: object().shape({
@@ -134,17 +154,13 @@ export const SMS: FormSchema = {
   type: 'object',
   title: 'SMS Message',
   properties: {
-    SMS_VONAGE_FROM: {
-      title: 'Subject heading',
-      type: 'string',
-    },
     SMS_TEMPLATE: {
       title: 'Message',
       type: 'string',
+      description: 'To format the OPT code use `{{ .Code }}`',
     },
   },
   validationSchema: object().shape({
-    SMS_VONAGE_FROM: string().required('"Subject heading is required.'),
     SMS_TEMPLATE: string().required('"SMS template is required.'),
   }),
   misc: {
