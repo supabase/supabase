@@ -1,17 +1,11 @@
-import { Alert, Form, IconInfo, Input, InputNumber, Loading, Tabs, Toggle } from '@supabase/ui'
+import { Form, Input, Tabs } from '@supabase/ui'
 import CodeEditor from 'components/ui/CodeEditor'
 import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import { loadavg } from 'os'
-import auth from 'pages/project/[ref]/auth'
-import React from 'react'
-import { useState } from 'react'
 import { useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'
-import { boolean, number, object, string } from 'yup'
 import {
   FormActions,
   FormHeader,
@@ -23,7 +17,6 @@ import {
 
 const EmailTemplates = observer(() => {
   const { authConfig, ui } = useStore()
-  const [enableSmtp, setEnableSmtp] = useState(false)
 
   const isLoaded = authConfig.isLoaded
 
