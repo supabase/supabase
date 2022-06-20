@@ -93,7 +93,12 @@ export interface IMetaStore {
   ) => any
   duplicateTable: (
     payload: any,
-    metadata: { duplicateTable: PostgresTable; isRLSEnabled: boolean; isDuplicateRows: boolean }
+    metadata: {
+      duplicateTable: PostgresTable
+      isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
+      isDuplicateRows: boolean
+    }
   ) => void
   createTable: (
     toastId: string,
@@ -304,9 +309,15 @@ export default class MetaStore implements IMetaStore {
 
   async duplicateTable(
     payload: any,
-    metadata: { duplicateTable: PostgresTable; isRLSEnabled: boolean; isDuplicateRows: boolean }
+    metadata: {
+      duplicateTable: PostgresTable
+      isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
+      isDuplicateRows: boolean
+    }
   ) {
-    const sourceTableName = metadata.duplicateTable.name
+    const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
+    const sourceTableName = duplicateTable.name
     const duplicatedTableName = payload.name
 
     // The following query will copy the structure of the table along with indexes, constraints and
@@ -317,7 +328,7 @@ export default class MetaStore implements IMetaStore {
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
-    const relationships = metadata.duplicateTable.relationships
+    const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
       // @ts-ignore, but might need to investigate, sounds bad:
       // Type instantiation is excessively deep and possibly infinite
@@ -331,14 +342,14 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Duplicate rows if needed
-    if (metadata.isDuplicateRows) {
+    if (isDuplicateRows) {
       const rows = await this.rootStore.meta.query(
         `INSERT INTO "${duplicatedTableName}" SELECT * FROM ${sourceTableName};`
       )
       if (rows.error) throw rows.error
 
       // Insert into does not copy over auto increment sequences, so we manually do it next if any
-      const columns = metadata.duplicateTable.columns
+      const columns = duplicateTable.columns
       // @ts-ignore
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
@@ -353,11 +364,26 @@ export default class MetaStore implements IMetaStore {
     const tables = this.tables.list()
     const duplicatedTable = find(tables, { name: duplicatedTableName })
 
-    if (metadata.isRLSEnabled) {
+    if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
-        rls_enabled: metadata.isRLSEnabled,
+        rls_enabled: isRLSEnabled,
       })
       if (updateTable.error) throw updateTable.error
+    }
+
+    if (isRealtimeEnabled) {
+      const publications = this.publications.list()
+      const realtimePublication = publications.find(
+        (publication) => publication.name === 'supabase_realtime'
+      )
+
+      const id = realtimePublication?.id
+      const realtimeTables = [`${duplicateTable.schema}.${duplicatedTableName}`].concat(
+        realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+      )
+      let payload = { id, tables: realtimeTables }
+      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
+      if (publicationsUpdateError) throw publicationsUpdateError
     }
 
     return duplicatedTable
