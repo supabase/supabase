@@ -101,7 +101,7 @@ class _TodoPageState extends State<TodoPage> {
 
   Future<void> displayTextInputDialog({
     required BuildContext context,
-    void Function()? onTab,
+    void Function()? onTap,
     required TextEditingController taskCtrl,
   }) async {
     return showDialog(
@@ -119,7 +119,7 @@ class _TodoPageState extends State<TodoPage> {
               ),
               smallGap,
               MaterialButton(
-                onPressed: onTab,
+                onPressed: onTap,
                 child: const Text(
                   'Add Task',
                   style: TextStyle(
@@ -170,7 +170,7 @@ class _TodoPageState extends State<TodoPage> {
                             displayTextInputDialog(
                               context: context,
                               taskCtrl: _taskEditingController,
-                              onTab: () async {
+                              onTap: () async {
                                 await editTask(
                                   id: todos[index]['id'].toString(),
                                   task: _taskEditingController.text,
@@ -270,7 +270,7 @@ class _TodoPageState extends State<TodoPage> {
           displayTextInputDialog(
             context: context,
             taskCtrl: _taskEditingController,
-            onTab: () async {
+            onTap: () async {
               await addTodo(
                 task: _taskEditingController.text,
               );
