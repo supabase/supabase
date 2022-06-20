@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache, gql } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Layout from '../../components/layouts/Layout'
-import { IconArrowLeft } from '@supabase/ui'
+import { IconArrowLeft, Badge } from '@supabase/ui'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -37,6 +37,9 @@ export async function getServerSideProps(context: any) {
             title
             bodyText
             createdAt
+            answer {
+              isAnswer
+            }
             author {
               url
               login
@@ -134,8 +137,11 @@ const discussion = ({ data }: any) => {
             <span>{data.repository.discussion.title}</span>
             <span className="text-scale-1000 ml-1">#{data.repository.discussion.number}</span>
           </div>
-          <div className="text-scale-1100 mt-1">
-            {`${data.repository.discussion.author.login} started this conversation in ${data.repository.discussion.category.name}`}
+          <div className="text-scale-1100 mt-1 flex items-center space-x-2">
+            <Badge color={data.repository.discussion.answer?.isAnswer ? 'green' : 'gray'}>
+              {data.repository.discussion.answer?.isAnswer ? 'Answered' : 'Unanswered'}
+            </Badge>
+            <span>{`${data.repository.discussion.author.login} started this conversation in ${data.repository.discussion.category.name}`}</span>
           </div>
         </div>
         <div className="bg-scale-400 border-scale-600 rounded-lg border px-6 py-4">

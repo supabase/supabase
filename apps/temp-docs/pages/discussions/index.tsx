@@ -9,7 +9,6 @@ import Pagination from '../../components/pagination'
 export async function getStaticProps(context: { query: { page: number } }) {
   const Page: any = context.query?.page || 1
   const page = parseInt(Page)
-  console.log(page)
 
   const httpLink = createHttpLink({
     uri: 'https://api.github.com/graphql',
