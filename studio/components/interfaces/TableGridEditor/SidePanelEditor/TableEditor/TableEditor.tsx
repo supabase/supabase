@@ -99,7 +99,7 @@ const TableEditor: FC<Props> = ({
     if (tableFields) {
       const errors: any = validateFields(tableFields)
       if (errors.columns) {
-        ui.setNotification({ category: 'error', message: errors.columns })
+        ui.setNotification({ category: 'error', message: errors.columns, duration: 4000 })
       }
       setErrors(errors)
 
