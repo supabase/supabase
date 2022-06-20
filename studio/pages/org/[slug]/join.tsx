@@ -1,5 +1,4 @@
 import React from 'react'
-import { observer } from 'mobx-react-lite'
 import { useStore, withAuth } from 'hooks'
 import { Button, IconAlertCircle, Typography } from '@supabase/ui'
 import { useState } from 'react'
@@ -161,4 +160,4 @@ const User = () => {
   )
 }
 
-export default withAuth( observer( User ) )
+export default withAuth(User)
