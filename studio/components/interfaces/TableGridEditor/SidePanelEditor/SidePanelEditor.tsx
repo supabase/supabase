@@ -165,10 +165,9 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Duplicating table: ${duplicateTable.name}...`,
         })
-
-        // Need to duplicate realtime perhaps?
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
+          isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
