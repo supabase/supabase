@@ -98,11 +98,18 @@ export interface IMetaStore {
   createTable: (
     toastId: string,
     payload: any,
-    isRLSEnabled: boolean,
     columns: ColumnField[],
+    isRLSEnabled: boolean,
+    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) => any
-  updateTable: (toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) => any
+  updateTable: (
+    toastId: string,
+    table: PostgresTable,
+    payload: any,
+    columns: ColumnField[],
+    isRealtimeEnabled: boolean
+  ) => any
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -332,6 +339,7 @@ export default class MetaStore implements IMetaStore {
 
       // Insert into does not copy over auto increment sequences, so we manually do it next if any
       const columns = metadata.duplicateTable.columns
+      // @ts-ignore
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
@@ -358,8 +366,9 @@ export default class MetaStore implements IMetaStore {
   async createTable(
     toastId: string,
     payload: any,
-    isRLSEnabled: boolean,
     columns: ColumnField[] = [],
+    isRLSEnabled: boolean,
+    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) {
     // Create the table first
@@ -377,6 +386,22 @@ export default class MetaStore implements IMetaStore {
           rls_enabled: isRLSEnabled,
         })
         if (updatedTable.error) throw updatedTable.error
+      }
+
+      // Toggle Realtime if configured to be
+      if (isRealtimeEnabled) {
+        const publications = this.publications.list()
+        const realtimePublication = publications.find(
+          (publication) => publication.name === 'supabase_realtime'
+        )
+
+        const id = realtimePublication?.id
+        const realtimeTables = [`${table.schema}.${table.name}`].concat(
+          realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+        )
+        let payload = { id, tables: realtimeTables }
+        const { error: publicationsUpdateError } = await this.publications.update(id, payload)
+        if (publicationsUpdateError) throw publicationsUpdateError
       }
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
@@ -483,11 +508,18 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async updateTable(toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) {
+  async updateTable(
+    toastId: string,
+    table: PostgresTable,
+    payload: any,
+    columns: ColumnField[],
+    isRealtimeEnabled: boolean
+  ) {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
       .map((column) => `"${column.name}"`)
+    // @ts-ignore
     const existingPrimaryKeyColumns = table.primary_keys.map(
       (pk: PostgresPrimaryKey) => `"${pk.name}"`
     )
@@ -512,6 +544,7 @@ export default class MetaStore implements IMetaStore {
     const columnIds = columns.map((column) => column.id)
 
     // Delete any removed columns
+    // @ts-ignore
     const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
     for (const column of columnsToRemove) {
       this.rootStore.ui.setNotification({
@@ -581,6 +614,30 @@ export default class MetaStore implements IMetaStore {
         primaryKeyColumns
       )
       if (primaryKeys.error) throw primaryKeys.error
+    }
+
+    // Update realtime configuration
+    const publications = this.publications.list()
+    const realtimePublication = publications.find(
+      (publication) => publication.name === 'supabase_realtime'
+    )
+
+    const id = realtimePublication?.id
+    const realtimeEnabled = realtimePublication.tables.some((x: any) => x.id == table.id)
+    if (realtimeEnabled && !isRealtimeEnabled) {
+      // Toggle realtime off
+      const realtimeTables = realtimePublication.tables
+        .filter((x: any) => x.id != table.id)
+        .map((x: any) => `${x.schema}.${x.name}`)
+      let payload = { id, tables: realtimeTables }
+      await this.publications.update(id, payload)
+    } else if (!realtimeEnabled && isRealtimeEnabled) {
+      // Toggle realtime on
+      const realtimeTables = [`${table.schema}.${table.name}`].concat(
+        realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+      )
+      let payload = { id, tables: realtimeTables }
+      await this.publications.update(id, payload)
     }
 
     return { table: await this.tables.loadById(table.id), hasError }
