@@ -9,12 +9,12 @@ import { get, post, delete_ } from 'lib/common/fetch'
 import { useEffect } from 'react'
 
 interface TokenInfoI {
-  organization_name: string | undefined
-  token_does_not_exist: boolean
-  email_match: boolean
-  authorized_user: boolean
-  expired_token: boolean
-  invite_id: number
+  organization_name?: string | undefined
+  token_does_not_exist?: boolean
+  email_match?: boolean
+  authorized_user?: boolean
+  expired_token?: boolean
+  invite_id?: number
 }
 
 type TokenInfo = TokenInfoI | undefined
@@ -36,14 +36,22 @@ const User = () => {
   } = tokenValidationInfo || {}
 
   useEffect(() => {
-    async function fetchTokenInfo() {
-      try {
-        const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-        setTokenValidationInfo(response)
-        setTokenInfoLoaded(true)
-      } catch (error) {
-        console.error(error)
+    const fetchTokenInfo = async () => {
+      const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
+      console.log('i got here')
+
+      // if (!response.ok) {
+      //   throw response
+      // }
+
+      if (response.status == 401) {
+        setTokenValidationInfo({
+          authorized_user: false,
+        })
       }
+
+      setTokenValidationInfo(response)
+      setTokenInfoLoaded(true)
     }
 
     if (router.query.token && !tokenInfoLoaded) {
