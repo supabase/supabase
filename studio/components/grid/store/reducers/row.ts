@@ -85,7 +85,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
       }
     }
     case 'SET_ROWS': {
-      console.log('SET_ROWS', action.payload.rows[0])
       return {
         ...state,
         rows: action.payload.rows,

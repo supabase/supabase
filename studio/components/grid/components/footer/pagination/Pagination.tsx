@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react'
+import { FC, useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, InputNumber, IconArrowRight, IconArrowLeft } from '@supabase/ui'
 import { DropdownControl, showConfirmAlert } from '../../common'
@@ -31,8 +31,8 @@ const Pagination: FC<PaginationProps> = () => {
     if (state.page != page) setPage(state.page)
   }, [state.page, page])
 
-  // [Joshen] Oddly the methods here seems to be getting stale state
-  console.log('Pagination', state.selectedRows)
+  // [Joshen] Oddly without this, state.selectedRows will be stale
+  useEffect(() => {}, [state.selectedRows])
 
   const onPreviousPage = () => {
     if (state.page > 1) {
