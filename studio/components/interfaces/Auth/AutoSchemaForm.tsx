@@ -36,11 +36,12 @@ const AutoSchemaForm = observer(() => {
   })
 
   const isLoaded = authConfig.isLoaded
+  const formId = 'auth-config-general-form'
 
   return (
     <>
       <Form
-        id="auth-config-general-form"
+        id={formId}
         initialValues={INITIAL_VALUES}
         onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
           const payload = { ...values }
@@ -92,6 +93,7 @@ const AutoSchemaForm = observer(() => {
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
                       helper={'Learn more about global Auth settings'}
+                      form={formId}
                     />
                   </div>
                 }
