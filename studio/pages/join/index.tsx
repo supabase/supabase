@@ -137,7 +137,7 @@ const User = () => {
         </div>
 
         <div
-          className={['border-scale-400 border-t', isError ? 'bg-gold-100' : 'bg-transparent'].join(
+          className={['border-scale-400 border-t', isError ? 'bg-sand-100' : 'bg-transparent'].join(
             ' '
           )}
         >
@@ -169,7 +169,7 @@ const User = () => {
               <div
                 className={[
                   'flex flex-col items-center justify-center gap-3 text-base',
-                  isError ? 'text-gold-1100' : 'text-scale-1200',
+                  isError ? 'text-sand-1100' : 'text-scale-1200',
                 ].join(' ')}
               >
                 {isError && <IconAlertCircle size={21} strokeWidth={1.5} />}
