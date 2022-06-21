@@ -40,7 +40,7 @@ import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
 import { useStore, useJwtSecretUpdateStatus } from 'hooks'
 
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 
 import { SettingsLayout } from 'components/layouts'
@@ -353,7 +353,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                       variant="warning"
                       title="This will invalidate all existing API keys!"
                     >
-                      Your project will also be restarted during this process, which will terminate
+                      Generating a new JWT secret will invalidate <u>all</u> of your API keys, including your <code>service_role</code> and <code>anon</code> keys. Your project will also be restarted during this process, which will terminate
                       any existing connections.
                     </Alert>
                   )}

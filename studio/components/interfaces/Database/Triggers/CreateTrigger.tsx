@@ -19,7 +19,7 @@ import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
-import FormEmptyBox from 'components/to-be-cleaned/FormBoxEmpty'
+import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 

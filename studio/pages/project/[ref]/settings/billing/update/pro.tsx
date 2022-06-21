@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { useStore, useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
@@ -21,12 +21,13 @@ const BillingUpdatePro: NextPageWithLayout = () => {
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
-  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
-
   const [subscription, setSubscription] = useState<StripeSubscription>()
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [paymentMethods, setPaymentMethods] = useState<any>()
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
+
+  const isEnterprise =
+    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
     // User added a new payment method
@@ -50,12 +51,16 @@ const BillingUpdatePro: NextPageWithLayout = () => {
     }
   }, [orgSlug])
 
+  useEffect(() => {
+    if (isEnterprise) {
+      router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    }
+  }, [subscription])
+
   const getStripeProducts = async () => {
     try {
-      setIsLoadingProducts(true)
       const products = await get(`${API_URL}/stripe/products`)
       setProducts(products)
-      setIsLoadingProducts(false)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -102,7 +107,12 @@ const BillingUpdatePro: NextPageWithLayout = () => {
     }
   }
 
-  if (!products || !subscription) return <Connecting />
+  if (!products || !subscription || isEnterprise)
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Connecting />
+      </div>
+    )
 
   return (
     <ProUpgrade
