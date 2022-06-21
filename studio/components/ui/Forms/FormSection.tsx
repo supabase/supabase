@@ -1,3 +1,5 @@
+import { Children } from 'react'
+
 const FormSection = ({
   children,
   header,
@@ -29,6 +31,16 @@ const FormSection = ({
 const FormSectionLabel = ({ children }: { children: React.ReactNode | string }) => {
   return <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">{children}</label>
 }
+
+const Shimmer = () => (
+  <div className="flex w-full flex-col gap-2">
+    <div className="shimmering-loader h-2 w-1/3 rounded"></div>
+    <div className="flex flex-col justify-between space-y-2">
+      <div className="shimmering-loader h-[34px] w-2/3 rounded" />
+    </div>
+  </div>
+)
+
 const FormSectionContent = ({
   children,
   loading = true,
@@ -48,16 +60,7 @@ const FormSectionContent = ({
         ${className}
       `}
     >
-      {loading ? (
-        <div className="flex w-full flex-col gap-2">
-          <div className="shimmering-loader h-2 w-1/3 rounded"></div>
-          <div className="flex flex-col justify-between space-y-2">
-            <div className="shimmering-loader h-[34px] w-2/3 rounded" />
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      {loading ? Children.map(children, (child) => <Shimmer />) : children}
     </div>
   )
 }
