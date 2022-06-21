@@ -7,6 +7,7 @@ export interface TableField {
   comment?: string
   columns: ColumnField[]
   isRLSEnabled: boolean
+  isRealtimeEnabled: boolean
 }
 
 export interface ImportContent {

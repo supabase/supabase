@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { Button, Modal } from '@supabase/ui';
-import { render, unmountComponentAtNode } from 'react-dom';
+import * as React from 'react'
+import { Button, Modal } from '@supabase/ui'
+import { render, unmountComponentAtNode } from 'react-dom'
 
 type ConfirmModalProps = {
-  title: string;
-  message: string;
-  onConfirm?: () => void;
-  onAsyncConfirm?: () => Promise<void>;
-  variant?: 'danger' | 'warning' | 'success' | undefined;
-};
+  title: string
+  message: string
+  onConfirm?: () => void
+  onAsyncConfirm?: () => Promise<void>
+  variant?: 'danger' | 'warning' | 'success' | undefined
+}
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   message,
@@ -16,26 +16,26 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onAsyncConfirm,
   variant = 'danger',
 }) => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false)
 
   function onCancelClick() {
-    if (!loading) onClose();
+    if (!loading) onClose()
   }
 
   async function onConfirmClick() {
     if (onAsyncConfirm) {
-      setLoading(true);
-      await onAsyncConfirm();
+      setLoading(true)
+      await onAsyncConfirm()
 
-      onClose();
+      onClose()
     } else if (onConfirm) {
-      onConfirm();
-      onClose();
+      onConfirm()
+      onClose()
     }
   }
 
   function onClose() {
-    removeElement();
+    removeElement()
   }
 
   return (
@@ -55,11 +55,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <Button type="default" onClick={() => onCancelClick()}>
               Cancel
             </Button>
-            <Button
-              type="primary"
-              loading={loading}
-              onClick={() => onConfirmClick()}
-            >
+            <Button type="primary" loading={loading} onClick={() => onConfirmClick()}>
               Confirm
             </Button>
           </div>
@@ -67,32 +63,32 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       }
     >
       <Modal.Content>
-        <p className="text-sm text-scale-1100">{message}</p>
+        <p className="text-scale-1100 py-4 text-sm">{message}</p>
       </Modal.Content>
     </Modal>
-  );
-};
+  )
+}
 
 function removeElement() {
-  const target = document.getElementById('supabase-ui-confirm-alert');
+  const target = document.getElementById('supabase-ui-confirm-alert')
   if (target) {
-    unmountComponentAtNode(target);
-    target?.parentNode?.removeChild(target);
+    unmountComponentAtNode(target)
+    target?.parentNode?.removeChild(target)
   }
 }
 
 function createElement(props: ConfirmModalProps) {
-  let divTarget = document.getElementById('supabase-ui-confirm-alert');
+  let divTarget = document.getElementById('supabase-ui-confirm-alert')
   if (divTarget) {
-    render(<ConfirmModal {...props} />, divTarget);
+    render(<ConfirmModal {...props} />, divTarget)
   } else {
-    divTarget = document.createElement('div');
-    divTarget.id = 'supabase-ui-confirm-alert';
-    document.body.appendChild(divTarget);
-    render(<ConfirmModal {...props} />, divTarget);
+    divTarget = document.createElement('div')
+    divTarget.id = 'supabase-ui-confirm-alert'
+    document.body.appendChild(divTarget)
+    render(<ConfirmModal {...props} />, divTarget)
   }
 }
 
 export function showConfirmAlert(props: ConfirmModalProps) {
-  createElement(props);
+  createElement(props)
 }

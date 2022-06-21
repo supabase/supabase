@@ -148,13 +148,15 @@ const SidePanelEditor: FC<Props> = ({
       tableId?: number
       importContent?: ImportContent
       isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
       isDuplicateRows: boolean
     },
     resolve: any
   ) => {
     let toastId
     let saveTableError = false
-    const { tableId, importContent, isRLSEnabled, isDuplicateRows } = configuration
+    const { tableId, importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } =
+      configuration
 
     try {
       if (isDuplicating) {
@@ -165,6 +167,7 @@ const SidePanelEditor: FC<Props> = ({
         })
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
+          isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
@@ -179,7 +182,14 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Creating new table: ${payload.name}...`,
         })
-        const table = await meta.createTable(toastId, payload, isRLSEnabled, columns, importContent)
+        const table = await meta.createTable(
+          toastId,
+          payload,
+          columns,
+          isRLSEnabled,
+          isRealtimeEnabled,
+          importContent
+        )
         ui.setNotification({
           id: toastId,
           category: 'success',
@@ -195,7 +205,8 @@ const SidePanelEditor: FC<Props> = ({
           toastId,
           selectedTableToEdit,
           payload,
-          columns
+          columns,
+          isRealtimeEnabled
         )
         if (hasError) {
           ui.setNotification({
@@ -258,8 +269,6 @@ const SidePanelEditor: FC<Props> = ({
       )}
       <TableEditor
         table={selectedTableToEdit}
-        tables={tables}
-        enumTypes={enumTypes}
         selectedSchema={selectedSchema}
         isDuplicating={isDuplicating}
         visible={sidePanelKey === 'table'}
