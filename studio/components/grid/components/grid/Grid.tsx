@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
 import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
 import { IconLoader } from '@supabase/ui'
@@ -12,7 +12,7 @@ function rowKeyGetter(row: SupaRow) {
 }
 
 export const Grid = memo(
-  React.forwardRef<DataGridHandle, GridProps>(
+  forwardRef<DataGridHandle, GridProps>(
     (
       { width, height, containerClass, gridClass, rowClass },
       ref: React.Ref<DataGridHandle> | undefined
@@ -22,6 +22,9 @@ export const Grid = memo(
       // workaround to force state tracking on state.gridColumns
       const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
       const { gridColumns, rows, onError: onErrorFunc } = state
+
+      // PROBLEM MIGHT BE HERE - MEMO IS NOT LETTING THE GRID RERENDER
+      console.log('Rows', rows)
 
       function onColumnResize(index: number, width: number) {
         updateColumnResizeDebounced(index, width, dispatch)
@@ -52,6 +55,7 @@ export const Grid = memo(
       }
 
       function onSelectedRowsChange(selectedRows: ReadonlySet<number>) {
+        console.log('onSelectedRowsChange', selectedRows)
         dispatch({
           type: 'SELECTED_ROWS_CHANGE',
           payload: { selectedRows },
@@ -80,6 +84,7 @@ export const Grid = memo(
           </div>
         )
       }
+
       return (
         <div
           className={containerClass}
