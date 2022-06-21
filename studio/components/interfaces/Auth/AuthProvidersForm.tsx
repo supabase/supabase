@@ -83,8 +83,9 @@ const AuthProvidersForm = () => {
 
       <div className="-space-y-px">
         {!authConfig.isLoaded
-          ? providers.map((i) => (
-              <div className={ProviderCollapsibleClasses.join(' ')}>
+          ? // true
+            providers.map((i) => (
+              <div className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}>
                 <HorizontalShimmerWithIcon />
               </div>
             ))
@@ -128,7 +129,7 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
               group
               flex 
               w-full items-center justify-between rounded 
-              p-3 px-6"
+              py-3 px-6"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
