@@ -16,7 +16,7 @@ import { ALL_TIMEZONES } from './PITRBackupSelection.constants'
 import {
   getClientTimezone,
   getTimezoneOffsetText,
-  convertTimeStringtoUnixMs,
+  convertTimeStringtoUnixS,
 } from './PITRBackupSelection.utils'
 
 interface Props {}
@@ -53,7 +53,8 @@ const PITRBackupSelection: FC<Props> = () => {
 
   const hasPhysicalBackups =
     configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
-    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null
+    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null &&
+    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== configuration.physicalBackupData.latestPhysicalBackupDateUnix
 
   if (!configuration.walg_enabled) {
     // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
@@ -75,13 +76,13 @@ const PITRBackupSelection: FC<Props> = () => {
         )
       : ALL_TIMEZONES.map((option) => option.text)
 
-  const earliestAvailableBackup = dayjs(
+  const earliestAvailableBackup = dayjs.unix(
     configuration.physicalBackupData.earliestPhysicalBackupDateUnix
   )
     .tz(selectedTimezone.utc[0])
     .format('YYYY-MM-DDTHH:mm:ss')
 
-  const latestAvailableBackup = dayjs(configuration.physicalBackupData.latestPhysicalBackupDateUnix)
+  const latestAvailableBackup = dayjs.unix(configuration.physicalBackupData.latestPhysicalBackupDateUnix)
     .tz(selectedTimezone.utc[0])
     .format('YYYY-MM-DDTHH:mm:ss')
 
@@ -92,7 +93,7 @@ const PITRBackupSelection: FC<Props> = () => {
     if (!recoveryPoint) {
       setErrors({ recoveryPoint: 'Please enter a date to recovery your project from' })
     } else {
-      const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
+      const recoveryTimeTargetUnix = convertTimeStringtoUnixS(recoveryPoint, selectedTimezone)
       const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
         configuration.physicalBackupData
 
@@ -115,7 +116,7 @@ const PITRBackupSelection: FC<Props> = () => {
     if (!recoveryPoint) return
 
     // To unix milliseconds
-    const recoveryTimeTargetUnix = convertTimeStringtoUnixMs(recoveryPoint, selectedTimezone)
+    const recoveryTimeTargetUnix = convertTimeStringtoUnixS(recoveryPoint, selectedTimezone)
 
     try {
       post(`${API_URL}/database/${projectRef}/backups/pitr`, {
