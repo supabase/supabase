@@ -16,6 +16,7 @@ export async function fetchCount(state: InitialStateType, dispatch: (value: unkn
 
 export async function fetchPage(state: InitialStateType, dispatch: (value: unknown) => void) {
   if (!state.rowService) return
+  dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: true } })
   const { data, error } = await state.rowService.fetchPage(
     state.page,
     state.rowsPerPage,
@@ -30,5 +31,6 @@ export async function fetchPage(state: InitialStateType, dispatch: (value: unkno
       payload: { rows: data?.rows ?? [] },
     })
   }
+  dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: false } })
 }
 export const refreshPageDebounced = AwesomeDebouncePromise(fetchPage, 500)

@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { Button, InputNumber, IconArrowRight, IconArrowLeft } from '@supabase/ui'
+import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from '@supabase/ui'
 import { DropdownControl, showConfirmAlert } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
 
@@ -33,6 +33,10 @@ const Pagination: FC<PaginationProps> = () => {
 
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
+
+  // [Joshen] Note: I've made pagination buttons disabled while rows are being fetched for now
+  // at least until we can send an abort signal to cancel requests if users are mashing the
+  // pagination buttons to find the data they want
 
   const onPreviousPage = () => {
     if (state.page > 1) {
@@ -106,7 +110,7 @@ const Pagination: FC<PaginationProps> = () => {
           <Button
             icon={<IconArrowLeft />}
             type="outline"
-            disabled={state.page <= 1}
+            disabled={state.page <= 1 || state.isLoading}
             onClick={onPreviousPage}
             style={{ padding: '3px 10px' }}
           />
@@ -128,7 +132,7 @@ const Pagination: FC<PaginationProps> = () => {
           <Button
             icon={<IconArrowRight />}
             type="outline"
-            disabled={state.page >= maxPages}
+            disabled={state.page >= maxPages || state.isLoading}
             onClick={onNextPage}
             style={{ padding: '3px 10px' }}
           />
@@ -146,6 +150,7 @@ const Pagination: FC<PaginationProps> = () => {
             >{`${state.rowsPerPage} rows`}</Button>
           </DropdownControl>
           <p className="text-scale-1100 text-sm">{`${state.totalRows.toLocaleString()} records`}</p>
+          {state.isLoading && <IconLoader size={14} className="animate-spin" />}
         </>
       )}
     </div>
