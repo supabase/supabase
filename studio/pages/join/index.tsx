@@ -93,37 +93,38 @@ const User = () => {
   }
 
   return (
-    <div className="bg-secondary flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center px-3">
-      <Link
+    <div className="bg-scale-100 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5">
+      {/* <Link
         passHref
         href={`/?next=${encodeURIComponent(
           `/join/?token=${router.query.token}&slug=${router.query.slug}`
         )}`}
       >
         <Button as="a">Sign in / Sign up</Button>
+      </Link> */}
+      <Link href="/">
+        <a className="flex items-center justify-center gap-4">
+          <img
+            src="/img/supabase-logo.svg"
+            alt="Supabase"
+            className="block h-[24px] cursor-pointer rounded"
+          />
+          {/* <h3 className="text-scale-1200">Supabase</h3> */}
+        </a>
       </Link>
 
-      <div className="mx-auto mt-16 max-w-md space-y-6 rounded-md border-2 p-12 ">
-        <div className="space-y-4">
-          <Link href="/">
-            <a className="flex items-center gap-4">
-              <img
-                src="/img/supabase-logo.svg"
-                alt="Supabase"
-                className="block h-[30px] cursor-pointer rounded"
-              />
-              <Typography.Title level={3} className="mb-0">
-                Supabase
-              </Typography.Title>
-            </a>
-          </Link>
-
-          <h2 className="text-xl">
+      <div
+        className="
+      bg-scale-200 border-scale-300 mx-auto max-w-md
+     rounded-md border text-center shadow"
+      >
+        <div className="space-y-4 px-6 py-6">
+          <p className="text-scale-900 text-sm">
             Join {organization_name && email_match ? organization_name : 'a new organization'}
-          </h2>
+          </p>
 
           {!token_does_not_exist ? (
-            <p className="text-md">
+            <p className="text-scale-1200 text-xl">
               You have been invited to join{' '}
               {organization_name && email_match
                 ? `${organization_name}'s organization`
@@ -135,43 +136,48 @@ const User = () => {
           )}
         </div>
 
-        {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={handleJoinOrganization}
-              htmlType="submit"
-              loading={isSubmitting}
-              size="small"
-            >
-              Join this organization
-            </Button>
+        <div className="border-scale-300 border-t bg-amber-100">
+          <div className="flex flex-col gap-4 px-6 py-4">
+            {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleJoinOrganization}
+                  htmlType="submit"
+                  loading={isSubmitting}
+                  size="small"
+                  type="primary"
+                >
+                  Join this organization
+                </Button>
 
-            <Button
-              onClick={handleDeclineJoinOrganization}
-              htmlType="submit"
-              size="small"
-              type="text"
-            >
-              Decline
-            </Button>
+                <Button
+                  onClick={handleDeclineJoinOrganization}
+                  htmlType="submit"
+                  size="small"
+                  type="warning"
+                >
+                  Decline
+                </Button>
+              </div>
+            )}
+
+            {tokenInfoLoaded && (
+              <div className="text-amber-1100 flex gap-4 text-base">
+                {token_does_not_exist ||
+                  !email_match ||
+                  (expired_token && <IconAlertCircle size={24} strokeWidth={2} />)}
+
+                {token_does_not_exist
+                  ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
+                  : !email_match
+                  ? 'The email address does not match. Are you signed in with right GitHub account?'
+                  : expired_token
+                  ? 'The invite token has expired. Please request a new one from the organization owner.'
+                  : ''}
+              </div>
+            )}
           </div>
-        )}
-
-        {tokenInfoLoaded && (
-          <div className="mt-4 flex gap-4 border-t pt-4 text-sm">
-            {token_does_not_exist ||
-              !email_match ||
-              (expired_token && <IconAlertCircle size={24} strokeWidth={2} />)}
-
-            {token_does_not_exist
-              ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
-              : !email_match
-              ? 'The email address does not match. Are you signed in with right GitHub account?'
-              : expired_token
-              ? 'The invite token has expired. Please request a new one from the organization owner.'
-              : ''}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   )
