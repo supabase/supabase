@@ -1,12 +1,8 @@
-import { Alert, Form, Input, InputNumber, Loading, Toggle } from '@supabase/ui'
+import { Form, Input, Toggle } from '@supabase/ui'
 import { useStore } from 'hooks'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import auth from 'pages/project/[ref]/auth'
-import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
-import { boolean, number, object, string } from 'yup'
+import { useEffect, useState } from 'react'
+import { number, object, string } from 'yup'
 import {
   FormActions,
   FormHeader,
@@ -287,7 +283,6 @@ const SmtpForm = observer(() => {
                       label="Host"
                       descriptionText="Hostname or IP address of your SMTP server."
                     />
-
                     <Input
                       type="number"
                       name="SMTP_PORT"
@@ -317,7 +312,6 @@ const SmtpForm = observer(() => {
                       descriptionText="Maximum number of emails sent per hour"
                       actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                     />
-
                     <Input
                       name="SMTP_USER"
                       id="SMTP_USER"
