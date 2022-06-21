@@ -120,18 +120,21 @@ const PolicyEditorModal: FC<Props> = ({
       return ui.setNotification({
         category: 'error',
         message: 'You will need to allow at one operation in your policy',
+        duration: 4000,
       })
     }
     if (['SELECT', 'DELETE'].includes(command) && !definition) {
       return ui.setNotification({
         category: 'error',
         message: 'Did you forget to provide a USING expression for your policy?',
+        duration: 4000,
       })
     }
     if (command === 'INSERT' && !check) {
       return ui.setNotification({
         category: 'error',
         message: 'Did you forget to provide a WITH CHECK expression for your policy?',
+        duration: 4000,
       })
     }
     if (command === 'UPDATE' && !definition && !check) {
@@ -139,6 +142,7 @@ const PolicyEditorModal: FC<Props> = ({
         category: 'error',
         message:
           'You will need to provide either a USING, or WITH CHECK expression, or both for your policy',
+        duration: 4000,
       })
     }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)
