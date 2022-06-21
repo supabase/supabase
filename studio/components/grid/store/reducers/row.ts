@@ -4,6 +4,7 @@ import { Dictionary, SupaRow } from '../../types'
 import { INIT_ACTIONTYPE } from './base'
 
 export interface RowInitialState {
+  isLoading: boolean
   rows: SupaRow[]
   selectedRows: ReadonlySet<number>
   selectedCellPosition: { idx: number; rowIdx: number } | null
@@ -13,6 +14,7 @@ export interface RowInitialState {
 }
 
 export const rowInitialState: RowInitialState = {
+  isLoading: false,
   rows: [],
   selectedRows: new Set(),
   selectedCellPosition: null,
@@ -45,6 +47,7 @@ type ROW_ACTIONTYPE =
   | { type: 'ADD_NEW_ROW'; payload: Dictionary<any> }
   | { type: 'EDIT_ROW'; payload: { row: Dictionary<any>; idx: number } }
   | { type: 'REMOVE_ROWS'; payload: { rowIdxs: number[] } }
+  | { type: 'SET_IS_LOADING'; payload: { isLoading: boolean } }
 
 const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
   switch (action.type) {
@@ -129,6 +132,12 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         ...state,
         rows: state.rows.filter((x) => !action.payload.rowIdxs.includes(x.idx)),
         totalRows: totalRows,
+      }
+    }
+    case 'SET_IS_LOADING': {
+      return {
+        ...state,
+        isLoading: action.payload.isLoading,
       }
     }
     default:
