@@ -1,6 +1,6 @@
 import React from 'react'
-import { useStore, withAuth } from 'hooks'
-import { Button, IconAlertCircle, Typography } from '@supabase/ui'
+import { useStore } from 'hooks'
+import { Button, IconAlertCircle } from '@supabase/ui'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -22,7 +22,8 @@ type TokenInfo = TokenInfoI | undefined
 const User = () => {
   const router = useRouter()
   const { slug, token } = router.query
-  const { ui } = useStore()
+  const { ui, app } = useStore()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
@@ -38,14 +39,8 @@ const User = () => {
   useEffect(() => {
     const fetchTokenInfo = async () => {
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-      console.log(response)
-
-      // if (!response.ok) {
-      //   throw response
-      // }
-
+      console.log({response})
       if (response.error && response.error.code === 401) {
-        console.log('401111')
         setTokenValidationInfo({
           authorized_user: false,
         })
@@ -53,8 +48,6 @@ const User = () => {
         setTokenInfoLoaded(true)
         setTokenValidationInfo(response)
       }
-
-      // console.log(response)
     }
 
     if (router.query.token && !tokenInfoLoaded) {
@@ -73,7 +66,7 @@ const User = () => {
       setIsSubmitting(false)
     } else {
       setIsSubmitting(false)
-      //   app.organizations.load()
+      app.organizations.load()
       router.push('/')
     }
   }
@@ -143,7 +136,7 @@ const User = () => {
         >
           <div className="flex flex-col gap-4 px-6 py-6 ">
             {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-center">
                 <Button
                   onClick={handleJoinOrganization}
                   htmlType="submit"
@@ -177,21 +170,10 @@ const User = () => {
                 {tokenInfoLoaded && token_does_not_exist
                   ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
                   : tokenInfoLoaded && !email_match
-                  ? 'The email address does not match. Are you signed in with right GitHub account?'
+                  ? 'The invite email address does not match your current Supabase email. Are you signed in with right GitHub account?'
                   : tokenInfoLoaded && expired_token
                   ? 'The invite token has expired. Please request a new one from the organization owner.'
                   : ''}
-              </div>
-            )}
-            {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
-              <div className="flex flex-row items-center gap-3">
-                <Button onClick={handleDeclineJoinOrganization} size="small" type="text">
-                  Decline
-                </Button>
-
-                <Button onClick={handleJoinOrganization} loading={isSubmitting} size="small">
-                  Join this organization
-                </Button>
               </div>
             )}
             {!authorized_user && (
