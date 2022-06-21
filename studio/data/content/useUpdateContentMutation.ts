@@ -1,4 +1,4 @@
-import { post } from 'lib/common/fetch'
+import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useMutation, UseMutationOptions } from 'react-query'
 import { UserContent } from 'types'
@@ -8,14 +8,14 @@ import { UserContent } from 'types'
 type UpdateContentVariables = {
   projectRef: string
   id: string
-  content: UserContent
+  content: Partial<UserContent>
 }
 
 export async function updateContent(
   { projectRef, id, content }: UpdateContentVariables,
   signal?: AbortSignal
 ) {
-  const created = await post<UserContent>(
+  const created = await patch<UserContent>(
     `${API_URL}/projects/${projectRef}/content?id=${id}`,
     content,
     { signal }
