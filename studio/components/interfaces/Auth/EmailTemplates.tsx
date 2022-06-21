@@ -3,7 +3,7 @@ import CodeEditor from 'components/ui/CodeEditor'
 import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'
 import {
@@ -34,8 +34,12 @@ const EmailTemplates = observer(() => {
           size="small"
           scrollable
         >
-          {TEMPLATES_SCHEMAS.map((template) => {
+          {TEMPLATES_SCHEMAS.map((template, i) => {
+            const [bodyValue, setBodyValue] = useState('')
+
             const INITIAL_VALUES: { [x: string]: string } = {}
+
+            // console.log('template.properties', template.properties)
 
             /**
              * construct values for INITIAL_VALUES
@@ -47,17 +51,35 @@ const EmailTemplates = observer(() => {
               INITIAL_VALUES[key] = authConfig.config[key] ?? ''
             })
 
+            console.log(`INITIAL_VALUES for ${template.id}`, INITIAL_VALUES)
+
             const messageSlug = `MAILER_TEMPLATES_${template.id}_CONTENT`
             const messageProperty = template.properties[messageSlug]
 
+            const panelId = template.title.trim().replace(/\s+/g, '-')
+            const formId = `auth-config-email-templates--${template.id}`
+
+            delete INITIAL_VALUES[messageSlug]
+
             return (
-              <Tabs.Panel id={template.title.trim().replace(/\s+/g, '-')} label={template.title}>
+              <Tabs.Panel id={panelId} label={template.title} key={panelId}>
                 <Form
-                  id="auth-config-email-templates"
+                  id={formId}
                   className="!border-t-0"
                   initialValues={INITIAL_VALUES}
                   onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
+                    console.log('hello world')
+
                     const payload = { ...values }
+
+                    // remove rendundant value
+                    delete payload[messageSlug]
+
+                    if (messageProperty) {
+                      payload[messageSlug] = bodyValue
+                    }
+
+                    console.log('payload', payload)
 
                     try {
                       setSubmitting(true)
@@ -68,6 +90,12 @@ const EmailTemplates = observer(() => {
                         category: 'success',
                         message: `Updated settings`,
                       })
+
+                      resetForm({
+                        values: values,
+                        initialValues: values,
+                      })
+                      setBodyValue(authConfig?.config?.[messageSlug])
                     } catch (error) {
                       ui.setNotification({
                         category: 'error',
@@ -77,20 +105,33 @@ const EmailTemplates = observer(() => {
                     }
                   }}
                 >
-                  {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+                  {({ isSubmitting, resetForm, values, initialValues }: any) => {
                     /**
                      * Tracks changes in form
                      */
-                    const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+                    const hasChanges = () => {
+                      if (JSON.stringify(values) !== JSON.stringify(initialValues)) return true
+
+                      if (authConfig?.config?.[messageSlug]) {
+                        if (
+                          authConfig?.config?.[messageSlug] &&
+                          authConfig?.config?.[messageSlug] !== bodyValue
+                        )
+                          return true
+                      }
+
+                      return false
+                    }
 
                     /**
                      * Form is reset once remote data is loaded in store
                      */
                     useEffect(() => {
                       resetForm({
-                        values: authConfig.config,
-                        initialValues: authConfig.config,
+                        values: INITIAL_VALUES,
+                        initialValues: INITIAL_VALUES,
                       })
+                      setBodyValue(authConfig?.config?.[messageSlug])
                     }, [authConfig.isLoaded])
 
                     return (
@@ -185,9 +226,10 @@ const EmailTemplates = observer(() => {
                                     loading={!isLoaded}
                                     language="html"
                                     className="!mb-0 h-96 overflow-hidden rounded border"
-                                    defaultValue={authConfig?.config?.[messageSlug] || ''}
-                                    onInputChange={(e) => console.log(e)}
+                                    // defaultValue={bodyValue}
+                                    onInputChange={(e) => setBodyValue(e)}
                                     options={{ wordWrap: 'off', contextmenu: false }}
+                                    value={bodyValue}
                                   />
                                 </div>
                               </>
@@ -199,10 +241,11 @@ const EmailTemplates = observer(() => {
                                     values: authConfig.config,
                                     initialValues: authConfig.config,
                                   })
+                                  setBodyValue(authConfig?.config?.[messageSlug])
                                 }}
+                                form={formId}
                                 isSubmitting={isSubmitting}
-                                hasChanges={hasChanges}
-                                helper={'Learn more about global Auth settings'}
+                                hasChanges={hasChanges()}
                               />
                             </div>
                           </FormSectionContent>

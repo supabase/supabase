@@ -20,12 +20,6 @@ const SmtpForm = observer(() => {
   const { authConfig, ui } = useStore()
   const [enableSmtp, setEnableSmtp] = useState(false)
 
-  // let enableSmtp = false
-
-  // function setEnableSmtp(value: boolean) {
-  //   enableSmtp = value
-  // }
-
   function generateInitialValues(config: any) {
     return {
       ENABLE_SMTP: enableSmtp,
@@ -39,8 +33,6 @@ const SmtpForm = observer(() => {
     }
   }
 
-  // const INITIAL_VALUES = generateInitialValues(authConfig.config)
-
   function checkSmtpState(config: any, resetForm: () => void) {
     if (
       config.SMTP_ADMIN_EMAIL &&
@@ -51,11 +43,9 @@ const SmtpForm = observer(() => {
       config.SMTP_PORT &&
       config.SMTP_MAX_FREQUENCY > 0
     ) {
-      console.log('TRUE')
       setEnableSmtp(true)
       return resetForm
     } else {
-      console.log('FALSE')
       setEnableSmtp(false)
       return resetForm
     }
@@ -81,7 +71,7 @@ const SmtpForm = observer(() => {
       is: () => {
         return enableSmtp
       },
-      then: (schema) => schema.email('Must be a valid email').required('Admin Email is required'),
+      then: (schema) => schema.email('Must be a valid email').required('Sender email is required'),
       otherwise: (schema) => schema,
     }),
     SMTP_SENDER_NAME: string().when([], {
@@ -112,16 +102,17 @@ const SmtpForm = observer(() => {
           .max(65535, 'Must be a valid port number no more than 65535'),
       otherwise: (schema) => schema,
     }),
-
     SMTP_MAX_FREQUENCY: number().when([], {
       is: () => {
         return enableSmtp
       },
       then: (schema) =>
-        schema.min(1, 'Must be more than 0').max(32767, 'Must not be more than 32,767 an hour'),
+        schema
+          .required('Rate limit is required.')
+          .min(1, 'Must be more than 0')
+          .max(32767, 'Must not be more than 32,767 an hour'),
       otherwise: (schema) => schema,
     }),
-
     SMTP_USER: string().when([], {
       is: () => {
         return enableSmtp
@@ -139,11 +130,12 @@ const SmtpForm = observer(() => {
   })
 
   const isLoaded = authConfig.isLoaded
+  const formId = 'auth-config-smtp-form'
 
   return (
     <>
       <Form
-        id="auth-config-general-form"
+        id={formId}
         initialValues={generateInitialValues(authConfig.config)}
         onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
           const payload = { ...values }
@@ -170,7 +162,6 @@ const SmtpForm = observer(() => {
               category: 'success',
               message: `Updated settings`,
             })
-            console.log('payload', payload)
 
             checkSmtpState(
               payload,
@@ -189,7 +180,7 @@ const SmtpForm = observer(() => {
         }}
         validationSchema={schema}
       >
-        {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+        {({ isSubmitting, resetForm, values, initialValues }: any) => {
           /**
            * Tracks changes in form
            */
@@ -225,6 +216,7 @@ const SmtpForm = observer(() => {
                           })
                         )
                       }}
+                      form={formId}
                       isSubmitting={isSubmitting}
                       hasChanges={hasChanges}
                       helper={'Learn more about global Auth settings'}

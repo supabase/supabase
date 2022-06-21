@@ -1,4 +1,5 @@
 import { Button } from '@supabase/ui'
+import { ButtonHTMLAttributes } from 'react'
 
 interface Props {
   /**
@@ -17,13 +18,26 @@ interface Props {
    * Helper text to show alongside actions
    */
   helper?: React.ReactNode
+  form: React.HTMLProps<HTMLButtonElement>['form']
 }
 
-const FormActions = ({ isSubmitting, handleReset, hasChanges = undefined, helper }: Props) => {
+const FormActions = ({
+  isSubmitting,
+  handleReset,
+  hasChanges = undefined,
+  helper,
+  form,
+}: Props) => {
   return (
-    <div className="flex w-full items-center justify-between gap-2">
+    <div
+      className={[
+        'flex w-full items-center gap-2',
+        // justify actions to right if no helper text
+        helper ? 'justify-between' : 'justify-end',
+      ].join(' ')}
+    >
       {helper && <span className="text-scale-900 text-xs">{helper}</span>}
-      <div className="flex justify-between gap-2">
+      <div className="flex gap-2">
         <Button
           disabled={!hasChanges && hasChanges !== undefined}
           type="default"
@@ -37,7 +51,7 @@ const FormActions = ({ isSubmitting, handleReset, hasChanges = undefined, helper
           loading={isSubmitting}
           type="primary"
           htmlType="submit"
-          form="auth-config-general-form"
+          form={form}
         >
           Save
         </Button>

@@ -17,6 +17,7 @@ interface Props {
   className?: string
   loading?: boolean
   options?: EditorProps['options']
+  value?: string
 }
 
 const CodeEditor: FC<Props> = ({
@@ -30,6 +31,7 @@ const CodeEditor: FC<Props> = ({
   className,
   loading,
   options,
+  value,
 }) => {
   const editorRef = useRef()
 
@@ -81,11 +83,12 @@ const CodeEditor: FC<Props> = ({
 
   return (
     <Editor
+      value={value ?? undefined}
       path={id}
       theme="supabase"
       className={`monaco-editor ${className}`}
       defaultLanguage={language}
-      defaultValue={defaultValue}
+      defaultValue={defaultValue ?? undefined}
       loading={loading || <Connecting />}
       options={optionsMerged}
       onMount={onMount}

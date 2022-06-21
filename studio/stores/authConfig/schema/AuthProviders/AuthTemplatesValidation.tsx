@@ -1,5 +1,5 @@
 import { FormSchema } from 'types'
-import { boolean, number, object, string } from 'yup'
+import { object, string } from 'yup'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 

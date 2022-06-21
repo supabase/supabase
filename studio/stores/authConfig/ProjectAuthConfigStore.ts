@@ -68,9 +68,7 @@ export default class ProjectAuthConfigStore implements IProjectAuthConfigStore {
     const headers = {
       'Content-Type': 'application/json',
     }
-    console.log('this.baseUrl', this.baseUrl)
     const response = await get(this.baseUrl, { headers })
-    console.log('response in authCOnfig store', response)
     if (response.error) {
       throw response.error
     }

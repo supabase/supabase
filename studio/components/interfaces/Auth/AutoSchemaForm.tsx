@@ -1,9 +1,6 @@
-import { Form, Input, InputNumber, Loading, Toggle } from '@supabase/ui'
+import { Form, Input, InputNumber, Toggle } from '@supabase/ui'
 import { useStore } from 'hooks'
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
-import React from 'react'
-import { useState } from 'react'
 import { useEffect } from 'react'
 import { boolean, number, object, string } from 'yup'
 import {
