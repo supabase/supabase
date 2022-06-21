@@ -10,7 +10,6 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
       items: [
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
-        { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
         ...(IS_PLATFORM && logsAuth
           ? [
               {
@@ -28,18 +27,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           {
             title: 'Configuration',
             items: [
-              {
-                name: 'Settings',
-                key: 'settings',
-                url: `/project/${ref}/auth/settings`,
-                items: [],
-              },
-              {
-                name: 'Settings new',
-                key: 'settings-new',
-                url: `/project/${ref}/auth/settings-new`,
-                items: [],
-              },
+              ...(IS_PLATFORM && logsAuth
+                ? [
+                    {
+                      name: 'Settings',
+                      key: 'settings',
+                      url: `/project/${ref}/auth/settings`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
                 name: 'Templates',
                 key: 'settings-templates',
