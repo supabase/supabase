@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
-import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
+import { Menu, Typography, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 
@@ -88,7 +88,7 @@ export default WithSidebar
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return links.map((x: any) => (
     <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
-      <Menu.Group title={x.heading} />
+      {x.heading && <Menu.Group title={x.heading} />}
       {x.versionLabel && (
         <div className="mb-1 px-3">
           <Badge color="yellow">{x.versionLabel}</Badge>
@@ -147,6 +147,15 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
 
 const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, external }) => {
   if (isUndefined(href)) {
+    let icon
+    if (external) {
+      icon = <IconArrowUpRight size={'tiny'} />
+    }
+
+    if (label === 'Logout') {
+      icon = <IconLogOut size={'tiny'} />
+    }
+
     return (
       <Menu.Item
         rounded
@@ -156,7 +165,7 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
         }}
         active={isActive ? true : false}
         onClick={onClick || (() => {})}
-        icon={external && <IconArrowUpRight size={'tiny'} />}
+        icon={icon}
       >
         {isSubitem ? <p className="text-sm">{label}</p> : label}
       </Menu.Item>
