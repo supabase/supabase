@@ -22,7 +22,6 @@ export async function fetchPage(state: InitialStateType, dispatch: (value: unkno
     state.filters,
     state.sorts
   )
-  console.log('Fetch page', { page: state.page, rowsPerPage: state.rowsPerPage }, data, error)
   if (error) {
     // TODO: handle fetch rows data error
   } else {
