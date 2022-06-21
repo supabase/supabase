@@ -1,25 +1,30 @@
+import Split from 'react-split'
 import Editor from '@monaco-editor/react'
 import DataGrid from '@supabase/react-data-grid'
+import { toJS } from 'mobx'
+import { CSVLink } from 'react-csv'
+import { debounce } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Dropdown,
+  IconAlertCircle,
+  IconCheck,
   IconChevronDown,
   IconChevronUp,
   IconHeart,
+  IconLoader,
   IconRefreshCcw,
   Typography,
 } from '@supabase/ui'
-import { useKeyboardShortcuts, useStore, useWindowDimensions } from 'hooks'
+import * as Tooltip from '@radix-ui/react-tooltip'
+
+import { useKeyboardShortcuts, useStore, useWindowDimensions, usePrevious } from 'hooks'
+import Telemetry from 'lib/telemetry'
 import { IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard, timeout } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-import { debounce } from 'lodash'
-import { toJS } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import React, { useEffect, useRef, useState } from 'react'
-import { CSVLink } from 'react-csv'
-import Split from 'react-split'
 import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
 
 const TabSqlQuery = observer(() => {
@@ -264,15 +269,26 @@ const ResultsDropdown = observer(() => {
 })
 
 const SavingIndicator = observer(({ updateSqlSnippet }) => {
-  const sqlEditorStore = useSqlStore()
   const { content } = useStore()
+  const sqlEditorStore = useSqlStore()
+  const previousState = usePrevious(content.savingState)
+  const [showSavedText, setShowSavedText] = useState(false)
 
-  const dotColorClasses =
-    content.savingState === 'IDLE'
-      ? 'bg-green-900 ring-green-800'
-      : content.savingState === 'CREATING' || content.savingState === 'UPDATING'
-      ? 'bg-gray-900 ring-gray-700'
-      : 'bg-red-900 ring-red-800'
+  useEffect(() => {
+    let cancel = false
+
+    if (
+      (previousState === 'CREATING' || previousState === 'UPDATING') &&
+      content.savingState === 'IDLE'
+    ) {
+      setShowSavedText(true)
+      setTimeout(() => {
+        if (!cancel) setShowSavedText(false)
+      }, 3000)
+    }
+
+    return () => (cancel = true)
+  }, [content.savingState])
 
   const retry = () => {
     const [item] = content.list((item) => item.id === sqlEditorStore.selectedTabId)
@@ -299,16 +315,46 @@ const SavingIndicator = observer(({ updateSqlSnippet }) => {
           Retry
         </Button>
       )}
-
-      <span
-        className={
-          'inline-flex h-2 w-2 rounded-full ring-1 transition-colors duration-200 ' +
-          dotColorClasses
-        }
-      />
+      {(content.savingState === 'CREATING' || content.savingState === 'UPDATING') && (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">Saving changes...</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      )}
+      {(content.savingState === 'CREATING_FAILED' || content.savingState === 'UPDATING_FAILED') && (
+        <IconAlertCircle className="text-red-900" size={14} strokeWidth={2} />
+      )}
+      {showSavedText && (
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <IconCheck className="text-brand-800" size={14} strokeWidth={3} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border ',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">All changes saved</span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      )}
       <span className="text-scale-1000 text-sm">
-        {content.savingState === 'IDLE' && 'All changes saved'}
-        {(content.savingState === 'CREATING' || content.savingState === 'UPDATING') && 'Saving...'}
         {content.savingState === 'CREATING_FAILED' && 'Failed to create'}
         {content.savingState === 'UPDATING_FAILED' && 'Failed to save'}
       </span>
