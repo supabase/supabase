@@ -53,7 +53,8 @@ const PITRBackupSelection: FC<Props> = () => {
 
   const hasPhysicalBackups =
     configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
-    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null
+    configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null &&
+    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== configuration.physicalBackupData.latestPhysicalBackupDateUnix
 
   if (!configuration.walg_enabled) {
     // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
