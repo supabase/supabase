@@ -38,20 +38,23 @@ const User = () => {
   useEffect(() => {
     const fetchTokenInfo = async () => {
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-      console.log('i got here')
+      console.log(response)
 
       // if (!response.ok) {
       //   throw response
       // }
 
-      if (response.status == 401) {
+      if (response.error && response.error.code === 401) {
+        console.log('401111')
         setTokenValidationInfo({
           authorized_user: false,
         })
+      } else {
+        setTokenInfoLoaded(true)
+        setTokenValidationInfo(response)
       }
 
-      setTokenValidationInfo(response)
-      setTokenInfoLoaded(true)
+      // console.log(response)
     }
 
     if (router.query.token && !tokenInfoLoaded) {
@@ -93,6 +96,11 @@ const User = () => {
     }
   }
 
+  const isError =
+    !!(tokenInfoLoaded && token_does_not_exist) ||
+    (tokenInfoLoaded && !email_match) ||
+    (tokenInfoLoaded && expired_token)
+
   return (
     <div className="bg-scale-200 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5">
       <div
@@ -128,7 +136,12 @@ const User = () => {
           )}
         </div>
 
-        <div className="border-scale-400 border-t bg-amber-100">
+        <div
+          className={[
+            'border-scale-400 border-t',
+            isError ? 'bg-amber-100' : 'bg-transparent',
+          ].join(' ')}
+        >
           <div className="flex flex-col gap-4 px-6 py-6 ">
             {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
               <div className="flex items-center gap-2">
@@ -154,12 +167,13 @@ const User = () => {
             )}
 
             {tokenInfoLoaded && (
-              <div className="text-amber-1100 flex gap-4 text-base">
-                {(tokenInfoLoaded && token_does_not_exist) ||
-                  (tokenInfoLoaded && !email_match) ||
-                  (tokenInfoLoaded && expired_token && (
-                    <IconAlertCircle size={24} strokeWidth={2} />
-                  ))}
+              <div
+                className={[
+                  'flex flex-col items-center justify-center gap-3 text-base',
+                  isError ? 'text-amber-1100' : 'text-scale-1200',
+                ].join(' ')}
+              >
+                {isError && <IconAlertCircle size={21} strokeWidth={1.5} />}
 
                 {tokenInfoLoaded && token_does_not_exist
                   ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
@@ -182,17 +196,20 @@ const User = () => {
               </div>
             )}
             {!authorized_user && (
-              <div>
-                <Link
-                  passHref
-                  href={`/?next=${encodeURIComponent(
-                    `/join?token=${router.query.token}&slug=${router.query.slug}`
-                  )}`}
-                >
-                  <Button size="medium" as="a" type="default">
-                    Sign in
-                  </Button>
-                </Link>
+              <div className="flex flex-col gap-3">
+                <p className="text-scale-900 text-sm">You will need to sign in first</p>
+                <div>
+                  <Link
+                    passHref
+                    href={`/?next=${encodeURIComponent(
+                      `/join?token=${router.query.token}&slug=${router.query.slug}`
+                    )}`}
+                  >
+                    <Button size="medium" as="a" type="primary">
+                      Sign in to Supabase
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
