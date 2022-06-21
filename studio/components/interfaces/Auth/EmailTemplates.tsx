@@ -227,7 +227,7 @@ const EmailTemplates = observer(() => {
                                     language="html"
                                     className="!mb-0 h-96 overflow-hidden rounded border"
                                     // defaultValue={bodyValue}
-                                    onInputChange={(e) => setBodyValue(e)}
+                                    onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
                                     options={{ wordWrap: 'off', contextmenu: false }}
                                     value={bodyValue}
                                   />
