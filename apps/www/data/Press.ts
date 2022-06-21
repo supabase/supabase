@@ -25,18 +25,6 @@ const data: PressItem[] = [
     publisher: 'Medium',
   },
   {
-    type: 'article',
-    href: 'https://techcrunch.com/2021/09/09/supabase-raises-30m-for-its-open-source-insta-backend/',
-    title: 'Open source backend-as-a-service startup Supabase raises $30M',
-    publisher: 'TechCrunch',
-  },
-  {
-    type: 'article',
-    href: 'https://techcrunch.com/2020/12/15/supabase-raises-6m-for-its-open-source-firebase-alternative/',
-    title: 'Supabase raises $6M for its open-source Firebase alternative',
-    publisher: 'TechCrunch',
-  },
-  {
     type: 'podcast',
     href: 'https://podcasts.apple.com/us/podcast/73-elixir-at-supabase-with-paul-copplestone/id1516100616?i=1000542087899',
     title: 'Elixir at Supabase with Paul Copplestone',
@@ -44,9 +32,9 @@ const data: PressItem[] = [
   },
   {
     type: 'podcast',
-    href: 'https://changelog.com/podcast/476',
-    title: 'Supabase is all in on Postgres',
-    publisher: 'changelog',
+    href: 'https://podcasts.apple.com/us/podcast/73-elixir-at-supabase-with-paul-copplestone/id1516100616?i=1000542087899',
+    title: 'Ant Wilson on Supabase ',
+    publisher: 'Software Engineering Radio',
   },
   {
     type: 'podcast',
@@ -59,6 +47,12 @@ const data: PressItem[] = [
     href: 'https://stackoverflow.blog/2022/05/17/open-source-is-winning-over-developers-and-investors-ep-442/',
     title: 'Open-source is winning over developers and investors',
     publisher: 'Stackoverflow',
+  },
+  {
+    type: 'podcast',
+    href: 'https://changelog.com/podcast/476',
+    title: 'Supabase is all in on Postgres',
+    publisher: 'changelog',
   },
   {
     type: 'podcast',
