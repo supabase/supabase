@@ -242,3 +242,10 @@ table {
   position: relative !important;
   height: unset !important;
 }
+
+.line-clamp {
+  display: -webkit-box;
+  margin: 0 auto;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

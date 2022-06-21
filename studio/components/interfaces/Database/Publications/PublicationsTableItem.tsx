@@ -54,11 +54,11 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
     <Table.tr key={table.id}>
       <Table.td className="whitespace-nowrap">{table.name}</Table.td>
       <Table.td className="whitespace-nowrap">{table.schema}</Table.td>
-      <Table.td className="whitespace-nowrap truncate max-w-sm hidden lg:table-cell">
+      <Table.td className="hidden max-w-sm truncate whitespace-nowrap lg:table-cell">
         {table.comment}
       </Table.td>
       <Table.td className="px-4 py-3 pr-2">
-        <div className="flex gap-2 justify-end">
+        <div className="flex justify-end gap-2">
           {enabledForAllTables ? (
             // @ts-ignore
             <Badge
@@ -74,7 +74,7 @@ const PublicationsTableItem: FC<Props> = ({ table, selectedPublication }) => {
               size="tiny"
               align="right"
               disabled={loading}
-              className="m-0 p-0 ml-2 mt-1 -mb-1"
+              className="m-0 ml-2 mt-1 -mb-1 p-0"
               checked={checked}
               onChange={() => toggleReplicationForTable(table, publication)}
             />
