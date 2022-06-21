@@ -146,6 +146,8 @@ const IndexLayout = withAuth(
           router.push(`/vercel/integrate?${params.toString()}`)
         } else if (router.query?.next?.includes('new-project')) {
           router.push('/new/project')
+        } else if (router.query?.next?.includes('join')) {
+          router.push(`/${router.query.next}`)
         } else if (
           typeof router.query?.next === 'string' &&
           router.query?.next?.startsWith('project/_/')
