@@ -121,7 +121,7 @@ function isMounted() {
 }
 
 function getWindowDimensions() {
-  if (!window) return { width: 0, height: 0 }
+  if (typeof window === 'undefined') return { width: 0, height: 0 }
 
   const { innerWidth: width, innerHeight: height } = window
   return {

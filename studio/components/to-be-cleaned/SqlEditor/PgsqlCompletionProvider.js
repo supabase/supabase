@@ -39,6 +39,7 @@ function startingQuoteScenarioSuggestions(monaco, sqlEditorStore, iterator) {
       isQuotedIdent = true
       ident = fixQuotedIdent(ident)
     }
+    console.log('sqlEditorStore.tableCache:', sqlEditorStore.tableCache)
     let table = sqlEditorStore.tableCache.find((tbl) => {
       return (
         (isQuotedIdent && tbl.tablename === ident) ||

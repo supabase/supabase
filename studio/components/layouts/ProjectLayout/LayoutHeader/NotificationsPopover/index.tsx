@@ -20,8 +20,6 @@ const NotificationsPopover: FC<Props> = () => {
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
-
   const hasNewNotifications = notifications?.some(
     (notification) => notification.notification_status === NotificationStatus.New
   )
@@ -30,9 +28,10 @@ const NotificationsPopover: FC<Props> = () => {
     if (!open) {
       // Mark notifications as seen
       const notificationIds = notifications
-        .filter((notification) => notification.notification_status === NotificationStatus.New)
+        ?.filter((notification) => notification.notification_status === NotificationStatus.New)
         .map((notification) => notification.id)
-      if (notificationIds.length > 0) {
+
+      if ((notificationIds?.length ?? 0) > 0) {
         const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
         if (error) console.error('Failed to update notifications', error)
         refresh()
@@ -88,13 +87,13 @@ const NotificationsPopover: FC<Props> = () => {
             </p> */}
             </div>
             <div className="max-h-[380px] overflow-y-auto py-2">
-              {notifications.length === 0 ? (
+              {(notifications?.length ?? 0) === 0 ? (
                 <div className="py-2 px-4">
                   <p className="text-scale-1000 text-sm">No notifications available</p>
                 </div>
               ) : (
                 <>
-                  {notifications.map((notification, i: number) => (
+                  {notifications?.map((notification, i: number) => (
                     <Fragment key={notification.id}>
                       <NotificationRow
                         notification={notification}

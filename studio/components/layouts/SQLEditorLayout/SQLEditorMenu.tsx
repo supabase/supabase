@@ -1,45 +1,31 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import {
   Button,
   Dropdown,
-  Menu,
-  Input,
-  IconSearch,
-  IconPlus,
-  IconX,
-  IconLoader,
-  IconTrash,
   IconChevronDown,
-  Modal,
   IconEdit2,
+  IconLoader,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+  IconX,
+  Input,
+  Menu,
+  Modal,
 } from '@supabase/ui'
-
-import { IS_PLATFORM } from 'lib/constants'
-import { useOptimisticSqlSnippetCreate, useStore } from 'hooks'
-import QueryTab from 'localStores/sqlEditor/QueryTab'
-import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-
 import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-
-const OpenQueryItem = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const sqlEditorStore: any = useSqlStore()
-  const { id, name } = tabInfo || {}
-  const active = sqlEditorStore.activeTab.id === id
-
-  return (
-    <ProductMenuItem
-      key={id}
-      isActive={active}
-      name={name}
-      action={active && <DropdownMenu tabInfo={tabInfo} />}
-      onClick={() => sqlEditorStore.selectTab(id)}
-      textClassName="w-44"
-    />
-  )
-})
+import { useSqlSnippetsQuery } from 'data/sql/useSqlSnippetsQuery'
+import { useOptimisticSqlSnippetCreate, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { useParams } from 'lib/params'
+import QueryTab from 'localStores/sqlEditor/QueryTab'
+import { TAB_TYPES, useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
+import { toJS } from 'mobx'
+import { observer } from 'mobx-react-lite'
+import { useMemo } from 'react'
+import { useState } from 'react'
+import { partition } from 'lodash'
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   const {
@@ -125,34 +111,18 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   )
 })
 
-const SideBarContent = observer(() => {
-  const sqlEditorStore: any = useSqlStore()
+const SideBarContent = () => {
+  const { ref: projectRef, id } = useParams()
+  const { data, isLoading, isSuccess } = useSqlSnippetsQuery(projectRef)
 
   const [filterString, setFilterString] = useState('')
+  // TODO: add filtering based on filterString
+  const [favorites, queries] = useMemo(
+    () => (data?.snippets ? partition(data.snippets, (snippet) => snippet.content.favorite) : []),
+    [data?.snippets]
+  )
 
   const handleNewQuery = useOptimisticSqlSnippetCreate()
-
-  const getStartedTabs = (sqlEditorStore?.tabs ?? []).filter((tab: any) => {
-    return tab.type === TAB_TYPES.WELCOME
-  })
-
-  const favorites = (sqlEditorStore?.tabs ?? []).filter((tab: any) => {
-    return tab.type !== TAB_TYPES.WELCOME && tab.favorite
-  })
-
-  const queries = (sqlEditorStore?.tabs ?? []).filter((tab: any) => {
-    return tab.type !== TAB_TYPES.WELCOME && !tab.favorite
-  })
-
-  const favouriteTabs =
-    filterString.length === 0
-      ? favorites
-      : favorites.filter((tab: any) => tab.name.includes(filterString))
-
-  const queryTabs =
-    filterString.length === 0
-      ? queries
-      : queries.filter((tab: any) => tab.name.includes(filterString))
 
   return (
     <div className="mt-6">
@@ -187,53 +157,67 @@ const SideBarContent = observer(() => {
           </div>
         )}
 
-        {(sqlEditorStore?.tabs ?? []).length === 0 ? (
+        {isLoading && (
           <div className="my-4 flex items-center space-x-2 px-7">
             <IconLoader className="animate-spin" size={16} strokeWidth={2} />
             <p className="text-sm">Loading SQL snippets</p>
           </div>
-        ) : (
+        )}
+
+        {isSuccess && (
           <div className="space-y-6">
             {IS_PLATFORM && (
               <div className="px-3">
                 <Menu.Group title="Getting started" />
-                {getStartedTabs.map((tab: any) => {
-                  const { id, name } = tab || {}
-                  return (
-                    <ProductMenuItem
-                      key={id}
-                      name={name}
-                      isActive={sqlEditorStore.activeTab.id === id}
-                      onClick={() => sqlEditorStore.selectTab(id)}
-                    />
-                  )
-                })}
+
+                <ProductMenuItem name="Welcome" isActive={!id} url={`/project/${projectRef}/sql`} />
               </div>
             )}
+
             <div className="space-y-6 px-3">
-              {favouriteTabs.length >= 1 && (
+              {favorites!.length >= 1 && (
                 <div className="editor-product-menu">
                   <Menu.Group title="Favorites" />
                   <div className="space-y-1">
-                    {favouriteTabs.map((tabInfo: any) => {
-                      const { id } = tabInfo || {}
-                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                    {favorites!.map(({ id: _id, name }) => {
+                      return (
+                        <ProductMenuItem
+                          key={_id}
+                          isActive={id === _id}
+                          name={name}
+                          url={`/project/${projectRef}/sql/${_id}`}
+                          // action={id === _id && <DropdownMenu tabInfo={tabInfo} />}
+                          // onClick={() => sqlEditorStore.selectTab(id)}
+                          textClassName="w-44"
+                        />
+                      )
                     })}
                   </div>
                 </div>
               )}
-              {queryTabs.length >= 1 && (
+
+              {queries!.length >= 1 && (
                 <div className="editor-product-menu">
                   <Menu.Group title="SQL snippets" />
                   <div className="space-y-1">
-                    {queryTabs.map((tabInfo: any) => {
-                      const { id } = tabInfo || {}
-                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                    {queries!.map(({ id: _id, name }) => {
+                      return (
+                        <ProductMenuItem
+                          key={_id}
+                          isActive={id === _id}
+                          name={name}
+                          url={`/project/${projectRef}/sql/${_id}`}
+                          // action={active && <DropdownMenu tabInfo={tabInfo} />}
+                          // onClick={() => sqlEditorStore.selectTab(id)}
+                          textClassName="w-44"
+                        />
+                      )
                     })}
                   </div>
                 </div>
               )}
-              {filterString.length > 0 && favouriteTabs.length === 0 && queryTabs.length === 0 && (
+
+              {filterString.length > 0 && favorites!.length === 0 && queries!.length === 0 && (
                 <div className="px-4">
                   <p className="text-sm">No queries found</p>
                 </div>
@@ -244,6 +228,6 @@ const SideBarContent = observer(() => {
       </Menu>
     </div>
   )
-})
+}
 
 export default SideBarContent

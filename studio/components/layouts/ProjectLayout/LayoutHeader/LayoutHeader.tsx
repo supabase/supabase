@@ -53,7 +53,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         ) : (
           <Link href="/">
             <a
-              className={`text-scale-1200 cursor-pointer px-2 py-1 text-xs focus:bg-transparent focus:outline-none`}
+              className={`text-scale-1200 inline-flex h-8 cursor-pointer items-center justify-center px-2 py-1 text-xs focus:bg-transparent focus:outline-none`}
             >
               Supabase
             </a>
@@ -71,8 +71,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {IS_PLATFORM && <NotificationsPopover />}
       </div>
     </div>
-    // </div>
-    // </div>
   )
 }
 export default observer(LayoutHeader)

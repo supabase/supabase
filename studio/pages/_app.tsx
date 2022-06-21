@@ -21,6 +21,8 @@ import { AppPropsWithLayout } from 'types'
 
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
 import { getParameterByName } from 'lib/common/fetch'
@@ -35,6 +37,7 @@ dayjs.extend(timezone)
 dayjs.extend(utc)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const [queryClient] = useState(() => new QueryClient())
   const [rootStore] = useState(() => new RootStore())
   const router = useRouter()
 
@@ -52,21 +55,26 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
-    <StoreProvider rootStore={rootStore}>
-      <FlagProvider>
-        <Head>
-          <title>Supabase</title>
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
-        </Head>
-        <PageTelemetry>
-          <RouteValidationWrapper>
-            <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-          </RouteValidationWrapper>
-        </PageTelemetry>
-        <PortalToast />
-      </FlagProvider>
-    </StoreProvider>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <StoreProvider rootStore={rootStore}>
+          <FlagProvider>
+            <Head>
+              <title>Supabase</title>
+              <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
+            </Head>
+            <PageTelemetry>
+              <RouteValidationWrapper>
+                <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+              </RouteValidationWrapper>
+            </PageTelemetry>
+            <PortalToast />
+            <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+          </FlagProvider>
+        </StoreProvider>
+      </Hydrate>
+    </QueryClientProvider>
   )
 }
 export default MyApp
