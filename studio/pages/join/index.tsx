@@ -33,10 +33,6 @@ const User = () => {
     invite_id,
   } = tokenValidationInfo || {}
 
-  console.log(slug, token)
-  console.log('tokenValidationInfo', tokenValidationInfo)
-  console.log('tokenInfoLoaded', tokenInfoLoaded)
-
   useEffect(() => {
     let cancel = false
 
@@ -97,7 +93,7 @@ const User = () => {
       <Link
         passHref
         href={`/?next=${encodeURIComponent(
-          `/join/?token=${router.query.token}&slug=${router.query.slug}`
+          `/join?token=${router.query.token}&slug=${router.query.slug}`
         )}`}
       >
         <Button as="a">Sign in / Sign up</Button>
@@ -137,21 +133,11 @@ const User = () => {
 
         {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
           <div className="flex items-center gap-2">
-            <Button
-              onClick={handleJoinOrganization}
-              htmlType="submit"
-              loading={isSubmitting}
-              size="small"
-            >
+            <Button onClick={handleJoinOrganization} loading={isSubmitting} size="small">
               Join this organization
             </Button>
 
-            <Button
-              onClick={handleDeclineJoinOrganization}
-              htmlType="submit"
-              size="small"
-              type="text"
-            >
+            <Button onClick={handleDeclineJoinOrganization} size="small" type="text">
               Decline
             </Button>
           </div>
