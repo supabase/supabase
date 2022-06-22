@@ -39,7 +39,6 @@ const User = () => {
   useEffect(() => {
     const fetchTokenInfo = async () => {
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-      console.log({response})
       if (response.error && response.error.code === 401) {
         setTokenValidationInfo({
           authorized_user: false,
@@ -109,7 +108,6 @@ const User = () => {
                 alt="Supabase"
                 className="block h-[24px] cursor-pointer rounded"
               />
-              {/* <h3 className="text-scale-1200">Supabase</h3> */}
             </a>
           </Link>
           <p className="text-scale-900 text-sm">
