@@ -234,6 +234,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   auth_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  hooks_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -242,6 +245,7 @@ export enum LogsTableName {
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
+  HOOKS = 'hooks_logs',
 }
 
 export const LOGS_TABLES = {
@@ -250,6 +254,7 @@ export const LOGS_TABLES = {
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
+  hooks: LogsTableName.HOOKS,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -258,6 +263,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
+  [LogsTableName.HOOKS]: 'Logs from Postgres hooks',
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
