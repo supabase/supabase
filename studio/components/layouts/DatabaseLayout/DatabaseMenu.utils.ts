@@ -1,10 +1,11 @@
 import { Project } from 'types'
 import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { useFlag } from 'hooks'
 
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-
+  const logsPostgrest = useFlag('logsPostgrest')
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
 
@@ -36,62 +37,66 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
     },
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Logs',
-          items: [
-            {
-              name: 'API logs',
-              key: 'api-logs',
-              url: `/project/${ref}/database/api-logs`,
-              items: [],
-            },
-            {
-              name: 'Postgres logs',
-              key: 'postgres-logs',
-              url: `/project/${ref}/database/postgres-logs`,
-              items: [],
-            },
-            {
-              name: 'PostgREST logs',
-              key: 'postgrest-logs',
-              url: `/project/${ref}/database/postgrest-logs`,
-              items: [],
-            },
-          ],
-        },
-      ]
+          {
+            title: 'Logs',
+            items: [
+              {
+                name: 'API logs',
+                key: 'api-logs',
+                url: `/project/${ref}/database/api-logs`,
+                items: [],
+              },
+              {
+                name: 'Postgres logs',
+                key: 'postgres-logs',
+                url: `/project/${ref}/database/postgres-logs`,
+                items: [],
+              },
+              ...(logsPostgrest
+                ? [
+                    {
+                      name: 'PostgREST logs',
+                      key: 'postgrest-logs',
+                      url: `/project/${ref}/database/postgrest-logs`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
       : []),
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Alpha Preview',
-          isPreview: true,
-          items: [
-            {
-              name: 'Triggers',
-              key: 'triggers',
-              url: `/project/${ref}/database/triggers`,
-              items: [],
-            },
-            {
-              name: 'Functions',
-              key: 'functions',
-              url: `/project/${ref}/database/functions`,
-              items: [],
-            },
-            ...(showHooksRoute
-              ? [
-                {
-                  name: 'Function Hooks',
-                  key: 'hooks',
-                  url: `/project/${ref}/database/hooks`,
-                  items: [],
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
+          {
+            title: 'Alpha Preview',
+            isPreview: true,
+            items: [
+              {
+                name: 'Triggers',
+                key: 'triggers',
+                url: `/project/${ref}/database/triggers`,
+                items: [],
+              },
+              {
+                name: 'Functions',
+                key: 'functions',
+                url: `/project/${ref}/database/functions`,
+                items: [],
+              },
+              ...(showHooksRoute
+                ? [
+                    {
+                      name: 'Function Hooks',
+                      key: 'hooks',
+                      url: `/project/${ref}/database/hooks`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
       : []),
   ]
 }
