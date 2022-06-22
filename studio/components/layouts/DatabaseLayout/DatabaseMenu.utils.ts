@@ -51,6 +51,12 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
               url: `/project/${ref}/database/postgres-logs`,
               items: [],
             },
+            {
+              name: 'PostgREST logs',
+              key: 'postgrest-logs',
+              url: `/project/${ref}/database/postgrest-logs`,
+              items: [],
+            },
           ],
         },
       ]
