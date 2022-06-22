@@ -1,6 +1,6 @@
 import React from 'react'
 import { useProfile, useStore } from 'hooks'
-import { Button, IconAlertCircle, IconCheck, IconCheckSquare, IconXSquare } from '@supabase/ui'
+import { Button, IconCheckSquare } from '@supabase/ui'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -9,7 +9,7 @@ import { get, post, delete_ } from 'lib/common/fetch'
 import { useEffect } from 'react'
 import { auth } from 'lib/gotrue'
 
-interface TokenInfoI {
+interface ITokenInfo {
   organization_name?: string | undefined
   token_does_not_exist?: boolean
   email_match?: boolean
@@ -18,13 +18,13 @@ interface TokenInfoI {
   invite_id?: number
 }
 
-type TokenInfo = TokenInfoI | undefined
+type TokenInfo = ITokenInfo | undefined
 
-const User = () => {
+const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token } = router.query
   const { ui, app } = useStore()
-  const { profile, isLoading } = useProfile()
+  const { profile } = useProfile()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
@@ -38,9 +38,7 @@ const User = () => {
     invite_id,
   } = tokenValidationInfo || {}
 
-  const loginRedirectLink = `/?next=${encodeURIComponent(
-    `/join?token=${router.query.token}&slug=${router.query.slug}`
-  )}`
+  const loginRedirectLink = `/?next=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   useEffect(() => {
     const fetchTokenInfo = async () => {
@@ -57,10 +55,10 @@ const User = () => {
       }
     }
 
-    if (router.query.token && !tokenInfoLoaded) {
+    if (token && !tokenInfoLoaded) {
       fetchTokenInfo()
     }
-  }, [router.query])
+  }, [token])
 
   async function handleJoinOrganization() {
     setIsSubmitting(true)
@@ -102,18 +100,6 @@ const User = () => {
     (tokenInfoLoaded && expired_token)
 
   const ErrorMessage = () => {
-    const Container = ({ children }: { children: React.ReactNode }) => (
-      <div
-        className={[
-          'flex flex-col items-center justify-center gap-3 text-sm',
-          isError ? 'text-scale-1100' : 'text-scale-1200',
-        ].join(' ')}
-      >
-        {/* <IconAlertCircle size={21} strokeWidth={1.5} /> */}
-        <>{children}</>
-      </div>
-    )
-
     const message = token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
@@ -152,11 +138,26 @@ const User = () => {
       ''
     )
 
-    return <Container>{message}</Container>
+    return (
+      <div
+        className={[
+          'flex flex-col items-center justify-center gap-3 text-sm',
+          isError ? 'text-scale-1100' : 'text-scale-1200',
+        ].join(' ')}
+      >
+        {message}
+      </div>
+    )
   }
 
   return (
-    <div className="bg-scale-200 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5">
+    <div
+      className={[
+        'bg-scale-200 flex h-full min-h-screen',
+        'w-full flex-col place-items-center',
+        'items-center justify-center gap-8 px-5',
+      ].join(' ')}
+    >
       <Link href="/">
         <a className="flex items-center justify-center gap-4">
           <img
@@ -170,12 +171,10 @@ const User = () => {
         className="
           bg-scale-300 border-scale-400 mx-auto overflow-hidden
           rounded-md border text-center shadow
-          md:w-[380px]
+          md:w-[400px]
           "
       >
         <div className="flex flex-col gap-2 px-6 py-8">
-          {/* <p className="text-scale-900 text-xs">Organization invitation</p> */}
-
           {!token_does_not_exist ? (
             <>
               <p className="text-scale-1200 text-sm">You have been invited to join </p>
@@ -205,13 +204,7 @@ const User = () => {
           <div className="flex flex-col gap-4 px-6 py-4 ">
             {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
               <div className="flex flex-row items-center justify-center gap-3">
-                <Button
-                  onClick={handleDeclineJoinOrganization}
-                  htmlType="submit"
-                  type="default"
-
-                  // icon={<IconXSquare />}
-                >
+                <Button onClick={handleDeclineJoinOrganization} htmlType="submit" type="default">
                   Decline
                 </Button>
                 <Button
@@ -254,4 +247,4 @@ const User = () => {
   )
 }
 
-export default User
+export default JoinOrganizationPage
