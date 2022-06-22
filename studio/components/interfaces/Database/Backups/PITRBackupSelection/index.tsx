@@ -54,7 +54,8 @@ const PITRBackupSelection: FC<Props> = () => {
   const hasPhysicalBackups =
     configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== null &&
     configuration.physicalBackupData.latestPhysicalBackupDateUnix !== null &&
-    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !== configuration.physicalBackupData.latestPhysicalBackupDateUnix
+    configuration.physicalBackupData.earliestPhysicalBackupDateUnix !==
+      configuration.physicalBackupData.latestPhysicalBackupDateUnix
 
   if (!configuration.walg_enabled) {
     // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
@@ -76,13 +77,13 @@ const PITRBackupSelection: FC<Props> = () => {
         )
       : ALL_TIMEZONES.map((option) => option.text)
 
-  const earliestAvailableBackup = dayjs.unix(
-    configuration.physicalBackupData.earliestPhysicalBackupDateUnix
-  )
+  const earliestAvailableBackup = dayjs
+    .unix(configuration.physicalBackupData.earliestPhysicalBackupDateUnix)
     .tz(selectedTimezone.utc[0])
     .format('YYYY-MM-DDTHH:mm:ss')
 
-  const latestAvailableBackup = dayjs.unix(configuration.physicalBackupData.latestPhysicalBackupDateUnix)
+  const latestAvailableBackup = dayjs
+    .unix(configuration.physicalBackupData.latestPhysicalBackupDateUnix)
     .tz(selectedTimezone.utc[0])
     .format('YYYY-MM-DDTHH:mm:ss')
 
@@ -118,30 +119,31 @@ const PITRBackupSelection: FC<Props> = () => {
     // To unix milliseconds
     const recoveryTimeTargetUnix = convertTimeStringtoUnixS(recoveryPoint, selectedTimezone)
 
-    try {
-      post(`${API_URL}/database/${projectRef}/backups/pitr`, {
-        recovery_time_target_unix: recoveryTimeTargetUnix,
-        region: configuration.region,
-      }).then(() => {
-        setTimeout(() => {
-          setShowConfirmation(false)
-          app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
-          ui.setNotification({
-            category: 'success',
-            message: `Restoring database back to ${dayjs(recoveryPoint).format(
-              'DD MMM YYYY, HH:mm:ss'
-            )} (
-            ${getTimezoneOffsetText(selectedTimezone)})`,
-          })
-          router.push(`/project/${projectRef}`)
-        }, 3000)
-      })
-    } catch (error) {
+    const { error } = await post(`${API_URL}/database/${projectRef}/backups/pitr`, {
+      recovery_time_target_unix: recoveryTimeTargetUnix,
+      region: configuration.region,
+    })
+
+    if (error) {
       ui.setNotification({
         error,
         category: 'error',
         message: `Point in time recovery for project failed`,
       })
+      setShowConfirmation(false)
+    } else {
+      setTimeout(() => {
+        setShowConfirmation(false)
+        app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+        ui.setNotification({
+          category: 'success',
+          message: `Restoring database back to ${dayjs(recoveryPoint).format(
+            'DD MMM YYYY, HH:mm:ss'
+          )} (
+                ${getTimezoneOffsetText(selectedTimezone)})`,
+        })
+        router.push(`/project/${projectRef}`)
+      }, 3000)
     }
   }
 
