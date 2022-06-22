@@ -122,9 +122,10 @@ export const inferColumnType = (column: string, rows: object[]) => {
 
   // Infer boolean type
   if (includes(['true', 'false'], columnData.toString().toLowerCase())) {
-    const isAllBoolean = columnDataAcrossRows.every((item: any) =>
-      includes(['true', 'false'], item.toString().toLowerCase())
-    )
+    const isAllBoolean = columnDataAcrossRows.every((item: any) => {
+      if (item === null) return true
+      else return includes(['true', 'false'], item.toString().toLowerCase())
+    })
     if (isAllBoolean) {
       return 'boolean'
     }

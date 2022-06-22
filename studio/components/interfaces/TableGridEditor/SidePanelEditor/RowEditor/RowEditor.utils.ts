@@ -283,8 +283,6 @@ export const generateRowObjectFromFields = (
           rowObject[field.name] = tryParseJson(value)
         }
       }
-    } else if (NUMERICAL_TYPES.includes(field.format) && value) {
-      rowObject[field.name] = Number(value)
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
