@@ -358,10 +358,10 @@ const handleInserts = (payload) => {
   console.log('Change received!', payload)
 }
 
-// Listen to unserts
+// Listen to inserts
 const { data: todos, error } = await supabase
   .from('todos')
-  .on('INSERT', handleUpdates)
+  .on('INSERT', handleInserts)
   .subscribe()
 ```
 
