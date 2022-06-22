@@ -1,12 +1,12 @@
-import { useProfile, useStore } from 'hooks'
-import { Button, IconCheckSquare } from '@supabase/ui'
-import { useState } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { Button, IconCheckSquare } from '@supabase/ui'
+
+import { useProfile, useStore } from 'hooks'
+import { auth } from 'lib/gotrue'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
-import { useEffect } from 'react'
-import { auth } from 'lib/gotrue'
 
 interface ITokenInfo {
   organization_name?: string | undefined
