@@ -1,33 +1,33 @@
-import React from 'react'
-import { observer } from 'mobx-react-lite'
-
-import { useStore } from 'hooks'
-import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { Button, Form, Input, Modal } from '@supabase/ui'
+import { useStore } from 'hooks'
 
-const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
+const RenameQuery = ({ tabId, onComplete, visible, onCancel }: any) => {
   const { ui, content: contentStore } = useStore()
 
-  const sqlEditorStore = useSqlStore()
+  const sqlEditorStore: any = null
   const model = prepareModel()
 
   function prepareModel() {
-    const tabInfo = sqlEditorStore.tabs.find((x) => x.id === tabId)
+    const tabInfo = sqlEditorStore.tabs.find((x: any) => x.id === tabId)
     if (tabInfo) return tabInfo.renameModel
 
-    const favInfo = sqlEditorStore.favorites.find((x) => x.key === tabId)
+    const favInfo = sqlEditorStore.favorites.find((x: any) => x.key === tabId)
     if (favInfo) return favInfo.renameModel
   }
 
-  async function onRename(model) {
+  async function onRename(model: any) {
     try {
       /*
        * new main db save
        */
-      await contentStore.update(tabId, {
-        name: model.name,
-        description: model.desc,
-      })
+      await contentStore.update(
+        tabId,
+        {
+          name: model.name,
+          description: model.desc,
+        },
+        'sql'
+      )
 
       /*
        * old localStorage save
@@ -36,7 +36,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
 
       if (onComplete) onComplete()
       return Promise.resolve()
-    } catch (error) {
+    } catch (error: any) {
       ui.setNotification({
         error,
         category: 'error',
@@ -55,7 +55,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
           desc: model ? model.desc : '',
         }}
         validate={(values) => {
-          const errors = {}
+          const errors: any = {}
           if (!values.name) errors.name = 'Please enter a query name'
           return errors
         }}
@@ -65,7 +65,7 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
           setSubmitting(false)
         }}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting }: any) => (
           <div className="space-y-4 py-4">
             <Modal.Content>
               <Input label="Name" id="name" name="name" />
@@ -89,6 +89,6 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
       </Form>
     </Modal>
   )
-})
+}
 
 export default RenameQuery

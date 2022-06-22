@@ -12,30 +12,19 @@ import {
   Menu,
   Modal,
 } from '@supabase/ui'
-import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
+import RenameQuery from 'components/interfaces/SQLEditor/RenameQuery'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { useSqlSnippetsQuery } from 'data/sql/useSqlSnippetsQuery'
-import { useOptimisticSqlSnippetCreate, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useParams } from 'lib/params'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
-import { TAB_TYPES, useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-import { toJS } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import { useMemo } from 'react'
-import { useState } from 'react'
 import { partition } from 'lodash'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
-const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const {
-    ui: { profile: user },
-    content: contentStore,
-  } = useStore()
-
-  const sqlEditorStore: any = useSqlStore()
-
+const DropdownMenu = ({ tabInfo }: { tabInfo: QueryTab }) => {
   const [tabId, setTabId] = useState('')
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -81,7 +70,6 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
       )}
 
       <RenameQuery
-        // @ts-ignore -- @mildtomato not sure what is wrong here
         visible={renameModalOpen}
         onCancel={onCloseRenameModal}
         tabId={tabId}
@@ -93,14 +81,12 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         buttonLabel="Confirm"
         visible={deleteModalOpen}
         onSelectConfirm={async () => {
-          sqlEditorStore.closeTab(id)
-
-          await contentStore.del(id)
-
-          sqlEditorStore.loadTabs(
-            sqlEditorStore.tabsFromContentStore(contentStore, user?.id),
-            false
-          )
+          // sqlEditorStore.closeTab(id)
+          // await contentStore.del(id)
+          // sqlEditorStore.loadTabs(
+          //   sqlEditorStore.tabsFromContentStore(contentStore, user?.id),
+          //   false
+          // )
         }}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
@@ -110,9 +96,10 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
       </ConfirmationModal>
     </div>
   )
-})
+}
 
 const SideBarContent = () => {
+  const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
   const { ref: projectRef, id } = useParams()
   const { data, isLoading, isSuccess } = useSqlSnippetsQuery(projectRef, {
@@ -130,7 +117,7 @@ const SideBarContent = () => {
     [data?.snippets]
   )
 
-  const handleNewQuery = useOptimisticSqlSnippetCreate()
+  const handleNewQuery = () => {}
 
   return (
     <div className="mt-6">
@@ -178,7 +165,16 @@ const SideBarContent = () => {
               <div className="px-3">
                 <Menu.Group title="Getting started" />
 
-                <ProductMenuItem name="Welcome" isActive={!id} url={`/project/${projectRef}/sql`} />
+                <ProductMenuItem
+                  name="Quick Query"
+                  isActive={router.pathname === '/project/[ref]/sql'}
+                  url={`/project/${projectRef}/sql`}
+                />
+                <ProductMenuItem
+                  name="Templates"
+                  isActive={router.pathname === '/project/[ref]/sql/templates'}
+                  url={`/project/${projectRef}/sql/templates`}
+                />
               </div>
             )}
 

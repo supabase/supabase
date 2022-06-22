@@ -1,4 +1,3 @@
 import TableGridEditor from './TableGridEditor'
-import SQLEditor from './SQLEditor'
 
-export { TableGridEditor, SQLEditor }
+export { TableGridEditor }
