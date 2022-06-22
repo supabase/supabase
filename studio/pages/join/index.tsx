@@ -1,12 +1,13 @@
 import React from 'react'
-import { useStore } from 'hooks'
-import { Button, IconAlertCircle } from '@supabase/ui'
+import { useProfile, useStore } from 'hooks'
+import { Button, IconAlertCircle, IconCheck, IconCheckSquare, IconXSquare } from '@supabase/ui'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { API_URL } from 'lib/constants'
 import { get, post, delete_ } from 'lib/common/fetch'
 import { useEffect } from 'react'
+import { auth } from 'lib/gotrue'
 
 interface TokenInfoI {
   organization_name?: string | undefined
@@ -23,6 +24,7 @@ const User = () => {
   const router = useRouter()
   const { slug, token } = router.query
   const { ui, app } = useStore()
+  const { profile, isLoading } = useProfile()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
@@ -36,8 +38,14 @@ const User = () => {
     invite_id,
   } = tokenValidationInfo || {}
 
+  const loginRedirectLink = `/?next=${encodeURIComponent(
+    `/join?token=${router.query.token}&slug=${router.query.slug}`
+  )}`
+
   useEffect(() => {
     const fetchTokenInfo = async () => {
+      await ui.load()
+
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
       if (response.error && response.error.code === 401) {
         setTokenValidationInfo({
@@ -93,37 +101,99 @@ const User = () => {
     (tokenInfoLoaded && !email_match) ||
     (tokenInfoLoaded && expired_token)
 
+  const ErrorMessage = () => {
+    const Container = ({ children }: { children: React.ReactNode }) => (
+      <div
+        className={[
+          'flex flex-col items-center justify-center gap-3 text-sm',
+          isError ? 'text-scale-1100' : 'text-scale-1200',
+        ].join(' ')}
+      >
+        {/* <IconAlertCircle size={21} strokeWidth={1.5} /> */}
+        <>{children}</>
+      </div>
+    )
+
+    const message = token_does_not_exist ? (
+      <>
+        <p>The invite token is invalid.</p>
+        <p className="text-scale-900">
+          Try copying and pasting the link from the invite email, or ask the organization owner to
+          invite you again.
+        </p>
+      </>
+    ) : !email_match ? (
+      <>
+        <p>
+          Your email address {profile?.primary_email} does not match the email address this
+          invitation was sent to.
+        </p>
+        <p className="text-scale-900">
+          To accept this invitation, you will need to{' '}
+          <a
+            className="text-brand-900 cursor-pointer"
+            onClick={async () => {
+              await auth.signOut()
+              router.reload()
+            }}
+          >
+            sign out
+          </a>{' '}
+          and then sign in or create a new account using the same email address used in the
+          invitation.
+        </p>
+      </>
+    ) : expired_token ? (
+      <>
+        <p>The invite token has expired.</p>
+        <p className="text-scale-900">Please request a new one from the organization member.</p>
+      </>
+    ) : (
+      ''
+    )
+
+    return <Container>{message}</Container>
+  }
+
   return (
     <div className="bg-scale-200 flex h-full min-h-screen w-full flex-col place-items-center items-center justify-center gap-8 px-5">
+      <Link href="/">
+        <a className="flex items-center justify-center gap-4">
+          <img
+            src="/img/supabase-logo.svg"
+            alt="Supabase"
+            className="block h-[24px] cursor-pointer rounded"
+          />
+        </a>
+      </Link>
       <div
         className="
-          bg-scale-300 border-scale-400 mx-auto max-w-md
-          overflow-hidden rounded-md border text-center shadow"
+          bg-scale-300 border-scale-400 mx-auto overflow-hidden
+          rounded-md border text-center shadow
+          md:w-[380px]
+          "
       >
-        <div className="space-y-4 px-6 py-6">
-          <Link href="/">
-            <a className="flex items-center justify-center gap-4">
-              <img
-                src="/img/supabase-logo.svg"
-                alt="Supabase"
-                className="block h-[24px] cursor-pointer rounded"
-              />
-            </a>
-          </Link>
-          <p className="text-scale-900 text-sm">
-            Join {organization_name && email_match ? organization_name : 'a new organization'}
-          </p>
+        <div className="flex flex-col gap-2 px-6 py-8">
+          {/* <p className="text-scale-900 text-xs">Organization invitation</p> */}
 
           {!token_does_not_exist ? (
-            <p className="text-scale-1200 text-xl">
-              You have been invited to join{' '}
-              {organization_name && email_match
-                ? `${organization_name}'s organization`
-                : 'a new organization'}{' '}
-              at Supabase.
-            </p>
+            <>
+              <p className="text-scale-1200 text-sm">You have been invited to join </p>
+              {organization_name ? (
+                <>
+                  <p className="text-scale-1200 text-3xl">
+                    {organization_name ? `${organization_name}` : 'an organization'}{' '}
+                  </p>
+                  <p className="text-scale-900 text-sm">an organization on Supabase</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+                </>
+              )}
+            </>
           ) : (
-            <div className="w-96" />
+            <div className="w-96"></div>
           )}
         </div>
 
@@ -132,60 +202,46 @@ const User = () => {
             ' '
           )}
         >
-          <div className="flex flex-col gap-4 px-6 py-6 ">
+          <div className="flex flex-col gap-4 px-6 py-4 ">
             {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
-              <div className="flex items-center gap-2 justify-center">
+              <div className="flex flex-row items-center justify-center gap-3">
+                <Button
+                  onClick={handleDeclineJoinOrganization}
+                  htmlType="submit"
+                  type="default"
+
+                  // icon={<IconXSquare />}
+                >
+                  Decline
+                </Button>
                 <Button
                   onClick={handleJoinOrganization}
                   htmlType="submit"
                   loading={isSubmitting}
-                  size="small"
                   type="primary"
+                  icon={<IconCheckSquare />}
                 >
-                  Join this organization
-                </Button>
-
-                <Button
-                  onClick={handleDeclineJoinOrganization}
-                  htmlType="submit"
-                  size="small"
-                  type="warning"
-                >
-                  Decline
+                  Join organization
                 </Button>
               </div>
             )}
 
-            {tokenInfoLoaded && (
-              <div
-                className={[
-                  'flex flex-col items-center justify-center gap-3 text-base',
-                  isError ? 'text-sand-1100' : 'text-scale-1200',
-                ].join(' ')}
-              >
-                {isError && <IconAlertCircle size={21} strokeWidth={1.5} />}
+            {tokenInfoLoaded && <ErrorMessage />}
 
-                {tokenInfoLoaded && token_does_not_exist
-                  ? 'The invite token is invalid. Try copying and pasting the link from the invite email, or ask the organization owner to invite you again.'
-                  : tokenInfoLoaded && !email_match
-                  ? 'The invite email address does not match your current Supabase email. Are you signed in with right GitHub account?'
-                  : tokenInfoLoaded && expired_token
-                  ? 'The invite token has expired. Please request a new one from the organization owner.'
-                  : ''}
-              </div>
-            )}
             {!authorized_user && (
               <div className="flex flex-col gap-3">
-                <p className="text-scale-900 text-sm">You will need to sign in first</p>
-                <div>
-                  <Link
-                    passHref
-                    href={`/?next=${encodeURIComponent(
-                      `/join?token=${router.query.token}&slug=${router.query.slug}`
-                    )}`}
-                  >
-                    <Button size="medium" as="a" type="primary">
-                      Sign in to Supabase
+                <p className="text-scale-900 text-xs">
+                  You will need to sign in to accept this invitation
+                </p>
+                <div className="flex justify-center gap-3">
+                  <Link passHref href={loginRedirectLink}>
+                    <Button as="a" type="default">
+                      Sign in
+                    </Button>
+                  </Link>
+                  <Link passHref href={loginRedirectLink}>
+                    <Button as="a" type="default">
+                      Create an account
                     </Button>
                   </Link>
                 </div>
