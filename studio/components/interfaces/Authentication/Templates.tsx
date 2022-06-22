@@ -22,7 +22,7 @@ const Templates: FC<any> = ({ project }) => {
     semver.coerce('kps-v2.5.3')
   )
 
-  const { config, error, mutateAuthConfig } = useProjectAuthConfig(project.ref)
+  const { config, error, mutateAuthConfig } = useProjectAuthConfig(project?.ref)
   if (error) {
     return (
       <Typography.Text type="danger">

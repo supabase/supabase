@@ -14,11 +14,19 @@ export const sqlEditorState = proxy({
       projectRef: string
     }
   },
+  results: {} as {
+    [key: string]: {
+      rows: any[]
+      error?: any
+    }[]
+  },
   loaded: {} as {
     [key: string]: true
   },
   needsSaving: proxySet<string>([]),
-  isSaving: proxySet<string>([]),
+  savingStates: {} as {
+    [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
+  },
 
   setInitialSnippets: (snippets: SqlSnippet[], projectRef: string) => {
     snippets.forEach((snippet) => {
@@ -29,6 +37,8 @@ export const sqlEditorState = proxy({
           utilityPanelCollapsed: false,
           projectRef,
         }
+        sqlEditorState.results[snippet.id] = []
+        sqlEditorState.savingStates[snippet.id] = 'IDLE'
       }
 
       sqlEditorState.loaded[projectRef] = true
@@ -59,19 +69,46 @@ export const sqlEditorState = proxy({
       sqlEditorState.needsSaving.add(id)
     }
   },
+  addNeedsSaving: (id: string) => {
+    sqlEditorState.needsSaving.add(id)
+  },
+  addResult: (id: string, results: any[]) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id].unshift({ rows: results })
+    }
+  },
+  addResultError: (id: string, error: any) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id].unshift({ rows: [], error })
+    }
+  },
+  addFavorite: (id: string) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet.content.favorite = true
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
+  removeFavorite: (id: string) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet.content.favorite = false
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
 })
 
-export const useSqlEditorStateSnapshot = () => useSnapshot(sqlEditorState)
+export const getSqlEditorStateSnapshot = () => snapshot(sqlEditorState)
+
+export const useSqlEditorStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
+  useSnapshot(sqlEditorState, options)
 
 async function update(id: string, projectRef: string, content: Partial<Content>) {
   try {
     await updateContent({ projectRef, id, content })
-  } catch (error) {
-    // TODO
-    console.log('error:', error)
-  }
 
-  sqlEditorState.isSaving.delete(id)
+    sqlEditorState.savingStates[id] = 'IDLE'
+  } catch (error) {
+    sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
+  }
 }
 
 const memoizedUpdate = memoize((_id: string) => debounce(update, 1000))
@@ -82,7 +119,7 @@ if (typeof window !== 'undefined') {
   devtools(sqlEditorState, { name: 'sqlEditorState', enabled: true })
 
   subscribe(sqlEditorState.needsSaving, () => {
-    const state = snapshot(sqlEditorState)
+    const state = getSqlEditorStateSnapshot()
 
     state.needsSaving.forEach((id) => {
       const snippet = state.snippets[id]
@@ -95,7 +132,7 @@ if (typeof window !== 'undefined') {
         })
 
         sqlEditorState.needsSaving.delete(id)
-        sqlEditorState.isSaving.add(id)
+        sqlEditorState.savingStates[id] = 'UPDATING'
       }
     })
   })

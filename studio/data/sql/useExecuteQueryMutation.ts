@@ -4,7 +4,7 @@ import { useMutation, UseMutationOptions } from 'react-query'
 
 /* Execute Query */
 
-type ExecuteQueryVariables = {
+export type ExecuteQueryVariables = {
   projectRef: string
   sql: string
   connectionString?: string
@@ -23,7 +23,7 @@ export async function executeQuery(
   const response = await post(
     `${API_URL}/pg-meta/${projectRef}/query`,
     { query: sql },
-    { headers, signal }
+    { headers: Object.fromEntries(headers), signal }
   )
   if (response.error) {
     throw response.error

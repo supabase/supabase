@@ -26,6 +26,7 @@ import { observer } from 'mobx-react-lite'
 import { useMemo } from 'react'
 import { useState } from 'react'
 import { partition } from 'lodash'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   const {
@@ -112,8 +113,15 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const SideBarContent = () => {
+  const snap = useSqlEditorStateSnapshot()
   const { ref: projectRef, id } = useParams()
-  const { data, isLoading, isSuccess } = useSqlSnippetsQuery(projectRef)
+  const { data, isLoading, isSuccess } = useSqlSnippetsQuery(projectRef, {
+    onSuccess(data) {
+      if (projectRef) {
+        snap.setInitialSnippets(data.snippets, projectRef)
+      }
+    },
+  })
 
   const [filterString, setFilterString] = useState('')
   // TODO: add filtering based on filterString
