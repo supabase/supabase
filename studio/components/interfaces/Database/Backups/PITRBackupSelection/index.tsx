@@ -121,7 +121,6 @@ const PITRBackupSelection: FC<Props> = () => {
 
     const { error } = await post(`${API_URL}/database/${projectRef}/backups/pitr`, {
       recovery_time_target_unix: recoveryTimeTargetUnix,
-      region: configuration.region,
     })
 
     if (error) {
