@@ -62,7 +62,7 @@ const TabWelcome = observer(() => {
               description={x.description}
               sql={x.sql}
               onClick={(sql, title) => {
-                handleNewQuery(sql, title)
+                handleNewQuery({ sql, name: title })
                 Telemetry.sendEvent('quickstart', 'quickstart_clicked', x.title)
               }}
             />
