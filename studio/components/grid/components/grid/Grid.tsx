@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
 import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
 import { IconLoader } from '@supabase/ui'
@@ -11,17 +11,22 @@ function rowKeyGetter(row: SupaRow) {
   return row.idx
 }
 
+interface IGrid extends GridProps {
+  rows: any[]
+}
+
 export const Grid = memo(
-  React.forwardRef<DataGridHandle, GridProps>(
+  forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass },
+      { width, height, containerClass, gridClass, rowClass, rows },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
       const state = useTrackedState()
+
       // workaround to force state tracking on state.gridColumns
       const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
-      const { gridColumns, rows, onError: onErrorFunc } = state
+      const { gridColumns, onError: onErrorFunc } = state
 
       function onColumnResize(index: number, width: number) {
         updateColumnResizeDebounced(index, width, dispatch)
@@ -40,14 +45,7 @@ export const Grid = memo(
               payload,
             })
           })
-          if (error) {
-            if (onErrorFunc) onErrorFunc(error)
-          } else {
-            // dispatch({
-            //   type: 'SET_ROWS',
-            //   payload: { rows },
-            // })
-          }
+          if (error && onErrorFunc) onErrorFunc(error)
         }
       }
 
@@ -80,6 +78,7 @@ export const Grid = memo(
           </div>
         )
       }
+
       return (
         <div
           className={containerClass}
