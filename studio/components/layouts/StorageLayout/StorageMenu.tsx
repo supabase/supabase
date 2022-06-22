@@ -103,6 +103,13 @@ const StorageMenu: FC<Props> = () => {
               <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
+          <Flag name="logsStorage">
+            <Link href={`/project/${projectRef}/storage/logs`}>
+              <Menu.Item rounded active={page === 'logs'}>
+                <Typography.Text className="truncate">Logs</Typography.Text>
+              </Menu.Item>
+            </Link>
+          </Flag>
         </div>
       </div>
     </Menu>
