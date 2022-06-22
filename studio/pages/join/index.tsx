@@ -1,4 +1,3 @@
-import React from 'react'
 import { useProfile, useStore } from 'hooks'
 import { Button, IconCheckSquare } from '@supabase/ui'
 import { useState } from 'react'
