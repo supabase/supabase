@@ -32,9 +32,9 @@ export const Grid = memo(
         updateColumnResizeDebounced(index, width, dispatch)
       }
 
-      async function onRowsChange(rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) {
-        const rowData = rows[data.indexes[0]]
-        const originRowData = state.rows.find((x) => x.idx == rowData.idx)
+      async function onRowsChange(_rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) {
+        const rowData = _rows[data.indexes[0]]
+        const originRowData = rows.find((x) => x.idx == rowData.idx)
         const changedColumn = Object.keys(rowData).find(
           (name) => rowData[name] !== originRowData![name]
         )
