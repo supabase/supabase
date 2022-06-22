@@ -250,7 +250,7 @@ const JoinOrganizationPage = () => {
       </Link>
       <div
         className="
-          bg-scale-300 border-scale-400 mx-auto overflow-hidden
+          bg-scale-100 bg-scale-300 border-scale-400 mx-auto overflow-hidden
           rounded-md border text-center shadow
           md:w-[400px]
           "
