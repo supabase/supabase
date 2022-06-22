@@ -1,54 +1,51 @@
-import * as React from 'react';
-import { memo } from 'react-tracked';
-import DataGrid, {
-  DataGridHandle,
-  RowsChangeData,
-} from '@supabase/react-data-grid';
-import { IconLoader } from '@supabase/ui';
-import { GridProps, SupaRow } from '../../types';
-import { useDispatch, useTrackedState } from '../../store';
-import RowRenderer from './RowRenderer';
-import AwesomeDebouncePromise from 'awesome-debounce-promise';
+import { forwardRef } from 'react'
+import { memo } from 'react-tracked'
+import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
+import { IconLoader } from '@supabase/ui'
+import { GridProps, SupaRow } from '../../types'
+import { useDispatch, useTrackedState } from '../../store'
+import RowRenderer from './RowRenderer'
+import AwesomeDebouncePromise from 'awesome-debounce-promise'
 
 function rowKeyGetter(row: SupaRow) {
-  return row.idx;
+  return row.idx
+}
+
+interface IGrid extends GridProps {
+  rows: any[]
 }
 
 export const Grid = memo(
-  React.forwardRef<DataGridHandle, GridProps>(
+  forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass },
+      { width, height, containerClass, gridClass, rowClass, rows },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
-      const dispatch = useDispatch();
-      const state = useTrackedState();
+      const dispatch = useDispatch()
+      const state = useTrackedState()
+
       // workaround to force state tracking on state.gridColumns
-      const columnHeaders = state.gridColumns.map(
-        (x) => `${x.key}_${x.frozen}`
-      );
-      const { gridColumns, rows, onError: onErrorFunc } = state;
+      const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
+      const { gridColumns, onError: onErrorFunc } = state
 
       function onColumnResize(index: number, width: number) {
-        updateColumnResizeDebounced(index, width, dispatch);
+        updateColumnResizeDebounced(index, width, dispatch)
       }
 
-      function onRowsChange(
-        rows: SupaRow[],
-        data: RowsChangeData<SupaRow, unknown>
-      ) {
-        const rowData = rows[data.indexes[0]];
-        const originRowData = state.rows.find((x) => x.idx == rowData.idx);
-        const changedColumn = Object.keys(rowData).find((name) => rowData[name] !== originRowData![name]);
+      async function onRowsChange(rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) {
+        const rowData = rows[data.indexes[0]]
+        const originRowData = state.rows.find((x) => x.idx == rowData.idx)
+        const changedColumn = Object.keys(rowData).find(
+          (name) => rowData[name] !== originRowData![name]
+        )
         if (changedColumn) {
-          const { error } = state.rowService!.update(rowData, changedColumn);
-          if (error) {
-            if (onErrorFunc) onErrorFunc(error);
-          } else {
+          const { error } = state.rowService!.update(rowData, changedColumn, (payload) => {
             dispatch({
-              type: 'SET_ROWS',
-              payload: { rows },
-            });
-          }
+              type: 'EDIT_ROW',
+              payload,
+            })
+          })
+          if (error && onErrorFunc) onErrorFunc(error)
         }
       }
 
@@ -56,14 +53,14 @@ export const Grid = memo(
         dispatch({
           type: 'SELECTED_ROWS_CHANGE',
           payload: { selectedRows },
-        });
+        })
       }
 
       function onSelectedCellChange(position: { idx: number; rowIdx: number }) {
         dispatch({
           type: 'SELECTED_CELL_CHANGE',
           payload: { position },
-        });
+        })
       }
 
       if (!columnHeaders || columnHeaders.length == 0) {
@@ -73,14 +70,15 @@ export const Grid = memo(
             style={{ width: width || '100%', height: height || '50vh' }}
           >
             <div className="sb-grid-grid--loading__inner flex items-center gap-2">
-              <div className="animate-spin text-scale-900">
+              <div className="text-scale-900 animate-spin">
                 <IconLoader />
               </div>
-              <div className="text-sm text-scale-1100">Loading...</div>
+              <div className="text-scale-1100 text-sm">Loading...</div>
             </div>
           </div>
-        );
+        )
       }
+
       return (
         <div
           className={containerClass}
@@ -102,22 +100,15 @@ export const Grid = memo(
             style={{ height: '100%' }}
           />
         </div>
-      );
+      )
     }
   )
-);
+)
 
-const updateColumnResize = (
-  index: number,
-  width: number,
-  dispatch: (value: unknown) => void
-) => {
+const updateColumnResize = (index: number, width: number, dispatch: (value: unknown) => void) => {
   dispatch({
     type: 'UPDATE_COLUMN_SIZE',
     payload: { index, width: Math.round(width) },
-  });
-};
-const updateColumnResizeDebounced = AwesomeDebouncePromise(
-  updateColumnResize,
-  500
-);
+  })
+}
+const updateColumnResizeDebounced = AwesomeDebouncePromise(updateColumnResize, 500)
