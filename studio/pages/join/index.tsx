@@ -187,7 +187,7 @@ const JoinOrganizationPage = () => {
                 </>
               ) : (
                 <>
-                  <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+                  <p className="text-scale-1200 text-3xl">an organization</p>
                 </>
               )}
             </>
