@@ -38,7 +38,7 @@ const Home: NextPageWithLayout = () => {
           <Typography.Title level={4}>Example projects</Typography.Title>
         </div>
         <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {EXAMPLE_PROJECTS.map((project) => (
+          {EXAMPLE_PROJECTS.sort((a, b) => a.title.localeCompare(b.title)).map((project) => (
             <ExampleProject key={project.url} {...project} />
           ))}
         </div>

@@ -55,7 +55,7 @@ export const EXAMPLE_PROJECTS = [
   },
   {
     framework: 'React',
-    title: 'React.js realtime chat app',
+    title: 'React realtime chat app',
     description: 'Example app of real-time chat using supabase realtime api',
     url: 'https://github.com/shwosner/realtime-chat-supabase-react',
   },
@@ -73,7 +73,7 @@ export const EXAMPLE_PROJECTS = [
   },
   {
     framework: 'NextJS',
-    title: 'NextJS todo list app',
+    title: 'Next.js todo list app',
     description: 'NextJS todo list example',
     url: 'https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list',
   },

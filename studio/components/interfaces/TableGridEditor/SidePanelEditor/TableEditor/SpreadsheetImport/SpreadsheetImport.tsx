@@ -74,6 +74,7 @@ const SpreadsheetImport: FC<Props> = ({
           error: errors,
           category: 'error',
           message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
+          duration: 4000,
         })
       }
       setErrors(errors)
@@ -98,6 +99,7 @@ const SpreadsheetImport: FC<Props> = ({
           error: errors,
           category: 'error',
           message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
+          duration: 4000,
         })
       }
       setErrors(errors)
@@ -160,7 +162,7 @@ const SpreadsheetImport: FC<Props> = ({
         </div>
 
         {spreadsheetData.headers.length > 0 && (
-          <div className="py-5 space-y-5">
+          <div className="space-y-5 py-5">
             <div className="space-y-2">
               <div className="flex flex-col space-y-1">
                 <Typography.Text>Content Preview</Typography.Text>
@@ -188,7 +190,7 @@ const SpreadsheetImport: FC<Props> = ({
                       <div key={key} className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <IconChevronRight
-                            className={`cursor-pointer transform ${isExpanded ? 'rotate-90' : ''}`}
+                            className={`transform cursor-pointer ${isExpanded ? 'rotate-90' : ''}`}
                             size={14}
                             onClick={() => onSelectExpandError(key)}
                           />

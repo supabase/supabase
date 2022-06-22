@@ -33,8 +33,8 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
     } catch (error: any) {
       const message = error.message
         ? `Error: ${error.message}`
-        : 'Hmm, invalid JSON seems to have an invalid structure.'
-      ui.setNotification({ category: 'error', message })
+        : 'JSON seems to have an invalid structure.'
+      ui.setNotification({ category: 'error', message, duration: 4000 })
     } finally {
       resolve()
     }
