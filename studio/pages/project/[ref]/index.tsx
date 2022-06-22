@@ -14,7 +14,9 @@ const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
 
   const project = ui.selectedProject
-  console.log( toJS( project ) )
+
+  console.log('project ref:', toJS(project))
+
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
       ? project?.name
@@ -25,7 +27,7 @@ const Home: NextPageWithLayout = () => {
       <div className="mx-6 flex items-center space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
         {project?.status == 'INACTIVE' && (
-          <div className='mt-2'>
+          <div className="mt-2">
             <Badge color="gray">
               <div className="flex items-center gap-2">
                 <IconPauseCircle size={15} />
@@ -37,6 +39,7 @@ const Home: NextPageWithLayout = () => {
       </div>
 
       {project && project?.status == 'INACTIVE' && <ProjectPausedState project={project} />}
+
       {IS_PLATFORM && project?.status !== 'INACTIVE' && <ProjectUsageSection />}
 
       <div className="space-y-8">
@@ -44,9 +47,9 @@ const Home: NextPageWithLayout = () => {
           <Typography.Title level={4}>Client libraries</Typography.Title>
         </div>
         <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
-          {CLIENT_LIBRARIES.map( ( library ) => (
+          {CLIENT_LIBRARIES.map((library) => (
             <ClientLibrary key={library.language} {...library} />
-          ) )}
+          ))}
         </div>
       </div>
       <div className="space-y-8">
@@ -54,15 +57,15 @@ const Home: NextPageWithLayout = () => {
           <Typography.Title level={4}>Example projects</Typography.Title>
         </div>
         <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {EXAMPLE_PROJECTS.map( ( project ) => (
+          {EXAMPLE_PROJECTS.map((project) => (
             <ExampleProject key={project.url} {...project} />
-          ) )}
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
-Home.getLayout = ( page ) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
-export default observer( Home )
+export default observer(Home)
