@@ -204,7 +204,7 @@ module.exports = {
       },
     ],
   ],
-  scripts: [{ src: '/scripts/telemetry.js' }],
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',
