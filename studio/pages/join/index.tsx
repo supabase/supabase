@@ -99,6 +99,18 @@ const JoinOrganizationPage = () => {
     (tokenInfoLoaded && expired_token)
 
   const ErrorMessage = () => {
+    const Container = ({ children }: { children: React.ReactNode }) => (
+      <div
+        className={[
+          'flex flex-col items-center justify-center gap-3 text-sm',
+          isError ? 'text-scale-1100' : 'text-scale-1200',
+        ].join(' ')}
+      >
+        {/* <IconAlertCircle size={21} strokeWidth={1.5} /> */}
+        <>{children}</>
+      </div>
+    )
+
     const message = token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
@@ -137,16 +149,7 @@ const JoinOrganizationPage = () => {
       ''
     )
 
-    return (
-      <div
-        className={[
-          'flex flex-col items-center justify-center gap-3 text-sm',
-          isError ? 'text-scale-1100' : 'text-scale-1200',
-        ].join(' ')}
-      >
-        {message}
-      </div>
-    )
+    return isError ? <Container>{message}</Container> : null
   }
 
   return (
@@ -174,25 +177,26 @@ const JoinOrganizationPage = () => {
           "
       >
         <div className="flex flex-col gap-2 px-6 py-8">
-          {!token_does_not_exist ? (
-            <>
-              <p className="text-scale-1200 text-sm">You have been invited to join </p>
-              {organization_name ? (
-                <>
-                  <p className="text-scale-1200 text-3xl">
-                    {organization_name ? `${organization_name}` : 'an organization'}{' '}
-                  </p>
+          {/* <p className="text-scale-900 text-xs">Organization invitation</p> */}
+
+          <>
+            <p className="text-scale-1200 text-sm">You have been invited to join </p>
+            {organization_name ? (
+              <>
+                <p className="text-scale-1200 text-3xl">
+                  {organization_name ? `${organization_name}` : 'an organization'}{' '}
+                </p>
+                {!token_does_not_exist && (
                   <p className="text-scale-900 text-sm">an organization on Supabase</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-scale-1200 text-3xl">an organization</p>
-                </>
-              )}
-            </>
-          ) : (
-            <div className="w-96"></div>
-          )}
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+              </>
+            )}
+            {slug && <p className="text-scale-900 text-xs">{`organization slug: ${slug}`}</p>}
+          </>
         </div>
 
         <div
