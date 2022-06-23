@@ -1,0 +1,71 @@
+---
+title: Boosting "Soulless Citadel" NFT sales using Supabase
+description: Popular NFT Project, "Soulless Citadel", migrated to Supabase to accelerate development cycle and simplify DevOps.
+author: rory_wilding
+image: soulless-citadel/supabase-case-study-soulless-citadel.png
+thumb: soulless-citadel/supabase-case-study-soulless-citadel.png
+tags:
+  - nfts
+  - case-study
+date: '2022-06-23'
+toc_depth: 3
+---
+
+The online world of NFTs (or Non-Fungible Tokens) is a hit business, and NFTs are a hot commodity among online artists and collectors worldwide. NFTs were designed initially to verify the authenticity of digital art. However, they have become much more than that in recent years - they are a highly-wanted tradeable commodity that exists on a blockchain.
+
+Quinence is a Singapore-based tech consultancy specializing in blockchain, artificial intelligence, and web 3.0 technologies. The company has worked on several projects, including Zilliqa, and Polkadot, among others. We talked to Ratul Saha, Director of Quinence and Ph.D. in Computer Science from the National University of Singapore, who has extensive experience in the blockchain industry since 2013. Using Supabase, Ratul and his team created and powered his company's NFT project, "The Soulless Citadel," a collection with over 5000 unique NFTs that sold out faster than any other NFT product within a week of launch.
+
+## Building Soulless Citadel at Zilliqa
+
+The [Quinence](https://quinence.com/) team partnered with Zilliqa to deliver a unique story-driven NFT experience, blending together art, storytelling, and blockchain tech. 
+The ["Soulless Citadel"](https://soullesscitadel.com/) project was born in February 2022 and soon launched on Zilliqa’s main net. Within a week of the launch, the collection’s 5555 unique NFTs rapidly gained popularity and was sold out.
+
+![Soulless Citadel NFT collection](/images/blog/soulless-citadel/supabase-case-study-soulless-citadel-nft-carousel.png)
+
+In the "Soulless Citadel" project, wallet-based authentication was used. AWS was chosen to start, and all the application data was stored in DynamoDB. Soon, they realized that it was tough to work with AWS, primarily since they built a lot of projects using Supabase and were very familiar with it.
+
+<Quote img="ratul-sahal-director-at-quinence.jpeg" caption="Ratul Saha - Director at Quinence">
+ Typically, we use many Supabase features like authentication, storage, and others in our projects. Even though we have written many courses on DynamoDB, AWS, and everything, it was hard to work with AWS, and we missed the simplicity of Supabase.
+</Quote>
+
+## Lack of visibility and soaring costs
+The team initially launched the “The Soulless Citadel” project with AWS and DynamoDB technology. However, as demand for the NFTs grew, so did the AWS costs and the lack of visibility.
+
+<Quote img="ratul-sahal-director-at-quinence.jpeg" caption="Ratul Saha - Director at Quinence">
+ The increase in NFT demand generated a lot of traffic. Although we paid for ingress, we did not know what caused it. During the first few hours,  it was often hard to tell whether it was a genuine spike in traffic to our site because of someone on it or a DDoS attack. So I didn’t want to take that risk.
+</Quote>
+
+While the team was refactoring their codebase, they began looking for alternative solutions that were simpler to use, easier to maintain and could accelerate their development cycle. Supabase was an excellent choice that they decided to go with.
+
+## Unlocking transparency at no additional cost
+
+With Supabase, Quinence developers were notified whenever certain API limits were hit. Furthermore, Supabase’s built-in DDoS protection capabilities provided the Quinence development team peace of mind. Additionally, with the power of Supabase’s dashboard, the team could unlock more visibility into what was going on.
+
+<Quote img="ratul-sahal-director-at-quinence.jpeg" caption="Ratul Saha - Director at Quinence">
+  With Supabase, our teams can have a much better picture of genuine website traffic in real-time. Previously, we couldn’t figure out whether the traffic was real or was it a result of a DDoS attack. The DDoS protection capability of Supabase gave us peace of mind and greater visibility.
+</Quote>
+
+## Slow, complicated filters with a managed service
+
+With an extensive gallery of over 5000 digital NFTs, fans of “The Soulless Citadel” collection needed a better and faster way to find what they liked - narrowing search results from thousands of items to only a handful. With several NFT attributes to filter on, such as image backgrounds, the task of searching, filtering very quickly, and rendering on-page was a nightmare to do at scale and also quite expensive with DynamoDB.
+
+## Simpler database migrations and faster filtering
+
+To factor in the incoming peak traffic that the site was getting, they moved to Supabase bit by bit. After about two hours, they were up and running in Supabase, and then things started becoming more manageable. With Supabase, managing the gallery was extremely easy, and they were able to set it up with just a few clicks. 
+
+<Quote img="ratul-sahal-director-at-quinence.jpeg" caption="Ratul Saha - Director at Quinence">
+  So, to perform all those complex filtering, we just opened up a Supabase database, dumped the data, and made the data accessible to the front-end via APIs. The front-end could easily query the data needed and do the filtering quickly and adequately. What we could accomplish with Supabase would have taken us at least two weeks in AWS to implement, and we were able to build it in a day. We switched to Supabase at a critical point in the lifecycle of our project - just a couple of hours before the demand peaked and things got sold out.</Quote>
+
+## The success of Supabase, after the sale
+
+Supabase accelerated time to value for the "Soulless Citadel" project, cutting down precious development cycles from weeks to a matter of days. Supabase made it easy for developers to interact with storage and database seamlessly. In addition, with built-in DDoS protection in Supabase, the developer had one less thing to worry about.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/kTfRUNt2WC0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+_Sneak peek of the next Chapter of the Souless Citadel, powered by Supabase_
+
+<Quote img="ratul-sahal-director-at-quinence.jpeg" caption="Ratul Saha - Director at Quinence">
+  Supabase makes development speed insanely fast. Developers can now easily interact with complex and rich datasets, including images, and perform operations much faster. Supabase also greatly simplifies DevOps because we don’t want to do the ops, and instead focus on building the application.
+</Quote>
+
+Soulless is an early customer of Supabase and is using [Storage](https://supabase.com/storage) for the images, [Database](https://supabase.com/database) for storing all user interactions, and [Authentication](https://supabase.com/auth) for multi-wallet user profiles through traditional email and social logins. Start a new project on the [free tier today](https://app.supabase.com/) and experience the Supabase developer experience!
