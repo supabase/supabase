@@ -64,9 +64,10 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
-
+  // @ts-ignore
+  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
-  const isLocked = meta.excludedSchemas.includes(selectedSchema || '')
+  const isLocked = schema?.owner === 'supabase_admin'
 
   const gridTable = !isViewSelected
     ? parseSupaTable({

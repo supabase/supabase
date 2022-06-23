@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { partition } from 'lodash'
 import {
   Button,
   Dropdown,
@@ -47,11 +48,17 @@ const TableEditorMenu: FC<Props> = ({
   const { id } = router.query
 
   const projectRef = ui.selectedProject?.ref
+  const schemas: PostgresSchema[] = meta.schemas.list()
+  const tables: PostgresTable[] = meta.tables.list(
+    (table: PostgresTable) => table.schema === selectedSchema
+  )
+
+  // @ts-ignore
+  const schema = schemas.find((schema) => schema.name === selectedSchema)
+
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-
-  const isLocked = meta.excludedSchemas.includes(selectedSchema || '')
 
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views
@@ -75,11 +82,6 @@ const TableEditorMenu: FC<Props> = ({
     setIsRefreshing(false)
   }
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const tables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedSchema
-  )
-
   const schemaTables =
     searchText.length === 0
       ? tables
@@ -90,6 +92,12 @@ const TableEditorMenu: FC<Props> = ({
     searchText.length === 0
       ? schemaViews
       : schemaViews.filter((view) => view.name.includes(searchText))
+
+  const isLocked = schema?.owner === 'supabase_admin'
+  const [protectedSchemas, openSchemas] = partition(
+    schemas,
+    (schema) => schema.owner === 'supabase_admin'
+  )
 
   return (
     <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
@@ -111,7 +119,29 @@ const TableEditorMenu: FC<Props> = ({
               onSelectSchema(name)
             }}
           >
-            {schemas.map((schema) => (
+            <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
+              <p className="text-sm">Schemas</p>
+            </Listbox.Option>
+            {openSchemas.map((schema) => (
+              <Listbox.Option
+                key={schema.id}
+                value={schema.name}
+                // @ts-ignore
+                label={schema.name}
+                addOnBefore={() => <span className="text-scale-900">schema</span>}
+              >
+                <span className="text-scale-1200 text-sm">{schema.name}</span>
+              </Listbox.Option>
+            ))}
+            <Listbox.Option
+              disabled
+              key="protected-schemas"
+              value="protected-schemas"
+              label="Protected schemas"
+            >
+              <p className="text-sm">Protected schemas</p>
+            </Listbox.Option>
+            {protectedSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}

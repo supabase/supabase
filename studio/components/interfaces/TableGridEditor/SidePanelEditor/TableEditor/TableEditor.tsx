@@ -141,6 +141,7 @@ const TableEditor: FC<Props> = ({
           isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
         }
+
         saveChanges(payload, columns, isNewRecord, configuration, resolve)
       } else {
         resolve()
