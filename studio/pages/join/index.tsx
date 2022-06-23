@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckSquare } from '@supabase/ui'
+import { Button, IconCheckSquare, Loading } from '@supabase/ui'
 
 import { useProfile, useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
@@ -26,16 +26,11 @@ const JoinOrganizationPage = () => {
   const { profile } = useProfile()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(false)
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
-  const {
-    token_does_not_exist,
-    email_match,
-    authorized_user,
-    expired_token,
-    organization_name,
-    invite_id,
-  } = tokenValidationInfo || {}
+  const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
+    tokenValidationInfo || {}
 
   const loginRedirectLink = `/?next=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
@@ -44,20 +39,26 @@ const JoinOrganizationPage = () => {
       await ui.load()
 
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-      if (response.error && response.error.code === 401) {
-        setTokenValidationInfo({
-          authorized_user: false,
-        })
+
+      if (response.error) {
+        setError(response.error)
+        setTokenInfoLoaded(true)
       } else {
         setTokenInfoLoaded(true)
         setTokenValidationInfo(response)
       }
     }
 
-    if (token && !tokenInfoLoaded) {
+    if (!tokenInfoLoaded && token) {
       fetchTokenInfo()
     }
-  }, [token])
+
+    /**
+     * if params are empty then redirect
+     * user to the homepage of app
+     */
+    // if (!slug && !token) router.push('/')
+  }, [token, router.asPath])
 
   async function handleJoinOrganization() {
     setIsSubmitting(true)
@@ -95,12 +96,30 @@ const JoinOrganizationPage = () => {
   }
 
   const isError =
+    error ||
     !!(tokenInfoLoaded && token_does_not_exist) ||
     (tokenInfoLoaded && !email_match) ||
     (tokenInfoLoaded && expired_token)
 
+  console.log('error', error)
+  console.log('isError', isError)
+
   const ErrorMessage = () => {
-    const message = token_does_not_exist ? (
+    const Container = ({ children }: { children: React.ReactNode }) => (
+      <div
+        className={[
+          'flex flex-col items-center justify-center gap-3 text-sm',
+          isError ? 'text-scale-1100' : 'text-scale-1200',
+        ].join(' ')}
+      >
+        {/* <IconAlertCircle size={21} strokeWidth={1.5} /> */}
+        <>{children}</>
+      </div>
+    )
+
+    const message = error ? (
+      <p>There was an error requesting details for this invitation.</p>
+    ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
         <p className="text-scale-900">
@@ -138,17 +157,80 @@ const JoinOrganizationPage = () => {
       ''
     )
 
-    return (
-      <div
-        className={[
-          'flex flex-col items-center justify-center gap-3 text-sm',
-          isError ? 'text-scale-1100' : 'text-scale-1200',
-        ].join(' ')}
-      >
-        {message}
-      </div>
-    )
+    return isError ? <Container>{message}</Container> : null
   }
+
+  const Content = () => (
+    <>
+      <div className="flex flex-col gap-2 px-6 py-8">
+        <>
+          <p className="text-scale-1200 text-sm">You have been invited to join </p>
+          {organization_name ? (
+            <>
+              <p className="text-scale-1200 text-3xl">
+                {organization_name ? `${organization_name}` : 'an organization'}{' '}
+              </p>
+              {!token_does_not_exist && (
+                <p className="text-scale-900 text-sm">an organization on Supabase</p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+            </>
+          )}
+          {slug && <p className="text-scale-900 text-xs">{`organization slug: ${slug}`}</p>}
+        </>
+      </div>
+
+      <div
+        className={['border-scale-400 border-t', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+          ' '
+        )}
+      >
+        <div className="flex flex-col gap-4 px-6 py-4 ">
+          {profile && !isError && (
+            <div className="flex flex-row items-center justify-center gap-3">
+              <Button onClick={handleDeclineJoinOrganization} htmlType="submit" type="default">
+                Decline
+              </Button>
+              <Button
+                onClick={handleJoinOrganization}
+                htmlType="submit"
+                loading={isSubmitting}
+                type="primary"
+                icon={<IconCheckSquare />}
+              >
+                Join organization
+              </Button>
+            </div>
+          )}
+
+          {tokenInfoLoaded && <ErrorMessage />}
+
+          {!profile && (
+            <div className="flex flex-col gap-3">
+              <p className="text-scale-900 text-xs">
+                You will need to sign in to accept this invitation
+              </p>
+              <div className="flex justify-center gap-3">
+                <Link passHref href={loginRedirectLink}>
+                  <Button as="a" type="default">
+                    Sign in
+                  </Button>
+                </Link>
+                <Link passHref href={loginRedirectLink}>
+                  <Button as="a" type="default">
+                    Create an account
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  )
 
   return (
     <div
@@ -169,79 +251,19 @@ const JoinOrganizationPage = () => {
       </Link>
       <div
         className="
-          bg-scale-300 border-scale-400 mx-auto overflow-hidden
+          bg-scale-100 bg-scale-300 border-scale-400 mx-auto overflow-hidden
           rounded-md border text-center shadow
           md:w-[400px]
           "
       >
-        <div className="flex flex-col gap-2 px-6 py-8">
-          {!token_does_not_exist ? (
-            <>
-              <p className="text-scale-1200 text-sm">You have been invited to join </p>
-              {organization_name ? (
-                <>
-                  <p className="text-scale-1200 text-3xl">
-                    {organization_name ? `${organization_name}` : 'an organization'}{' '}
-                  </p>
-                  <p className="text-scale-900 text-sm">an organization on Supabase</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-scale-1200 text-3xl">an organization</p>
-                </>
-              )}
-            </>
-          ) : (
-            <div className="w-96"></div>
-          )}
-        </div>
-
-        <div
-          className={['border-scale-400 border-t', isError ? 'bg-sand-100' : 'bg-transparent'].join(
-            ' '
-          )}
+        <Loading
+          active={
+            // true
+            !tokenInfoLoaded
+          }
         >
-          <div className="flex flex-col gap-4 px-6 py-4 ">
-            {authorized_user && !expired_token && email_match && tokenInfoLoaded && (
-              <div className="flex flex-row items-center justify-center gap-3">
-                <Button onClick={handleDeclineJoinOrganization} htmlType="submit" type="default">
-                  Decline
-                </Button>
-                <Button
-                  onClick={handleJoinOrganization}
-                  htmlType="submit"
-                  loading={isSubmitting}
-                  type="primary"
-                  icon={<IconCheckSquare />}
-                >
-                  Join organization
-                </Button>
-              </div>
-            )}
-
-            {tokenInfoLoaded && <ErrorMessage />}
-
-            {!authorized_user && (
-              <div className="flex flex-col gap-3">
-                <p className="text-scale-900 text-xs">
-                  You will need to sign in to accept this invitation
-                </p>
-                <div className="flex justify-center gap-3">
-                  <Link passHref href={loginRedirectLink}>
-                    <Button as="a" type="default">
-                      Sign in
-                    </Button>
-                  </Link>
-                  <Link passHref href={loginRedirectLink}>
-                    <Button as="a" type="default">
-                      Create an account
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+          <Content />
+        </Loading>
       </div>
     </div>
   )
