@@ -39,6 +39,7 @@ const JoinOrganizationPage = () => {
       await ui.load()
 
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
+      console.log({ response })
 
       if (response.error) {
         setError(response.error)
@@ -148,7 +149,7 @@ const JoinOrganizationPage = () => {
     ) : expired_token ? (
       <>
         <p>The invite token has expired.</p>
-        <p className="text-scale-900">Please request a new one from the organization member.</p>
+        <p className="text-scale-900">Please request a new one from the organization owner.</p>
       </>
     ) : (
       ''
