@@ -37,7 +37,7 @@ const NavigationBar: FC<Props> = ({}) => {
     >
       <ul className="flex flex-col space-y-2">
         <Link href='/'>
-          <a className="block mx-2 h-10">
+          <a className={`block ml-2 w-fit ${isCollapsed ? "h-6 my-2" : "h-10"}`}>
             {isCollapsed ? (
               <Image src="/img/supabase-logo.svg" width="24" height="24" alt="Supabase Logo" />
             ) : (
