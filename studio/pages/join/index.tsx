@@ -62,6 +62,7 @@ const JoinOrganizationPage = () => {
   async function handleJoinOrganization() {
     setIsSubmitting(true)
     const response = await post(`${API_URL}/organizations/${slug}/members/join?token=${token}`, {})
+
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -70,7 +71,7 @@ const JoinOrganizationPage = () => {
       setIsSubmitting(false)
     } else {
       setIsSubmitting(false)
-      app.organizations.load()
+      app.onOrgJoined(response)
       router.push('/')
     }
   }
