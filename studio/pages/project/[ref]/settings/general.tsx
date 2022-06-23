@@ -155,7 +155,6 @@ const GeneralSettings = observer(() => {
           onSubmit={(model: any) => handleUpdateProject(pluckObjectFields(model, BASIC_FIELDS))}
         >
           <AutoField name="name" showInlineError errorMessage="Please enter a project name" />
-          eeeee
         </SchemaFormPanel>
       </section>
 
