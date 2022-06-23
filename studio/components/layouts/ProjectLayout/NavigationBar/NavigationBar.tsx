@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { isUndefined } from 'lodash'
@@ -15,6 +16,7 @@ interface Props {}
 const NavigationBar: FC<Props> = ({}) => {
   const router = useRouter()
   const { ui } = useStore()
+  const [isCollapsed, setIsCollapsed] = useState(false)
   const projectRef = ui.selectedProjectRef as string
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
@@ -28,21 +30,23 @@ const NavigationBar: FC<Props> = ({}) => {
     <div
       style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
       className={[
-        'flex w-14 flex-col justify-between overflow-y-hidden p-2',
+        `${isCollapsed ? 'w-14' : 'w-48'}`,
+        'flex flex-col justify-between overflow-y-hidden p-2',
         'bg-sidebar-light dark:bg-sidebar-dark dark:border-dark border-r',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        <Link href={'/'}>
-          <a className="block">
-            <img
-              src="/img/supabase-logo.svg"
-              alt="Supabase"
-              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
-            />
+        <Link href='/'>
+          <a className="block mx-2 h-10">
+            {isCollapsed ? (
+              <Image src="/img/supabase-logo.svg" width="24" height="24" alt="Supabase Logo" />
+            ) : (
+              <Image src={`/img/${"supabase-dark.svg"}`} width="125" height="40" alt="Supabase Logo" />
+            )}
           </a>
         </Link>
         <NavigationIconButton
+          isCollapsed={isCollapsed}
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
@@ -56,6 +60,7 @@ const NavigationBar: FC<Props> = ({}) => {
           <NavigationIconButton
             key={route.key}
             route={route}
+            isCollapsed={isCollapsed}
             isActive={activeRoute === route.key}
           />
         ))}
@@ -64,6 +69,7 @@ const NavigationBar: FC<Props> = ({}) => {
           <NavigationIconButton
             key={route.key}
             route={route}
+            isCollapsed={isCollapsed}
             isActive={activeRoute === route.key}
           />
         ))}

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
 import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
@@ -47,10 +48,8 @@ const WithSidebar: FC<Props> = ({
         >
           {title && (
             <div className="mb-2">
-              <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6">
-                <Typography.Title level={4} className="mb-0">
-                  {title}
-                </Typography.Title>
+              <div className="dark:border-dark flex max-h-12 items-center border-b px-6">
+                <Image src={`/img/${"supabase-dark.svg"}`} width="100%" height="48" alt="Supabase Logo" />
               </div>
             </div>
           )}

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import Link from 'next/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -7,26 +7,29 @@ import { Route } from 'components/ui/ui.types'
 interface Props {
   route: Route
   isActive?: boolean
+  isCollapsed: boolean
 }
 
-const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
+const NavigationIconButton: FC<Props> = ({ route, isCollapsed, isActive = false }) => {
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
         <Link href={route.link}>
-          <a
-            className={[
+          <a className='flex items-center space-x-2'>
+            <div className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
               'bg-scale-200 hover:bg-scale-500', // Light mode
               'text-scale-900 hover:text-scale-1200 ', // Dark mode
               `${isActive ? 'bg-scale-500 shadow-sm text-scale-1200' : ''}`,
-            ].join(' ')}
-          >
-            {route.icon}
+            ].join(' ')}>
+              {route.icon}
+            </div>
+            {isCollapsed === false && <span className={`text-sm ${isActive ? 'text-scale-1200' : 'text-scale-900'}`}>{route.label}</span>}
           </a>
         </Link>
       </Tooltip.Trigger>
+      {isCollapsed === false && (
       <Tooltip.Content side="right">
         <Tooltip.Arrow className="radix-tooltip-arrow" />
         <div
@@ -38,6 +41,7 @@ const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
           <span className="text-scale-1200 text-xs">{route.label}</span>
         </div>
       </Tooltip.Content>
+      )}
     </Tooltip.Root>
   )
 }
