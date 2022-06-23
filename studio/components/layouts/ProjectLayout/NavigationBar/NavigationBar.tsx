@@ -104,8 +104,9 @@ const NavigationBar: FC<Props> = ({}) => {
           }
         >
           <Button as="span" type="text" size="tiny">
-            <div className="py-1">
+            <div className="py-1 flex items-start space-x-2">
               <IconUser size={18} strokeWidth={2} />
+              {isCollapsed === false && <span className='text-sm'>Account Preferences</span>}
             </div>
           </Button>
         </Dropdown>

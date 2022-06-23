@@ -15,21 +15,21 @@ const NavigationIconButton: FC<Props> = ({ route, isCollapsed, isActive = false 
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
         <Link href={route.link}>
-          <a className='flex items-center space-x-2'>
+          <a className='flex items-center space-x-2 group'>
             <div className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'bg-scale-200 hover:bg-scale-500', // Light mode
-              'text-scale-900 hover:text-scale-1200 ', // Dark mode
+              'bg-scale-200 group-hover:bg-scale-500', // Light mode
+              'text-scale-900 group-hover:text-scale-1200 ', // Dark mode
               `${isActive ? 'bg-scale-500 shadow-sm text-scale-1200' : ''}`,
             ].join(' ')}>
               {route.icon}
             </div>
-            {isCollapsed === false && <span className={`text-sm ${isActive ? 'text-scale-1200' : 'text-scale-900'}`}>{route.label}</span>}
+            {isCollapsed === false && <span className={`transition-colors duration-200 text-sm group-hover:text-scale-1200 ${isActive ? 'text-scale-1200' : 'text-scale-900'}`}>{route.label}</span>}
           </a>
         </Link>
       </Tooltip.Trigger>
-      {isCollapsed === false && (
+      {isCollapsed === true && (
       <Tooltip.Content side="right">
         <Tooltip.Arrow className="radix-tooltip-arrow" />
         <div
