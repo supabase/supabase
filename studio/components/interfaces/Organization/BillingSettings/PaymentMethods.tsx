@@ -202,11 +202,34 @@ const PaymentMethods: FC<Props> = ({
                                 >
                                   Make default
                                 </Dropdown.Item>,
-                                <Dropdown.Item
-                                  onClick={() => setSelectedMethodToDelete(paymentMethod)}
-                                >
-                                  Delete
-                                </Dropdown.Item>,
+                                paymentMethods.length === 1 ? (
+                                  <Tooltip.Root delayDuration={0}>
+                                    <Tooltip.Trigger>
+                                      <Dropdown.Item disabled>
+                                        <span className="text-scale-1000">Delete</span>
+                                      </Dropdown.Item>
+                                    </Tooltip.Trigger>
+                                    <Tooltip.Content side="right">
+                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                      <div
+                                        className={[
+                                          'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                                          'border-scale-200 w-48 border text-center', //border
+                                        ].join(' ')}
+                                      >
+                                        <span className="text-scale-1200 text-xs">
+                                          Your only payment method cannot be deleted
+                                        </span>
+                                      </div>
+                                    </Tooltip.Content>
+                                  </Tooltip.Root>
+                                ) : (
+                                  <Dropdown.Item
+                                    onClick={() => setSelectedMethodToDelete(paymentMethod)}
+                                  >
+                                    Delete
+                                  </Dropdown.Item>
+                                ),
                               ]}
                             >
                               <Button
