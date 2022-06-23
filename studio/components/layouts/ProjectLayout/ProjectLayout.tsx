@@ -113,6 +113,9 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
 
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
+  // works if just navigating from homepage, undefined if you go to /project/ref/ and refresh
+  console.log(ui.selectedProject)
+
   return (
     <>
       {isLoading || ui.selectedProject === undefined ? (
