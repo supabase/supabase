@@ -51,6 +51,8 @@ const TableEditorMenu: FC<Props> = ({
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
+  const isLocked = meta.excludedSchemas.includes(selectedSchema || '')
+
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views
   useEffect(() => {
@@ -90,13 +92,13 @@ const TableEditorMenu: FC<Props> = ({
       : schemaViews.filter((view) => view.name.includes(searchText))
 
   return (
-    <div className="my-6 mx-4 flex flex-col flex-grow space-y-6">
+    <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">
       {/* Schema selection dropdown */}
       <div className="px-3">
         {meta.schemas.isLoading ? (
-          <div className="h-[30px] border border-gray-500 px-3 rounded flex items-center space-x-3">
+          <div className="flex h-[30px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
-            <span className="text-xs text-scale-900">Loading schemas...</span>
+            <span className="text-scale-900 text-xs">Loading schemas...</span>
           </div>
         ) : (
           <Listbox
@@ -114,14 +116,10 @@ const TableEditorMenu: FC<Props> = ({
                 key={schema.id}
                 value={schema.name}
                 // @ts-ignore
-                label={
-                  <>
-                    <span className="text-scale-900">schema</span> <span>{schema.name}</span>
-                  </>
-                }
+                label={schema.name}
+                addOnBefore={() => <span className="text-scale-900">schema</span>}
               >
-                <span className="text-sm text-scale-900">schema</span>{' '}
-                <span className="text-sm text-scale-1200">{schema.name}</span>
+                <span className="text-scale-1200 text-sm">{schema.name}</span>
               </Listbox.Option>
             ))}
           </Listbox>
@@ -129,7 +127,7 @@ const TableEditorMenu: FC<Props> = ({
       </div>
 
       <div className="space-y-1">
-        {selectedSchema === 'public' && (
+        {!isLocked && (
           <div className="px-3">
             {/* Add new table button */}
             <Button
@@ -149,7 +147,7 @@ const TableEditorMenu: FC<Props> = ({
           </div>
         )}
         {/* Table search input */}
-        <div className="block mb-2 px-3">
+        <div className="mb-2 block px-3">
           <Input
             className="border-none"
             icon={
@@ -179,7 +177,7 @@ const TableEditorMenu: FC<Props> = ({
             // @ts-ignore
             title={
               <>
-                <div className="w-full flex items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                   <span>All tables</span>
                   <button className="cursor-pointer" onClick={refreshTables}>
                     <IconRefreshCw className={isRefreshing ? 'animate-spin' : ''} size={14} />
@@ -229,7 +227,7 @@ const TableEditorMenu: FC<Props> = ({
                           </Dropdown.Item>,
                         ]}
                       >
-                        <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                        <div className="text-scale-900 hover:text-scale-1200 transition-colors">
                           <IconChevronDown size={14} strokeWidth={2} />
                         </div>
                       </Dropdown>
@@ -249,7 +247,7 @@ const TableEditorMenu: FC<Props> = ({
             // @ts-ignore
             title={
               <>
-                <div className="w-full flex items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                   <span>All views</span>
                 </div>
               </>

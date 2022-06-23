@@ -121,6 +121,7 @@ const TableEditor: FC<Props> = ({
       if (isEmpty(errors)) {
         const payload: CreateTablePayload | UpdateTablePayload = {
           name: tableFields.name,
+          schema: selectedSchema,
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
@@ -140,7 +141,6 @@ const TableEditor: FC<Props> = ({
           isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
         }
-
         saveChanges(payload, columns, isNewRecord, configuration, resolve)
       } else {
         resolve()
@@ -156,7 +156,7 @@ const TableEditor: FC<Props> = ({
       key="TableEditor"
       visible={visible}
       // @ts-ignore
-      header={<HeaderTitle table={table} isDuplicating={isDuplicating} />}
+      header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
       className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
       onConfirm={() => (resolve: () => void) => onSaveChanges(resolve)}
