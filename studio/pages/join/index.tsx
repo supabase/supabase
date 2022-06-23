@@ -101,9 +101,6 @@ const JoinOrganizationPage = () => {
     (tokenInfoLoaded && !email_match) ||
     (tokenInfoLoaded && expired_token)
 
-  console.log('error', error)
-  console.log('isError', isError)
-
   const ErrorMessage = () => {
     const Container = ({ children }: { children: React.ReactNode }) => (
       <div
