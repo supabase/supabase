@@ -18,7 +18,6 @@ export interface IAppStore {
   onProjectStatusUpdated: (projectId: number, value: string) => void
   onProjectPostgrestStatusUpdated: (projectId: number, value: 'OFFLINE' | 'ONLINE') => void
   onOrgAdded: (org: any) => void
-  onOrgJoined: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
 }
@@ -100,12 +99,6 @@ export default class AppStore implements IAppStore {
   }
 
   onOrgAdded(org: Organization) {
-    if (org && org.id) {
-      this.organizations.data[org.id] = org
-    }
-  }
-
-  onOrgJoined(org: Organization) {
     if (org && org.id) {
       this.organizations.data[org.id] = org
     }
