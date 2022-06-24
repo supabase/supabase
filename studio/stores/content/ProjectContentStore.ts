@@ -111,7 +111,6 @@ export default class ProjectContentStore implements IProjectContentStore {
     if (response.error) {
       throw response.error
     }
-    console.log(response)
     this.data = keyBy(response.data, 'id')
     return response
   }
