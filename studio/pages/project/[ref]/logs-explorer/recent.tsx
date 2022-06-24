@@ -22,38 +22,30 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        {recent.length > 0 && (
-          <>
-            <div className="flex flex-row justify-end">
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => {
-                  content.clearRecentLogSqlSnippets()
-                }}
-              >
-                Clear
-              </Button>
-            </div>
-            <Table
-              head={
-                <>
-                  <Table.th>Snippets</Table.th>
-                  <Table.th className="w-24"></Table.th>
-                </>
-              }
-              body={
-                <>
-                  {recent.map((item: LogSqlSnippets.Content) => (
-                    <RecentQueriesItem key={item.sql} item={item} />
-                  ))}
-                </>
-              }
-            />
-          </>
-        )}
-      </div>
+      {recent.length > 0 && (
+          <Table
+            head={
+              <>
+                <Table.th>Snippets</Table.th>
+                <Table.th className="w-24">
+                  <Button
+                    size="tiny"
+                    type="default"
+                    onClick={() => {
+                      content.clearRecentLogSqlSnippets()
+                    }}
+                  >
+                    Clear history
+                  </Button>
+                </Table.th>
+              </>
+            }
+            body={recent.map((item: LogSqlSnippets.Content) => (
+                  <RecentQueriesItem key={item.sql} item={item} />
+                ))
+            }
+          />
+      )}
       {recent.length === 0 && (
         <>
           <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">

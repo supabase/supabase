@@ -3,6 +3,7 @@ import { FC, useState } from 'react'
 import { Button, IconChevronRight, IconMaximize2, IconPlay } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
+import SqlSnippetCode from './Logs.SqlSnippetCode'
 
 interface Props {
   item: any
@@ -45,27 +46,21 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
             type="alternative"
             iconRight={<IconPlay size={10} />}
             onClick={() =>
-              router.push(
-                `/project/${ref}/logs-explorer?q=${encodeURIComponent(item.content.sql)}`
-              )
+              router.push(`/project/${ref}/logs-explorer?q=${encodeURIComponent(item.content.sql)}`)
             }
           >
             Run
           </Button>
         </Table.td>
       </Table.tr>
-      <>
-        <td
-          className={
-            'bg-scale-100 border-l border-r !pt-0 !pb-0 text-scale-1200 transition-all expanded-row-content ' +
-            (expand ? ' h-auto opacity-100' : 'h-0 opacity-0')
-          }
-          colSpan={5}
-        >
-          {/* <CodeEditor defaultValue={item.content.sql} language="pgsql" classname /> */}
-          {expand && <pre className="text-sm break-words py-4 px-3 ">{item.content.sql}</pre>}
-        </td>
-      </>
+      <Table.td
+        className={`${
+          expand ? ' h-auto opacity-100' : 'h-0 opacity-0'
+        } transition-all expanded-row-content bg-scale-100 border-l border-r !pt-0 !pb-0`}
+        colSpan={5}
+      >
+        {expand && <SqlSnippetCode>{item.content.sql}</SqlSnippetCode>}
+      </Table.td>
     </>
   )
 }
