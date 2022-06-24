@@ -9,14 +9,6 @@
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
 <item>
-  <guid>https://supabase.com/blog/2022/06/22/boosting-soulless-citadel-nft-sales-using-supabase</guid>
-  <title>Boosting "Soulless Citadel" NFT sales using Supabase</title>
-  <link>https://supabase.com/blog/2022/06/22/boosting-soulless-citadel-nft-sales-using-supabase</link>
-  <description>One of the most popular NFT projects, Soulless Citadel, migrated to Supabase to save development time and provide faster and better filtering for their users.</description>
-  <pubDate>Wed, 22 Jun 2022 00:00:00 GMT</pubDate>
-</item>
-
-<item>
   <guid>https://supabase.com/blog/2022/06/15/loading-data-supabase-python</guid>
   <title>Python data loading with Supabase</title>
   <link>https://supabase.com/blog/2022/06/15/loading-data-supabase-python</link>
