@@ -39,7 +39,6 @@ const JoinOrganizationPage = () => {
       await ui.load()
 
       const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-      console.log({ response })
 
       if (response.error) {
         setError(response.error)
@@ -73,7 +72,7 @@ const JoinOrganizationPage = () => {
       setIsSubmitting(false)
     } else {
       setIsSubmitting(false)
-      app.onOrgJoined(response)
+      app.onOrgAdded(response)
       router.push('/')
     }
   }
@@ -110,7 +109,6 @@ const JoinOrganizationPage = () => {
           isError ? 'text-scale-1100' : 'text-scale-1200',
         ].join(' ')}
       >
-        {/* <IconAlertCircle size={21} strokeWidth={1.5} /> */}
         <>{children}</>
       </div>
     )
@@ -249,17 +247,12 @@ const JoinOrganizationPage = () => {
       </Link>
       <div
         className="
-          bg-scale-100 bg-scale-300 border-scale-400 mx-auto overflow-hidden
+          bg-scale-100 border-scale-400 mx-auto overflow-hidden
           rounded-md border text-center shadow
           md:w-[400px]
           "
       >
-        <Loading
-          active={
-            // true
-            !tokenInfoLoaded
-          }
-        >
+        <Loading active={!tokenInfoLoaded}>
           <Content />
         </Loading>
       </div>
