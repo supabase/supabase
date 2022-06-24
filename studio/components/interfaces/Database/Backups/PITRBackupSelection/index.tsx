@@ -92,7 +92,7 @@ const PITRBackupSelection: FC<Props> = () => {
 
     // Validation
     if (!recoveryPoint) {
-      setErrors({ recoveryPoint: 'Please enter a date to recovery your project from' })
+      setErrors({ recoveryPoint: 'Please enter a date to recover your project from' })
     } else {
       const recoveryTimeTargetUnix = convertTimeStringtoUnixS(recoveryPoint, selectedTimezone)
       const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
@@ -116,9 +116,7 @@ const PITRBackupSelection: FC<Props> = () => {
   const onConfirmRestore = async () => {
     if (!recoveryPoint) return
 
-    // To unix milliseconds
     const recoveryTimeTargetUnix = convertTimeStringtoUnixS(recoveryPoint, selectedTimezone)
-
     const { error } = await post(`${API_URL}/database/${projectRef}/backups/pitr`, {
       recovery_time_target_unix: recoveryTimeTargetUnix,
       region: configuration.region,
@@ -152,86 +150,106 @@ const PITRBackupSelection: FC<Props> = () => {
       <form onSubmit={onSubmit}>
         <div className="space-y-4">
           <div className="space-y-4 rounded border border-gray-400 border-opacity-50 bg-gray-300 py-3">
-            <div className="flex justify-between px-4">
-              <p className="text-scale-1100 flex-1 text-sm">Select timezone</p>
-              <div className="flex-1">
-                <Listbox
-                  value={selectedTimezone.text}
-                  onChange={(text) => {
-                    const selectedTimezone = ALL_TIMEZONES.find((option) => option.text === text)
-                    setSelectedTimezone(selectedTimezone)
-                  }}
-                  onBlur={() => setSearchString('')}
-                >
-                  <div
-                    className={[
-                      'fixed top-0 flex w-full items-center',
-                      'rounded-t-md border-b border-gray-600 bg-gray-500',
-                      'mb-4 space-x-2 px-4 py-2',
-                    ].join(' ')}
-                    style={{ zIndex: 1 }}
+            <div className="space-y-4 py-2">
+              <div className="flex justify-between px-4">
+                <p className="flex-1 text-sm">Select timezone</p>
+                <div className="flex-1">
+                  <Listbox
+                    value={selectedTimezone.text}
+                    onChange={(text) => {
+                      const selectedTimezone = ALL_TIMEZONES.find((option) => option.text === text)
+                      setSelectedTimezone(selectedTimezone)
+                    }}
+                    onBlur={() => setSearchString('')}
                   >
-                    <IconSearch size={14} />
-                    <input
-                      autoFocus
-                      className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
-                      value={searchString}
-                      placeholder={''}
-                      onChange={(e: FormEvent<HTMLInputElement>) =>
-                        setSearchString(e.currentTarget.value)
-                      }
-                    />
-                  </div>
-                  {/* Whitespace to shift listbox options down for searchfield */}
-                  <div className="h-8" />
-                  {timezoneOptions.map((option) => {
-                    return (
-                      <Listbox.Option key={option} label={option} value={option}>
-                        <div>{option}</div>
+                    <div
+                      className={[
+                        'fixed top-0 flex w-full items-center',
+                        'rounded-t-md border-b border-gray-600 bg-gray-500',
+                        'mb-4 space-x-2 px-4 py-2',
+                      ].join(' ')}
+                      style={{ zIndex: 1 }}
+                    >
+                      <IconSearch size={14} />
+                      <input
+                        autoFocus
+                        className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
+                        value={searchString}
+                        placeholder={''}
+                        onChange={(e: FormEvent<HTMLInputElement>) =>
+                          setSearchString(e.currentTarget.value)
+                        }
+                      />
+                    </div>
+                    {/* Whitespace to shift listbox options down for searchfield */}
+                    <div className="h-8" />
+                    {timezoneOptions.map((option) => {
+                      return (
+                        <Listbox.Option key={option} label={option} value={option}>
+                          <div>{option}</div>
+                        </Listbox.Option>
+                      )
+                    })}
+                    {timezoneOptions.length === 0 && (
+                      <Listbox.Option disabled key="no-results" label="" value="">
+                        No timezones found
                       </Listbox.Option>
-                    )
-                  })}
-                  {timezoneOptions.length === 0 && (
-                    <Listbox.Option disabled key="no-results" label="" value="">
-                      No timezones found
-                    </Listbox.Option>
-                  )}
-                </Listbox>
+                    )}
+                  </Listbox>
+                </div>
+              </div>
+              <div className="flex justify-between space-x-4">
+                <div className="w-2/5 space-y-2 pl-4">
+                  <p className="text-sm">Earliest point of recovery</p>
+                </div>
+                <div className="w-3/5">
+                  <Input
+                    readOnly
+                    disabled
+                    step={1}
+                    type="datetime-local"
+                    className="px-4"
+                    value={earliestAvailableBackup}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between space-x-4">
+                <div className="w-2/5 space-y-2 pl-4">
+                  <p className="text-sm">Latest point of recovery</p>
+                </div>
+                <div className="w-3/5">
+                  <Input
+                    readOnly
+                    disabled
+                    step={1}
+                    type="datetime-local"
+                    className="px-4"
+                    value={latestAvailableBackup}
+                  />
+                </div>
               </div>
             </div>
             <Popover.Seperator />
-            <Input
-              readOnly
-              disabled
-              step={1}
-              type="datetime-local"
-              className="px-4"
-              label="Earliest point of recovery"
-              layout="horizontal"
-              value={earliestAvailableBackup}
-            />
-            <Input
-              readOnly
-              disabled
-              step={1}
-              type="datetime-local"
-              className="px-4"
-              label="Latest point of recovery"
-              layout="horizontal"
-              value={latestAvailableBackup}
-            />
-            <Input
-              step={1}
-              type="datetime-local"
-              error={errors?.recoveryPoint}
-              className="px-4"
-              label="Recovery point"
-              layout="horizontal"
-              onChange={(e) => {
-                setErrors(undefined)
-                setRecoveryPoint(e.target.value)
-              }}
-            />
+            <div className="flex justify-between space-x-4 py-2">
+              <div className="w-2/5 space-y-2 pl-4">
+                <p className="text-sm">Recovery point</p>
+                <p className="text-scale-1100 text-sm">
+                  Select a date and time that you would like to restore your project to
+                </p>
+              </div>
+              <div className="w-3/5">
+                <Input
+                  step={1}
+                  type="datetime-local"
+                  error={errors?.recoveryPoint}
+                  className="px-4"
+                  onChange={(e) => {
+                    setErrors(undefined)
+                    setRecoveryPoint(e.target.value)
+                  }}
+                />
+              </div>
+            </div>
             <Popover.Seperator />
             <div className="flex items-center justify-end px-4">
               <Button type="default">Restore</Button>
