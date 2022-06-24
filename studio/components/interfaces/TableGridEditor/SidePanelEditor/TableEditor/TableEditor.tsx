@@ -20,8 +20,6 @@ import {
 
 interface Props {
   table?: PostgresTable
-  tables: PostgresTable[]
-  enumTypes: PostgresType[]
   selectedSchema: string
   isDuplicating: boolean
   visible: boolean
@@ -34,6 +32,7 @@ interface Props {
       tableId?: number
       importContent?: ImportContent
       isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
       isDuplicateRows: boolean
     },
     resolve: any
@@ -43,8 +42,6 @@ interface Props {
 
 const TableEditor: FC<Props> = ({
   table,
-  tables = [],
-  enumTypes = [] as PostgresType[],
   selectedSchema,
   isDuplicating,
   visible = false,
@@ -52,8 +49,22 @@ const TableEditor: FC<Props> = ({
   saveChanges = () => {},
   updateEditorDirty = () => {},
 }) => {
-  const { ui } = useStore()
+  const { ui, meta } = useStore()
   const isNewRecord = isUndefined(table)
+
+  const tables = meta.tables.list()
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
+
+  const publications = meta.publications.list()
+  const realtimePublication = publications.find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const realtimeEnabledTables = realtimePublication?.tables ?? []
+  const isRealtimeEnabled = isNewRecord
+    ? false
+    : realtimeEnabledTables.some((t: any) => t.id === table?.id)
 
   const [errors, setErrors] = useState<any>({})
   const [tableFields, setTableFields] = useState<TableField>()
@@ -70,7 +81,11 @@ const TableEditor: FC<Props> = ({
         const tableFields = generateTableField()
         setTableFields(tableFields)
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(table!, isDuplicating)
+        const tableFields = generateTableFieldFromPostgresTable(
+          table!,
+          isDuplicating,
+          isRealtimeEnabled
+        )
         setTableFields(tableFields)
       }
     }
@@ -99,7 +114,7 @@ const TableEditor: FC<Props> = ({
     if (tableFields) {
       const errors: any = validateFields(tableFields)
       if (errors.columns) {
-        ui.setNotification({ category: 'error', message: errors.columns })
+        ui.setNotification({ category: 'error', message: errors.columns, duration: 4000 })
       }
       setErrors(errors)
 
@@ -122,6 +137,7 @@ const TableEditor: FC<Props> = ({
           tableId: table?.id,
           importContent,
           isRLSEnabled: tableFields.isRLSEnabled,
+          isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
         }
 
@@ -187,8 +203,16 @@ const TableEditor: FC<Props> = ({
                 </div>
               }
               description="Restrict access to your table by enabling RLS and writing Postgres policies"
-              checked={tableFields?.isRLSEnabled}
-              onChange={() => onUpdateField({ isRLSEnabled: !tableFields?.isRLSEnabled })}
+              checked={tableFields.isRLSEnabled}
+              onChange={() => onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })}
+              size="medium"
+            />
+            <Checkbox
+              id="enable-realtime"
+              label="Enable Realtime"
+              description="Broadcast changes on this table to authorized subscribers"
+              checked={tableFields.isRealtimeEnabled}
+              onChange={() => onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })}
               size="medium"
             />
           </div>

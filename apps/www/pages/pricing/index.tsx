@@ -30,7 +30,8 @@ export default function IndexPage() {
   const tiers = [
     {
       name: 'Free',
-      href: '#',
+      costUnit: '/month per project',
+      href: 'https://app.supabase.com/new/new-project',
       priceMonthly: 0,
       warning: 'Limit of 2 free projects',
       description: 'Perfect for passion projects & simple websites.',
@@ -39,6 +40,7 @@ export default function IndexPage() {
         'Up to 2GB bandwidth',
         'Up to 50MB file uploads',
         'Social OAuth providers',
+        '50,000 monthly active users',
         'Up to 500K Edge Function invocations',
         '1-day log retention',
         'Community support',
@@ -49,16 +51,17 @@ export default function IndexPage() {
     },
     {
       name: 'Pro',
-      href: '#',
+      costUnit: '/month per project',
+      href: 'https://app.supabase.com/new/new-project',
       from: true,
       priceMonthly: 25,
-      warning: '+ additional use',
       description: 'For production applications with the option to scale.',
       features: [
         '8GB database & 100GB file storage',
-        '50GB bandwith',
-        '3GB file uploads',
+        '50GB bandwidth',
+        '5GB file uploads',
         'Social OAuth providers',
+        '100,000 monthly active users',
         '2M Edge Function invocations',
         'Daily backups',
         '7-day log retention',
@@ -165,7 +168,7 @@ export default function IndexPage() {
 
           <div
             className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
-          
+
             lg:px-8
           "
           >
@@ -174,77 +177,75 @@ export default function IndexPage() {
                 <div
                   key={tier.name}
                   className="
-                  flex 
-                  flex-col 
+                  flex
+                  flex-col
                   overflow-hidden
-                  rounded 
-                  border 
+                  rounded
+                  border
                   "
                 >
-                  <div className="dark:bg-scale-300 h-48 bg-white px-8 pt-6">
-                    <h3
-                      className="
-                        text-scale-1200 
-                        mb-2 
-                        inline-flex 
-                        rounded-full 
-                        text-sm 
-                        font-normal 
-                        tracking-wide 
-                        lg:text-xl"
-                      id="tier-standard"
-                    >
-                      {tier.name}
-                    </h3>
+                  <div className="dark:bg-scale-300 h-[220px] bg-white px-8 pt-6">
+                    <div className="mb-2 flex items-center gap-2">
+                      <h3 className="text-scale-1200 text-xl font-medium">{tier.name}</h3>
+                      {tier.warning && (
+                        <div className="bg-scale-400 text-scale-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                          {tier.warning}
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-scale-1100 my-4 h-[40px] text-sm">{tier.description}</p>
                     <div
                       className="
-                      text-scale-1200 flex items-baseline 
-                      text-5xl 
-                      font-normal 
-                      lg:text-4xl 
+                      text-scale-1200 flex items-baseline
+                      text-5xl
+                      font-normal
+                      lg:text-4xl
                       xl:text-4xl
-                      
+
                       "
                     >
                       {tier.priceMonthly !== undefined ? (
-                        <div className="flex items-end gap-2">
-                          {tier.from && (
-                            <span className="text-base font-medium xl:text-xl">From</span>
-                          )}
-                          <div>
-                            <span>${tier.priceMonthly}</span>
-                            <span className="text-scale-900 ml-1 text-2xl font-medium">/mo</span>
-                          </div>
-                          {tier.warning && (
-                            <div className="bg-brand-300 text-brand-1000 mt-2 rounded-md bg-opacity-30 px-2 py-1 text-xs">
-                              {tier.warning}
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-end gap-2">
+                            <div>
+                              <span>
+                                {typeof tier.priceMonthly !== 'string' && '$'}
+                                {tier.priceMonthly}
+                              </span>
+                              <span className="text-scale-900 ml-1 text-xl font-normal">
+                                {tier.costUnit}
+                              </span>
                             </div>
+                          </div>
+                          {tier.from && (
+                            <span className="text-scale-900 block text-sm">
+                              + any additional usage
+                            </span>
                           )}
                         </div>
                       ) : (
                         <span>Contact Us</span>
                       )}
                     </div>
-                    <p className="text-scale-1100 mt-4 text-base">{tier.description}</p>
                   </div>
                   <div
                     className="
-                    dark:border-scale-400 bg-scale-100 dark:bg-scale-300 flex
-                    
-                    h-full 
-                    flex-1 
-                    flex-col
-                    
-                    justify-between 
-                    space-y-6 
+                    dark:border-scale-400 dark:bg-scale-300 flex h-full
 
+                    flex-1
+                    flex-col
+                    justify-between
+
+                    space-y-6
                     border-t
+
+                    bg-white
                     px-8
 
                     py-6
                   "
                   >
-                    {tier.preface && <p className="text-scale-1200 text-base">{tier.preface}</p>}
+                    {tier.preface && <p className="text-scale-1100 text-sm">{tier.preface}</p>}
                     {/* <p className="text-scale-900 text-sm">Included with plan:</p> */}
                     <ul role="list" className="dark:divide-scale-400 divide-y">
                       {tier.features.map((feature) => (
@@ -645,16 +646,22 @@ export default function IndexPage() {
               <div className="mt-16">
                 {/* @ts-ignore */}
                 <Accordion
-                  type="bordered"
+                  type="default"
                   openBehaviour="multiple"
                   size="medium"
                   className="text-scale-900 dark:text-white"
                 >
                   {pricingFaq.map((faq, i) => {
                     return (
-                      <Accordion.Item key={i} header={faq.question} id={`faq--${i.toString()}`}>
-                        <ReactMarkdown className="text-scale-1100">{faq.answer}</ReactMarkdown>
-                      </Accordion.Item>
+                      <div className="border-b pb-3">
+                        <Accordion.Item
+                          key={i}
+                          header={<span className="text-scale-1200">{faq.question}</span>}
+                          id={`faq--${i.toString()}`}
+                        >
+                          <ReactMarkdown className="text-scale-900">{faq.answer}</ReactMarkdown>
+                        </Accordion.Item>
+                      </div>
                     )
                   })}
                 </Accordion>

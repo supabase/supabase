@@ -9,7 +9,7 @@ import {
   IconLoader,
   Typography,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'

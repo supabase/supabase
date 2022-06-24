@@ -34,7 +34,7 @@ const ActionBar: FC<ActionBarProps> = ({
 
   return (
     <div className="border-scale-500 flex w-full justify-between space-x-3 border-t px-3 py-4">
-      <Button size="small" onClick={closePanel} type="default">
+      <Button size="small" onClick={closePanel} type="default" htmlType="button">
         {backButtonLabel}
       </Button>
 
@@ -53,7 +53,7 @@ const ActionBar: FC<ActionBarProps> = ({
       ) : !hideApply ? (
         // New solution, when using the Form component, loading is handled by the Form itself
         // Does not require applyFunction() callback
-        <Button size="small" disabled={disableApply} loading={loading}>
+        <Button size="small" disabled={disableApply} loading={loading} htmlType="submit">
           {applyButtonLabel}
         </Button>
       ) : (

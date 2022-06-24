@@ -4,7 +4,7 @@
     "links": [
       {
         "text": "Blog",
-        "url": "https://supabase.com/blog"
+        "url": "/blog"
       },
       {
         "text": "Open Source",
@@ -25,7 +25,7 @@
     "links": [
       {
         "text": "Brand Assets",
-        "url": "https://supabase.com/brand-assets"
+        "url": "/brand-assets"
       },
       {
         "text": "Docs",
@@ -33,7 +33,7 @@
       },
       {
         "text": "Pricing",
-        "url": "https://supabase.com/pricing"
+        "url": "/pricing"
       },
       {
         "text": "Support",
@@ -62,7 +62,7 @@
       },
       {
         "text": "RSS",
-        "url": "https://supabase.com/rss.xml"
+        "url": "/rss.xml"
       },
       {
         "text": "Discord",

@@ -194,7 +194,7 @@ const { user, session, error } = await supabase.auth.signIn({
 ### Sign in with redirect.
 
 Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
-any URL path on your website (the base domain must be the same as the domain in your Auth settings).
+any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
 
 <Tabs
   defaultActiveId="js"

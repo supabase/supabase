@@ -153,53 +153,16 @@ Let's start building the Svelte app from scratch.
 We can use the [SvelteKit Skeleton Project](https://kit.svelte.dev/docs) to initialize 
 an app called `supabase-sveltekit`:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm init svelte@next supabase-sveltekit
 cd supabase-sveltekit
 ```
 
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn init svelte@next supabase-sveltekit
-cd supabase-sveltekit
-```
-
-</TabItem>
-</Tabs>
-
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
-
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
 
 ```bash
 npm install @supabase/supabase-js
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add @supabase/supabase-js
-```
-
-</TabItem>
-</Tabs>
 
 And finally we want to save the environment variables in a `.env`. 
 All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
@@ -421,27 +384,9 @@ Now that we have all the components in place, let's update `src/routes/index.sve
 
 Once that's done, run this in a terminal window:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm run dev
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn dev
-```
-
-</TabItem>
-</Tabs>
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 

@@ -17,7 +17,6 @@ import { useFlag } from 'hooks'
 import { ProjectBase } from 'types'
 
 export const generateProductRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const functionsUi = useFlag('functionsUi')
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
@@ -68,7 +67,7 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       icon: <IconDatabase size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`,
     },
-    ...(IS_PLATFORM && functionsUi
+    ...(IS_PLATFORM
       ? [
           {
             key: 'functions',
