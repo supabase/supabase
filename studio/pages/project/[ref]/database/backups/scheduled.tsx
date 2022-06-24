@@ -29,7 +29,8 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
       <div className="space-y-4">
         <p className="text-scale-1100 text-sm">
-          Projects are backed up daily and can be restored at any time.
+          Projects are backed up daily around midnight of your project's region and can be restored
+          at any time.
         </p>
         <BackupsList />
       </div>
