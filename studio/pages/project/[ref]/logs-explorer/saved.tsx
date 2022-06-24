@@ -47,7 +47,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
           <p className="text-scale-900 text-sm">
             Saved queries will appear here. Queries can be saved from the{' '}
             <Link href={`/project/${ref}/logs-explorer`}>
-              <span className="cursor-pointer font-bold text-white underline">Query</span>
+              <span className="cursor-pointer font-bold underline">Query</span>
             </Link>{' '}
             tab.
           </p>
