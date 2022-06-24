@@ -14,12 +14,12 @@ import {
   Badge,
   Button,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
-import FormEmptyBox from 'components/to-be-cleaned/FormBoxEmpty'
+import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 
@@ -695,17 +695,17 @@ const FunctionEmpty: FC = observer(({}) => {
     <button
       type="button"
       onClick={() => _localState!.setChooseFunctionFormVisible(true)}
-      className="w-full relative 
+      className="w-full relative
         transition-all
-        
-        shadow-sm 
+
+        shadow-sm
                   border bg-scale-200 dark:bg-scale-400
                   border-scale-600
                   rounded
                   hover:border-scale-700
                   hover:bg-scale-300 dark:hover:bg-scale-500
-                  px-5 py-1 
-                  
+                  px-5 py-1
+
                   "
     >
       <FormEmptyBox
@@ -723,17 +723,17 @@ const FunctionWithArguments: FC = observer(({}) => {
     <>
       <div
         className="
-        
-        
+
+
               w-full
 
-              relative 
-              transition-shadow shadow-sm 
+              relative
+              transition-shadow shadow-sm
               border border-scale-200 dark:border-scale-500
               rounded
 
 
-              px-5 py-4 
+              px-5 py-4
               flex space-x-3 items-center justify-between"
       >
         <div className="flex items-center gap-2">

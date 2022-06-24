@@ -73,8 +73,8 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
 
         <Form initialValues={INITIAL_VALUES} validate={validate} onSubmit={handleFormSubmit}>
           {({ isSubmitting }: any) => (
-            <div className="grid grid-cols-2 gap-x-6 gap-y-1">
-              <div className="col-span-2 h-24">
+            <div className="flex flex-col space-y-4">
+              <div>
                 <Select
                   id="type"
                   name="type"
@@ -89,67 +89,73 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 </Select>
               </div>
 
-              <div className="h-24">
-                <Input
-                  label="First Name *"
-                  id="first"
-                  name="first"
-                  layout="vertical"
-                  placeholder="Jane"
-                />
+              <div className="flex space-x-2 sm:space-x-4">
+                <div className="flex-1">
+                  <Input
+                    label="First Name *"
+                    id="first"
+                    name="first"
+                    layout="vertical"
+                    placeholder="Jane"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <Input
+                    label="Last Name *"
+                    id="last"
+                    name="last"
+                    layout="vertical"
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
 
-              <div className="h-24">
-                <Input
-                  label="Last Name *"
-                  id="last"
-                  name="last"
-                  layout="vertical"
-                  placeholder="Doe"
-                />
+              <div className="flex space-x-2 sm:space-x-4">
+                <div className="flex-1">
+                  <Input
+                    label="Company Name"
+                    id="company"
+                    name="company"
+                    layout="vertical"
+                    placeholder="Supa Inc."
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <InputNumber
+                    label="Company Size"
+                    id="size"
+                    name="size"
+                    layout="vertical"
+                    placeholder="1"
+                  />
+                </div>
               </div>
 
-              <div className="h-24">
-                <Input
-                  label="Company Name"
-                  id="company"
-                  name="company"
-                  layout="vertical"
-                  placeholder="Supa Inc."
-                />
+              <div className="flex space-x-2 sm:space-x-4">
+                <div className="flex-1">
+                  <Input
+                    label="Job Title"
+                    id="title"
+                    name="title"
+                    layout="vertical"
+                    placeholder="CEO"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <Input
+                    label="Business email *"
+                    id="email"
+                    name="email"
+                    layout="vertical"
+                    placeholder="janedoe@example.sg"
+                  />
+                </div>
               </div>
 
-              <div className="h-24">
-                <InputNumber
-                  label="Company Size"
-                  id="size"
-                  name="size"
-                  layout="vertical"
-                  placeholder="1"
-                />
-              </div>
-
-              <div className="h-24">
-                <Input
-                  label="Job Title"
-                  id="title"
-                  name="title"
-                  layout="vertical"
-                  placeholder="CEO"
-                />
-              </div>
-
-              <div className="h-24">
-                <Input
-                  label="Business email *"
-                  id="email"
-                  name="email"
-                  layout="vertical"
-                  placeholder="janedoe@example.sg"
-                />
-              </div>
-
-              <div className="h-24">
+              <div>
                 <Input
                   label="Phone Number"
                   id="phone"
@@ -159,7 +165,7 @@ export default function BecomeAPartner({ supabase }: { supabase: SupabaseClient 
                 />
               </div>
 
-              <div className="h-24">
+              <div>
                 <Select
                   label="Country / Main Timezone"
                   id="country"
