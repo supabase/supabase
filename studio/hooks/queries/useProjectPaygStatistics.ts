@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import useSWR from 'swr'
-import { get as _get, maxBy } from 'lodash'
+import { get as _get, maxBy, meanBy } from 'lodash'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from 'components/interfaces/Billing'
@@ -66,10 +66,14 @@ function getPaygStats(data: any): PaygStats {
         sum = sum + featureAttribute
       })
 
+      // calculate average
+      let avg = meanBy(dataModified, (x: any) => x[feature.attribute] == undefined ? 0 : x[feature.attribute])
+
       // set sum and max under attribute name
       paygStats[feature.attribute] = {
         sum,
         max,
+        avg
       }
     })
   })

@@ -15,4 +15,4 @@ export interface ProductFeature {
 
 export type PaygStats = { [key: string]: { sum: number; max: number } }
 
-export type PricingModel = 'sum' | 'max'
+export type PricingModel = 'sum' | 'max' | 'avg'
