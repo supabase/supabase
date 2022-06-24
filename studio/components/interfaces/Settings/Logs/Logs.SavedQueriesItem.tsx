@@ -46,7 +46,7 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
             iconRight={<IconPlay size={10} />}
             onClick={() =>
               router.push(
-                `/project/${ref}/logs-explorer?sql=${encodeURIComponent(item.content.sql)}`
+                `/project/${ref}/logs-explorer?q=${encodeURIComponent(item.content.sql)}`
               )
             }
           >
