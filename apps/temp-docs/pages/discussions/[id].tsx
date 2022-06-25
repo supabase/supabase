@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache, gql } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Layout from '../../components/layouts/Layout'
-import { IconArrowLeft, Badge } from '@supabase/ui'
+import { IconArrowLeft, Badge, IconArrowUp, IconCheck } from '@supabase/ui'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -35,7 +35,8 @@ export async function getServerSideProps(context: any) {
             id
             number
             title
-            bodyText
+            upvoteCount
+            body
             createdAt
             answer {
               isAnswer
@@ -52,7 +53,17 @@ export async function getServerSideProps(context: any) {
               totalCount
               nodes {
                 id
+                isAnswer
                 replies(first: 10) {
+                  nodes {
+                    author {
+                      avatarUrl
+                      login
+                      url
+                    }
+                    body
+                    createdAt
+                  }
                   totalCount
                 }
                 author {
@@ -122,15 +133,15 @@ const discussion = ({ data }: any) => {
       }}
       currentPage={'Discussions'}
     >
-      <div className="mt-8 space-y-8">
+      <div className="my-8 space-y-8">
         <div>
           <Link href="/discussions">
-            <a className="text-scale-1100 group flex w-fit items-center">
+            <a className="text-scale-1100 group flex w-fit items-center text-sm">
               <IconArrowLeft
                 className="stroke-2 transition group-hover:-translate-x-1"
                 height={15}
               />
-              Back
+              Go Back
             </a>
           </Link>
           <div className="mt-3 flex items-center text-3xl">
@@ -141,13 +152,18 @@ const discussion = ({ data }: any) => {
             <Badge color={data.repository.discussion.answer?.isAnswer ? 'green' : 'gray'}>
               {data.repository.discussion.answer?.isAnswer ? 'Answered' : 'Unanswered'}
             </Badge>
-            <span>{`${data.repository.discussion.author.login} started this conversation in ${data.repository.discussion.category.name}`}</span>
+            <span>
+              <Link href={data.repository.discussion.author.url}>
+                <a target="_blank">{data.repository.discussion.author.login}</a>
+              </Link>
+              {` started this conversation in ${data.repository.discussion.category.name}`}
+            </span>
           </div>
         </div>
-        <div className="bg-scale-400 border-scale-600 rounded-lg border px-6 py-4">
+        <div className="bg-scale-400 border-scale-600 space-y-4 rounded-lg border px-6 py-4">
           <div className="flex items-center">
             <Link href={data.repository.discussion.author.url}>
-              <a className="flex items-center">
+              <a target="_blank" className="flex items-center">
                 <Image
                   className="rounded-full"
                   src={data.repository.discussion.author.avatarUrl}
@@ -164,40 +180,87 @@ const discussion = ({ data }: any) => {
           <div className="mt-4">
             <ReactMarkdown>{data.repository.discussion.body}</ReactMarkdown>
           </div>
+          <div className="item-center bg-scale-400 border-scale-600 flex h-fit w-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2">
+            <IconArrowUp className="stroke-2" height={10} />
+            <span className="text-sm">{data.repository.discussion.upvoteCount}</span>
+          </div>
         </div>
-        <div>
-          {`${data.repository.discussion.comments.totalCount} comments${
-            data.repository.discussion.comments?.nodes[0] === undefined
-              ? ``
-              : ` • ${data.repository.discussion.comments.nodes[0].replies.totalCount} replies`
-          }`}
-        </div>
+        <div>{`${data.repository.discussion.comments.totalCount} comments`}</div>
         <div className="space-y-8">
           {data.repository.discussion.comments.nodes.map((comment: any) => {
             return (
-              <div
-                className="bg-scale-400 border-scale-600 rounded-lg border px-6 py-4"
-                key={comment.id}
-              >
-                <div className="flex items-center">
-                  <Link href={comment.author.url}>
-                    <a className="flex items-center">
-                      <Image
-                        className="rounded-full"
-                        src={comment.author.avatarUrl}
-                        width={30}
-                        height={30}
-                      />
-                      <span className="ml-2">{comment.author.login}</span>
-                    </a>
-                  </Link>
-                  <span className="text-scale-1100 ml-2">{`on ${getTimeSinceCreated(
-                    comment.createdAt
-                  )}`}</span>
+              <div key={comment.id}>
+                <div
+                  className={`bg-scale-400 space-y-4 border px-6 py-4 ${
+                    comment.replies.totalCount > 0 ? 'rounded-t-lg' : 'rounded-lg'
+                  } ${comment.isAnswer === true ? 'border-brand-900' : 'border-scale-600'}`}
+                >
+                  <div className="flex items-center">
+                    <Link href={comment.author.url}>
+                      <a target="_blank" className="flex items-center">
+                        <Image
+                          className="rounded-full"
+                          src={comment.author.avatarUrl}
+                          width={30}
+                          height={30}
+                        />
+                        <span className="ml-2">{comment.author.login}</span>
+                      </a>
+                    </Link>
+                    <span className="text-scale-1100 ml-2">{`on ${getTimeSinceCreated(
+                      comment.createdAt
+                    )}`}</span>
+                  </div>
+                  <div>
+                    <ReactMarkdown>{comment.body}</ReactMarkdown>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {comment.isAnswer === true && (
+                      <div className="bg-brand-900 rounded-full px-1.5 py-2 text-white">
+                        <IconCheck className="stroke-2" height={15} />
+                      </div>
+                    )}
+                    <div className="item-center bg-scale-400 border-scale-600 flex h-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2">
+                      <IconArrowUp className="stroke-2" height={10} />
+                      <span className="text-sm">{comment.upvoteCount}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <ReactMarkdown>{comment.body}</ReactMarkdown>
-                </div>
+                {comment.replies.totalCount > 0 && (
+                  <div className="border-scale-600 bg-scale-100 space-y-4 rounded-b-lg border p-4">
+                    {comment.replies.nodes.map((reply: any, i: number) => {
+                      const lastReply = i === comment.replies.nodes.length - 1
+                      return (
+                        <div
+                          className={`space-y-4 pb-4 ${
+                            lastReply === true ? null : 'border-scale-600 border-b'
+                          }`}
+                          key={i}
+                        >
+                          <div className="flex items-center">
+                            <Link href={reply.author.url}>
+                              <a target="_blank" className="flex items-center">
+                                <Image
+                                  className="rounded-full"
+                                  src={reply.author.avatarUrl}
+                                  width={30}
+                                  height={30}
+                                />
+                                <span className="ml-2">{reply.author.login}</span>
+                              </a>
+                            </Link>
+                            <span className="text-scale-1100 ml-2">{`on ${getTimeSinceCreated(
+                              reply.createdAt
+                            )}`}</span>
+                          </div>
+                          <div>
+                            <ReactMarkdown>{reply.body}</ReactMarkdown>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )
           })}
