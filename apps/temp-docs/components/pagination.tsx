@@ -11,7 +11,7 @@ const pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
   return (
     <ul className="flex justify-center space-x-1 text-xs font-medium">
       <li>
-        <Link href="/discussions?page=1">
+        <Link href={`/discussions?page=${currentPage - 1}`}>
           <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
             <IconArrowLeft
               className="stroke-2 transition group-hover:-translate-x-1"
@@ -37,7 +37,7 @@ const pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
         )
       })}
       <li>
-        <Link href="/discussions?page=1">
+        <Link href={`/discussions?page=${currentPage + 1}`}>
           <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
             <IconArrowRight
               className="stroke-2 transition group-hover:-translate-x-1"
