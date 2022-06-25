@@ -1,41 +1,36 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { IconArrowLeft, IconArrowRight } from '@supabase/ui'
 
-const pagination = () => {
-  const router = useRouter()
-  const Page: any = router.query.page || 1
-  const page = parseInt(Page)
+const pagination = ({ currentPage, totalCount }: { currentPage: number, totalCount: number }) => {
+  // TODO: not sure if this is the most efficient way to do this. may need to refactor.
+  const totalArray = Array.from({ length: totalCount }, (_, i: number) => i + 1)
+  const pages = totalArray.filter((page: number) => {
+    return page >= currentPage - 2 && page <= currentPage + 2
+  })
+
   return (
     <ul className="flex justify-center space-x-1 text-xs font-medium">
       <li>
         <Link href="/discussions?page=1">
           <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
+            <IconArrowLeft
+              className="stroke-2 transition group-hover:-translate-x-1"
+              height={12.5}
+            />
           </a>
         </Link>
       </li>
-      {[1, 2, 3, 4, 5].map((element: any, i: number) => {
+      {pages.map((page: number, i: number) => {
         i = i + 1
         return (
           <li key={i}>
-            <Link href={`/discussions?page=${i}`}>
+            <Link href={`/discussions?page=${page}`}>
               <a
                 className={`border-scale-600 inline-flex h-8 w-8 items-center justify-center rounded border ${
-                  page === i ? 'bg-brand-900' : 'bg-scale-300'
+                  currentPage === page ? 'bg-brand-900' : 'bg-scale-300'
                 }`}
               >
-                {i}
+                {page}
               </a>
             </Link>
           </li>
@@ -44,18 +39,10 @@ const pagination = () => {
       <li>
         <Link href="/discussions?page=1">
           <a className="border-scale-600 bg-scale-300 inline-flex h-8 w-8 items-center justify-center rounded border">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
+            <IconArrowRight
+              className="stroke-2 transition group-hover:-translate-x-1"
+              height={12.5}
+            />
           </a>
         </Link>
       </li>

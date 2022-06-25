@@ -6,9 +6,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Pagination from '../../components/pagination'
 
-export async function getStaticProps(context: { query: { page: number } }) {
+export async function getServerSideProps(context: { query: { page: number } }) {
   const Page: any = context.query?.page || 1
-  const page = parseInt(Page)
+  const page: number = parseInt(Page)
 
   const httpLink = createHttpLink({
     uri: 'https://api.github.com/graphql',
@@ -101,15 +101,16 @@ export async function getStaticProps(context: { query: { page: number } }) {
   return {
     props: {
       data,
+      page,
     },
   }
 }
 
-const discussions = ({ data }: any) => {
+const discussions = ({ data, page }: {data: any, page: number}) => {
   const meta_title = 'Discussions'
   const meta_description = 'Discuss Supabase with other developers and users.'
 
-  // TODO: This was a quick hack to show emojis in discussions. could be replaced with a proper solution.
+  // TODO: This was a quick hack to show emojis in discussions. should be replaced with a proper solution.
   const emojiInput = [':zap:', ':ship:', ':bulb:', ':question:', ':raised_hands:']
   const emojiOutput = ['⚡️', '🚢', '💡', '❓', '🙌']
 
@@ -201,80 +202,68 @@ const discussions = ({ data }: any) => {
           })}
         </div>
         <div className="space-y-6">
-          {data.repository.discussions.nodes.map((discussion: any) => {
-            return (
-              <div className="border-scale-600 border-b pb-6 md:pb-0" key={discussion.id}>
-                <Link href={`/discussions/${discussion.number}`}>
-                  <a className="mb-6 items-center justify-between md:mx-6 md:flex">
-                    <div className="flex items-center">
-                      <div className="item-center flex items-center md:space-x-6">
-                        <div className="item-center bg-scale-400 border-scale-600 hidden h-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2 md:flex">
-                          <IconArrowUp className="stroke-2" height={15} />
-                          <span>{discussion.upvoteCount}</span>
-                        </div>
-                        <div className="rounded-lg bg-gray-400 px-3 py-2 md:px-5 md:py-4">
-                          {getEmoji(discussion.category.emoji)}
-                        </div>
-                      </div>
-                      <div className="ml-6">
-                        <h2 className="text-base font-semibold md:max-w-sm md:text-lg lg:max-w-4xl">
-                          {discussion.title}
-                        </h2>
-                        <span className="text-scale-1000 text-xs">
-                          <Link href={discussion.author.url}>
-                            <a>{discussion.author.login}</a>
-                          </Link>
-                          <span>{` asked ${getTimeSinceCreated(discussion.createdAt)} • `}</span>
-                          <span className={discussion.answer?.isAnswer ? 'text-brand-900' : ''}>
-                            {discussion.answer?.isAnswer ? 'Answered' : 'Unanswered'}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="ml-16 mt-2 flex items-center space-x-2 md:ml-0 md:mt-0">
-                      <div className="flex items-center -space-x-2">
-                        {/* TODO: this is a hack because I couldn't find a participant query for graphql. could be replaced with a proper solution. */}
-                        {discussion.comments.totalCount === 0 ? (
-                          <div>
-                            <Image
-                              className="rounded-full"
-                              src={discussion.author.avatarUrl}
-                              height={30}
-                              width={30}
-                            />
+          {data.repository.discussions.nodes
+            .slice(page * 10 - 10, page * 10)
+            .map((discussion: any) => {
+              return (
+                <div className="border-scale-600 border-b pb-6 md:pb-0" key={discussion.id}>
+                  <Link href={`/discussions/${discussion.number}`}>
+                    <a className="mb-6 items-center justify-between md:mx-6 md:flex">
+                      <div className="flex items-center">
+                        <div className="item-center flex items-center md:space-x-6">
+                          <div className="item-center bg-scale-400 border-scale-600 hidden h-fit items-center space-x-1 rounded-xl border py-1 pl-1 pr-2 md:flex">
+                            <IconArrowUp className="stroke-2" height={15} />
+                            <span>{discussion.upvoteCount}</span>
                           </div>
-                        ) : (
-                          discussion.comments.nodes.map((comment: any) => {
-                            return (
-                              <div>
-                                <Image
-                                  className="rounded-full"
-                                  src={comment.author.avatarUrl}
-                                  height={30}
-                                  width={30}
-                                />
-                              </div>
-                            )
-                          })
-                        )}
+                          <div className="rounded-lg bg-gray-400 px-3 py-2 md:px-5 md:py-4">
+                            {getEmoji(discussion.category.emoji)}
+                          </div>
+                        </div>
+                        <div className="ml-6">
+                          <h2 className="text-base font-semibold md:max-w-sm md:text-lg lg:max-w-4xl">
+                            {discussion.title}
+                          </h2>
+                          <span className="text-scale-1000 text-xs">
+                            <Link href={discussion.author.url}>
+                              <a>{discussion.author.login}</a>
+                            </Link>
+                            <span>{` asked ${getTimeSinceCreated(discussion.createdAt)} • `}</span>
+                            <span className={discussion.answer?.isAnswer ? 'text-brand-900' : ''}>
+                              {discussion.answer?.isAnswer ? 'Answered' : 'Unanswered'}
+                            </span>
+                          </span>
+                        </div>
                       </div>
-                      <div
-                        className={`item-center flex items-center space-x-1 ${
-                          discussion.answer?.isAnswer ? 'text-brand-900' : ''
-                        }`}
-                      >
-                        <IconCheckCircle className="stroke-2" height={15} />
-                        <span>{discussion.comments.totalCount}</span>
+                      <div className="ml-16 mt-2 flex items-center space-x-2 md:ml-0 md:mt-0">
+                        <div className="flex items-center -space-x-2">
+                          <Link href={discussion.author.url}>
+                            <a>
+                              <Image
+                                className="rounded-full"
+                                src={discussion.author.avatarUrl}
+                                height={30}
+                                width={30}
+                              />
+                            </a>
+                          </Link>
+                        </div>
+                        <div
+                          className={`item-center flex items-center space-x-1 ${
+                            discussion.answer?.isAnswer ? 'text-brand-900' : ''
+                          }`}
+                        >
+                          <IconCheckCircle className="stroke-2" height={15} />
+                          <span>{discussion.comments.totalCount}</span>
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                </Link>
-              </div>
-            )
-          })}
+                    </a>
+                  </Link>
+                </div>
+              )
+            })}
         </div>
         <div>
-          <Pagination />
+          <Pagination currentPage={page} totalCount={data.repository.discussions.totalCount} />
         </div>
       </div>
     </Layout>
