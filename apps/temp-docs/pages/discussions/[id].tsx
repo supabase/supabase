@@ -90,7 +90,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-const discussion = ({ data, prams }: { data: any; prams: number }) => {
+const discussion = ({ data, prams }: any) => {
   const meta_description = 'Discuss Supabase with other developers and users.'
 
   const getTimeSinceCreated = (createdAt: string) => {
