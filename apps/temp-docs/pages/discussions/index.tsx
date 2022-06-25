@@ -106,7 +106,7 @@ export async function getServerSideProps(context: { query: { page: number } }) {
   }
 }
 
-const discussions = ({ data, page }: {data: any, page: number}) => {
+const discussions = ({ data, page }: { data: any; page: number }) => {
   const meta_title = 'Discussions'
   const meta_description = 'Discuss Supabase with other developers and users.'
 
