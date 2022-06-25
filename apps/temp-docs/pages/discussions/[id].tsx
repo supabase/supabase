@@ -1,7 +1,7 @@
 import { ApolloClient, createHttpLink, InMemoryCache, gql } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Layout from '../../components/layouts/Layout'
-import { IconArrowLeft, Badge, IconArrowUp, IconCheck } from '@supabase/ui'
+import { IconArrowLeft, Badge, Button, IconArrowUp, IconCheck } from '@supabase/ui'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -90,7 +90,7 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-const discussion = ({ data }: any) => {
+const discussion = ({ data, prams }: { data: any; prams: number }) => {
   const meta_description = 'Discuss Supabase with other developers and users.'
 
   const getTimeSinceCreated = (createdAt: string) => {
@@ -135,15 +135,22 @@ const discussion = ({ data }: any) => {
     >
       <div className="my-8 space-y-8">
         <div>
-          <Link href="/discussions">
-            <a className="text-scale-1100 group flex w-fit items-center text-sm">
-              <IconArrowLeft
-                className="stroke-2 transition group-hover:-translate-x-1"
-                height={15}
-              />
-              Go Back
-            </a>
-          </Link>
+          <div className="flex justify-between">
+            <Link href="/discussions">
+              <a className="text-scale-1100 group flex w-fit items-center text-sm">
+                <IconArrowLeft
+                  className="stroke-2 transition group-hover:-translate-x-1"
+                  height={15}
+                />
+                Go Back
+              </a>
+            </Link>
+            <Link href={`https://github.com/supabase/supabase/discussions/${prams.id}`}>
+              <a target="_blank">
+                <Button className="text-base text-white">Open in Github</Button>
+              </a>
+            </Link>
+          </div>
           <div className="mt-3 flex items-center text-3xl">
             <span>{data.repository.discussion.title}</span>
             <span className="text-scale-1000 ml-1">#{data.repository.discussion.number}</span>
@@ -264,6 +271,13 @@ const discussion = ({ data }: any) => {
               </div>
             )
           })}
+        </div>
+        <div className="mt-8">
+          <Link href={`https://github.com/supabase/supabase/discussions/${prams.id}`}>
+            <a target="_blank">
+              <Button className="text-base text-white">comment on Github</Button>
+            </a>
+          </Link>
         </div>
       </div>
     </Layout>
