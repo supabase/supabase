@@ -4,6 +4,8 @@ import { Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
 import { Project } from 'types'
 import Link from '@supabase/ui/dist/cjs/components/Typography/Link'
 import router from 'next/router'
+import { useStore } from 'hooks'
+import { DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 
 interface Props {
   project: Project
@@ -12,43 +14,51 @@ interface Props {
 const ProjectPausedState: FC<Props> = ({ project }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { ref } = router.query
+  const { ui } = useStore()
+  const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
   return (
     <>
-      <div className="mx-auto mt-8 mb-16 w-full max-w-7xl space-y-8">
-        <div className="mx-6 space-y-8">
-          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6"></div>
+      <div className="mx-auto mt-8 mb-16 w-full max-w-7xl">
+        <div className="mx-6">
           <div className="bg-scale-300 border-scale-400 flex h-[500px] items-center justify-center rounded border p-8">
-            <div className="w-[420px] space-y-4">
+            <div className="grid w-[420px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
               </div>
 
-              <div className="space-y-1">
-                <p className="text-center">This project is paused.</p>
-              </div>
+              <p className="text-center">This project is paused.</p>
 
-              <div className="mt-4 flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-4">
                 <Button
                   // onClick={}
-                  size="medium"
+                  size="small"
                   loading={isSubmitting}
                   type="primary"
                 >
-                  Restore project
+                  Restore
                 </Button>
+
                 <Link href={`/project/${ref}/settings/general`}>
-                  <a>Delete</a>
+                  <Button
+                    // onClick={}
+                    size="small"
+                    loading={isSubmitting}
+                    type="default"
+                    tabIndex={-1}
+                  >
+                    <a>Delete</a>
+                  </Button>
                 </Link>
               </div>
 
-              <div className="flex gap-4">
+              <div className="mt-4 flex gap-4 border-t pt-8">
                 <IconAlertCircle className="text-red-900" size={35} strokeWidth={2} />
                 <div>
-                  <p className="text-lg">
-                    Your account can only have <u>2 free projects.</u>
+                  <p className="text-md">
+                    Your account can only have <u>{freeProjectsLimit} free projects.</u>
                   </p>
-                  <p className="text-scale-900">
+                  <p className="text-scale-900 mt-2 text-sm">
                     To restore this project you'll need to pause or delete an existing free project
                     first.
                   </p>

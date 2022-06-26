@@ -15,8 +15,6 @@ const Home: NextPageWithLayout = () => {
 
   const project = ui.selectedProject
 
-  console.log('project ref:', toJS(project))
-
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
       ? project?.name
