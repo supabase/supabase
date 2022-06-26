@@ -1,3 +1,5 @@
+-- migrate:up
+
 CREATE SCHEMA IF NOT EXISTS storage AUTHORIZATION supabase_admin;
 
 grant usage on schema storage to postgres, anon, authenticated, service_role;
@@ -41,8 +43,8 @@ AS $function$
 DECLARE
 _parts text[];
 BEGIN
-	select string_to_array(name, '/') into _parts;
-	return _parts[1:array_length(_parts,1)-1];
+    select string_to_array(name, '/') into _parts;
+    return _parts[1:array_length(_parts,1)-1];
 END
 $function$;
 
@@ -53,8 +55,8 @@ AS $function$
 DECLARE
 _parts text[];
 BEGIN
-	select string_to_array(name, '/') into _parts;
-	return _parts[array_length(_parts,1)];
+    select string_to_array(name, '/') into _parts;
+    return _parts[array_length(_parts,1)];
 END
 $function$;
 
@@ -66,10 +68,10 @@ DECLARE
 _parts text[];
 _filename text;
 BEGIN
-	select string_to_array(name, '/') into _parts;
-	select _parts[array_length(_parts,1)] into _filename;
-	-- @todo return the last part instead of 2
-	return split_part(_filename, '.', 2);
+    select string_to_array(name, '/') into _parts;
+    select _parts[array_length(_parts,1)] into _filename;
+    -- @todo return the last part instead of 2
+    return split_part(_filename, '.', 2);
 END
 $function$;
 
@@ -114,3 +116,5 @@ ALTER function "storage".foldername(text) owner to supabase_storage_admin;
 ALTER function "storage".filename(text) owner to supabase_storage_admin;
 ALTER function "storage".extension(text) owner to supabase_storage_admin;
 ALTER function "storage".search(text,text,int,int,int) owner to supabase_storage_admin;
+
+-- migrate:down

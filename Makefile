@@ -14,7 +14,7 @@ github.contributors.%:
 	| sort_by(.username)' \
 	> $(REPO_DIR)/web/src/data/contributors/$*.json
 
-.PHONY: github.rcontributorsepos
+.PHONY: github.contributors
 github.contributors: \
 	github.contributors.supabase \
 	github.contributors.supabase-js \
@@ -46,3 +46,9 @@ github.traction:
 
 dev:
 	vercel dev --listen 8080 --local-config vercel-local.json
+
+# Clones all migrations from our github repo and copies them into the docker folder
+docker.migrations:
+	git clone https://github.com/supabase/migrations
+	mv -f  ./migrations/db/migrations/* ./docker/volumes/db/init
+	rm -rf ./migrations

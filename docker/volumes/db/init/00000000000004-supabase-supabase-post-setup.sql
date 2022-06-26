@@ -1,3 +1,5 @@
+-- migrate:up
+
 ALTER ROLE postgres SET search_path TO "\$user",public,extensions;
 CREATE OR REPLACE FUNCTION extensions.notify_api_restart()
 RETURNS event_trigger
@@ -41,7 +43,7 @@ BEGIN
     alter default privileges for user supabase_admin in schema cron grant all
         on functions to postgres with grant option;
 
-    grant all privileges on all tables in schema cron to postgres with grant option; 
+    grant all privileges on all tables in schema cron to postgres with grant option;
 
   END IF;
 
@@ -66,3 +68,5 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA extensions TO dashboard_user;
 GRANT ALL ON ALL ROUTINES IN SCHEMA auth TO dashboard_user;
 GRANT ALL ON ALL ROUTINES IN SCHEMA storage TO dashboard_user;
 GRANT ALL ON ALL ROUTINES IN SCHEMA extensions TO dashboard_user;
+
+-- migrate:down
