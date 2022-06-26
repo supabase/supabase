@@ -28,21 +28,20 @@ export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((prop
   useEffect(() => {
     if (monaco) {
       const darkTheme = theme && theme === 'dark' ? true : false
-
       monaco.editor.defineTheme('supabase', {
-        base: 'vs-dark', // can also be vs-dark or hc-black
+        base: darkTheme ? 'vs-dark' : 'vs',
         inherit: true, // can also be false to completely replace the builtin rules
         rules: [
           { token: 'string.sql', foreground: '24b47e' },
           { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: 'D4D4D4' },
+          { token: 'predefined.sql', foreground: '999999' },
         ],
         colors: {
-          'editor.background': darkTheme ? '#1f1f1f' : '#30313f',
+          'editor.background': darkTheme ? '#222222' : '#fbfcfd',
         },
       })
     }
-  }, [monaco])
+  }, [monaco, theme])
 
   return (
     <StoreProvider>
