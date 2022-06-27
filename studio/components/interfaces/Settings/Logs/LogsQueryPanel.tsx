@@ -137,11 +137,9 @@ bg-panel-header-light dark:bg-panel-header-dark
                 Clear query
               </Button>
               {onSave && (
-                <Flag name="logsSavedQueries">
-                  <Button type="default" onClick={() => onSave()} disabled={!hasEditorValue}>
-                    Save query
-                  </Button>
-                </Flag>
+                <Button type="default" onClick={() => onSave()} disabled={!hasEditorValue}>
+                  Save query
+                </Button>
               )}
             </div>
 
