@@ -43,11 +43,7 @@ const DefaultHeader: React.FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) 
   const renderNewColumn = (onAddColumn?: () => void) => {
     if (!onAddColumn) return null
     return (
-      <Button
-        type="text"
-        onClick={onAddColumn}
-        // style={{ padding: '4px 8px' }}
-      >
+      <Button type="text" onClick={onAddColumn}>
         New Column
       </Button>
     )
@@ -56,12 +52,7 @@ const DefaultHeader: React.FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) 
   const renderAddRow = (onAddRow?: () => void) => {
     if (!onAddRow) return null
     return (
-      <Button
-        size="tiny"
-        // style={{ padding: '4px 8px' }}
-        icon={<IconPlus size={14} strokeWidth={2} />}
-        onClick={onAddRow}
-      >
+      <Button size="tiny" icon={<IconPlus size={14} strokeWidth={2} />} onClick={onAddRow}>
         Insert row
       </Button>
     )

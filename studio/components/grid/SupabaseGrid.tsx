@@ -3,17 +3,20 @@ import { createPortal } from 'react-dom'
 import { useMonaco } from '@monaco-editor/react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { DataGridHandle } from '@supabase/react-data-grid'
-import { RowContextMenu } from './components/menu'
+
+import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
 import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from './constants'
-import { Grid } from './components/grid'
 import { Shortcuts } from './components/common'
+import { Grid } from './components/grid'
 import Header from './components/header'
 import Footer from './components/footer'
+import { RowContextMenu } from './components/menu'
 import { cleanupProps, initTable, saveStorageDebounced } from './SupabaseGrid.utils'
+
+import { useUrlState } from 'hooks'
 
 /**
  * Supabase Grid.
@@ -60,6 +63,10 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMount] = useState(false)
 
+  const [{ sort: sorts, filter: filters }, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
+
   useImperativeHandle(ref, () => ({
     rowAdded(row: Dictionary<any>) {
       dispatch({
@@ -79,6 +86,16 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     if (!mounted) setMount(true)
   }, [])
 
+  // [Joshen] This where we refetch the data is say a sort or filter was updated
+  useEffect(() => {
+    if (state.refreshPageFlag == REFRESH_PAGE_IMMEDIATELY) {
+      console.log('Refresh page')
+      fetchPage(state, dispatch)
+    } else if (state.refreshPageFlag != 0) {
+      refreshPageDebounced(state, dispatch)
+    }
+  }, [state.refreshPageFlag])
+
   useEffect(() => {
     if (state.isInitialComplete && storageRef && state.table) {
       saveStorageDebounced(state, storageRef)
@@ -91,14 +108,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     state.filters,
     storageRef,
   ])
-
-  useEffect(() => {
-    if (state.refreshPageFlag == REFRESH_PAGE_IMMEDIATELY) {
-      fetchPage(state, dispatch)
-    } else if (state.refreshPageFlag != 0) {
-      refreshPageDebounced(state, dispatch)
-    }
-  }, [state.refreshPageFlag])
 
   useEffect(() => {
     if (state.totalRows === TOTAL_ROWS_RESET) {
@@ -130,7 +139,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       (typeof props.table != 'string' &&
         JSON.stringify(props.table) !== JSON.stringify(state.table))
     ) {
-      initTable(props, state, dispatch)
+      initTable(props, state, dispatch, sorts as string[], filters as string[])
     }
   }, [state.metaService, state.table, props.table, props.schema])
 

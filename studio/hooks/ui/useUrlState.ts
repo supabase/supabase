@@ -21,7 +21,6 @@ export function useUrlState({
   const params: UrlStateParams = Object.fromEntries(
     Object.entries(router.query).map(([key, value]) => {
       if (arrayKeysSet.has(key)) {
-        console.log(value)
         return Array.isArray(value) ? [key, value] : [key, [value]]
       }
 
@@ -50,5 +49,5 @@ export function useUrlState({
     [router, params, replace]
   )
 
-  return [params, setParams]
+  return [params, setParams] as const
 }
