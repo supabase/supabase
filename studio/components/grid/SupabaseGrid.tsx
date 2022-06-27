@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react'
-import { isEqual } from 'lodash'
 import { createPortal } from 'react-dom'
 import { useMonaco } from '@monaco-editor/react'
 import { DndProvider } from 'react-dnd'
