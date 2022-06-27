@@ -63,7 +63,7 @@ Before you start a development server, you must choose if you want to work on th
 1. Go to the [Supabase Website](https://supabase.com) directory
 
    ```sh
-   cd apps/www
+   cd apps
    ```
 
    Go to the [Supabase Docs](https://supabase.com/docs) directory
@@ -171,6 +171,8 @@ Eventually, the docs and the Studio will be run using Turborepo, which will sign
 You must be using NPM 7 or higher.
 
 ### Getting started
+
+From the supabase/apps directory: 
 
 ```sh
 npm install # install dependencies
