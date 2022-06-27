@@ -34,7 +34,7 @@ export interface IProjectContentStore {
   list: (filter?: any) => any[]
   reports: (filter?: any) => any[]
   sqlSnippets: (filter?: any) => any[]
-  logSqlSnippets: (filter?: CustomFilter) => UserContent[]
+  savedLogSqlSnippets: (filter?: CustomFilter) => UserContent[]
   addRecentLogSqlSnippet: (snippet: Partial<LogSqlSnippets.Content>) => void
   clearRecentLogSqlSnippets: () => void
   setProjectRef: (ref?: string) => void
@@ -111,7 +111,7 @@ export default class ProjectContentStore implements IProjectContentStore {
     if (response.error) {
       throw response.error
     }
-    this.data = keyBy(response.data ?? response, 'id')
+    this.data = keyBy(response.data, 'id')
     return response
   }
 
@@ -209,8 +209,8 @@ export default class ProjectContentStore implements IProjectContentStore {
     ;(window as any).localStorage.setItem(this.recentLogSqlKey, JSON.stringify([]))
   }
 
-  logSqlSnippets(filter?: CustomFilter) {
-    let arr = ((Object.values(this.data)[0] as any) || []) as UserContent[]
+  savedLogSqlSnippets(filter?: CustomFilter) {
+    let arr = Object.values(this.data) as UserContent[]
     let snippets = arr.filter((c) => c.type === 'log_sql')
     if (filter) {
       snippets = snippets.filter(filter)

@@ -64,8 +64,11 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
-
+  // @ts-ignore
+  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
+  const isLocked = schema?.owner === 'supabase_admin'
+
   const gridTable = !isViewSelected
     ? parseSupaTable({
         table: selectedTable as PostgresTable,
@@ -102,6 +105,7 @@ const TableGridEditor: FC<Props> = ({
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
     const tables: PostgresTable[] = meta.tables.list()
+    // @ts-ignore
     const table = tables.find((table) => table.id === Number(tableId))
     const column = find(table!.columns, { name }) as PostgresColumn
     if (column) {
@@ -135,11 +139,14 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && selectedTable.schema === 'public'}
+        editable={!isViewSelected && !isLocked}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          !isViewSelected && selectedTable.schema === 'public' && <GridHeaderActions table={selectedTable as PostgresTable} />
+          !isViewSelected &&
+          selectedTable.schema === 'public' && (
+            <GridHeaderActions table={selectedTable as PostgresTable} />
+          )
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
