@@ -83,7 +83,6 @@ const TableList: FC<{
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
-              <Table.th key="buttons">Actions</Table.th>,
               <Table.th key="schema">Schema</Table.th>,
               <Table.th key="description" className="hidden lg:table-cell">
                 Description
@@ -93,7 +92,8 @@ const TableList: FC<{
               </Table.th>,
               <Table.th key="size" className="hidden xl:table-cell">
                 Size (Estimated)
-              </Table.th>
+              </Table.th>,
+              <Table.th key="buttons"></Table.th>,
             ]}
             body={tables.map((x: any, i: any) => (
               <Table.tr key={x.id} hoverable>
@@ -101,7 +101,23 @@ const TableList: FC<{
                   <Typography.Text>{x.name}</Typography.Text>
                 </Table.td>
                 <Table.td>
-                  <div className="flex gap-2">
+                  <Typography.Text>{x.schema}</Typography.Text>
+                </Table.td>
+                <Table.td className=" truncate max-w-sm hidden lg:table-cell">
+                  <Typography.Text>{x.comment}</Typography.Text>
+                </Table.td>
+                <Table.td className=" hidden xl:table-cell">
+                  <Typography.Text small code>
+                    {x.live_rows_estimate ?? x.live_row_count}
+                  </Typography.Text>
+                </Table.td>
+                <Table.td className=" hidden xl:table-cell">
+                  <Typography.Text small code>
+                    {x.size}
+                  </Typography.Text>
+                </Table.td>
+                <Table.td>
+                  <div className="flex gap-2 justify-end">
                     <Button
                       iconRight={<IconColumns />}
                       type="default"
@@ -126,22 +142,6 @@ const TableList: FC<{
                       type="text"
                     />
                   </div>
-                </Table.td>
-                <Table.td>
-                  <Typography.Text>{x.schema}</Typography.Text>
-                </Table.td>
-                <Table.td className=" truncate max-w-sm hidden lg:table-cell">
-                  <Typography.Text>{x.comment}</Typography.Text>
-                </Table.td>
-                <Table.td className=" hidden xl:table-cell">
-                  <Typography.Text small code>
-                    {x.live_rows_estimate ?? x.live_row_count}
-                  </Typography.Text>
-                </Table.td>
-                <Table.td className=" hidden xl:table-cell">
-                  <Typography.Text small code>
-                    {x.size}
-                  </Typography.Text>
                 </Table.td>
               </Table.tr>
             ))}
