@@ -150,9 +150,9 @@ const PITRBackupSelection: FC<Props> = () => {
         <div className="space-y-4">
           <div className="space-y-4 rounded border border-gray-400 border-opacity-50 bg-gray-300 py-3">
             <div className="space-y-4 py-2">
-              <div className="flex justify-between px-4">
-                <p className="flex-1 text-sm">Select timezone</p>
-                <div className="flex-1">
+              <div className="flex justify-between space-x-8">
+                <p className="w-2/5 pl-4 text-sm">Select timezone</p>
+                <div className="w-3/5 px-4">
                   <Listbox
                     value={selectedTimezone.text}
                     onChange={(text) => {
@@ -197,7 +197,7 @@ const PITRBackupSelection: FC<Props> = () => {
                   </Listbox>
                 </div>
               </div>
-              <div className="flex justify-between space-x-4">
+              <div className="flex justify-between space-x-8">
                 <div className="w-2/5 space-y-2 pl-4">
                   <p className="text-sm">Earliest point of recovery</p>
                 </div>
@@ -212,7 +212,7 @@ const PITRBackupSelection: FC<Props> = () => {
                   />
                 </div>
               </div>
-              <div className="flex justify-between space-x-4">
+              <div className="flex justify-between space-x-8">
                 <div className="w-2/5 space-y-2 pl-4">
                   <p className="text-sm">Latest point of recovery</p>
                 </div>
@@ -229,7 +229,7 @@ const PITRBackupSelection: FC<Props> = () => {
               </div>
             </div>
             <Popover.Seperator />
-            <div className="flex justify-between space-x-4 py-2">
+            <div className="flex justify-between space-x-8 py-2">
               <div className="w-2/5 space-y-2 pl-4">
                 <p className="text-sm">Recovery point</p>
                 <p className="text-scale-1100 text-sm">
