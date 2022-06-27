@@ -16,7 +16,7 @@ const ConfirmDeleteModal = ({
   const multipleFiles = selectedItemsToDelete.length > 1
 
   const title = multipleFiles
-    ? `Confirm deletion of items`
+    ? `Confirm deletion of ${selectedItemsToDelete.length} items`
     : selectedItemsToDelete.length === 1
     ? `Confirm deletion of ${selectedItemsToDelete[0].name}`
     : ``
@@ -35,7 +35,7 @@ const ConfirmDeleteModal = ({
   return (
     <Modal
       visible={visible}
-      header={title}
+      header={<span className="break-words">{title}</span>}
       size="small"
       onCancel={onSelectCancel}
       customFooter={

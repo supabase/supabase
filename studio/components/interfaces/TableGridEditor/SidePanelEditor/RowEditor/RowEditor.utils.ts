@@ -75,7 +75,12 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.isIdentity || field.defaultValue) return
-    if (!field.isNullable && !field.value && field.defaultValue === null) {
+    if (
+      !field.isNullable &&
+      typeof field.value === 'string' &&
+      field.value.length === 0 &&
+      field.defaultValue === null
+    ) {
       errors[field.name] = `Please assign a value for this field`
     }
   })
@@ -278,8 +283,6 @@ export const generateRowObjectFromFields = (
           rowObject[field.name] = tryParseJson(value)
         }
       }
-    } else if (NUMERICAL_TYPES.includes(field.format) && value) {
-      rowObject[field.name] = Number(value)
     } else if (field.format === 'bool' && value) {
       rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {

@@ -3,7 +3,7 @@ import { get } from 'lodash'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import { PolicyName, PolicyRoles } from 'components/interfaces/Authentication/Policies/PolicyEditor'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
