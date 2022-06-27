@@ -3,9 +3,10 @@ import { uuidv4 } from 'lib/helpers'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { IMetaService } from './services/meta'
 import { InitialStateType } from './store/reducers'
-import { Dictionary, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import { Dictionary, Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
 import { getGridColumns } from './utils/gridColumns'
 import { FilterOperatorOptions } from './components/header/filter'
+import { Filter } from 'components/grid/types'
 
 export function defaultErrorHandler(error: any) {
   console.log('Supabase grid error: ', error)
@@ -31,6 +32,41 @@ export function cleanupProps(props: SupabaseGridProps) {
   }
 }
 
+// [JOSHEN TODO] Write tests for this
+export function formatSortURLParams(sort?: string[]) {
+  return (
+    Array.isArray(sort)
+      ? sort
+          .map((s) => {
+            const [column, order] = s.split(':')
+            // Reject any possible malformed sort param
+            if (!column || !order) return undefined
+            else return { column, ascending: order === 'asc' }
+          })
+          .filter((s) => s !== undefined)
+      : []
+  ) as Sort[]
+}
+
+// [JOSHEN TODO] Write tests for this
+export function formatFilterURLParams(filter?: string[]): Filter[] {
+  return (
+    Array.isArray(filter)
+      ? filter
+          .map((f) => {
+            const [column, operatorAbbrev, value] = f.split(':')
+            const operator = FilterOperatorOptions.find(
+              (option) => option.abbrev === operatorAbbrev
+            )
+            // Reject any possible malformed filter param
+            if (!column || !operatorAbbrev || !operator) return undefined
+            else return { id: uuidv4(), column, operator: operator.value, value: value || '' }
+          })
+          .filter((f) => f !== undefined)
+      : []
+  ) as Filter[]
+}
+
 export function initTable(
   props: SupabaseGridProps,
   state: InitialStateType,
@@ -45,43 +81,17 @@ export function initTable(
       onAddColumn: props.editable ? props.onAddColumn : undefined,
     })
 
-    // [JOSHEN WE LEFT OFF HERE TO FIGURE OUT HOW TO REPLACE EXISTING FILTER AND SORT]
-    const sorts = Array.isArray(sort)
-      ? sort
-          .map((s) => {
-            const [column, order] = s.split(':')
-            // Reject any possible malformed sort param
-            if (!column || !order) return undefined
-            else return { column, ascending: order === 'asc' }
-          })
-          .filter((s) => s !== undefined)
-      : []
+    const savedState = props.storageRef
+      ? onLoadStorage(props.storageRef, table.name, table.schema)
+      : undefined
 
-    const filters = Array.isArray(filter)
-      ? filter
-          .map((f) => {
-            const [column, operatorAbbrev, value] = f.split(':')
-            const operator = FilterOperatorOptions.find(
-              (option) => option.abbrev === operatorAbbrev
-            )
-            // Reject any possible malformed filter param
-            if (!column || !operatorAbbrev || !operator || !value) return undefined
-            else return { id: uuidv4(), column, operator: operator.value, value }
-          })
-          .filter((f) => f !== undefined)
-      : []
-
-    let savedState
-    if (props.storageRef) {
-      savedState = onLoadStorage(props.storageRef, table.name, table.schema)
-    }
-
-    console.log('initTable', savedState, {
-      sort,
-      sorts,
-      filter,
-      filters,
-    })
+    // [JOSHEN TODO] Temp force update savedState to use URL param
+    // Load sort and filters via URL param only if given, otherwise get
+    // from saved state in local storage
+    const sorts = formatSortURLParams(sort)
+    const filters = formatFilterURLParams(filter)
+    if (sorts.length > 0) savedState.sorts = sorts
+    if (filters.length > 0) savedState.filters = filters
 
     dispatch({
       type: 'INIT_TABLE',
@@ -227,13 +237,14 @@ export function onLoadStorage(storageRef: string, tableName: string, schema?: st
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
 
+// [JOSHEN TODO] Need to fix this
 function saveStorage(state: InitialStateType, storageRef: string) {
   if (!state.table) return
 
   const config = {
     gridColumns: state.gridColumns,
     sorts: state.sorts,
-    filters: state.filters,
+    // filters: state.filters,
   }
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const savedStr = localStorage.getItem(storageKey)
