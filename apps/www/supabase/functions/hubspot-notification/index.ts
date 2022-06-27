@@ -50,7 +50,7 @@ serve(async (req) => {
 
   const fields: { objectTypeId: '0-1'; name: string; value: string }[] = []
   for (const [key, value] of Object.entries(formData)) {
-    fields.push({ objectTypeId: '0-1', name: key, value: value })
+    fields.push({ objectTypeId: '0-1', name: key, value: value || 'NOT_PROVIDED' })
   }
 
   const formId = input.table === 'partner_contacts' ? PARTNER_FORM_ID : ENTERPRISE_FORM_ID
