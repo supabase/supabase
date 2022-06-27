@@ -3,8 +3,9 @@ import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
-import ProjectContentStore, { IProjectContentStore } from './content/ProjectContentStore'
-import ProjectFunctionsStore, { IProjectFunctionsStore } from './functions/ProjectFunctionsStore'
+import ProjectContentStore, { IProjectContentStore } from './project/ProjectContentStore'
+import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
+import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBackupsStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -13,31 +14,35 @@ configure({
 })
 
 export interface IRootStore {
+  app: IAppStore
   ui: IUiStore
+  meta: IMetaStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
-  meta: IMetaStore
-  app: IAppStore
+  backups: IProjectBackupsStore
   setProjectRef: (value?: string) => void
   setOrganizationSlug: (value?: string) => void
 }
 export class RootStore implements IRootStore {
+  app: IAppStore
   ui: IUiStore
+  meta: IMetaStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
-  meta: IMetaStore
-  app: IAppStore
+  backups: IProjectBackupsStore
 
   constructor() {
+    this.app = new AppStore(this)
     this.ui = new UiStore(this)
-    // @ts-ignore
-    this.content = new ProjectContentStore(this, { projectRef: '' })
-    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
       projectRef: '',
       connectionString: '',
     })
-    this.app = new AppStore(this)
+
+    // @ts-ignore
+    this.content = new ProjectContentStore(this, { projectRef: '' })
+    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
+    this.backups = new ProjectBackupsStore(this, { projectRef: '' })
 
     /**
      * TODO: meta and content are not observable
@@ -87,6 +92,7 @@ export class RootStore implements IRootStore {
     this.ui.setProjectRef(value)
     this.functions.setProjectRef(value)
     this.content.setProjectRef(value)
+    this.backups.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {

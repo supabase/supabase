@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 import { exportRowsToCsv } from '../../utils'
 import { saveAs } from 'file-saver'
-import { showConfirmAlert } from '../common'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 type RowMenuProps = {}
 
@@ -13,7 +13,7 @@ const RowMenu: React.FC<RowMenuProps> = ({}) => {
   const { selectedRows, rows: allRows, editable } = state
 
   function onRowsDelete() {
-    showConfirmAlert({
+    confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
       onConfirm: async () => {
