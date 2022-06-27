@@ -1,7 +1,7 @@
 import { Menu, Item, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
-import { STORAGE_VIEWS, STORAGE_SORT_BY } from '../Storage.constants'
+import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
 
 const ColumnContextMenu = ({
   id = '',
@@ -9,6 +9,7 @@ const ColumnContextMenu = ({
   onSelectAllItems = () => {},
   onSelectView = () => {},
   onSelectSort = () => {},
+  onSelectSortByOrder = () => {},
 }) => {
   return (
     <Menu id={id} animation="fade">
@@ -36,6 +37,10 @@ const ColumnContextMenu = ({
         <Item onClick={() => onSelectSort(STORAGE_SORT_BY.CREATED_AT)}>Last created</Item>
         <Item onClick={() => onSelectSort(STORAGE_SORT_BY.UPDATED_AT)}>Last modified</Item>
         <Item onClick={() => onSelectSort(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>Last accessed</Item>
+      </Submenu>
+      <Submenu label="Sort by order">
+        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>Asc</Item>
+        <Item onClick={() => onSelectSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>Desc</Item>
       </Submenu>
     </Menu>
   )
