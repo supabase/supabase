@@ -111,56 +111,55 @@ Here's a list of the data types that are available to use in the table editor in
 Here's a complete list of all of the default data types provided by Postgres:
 
 <details>
-<summary>View all default data types</summary>
+<summary>Show/Hide default data types</summary>
 
-| `Name`                                        | `Aliases`              | `Description`                                                       |
+| `Name`                                        | `Aliases`              | `Description`                                                 |
 | ------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
-| bigint                                      | int8                 | signed eight-byte integer                                         |
-| bigserial                                   | serial8              | autoincrementing eight-byte integer                               |
-| bit                                |                      | fixed-length bit string                                           |
-| bit varying                        | varbit      | variable-length bit string                                        |
-| boolean                                     | bool                 | logical Boolean (true/false)                                      |
-| box                                         |                      | rectangular box on a plane                                        |
-| bytea                                       |                      | binary data (“byte array”)                                        |
-| character                          | char        | fixed-length character string                                     |
-| character varying                  | varchar     | variable-length character string                                  |
-| cidr                                        |                      | IPv4 or IPv6 network address                                      |
-| circle                                      |                      | circle on a plane                                                 |
-| date                                        |                      | calendar date (year, month, day)                                  |
-| double precision                            | float8               | double precision floating-point number (8 bytes)                  |
-| inet                                        |                      | IPv4 or IPv6 host address                                         |
-| integer                                     | int, int4            | signed four-byte integer                                          |
-| interval \[ fields \]              |                      | time span                                                         |
-| json                                        |                      | textual JSON data                                                 |
-| jsonb                                       |                      | binary JSON data, decomposed                                      |
-| line                                        |                      | infinite line on a plane                                          |
-| lseg                                        |                      | line segment on a plane                                           |
-| macaddr                                     |                      | MAC (Media Access Control) address                                |
-| macaddr8                                    |                      | MAC (Media Access Control) address (EUI-64 format)                |
-| money                                       |                      | currency amount                                                   |
-| numeric                         | decimal  | exact numeric of selectable precision                             |
-| path                                        |                      | geometric path on a plane                                         |
-| pg\_lsn                                     |                      | PostgreSQL Log Sequence Number                                    |
-| pg\_snapshot                                |                      | user-level transaction ID snapshot                                |
-| point                                       |                      | geometric point on a plane                                        |
-| polygon                                     |                      | closed geometric path on a plane                                  |
-| real                                        | float4               | single precision floating-point number (4 bytes)                  |
-| smallint                                    | int2                 | signed two-byte integer                                           |
-| smallserial                                 | serial2              | autoincrementing two-byte integer                                 |
-| serial                                      | serial4              | autoincrementing four-byte integer                                |
-| text                                        |                      | variable-length character string                                  |
-| time \[ without time zone \]      |                      | time of day (no time zone)                                        |
-| time  with time zone               | timetz               | time of day, including time zone                                  |
-| timestamp  \[ without time zone \] |                      | date and time (no time zone)                                      |
-| timestamp  with time zone          | timestamptz          | date and time, including time zone                                |
-| tsquery                                     |                      | text search query                                                 |
-| tsvector                                    |                      | text search document                                              |
-| txid\_snapshot                              |                      | user-level transaction ID snapshot (deprecated; see pg\_snapshot) |
-| uuid                                        |                      | universally unique identifier                                     |
-| xml                                         |                      | XML data                                                          |
-
-
+| bigint                                      | int8                 | Signed eight-byte integer. For numbers ranging from -9223372036854775808 to +9223372036854775807. |
+| bigserial                                   | serial8              | Autoincrementing eight-byte integer.  For numbers ranging from 1 to 9223372036854775807. |
+| bit                                         |                      | Fixed-length bit string.                |
+| bit varying                                 | varbit               | Variable-length bit string.                |
+| boolean                                     | bool                 | Logical Boolean (true/false).                |
+| box                                         |                      | Rectangular box on a plane.                |
+| bytea                                       |                      | Binary data (“byte array”).                |
+| character                                   | char                 | Fixed-length character string.                |
+| character varying                           | varchar              | Variable-length character string.                |
+| cidr                                        |                      | IPv4 or IPv6 network address.                |
+| circle                                      |                      | Circle on a plane.                |
+| date                                        |                      | Calendar date (year, month, day).                |
+| double precision                            | float8               | Double precision floating-point number (8 bytes). 15 decimal digits of precision. |
+| inet                                        |                      | IPv4 or IPv6 host address.                |
+| integer                                     | int, int4            | Signed four-byte integer. -2147483648 to +2147483647.               |
+| interval \[ fields \]                       |                      | Time span.                |
+| json                                        |                      | Textual JSON data.                |
+| jsonb                                       |                      | Binary JSON data, decomposed. If you are doing a lot of JSON manipulation in Postgres you should consider using JSONB for efficiency. Otherwise, if you are just doing typical data storing and fetching, JSON should be fine.                |
+| line                                        |                      | Infinite line on a plane.                |
+| lseg                                        |                      | Line segment on a plane.                |
+| macaddr                                     |                      | MAC (Media Access Control) address.                |
+| macaddr8                                    |                      | MAC (Media Access Control) address (EUI-64 format).                |
+| money                                       |                      | currency.                |
+| numeric                                     | decimal              | Exact numeric of selectable precision. Up to 131072 digits before the decimal point; up to 16383 digits after. For storing number that require very high precision. Use the numeric type when you need more precision than float4 or float8 offer. |
+| path                                        |                      | Geometric path on a plane.                |
+| pg\_lsn                                     |                      | PostgreSQL Log Sequence Numb.                |
+| pg\_snapshot                                |                      | User-level transaction ID snapshot.                |
+| point                                       |                      | Geometric point on a plane.                |
+| polygon                                     |                      | Closed geometric path on a plane.                |
+| real                                        | float4               | Single precision floating-point number (4 byte). 6 decimal digits precision. |
+| smallint                                    | int2                 | Signed two-byte integer. For numbers ranging from -32768 to +32767               |
+| smallserial                                 | serial2              | Autoincrementing two-byte integer. For numbers ranging from  1 to 32767.               |
+| serial                                      | serial4              | Autoincrementing four-byte integer. For numbers ranging from 1 to 2147483647   |
+| text                                        |                      | Variable-length character string. This is the general purpose data type for textual content. |
+| time \[ without time zone \]                |                      | Time of day (no time zone).                |
+| time  with time zone                        | timetz               | Time of day, including time zone.                |
+| timestamp  \[ without time zone \]          |                      | Date and time (no time zone).                |
+| timestamp  with time zone                   | timestamptz          | Date and time, including time zone.                |
+| tsquery                                     |                      | Text search query.                |
+| tsvector                                    |                      | Text search document .                |
+| txid\_snapshot                              |                      | User-level transaction ID snapshot (deprecated; see pg\_snapshot).                |
+| uuid                                        |                      | Universally unique identifier.                |
+| xml                                         |                      | XML data.                |
 </details>
+
 
 <br />
 
