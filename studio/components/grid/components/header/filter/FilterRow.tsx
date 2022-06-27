@@ -1,23 +1,24 @@
-import { FC, memo, useState, useEffect, ChangeEvent } from 'react'
+import { debounce } from 'lodash'
+import { FC, memo, useState, useEffect, ChangeEvent, useCallback } from 'react'
 import { Button, Input, IconChevronDown, IconX } from '@supabase/ui'
-import { DropdownControl } from '../../common'
-import { useDispatch, useTrackedState } from '../../../store'
-import { FilterOperatorOptions } from './Filter.constants'
-import { updateFilterValueDebounced } from './Filter.utils'
 
-/**
- * use `now` to trigger re-render as filterIdx won't change value
- * if not filterText state will not updated on delete filter
- */
+import { useUrlState } from 'hooks'
+import { Filter } from 'components/grid/types'
+import { DropdownControl } from 'components/grid/components/common'
+import { useTrackedState } from 'components/grid/store'
+import { FilterOperatorOptions } from './Filter.constants'
+
 type FilterRowProps = {
+  filter: Filter
   filterIdx: number
-  now: number
 }
 
-const FilterRow: FC<FilterRowProps> = ({ filterIdx }) => {
+// [JOSHEN TODO] Area of improvement: Input field loses focus after the debounce (because of useUrlState?)
+// [JOSHEN TODO] Area of improvement: Pretty sure we can refactor for DRY for updates on each column, operator and value
+const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
-  const filter = state.filters[filterIdx]
+  const [_, setParams] = useUrlState()
+
   const column = state.table?.columns.find((x) => x.name === filter.column)
   const columnOptions =
     state.table?.columns?.map((x) => {
@@ -26,42 +27,86 @@ const FilterRow: FC<FilterRowProps> = ({ filterIdx }) => {
   const [filterValue, setFilterValue] = useState(filter.value)
 
   useEffect(() => {
-    const filter = state.filters[filterIdx]
     setFilterValue(filter.value)
   }, [filterIdx])
 
+  function onRemoveFilter() {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const updatedFilters = existingFilters.filter((filter: string, idx: number) => {
+        if (idx !== filterIdx) return filter
+      })
+      return {
+        ...prevParams,
+        filter: updatedFilters,
+      }
+    })
+  }
+
   function onColumnChange(column: string | number) {
-    dispatch({
-      type: 'UPDATE_FILTER',
-      payload: { filterIdx, value: { ...filter, column } },
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+        if (idx === filterIdx) {
+          const [_, operator, value] = filter.split(':')
+          return `${column}:${operator}:${value}`
+        } else {
+          return filter
+        }
+      })
+      return {
+        ...prevParams,
+        filter: updatedFilters,
+      }
     })
   }
 
   function onOperatorChange(operator: string | number) {
-    dispatch({
-      type: 'UPDATE_FILTER',
-      payload: { filterIdx, value: { ...filter, operator } },
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+        if (idx === filterIdx) {
+          const [column, _, value] = filter.split(':')
+          const selectedOperator = FilterOperatorOptions.find((option) => option.value === operator)
+          return `${column}:${selectedOperator?.abbrev}:${value}`
+        } else {
+          return filter
+        }
+      })
+      return {
+        ...prevParams,
+        filter: updatedFilters,
+      }
     })
   }
 
-  function onFilterChange(event: ChangeEvent<HTMLInputElement>) {
+  function onValueChange(event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
     setFilterValue(value)
-    updateFilterValueDebounced(
-      {
-        filterIdx,
-        value: { ...filter, value: value },
-      },
-      dispatch
-    )
-  }
-
-  function onRemoveFilter() {
-    dispatch({
-      type: 'REMOVE_FILTER',
-      payload: { index: filterIdx },
+    debounceHandler({
+      filterIdx,
+      value: { ...filter, value: value },
     })
   }
+
+  const updateFilterValue = (payload: { filterIdx: number; value: Filter }) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+        if (idx === filterIdx) {
+          const [column, operator] = filter.split(':')
+          return `${column}:${operator}:${payload.value.value}`
+        } else {
+          return filter
+        }
+      })
+      return {
+        ...prevParams,
+        filter: updatedFilters,
+      }
+    })
+  }
+  const debounceHandler = useCallback(debounce(updateFilterValue, 600), [])
 
   return (
     <div className="sb-grid-filter-row px-3">
@@ -97,7 +142,7 @@ const FilterRow: FC<FilterRowProps> = ({ filterIdx }) => {
         className="w-full"
         placeholder="Enter a value"
         value={filterValue}
-        onChange={onFilterChange}
+        onChange={onValueChange}
       />
       <Button
         icon={<IconX strokeWidth={1.5} size={14} />}

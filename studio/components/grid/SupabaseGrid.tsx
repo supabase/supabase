@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react'
+import { isEqual } from 'lodash'
 import { createPortal } from 'react-dom'
 import { useMonaco } from '@monaco-editor/react'
 import { DndProvider } from 'react-dnd'
@@ -19,10 +20,12 @@ import { cleanupProps, initTable, saveStorageDebounced } from './SupabaseGrid.ut
 import { useUrlState } from 'hooks'
 
 /**
- * Supabase Grid.
- *
- * React component to render database table.
+ * Supabase Grid: React component to render database table.
  */
+
+// [JOSHEN TODO] Updating of rows when filters updating feels very choppy
+// Rows do not get updated immediately for some reason despite a short debounce
+
 export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((props, ref) => {
   const monaco = useMonaco()
   const _props = cleanupProps(props)
@@ -60,8 +63,9 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const { editable, storageRef, gridProps, headerActions } = props
   const dispatch = useDispatch()
   const state = useTrackedState()
+
   const gridRef = useRef<DataGridHandle>(null)
-  const [mounted, setMount] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const [{ sort: sorts, filter: filters }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
@@ -83,18 +87,22 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   }))
 
   useEffect(() => {
-    if (!mounted) setMount(true)
+    if (!mounted) setMounted(true)
   }, [])
 
-  // [Joshen] This where we refetch the data is say a sort or filter was updated
   useEffect(() => {
     if (state.refreshPageFlag == REFRESH_PAGE_IMMEDIATELY) {
-      console.log('Refresh page')
-      fetchPage(state, dispatch)
-    } else if (state.refreshPageFlag != 0) {
-      refreshPageDebounced(state, dispatch)
+      fetchPage(state, dispatch, sorts as string[], filters as string[])
+    } else if (state.refreshPageFlag !== 0) {
+      refreshPageDebounced(state, dispatch, sorts as string[], filters as string[])
     }
   }, [state.refreshPageFlag])
+
+  useEffect(() => {
+    if (mounted) {
+      dispatch({ type: 'UPDATE_FILTERS_SORTS', payload: {} })
+    }
+  }, [JSON.stringify(filters)])
 
   useEffect(() => {
     if (state.isInitialComplete && storageRef && state.table) {
@@ -104,14 +112,14 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     state.table,
     state.isInitialComplete,
     state.gridColumns,
-    state.sorts,
-    state.filters,
+    state.sorts, // [JOSHEN TODO] To update accordingly
+    // state.filters, // [JOSHEN TODO] To update accordingly
     storageRef,
   ])
 
   useEffect(() => {
     if (state.totalRows === TOTAL_ROWS_RESET) {
-      fetchCount(state, dispatch)
+      fetchCount(state, dispatch, filters as string[])
     }
   }, [state.totalRows])
 

@@ -1,6 +1,7 @@
 import { uuidv4 } from 'lib/helpers'
 import { Filter, SavedState, SupaTable } from '../types'
 
+// [JOSHEN TODO] Deprecated but double check
 export function getInitialFilters(table: SupaTable, savedState?: SavedState): Filter[] {
   if (savedState?.filters) {
     // verify column still exists

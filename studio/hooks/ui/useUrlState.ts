@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useRouter } from 'next/router'
 
-type UrlStateParams = {
+export type UrlStateParams = {
   [k: string]: string | string[] | undefined
 }
 
