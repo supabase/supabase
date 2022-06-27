@@ -85,30 +85,7 @@ You must define the "data type" when you create a column.
 
 Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs.
 
-Here's a list of the data types that are available to use in the table editor in the Dashboard:
-
-| `Name`                                        | `Description`              | `Example`                                                       |
-| ------------------------------------------- | -------------------- | ----------------------------------------------------------------- |
-| int2       | Can contain numbers between -32,768 and 32,767 | For storing numbers like ages of people, distance between places or numbers you know will be fairly small.  |
-| int4       | Can contain numbers between -2,147,483,648 and +2,147,483,648  | For storing numbers like the population of small towns or cities that you know will be less than about 2 billion. |
-| int8       | Can contain numbers between 9,223,372,036,854,775,808 and +9,223,372,036,854,775,808 | For storing numbers larger than roughly 2 billion. Like the number of people who live in the Northern vs Southern hemisphere or the total number of COVID-19 vaccinations administered. |
-| float4     | Can contain numbers with up to 6 decimal places   | For storing things like temperature (22.5 degrees Celsius) or distance (10.25kms)|
-| float8     | Can contain numbers with up to 15 decimal places   | For storing numbers with a high level of precision, like scientific or mathematical data.  |
-| numeric    | Can contain 131,072 digits before the decimal point and 16,383 digits after the decimal point. | For storing number that require very high precision. Use the numeric type when you need more precision than float4 or float8 offer. |
-| json       | Can contain JSON data.  | For storing data that logically belongs together, like a person's street address. Useful for when you want to store dynamic fields and not have every field represented as a column in your table.  |
-| jsonb      | The JSONB type stores your JSON input as a binary code instead of as an exact copy of the JSON data. JSONB is faster, more efficient and supports indexing.    |  If you are doing a lot of JSON manipulation in Postgres you should consider using JSONB for efficiency. Otherwise, if you are just doing typical data storing and fetching, JSON should be fine.  |
-| text       | Can contain strings of any length. | For storing any kind of textual data. Examples include text contents of recipes or blog posts. This is the general purpose data type for textual content.    |
-| varchar    | Can contain strings with a fixed length | For storing a string where you would want to limit the length to 160 characters.     |
-| uuid       | Can store a universal unique identifier. | For storing unique IDs, like when you need to store a reference to another table row.  |
-| date       | Can store a data value without time. |  For storing dates like birthdays or holidays with a year, month and day.  |
-| time       | Can store the time of day |  For storing things like when a process starts and stops at specific times in the day. The lights come on at 6:00:00 a.m. and go off at 10:00:00 p.m. |
-| timez      | Can store the time of day, along with a timezone. | For storing things like event start times,  like an Apple event starting at 10:00:00 a.m. Pacific Time. |
-| timestamp  | Can store the date and time without a timezone.  | For storing times like: May 1st, 2022 at 10 a.m.  |
-| timestampz | Can store the date and time with a timezone.  | For storing times like: May 1st, 2022 at 10 a.m, Pacific Time. |
-| bool       | Can store boolean values  | For storing things that will be true or false, like user_is_subscribed or show_homepage_ad. |
-
-
-Here's a complete list of all of the default data types provided by Postgres:
+Here's list of all of the default data types provided by Postgres:
 
 <details>
 <summary>Show/Hide default data types</summary>
