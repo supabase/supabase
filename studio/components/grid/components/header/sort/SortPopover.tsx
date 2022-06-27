@@ -21,7 +21,6 @@ const SortPopover: FC = () => {
             <IconList strokeWidth={1.5} />
           </div>
         }
-        // style={{ padding: '4px 8px' }}
       >
         {btnText}
       </Button>

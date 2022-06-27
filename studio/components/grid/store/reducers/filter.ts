@@ -35,6 +35,10 @@ type FILTER_ACTIONTYPE =
 const FilterReducer = (state: FilterInitialState, action: FILTER_ACTIONTYPE) => {
   switch (action.type) {
     case 'INIT_TABLE': {
+      console.log('Filter Reducer INIT_TABLE', {
+        savedState: action.payload.savedState,
+        filters: getInitialFilters(action.payload.table, action.payload.savedState),
+      })
       return {
         ...state,
         filters: getInitialFilters(action.payload.table, action.payload.savedState),
