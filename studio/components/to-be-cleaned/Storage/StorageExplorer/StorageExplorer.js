@@ -40,6 +40,8 @@ const StorageExplorer = observer(({ bucket }) => {
     setView,
     sortBy,
     setSortBy,
+    sortByOrder,
+    setSortByOrder,
     currentBucketName,
     copyFileURLToClipboard,
     openBucket,
@@ -268,6 +270,8 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const onChangeSortBy = (sortBy) => setSortBy(sortBy)
 
+  const onChangeSortByOrder = (sortByOrder) => setSortByOrder(sortByOrder)
+
   const onToggleSearch = (bool) => {
     setIsSearching(bool)
     if (bool === false) {
@@ -287,6 +291,7 @@ const StorageExplorer = observer(({ bucket }) => {
         <FileExplorerHeader
           view={view}
           sortBy={sortBy}
+          sortByOrder={sortByOrder}
           loading={loading}
           breadcrumbs={columns.map((column) => column.name)}
           backDisabled={columns.length <= 1}
@@ -295,6 +300,7 @@ const StorageExplorer = observer(({ bucket }) => {
           setItemSearchString={setItemSearchString}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onChangeSortByOrder={onChangeSortByOrder}
           onToggleSearch={onToggleSearch}
           onFilesUpload={onFilesUpload}
           onSelectBack={onSelectBack}
@@ -335,6 +341,7 @@ const StorageExplorer = observer(({ bucket }) => {
           onSelectCreateFolder={onSelectCreateFolder}
           onChangeView={onChangeView}
           onChangeSortBy={onChangeSortBy}
+          onChangeSortByOrder={onChangeSortByOrder}
           onColumnLoadMore={(index, column) =>
             fetchMoreFolderContents(index, column, itemSearchString)
           }

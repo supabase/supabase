@@ -31,7 +31,9 @@ const PolicyEditor: FC<Props> = ({
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
   const check = policyFormFields?.check ?? ''
-  const selectedRoles = policyFormFields?.roles ?? []
+
+  // Filter out default public role (public if no roles selected)
+  const selectedRoles = (policyFormFields?.roles ?? []).filter((role: string) => role !== 'public')
 
   return (
     <div className="">
@@ -68,10 +70,10 @@ const PolicyEditor: FC<Props> = ({
             operation={operation}
             definition={definition}
             check={check}
-            onUpdatePolicyUsing={(definition: string | null) =>
+            onUpdatePolicyUsing={(definition: string | undefined) =>
               onUpdatePolicyFormFields({ definition })
             }
-            onUpdatePolicyCheck={(check: string | null) => onUpdatePolicyFormFields({ check })}
+            onUpdatePolicyCheck={(check: string | undefined) => onUpdatePolicyFormFields({ check })}
           />
         </Modal.Content>
       </div>
