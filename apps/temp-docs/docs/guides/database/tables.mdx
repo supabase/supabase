@@ -77,7 +77,7 @@ create table todos (
 
 ### Data types
 
-Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. Here's a complete list of all of the default data types provided by Postgres:
+Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. Here's a list of all of the default data types provided by Postgres:
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -109,21 +109,21 @@ Every column is a predefined type. PostgreSQL provides many [default types](http
 | money                                       |                      | currency.                |
 | numeric                                     | decimal              | Exact numeric of selectable precision. Up to 131072 digits before the decimal point; up to 16383 digits after. For storing number that require very high precision. Use the numeric type when you need more precision than float4 or float8 offer. |
 | path                                        |                      | Geometric path on a plane.                |
-| pg\_lsn                                     |                      | PostgreSQL Log Sequence Numb.                |
+| pg\_lsn                                     |                      | PostgreSQL Log Sequence Number.                |
 | pg\_snapshot                                |                      | User-level transaction ID snapshot.                |
 | point                                       |                      | Geometric point on a plane.                |
 | polygon                                     |                      | Closed geometric path on a plane.                |
-| real                                        | float4               | Single precision floating-point number (4 byte). 6 decimal digits precision. |
-| smallint                                    | int2                 | Signed two-byte integer. For numbers ranging from -32768 to +32767               |
+| real                                        | float4               | Single precision floating-point number (4 bytes). 6 decimal digits precision. |
+| smallint                                    | int2                 | Signed two-byte integer. For numbers ranging from -32768 to +32767.               |
 | smallserial                                 | serial2              | Autoincrementing two-byte integer. For numbers ranging from  1 to 32767.               |
-| serial                                      | serial4              | Autoincrementing four-byte integer. For numbers ranging from 1 to 2147483647   |
+| serial                                      | serial4              | Autoincrementing four-byte integer. For numbers ranging from 1 to 2147483647.   |
 | text                                        |                      | Variable-length character string. This is the general purpose data type for textual content. |
 | time \[ without time zone \]                |                      | Time of day (no time zone).                |
 | time  with time zone                        | timetz               | Time of day, including time zone.                |
 | timestamp  \[ without time zone \]          |                      | Date and time (no time zone).                |
 | timestamp  with time zone                   | timestamptz          | Date and time, including time zone.                |
 | tsquery                                     |                      | Text search query.                |
-| tsvector                                    |                      | Text search document .                |
+| tsvector                                    |                      | Text search document.                |
 | txid\_snapshot                              |                      | User-level transaction ID snapshot (deprecated; see pg\_snapshot).                |
 | uuid                                        |                      | Universally unique identifier.                |
 | xml                                         |                      | XML data.                |
