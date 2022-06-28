@@ -20,7 +20,7 @@
     "@kiwicopple/prism-react-renderer": "https://github.com/kiwicopple/prism-react-renderer.git",
     "@octokit/core": "^3.5.1",
     "docusaurus-theme-search-typesense": "^0.4.0",
-    "jsrsasign": "^10.4.1",
+    "jsrsasign": "^10.5.25",
     "mermaid": "^8.13.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
