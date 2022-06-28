@@ -33,7 +33,10 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onRemoveFilter() {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const updatedFilters = existingFilters.filter((filter: string, idx: number) => {
+      const formattedExistingFilters = Array.isArray(existingFilters)
+        ? existingFilters
+        : [existingFilters]
+      const updatedFilters = formattedExistingFilters.filter((filter: string, idx: number) => {
         if (idx !== filterIdx) return filter
       })
       return {

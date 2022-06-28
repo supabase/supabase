@@ -40,6 +40,8 @@ const Filter: FC = () => {
   function onAddFilter() {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
+      // [JOSHEN TODO] Investigate why prevParams.filter returns as array here if only one
+      // but returns as string in FilterRow instead?
       const column = state.table?.columns[0].name
       return {
         ...prevParams,
