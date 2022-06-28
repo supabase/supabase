@@ -3,9 +3,11 @@ import { Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
 
 import { Project } from 'types'
 import Link from '@supabase/ui/dist/cjs/components/Typography/Link'
-import router from 'next/router'
 import { useStore, useSubscriptionStats } from 'hooks'
 import { DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useRouter } from 'next/router'
 
 interface Props {
   project: Project
@@ -13,8 +15,9 @@ interface Props {
 
 const ProjectPausedState: FC<Props> = ({ project }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
   const { ref } = router.query
-  const { ui } = useStore()
+  const { ui, app } = useStore()
   const subscriptionStats = useSubscriptionStats()
   const {
     total_free_projects: totalFreeProjects,
@@ -22,6 +25,12 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
     total_paused_free_projects: totalPausedFreeProjects,
   } = subscriptionStats
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+
+  const restoreProject = async (project: Project) => {
+    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
+    await post(`${API_URL}/projects/${project.ref}/restore`, {})
+    //router.reload()
+  }
 
   return (
     <>
@@ -37,7 +46,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
 
               <div className="flex items-center justify-center gap-4">
                 <Button
-                  // onClick={}
+                  onClick={() => restoreProject(project)}
                   size="small"
                   loading={isSubmitting}
                   type="primary"

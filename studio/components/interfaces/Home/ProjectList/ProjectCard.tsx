@@ -19,7 +19,6 @@ const ProjectCard: FC<Props> = ({
   onSelectDelete,
   rewriteHref,
 }) => {
-  console.log({ rewriteHref })
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
