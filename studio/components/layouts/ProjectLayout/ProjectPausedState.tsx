@@ -4,7 +4,7 @@ import { Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
 import { Project } from 'types'
 import Link from '@supabase/ui/dist/cjs/components/Typography/Link'
 import router from 'next/router'
-import { useStore } from 'hooks'
+import { useStore, useSubscriptionStats } from 'hooks'
 import { DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 
 interface Props {
@@ -15,7 +15,9 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { ref } = router.query
   const { ui } = useStore()
+  const subscriptionStats = useSubscriptionStats()
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+  console.log(subscriptionStats)
 
   return (
     <>
