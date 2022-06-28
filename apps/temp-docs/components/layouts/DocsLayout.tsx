@@ -12,7 +12,7 @@ const DocsLayout = ({
   currentPage,
 }: {
   meta: { title: string; description: string }
-  children: string
+  children: JSX.Element
   toc: any
   menuItems: any
   currentPage: string

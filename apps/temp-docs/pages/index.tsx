@@ -6,6 +6,9 @@ import { MDXProvider } from '@mdx-js/react'
 import components from '../components'
 import menuItems from '../components/nav/menu-items.json'
 
+// table of contents extractor
+const toc = require('markdown-toc')
+
 export default function Home({
   meta,
   content,
@@ -14,7 +17,7 @@ export default function Home({
   content: any
 }) {
   return (
-    <Layout meta={meta} menuItems={menuItems['Guides']} currentPage="Guides">
+    <Layout meta={meta} toc={toc} menuItems={menuItems['Guides']} currentPage="Guides">
       <MDXProvider components={components}>
         <MDXRemote {...content} />
       </MDXProvider>
