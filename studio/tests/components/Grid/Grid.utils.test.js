@@ -34,14 +34,16 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
     const mockInput = ['id:gte:20', 'id:lte:40']
     const output = formatFilterURLParams(mockInput)
     expect(output).toHaveLength(2)
-    expect(output[0]).toHaveProperty('id')
-    expect(output[0]).toHaveProperty('column', 'id')
-    expect(output[0]).toHaveProperty('operator', '>=')
-    expect(output[0]).toHaveProperty('value', '20')
-    expect(output[1]).toHaveProperty('id')
-    expect(output[1]).toHaveProperty('column', 'id')
-    expect(output[1]).toHaveProperty('operator', '<=')
-    expect(output[1]).toHaveProperty('value', '40')
+    expect(output[0]).toStrictEqual({
+      column: 'id',
+      operator: '>=',
+      value: '20',
+    })
+    expect(output[1]).toStrictEqual({
+      column: 'id',
+      operator: '<=',
+      value: '40',
+    })
   })
   test('should reject any malformed filter options based on URL params', () => {
     const mockInput = ['id', ':gte', ':50', 'id:eq:10']
@@ -57,8 +59,10 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
     const mockInput = ['id:ilike:']
     const output = formatFilterURLParams(mockInput)
     expect(output).toHaveLength(1)
-    expect(output[0]).toHaveProperty('column', 'id')
-    expect(output[0]).toHaveProperty('operator', '~~*')
-    expect(output[0]).toHaveProperty('value', '')
+    expect(output[0]).toStrictEqual({
+      column: 'id',
+      operator: '~~*',
+      value: '',
+    })
   })
 })
