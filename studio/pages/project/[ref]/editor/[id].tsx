@@ -167,6 +167,7 @@ const TableEditorPage: NextPage = () => {
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
         onClosePanel={onClosePanel}
+        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger

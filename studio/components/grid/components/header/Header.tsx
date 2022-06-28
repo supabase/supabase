@@ -6,8 +6,8 @@ import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
-import { showConfirmAlert } from '../common'
 import { exportRowsToCsv } from 'components/grid/utils'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 
 type HeaderProps = {
@@ -83,7 +83,7 @@ const RowHeader: FC<RowHeaderProps> = ({}) => {
   const { selectedRows, rows: allRows, editable } = state
 
   const onRowsDelete = () => {
-    showConfirmAlert({
+    confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
       onConfirm: async () => {
