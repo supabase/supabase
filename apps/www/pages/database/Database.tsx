@@ -109,6 +109,7 @@ function Database() {
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
                     height={30}
+                    alt="postgresql icon"
                   />
                 </div>
               </div>
