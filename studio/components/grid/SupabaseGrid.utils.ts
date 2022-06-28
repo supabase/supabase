@@ -1,5 +1,4 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { uuidv4 } from 'lib/helpers'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { IMetaService } from './services/meta'
 import { InitialStateType } from './store/reducers'
@@ -58,7 +57,7 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
             )
             // Reject any possible malformed filter param
             if (!column || !operatorAbbrev || !operator) return undefined
-            else return { id: uuidv4(), column, operator: operator.value, value: value || '' }
+            else return { column, operator: operator.value, value: value || '' }
           })
           .filter((f) => f !== undefined)
       : []
@@ -71,25 +70,23 @@ export function initTable(
   dispatch: (value: any) => void,
   sort?: string[], // Come directly from URL param
   filter?: string[] // Come directly from URL param
-) {
+): { savedState: { sorts?: string[]; filters?: string[] } } {
   function onInitTable(table: SupaTable, props: SupabaseGridProps) {
+    const savedState = props.storageRef
+      ? onLoadStorage(props.storageRef, table.name, table.schema)
+      : undefined
+
+    // Load sort and filters via URL param only if given
+    // Otherwise load from local storage to resume user session
+    if (sort === undefined && filter === undefined && (savedState.sorts || savedState.filters)) {
+      return { savedState: { sorts: savedState.sorts, filters: savedState.filters } }
+    }
+
     const gridColumns = getGridColumns(table, {
       editable: props.editable,
       defaultWidth: props.gridProps?.defaultColumnWidth,
       onAddColumn: props.editable ? props.onAddColumn : undefined,
     })
-
-    const savedState = props.storageRef
-      ? onLoadStorage(props.storageRef, table.name, table.schema)
-      : undefined
-
-    // [JOSHEN TODO] Temp force update savedState to use URL param
-    // Load sort and filters via URL param only if given, otherwise get
-    // from saved state in local storage
-    const sorts = formatSortURLParams(sort)
-    const filters = formatFilterURLParams(filter)
-    if (sorts.length > 0) savedState.sorts = sorts
-    if (filters.length > 0) savedState.filters = filters
 
     dispatch({
       type: 'INIT_TABLE',
@@ -103,6 +100,8 @@ export function initTable(
         onError: props.onError ?? defaultErrorHandler,
       },
     })
+
+    return { savedState: {} }
   }
 
   if (typeof props.table === 'string') {
@@ -111,16 +110,19 @@ export function initTable(
       : fetchReadOnlyInfo(state.metaService!, props.table, props.schema)
 
     fetchMethod.then((res) => {
-      if (res) onInitTable(res, props)
-      else {
+      if (res) {
+        return onInitTable(res, props)
+      } else {
         if (props.onError) {
           props.onError({ message: 'fetch table info failed' })
         }
       }
     })
   } else {
-    onInitTable(props.table, props)
+    return onInitTable(props.table, props)
   }
+
+  return { savedState: {} }
 }
 
 async function fetchEditableInfo(
@@ -235,15 +237,20 @@ export function onLoadStorage(storageRef: string, tableName: string, schema?: st
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
 
-// [JOSHEN TODO] Need to fix this
-function saveStorage(state: InitialStateType, storageRef: string) {
+function saveStorage(
+  state: InitialStateType,
+  storageRef: string,
+  sorts?: string[],
+  filters?: string[]
+) {
   if (!state.table) return
 
   const config = {
     gridColumns: state.gridColumns,
-    // sorts: state.sorts,
-    // filters: state.filters,
+    ...(sorts !== undefined && { sorts }),
+    ...(filters !== undefined && { filters }),
   }
+  console.log('Save storage', config)
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const savedStr = localStorage.getItem(storageKey)
 

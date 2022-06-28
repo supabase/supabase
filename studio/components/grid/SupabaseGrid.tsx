@@ -111,14 +111,14 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
 
   useEffect(() => {
     if (state.isInitialComplete && storageRef && state.table) {
-      saveStorageDebounced(state, storageRef)
+      saveStorageDebounced(state, storageRef, sorts as string[], filters as string[])
     }
   }, [
     state.table,
     state.isInitialComplete,
     state.gridColumns,
-    // state.sorts,   // [JOSHEN TODO] To update accordingly
-    // state.filters, // [JOSHEN TODO] To update accordingly
+    JSON.stringify(sorts),
+    JSON.stringify(filters),
     storageRef,
   ])
 
@@ -152,7 +152,22 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
       (typeof props.table != 'string' &&
         JSON.stringify(props.table) !== JSON.stringify(state.table))
     ) {
-      initTable(props, state, dispatch, sorts as string[], filters as string[])
+      const { savedState } = initTable(
+        props,
+        state,
+        dispatch,
+        sorts as string[],
+        filters as string[]
+      )
+      if (savedState.sorts || savedState.filters) {
+        setParams((prevParams) => {
+          return {
+            ...prevParams,
+            ...(savedState.sorts && { sort: savedState.sorts }),
+            ...(savedState.filters && { filter: savedState.filters }),
+          }
+        })
+      }
     }
   }, [state.metaService, state.table, props.table, props.schema])
 
