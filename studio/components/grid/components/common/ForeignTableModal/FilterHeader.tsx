@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, Input, IconChevronDown, IconSearch } from '@supabase/ui'
-import { uuidv4 } from 'lib/helpers'
 import { DropdownControl } from '../../common'
 import { FilterOperatorOptions } from '../../header/filter'
 import { Filter, FilterOperator } from '../../../types'
@@ -37,7 +36,6 @@ export const FilterHeader: FC<FilterProps> = ({
   function triggerOnChange(columnName: string, condition: string, filterText: string) {
     onFilterChangeDebounced(
       {
-        id: uuidv4(),
         column: columnName,
         operator: condition as FilterOperator,
         value: filterText,

@@ -25,7 +25,6 @@ export type FilterOperator =
   | 'is'
 
 export interface Filter {
-  id: string
   column: string
   operator: FilterOperator
   value: any
