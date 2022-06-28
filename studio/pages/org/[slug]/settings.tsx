@@ -31,7 +31,7 @@ import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organiz
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/ui/Panel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import InviteMemberModal from 'components/to-be-cleaned/ModalsDeprecated/InviteMemberModal'
+import InviteMemberModal from 'components/interfaces/Organization/InviteMemberModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { Member, NextPageWithLayout, Project } from 'types'
