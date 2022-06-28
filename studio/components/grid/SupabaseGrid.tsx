@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { createPortal } from 'react-dom'
-import { useMonaco } from '@monaco-editor/react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useMonaco } from '@monaco-editor/react'
 import { DataGridHandle } from '@supabase/react-data-grid'
 
+import { useUrlState } from 'hooks'
 import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
@@ -16,14 +17,7 @@ import Footer from './components/footer'
 import { RowContextMenu } from './components/menu'
 import { cleanupProps, initTable, saveStorageDebounced } from './SupabaseGrid.utils'
 
-import { useUrlState } from 'hooks'
-
-/**
- * Supabase Grid: React component to render database table.
- */
-
-// [JOSHEN TODO] Updating of rows when filters updating feels very choppy
-// Rows do not get updated immediately for some reason despite a short debounce
+/** Supabase Grid: React component to render database table */
 
 export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((props, ref) => {
   const monaco = useMonaco()
@@ -98,6 +92,12 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   }, [state.refreshPageFlag])
 
   useEffect(() => {
+    if (state.totalRows === TOTAL_ROWS_RESET) {
+      fetchCount(state, dispatch, filters as string[])
+    }
+  }, [state.totalRows])
+
+  useEffect(() => {
     if (mounted) {
       dispatch({ type: 'UPDATE_FILTERS', payload: {} })
     }
@@ -121,12 +121,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     JSON.stringify(filters),
     storageRef,
   ])
-
-  useEffect(() => {
-    if (state.totalRows === TOTAL_ROWS_RESET) {
-      fetchCount(state, dispatch, filters as string[])
-    }
-  }, [state.totalRows])
 
   useEffect(() => {
     if (!state.metaService) {

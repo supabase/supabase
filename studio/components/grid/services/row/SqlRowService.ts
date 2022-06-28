@@ -65,6 +65,7 @@ export class SqlRowService implements IRowService {
   }
 
   async fetchPage(page: number, rowsPerPage: number, filters: Filter[], sorts: Sort[]) {
+    console.log('Fetch page')
     const pageFromZero = page > 0 ? page - 1 : page
     const from = pageFromZero * rowsPerPage
     const to = (pageFromZero + 1) * rowsPerPage - 1

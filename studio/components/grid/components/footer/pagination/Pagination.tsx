@@ -101,6 +101,11 @@ const Pagination: FC<PaginationProps> = () => {
     dispatch({ type: 'SET_ROWS_PER_PAGE', payload: value })
   }
 
+  console.log('State', {
+    totalRows: state.totalRows,
+    isLoading: state.isLoading,
+  })
+
   return (
     <div className="sb-grid-pagination">
       {state.totalRows < 0 ? (
