@@ -1,8 +1,9 @@
 import fs from 'fs'
 import { join } from 'path'
+import path from 'path'
 import matter from 'gray-matter'
 
-const docsDirectory = process.cwd()
+const docsDirectory = path.normalize(__dirname + "/../../../../../web")
 
 export function getDocsBySlug(slug: string) {
   const realSlug = slug.replace(/\.mdx$/, '')
