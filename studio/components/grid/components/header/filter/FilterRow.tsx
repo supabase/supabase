@@ -17,7 +17,7 @@ type FilterRowProps = {
 // [JOSHEN TODO] Area of improvement: Pretty sure we can refactor for DRY for updates on each column, operator and value
 const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   const state = useTrackedState()
-  const [_, setParams] = useUrlState()
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter'] })
 
   const column = state.table?.columns.find((x) => x.name === filter.column)
   const columnOptions =
@@ -33,10 +33,7 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onRemoveFilter() {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const formattedExistingFilters = Array.isArray(existingFilters)
-        ? existingFilters
-        : [existingFilters]
-      const updatedFilters = formattedExistingFilters.filter((filter: string, idx: number) => {
+      const updatedFilters = existingFilters.filter((filter: string, idx: number) => {
         if (idx !== filterIdx) return filter
       })
       return {
@@ -49,10 +46,7 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onColumnChange(column: string | number) {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const formattedExistingFilters = Array.isArray(existingFilters)
-        ? existingFilters
-        : [existingFilters]
-      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [_, operator, value] = filter.split(':')
           return `${column}:${operator}:${value}`
@@ -70,10 +64,7 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onOperatorChange(operator: string | number) {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const formattedExistingFilters = Array.isArray(existingFilters)
-        ? existingFilters
-        : [existingFilters]
-      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [column, _, value] = filter.split(':')
           const selectedOperator = FilterOperatorOptions.find((option) => option.value === operator)
@@ -101,10 +92,7 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   const updateFilterValue = (payload: { filterIdx: number; value: Filter }) => {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const formattedExistingFilters = Array.isArray(existingFilters)
-        ? existingFilters
-        : [existingFilters]
-      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
+      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [column, operator] = filter.split(':')
           return `${column}:${operator}:${payload.value.value}`

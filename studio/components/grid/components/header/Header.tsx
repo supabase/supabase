@@ -1,21 +1,22 @@
-import * as React from 'react'
-import { useDispatch, useTrackedState } from '../../store'
-import { Button, Divider, IconDownload, IconPlus, IconX, IconTrash, Typography } from '@supabase/ui'
+import { FC, ReactNode } from 'react'
+import { Button, IconDownload, IconPlus, IconX, IconTrash } from '@supabase/ui'
 import { saveAs } from 'file-saver'
+
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
-import { exportRowsToCsv } from '../../utils'
 import { showConfirmAlert } from '../common'
+import { exportRowsToCsv } from 'components/grid/utils'
+import { useDispatch, useTrackedState } from 'components/grid/store'
 
 type HeaderProps = {
   onAddColumn?: () => void
   onAddRow?: () => void
-  headerActions?: React.ReactNode
+  headerActions?: ReactNode
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddColumn, onAddRow, headerActions }) => {
+const Header: FC<HeaderProps> = ({ onAddColumn, onAddRow, headerActions }) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
@@ -39,7 +40,7 @@ type DefaultHeaderProps = {
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader: React.FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
+const DefaultHeader: FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
   const renderNewColumn = (onAddColumn?: () => void) => {
     if (!onAddColumn) return null
     return (
@@ -75,7 +76,7 @@ const DefaultHeader: React.FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) 
 }
 
 type RowHeaderProps = {}
-const RowHeader: React.FC<RowHeaderProps> = ({}) => {
+const RowHeader: FC<RowHeaderProps> = ({}) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -136,18 +137,16 @@ const RowHeader: React.FC<RowHeaderProps> = ({}) => {
           Export to csv
         </Button>
         {editable && (
-          <>
-            <Button
-              type="default"
-              size="tiny"
-              icon={<IconTrash size="tiny" />}
-              onClick={onRowsDelete}
-            >
-              {selectedRows.size > 1
-                ? `Delete ${selectedRows.size} rows`
-                : `Delete ${selectedRows.size} row`}
-            </Button>
-          </>
+          <Button
+            type="default"
+            size="tiny"
+            icon={<IconTrash size="tiny" />}
+            onClick={onRowsDelete}
+          >
+            {selectedRows.size > 1
+              ? `Delete ${selectedRows.size} rows`
+              : `Delete ${selectedRows.size} row`}
+          </Button>
         )}
       </div>
     </div>

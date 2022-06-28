@@ -243,7 +243,7 @@ function saveStorage(state: InitialStateType, storageRef: string) {
 
   const config = {
     gridColumns: state.gridColumns,
-    sorts: state.sorts,
+    // sorts: state.sorts,
     // filters: state.filters,
   }
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)

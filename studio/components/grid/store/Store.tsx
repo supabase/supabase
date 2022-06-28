@@ -5,7 +5,6 @@ import {
   CallbackReducer,
   ColumnReducer,
   RowReducer,
-  SortReducer,
   initialState,
   InitialStateType,
 } from './reducers'
@@ -17,13 +16,7 @@ const combineReducers =
     return state
   }
 
-const storeReducers = combineReducers(
-  BaseReducer,
-  CallbackReducer,
-  ColumnReducer,
-  RowReducer,
-  SortReducer
-)
+const storeReducers = combineReducers(BaseReducer, CallbackReducer, ColumnReducer, RowReducer)
 
 const useValue = () => useReducer(storeReducers, initialState)
 
