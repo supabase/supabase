@@ -109,7 +109,7 @@ const JoinOrganizationPage = () => {
           isError ? 'text-scale-1100' : 'text-scale-1200',
         ].join(' ')}
       >
-        <>{children}</>
+        {children}
       </div>
     )
 
