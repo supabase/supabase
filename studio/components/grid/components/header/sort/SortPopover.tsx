@@ -2,16 +2,16 @@ import React, { FC } from 'react'
 import { Button, IconList, IconChevronDown, Popover } from '@supabase/ui'
 
 import { useUrlState } from 'hooks'
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { DropdownControl } from 'components/grid/components/common'
 import SortRow from './SortRow'
+import { useTrackedState } from 'components/grid/store'
+import { DropdownControl } from 'components/grid/components/common'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 
 const SortPopover: FC = () => {
-  const state = useTrackedState()
+  const [{ sort: sorts }]: any = useUrlState({ arrayKeys: ['sort'] })
   const btnText =
-    state.sorts.length > 0
-      ? `Sorted by ${state.sorts.length} rule${state.sorts.length > 1 ? 's' : ''}`
+    (sorts || []).length > 0
+      ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
       : 'Sort'
 
   return (
@@ -34,13 +34,12 @@ export default SortPopover
 
 const Sort: FC = () => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
 
   const [{ sort: sorts }, setParams] = useUrlState({ arrayKeys: ['sort'] })
   const formattedSorts = formatSortURLParams(sorts as string[])
 
   const columns = state?.table?.columns!.filter((x) => {
-    const found = state.sorts.find((y) => y.column == x.name)
+    const found = formattedSorts.find((y) => y.column == x.name)
     return !found
   })
 
@@ -50,18 +49,21 @@ const Sort: FC = () => {
     }) || []
 
   function onAddSort(columnName: string | number) {
-    dispatch({
-      type: 'ADD_SORT',
-      payload: { column: columnName, ascending: true },
+    setParams((prevParams) => {
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+      return {
+        ...prevParams,
+        sort: existingSorts.concat([`${columnName}:asc`]),
+      }
     })
   }
 
   return (
     <div className="space-y-2 py-2">
-      {state.sorts.map((x, index) => (
-        <SortRow key={x.column} columnName={x.column} index={index} />
+      {formattedSorts.map((sort, index) => (
+        <SortRow key={sort.column} index={index} columnName={sort.column} sort={sort} />
       ))}
-      {state.sorts.length == 0 && (
+      {formattedSorts.length === 0 && (
         <div className="space-y-1 px-3">
           <h5 className="text-scale-1100 text-sm">No sorts applied to this view</h5>
           <p className="text-scale-900 text-xs">Add a column below to sort the view</p>
@@ -83,7 +85,7 @@ const Sort: FC = () => {
               iconRight={<IconChevronDown />}
               className="sb-grid-dropdown__item-trigger"
             >
-              {`Pick ${state.sorts.length > 1 ? 'another' : 'a'} column to sort by`}
+              {`Pick ${formattedSorts.length > 1 ? 'another' : 'a'} column to sort by`}
             </Button>
           </DropdownControl>
         ) : (

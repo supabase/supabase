@@ -99,9 +99,15 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
 
   useEffect(() => {
     if (mounted) {
-      dispatch({ type: 'UPDATE_FILTERS_SORTS', payload: {} })
+      dispatch({ type: 'UPDATE_FILTERS', payload: {} })
     }
   }, [JSON.stringify(filters)])
+
+  useEffect(() => {
+    if (mounted) {
+      dispatch({ type: 'UPDATE_SORTS', payload: {} })
+    }
+  }, [JSON.stringify(sorts)])
 
   useEffect(() => {
     if (state.isInitialComplete && storageRef && state.table) {
@@ -111,7 +117,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
     state.table,
     state.isInitialComplete,
     state.gridColumns,
-    state.sorts, // [JOSHEN TODO] To update accordingly
+    // state.sorts,   // [JOSHEN TODO] To update accordingly
     // state.filters, // [JOSHEN TODO] To update accordingly
     storageRef,
   ])

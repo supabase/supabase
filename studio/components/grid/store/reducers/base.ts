@@ -42,7 +42,11 @@ export type INIT_ACTIONTYPE =
       }
     }
   | {
-      type: 'UPDATE_FILTERS_SORTS'
+      type: 'UPDATE_FILTERS'
+      payload: {}
+    }
+  | {
+      type: 'UPDATE_SORTS'
       payload: {}
     }
 
@@ -70,11 +74,16 @@ const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
         editable: action.payload.editable || false,
       }
     }
-    case 'UPDATE_FILTERS_SORTS': {
+    case 'UPDATE_FILTERS': {
       const newState: any = { ...state }
       newState.page = 1
       newState.refreshPageFlag = Date.now()
       newState.totalRows = TOTAL_ROWS_RESET
+      return newState
+    }
+    case 'UPDATE_SORTS': {
+      const newState: any = { ...state }
+      newState.refreshPageFlag = Date.now()
       return newState
     }
     default:
