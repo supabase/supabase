@@ -5,9 +5,6 @@ import { get, post, patch, delete_ } from 'lib/common/fetch'
 import { UserContent, UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
 
-// [Joshen] This will be the new ProjectContentStore
-// but use the one under the stores folder projectContentStore first while we transition
-
 export interface IProjectFunctionsStore {
   isLoading: boolean
   isInitialized: boolean
