@@ -78,7 +78,7 @@ export function initTable(
 
     // Load sort and filters via URL param only if given
     // Otherwise load from local storage to resume user session
-    if (sort === undefined && filter === undefined && (savedState.sorts || savedState.filters)) {
+    if (sort === undefined && filter === undefined && (savedState?.sorts || savedState?.filters)) {
       return { savedState: { sorts: savedState.sorts, filters: savedState.filters } }
     }
 
