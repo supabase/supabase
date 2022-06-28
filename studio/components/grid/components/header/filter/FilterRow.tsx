@@ -46,7 +46,10 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onColumnChange(column: string | number) {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+      const formattedExistingFilters = Array.isArray(existingFilters)
+        ? existingFilters
+        : [existingFilters]
+      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [_, operator, value] = filter.split(':')
           return `${column}:${operator}:${value}`
@@ -64,7 +67,10 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   function onOperatorChange(operator: string | number) {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+      const formattedExistingFilters = Array.isArray(existingFilters)
+        ? existingFilters
+        : [existingFilters]
+      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [column, _, value] = filter.split(':')
           const selectedOperator = FilterOperatorOptions.find((option) => option.value === operator)
@@ -92,7 +98,10 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   const updateFilterValue = (payload: { filterIdx: number; value: Filter }) => {
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
-      const updatedFilters = existingFilters.map((filter: string, idx: number) => {
+      const formattedExistingFilters = Array.isArray(existingFilters)
+        ? existingFilters
+        : [existingFilters]
+      const updatedFilters = formattedExistingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
           const [column, operator] = filter.split(':')
           return `${column}:${operator}:${payload.value.value}`

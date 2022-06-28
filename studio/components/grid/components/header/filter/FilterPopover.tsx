@@ -9,7 +9,7 @@ import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 const FilterPopover: FC = () => {
   const [{ filter: filters }]: any = useUrlState({ arrayKeys: ['filter'] })
   const btnText =
-    filters.length > 0
+    (filters || []).length > 0
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
       : 'Filter'
 
