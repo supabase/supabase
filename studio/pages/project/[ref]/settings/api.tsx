@@ -284,81 +284,81 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 }
                 layout="horizontal"
               />
-              <Flag name="jwtSecretUpdate">
-                <div className="space-y-3">
-                  <div className="dark:bg-bg-alt-dark bg-bg-alt-light dark:border-dark rounded-md border p-3 px-6 shadow-sm">
-                    {isUpdatingJwtSecret ? (
-                      <div className="flex items-center space-x-2">
-                        <IconLoader className="animate-spin" size={14} />
-                        <p className="text-sm">
-                          Updating JWT secret: {jwtSecretUpdateProgressMessage}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="w-full space-y-2">
-                        <div className="flex w-full items-center justify-between">
-                          <div className="flex flex-col space-y-1">
-                            <Typography.Text>Generate a new JWT secret</Typography.Text>
-                            <p className="text-sm opacity-50">
-                              A random secret will be created, or you can create your own.
-                            </p>
-                          </div>
-                          <div className="flex flex-col items-end">
-                            {isUpdatingJwtSecret ? (
-                              <Button loading type="secondary">
-                                Updating JWT secret...
+              <div className="space-y-3">
+                <div className="dark:bg-bg-alt-dark bg-bg-alt-light dark:border-dark rounded-md border p-3 px-6 shadow-sm">
+                  {isUpdatingJwtSecret ? (
+                    <div className="flex items-center space-x-2">
+                      <IconLoader className="animate-spin" size={14} />
+                      <p className="text-sm">
+                        Updating JWT secret: {jwtSecretUpdateProgressMessage}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="w-full space-y-2">
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text>Generate a new JWT secret</Typography.Text>
+                          <p className="text-sm opacity-50">
+                            A random secret will be created, or you can create your own.
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          {isUpdatingJwtSecret ? (
+                            <Button loading type="secondary">
+                              Updating JWT secret...
+                            </Button>
+                          ) : (
+                            <Dropdown
+                              align="end"
+                              side="bottom"
+                              overlay={
+                                <>
+                                  <Dropdown.Item
+                                    onClick={() => setIsGeneratingKey(true)}
+                                    icon={<IconRefreshCw size={16} />}
+                                  >
+                                    Generate a random secret
+                                  </Dropdown.Item>
+                                  <Dropdown.Seperator />
+                                  <Dropdown.Item
+                                    onClick={() => setIsCreatingKey(true)}
+                                    icon={<IconPenTool size={16} />}
+                                  >
+                                    Create my own secret
+                                  </Dropdown.Item>
+                                </>
+                              }
+                            >
+                              <Button as="span" type="default" iconRight={<IconChevronDown />}>
+                                Generate a new secret
                               </Button>
-                            ) : (
-                              <Dropdown
-                                align="end"
-                                side="bottom"
-                                overlay={
-                                  <>
-                                    <Dropdown.Item
-                                      onClick={() => setIsGeneratingKey(true)}
-                                      icon={<IconRefreshCw size={16} />}
-                                    >
-                                      Generate a random secret
-                                    </Dropdown.Item>
-                                    <Dropdown.Seperator />
-                                    <Dropdown.Item
-                                      onClick={() => setIsCreatingKey(true)}
-                                      icon={<IconPenTool size={16} />}
-                                    >
-                                      Create my own secret
-                                    </Dropdown.Item>
-                                  </>
-                                }
-                              >
-                                <Button as="span" type="default" iconRight={<IconChevronDown />}>
-                                  Generate a new secret
-                                </Button>
-                              </Dropdown>
-                            )}
-                          </div>
+                            </Dropdown>
+                          )}
                         </div>
                       </div>
-                    )}
-                  </div>
-                  {isJwtSecretUpdateFailed ? (
-                    <Alert withIcon variant="warning" title="Failed to update JWT secret">
-                      Please try again. If the failures persist, please contact Supabase support
-                      with the following details: <br />
-                      Change tracking ID: {changeTrackingId} <br />
-                      Error message: {jwtSecretUpdateErrorMessage}
-                    </Alert>
-                  ) : (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="This will invalidate all existing API keys!"
-                    >
-                      Generating a new JWT secret will invalidate <u>all</u> of your API keys, including your <code>service_role</code> and <code>anon</code> keys. Your project will also be restarted during this process, which will terminate
-                      any existing connections.
-                    </Alert>
+                    </div>
                   )}
                 </div>
-              </Flag>
+                {isJwtSecretUpdateFailed ? (
+                  <Alert withIcon variant="warning" title="Failed to update JWT secret">
+                    Please try again. If the failures persist, please contact Supabase support with
+                    the following details: <br />
+                    Change tracking ID: {changeTrackingId} <br />
+                    Error message: {jwtSecretUpdateErrorMessage}
+                  </Alert>
+                ) : (
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="This will invalidate all existing API keys!"
+                  >
+                    Generating a new JWT secret will invalidate <u>all</u> of your API keys,
+                    including your <code>service_role</code> and <code>anon</code> keys. Your
+                    project will also be restarted during this process, which will terminate any
+                    existing connections.
+                  </Alert>
+                )}
+              </div>
             </Panel.Content>
           </Panel>
         </section>
