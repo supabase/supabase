@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { FC, FormEvent, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
+import { IconSearch, IconInfo, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -60,11 +61,18 @@ const PITRBackupSelection: FC<Props> = () => {
   if (!configuration.walg_enabled) {
     // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
     return (
-      <UpgradeToPro
-        primaryText="Free Plan does not include project backups."
-        projectRef={projectRef}
-        secondaryText="Please upgrade to Pro plan for access to point in time recovery backups."
-      />
+      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
+        <div className="flex space-x-3">
+          <IconInfo size={20} strokeWidth={1.5} />
+          <p className="text-sm">
+            Point in time backups is an Enterprise feature. Reach out to us{' '}
+            <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <a className="text-brand-900">here</a>
+            </Link>{' '}
+            if you're interested!
+          </p>
+        </div>
+      </div>
     )
   } else if (!hasPhysicalBackups) {
     return <BackupsEmpty />
