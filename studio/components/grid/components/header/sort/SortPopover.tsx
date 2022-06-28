@@ -1,8 +1,11 @@
 import React, { FC } from 'react'
 import { Button, IconList, IconChevronDown, Popover } from '@supabase/ui'
-import { DropdownControl } from '../../common'
-import { useDispatch, useTrackedState } from '../../../store'
+
+import { useUrlState } from 'hooks'
+import { useDispatch, useTrackedState } from 'components/grid/store'
+import { DropdownControl } from 'components/grid/components/common'
 import SortRow from './SortRow'
+import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 
 const SortPopover: FC = () => {
   const state = useTrackedState()
@@ -32,10 +35,15 @@ export default SortPopover
 const Sort: FC = () => {
   const state = useTrackedState()
   const dispatch = useDispatch()
+
+  const [{ sort: sorts }, setParams] = useUrlState({ arrayKeys: ['sort'] })
+  const formattedSorts = formatSortURLParams(sorts as string[])
+
   const columns = state?.table?.columns!.filter((x) => {
     const found = state.sorts.find((y) => y.column == x.name)
     return !found
   })
+
   const dropdownOptions =
     columns?.map((x) => {
       return { value: x.name, label: x.name }
