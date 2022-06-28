@@ -80,7 +80,6 @@ function InviteMemberModal({ organization, members = [], user }: any) {
       <Modal
         size="small"
         className="!overflow-visible"
-        icon={<IconKey size="xlarge" background="brand" />}
         visible={isOpen}
         onCancel={toggle}
         header="Invite a member to this organization"
@@ -88,46 +87,38 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         layout="vertical"
         hideFooter
       >
-        <div className="w-full space-y-4 py-4">
-          <Modal.Content>
-            <div className="text-center">
-              <Form
-                validate={(values) => {
-                  const errors: any = {}
-                  if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-                    errors.email = 'Please enter a valid email address'
-                  }
-                  return errors
-                }}
-                initialValues={initialValues}
-                onSubmit={addMember}
-              >
-                {() => (
-                  <div className="w-full py-4">
-                    <div className="space-y-4">
-                      <Modal.Content>
-                        <Input
-                          id="email"
-                          icon={<IconMail />}
-                          autoFocus
-                          placeholder="Enter email address"
-                          onChange={onEmailInputChange}
-                          label="Email address"
-                        />
-                      </Modal.Content>
+        <Modal.Content>
+          <Form
+            validate={(values) => {
+              const errors: any = {}
+              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+                errors.email = 'Please enter a valid email address'
+              }
+              return errors
+            }}
+            initialValues={initialValues}
+            onSubmit={addMember}
+          >
+            {() => (
+              <div className="w-full py-4">
+                <div className="space-y-4">
+                  <Input
+                    id="email"
+                    icon={<IconMail />}
+                    autoFocus
+                    placeholder="Enter email address"
+                    onChange={onEmailInputChange}
+                    label="Email address"
+                  />
 
-                      <Modal.Content>
-                        <Button block size="medium" htmlType="submit" loading={addMemberLoading}>
-                          Invite new member
-                        </Button>
-                      </Modal.Content>
-                    </div>
-                  </div>
-                )}
-              </Form>
-            </div>
-          </Modal.Content>
-        </div>
+                  <Button block size="medium" htmlType="submit" loading={addMemberLoading}>
+                    Invite new member
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Form>
+        </Modal.Content>
       </Modal>
     </>
   )
