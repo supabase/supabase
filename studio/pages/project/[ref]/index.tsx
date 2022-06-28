@@ -7,12 +7,10 @@ import { IS_PLATFORM } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { NextPageWithLayout } from 'types'
-import { toJS } from 'mobx'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
-
   const project = ui.selectedProject
 
   const projectName =
