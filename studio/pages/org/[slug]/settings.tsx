@@ -579,7 +579,6 @@ const OwnerDropdown = observer(({ members, member }: any) => {
     const response = await post(`${API_URL}/organizations/${orgSlug}/transfer`, {
       org_id: orgId,
       member_id: member.id,
-      stripe_customer_id,
     })
     if (response.error) {
       ui.setNotification({
