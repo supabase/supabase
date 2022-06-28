@@ -13,7 +13,7 @@ const DocsLayout = ({
 }: {
   meta: { title: string; description: string }
   children: JSX.Element
-  toc: any
+  toc?: any
   menuItems: any
   currentPage: string
 }) => {
