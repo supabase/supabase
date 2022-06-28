@@ -22,7 +22,7 @@ export function getDocsBySlug(slug: string) {
 }
 
 export function getAllDocs() {
-  const slugs = walk('docs')
+  const slugs = walk(docsDirectory)
   const docs = slugs.map((slug) => getDocsBySlug(slug))
 
   return docs
