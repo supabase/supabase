@@ -8,7 +8,7 @@ import { FilterOperatorOptions } from './components/header/filter'
 import { Filter } from 'components/grid/types'
 
 export function defaultErrorHandler(error: any) {
-  console.log('Supabase grid error: ', error)
+  console.error('Supabase grid error: ', error)
 }
 
 /**
@@ -250,7 +250,6 @@ function saveStorage(
     ...(sorts !== undefined && { sorts }),
     ...(filters !== undefined && { filters }),
   }
-  console.log('Save storage', config)
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const savedStr = localStorage.getItem(storageKey)
 

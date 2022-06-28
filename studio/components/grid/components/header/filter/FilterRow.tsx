@@ -13,8 +13,7 @@ type FilterRowProps = {
   filterIdx: number
 }
 
-// [JOSHEN TODO] Area of improvement: Input field loses focus after the debounce (because of useUrlState?)
-// [JOSHEN TODO] Area of improvement: Pretty sure we can refactor for DRY for updates on each column, operator and value
+// [Area of improvement] Input field loses focus after the debounce (because of useUrlState?)
 const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   const state = useTrackedState()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter'] })
