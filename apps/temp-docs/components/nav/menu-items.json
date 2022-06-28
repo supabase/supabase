@@ -1,42 +1,32 @@
 {
-  "Docs": {
+  "Guides": {
     "Overview": [
       { "text": "Introduction", "link": "/" },
       { "text": "Architecture", "link": "/architecture" },
-      { "text": "Database", "link": "/guides/database" },
-      { "text": "Auth", "link": "/guides/auth" },
-      { "text": "Storage", "link": "/guides/storage" },
-      { "text": "APIs", "link": "/guides/apis" },
-      { "text": "Examples and Resources", "link": "/guides/examples" }
-    ],
-    "Tutorials": [
-      { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
-      { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
-      { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
-      { "text": "Quickstart: React", "link": "/guides/with-react" },
-      { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
-      { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
-      { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
-    ],
-    "See Also": [
-      { "text": "FAQs", "link": "/faqs" },
-      { "text": "Going into Prod Checklist", "link": "/going-into-prod" },
-      { "text": "Contributing", "link": "/handbook/contributing" },
-      { "text": "SupaSquad", "link": "/handbook/supasquad" },
-      { "text": "Terms of Service", "link": "/company/terms" },
-      { "text": "Privacy Policy", "link": "/company/privacy" },
-      { "text": "Acceptable Use Policy", "link": "/company/aup" }
-    ]
-  },
-  "Guides": {
-    "Guides": [
-      { "text": "Overview", "link": "/guides" },
+      { "text": "Supabase Platform", "link": "/guides/hosting/platform" },
+      { "text": "Examples and Resources", "link": "/guides/examples" },
       { "text": "Local Development", "link": "/guides/local-development" }
     ],
+    "QuickStarts": [
+      { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
+      { "text": "Quickstart: Expo", "link": "/guides/with-expo" },
+      { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
+      { "text": "Quickstart: Ionic Angular", "link": "/guides/with-ionic-angular" },
+      { "text": "Quickstart: Ionic React", "link": "/guides/with-ionic-react" },
+      { "text": "Quickstart: Ionic Vue", "link": "/guides/with-ionic-vue" },
+      { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
+      { "text": "Quickstart: React", "link": "/guides/with-react" },
+      { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },
+      { "text": "Quickstart: SolidJS", "link": "/guides/with-solidjs" },
+      { "text": "Quickstart: Svelte", "link": "/guides/with-svelte" },
+      { "text": "Quickstart: SvelteKit", "link": "/guides/with-sveltekit" },
+      { "text": "Quickstart: Vue 3", "link": "/guides/with-vue-3" }
+    ],
     "Database": [
-      { "text": "Introduction", "link": "/guides/database/introduction" },
-      { "text": "Tables", "link": "/guides/database/tables" },
-      { "text": "Functions", "link": "/guides/database/functions" },
+      { "text": "Database", "link": "/guides/database" },
+      { "text": "Connecting", "link": "/guides/database/connecting-to-postgres" },
+      { "text": "Tables and Data", "link": "/guides/database/tables" },
+      { "text": "Database Functions", "link": "/guides/database/functions" },
       { "text": "Full Text Search", "link": "/guides/database/full-text-search" },
       {
         "text": "Extensions",
@@ -56,23 +46,6 @@
           {
             "text": "uuid-ossp: Unique Identifiers",
             "link": "/guides/database/extensions/uuid-ossp"
-          }
-        ]
-      },
-      {
-        "text": "Connecting to Postgres",
-        "sections": [
-          {
-            "text": "Overview",
-            "link": "/guides/database/connecting/connecting-to-postgres"
-          },
-          {
-            "text": "Direct Connections",
-            "link": "/guides/database/connecting/direct-connections"
-          },
-          {
-            "text": "Connection Pooling",
-            "link": "/guides/database/connecting/connection-pooling"
           }
         ]
       },
@@ -98,11 +71,13 @@
         ]
       }
     ],
+    "APIs": [
+      { "text": "APIs", "link": "/guides/apis" },
+      { "text": "Generating Types", "link": "/guides/generating-types" }
+    ],
+    "Functions": [{ "text": "Edge Functions", "link": "/guides/functions" }],
     "Auth": [
-      {
-        "text": "Introduction",
-        "link": "/guides/auth/intro"
-      },
+      { "text": "Auth", "link": "/guides/auth" },
       {
         "text": "Authentication",
         "sections": [
@@ -144,28 +119,76 @@
         ]
       }
     ],
+    "Storage": [{ "text": "Storage", "link": "/guides/storage" }],
+    "Platform": [
+      { "text": "Logging", "link": "/guides/platform/logging" },
+      { "text": "Metrics", "link": "/guides/platform/metrics" },
+      { "text": "Production Readiness", "link": "/guides/platform/going-into-prod" },
+      { "text": "Performance Tuning", "link": "/guides/platform/performance" },
+      { "text": "Permissions", "link": "/guides/platform/permissions" }
+    ],
+    "Self Hosting": [
+      { "text": "Overview", "link": "/guides/hosting/overview" },
+      { "text": "With Docker", "link": "/guides/hosting/docker" }
+    ],
     "Integrations": [
+      {
+        "text": "Appsmith",
+        "link": "/guides/integrations/appsmith"
+      },
       {
         "text": "Auth0",
         "link": "/guides/integrations/auth0"
+      },
+      {
+        "text": "Clerk",
+        "link": "/guides/integrations/clerk"
+      },
+      {
+        "text": "Dashibase",
+        "link": "/guides/integrations/dashibase"
       },
       {
         "text": "Draftbit",
         "link": "/guides/integrations/draftbit"
       },
       {
+        "text": "pgMustard",
+        "link": "/guides/integrations/pgmustard"
+      },
+      {
+        "text": "Plasmic",
+        "link": "/guides/integrations/plasmic"
+      },
+      {
         "text": "Prisma",
         "link": "/guides/integrations/prisma"
+      },
+      {
+        "text": "Snaplet",
+        "link": "/guides/integrations/snaplet"
+      },
+      {
+        "text": "Stych",
+        "link": "/guides/integrations/stych"
+      },
+      {
+        "text": "SuperTokens",
+        "link": "/guides/integrations/supertokens"
       },
       {
         "text": "Vercel",
         "link": "/guides/integrations/vercel"
       }
     ],
-    "Self Hosting": [
-      { "text": "Overview", "link": "/guides/hosting/overview" },
-      { "text": "Supabase Platform", "link": "/guides/hosting/platform" },
-      { "text": "With Docker", "link": "/guides/hosting/docker" }
+    "See Also": [
+      { "text": "FAQs", "link": "/faqs" },
+      { "text": "Contributing", "link": "/handbook/contributing" },
+      { "text": "SupaSquad", "link": "/handbook/supasquad" },
+      { "text": "Terms of Service", "link": "/company/terms" },
+      { "text": "Privacy Policy", "link": "/company/privacy" },
+      { "text": "Acceptable Use Policy", "link": "/company/aup" },
+      { "text": "Service Level Agreement", "link": "/company/sla" }
     ]
   },
   "Reference": {

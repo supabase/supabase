@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 
 const SideBar = ({ menuItems }: { menuItems: any }) => {
   const { asPath } = useRouter()
+
   return (
     <div className="dark:bg-scale-200 dark:border-scale-400 thin-scrollbar sidebar-width sticky top-0 flex h-screen overflow-y-scroll border-r py-4">
       <Menu className="w-full">

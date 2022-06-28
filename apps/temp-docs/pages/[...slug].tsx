@@ -23,8 +23,8 @@ export default function Doc({
   let page
   switch (asPath) {
     case '/guides':
-    case '/guides/local-development':
-    case /\/guides\/[a-zA-Z]*\/[a-zA-Z\-]*/.test(asPath) && asPath:
+    case '/architecture':
+    case asPath.includes('/guides') && asPath:
       page = 'Guides'
       break
     case asPath.includes('/reference') && asPath:
