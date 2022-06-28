@@ -31,7 +31,7 @@ export default function Doc({
       page = 'Reference'
       break
     default:
-      page = 'Docs'
+      page = 'Guides'
       break
   }
 

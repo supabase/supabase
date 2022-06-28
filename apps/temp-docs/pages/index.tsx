@@ -14,7 +14,7 @@ export default function Home({
   content: any
 }) {
   return (
-    <Layout meta={meta} menuItems={menuItems['Docs']} currentPage="Docs">
+    <Layout meta={meta} menuItems={menuItems['Guides']} currentPage="Guides">
       <MDXProvider components={components}>
         <MDXRemote {...content} />
       </MDXProvider>

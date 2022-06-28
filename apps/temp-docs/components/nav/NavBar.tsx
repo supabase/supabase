@@ -22,14 +22,13 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
   }, [isDarkMode])
 
   const pageLinks = [
-    { text: 'Overview', active: currentPage == 'Docs', link: '/' },
-    { text: 'Guides', active: currentPage == 'Guides', link: '/guides' },
+    { text: 'Guides', active: currentPage == 'Docs', link: '/' },
     {
       text: 'Reference',
       active: currentPage == 'Reference',
       link: '/reference/javascript/supabase-client',
     },
-    { text: 'Discussions', active: currentPage == 'Discussions', link: '/discussions' },
+    { text: 'Forum', active: currentPage == 'Discussions', link: '/discussions' },
   ]
 
   return (
