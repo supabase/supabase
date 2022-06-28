@@ -46,6 +46,7 @@ const Home: NextPageWithLayout = () => {
     setSelectedProjectToDelete(undefined)
   }
 
+  // [Terry: make sure to remove when we're done. Restoring doesn't happen from here anymore]
   const onRestoreProject = async (project: Project) => {
     app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
     await post(`${API_URL}/projects/${project.ref}/restore`, {})
