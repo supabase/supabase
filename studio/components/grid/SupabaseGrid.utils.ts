@@ -32,7 +32,6 @@ export function cleanupProps(props: SupabaseGridProps) {
   }
 }
 
-// [JOSHEN TODO] Write tests for this
 export function formatSortURLParams(sort?: string[]) {
   return (
     Array.isArray(sort)
@@ -48,7 +47,6 @@ export function formatSortURLParams(sort?: string[]) {
   ) as Sort[]
 }
 
-// [JOSHEN TODO] Write tests for this
 export function formatFilterURLParams(filter?: string[]): Filter[] {
   return (
     Array.isArray(filter)
