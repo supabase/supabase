@@ -16,8 +16,12 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   const { ref } = router.query
   const { ui } = useStore()
   const subscriptionStats = useSubscriptionStats()
+  const {
+    total_free_projects: totalFreeProjects,
+    total_active_free_projects: totalActiveFreeProjects,
+    total_paused_free_projects: totalPausedFreeProjects,
+  } = subscriptionStats
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
-  console.log(subscriptionStats)
 
   return (
     <>
@@ -54,18 +58,24 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                 </Link>
               </div>
 
-              <div className="mt-4 flex gap-4 border-t pt-8">
-                <IconAlertCircle className="text-red-900" size={35} strokeWidth={2} />
-                <div>
-                  <p className="text-md">
-                    Your account can only have <u>{freeProjectsLimit} free projects.</u>
-                  </p>
-                  <p className="text-scale-900 mt-2 text-sm">
-                    To restore this project you'll need to pause or delete an existing free project
-                    first.
-                  </p>
+              {totalActiveFreeProjects > totalFreeProjects ? (
+                <div className="mt-4 flex gap-4 border-t pt-8">
+                  <IconAlertCircle className="text-red-900" size={35} strokeWidth={2} />
+                  <div>
+                    <p className="text-md">
+                      Your account can only have <u>{freeProjectsLimit} free projects.</u>
+                    </p>
+                    <p className="text-scale-900 mt-2 text-sm">
+                      To restore this project you'll need to pause or delete an existing free
+                      project.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <p className="text-scale-900 mt-4 text-sm">
+                  Restore this project and get back to building the next big thing!
+                </p>
+              )}
             </div>
           </div>
         </div>
