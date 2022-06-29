@@ -1,33 +1,33 @@
-import * as React from 'react'
+import { FC, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
+import { ProjectLayoutWithAuth } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-import ProjectLayout from 'components/layouts'
-
-type ProjectBuildingPageState = {} & any
-const ProjectBuildingPage: React.FC<ProjectBuildingPageState> = () => {
-  const { ui } = useStore()
-  const project: any = ui.selectedProject
-  return (
-    <ProjectLayout title="Project Building">
-      <RedirectToDashboard projectRef={project?.ref ?? ''} />
-    </ProjectLayout>
-  )
+const ProjectBuildingPage: NextPageWithLayout = () => {
+  return <RedirectToDashboard />
 }
-export default withAuth(observer(ProjectBuildingPage))
 
-type RedirectToDashboardState = {
-  projectRef: string
-}
-const RedirectToDashboard: React.FC<RedirectToDashboardState> = ({ projectRef }) => {
+ProjectBuildingPage.getLayout = (page) => (
+  <ProjectLayoutWithAuth title="Project Building">{page}</ProjectLayoutWithAuth>
+)
+
+export default ProjectBuildingPage
+
+const RedirectToDashboard: FC = () => {
   const router = useRouter()
+  const { ref } = router.query
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Use redirect to reload store data properly after project has been
     // been created or unpaused, this is necessarily especially for unpausing
     // so that the dashboard fetches the updated connection strings
-    window.location.replace(`/project/${projectRef}`)
+    // window.location.replace(`/project/${ref}`)
+
+    // TODO: for experiment only
+    // Cos we already pulling new connectionString after project building/restoring
+    // just use normal router.push is enough
+    router.push(`/project/${ref}`)
   }, [])
+
   return null
 }

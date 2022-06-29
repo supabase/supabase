@@ -1,25 +1,28 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Fill you client credential here.
-const db = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_KEY')
-
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event.request))
 })
 
 async function handleRequest(request) {
-  try {
-    // Uncomment this part to start querying your database using Supabase client.
-    //
-    // const { data, error } = await db
-    //   .from("TABLE")
-    //   .select("name");
-    // console.log(JSON.stringify(data, null, 2));
-  } catch (error) {
+  const db = createClient(
+    'YOUR_SUPABASE_URL', // Replace with your project's URL
+    'YOUR_SUPABASE_KEY', // Replace with your project's anon/service_role key
+    {
+      fetch: fetch.bind(globalThis), // Tell Supabase Client to use Cloudflare Workers' global `fetch` API to make requests
+    }
+  )
+  const { data, error } = await db.from('YOUR_TABLE_NAME').select('*')
+
+  if (error) {
     console.log(error)
+    return new Response(error.message || error.toString(), {
+      status: 500,
+    })
   }
 
-  return new Response('Hello worker!', {
-    headers: { 'content-type': 'text/plain' },
+  return new Response(JSON.stringify(data), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
   })
 }

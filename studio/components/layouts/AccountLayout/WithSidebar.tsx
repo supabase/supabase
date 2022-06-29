@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { CSSProperties, FC, ReactNode } from 'react'
-import { Menu, Typography, IconArrowUpRight, Badge } from '@supabase/ui'
+import { FC, ReactNode } from 'react'
 import { isUndefined } from 'lodash'
+import { Menu, Typography, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
+import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 
 interface Props {
@@ -11,7 +12,6 @@ interface Props {
   header?: ReactNode
   subitems?: any[]
   subitemsParentKey?: number
-  sidebarStyle?: CSSProperties
   hideSidebar?: boolean
   customSidebarContent?: ReactNode
   children: ReactNode
@@ -22,7 +22,6 @@ const WithSidebar: FC<Props> = ({
   header,
   breadcrumbs = [],
   children,
-  sidebarStyle,
   links,
   subitems,
   subitemsParentKey,
@@ -32,20 +31,23 @@ const WithSidebar: FC<Props> = ({
   const noContent = !links && !customSidebarContent
   const linksHaveHeaders = links && links[0].heading
 
+  const ongoingIncident = useFlag('ongoingIncident')
+  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
   return (
-    <div className={`flex `}>
+    <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
-          className="
-            w-64 h-screen overflow-auto bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark hide-scrollbar
-            border-r dark:border-dark
-          "
-          style={sidebarStyle}
+          style={{ height: maxHeight, maxHeight }}
+          className={[
+            'bg-sidebar-linkbar-light dark:bg-sidebar-linkbar-dark h-full',
+            'hide-scrollbar dark:border-dark w-64 overflow-auto border-r',
+          ].join(' ')}
         >
           {title && (
             <div className="mb-2">
-              <div className="max-h-12 h-12 flex items-center border-b dark:border-dark px-6">
+              <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6">
                 <Typography.Title level={4} className="mb-0">
                   {title}
                 </Typography.Title>
@@ -74,9 +76,9 @@ const WithSidebar: FC<Props> = ({
           </div>
         </div>
       )}
-      <div className="flex-1 flex flex-col h-screen">
+      <div className="flex flex-1 flex-col">
         <LayoutHeader breadcrumbs={breadcrumbs} />
-        <div className="flex-grow flex-1 overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-auto">{children}</div>
       </div>
     </div>
   )
@@ -85,10 +87,10 @@ export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return links.map((x: any) => (
-    <div key={x.heading} className="py-5 border-b dark:border-dark px-3">
-      <Menu.Group title={x.heading} />
+    <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
+      {x.heading && <Menu.Group title={x.heading} />}
       {x.versionLabel && (
-        <div className="px-3 mb-1">
+        <div className="mb-1 px-3">
           <Badge color="yellow">{x.versionLabel}</Badge>
         </div>
       )}
@@ -104,7 +106,7 @@ const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
 }
 const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
   return (
-    <ul className="dash-product-menu space-y-1">
+    <ul className="space-y-1">
       {links.map((x: any, i: number) => {
         // disable active state for link with subitems
         const isActive = x.isActive && !subitems
@@ -145,6 +147,15 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
 
 const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, external }) => {
   if (isUndefined(href)) {
+    let icon
+    if (external) {
+      icon = <IconArrowUpRight size={'tiny'} />
+    }
+
+    if (label === 'Logout') {
+      icon = <IconLogOut size={'tiny'} />
+    }
+
     return (
       <Menu.Item
         rounded
@@ -154,9 +165,9 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
         }}
         active={isActive ? true : false}
         onClick={onClick || (() => {})}
-        icon={external && <IconArrowUpRight size={'tiny'} />}
+        icon={icon}
       >
-        {isSubitem ? <Typography.Text small>{label}</Typography.Text> : label}
+        {isSubitem ? <p className="text-sm">{label}</p> : label}
       </Menu.Item>
     )
   }
@@ -164,18 +175,22 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
   return (
     <Link href={href || ''}>
       <a className="block" target={external ? '_blank' : '_self'}>
-        <Menu.Item
-          rounded
-          key={id}
-          style={{
-            marginLeft: isSubitem && '.5rem',
-          }}
-          active={isActive ? true : false}
+        <button
+          className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
           onClick={onClick || (() => {})}
-          icon={external && <IconArrowUpRight size={'tiny'} />}
         >
-          {isSubitem ? <Typography.Text small>{label}</Typography.Text> : label}
-        </Menu.Item>
+          {external && (
+            <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
+              <IconArrowUpRight size={'tiny'} />
+            </span>
+          )}
+          <span
+            title={label}
+            className="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
+          >
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+        </button>
       </a>
     </Link>
   )

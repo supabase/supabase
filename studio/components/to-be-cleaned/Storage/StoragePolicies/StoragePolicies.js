@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
+import { IconLoader, Typography } from '@supabase/ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'
@@ -8,15 +8,17 @@ import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
-import ConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModalV2'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-import PolicyEditorModal from 'components/to-be-cleaned/Auth/PolicyEditorModal'
+import { PolicyEditorModal } from 'components/interfaces/Authentication/Policies'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
   const storageStore = useStorageStore()
-  const { buckets } = storageStore
+  const { loaded, buckets } = storageStore
+
+  const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
 
   const [policies, setPolicies] = useState([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
@@ -140,70 +142,75 @@ const StoragePolicies = () => {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-full">
-      <Typography.Title level={4} className="mb-0">
-        Storage policies
-      </Typography.Title>
-      <Typography.Text className="opacity-50">
+    <div className="flex min-h-full w-full flex-col">
+      <h4 className="text-xl">Storage policies</h4>
+      <p className="text-scale-1100">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
-      </Typography.Text>
+      </p>
 
-      <div className="space-y-4 mt-4">
-        {buckets.length === 0 && <StoragePoliciesPlaceholder />}
+      {!loaded ? (
+        <div className="flex h-full items-center justify-center">
+          <IconLoader className="animate-spin" size={16} />
+        </div>
+      ) : (
+        <div className="mt-4 space-y-4">
+          {buckets.length === 0 && <StoragePoliciesPlaceholder />}
 
-        {/* Sections for policies grouped by buckets */}
-        {buckets.map((bucket) => {
-          const bucketPolicies = get(
-            find(formattedStorageObjectPolicies, { name: bucket.name }),
-            ['policies'],
-            []
-          )
-          return (
-            <StoragePoliciesBucketRow
-              key={bucket.name}
-              table="objects"
-              label={bucket.name}
-              bucket={bucket}
-              policies={bucketPolicies}
-              onSelectPolicyAdd={onSelectPolicyAdd}
-              onSelectPolicyEdit={onSelectPolicyEdit}
-              onSelectPolicyDelete={onSelectPolicyDelete}
-            />
-          )
-        })}
+          {/* Sections for policies grouped by buckets */}
+          {buckets.map((bucket) => {
+            const bucketPolicies = get(
+              find(formattedStorageObjectPolicies, { name: bucket.name }),
+              ['policies'],
+              []
+            )
+            return (
+              <StoragePoliciesBucketRow
+                key={bucket.name}
+                table="objects"
+                label={bucket.name}
+                bucket={bucket}
+                policies={bucketPolicies}
+                onSelectPolicyAdd={onSelectPolicyAdd}
+                onSelectPolicyEdit={onSelectPolicyEdit}
+                onSelectPolicyDelete={onSelectPolicyDelete}
+              />
+            )
+          })}
 
-        <div className="w-full border-b border-gray-600 !mb-4" />
-        <Typography.Text className="opacity-50">
-          You may also write policies for the tables under the storage schema directly for greater
-          control
-        </Typography.Text>
+          <div className="!mb-4 w-full border-b border-gray-600" />
+          <Typography.Text className="opacity-50">
+            You may also write policies for the tables under the storage schema directly for greater
+            control
+          </Typography.Text>
 
-        {/* Section for policies under storage.objects that are not tied to any buckets */}
-        <StoragePoliciesBucketRow
-          table="objects"
-          label="Other policies under storage.objects"
-          policies={ungroupedPolicies}
-          onSelectPolicyAdd={onSelectPolicyAdd}
-          onSelectPolicyEdit={onSelectPolicyEdit}
-          onSelectPolicyDelete={onSelectPolicyDelete}
-        />
+          {/* Section for policies under storage.objects that are not tied to any buckets */}
+          <StoragePoliciesBucketRow
+            table="objects"
+            label="Other policies under storage.objects"
+            policies={ungroupedPolicies}
+            onSelectPolicyAdd={onSelectPolicyAdd}
+            onSelectPolicyEdit={onSelectPolicyEdit}
+            onSelectPolicyDelete={onSelectPolicyDelete}
+          />
 
-        {/* Section for policies under storage.buckets */}
-        <StoragePoliciesBucketRow
-          table="buckets"
-          label="Policies under storage.buckets"
-          policies={storageBucketPolicies}
-          onSelectPolicyAdd={onSelectPolicyAdd}
-          onSelectPolicyEdit={onSelectPolicyEdit}
-          onSelectPolicyDelete={onSelectPolicyDelete}
-        />
-      </div>
+          {/* Section for policies under storage.buckets */}
+          <StoragePoliciesBucketRow
+            table="buckets"
+            label="Policies under storage.buckets"
+            policies={storageBucketPolicies}
+            onSelectPolicyAdd={onSelectPolicyAdd}
+            onSelectPolicyEdit={onSelectPolicyEdit}
+            onSelectPolicyDelete={onSelectPolicyDelete}
+          />
+        </div>
+      )}
 
       {/* Only used for adding policies to buckets */}
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
+        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -213,6 +220,7 @@ const StoragePolicies = () => {
       <PolicyEditorModal
         visible={showGeneralPolicyEditor}
         schema="storage"
+        roles={roles}
         table={isEditingPolicyForBucket.table}
         target={isEditingPolicyForBucket.bucket}
         selectedPolicyToEdit={selectedPolicyToEdit}
@@ -229,7 +237,6 @@ const StoragePolicies = () => {
         description={`This is permanent! Are you sure you want to delete the policy "${selectedPolicyToDelete.name}"`}
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"
-        selectedPolicyToDelete={selectedPolicyToDelete}
         onSelectCancel={onCancelPolicyDelete}
         onSelectConfirm={onDeletePolicy}
       />

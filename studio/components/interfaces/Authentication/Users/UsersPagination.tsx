@@ -18,13 +18,13 @@ const UsersPagination = () => {
   return (
     <nav className="flex items-center justify-between overflow-hidden" aria-label="Pagination">
       <div className="hidden sm:block">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-scale-900">
           Showing
-          <span className="px-1 font-medium text-gray-400">{PageState.fromRow}</span>
+          <span className="px-1 font-medium text-scale-1100">{PageState.fromRow}</span>
           to
-          <span className="px-1 font-medium text-gray-400">{PageState.toRow}</span>
+          <span className="px-1 font-medium text-scale-1100">{PageState.toRow}</span>
           of
-          <span className="px-1 font-medium text-gray-400">{PageState.totalUsers}</span>
+          <span className="px-1 font-medium text-scale-1100">{PageState.totalUsers}</span>
           results
         </p>
       </div>

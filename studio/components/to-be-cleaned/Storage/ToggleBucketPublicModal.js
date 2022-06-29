@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Modal, Alert, Button, Space } from '@supabase/ui'
+import { Modal, Alert, Button } from '@supabase/ui'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 const ToggleBucketPublicModal = ({
   visible = false,
@@ -31,27 +32,24 @@ const ToggleBucketPublicModal = ({
     : `This will make all objects in ${bucket.name} public`
 
   return (
-    <Modal
+    <ConfirmationModal
+      danger
       visible={visible}
       title={title}
-      size="large"
-      customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
-            Cancel
-          </Button>
-          <Button type="primary" loading={saving} onClick={onToggleBucketPublic}>
-            {saving ? 'Updating bucket' : 'Update bucket'}
-          </Button>
-        </Space>
+      children={
+        <div className="py-4">
+          <Modal.Content>
+            <Alert title={alertTitle} variant="warning" withIcon>
+              {alertDescription}
+            </Alert>
+          </Modal.Content>
+        </div>
       }
-    >
-      <div className="space-y-6 w-full pb-3">
-        <Alert title={alertTitle} variant="warning" withIcon>
-          {alertDescription}
-        </Alert>
-      </div>
-    </Modal>
+      buttonLabel="Update bucket"
+      buttonLoadingLabel="Updating bucket"
+      onSelectCancel={onSelectCancel}
+      onSelectConfirm={onToggleBucketPublic}
+    />
   )
 }
 

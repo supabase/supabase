@@ -1,24 +1,80 @@
 import useSWR from 'swr'
-import { FC, createContext, useContext, useState } from 'react'
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Typography, Input, IconAlertCircle, Modal, IconKey } from '@supabase/ui'
+import {
+  JwtSecretUpdateError,
+  JwtSecretUpdateProgress,
+  JwtSecretUpdateStatus,
+} from '@supabase/shared-types/out/events'
+import {
+  Alert,
+  Typography,
+  Input,
+  IconAlertCircle,
+  Modal,
+  IconKey,
+  Button,
+  Dropdown,
+  IconPenTool,
+  IconRefreshCw,
+  IconChevronDown,
+  IconLoader,
+  IconEye,
+  IconEyeOff,
+} from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
-import { SettingsLayout } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
-import MultiSelectUI from 'components/to-be-cleaned/MultiSelect'
+import { useStore, useJwtSecretUpdateStatus } from 'hooks'
+
+import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { DisplayApiSettings } from 'components/to-be-cleaned/DisplayProjectSettings'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+
+import { SettingsLayout } from 'components/layouts'
+import Flag from 'components/ui/Flag/Flag'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import MultiSelect from 'components/ui/MultiSelect'
+import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { NextPageWithLayout } from 'types'
+
+const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
+  [JwtSecretUpdateError.APIServicesConfigurationUpdateFailed]:
+    'failed to update configuration for API services',
+  [JwtSecretUpdateError.APIServicesRestartFailed]: 'failed to restart API services',
+  [JwtSecretUpdateError.DatabaseAdminAPIConfigurationUpdateFailed]:
+    'failed to update configuration for database admin API',
+  [JwtSecretUpdateError.PostgreSQLRestartFailed]: 'failed to restart PostgreSQL service',
+  [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update Supabase API key',
+  [JwtSecretUpdateError.APIGatewayUpdateFailed]: 'failed to update API Gateway',
+}
+
+const JWT_SECRET_UPDATE_PROGRESS_MESSAGES = {
+  [JwtSecretUpdateProgress.RestartedAPIServices]: 'restarted API services',
+  [JwtSecretUpdateProgress.RestartedPostgreSQL]: 'restarted PostgreSQL service',
+  [JwtSecretUpdateProgress.Started]: 'started updating',
+  [JwtSecretUpdateProgress.UpdatedAPIServicesConfiguration]:
+    'updated configuration for API services',
+  [JwtSecretUpdateProgress.UpdatedDatabaseAdminAPIConfiguration]:
+    'updated configuration for database admin API',
+  [JwtSecretUpdateProgress.UpdatedAPIGatewayConfiguration]: 'updated configuration for API Gateway',
+}
 
 const PageContext: any = createContext(null)
 
-const ApiSettings = () => {
+const ApiSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -46,27 +102,29 @@ const ApiSettings = () => {
   }
 
   return (
-    <SettingsLayout title="API Settings">
-      <PageContext.Provider value={PageState}>
-        <div className="content w-full h-full overflow-y-auto">
-          <ServiceList projectRef={ref} />
-        </div>
-      </PageContext.Provider>
-    </SettingsLayout>
+    <PageContext.Provider value={PageState}>
+      <div className="content h-full w-full overflow-y-auto">
+        <ServiceList projectRef={ref} />
+      </div>
+    </PageContext.Provider>
   )
 }
 
-export default withAuth(observer(ApiSettings))
+ApiSettings.getLayout = (page) => <SettingsLayout title="API Settings">{page}</SettingsLayout>
+
+export default observer(ApiSettings)
 
 const ServiceList: FC<any> = ({ projectRef }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = router.query
 
+  const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [customToken, setCustomToken] = useState<string>('')
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
-  const [isLoadingCreatingKey, setIsLoadingCreatingKey] = useState<boolean>(false)
+  const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
+    useState<boolean>(false)
 
   const {
     data,
@@ -77,17 +135,59 @@ const ServiceList: FC<any> = ({ projectRef }) => {
     `${API_URL}/projects/${projectRef}/config?app=postgrest`,
     get
   )
+  const {
+    changeTrackingId,
+    isError: isJwtSecretUpdateStatusError,
+    isLoading: isJwtSecretUpdateStatusLoading,
+    jwtSecretUpdateError,
+    jwtSecretUpdateProgress,
+    jwtSecretUpdateStatus,
+    mutateJwtSecretUpdateStatus,
+  }: any = useJwtSecretUpdateStatus(ref)
 
-  if (error) {
+  const { Failed, Updated, Updating } = JwtSecretUpdateStatus
+
+  const isJwtSecretUpdateFailed = jwtSecretUpdateStatus === Failed
+  const isNotUpdatingJwtSecret =
+    jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === Updated
+  const isUpdatingJwtSecret = jwtSecretUpdateStatus === Updating
+  const jwtSecretUpdateErrorMessage =
+    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
+  const jwtSecretUpdateProgressMessage =
+    JWT_SECRET_UPDATE_PROGRESS_MESSAGES[jwtSecretUpdateProgress as JwtSecretUpdateProgress]
+
+  const previousJwtSecretUpdateStatus = useRef()
+
+  useEffect(() => {
+    if (previousJwtSecretUpdateStatus.current === Updating) {
+      switch (jwtSecretUpdateStatus) {
+        case Updated:
+          mutateConfig()
+          mutateSettings()
+          ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
+          break
+        case Failed:
+          ui.setNotification({
+            category: 'error',
+            message: `JWT secret update failed: ${jwtSecretUpdateErrorMessage}`,
+          })
+          break
+      }
+    }
+
+    previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
+  }, [jwtSecretUpdateStatus])
+
+  if (error || isJwtSecretUpdateStatusError) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Error loading API settings</Typography.Title>
       </div>
     )
   }
-  if (!data) {
+  if (!data || isJwtSecretUpdateStatusLoading) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
         <Typography.Title level={3}>Loading...</Typography.Title>
       </div>
     )
@@ -100,50 +200,40 @@ const ServiceList: FC<any> = ({ projectRef }) => {
   const apiService = services.find((x: any) => x.app.id == API_SERVICE_ID)
   const apiConfig = apiService?.app_config
 
-  async function handleGenerateNewJwtToken() {
+  async function handleJwtSecretUpdate(
+    jwt_secret: string,
+    setModalVisibility: Dispatch<SetStateAction<boolean>>
+  ) {
+    setIsSubmittingJwtSecretUpdateRequest(true)
     try {
+      const trackingId = uuidv4()
       const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
-        jwt_secret: 'ROLL',
+        jwt_secret,
+        change_tracking_id: trackingId,
       })
       if (res.error) throw res.error
-      setIsGeneratingKey(false)
-      // refetch data in forms
-      mutateSettings()
-      mutateConfig()
-      ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    }
-  }
-
-  async function handleCustomNewJwtToken() {
-    setIsLoadingCreatingKey(true)
-    try {
-      const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
-        jwt_secret: customToken,
+      setModalVisibility(false)
+      mutateJwtSecretUpdateStatus()
+      ui.setNotification({
+        category: 'info',
+        message:
+          'Successfully submitted JWT secret update request. Please wait while your project is updated.',
       })
-      if (res.error) throw res.error
-      setIsCreatingKey(false)
-      // refetch data in forms
-      mutateSettings()
-      mutateConfig()
-      ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: error.message })
     } finally {
-      setIsLoadingCreatingKey(false)
+      setIsSubmittingJwtSecretUpdateRequest(false)
     }
   }
 
   return (
     <>
-      <article className="p-4 max-w-4xl">
-        <DisplayApiSettings key="DisplayAPISettings" />
+      <div className="max-w-4xl p-4">
         <section>
           <Panel
             title={
               <Typography.Title level={5} className="mb-0">
-                Config
+                Project URL
               </Typography.Title>
             }
           >
@@ -159,105 +249,191 @@ const ServiceList: FC<any> = ({ projectRef }) => {
                 layout="horizontal"
               />
             </Panel.Content>
-            <Panel.Content className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6">
+          </Panel>
+        </section>
+
+        <section>
+          <DisplayApiSettings key="DisplayAPISettings" />
+        </section>
+
+        <section>
+          <Panel
+            title={
+              <Typography.Title level={5} className="mb-0">
+                JWT Settings
+              </Typography.Title>
+            }
+          >
+            <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
               <Input
                 label="JWT Secret"
                 readOnly
-                copy
-                reveal
-                disabled={true}
-                value={config?.jwt_secret || ''}
+                copy={isNotUpdatingJwtSecret}
+                reveal={isNotUpdatingJwtSecret}
+                disabled
+                value={
+                  isJwtSecretUpdateFailed
+                    ? 'JWT secret update failed'
+                    : isUpdatingJwtSecret
+                    ? 'Updating JWT secret...'
+                    : config?.jwt_secret || ''
+                }
                 className="input-mono"
                 descriptionText={
                   'Used to decode your JWTs. You can also use this to mint your own JWTs.'
                 }
                 layout="horizontal"
               />
-              {/* Temporarily hide the jwt secret rolling feature */}
-              {/* <div className="space-y-3">
-                <div className="p-3 px-6 dark:bg-bg-alt-dark bg-bg-alt-light rounded-md shadow-sm border dark:border-dark flex items-center justify-between">
-                  <div>
-                    <Typography.Text>Generate a new JWT secret</Typography.Text>
-                    <div>
-                      <Typography.Text type="secondary">
-                        A random secret will be created, or you can create your own.
-                      </Typography.Text>
+              <div className="space-y-3">
+                <div className="dark:bg-bg-alt-dark bg-bg-alt-light dark:border-dark rounded-md border p-3 px-6 shadow-sm">
+                  {isUpdatingJwtSecret ? (
+                    <div className="flex items-center space-x-2">
+                      <IconLoader className="animate-spin" size={14} />
+                      <p className="text-sm">
+                        Updating JWT secret: {jwtSecretUpdateProgressMessage}
+                      </p>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <Dropdown
-                      align="end"
-                      side="bottom"
-                      overlay={
-                        <>
-                          <Dropdown.Item
-                            onClick={() => setIsGeneratingKey(true)}
-                            icon={<IconRefreshCw size={16} />}
-                          >
-                            Generate a random secret
-                          </Dropdown.Item>
-                          <Divider light />
-                          <Dropdown.Item
-                            onClick={() => setIsCreatingKey(true)}
-                            icon={<IconPenTool size={16} />}
-                          >
-                            Create my own secret
-                          </Dropdown.Item>
-                        </>
-                      }
-                    >
-                      <Button as="span" type="secondary" iconRight={<IconChevronDown />}>
-                        Generate a new secret
-                      </Button>
-                    </Dropdown>
-                  </div>
+                  ) : (
+                    <div className="w-full space-y-2">
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex flex-col space-y-1">
+                          <Typography.Text>Generate a new JWT secret</Typography.Text>
+                          <p className="text-sm opacity-50">
+                            A random secret will be created, or you can create your own.
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          {isUpdatingJwtSecret ? (
+                            <Button loading type="secondary">
+                              Updating JWT secret...
+                            </Button>
+                          ) : (
+                            <Dropdown
+                              align="end"
+                              side="bottom"
+                              overlay={
+                                <>
+                                  <Dropdown.Item
+                                    onClick={() => setIsGeneratingKey(true)}
+                                    icon={<IconRefreshCw size={16} />}
+                                  >
+                                    Generate a random secret
+                                  </Dropdown.Item>
+                                  <Dropdown.Seperator />
+                                  <Dropdown.Item
+                                    onClick={() => setIsCreatingKey(true)}
+                                    icon={<IconPenTool size={16} />}
+                                  >
+                                    Create my own secret
+                                  </Dropdown.Item>
+                                </>
+                              }
+                            >
+                              <Button as="span" type="default" iconRight={<IconChevronDown />}>
+                                Generate a new secret
+                              </Button>
+                            </Dropdown>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div> */}
+                {isJwtSecretUpdateFailed ? (
+                  <Alert withIcon variant="warning" title="Failed to update JWT secret">
+                    Please try again. If the failures persist, please contact Supabase support with
+                    the following details: <br />
+                    Change tracking ID: {changeTrackingId} <br />
+                    Error message: {jwtSecretUpdateErrorMessage}
+                  </Alert>
+                ) : (
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="This will invalidate all existing API keys!"
+                  >
+                    Generating a new JWT secret will invalidate <u>all</u> of your API keys,
+                    including your <code>service_role</code> and <code>anon</code> keys. Your
+                    project will also be restarted during this process, which will terminate any
+                    existing connections.
+                  </Alert>
+                )}
+              </div>
             </Panel.Content>
           </Panel>
         </section>
+
         <section>{config && <PostgrestConfig config={config} projectRef={projectRef} />}</section>
-      </article>
-      <ConfirmationModal
+      </div>
+
+      <ConfirmModal
         danger
         visible={isRegeneratingKey}
-        title="Generate new JWT secret"
+        title="Are you absolutely sure?"
+        description="This action cannot be undone and the old JWT secret will be lost. All existing API keys
+        will be invalidated, and any open connections will be terminated."
         buttonLabel="Generate new secret"
         buttonLoadingLabel="Generating"
-        children={
-          <Typography.Text type="secondary">
-            Are you sure you want to genereate a random new JWT secret? This action cannot be undone
-            and the old JWT secret will be lost.
-          </Typography.Text>
-        }
         onSelectCancel={() => setIsGeneratingKey(false)}
-        onSelectConfirm={handleGenerateNewJwtToken}
+        onSelectConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
       />
+
       <Modal
         closable
-        title="Create a custom JWT secret"
+        header="Create a custom JWT secret"
         visible={isCreatingKey}
-        size="small"
-        confirmText="Apply new JWT secret"
+        size="medium"
         variant="danger"
-        alignFooter="right"
-        loading={isLoadingCreatingKey}
-        onCancel={() => setIsCreatingKey(false)}
-        onConfirm={handleCustomNewJwtToken}
+        loading={isSubmittingJwtSecretUpdateRequest}
+        customFooter={
+          <div className="space-x-2">
+            <Button type="default" onClick={() => setIsCreatingKey(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              disabled={
+                customToken.length < 32 || customToken.includes('@') || customToken.includes('$')
+              }
+              loading={isSubmittingJwtSecretUpdateRequest}
+              onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
+            >
+              Apply new JWT secret
+            </Button>
+          </div>
+        }
       >
-        <Typography.Text type="secondary">
-          Create a custom JWT secret. Make sure it is a strong combination of characters that cannot
-          be guessed easily.
-        </Typography.Text>
-        <Input
-          onChange={(e: any) => setCustomToken(e.target.value)}
-          value={customToken}
-          icon={<IconKey />}
-          type="password"
-          className="w-full text-left"
-          label="Custom JWT secret"
-          descriptionText="Must be at least 32 characters long"
-        />
+        <Modal.Content>
+          <div className="space-y-2 py-4">
+            <p className="text-scale-1100 text-sm">
+              Create a custom JWT secret. Make sure it is a strong combination of characters that
+              cannot be guessed easily.
+            </p>
+            <Alert
+              withIcon
+              variant="warning"
+              title="All existing API keys will be invalidated, and any open connections will be terminated."
+            />
+            <Input
+              onChange={(e: any) => setCustomToken(e.target.value)}
+              value={customToken}
+              icon={<IconKey />}
+              type={showCustomTokenInput ? 'text' : 'password'}
+              className="w-full text-left"
+              label="Custom JWT secret"
+              descriptionText="Minimally 32 characters long, '@' and '$' are not allowed."
+              actions={
+                <div className="mr-1 flex items-center justify-center">
+                  <Button
+                    type="default"
+                    icon={showCustomTokenInput ? <IconEye /> : <IconEyeOff />}
+                    onClick={() => setShowCustomTokenInput(!showCustomTokenInput)}
+                  />
+                </div>
+              }
+            />
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )
@@ -348,7 +524,7 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
       >
         <div className="space-y-6 py-4">
           {schema.length >= 1 && (
-            <MultiSelectUI
+            <MultiSelect
               options={schema}
               // value must be passed as array of strings
               value={updates.db_schema.replace(/ /g, '').split(',')}

@@ -9,9 +9,11 @@ import {
   Popover,
   IconLink,
   IconSettings,
+  Button,
 } from '@supabase/ui'
+import { PostgresType } from '@supabase/postgres-meta'
 
-import { ColumnField, EnumType } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
@@ -37,7 +39,7 @@ import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constant
 
 interface Props {
   column: ColumnField
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   isNewRecord: boolean
   hasImportContent: boolean
   dragHandleProps?: any
@@ -48,7 +50,7 @@ interface Props {
 
 const Column: FC<Props> = ({
   column = {} as ColumnField,
-  enumTypes = [] as EnumType[],
+  enumTypes = [] as PostgresType[],
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
@@ -58,8 +60,15 @@ const Column: FC<Props> = ({
 }) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
+  let settingsCount = 0
+
+  column.isNullable ? (settingsCount += 1) : null
+  column.isIdentity ? (settingsCount += 1) : null
+  column.isUnique ? (settingsCount += 1) : null
+  column.isArray ? (settingsCount += 1) : null
+
   return (
-    <div className="w-full flex items-center">
+    <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
           <Typography>
@@ -68,29 +77,24 @@ const Column: FC<Props> = ({
         </div>
       </div>
       <div className="w-[25%]">
-        <div className="flex items-center justify-between w-[95%] border border-gray-500 rounded-md">
+        <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
             disabled={hasImportContent}
-            className={`table-editor-columns-input bg-white dark:bg-transparent rounded ${
+            className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
-            }`}
+            } rounded-md`}
+            actions={
+              <Button
+                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
+                onClick={() => onEditRelation(column)}
+              >
+                <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
+              </Button>
+            }
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
-          <div
-            className={`
-            border-l p-[9px] rounded-r border-gray-500 cursor-pointer transition
-            ${column.isPrimaryKey ? 'hover:bg-gray-500' : 'hover:bg-gray-600'}
-          `}
-            onClick={() => onEditRelation(column)}
-          >
-            <IconLink
-              className={!isUndefined(column.foreignKey) ? 'text-green-400' : ''}
-              size={14}
-              strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1}
-            />
-          </div>
         </div>
       </div>
       <div className="w-[25%]">
@@ -100,10 +104,10 @@ const Column: FC<Props> = ({
             enumTypes={enumTypes}
             size="small"
             showLabel={false}
-            className="table-editor-column-type"
+            className="table-editor-column-type lg:gap-0 "
             disabled={!isUndefined(column.foreignKey)}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: '' })
+              onUpdateColumn({ format, defaultValue: null })
             }}
           />
         </div>
@@ -111,11 +115,15 @@ const Column: FC<Props> = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[90%]">
           <InputWithSuggestions
-            placeholder="NULL"
+            placeholder={
+              typeof column.defaultValue === 'string' && column.defaultValue.length === 0
+                ? 'Empty string'
+                : 'NULL'
+            }
             size="small"
-            value={column.defaultValue}
+            value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`bg-white dark:bg-transparent rounded ${
+            className={`rounded bg-white dark:bg-transparent lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}
@@ -123,7 +131,7 @@ const Column: FC<Props> = ({
             suggestionsWidth={410}
             onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
-              onUpdateColumn({ defaultValue: suggestion.name })
+              onUpdateColumn({ defaultValue: suggestion.value })
             }
           />
         </div>
@@ -136,64 +144,93 @@ const Column: FC<Props> = ({
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
-      <div className="w-[5%] flex justify-end">
+      <div className="flex w-[5%] justify-end">
         {(!column.isPrimaryKey || column.format.includes('int')) && (
-          <Popover
-            portalled
-            className="w-80 pointer-events-auto"
-            overlay={[
-              <div className="p-4" key={`${column.id}_configuration`}>
-                {!column.isPrimaryKey && (
-                  <Checkbox
-                    label="Is Nullable"
-                    description="Specify if the column can assume a NULL value if no value is provided"
-                    checked={column.isNullable}
-                    onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                  />
+          <>
+            <Popover
+              size="xlarge"
+              className="pointer-events-auto"
+              header={
+                <div className="flex items-center justify-center">
+                  <h5 className="text-scale-1200 text-sm">Extra options</h5>
+                </div>
+              }
+              overlay={[
+                <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
+                  {!column.isPrimaryKey && (
+                    <>
+                      <Checkbox
+                        label="Is Nullable"
+                        description="Specify if the column can assume a NULL value if no value is provided"
+                        checked={column.isNullable}
+                        className="p-4"
+                        onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                      />
+                      <Popover.Seperator />
+                    </>
+                  )}
+
+                  {isNewRecord && (
+                    <>
+                      <Checkbox
+                        label="Is Unique"
+                        description="Enforce if values in the column should be unique across rows"
+                        checked={column.isUnique}
+                        className="p-4"
+                        onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                      />
+                      <Popover.Seperator />
+                    </>
+                  )}
+                  {column.format.includes('int') && (
+                    <>
+                      <Checkbox
+                        label="Is Identity"
+                        description="Automatically assign a sequential unique number to the column"
+                        checked={column.isIdentity}
+                        className="p-4"
+                        onChange={() => {
+                          const isIdentity = !column.isIdentity
+                          const isArray = isIdentity ? false : column.isArray
+                          onUpdateColumn({ isIdentity, isArray })
+                        }}
+                      />
+                      <Popover.Seperator />
+                    </>
+                  )}
+
+                  {!column.isPrimaryKey && (
+                    <Checkbox
+                      label="Define as Array"
+                      description="Define your column as a variable-length multidimensional array"
+                      checked={column.isArray}
+                      className="p-4"
+                      onChange={() => {
+                        const isArray = !column.isArray
+                        const isIdentity = isArray ? false : column.isIdentity
+                        onUpdateColumn({ isArray, isIdentity })
+                      }}
+                    />
+                  )}
+                </div>,
+              ]}
+            >
+              <div className="group flex items-center -space-x-1">
+                {settingsCount > 0 && (
+                  <div className="bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100 rounded-full py-0.5 px-2 text-xs">
+                    {settingsCount}
+                  </div>
                 )}
-                {isNewRecord && (
-                  <Checkbox
-                    label="Is Unique"
-                    description="Enforce if values in the column should be unique across rows"
-                    checked={column.isUnique}
-                    onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                  />
-                )}
-                {column.format.includes('int') && (
-                  <Checkbox
-                    label="Is Identity"
-                    description="Automatically assign a sequential unique number to the column"
-                    checked={column.isIdentity}
-                    onChange={() => {
-                      const isIdentity = !column.isIdentity
-                      const isArray = isIdentity ? false : column.isArray
-                      onUpdateColumn({ isIdentity, isArray })
-                    }}
-                  />
-                )}
-                {!column.isPrimaryKey && (
-                  <Checkbox
-                    label="Define as Array"
-                    description="Define your column as a variable-length multidimensional array"
-                    checked={column.isArray}
-                    onChange={() => {
-                      const isArray = !column.isArray
-                      const isIdentity = isArray ? false : column.isIdentity
-                      onUpdateColumn({ isArray, isIdentity })
-                    }}
-                  />
-                )}
-              </div>,
-            ]}
-          >
-            <Typography>
-              <IconSettings size={18} strokeWidth={1} />
-            </Typography>
-          </Popover>
+                <div className="text-scale-1100 group-hover:text-scale-1200 transition-colors">
+                  <IconSettings size={18} strokeWidth={1} />
+                </div>
+              </div>
+            </Popover>
+          </>
         )}
       </div>
       {!hasImportContent && (
-        <div className="w-[5%] flex justify-end">
+        <div className="flex w-[5%] justify-end">
           <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
             <Typography>
               <IconX strokeWidth={1} />

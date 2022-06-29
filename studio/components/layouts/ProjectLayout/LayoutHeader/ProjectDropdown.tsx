@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, Divider, IconPlus } from '@supabase/ui'
+import { Button, Dropdown, Divider, IconPlus, Popover } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -31,7 +31,7 @@ const ProjectDropdown = () => {
                 </a>
               </Link>
             ))}
-          <Divider light />
+          <Popover.Seperator />
           <Link href={`/new/${selectedOrganizationSlug}`}>
             <a className="block">
               <Dropdown.Item icon={<IconPlus size="tiny" />}>New project</Dropdown.Item>
@@ -40,7 +40,7 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button as="span" type="text" size="tiny">
+      <Button as="span" type="text" size="tiny" className="my-1">
         {selectedProject.name}
       </Button>
     </Dropdown>

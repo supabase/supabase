@@ -39,7 +39,7 @@ const RolesList: FC<Props> = ({ onSelectRole = () => {} }) => {
                 <SparkBar
                   max={x.connection_limit}
                   value={x.active_connections}
-                  barClass={'bg-green-500'}
+                  barClass={'bg-green-800'}
                 />
               </div>
             </Table.td>

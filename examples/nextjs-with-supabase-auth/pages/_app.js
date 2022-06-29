@@ -1,13 +1,13 @@
-import { Auth } from '@supabase/ui'
-import { supabase } from '../utils/initSupabase'
+import { UserProvider } from '@supabase/supabase-auth-helpers/react'
+import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs'
 import './../style.css'
 
 export default function MyApp({ Component, pageProps }) {
   return (
     <main className={'dark'}>
-      <Auth.UserContextProvider supabaseClient={supabase}>
+      <UserProvider supabaseClient={supabaseClient}>
         <Component {...pageProps} />
-      </Auth.UserContextProvider>
+      </UserProvider>
     </main>
   )
 }

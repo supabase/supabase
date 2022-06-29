@@ -12,7 +12,7 @@ const HeaderTitle: FC<Props> = ({ isNewRecord, tableName }) => {
   return (
     <>
       {header}
-      {tableName && <Typography.Text code>{tableName}</Typography.Text>}
+      {tableName && <span className="text-code">{tableName}</span>}
     </>
   )
 }

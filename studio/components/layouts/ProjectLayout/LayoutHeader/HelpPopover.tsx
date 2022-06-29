@@ -1,11 +1,10 @@
 import {
   Button,
-  Divider,
   IconHelpCircle,
   IconMail,
   IconMessageCircle,
   Popover,
-  Typography,
+  IconBookOpen,
 } from '@supabase/ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
@@ -23,65 +22,68 @@ const HelpPopover: FC<Props> = () => {
 
   return (
     <Popover
-      className="w-80"
+      size="content"
       align="end"
       side="bottom"
       sideOffset={8}
       overlay={
-        <div className="space-y-4 my-4">
+        <div className="space-y-4 my-4 w-96">
           <div className="px-5 space-y-4 my-5">
-            <Typography.Title level={5} className={'mb-2'}>
-              Need help with your project?
-            </Typography.Title>
-            <Typography.Text type="secondary" small>
-              <p>
-                For issues with your project hosted on supabase.com, or other inquiries about our
-                hosted services.
-              </p>
-            </Typography.Text>
-            <Link href={supportUrl}>
-              <Button className="sbui-default-button--dark-white" icon={<IconMail />}>
-                Contact support team
-              </Button>
-            </Link>
-            <Typography.Text type="secondary" small className="block opacity-50">
+            <h5 className="text-scale-1200">Need help with your project?</h5>
+            <p className="text-sm text-scale-900">
+              For issues with your project hosted on supabase.com, or other inquiries about our
+              hosted services.
+            </p>
+            <div className="space-x-2">
+              <Link href={supportUrl}>
+                <a>
+                  <Button type="default" icon={<IconMail />}>
+                    Contact support team
+                  </Button>
+                </a>
+              </Link>
+              <Link href="https://supabase.com/docs/">
+                <a>
+                  <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
+                    Docs
+                  </Button>
+                </a>
+              </Link>
+            </div>
+            <p className="text-sm text-scale-900">
               Expected response time is based on your billing tier. Pro and Pay as You Go plans are
               prioritised.
-            </Typography.Text>
+            </p>
           </div>
-          <Divider light />
+          <Popover.Seperator />
           <div className="space-y-2 mb-4">
             <div className="px-5 mb-4">
-              <Typography.Title level={5} className={'mb-2'}>
-                Reach out to the community
-              </Typography.Title>
-              <Typography.Text type="secondary" small className={'block mb-2'}>
-                <p>
-                  For other support, including questions on our client libraries, advice, or best
-                  practices.
-                </p>
-              </Typography.Text>
+              <h5 className={'mb-2'}>Reach out to the community</h5>
+
+              <p className="text-sm text-scale-900">
+                For other support, including questions on our client libraries, advice, or best
+                practices.
+              </p>
             </div>
             <div className="px-5">
               <div
                 className="relative px-5 py-4 pb-12 rounded overflow-hidden space-y-2 shadow-md"
                 style={{ background: '#404EED' }}
               >
-                <Image
-                  className="absolute left-0 top-0 opacity-50"
-                  src={'/img/support/discord-bg-small.jpg'}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="discord illustration header"
-                />
                 <a
                   href="https://discord.supabase.com"
                   target="_blank"
-                  className="block  cursor-pointer"
+                  className="block cursor-pointer dark"
                 >
+                  <Image
+                    className="absolute left-0 top-0 opacity-50"
+                    src={'/img/support/discord-bg-small.jpg'}
+                    layout="fill"
+                    objectFit="cover"
+                    alt="discord illustration header"
+                  />
                   <Button
-                    className="sbui-default-button--dark-white"
-                    type="default"
+                    type="secondary"
                     icon={<SVG src={`/img/discord-icon.svg`} className="w-4 h-4" />}
                   >
                     <span style={{ color: '#404EED' }}>Join Discord server</span>
@@ -103,7 +105,7 @@ const HelpPopover: FC<Props> = () => {
                     objectFit="cover"
                     alt="discord illustration header"
                   />
-                  <Button type="default" icon={<IconMessageCircle />}>
+                  <Button type="secondary" icon={<IconMessageCircle />}>
                     GitHub Discussions
                   </Button>
                 </a>
@@ -113,7 +115,11 @@ const HelpPopover: FC<Props> = () => {
         </div>
       }
     >
-      <Button as="span" type="text" icon={<IconHelpCircle size={16} strokeWidth={2} />}>
+      <Button
+        as="span"
+        type="default"
+        icon={<IconHelpCircle size={16} strokeWidth={1.5} className="text-scale-900" />}
+      >
         Help
       </Button>
     </Popover>

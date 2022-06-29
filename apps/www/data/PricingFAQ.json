@@ -1,0 +1,38 @@
+[
+  {
+    "question": "Can I cap my usage so my bill doesn't run over.",
+    "answer": "Yes. Spend caps are on by default on the pro tier. You can turn spend caps off for usage beyond the tier limits to pay as you grow."
+  },
+  {
+    "question": "I'm worried I could end up with a huge bill at the end of the month.",
+    "answer": "Spend caps are on by default and you need to toggle them off from your dashboard to enable pay as you grow pricing."
+  },
+  {
+    "question": "When will I be billed?",
+    "answer": "Our Pro plan is charged up front, and billed on a monthly basis. Additional usage costs are also billed at the end of the month."
+  },
+  {
+    "question": "Can I cap my additional usage so my bill doesn't run over $25?",
+    "answer": "Please note: The following feature will roll out 11th April 2022. Soft limits are currently in place, and we will contact the project owner if the project usage exceeds the allocated free limits | Pro plan projects have an optional 'Spend cap'. When this is enabled, the project will not go over the included Pro plan allocated limits."
+  },
+  {
+    "question": "Are you going to change your pricing in the future?",
+    "answer": "Our pricing is in Beta. You can read more about our decisions in our blog on pricing [here](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
+  },
+  {
+    "question": "What happens if I cancel my subscription",
+    "answer": "The organization is allocated credits for unused time during the billing month. Those credits can be used for other projects."
+  },
+  {
+    "question": "Do I get a notification if I am approaching my usage limits?",
+    "answer": "Yes, we will email you when you are within 20% of your tier limits."
+  },
+  {
+    "question": "What if I need one project for development and one for production?",
+    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free tier. This means you could have a development and a production server as part of your free tier."
+  },
+  {
+    "question": "Can I self host Supabase for free?",
+    "answer": "Yes, our Docker setup can be found [here](https://github.com/supabase/supabase), or in our [CLI](https://github.com/supabase/cli). Supabase Studio is available in the docker setup, read more about it [here](https://supabase.com/blog/2021/11/30/supabase-studio)."
+  }
+]

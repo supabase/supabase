@@ -43,8 +43,8 @@ values={[
 
 ```sql 
 
--- Example: enable the "pgtap" extension 
-create extension pgtap;
+-- Example: enable the "pgtap" extension and ensure it is installed
+create extension pgtap with schema extensions;
 
 -- Example: disable the "pgtap" extension 
 drop extension pgtap;
@@ -53,6 +53,8 @@ drop extension pgtap;
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
 To disable an extension you can call `drop extension`.
+
+Enabling few extensions by the SQL code `create extension <extension-name> with schema extensions` may lead to permission issues (e.g. `dblink`, `http`, `pg_cron`).
 
 </TabItem>
 

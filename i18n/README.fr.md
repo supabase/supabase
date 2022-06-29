@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] API générées automatiquement
 - [x] Tableau de bord
 - [x] Stockage
-- [ ] Fonctions (à venir)
+- [x] Fonctions
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentation
 
-Pour une documentation complète, visitez [supabase.io/docs](https://supabase.com/docs)
+Pour une documentation complète, visitez [supabase.com/docs](https://supabase.com/docs)
 
 Pour voir comment Contribuer, visitez [Getting Started](./DEVELOPERS.md)
 
@@ -32,7 +35,7 @@ Pour voir comment Contribuer, visitez [Getting Started](./DEVELOPERS.md)
 ## Statut
 
 - [x] Alpha : Nous testons Supabase avec un groupe fermé de clients.
-- [x] Alpha publique : Tout le monde peut s'inscrire sur [app.supabase.io](<(https://app.supabase.io)>). Mais allez-y doucement, il y a quelques problèmes.
+- [x] Alpha publique : Tout le monde peut s'inscrire sur [app.supabase.com](<(https://app.supabase.com)>). Mais allez-y doucement, il y a quelques problèmes.
 - [x] Bêta publique : Assez stable pour la plupart des cas d'utilisation hors entreprise
 - [ ] Public : Prêt pour la production
 
@@ -48,8 +51,8 @@ Supabase est une combinaison d'outils open source. Nous développons les fonctio
 
 **Architecture actuelle**
 
-Supabase est une [plateforme hébergée](https://app.supabase.io). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
-Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/self-hosting) et [développer localement](https://supabase.com/docs/guides/local-development).
+Supabase est une [plateforme hébergée](https://app.supabase.com). Vous pouvez vous inscrire et commencer à utiliser Supabase sans rien installer.
+Vous pouvez aussi [auto-héberger](https://supabase.com/docs/guides/hosting/overview) et [développer localement](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

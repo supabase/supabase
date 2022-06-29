@@ -8,41 +8,67 @@ import { Organization, Project } from 'types'
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper: FC = ({ children }) => {
   const { ui, app } = useStore()
-  const userProfile = ui.profile
+  const orgsInitialized = app.organizations.isInitialized
+  const projectsInitialized = app.projects.isInitialized
 
   const router = useRouter()
   const projectRef = router.query.ref
   const orgSlug = router.query.slug
 
+  /**
+   * Array of urls/routes that should be ignored
+   */
+  const excemptUrls: string[] = [
+    // project creation route, allows the page to self determine it's own route, it will redirect to the first org
+    // or prompt the user to create an organaization
+    // this is used by database.dev, usually as /new/new-project
+    '/new/[slug]',
+    '/join',
+  ]
+
+  /**
+   * Map through all the urls that are excluded
+   * from route validation check
+   *
+   * @returns a boolean
+   */
+  function isExceptUrl() {
+    return excemptUrls.includes(router?.pathname)
+  }
+
   useEffect(() => {
-    if (userProfile) {
+    // check if current route is excempted from route validation check
+    if (isExceptUrl()) return
+
+    if (orgsInitialized && orgSlug) {
       // Check validity of organization that user is trying to access
-      if (orgSlug) {
-        const organizations = app.organizations.list()
-        const organizationSlugs = organizations.map((org: Organization) => org.slug)
-        const isValidOrg = organizationSlugs.includes(orgSlug as string)
+      const organizations = app.organizations.list()
+      const isValidOrg = organizations.some((org: Organization) => org.slug === orgSlug)
 
-        if (!isValidOrg) {
-          ui.setNotification({ category: 'error', message: 'This organization does not exist' })
-          router.push('/')
-          return
-        }
-      }
-
-      // Check validity of project that the user is trying to access
-      if (projectRef) {
-        const projects = app.projects.list()
-        const projectRefs = projects.map((project: Project) => project.ref)
-        const isValidProject = projectRefs.includes(projectRef as string)
-
-        if (!isValidProject) {
-          ui.setNotification({ category: 'error', message: 'This project does not exist' })
-          router.push('/')
-          return
-        }
+      if (!isValidOrg) {
+        ui.setNotification({ category: 'error', message: 'This organization does not exist' })
+        router.push('/')
+        return
       }
     }
-  }, [userProfile])
+  }, [orgsInitialized])
+
+  useEffect(() => {
+    // check if current route is excempted from route validation check
+    if (isExceptUrl()) return
+
+    if (projectsInitialized && projectRef) {
+      // Check validity of project that the user is trying to access
+      const projects = app.projects.list()
+      const isValidProject = projects.some((project: Project) => project.ref === projectRef)
+
+      if (!isValidProject) {
+        ui.setNotification({ category: 'error', message: 'This project does not exist' })
+        router.push('/')
+        return
+      }
+    }
+  }, [projectsInitialized])
 
   return <>{children}</>
 }

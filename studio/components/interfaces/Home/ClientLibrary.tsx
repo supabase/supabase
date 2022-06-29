@@ -19,25 +19,25 @@ const ClientLibrary: FC<Props> = ({ language, releaseState, officialSupport, doc
       />
       <div className="space-y-4">
         <div>
-          <Typography.Title level={5}>
+          <h5 className="text-scale-1200 text-base flex items-center gap-2">
             {language} {releaseState && <Badge color="yellow">{`Public ${releaseState}`}</Badge>}
-          </Typography.Title>
-          <Typography.Text>
+          </h5>
+          <p className="text-scale-1000 text-sm">
             {officialSupport
               ? 'This library is officially supported'
               : 'This library is community supported'}
-          </Typography.Text>
+          </p>
         </div>
         <div className="space-x-1">
           {docsUrl && (
             <a href={docsUrl} target="_blank">
-              <Button icon={<IconBookOpen />} type="outline">
+              <Button icon={<IconBookOpen />} type="default">
                 Docs
               </Button>
             </a>
           )}
           <a href={gitUrl} target="_blank">
-            <Button icon={<IconGitHub />} type="outline">
+            <Button icon={<IconGitHub />} type="default">
               See GitHub
             </Button>
           </a>

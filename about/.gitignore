@@ -1,8 +1,3 @@
 node_modules
 build
 .docusaurus
-docs/client
-docs/gotrue/client
-docs/postgrest/client
-docs/realtime/client
-docs/reference

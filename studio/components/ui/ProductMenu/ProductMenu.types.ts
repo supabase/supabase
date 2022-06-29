@@ -3,10 +3,10 @@ import { ReactNode } from 'react'
 export interface ProductMenuGroup {
   title: string
   isPreview?: boolean
-  items: ProductMenuItem[]
+  items: ProductMenuGroupItem[]
 }
 
-export interface ProductMenuItem {
+export interface ProductMenuGroupItem {
   name: string
   key: string
   url: string

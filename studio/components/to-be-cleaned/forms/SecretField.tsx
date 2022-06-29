@@ -37,9 +37,9 @@ const SecretField: React.FC = (props: any) => {
           />
           <div className="px-2" onClick={onToggleVisible}>
             {visible ? (
-              <IconEye className="text-gray-400" />
+              <IconEye className="text-scale-900" />
             ) : (
-              <IconEyeOff className="text-gray-400" />
+              <IconEyeOff className="text-scale-900" />
             )}
           </div>
         </div>

@@ -1,6 +1,6 @@
 # Example: Supabase authentication client- and server-side (API routes), and SSR with auth cookie.
 
-This example shows how to use Supabase auth both on the client and server in both [API routes](https://nextjs.org/docs/api-routes/introduction) and when using [server side rendering (SSR)](https://nextjs.org/docs/basic-features/pages#server-side-rendering).
+This example shows how to use Supabase auth both on the client and server in both [API routes](https://nextjs.org/docs/api-routes/introduction) and when using [server side rendering (SSR)](https://nextjs.org/docs/basic-features/pages#server-side-rendering). This example uses helper functions that can be viewed at [supabase auth helpers repository](https://github.com/supabase-community/supabase-auth-helpers).
 
 ## Deploy with Vercel
 

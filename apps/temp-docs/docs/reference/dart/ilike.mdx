@@ -1,0 +1,146 @@
+---
+id: ilike
+title: ".ilike()"
+slug: ilike
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .ilike('name', '%la%')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### With `select()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .ilike('name', '%la%')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `update()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .ilike('name', '%la%')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `delete()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .ilike('name', '%la%')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `rpc()`
+
+
+
+<Tabs
+  defaultActiveId="dart"
+  groupId="reference/dart"
+  values={[{ label: 'Dart', value: 'dart' }]}>
+
+<TabsPanel id="dart" label="dart">
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .ilike('name', '%la%')
+  .execute();
+```
+
+
+</TabsPanel>
+
+</Tabs>

@@ -29,8 +29,8 @@ const ResultsPane: FC<Props> = ({ results }) => {
   }
   const columnRender = (name: string) => {
     return (
-      <div className="flex items-center justify-center font-mono h-full">
-        <Typography.Text small>{name}</Typography.Text>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-sm font-mono">{name}</p>
       </div>
     )
   }

@@ -87,7 +87,7 @@ export default class PostgresMetaInterface<T> implements IPostgresMetaInterface<
   }
 
   get isInitialized() {
-    return this.state !== this.STATES.INITIAL
+    return this.state === this.STATES.LOADED || this.state === this.STATES.ERROR
   }
 
   async fetchData() {

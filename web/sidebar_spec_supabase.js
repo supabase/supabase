@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['reference/javascript/index', 'reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
+      items: ['reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
       collapsed: true,
     },
     {
@@ -15,7 +15,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Auth (Server Only)',
-      items: ['reference/javascript/auth-api-createuser', 'reference/javascript/auth-api-deleteuser', 'reference/javascript/auth-api-generatelink', 'reference/javascript/auth-api-inviteuserbyemail', 'reference/javascript/auth-api-sendmobileotp', 'reference/javascript/auth-api-updateuserbyid'],
+      items: ['reference/javascript/auth-api-listusers', 'reference/javascript/auth-api-createuser', 'reference/javascript/auth-api-deleteuser', 'reference/javascript/auth-api-generatelink', 'reference/javascript/auth-api-inviteuserbyemail', 'reference/javascript/auth-api-sendmobileotp', 'reference/javascript/auth-api-updateuserbyid'],
+      collapsed: true,
+    },
+    {
+      type: 'category',
+      label: 'Functions',
+      items: ['reference/javascript/invoke'],
       collapsed: true,
     },
     {
@@ -33,7 +39,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Storage',
-      items: ['reference/javascript/storage-createbucket', 'reference/javascript/storage-getbucket', 'reference/javascript/storage-listbuckets', 'reference/javascript/storage-updatebucket', 'reference/javascript/storage-deletebucket', 'reference/javascript/storage-emptybucket', 'reference/javascript/storage-from-upload', 'reference/javascript/storage-from-download', 'reference/javascript/storage-from-list', 'reference/javascript/storage-from-update', 'reference/javascript/storage-from-move', 'reference/javascript/storage-from-remove', 'reference/javascript/storage-from-createsignedurl', 'reference/javascript/storage-from-getpublicurl'],
+      items: ['reference/javascript/storage-createbucket', 'reference/javascript/storage-getbucket', 'reference/javascript/storage-listbuckets', 'reference/javascript/storage-updatebucket', 'reference/javascript/storage-deletebucket', 'reference/javascript/storage-emptybucket', 'reference/javascript/storage-from-upload', 'reference/javascript/storage-from-download', 'reference/javascript/storage-from-list', 'reference/javascript/storage-from-update', 'reference/javascript/storage-from-move', 'reference/javascript/storage-from-copy', 'reference/javascript/storage-from-remove', 'reference/javascript/storage-from-createsignedurl', 'reference/javascript/storage-from-createsignedurls', 'reference/javascript/storage-from-getpublicurl'],
       collapsed: true,
     },
     {

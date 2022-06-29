@@ -1,0 +1,140 @@
+---
+id: rangelte
+title: ".rangeLte()"
+slug: rangelte
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabsPanel from '@theme/TabsPanel';
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLte('population_range_millions', [150, 250])
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### With `select()`
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLte('population_range_millions', [150, 250])
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `update()`
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeLte('population_range_millions', [150, 250])
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `delete()`
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeLte('population_range_millions', [150, 250])
+```
+
+
+</TabsPanel>
+
+</Tabs>
+
+### With `rpc()`
+
+
+
+<Tabs
+  defaultActiveId="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabsPanel id="js" label="js">
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeLte('population_range_millions', [150, 250])
+```
+
+
+</TabsPanel>
+
+</Tabs>

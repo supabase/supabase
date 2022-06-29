@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
-import { Button, Typography } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Button, Input, Listbox, Typography } from '@supabase/ui'
+import { Dictionary } from 'components/grid'
+import generator from 'generate-password'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -16,6 +17,7 @@ import {
   REGIONS_DEFAULT,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   API_URL,
+  PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 import {
@@ -26,14 +28,6 @@ import {
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import Loading from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-
-const PASSWORD_STRENGTH = {
-  0: "That's terrible.",
-  1: 'Pathetic.',
-  2: 'Weak.',
-  3: 'Not bad. Can you do better?',
-  4: "Strong. Let's get started!",
-}
 
 interface ISetupProjectStore {
   token: string
@@ -143,8 +137,8 @@ const SetupProject = () => {
 export default observer(SetupProject)
 
 const Connecting = () => (
-  <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-32 flex items-center justify-center">
+  <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
     <Typography.Text>
@@ -187,14 +181,25 @@ const CreateProject = observer(() => {
     } else delayedCheckPasswordStrength(value)
   }
 
-  function onDbRegionChange(e: ChangeEvent<HTMLSelectElement>) {
-    setDbRegion(e.target.value)
+  function onDbRegionChange(value: string) {
+    setDbRegion(value)
   }
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
     setPasswordStrengthScore(strength)
     setPasswordStrengthMessage(message)
+  }
+
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
   }
 
   async function createSupabaseProject(dbSql: string) {
@@ -205,6 +210,7 @@ const CreateProject = observer(() => {
       db_pass: dbPass,
       db_region: dbRegion,
       db_sql: dbSql || '',
+      db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
@@ -233,9 +239,7 @@ const CreateProject = observer(() => {
       const project = response
       _store.supabaseProjectRef = project.ref
 
-      // console.log('new project', project)
       const envs = prepareVercelEvns(requiredEnvs, project)
-      // console.log('envs', envs)
 
       await Promise.allSettled(
         envs.map(async (env: any) => {
@@ -263,71 +267,66 @@ const CreateProject = observer(() => {
 
   return (
     <div className="">
-      <Typography.Title level={3}>Project details for integration</Typography.Title>
+      <p className="mb-2">Project details for integration</p>
       <div className="py-2">
-        <label htmlFor="projectName" className="block w-full text-base normal-case">
-          Project name
-        </label>
-        <div className="mt-1">
-          <input
-            type="text"
-            name="projectName"
-            id="projectName"
-            value={projectName}
-            onChange={onProjectNameChange}
-            placeholder="Project name"
-            className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-          />
-        </div>
+        <Input
+          autoFocus
+          id="projectName"
+          label="Project name"
+          type="text"
+          placeholder=""
+          descriptionText=""
+          value={projectName}
+          onChange={onProjectNameChange}
+        />
       </div>
       <div className="py-2">
-        <label htmlFor="dbPass" className="block w-full text-base normal-case">
-          Database password
-        </label>
-        <div className="mt-1 space-y-2">
-          <input
-            type="password"
-            name="dbPass"
-            id="dbPass"
-            value={dbPass}
-            onChange={onDbPassChange}
-            placeholder="· · · · · · · · · · · · ·"
-            className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-          />
-          <PasswordStrengthBar
-            password={dbPass}
-            passwordStrengthScore={passwordStrengthScore}
-            passwordStrengthMessage={passwordStrengthMessage}
-          />
-        </div>
+        <Input
+          id="dbPass"
+          label="Database Password"
+          type="password"
+          placeholder="Type in a strong password"
+          value={dbPass}
+          copy={dbPass.length > 0}
+          onChange={onDbPassChange}
+          descriptionText={
+            <PasswordStrengthBar
+              passwordStrengthScore={passwordStrengthScore}
+              password={dbPass}
+              passwordStrengthMessage={passwordStrengthMessage}
+              generateStrongPassword={generateStrongPassword}
+            />
+          }
+        />
       </div>
       <div className="py-2 pb-4">
-        <label htmlFor="projectName" className="block w-full text-base normal-case">
-          Database region
-        </label>
         <div className="mt-1">
-          <select
-            id="dbRegion"
-            name="dbRegion"
+          <Listbox
+            label="Region"
+            type="select"
             value={dbRegion}
             onChange={onDbRegionChange}
-            className="focus:ring-green-500 focus:border-green-500 relative block w-full rounded-md bg-transparent focus:z-10 sm:text-sm border-gray-300"
+            descriptionText="Select a region close to you for the best performance."
           >
-            {Object.keys(REGIONS).map((choice) => {
+            {Object.keys(REGIONS).map((option: string, i) => {
+              const label = Object.values(REGIONS)[i]
               return (
-                <option
-                  key={(REGIONS as any)[choice]}
-                  value={(REGIONS as any)[choice]}
-                  className="text-black"
+                <Listbox.Option
+                  key={option}
+                  label={label}
+                  value={label}
+                  addOnBefore={({ active, selected }: any) => (
+                    <img
+                      className="w-5 rounded-sm"
+                      src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                    />
+                  )}
                 >
-                  {(REGIONS as any)[choice]}
-                </option>
+                  <span className="text-scale-1200">{label}</span>
+                </Listbox.Option>
               )
             })}
-          </select>
-          <Typography.Text type="secondary">
-            <p className="pt-2">Select a region close to you for the best performance.</p>
-          </Typography.Text>
+          </Listbox>
         </div>
       </div>
       <Button disabled={loading || !canSubmit} loading={loading} onClick={onCreateProject}>

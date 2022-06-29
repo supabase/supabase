@@ -1,29 +1,27 @@
 import Head from 'next/head'
-import { FC, ReactNode } from 'react'
+import { FC, ReactNode, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
-
-import { Project } from 'types'
-import { useStore } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
 import NavigationBar from './NavigationBar/NavigationBar'
 import ProductMenuBar from './ProductMenuBar'
 import LayoutHeader from './LayoutHeader'
-import TestConnection from './TestConnection'
+import ConnectingState from './ConnectingState'
+import BuildingState from './BuildingState'
 
 interface Props {
   title?: string
   isLoading?: boolean
   product?: string
   productMenu?: ReactNode
-  children: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
 }
 
-const ProjectLayout: FC<Props> = ({
+const ProjectLayout = ({
   title,
   isLoading = false,
   product = '',
@@ -31,34 +29,8 @@ const ProjectLayout: FC<Props> = ({
   children,
   hideHeader = false,
   hideIconBar = false,
-}) => {
-  const { ui } = useStore()
-  const project: Project | undefined = ui.selectedProject
-
-  const router = useRouter()
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
-
-  // useEffect(() => {
-  //   if (isUndefined(project)) router.push('/404')
-  // }, [])
-
-  const renderContent = () => {
-    if (!isUndefined(project)) {
-      return requiresDbConnection ? (
-        <TestConnection project={project}>
-          {isLoading ? (
-            <Connecting />
-          ) : (
-            <div className="flex flex-col flex-1 overflow-y-auto">{children}</div>
-          )}
-        </TestConnection>
-      ) : (
-        <>{children}</>
-      )
-    } else {
-      return <>{children}</>
-    }
-  }
+}: PropsWithChildren<Props>) => {
+  const ongoingIncident = useFlag('ongoingIncident')
 
   return (
     <>
@@ -72,20 +44,86 @@ const ProjectLayout: FC<Props> = ({
         {!hideIconBar && <NavigationBar />}
 
         {/* Product menu bar */}
-        {productMenu && !isLoading && (
+        <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
           <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        )}
+        </MenuBarWrapper>
 
         <main
-          style={{ maxHeight: '100vh' }}
-          className="w-full flex flex-col flex-1 overflow-x-hidden"
+          className="flex w-full flex-1 flex-col overflow-x-hidden"
+          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
         >
           {!hideHeader && <LayoutHeader />}
-          {renderContent()}
+          <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
         </main>
       </div>
     </>
   )
 }
 
-export default observer(ProjectLayout)
+export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
+
+export default ProjectLayout
+
+interface MenuBarWrapperProps {
+  isLoading: boolean
+  productMenu?: ReactNode
+}
+
+const MenuBarWrapper: FC<MenuBarWrapperProps> = observer(({ isLoading, productMenu, children }) => {
+  const { ui } = useStore()
+  return <>{!isLoading && productMenu && ui.selectedProject !== undefined ? children : null}</>
+})
+
+interface ContentWrapperProps {
+  isLoading: boolean
+}
+
+/**
+ * Check project.status to show building state or error state
+ *
+ * [Joshen] As of 210422: Current testing connection by pinging postgres
+ * Ideally we'd have a more specific monitoring of the project such as during restarts
+ * But that will come later: https://supabase.slack.com/archives/C01D6TWFFFW/p1650427619665549
+ *
+ * Just note that this logic does not differentiate between a "restarting" state and
+ * a "something is wrong and can't connect to project" state.
+ *
+ * [TODO] Next iteration should scrape long polling and just listen to the project's status
+ */
+const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children }) => {
+  const { ui } = useStore()
+  const router = useRouter()
+
+  const routesToIgnorePostgrestConnection = [
+    '/project/[ref]/reports',
+    '/project/[ref]/settings/general',
+    '/project/[ref]/settings/database',
+    '/project/[ref]/settings/billing',
+    '/project/[ref]/settings/billing/update',
+    '/project/[ref]/settings/billing/update/free',
+    '/project/[ref]/settings/billing/update/pro',
+  ]
+
+  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+
+  const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
+    ui.selectedProject?.status ?? ''
+  )
+
+  const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
+
+  return (
+    <>
+      {isLoading || ui.selectedProject === undefined ? (
+        <Connecting />
+      ) : requiresPostgrestConnection && isProjectOffline ? (
+        <ConnectingState project={ui.selectedProject} />
+      ) : requiresDbConnection && isProjectBuilding ? (
+        <BuildingState project={ui.selectedProject} />
+      ) : (
+        <>{children}</>
+      )}
+    </>
+  )
+})

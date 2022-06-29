@@ -115,6 +115,7 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
 
   return (
     <Dropdown
+      size="medium"
       overlay={
         <>
           {user.email !== null ? (
@@ -132,7 +133,7 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
               Send OTP
             </Dropdown.Item>
           ) : null}
-          <Divider light />
+          <Dropdown.Seperator />
           <Dropdown.Item onClick={handleDelete} icon={<IconTrash size="tiny" />}>
             Delete user
           </Dropdown.Item>

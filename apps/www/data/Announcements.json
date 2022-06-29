@@ -1,0 +1,33 @@
+[
+  {
+    "type": "Announcement",
+    "title": "Works With Supabase - announcing our Partner Gallery",
+    "description": "Introducing our Partner Gallery - open source and made with Supabase.",
+    "imgUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
+    "logoUrl": "images/blog/partner-gallery/partner-showcase-thumb.png",
+    "organization": "Supabase",
+    "url": "/blog/2022/04/20/partner-gallery-works-with-supabase",
+    "postMeta": {
+      "name": "Thor Shcaeff, Alaister Young, Shane Rice",
+      "publishDate": "Apr 20, 2022",
+      "readLength": 5
+    },
+    "ctaText": "Read blog post"
+  },
+  {
+    "type": "Announcement",
+    "title": "Supabase Launch Week IV",
+    "description": "Launch Week IV had something for everybody: Community Day, GraphQL support, Edge Functions, and more.",
+    "imgUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo-cal.png",
+    "logoUrl": "images/blog/launch-week-4/friday-before/launchweek-4-promo.png",
+    "organization": "Supabase",
+    "url": "/blog/2022/03/25/supabase-launch-week-four",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Mar 25, 2022",
+      "readLength": 4
+    },
+    "ctaText": "Read blog post"
+  }
+]

@@ -33,7 +33,7 @@ const Header: FC<{
       <div>{leftComponents}</div>
       <div>
         <Input
-          size="tiny"
+          size="small"
           placeholder={filterPlaceholder}
           value={filterString}
           onChange={(e: any) => setFilterString(e.target.value)}
@@ -47,49 +47,22 @@ const Header: FC<{
 
 const ColumnList: FC<{
   selectedTable: any
+  onSelectBack: () => void
   onAddColumn: () => void
   onEditColumn: (column: any) => void
-  onSelectBack: () => void
-  onColumnDeleted: () => void
+  onDeleteColumn: (column: any) => void
 }> = ({
   selectedTable,
+  onSelectBack = () => {},
   onAddColumn = () => {},
   onEditColumn = () => {},
-  onSelectBack = () => {},
-  onColumnDeleted = () => {},
+  onDeleteColumn = () => {},
 }) => {
-  const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
     filterString.length === 0
       ? selectedTable.columns
       : selectedTable.columns.filter((column: any) => column.name.includes(filterString))
-
-  async function onDeleteColumn(column: any) {
-    confirmAlert({
-      title: 'Confirm to delete',
-      message: `Are you sure you want to delete the "${column.name}" column? This action cannot be undone.`,
-      onAsyncConfirm: async () => {
-        try {
-          const response: any = await meta.columns.del(column.id)
-          if (response.error) {
-            throw response.error
-          } else {
-            onColumnDeleted()
-            ui.setNotification({
-              category: 'success',
-              message: `Successfully removed ${column.name}.`,
-            })
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to delete ${column.name}: ${error.message}`,
-          })
-        }
-      },
-    })
-  }
 
   return (
     <>
@@ -150,24 +123,16 @@ const ColumnList: FC<{
               <Table.td className="px-4 py-3 pr-2">
                 <div className="flex gap-2 justify-end">
                   <Button
-                    onClick={() => onDeleteColumn(x)}
-                    icon={<IconTrash />}
-                    style={{ padding: 5 }}
-                    type="outline"
-                    // tooltip={{
-                    //   title: 'Delete column',
-                    //   position: 'top-left',
-                    // }}
-                  />
-                  <Button
                     onClick={() => onEditColumn(x)}
                     icon={<IconEdit3 />}
                     style={{ padding: 5 }}
-                    type="outline"
-                    // tooltip={{
-                    //   title: 'Edit Details',
-                    //   position: 'top-left',
-                    // }}
+                    type="text"
+                  />
+                  <Button
+                    onClick={() => onDeleteColumn(x)}
+                    icon={<IconTrash />}
+                    style={{ padding: 5 }}
+                    type="text"
                   />
                 </div>
               </Table.td>

@@ -28,8 +28,11 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import { useFlag } from 'hooks'
+import { useFlag, useProjectSubscription } from 'hooks'
 useFlag.mockReturnValue(true)
+useProjectSubscription.mockReturnValue({
+  subscription: undefined,
+})
 
 beforeEach(() => {
   get.mockReset()
@@ -59,10 +62,11 @@ const MOCK_CHART_DATA = {
 test('mounts correctly', async () => {
   get.mockImplementation((url) => {
     if (url.includes('usage')) return {}
+    if (url.includes('subscription')) return {}
     return { data: MOCK_CHART_DATA }
   })
   render(<ProjectUsage project="12345" />)
-  await waitFor(() => screen.getByText(/Statistics for past 60 minutes/))
+  await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
   await waitFor(() => screen.getByText(/123/))
   await waitFor(() => screen.getByText(/223/))
   await waitFor(() => screen.getByText(/323/))
@@ -75,20 +79,19 @@ test('dropdown options changes chart query', async () => {
     return { data: MOCK_CHART_DATA }
   })
   render(<ProjectUsage project="12345" />)
-  await waitFor(() => screen.getByText(/Statistics for past 60 minutes/))
-  await waitFor(() => screen.getAllByRole('button', { name: '60 minutes' }))
-  console.log(get.mock.calls)
+  await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
+  await waitFor(() => screen.getAllByRole('button', { name: '24 hours' }))
   await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=minutely'))
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'))
   })
   // find button that has radix id
-  const [btn] = screen.getAllByRole('button', { name: '60 minutes' }).filter((e) => e.id)
+  const [btn] = screen.getAllByRole('button', { name: '24 hours' }).filter((e) => e.id)
   clickDropdown(btn)
   await waitFor(() => screen.getByText(/7 days/))
-  await waitFor(() => screen.getByText(/24 hours/))
+  await waitFor(() => screen.getByText(/60 minutes/))
 
   // simulate changing of dropdown
-  userEvent.click(screen.getByText(/24 hours/))
-  await waitFor(() => screen.getByText(/Statistics for past 24 hours/))
-  expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=hourly'))
+  userEvent.click(screen.getByText(/60 minutes/))
+  await waitFor(() => screen.getByText(/Statistics for past 60 minutes/))
+  expect(get).toHaveBeenCalledWith(expect.stringContaining('interval=minutely'))
 })
