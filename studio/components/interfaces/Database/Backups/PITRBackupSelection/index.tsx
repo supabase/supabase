@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { FC, FormEvent, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconSearch, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
+import { IconSearch, IconInfo, Input, Listbox, Popover, Button, Modal } from '@supabase/ui'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -26,10 +27,22 @@ const PITRBackupSelection: FC<Props> = () => {
   const { app, ui, backups } = useStore()
   const isAvailable = useFlag('pitrBackups')
 
+  const projectId = ui.selectedProject?.id ?? -1
+  const projectRef = ui.selectedProject?.ref ?? 'default'
+
   if (!isAvailable) {
     return (
-      <div className="flex items-center justify-center rounded border border-gray-500 bg-gray-300 py-8">
-        <p className="text-scale-1000 text-sm">Coming soon</p>
+      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
+        <div className="flex space-x-3">
+          <IconInfo size={20} strokeWidth={1.5} />
+          <p className="text-scale-1100 text-sm">
+            Coming soon - Point in time backups is an Enterprise feature. Reach out to us{' '}
+            <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <a className="text-brand-900">here</a>
+            </Link>{' '}
+            if you're interested!
+          </p>
+        </div>
       </div>
     )
   }
@@ -42,8 +55,6 @@ const PITRBackupSelection: FC<Props> = () => {
   const [recoveryPoint, setRecoveryPoint] = useState<string>()
 
   const { configuration } = backups
-  const projectId = ui.selectedProject?.id ?? -1
-  const projectRef = ui.selectedProject?.ref ?? 'default'
 
   if (backups.isLoading) {
     return <Loading />
@@ -58,13 +69,19 @@ const PITRBackupSelection: FC<Props> = () => {
       configuration.physicalBackupData.latestPhysicalBackupDateUnix
 
   if (!configuration.walg_enabled) {
-    // Using this check as opposed to checking price tier to allow enabling PITR for our own internal projects
     return (
-      <UpgradeToPro
-        primaryText="Free Plan does not include project backups."
-        projectRef={projectRef}
-        secondaryText="Please upgrade to Pro plan for access to point in time recovery backups."
-      />
+      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
+        <div className="flex space-x-3">
+          <IconInfo size={20} strokeWidth={1.5} />
+          <p className="text-sm">
+            Point in time backups is an Enterprise feature. Reach out to us{' '}
+            <Link href={`/support/new?ref=${projectRef}&category=sales`}>
+              <a className="text-brand-900">here</a>
+            </Link>{' '}
+            if you're interested!
+          </p>
+        </div>
+      </div>
     )
   } else if (!hasPhysicalBackups) {
     return <BackupsEmpty />
