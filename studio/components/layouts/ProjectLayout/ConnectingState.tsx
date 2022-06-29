@@ -12,7 +12,7 @@ interface Props {
   project: Project
 }
 
-const ProjectRestartingState: FC<Props> = ({ project }) => {
+const ConnectingState: FC<Props> = ({ project }) => {
   const { app } = useStore()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
@@ -146,4 +146,4 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   )
 }
 
-export default observer(ProjectRestartingState)
+export default observer(ConnectingState)

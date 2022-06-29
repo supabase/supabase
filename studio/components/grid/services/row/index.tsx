@@ -1,11 +1,9 @@
-import { Filter, ServiceError, Sort, SupaRow } from '../../types';
+import { Filter, ServiceError, Sort, SupaRow } from '../../types'
 
 export interface IRowService {
-  count: (
-    filters: Filter[]
-  ) => Promise<{ data?: number; error?: ServiceError }>;
+  count: (filters: Filter[]) => Promise<{ data?: number; error?: ServiceError }>
 
-  create: (row: SupaRow) => Promise<{ data?: SupaRow; error?: ServiceError }>;
+  create: (row: SupaRow) => Promise<{ data?: SupaRow; error?: ServiceError }>
 
   fetchPage: (
     page: number,
@@ -13,9 +11,9 @@ export interface IRowService {
     filters: Filter[],
     sorts: Sort[]
   ) => Promise<{
-    data?: { rows: SupaRow[] };
-    error?: ServiceError;
-  }>;
+    data?: { rows: SupaRow[] }
+    error?: ServiceError
+  }>
 
   /**
    * TODO: should return a promise.
@@ -25,9 +23,13 @@ export interface IRowService {
    * Right now, we remove rows immediately, so it's confused when delete operation fails
    * and rows are already removed from the grid
    */
-  delete: (rows: SupaRow[]) => { error?: ServiceError };
+  delete: (rows: SupaRow[]) => { error?: ServiceError }
 
-  update: (row: SupaRow, changedColumn?: string) => { error?: ServiceError };
+  update: (
+    row: SupaRow,
+    changedColumn?: string,
+    onRowUpdate?: (value: any) => void
+  ) => { row?: SupaRow; error?: ServiceError }
 }
 
-export * from './SqlRowService';
+export * from './SqlRowService'

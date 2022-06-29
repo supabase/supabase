@@ -42,6 +42,7 @@ const BlogListItem = ({ post }: Props) => {
                   }
                   objectFit="cover"
                   className="scale-100 transform duration-100 ease-in group-hover:scale-105"
+                  alt="case study thumbnail"
                 />
               </div>
 

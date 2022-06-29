@@ -4,20 +4,12 @@ title: Auth Server
 description: An SWT based API for managing users and issuing SWT tokens
 ---
 
-GoTrue is a small open-source API written in golang, that can act as a self-standing
-API service for handling user registration and authentication for JAM projects.
+GoTrue is an open source Auth server written in Go. It is an API server that handles user registration, authentication, and managing user data inside a PostgreSQL database.
 
-It's based on OAuth2 and JWT and will handle user signup, authentication and custom
-user data. 
+The Supabase Platform exposes a subset of these configuration options in the dashboard. If you're self-hosting GoTrue, these configuration options are maintained as environment variables.
 
-If you're using gotrue on the Supabase platform, some of these options are not exposed on the dashboard as they are set internally.
-If you're self-hosting gotrue on your own infrastructure, you will need to maintain these configuration options in an `.env` file. Most of these configuration options need to be prefixed with `GOTRUE_` if self-hosting.
 
-## Configuration
-
-The following list provides an overview of the configuration set in gotrue.
-
-### Security
+## Security
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -43,7 +35,7 @@ These options control additional security settings available in gotrue. If self-
 | <span id="captcha_timeout">`CAPTCHA_TIMEOUT`</span> | `string` | The http timeout on the captcha request. |
 | <span id="update_password_require_reauthentication">`UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION`</span> | `bool` | When enabled, this requires a user to reauthenticate before being able to update their password. |
 
-### API
+## API
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -52,7 +44,7 @@ These options control additional security settings available in gotrue. If self-
 | <span id="request_id_header">`REQUEST_ID_HEADER`</span> | `string` | If you wish to inherit a request ID from the incoming request, specify the name in this value. |
 
 
-### Database
+## Database
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -61,7 +53,7 @@ These options control additional security settings available in gotrue. If self-
 | <span id="db_max_pool_size">`DB_MAX_POOL_SIZE`</span> | `int` | Sets the maximum number of open connections to the database. Defaults to 0 which is equivalent to an "unlimited" number of connections. |
 | <span id="db_namespace">`DB_NAMESPACE`</span> | `string` | Specifies the schema in which the tables are to be created in. |
 
-### JSON Web Tokens (JWT)
+## JSON Web Tokens (JWT)
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -71,7 +63,7 @@ These options control additional security settings available in gotrue. If self-
 | <span id="jwt_admin_group_name">`JWT_ADMIN_GROUP_NAME`</span> | `string` | The name of the admin group (if enabled). Defaults to `admin`. |
 | <span id="jwt_default_group_name">`JWT_DEFAULT_GROUP_NAME`</span> | `string` | The default group to assign all new users to. |
 
-### External Authentication Providers
+## External Authentication Providers
 
 We support `apple`, `azure`, `bitbucket`, `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin`, `notion`, `spotify`, `slack`, `twitch`, `twitter` and `workos` for external authentication.
 
@@ -87,15 +79,15 @@ No external providers are required, but you must provide the required values if 
 | <span id="external_x_redirect_uri">`EXTERNAL_X_REDIRECT_URI`</span> | `string` | **Required**. Also known as the callback url, this is the URI an OAuth2 provider will redirect to with the `code` and `state` values. |
 | <span id="external_x_url">`EXTERNAL_X_URL`</span> | `string` | The base URL used for constructing the URLs to request authorization and access tokens. Used by `gitlab` and `keycloak`. For `gitlab` it defaults to `https://gitlab.com`. For `keycloak` you need to set this to your realm url, (e.g. `https://keycloak.example.com/auth/realms/myrealm`) |
 
-#### Apple OAuth
+### Apple OAuth
 
 To try out sign-in with Apple locally, you will need to do the following:
 
-1. Run gotrue over https via ngrok or another proxy.
-2. Generate the crt and key file. See [here](https://www.freecodecamp.org/news/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec/) for more information.
+1. Run GoTrue over `https` via a reverse proxy (like ngrok).
+2. Generate the `crt` and `key` file. See [here](https://www.freecodecamp.org/news/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec/) for more information.
 3. Generate the `GOTRUE_EXTERNAL_APPLE_SECRET` by following this [post](https://medium.com/identity-beyond-borders/how-to-configure-sign-in-with-apple-77c61e336003)!
 
-### SMTP Configuration
+## SMTP Configuration
 
 Sending email is not required, but highly recommended for password recovery. If `mailer_autoconfirm` is enabled, no emails will be sent out for `signup`, `recovery`, `invite`. Emails will only be sent out for `magiclink`.  
 
@@ -109,9 +101,9 @@ Sending email is not required, but highly recommended for password recovery. If 
 | <span id="smtp_max_frequency">`SMTP_MAX_FREQUENCY`</span> | `string` | Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email. The value is the number of seconds. Defaults to 60 seconds. |
 | <span id="smtp_sender_name">`SMTP_SENDER_NAME`</span> | `string` | Sets the name of the sender. Defaults to the `SMTP_ADMIN_EMAIL` if not used. |
 
-### Email
+## Email
 
-These options control the emails sent from gotrue.
+These options control the emails sent from GoTrue.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -127,7 +119,8 @@ These options control the emails sent from gotrue.
 | <span id="mailer_subjects_magiclink">`MAILER_SUBJECTS_MAGIC_LINK`</span> | `string` | Email subject to use for magic link email. Defaults to `Your Magic Link`. |
 | <span id="mailer_subjects_email_change">`MAILER_SUBJECTS_EMAIL_CHANGE`</span> | `string` | Email subject to use for email change confirmation. Defaults to `Confirm Email Change`. |
 
-### Email Templates
+## Email Templates
+
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | <span id="mailer_templates_invite">`MAILER_TEMPLATES_INVITE`</span> | `string` | URL path to an email template to use when inviting a user. `SiteURL`, `Email`, and `ConfirmationURL` variables are available. |
@@ -196,7 +189,7 @@ Default Content (if template is unavailable):
 
 ### Phone Auth
 
-These options control the sms-es sent from gotrue.
+These options control the SMS-es sent from GoTrue.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -217,23 +210,23 @@ You can find the `SMS_TWILIO_ACCOUNT_SID` and `SMS_TWILIO_AUTH_TOKEN` in the acc
 | <span id="twilio_message_service_sid">`SMS_TWILIO_MESSAGE_SERVICE_SID`</span> | `string` | Your twilio sender mobile number |
 
 
-If you're using messagebird, you can obtain your credentials from the [messagebird dashboard](https://dashboard.messagebird.com/en/developers/access):
+If you're using MessageBird, you can obtain your credentials from the [MessageBird dashboard](https://dashboard.messagebird.com/en/developers/access):
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| <span id="messagebird_access_key">`SMS_MESSAGEBIRD_ACCESS_KEY`</span> | `string` | Your messagebird access key. |
-| <span id="messagebird_originator">`SMS_MESSAGEBIRD_ORIGINATOR`</span> | `string` | Your messagebird sender phone number with + or company name.  |
+| <span id="messagebird_access_key">`SMS_MESSAGEBIRD_ACCESS_KEY`</span> | `string` | Your MessageBird access key. |
+| <span id="messagebird_originator">`SMS_MESSAGEBIRD_ORIGINATOR`</span> | `string` | Your MessageBird sender phone number with + or company name.  |
 
-### Logging
+## Logging
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | <span id="log_level">`LOG_LEVEL`</span> | `string` | Controls what log levels are output. Choose from `panic`, `fatal`, `error`, `warn`, `info`, or `debug`. Defaults to `info`. |
 | <span id="log_file">`LOG_FILE`</span> | `string` | If you wish logs to be written to a file, set `log_file` to a valid file path. |
 
-### Opentracing
+## Opentracing
 
-Currently, only the Datadog tracer is supported.
+Currently Datadog is the only tracer supported.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -243,11 +236,11 @@ Currently, only the Datadog tracer is supported.
 | <span id="tracing_tags">`TRACING_TAGS`</span> | `string` | A comma separated list of key:value pairs. These key value pairs will be added as tags to all opentracing spans. (e.g. `GOTRUE_TRACING_TAGS="tag1:value1,tag2:value2"`) |
 | <span id="service_name">`SERVICE_NAME`</span> | `string` | The name to use for the service. |
 
-### Webhooks
+## Webhooks
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| <span id="webhook_url">`WEBHOOK_URL`</span> | `string` | Url of the webhook receiver endpoint. This will be called when events like `validate`, `signup` or `login` occur. |
+| <span id="webhook_url">`WEBHOOK_URL`</span> | `string` | URL of the webhook receiver endpoint. This will be called when events like `validate`, `signup` or `login` occur. |
 | <span id="webhook_secret">`WEBHOOK_SECRET`</span> | `string` | Shared secret to authorize webhook requests. This secret signs the [JSON Web Signature](https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41) of the request. You _should_ use this to verify the integrity of the request. Otherwise others can feed your webhook receiver with fake data. |
 | <span id="webhook_retries">`WEBHOOK_RETRIES`</span> | `number` | How often GoTrue should try a failed hook. |
 | <span id="webhook_timeout_sec">`WEBHOOK_TIMEOUT_SEC`</span> | `number` | Time between retries (in seconds). |
