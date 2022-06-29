@@ -1,20 +1,22 @@
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { toJS } from 'mobx'
 import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
-import { Alert, Button, Input, IconRefreshCcw, IconPause } from '@supabase/ui'
+import { Alert, Input } from '@supabase/ui'
 
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
-import { post, delete_ } from 'lib/common/fetch'
+import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
 import { SettingsLayout } from 'components/layouts'
+import {
+  RestartServerButton,
+  PauseProjectButton,
+  DeleteProjectButton,
+} from 'components/interfaces/Settings/General'
+
 import Panel from 'components/ui/Panel'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
@@ -32,98 +34,6 @@ const ProjectSettings: NextPageWithLayout = () => {
 ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
 
 export default observer(ProjectSettings)
-
-interface RestartServerButtonProps {
-  projectId: number
-  projectRef: string
-}
-const RestartServerButton: FC<RestartServerButtonProps> = observer(({ projectRef, projectId }) => {
-  const { ui, app } = useStore()
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
-
-  const requestServerRestart = async () => {
-    setLoading(true)
-    try {
-      await post(`${API_URL}/projects/${projectRef}/restart`, {})
-      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
-      ui.setNotification({ category: 'success', message: 'Restarting server' })
-      router.push(`/project/${projectRef}`)
-    } catch (error) {
-      ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
-      setLoading(false)
-    }
-    closeModal()
-  }
-
-  return (
-    <>
-      <ConfirmModal
-        danger
-        visible={isModalOpen}
-        title="Restart Server"
-        description={`Are you sure you want to restart the server? There will be a few minutes of downtime.`}
-        buttonLabel="Restart"
-        buttonLoadingLabel="Restarting"
-        onSelectCancel={closeModal}
-        onSelectConfirm={requestServerRestart}
-      />
-      <Button type="default" icon={<IconRefreshCcw />} onClick={openModal} loading={loading}>
-        Restart server
-      </Button>
-    </>
-  )
-})
-
-interface PauseProjectButtonProps {
-  projectId: number
-  projectRef: string
-}
-const PauseProjectButton: FC<PauseProjectButtonProps> = observer(({ projectRef, projectId }) => {
-  const { ui, app } = useStore()
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => setIsModalOpen(false)
-
-  const requestPauseProject = async () => {
-    setLoading(true)
-    try {
-      await post(`${API_URL}/projects/${projectRef}/restart`, {})
-      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
-      ui.setNotification({ category: 'success', message: 'Restarting server' })
-      router.push(`/project/${projectRef}`)
-    } catch (error) {
-      ui.setNotification({ error, category: 'error', message: 'Unable to restart server' })
-      setLoading(false)
-    }
-    closeModal()
-  }
-
-  return (
-    <>
-      <ConfirmModal
-        danger
-        visible={isModalOpen}
-        title="Pause this project?"
-        description={`Are you sure you want to pause this project? It will not be accessible until you unpause it.`}
-        buttonLabel="Pause project"
-        buttonLoadingLabel="Pausing project"
-        onSelectCancel={closeModal}
-        onSelectConfirm={requestPauseProject}
-      />
-      <Button type="default" icon={<IconPause />} onClick={openModal} loading={loading}>
-        Pause Project
-      </Button>
-    </>
-  )
-})
 
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
@@ -182,8 +92,8 @@ const GeneralSettings = observer(() => {
             <div className="flex w-full items-center justify-between">
               <div>
                 <p>Restart server</p>
-                <div style={{ maxWidth: '420px' }}>
-                  <p className="text-sm opacity-50">
+                <div className="max-w-[420px]">
+                  <p className="text-scale-1100 text-sm">
                     Your project will not be available for a few minutes.
                   </p>
                 </div>
@@ -195,8 +105,8 @@ const GeneralSettings = observer(() => {
             <div className="flex w-full items-center justify-between">
               <div>
                 <p>Pause project</p>
-                <div style={{ maxWidth: '420px' }}>
-                  <p className="text-sm opacity-50">
+                <div className="max-w-[420px]">
+                  <p className="text-scale-1100 text-sm">
                     Your project will not be accessible while it is paused.
                   </p>
                 </div>
@@ -207,76 +117,26 @@ const GeneralSettings = observer(() => {
         </Panel>
       </section>
 
-      <section>
-        <Panel title={<p className="uppercase">Danger Zone</p>}>
-          <Panel.Content>
-            <Alert
-              variant="danger"
-              withIcon
-              title="Deleting this project will also remove your database."
-            >
-              <div className="flex flex-col">
-                <p className="mb-4 block">
-                  Make sure you have made a backup if you want to keep your data.
-                </p>
-                <ProjectDeleteModal project={project} />
-              </div>
-            </Alert>
-          </Panel.Content>
-        </Panel>
-      </section>
+      {project !== undefined && (
+        <section>
+          <Panel title={<p className="uppercase">Danger Zone</p>}>
+            <Panel.Content>
+              <Alert
+                variant="danger"
+                withIcon
+                title="Deleting this project will also remove your database."
+              >
+                <div className="flex flex-col">
+                  <p className="mb-4 block">
+                    Make sure you have made a backup if you want to keep your data.
+                  </p>
+                  <DeleteProjectButton project={project} />
+                </div>
+              </Alert>
+            </Panel.Content>
+          </Panel>
+        </section>
+      )}
     </article>
   )
 })
-
-const ProjectDeleteModal = ({ project }: any) => {
-  const router = useRouter()
-  const { ui, app } = useStore()
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  const toggle = () => {
-    if (loading) return
-    setIsOpen(!isOpen)
-  }
-
-  async function handleDeleteProject() {
-    setLoading(true)
-    try {
-      const response = await delete_(`${API_URL}/projects/${project.ref}`)
-      if (response.error) throw response.error
-      app.onProjectDeleted(response)
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
-      router.push(`/`)
-    } catch (error: any) {
-      setLoading(false)
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete project ${project.name}: ${error.message}`,
-      })
-    }
-  }
-
-  return (
-    <>
-      <div className="mt-2">
-        <Button onClick={toggle} type="danger">
-          Delete Project
-        </Button>
-      </div>
-      <TextConfirmModal
-        visible={isOpen}
-        loading={loading}
-        title={`Confirm deletion of ${project?.name}`}
-        confirmPlaceholder="Type the project name in here"
-        alert="This action cannot be undone."
-        text={`This will permanently delete the ${project?.name} project and all of its data.`}
-        confirmString={project?.name}
-        confirmLabel="I understand, delete this project"
-        onConfirm={handleDeleteProject}
-        onCancel={toggle}
-      />
-    </>
-  )
-}

@@ -6,9 +6,6 @@ import { constructHeaders } from 'lib/api/apiHelpers'
 import PostgresMetaInterface, { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 
 export interface IDatabaseStore extends IPostgresMetaInterface<any> {
-  getBackups: (
-    projectRef: string
-  ) => Promise<{ tierId: any; backups: any[] } | { error: ResponseError }>
   getPoolingConfiguration: (projectRef: string) => Promise<any | { error: ResponseError }>
 }
 
@@ -22,18 +19,6 @@ export default class DatabaseStore extends PostgresMetaInterface<any> {
     options?: { identifier: string }
   ) {
     super(rootStore, dataUrl, headers, options)
-  }
-
-  async getBackups(projectRef: string) {
-    try {
-      const url = `${this.url}/${projectRef}/backups`
-      const headers = constructHeaders(this.headers)
-      const response = await get(url, { headers })
-      if (response.error) throw response.error
-      return response
-    } catch (error: any) {
-      return { error }
-    }
   }
 
   async getPoolingConfiguration(projectRef: string) {

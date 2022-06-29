@@ -23,7 +23,7 @@ To make sure that everything works correctly, let’s try the connection string 
 
 If you already have one, all you need to do is set the `DATABASE_URL` to the connection string (including the password) in your `.env` file, and you’re good to go.
 
-In case you don’t have a Prisma project or this is your first time working with Prisma, you’re going to use with the repo from the [quickstart](https://www.prisma.io/docs/getting-started/quickstart) guide.
+In case you don’t have a Prisma project or this is your first time working with Prisma, you’re going to use the repo from the [quickstart](https://www.prisma.io/docs/getting-started/quickstart) guide.
 
 ### Cloning the starter project
 
@@ -140,10 +140,10 @@ alter type "Incompatible" rename to compatible;
 
 ## Connection pooling with Supabase
 
-If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [support connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
+If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [supports connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
 Go to the **Database** page from the sidebar in the Supabase dashboard and navigate to **connection pool** settings
 ![Connection pool settings](/img/guides/integrations/prisma/w0oowg8vq435ob5c3gf0.png)
-When running migrations you need to use the non pooled connection URL (like the one we used in **step 4**). However, when deploying your app, you’ll use the pooled connection URL and add the `?pgbouncer=true` flag to the PostgreSQL connection URL. To minimize the number of concurrent connections, setting the `connection_limit` to `1` is also recommended. So The URL might look as follows:
+When running migrations you need to use the non pooled connection URL (like the one we used in **step 4**). However, when deploying your app, you’ll use the pooled connection URL and add the `?pgbouncer=true` flag to the PostgreSQL connection URL. To minimize the number of concurrent connections, setting the `connection_limit` to `1` is also recommended. So the URL might look as follows:
 
 ```env
 # prisma/.env
@@ -159,6 +159,37 @@ Error querying the database: db error: ERROR: prepared statement “s0” alread
 
 This is a known issue and it is being worked on, you can follow the progress on this [GitHub issue](https://github.com/prisma/prisma/issues/6485).
 If you want to learn more about Prisma, check out the [docs](https://www.prisma.io/docs). Also in case you have any questions or run into any issue, feel free to start a discussion in the repo’s [discussions section](https://github.com/prisma/prisma/discussions).
+
+## Troubleshooting
+
+If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to recreate the whole schema. If you chose yes, it will delete the public schema and recreates it. The default grants are missing after this. If you run into this problem, add a helper SQL for fixing the grants:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS "auth";
+CREATE SCHEMA IF NOT EXISTS "extensions";
+create extension if not exists "uuid-ossp"      with schema extensions;
+create extension if not exists pgcrypto         with schema extensions;
+create extension if not exists pgjwt            with schema extensions;
+
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant usage on schema extensions to postgres, anon, authenticated, service_role;
+alter user supabase_admin SET search_path TO public, extensions; -- don't include the "auth" schema
+
+grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+grant all privileges on all functions in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+grant all privileges on all sequences in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+
+alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+
+alter default privileges for user supabase_admin in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+alter default privileges for user supabase_admin in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges for user supabase_admin in schema public grant all on functions to postgres, anon, authenticated, service_role;
+
+alter role anon set statement_timeout = '3s';
+alter role authenticated set statement_timeout = '8s';
+```
 
 ## Resources
 
