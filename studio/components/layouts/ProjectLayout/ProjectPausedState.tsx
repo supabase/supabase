@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Alert, Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
+import { Alert, Button, IconPauseCircle } from '@supabase/ui'
 
 import { Project } from 'types'
 import { useStore, useSubscriptionStats } from 'hooks'
