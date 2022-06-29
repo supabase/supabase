@@ -1,22 +1,19 @@
 import { FC, useState } from 'react'
-import { Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
+import { useRouter } from 'next/router'
+import { Alert, Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
 
 import { Project } from 'types'
-import Link from '@supabase/ui/dist/cjs/components/Typography/Link'
 import { useStore, useSubscriptionStats } from 'hooks'
-import { DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { API_URL, PROJECT_STATUS, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
+import { DeleteProjectButton } from 'components/interfaces/Settings/General'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
 interface Props {
   project: Project
 }
 
 const ProjectPausedState: FC<Props> = ({ project }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
-  const { ref } = router.query
   const { ui, app } = useStore()
   const subscriptionStats = useSubscriptionStats()
   const {
@@ -26,17 +23,39 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   } = subscriptionStats
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  const restoreProject = async (project: Project) => {
-    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
+  console.log('ProjectPausedState', {
+    totalFreeProjects,
+    totalActiveFreeProjects,
+    totalPausedFreeProjects,
+    freeProjectsLimit,
+  })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showConfirmRestore, setShowConfirmRestore] = useState(false)
+  const hasExceedActiveFreeProjectsLimit = totalActiveFreeProjects >= freeProjectsLimit
+
+  const onConfirmRestore = async () => {
     await post(`${API_URL}/projects/${project.ref}/restore`, {})
-    //router.reload()
+    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
+    ui.setNotification({ category: 'success', message: 'Restoring project' })
   }
 
   return (
     <>
-      <div className="mx-auto mt-8 mb-16 w-full max-w-7xl">
-        <div className="mx-6">
-          <div className="bg-scale-300 border-scale-400 flex h-[500px] items-center justify-center rounded border p-8">
+      <div className="space-y-4">
+        {hasExceedActiveFreeProjectsLimit && (
+          <div className="mx-6">
+            <Alert
+              withIcon
+              variant="warning"
+              title={`Your account can only have ${freeProjectsLimit} active free projects`}
+            >
+              To restore this project you'll need to pause or delete an existing free project.
+            </Alert>
+          </div>
+        )}
+        <div className="mx-auto mb-16 w-full max-w-7xl">
+          <div className="bg-scale-300 border-scale-400 mx-6 flex h-[500px] items-center justify-center rounded border p-8">
             <div className="grid w-[420px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
@@ -46,42 +65,19 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
 
               <div className="flex items-center justify-center gap-4">
                 <Button
-                  onClick={() => restoreProject(project)}
-                  size="small"
-                  loading={isSubmitting}
+                  size="tiny"
                   type="primary"
+                  loading={isSubmitting}
+                  disabled={hasExceedActiveFreeProjectsLimit}
+                  onClick={() => setShowConfirmRestore(true)}
                 >
-                  Restore
+                  Restore project
                 </Button>
-
-                <Link href={`/project/${ref}/settings/general`}>
-                  <Button
-                    // onClick={}
-                    size="small"
-                    loading={isSubmitting}
-                    type="default"
-                    tabIndex={-1}
-                  >
-                    <a>Delete</a>
-                  </Button>
-                </Link>
+                <DeleteProjectButton project={project} type="default" />
               </div>
 
-              {totalActiveFreeProjects > totalFreeProjects ? (
-                <div className="mt-4 flex gap-4 border-t pt-8">
-                  <IconAlertCircle className="text-red-900" size={35} strokeWidth={2} />
-                  <div>
-                    <p className="text-md">
-                      Your account can only have <u>{freeProjectsLimit} free projects.</u>
-                    </p>
-                    <p className="text-scale-900 mt-2 text-sm">
-                      To restore this project you'll need to pause or delete an existing free
-                      project.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-scale-900 mt-4 text-sm">
+              {!hasExceedActiveFreeProjectsLimit && (
+                <p className="text-scale-1000 mt-4 text-sm">
                   Restore this project and get back to building the next big thing!
                 </p>
               )}
@@ -89,6 +85,15 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        visible={showConfirmRestore}
+        title="Restore this project"
+        description="Confirm to restore this project? Your project's data will be restored to when it was initially paused."
+        buttonLabel="Restore project"
+        buttonLoadingLabel="Restoring project"
+        onSelectCancel={() => setShowConfirmRestore(false)}
+        onSelectConfirm={onConfirmRestore}
+      />
     </>
   )
 }

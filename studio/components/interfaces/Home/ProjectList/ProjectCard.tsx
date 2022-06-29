@@ -1,26 +1,22 @@
 import { FC } from 'react'
+import { Badge, IconLoader, IconPauseCircle } from '@supabase/ui'
 
-import { Badge, Button, IconClock } from '@supabase/ui'
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface Props {
   project: Project
-  paused: boolean
-  onSelectRestore?: () => void
-  onSelectDelete?: () => void
   rewriteHref?: string
 }
 
-const ProjectCard: FC<Props> = ({
-  project,
-  paused,
-  onSelectRestore,
-  onSelectDelete,
-  rewriteHref,
-}) => {
+const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
+
+  const isPausing = project.status === PROJECT_STATUS.GOING_DOWN
+  const isPaused = project.status === PROJECT_STATUS.INACTIVE
+  const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
   return (
     <li className="col-span-1">
@@ -35,35 +31,36 @@ const ProjectCard: FC<Props> = ({
         footer={
           <div className="flex items-end justify-between">
             <span className="text-scale-900 text-sm lowercase">{desc}</span>
-            {paused && (
+            {isRestoring ? (
               <div className="grow text-right">
-                <Badge color="scale">
+                <Badge color="brand">
                   <div className="flex items-center gap-2">
-                    <IconClock size={14} strokeWidth={2} />
-                    <span className="truncate">Project paused</span>
+                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                    <span className="truncate">Restoring</span>
                   </div>
                 </Badge>
               </div>
+            ) : isPausing ? (
+              <div className="grow text-right">
+                <Badge color="scale">
+                  <div className="flex items-center gap-2">
+                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                    <span className="truncate">Pausing</span>
+                  </div>
+                </Badge>
+              </div>
+            ) : isPaused ? (
+              <div className="grow text-right">
+                <Badge color="scale">
+                  <div className="flex items-center gap-2">
+                    <IconPauseCircle size={14} strokeWidth={2} />
+                    <span className="truncate">Paused</span>
+                  </div>
+                </Badge>
+              </div>
+            ) : (
+              <></>
             )}
-
-            {/*<div className="flex items-center gap-2">
-                 <div className="flex items-center gap-2">
-                  <Button
-                    size="tiny"
-                    type="primary"
-                    onClick={() => onSelectRestore && onSelectRestore()}
-                  >
-                    Restore
-                  </Button>
-                  <Button
-                    size="tiny"
-                    type="default"
-                    onClick={() => onSelectDelete && onSelectDelete()}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>*/}
           </div>
         }
       ></CardButton>
