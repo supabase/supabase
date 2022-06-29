@@ -45,10 +45,10 @@ const Users = () => {
 
   return (
     <div className="">
-      <div className="flex justify-between">
+      <div className="flex justify-between px-6 pt-6 pb-2">
         <div className="relative flex space-x-1">
           <Input
-            size="tiny"
+            size="small"
             value={PageState.filterInputValue}
             onChange={onFilterChange}
             onKeyDown={onFilterKeyPress}
@@ -68,12 +68,21 @@ const Users = () => {
             ]}
           />
         </div>
-        <div className='flex items-center'>
-          <Button className="mr-2" size="tiny" icon={<IconRefreshCw />} type="default" onClick={refreshUsers}>Reload</Button>
+        <div className="flex items-center">
+          <Button
+            className="mr-2"
+            size="tiny"
+            icon={<IconRefreshCw />}
+            type="default"
+            loading={PageState.usersLoading}
+            onClick={refreshUsers}
+          >
+            Reload
+          </Button>
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="overflow-visible mt-4">
+      <section className="overflow-visible mt-4 px-6">
         <div className="relative section-block--body rounded">
           <div className="align-middle inline-block min-w-full">
             <UsersList />

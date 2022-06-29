@@ -8,10 +8,10 @@ const FileExplorerHeaderSelection = ({
   onUnselectAllItems = () => {},
 }) => {
   return (
-    <div className="px-1 py-1 rounded-t-md bg-green-500 flex items-center shadow z-10 h-[40px]">
+    <div className="px-1 py-1 rounded-t-md bg-green-600 flex items-center shadow z-10 h-[40px]">
       <Button
         icon={<IconX size={16} strokeWidth={2} />}
-        type="primary"
+        type="text"
         shadow={false}
         onClick={onUnselectAllItems}
       />
@@ -29,7 +29,7 @@ const FileExplorerHeaderSelection = ({
         >
           Download
         </Button>
-        <div className="border-r border-green-700 py-3 opacity-50" />
+        <div className="border-r border-green-800 py-3 opacity-50" />
         <Button
           icon={<IconTrash2 size={16} strokeWidth={2} />}
           type="primary"

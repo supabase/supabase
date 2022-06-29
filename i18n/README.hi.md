@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] स्वतः जनरेट किए गए API
 - [x] डैशबोर्ड
 - [x] भंडारण
-- [ ] कार्यों (जल्द आ रहा है)
+- [x] कार्यों
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## प्रलेखन
 
-पूर्ण प्रलेखन के लिए, [supabase.io/docs](https://supabase.com/docs) पर जाएँ
+पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 
@@ -29,7 +32,7 @@
 ## स्थिति
 
 - [x] अल्फा: हम चुनिंदा ग्राहकों के साथ सुपरबास का परीक्षण कर रहे हैं
-- [x] सार्वजनिक अल्फा: कोई भी [app.supabase.io](https://app.supabase.io) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
+- [x] सार्वजनिक अल्फा: कोई भी [app.supabase.com](https://app.supabase.com) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
 - [x] सार्वजनिक बीटा: अधिकांश गैर-एंटरप्राइज़ उपयोग-मामलों के लिए पर्याप्त स्थिर
 - [ ] सार्वजनिक: उत्पादन-तैयार
 
@@ -45,7 +48,7 @@
 
 **वर्तमान वास्तुकला**
 
-सुपबेस [होस्टेड प्लेटफार्म](https://app.supabase.io). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपबेस का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
+सुपबेस [होस्टेड प्लेटफार्म](https://app.supabase.com). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपबेस का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
 
 ![आर्किटेक्चर](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

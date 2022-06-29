@@ -1,15 +1,18 @@
 import React from 'react'
+import { Octokit } from '@octokit/core'
 import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import sponsors from '../data/sponsors.json'
 import maintainers from '../data/maintainers.json'
 import GithubCard from '../components/GithubCard'
-import { repos } from '../data/github'
 
 import Sponsors from '../components/Sponsors'
 
 export default function Oss() {
+  const octokit = new Octokit()
+
   const [activePill, setActivePill] = React.useState('All')
+  const [repos, setRepos] = React.useState([])
+
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
 
@@ -18,12 +21,27 @@ export default function Oss() {
     .filter((v, i, a) => a.indexOf(v) === i) // remove duplicates
     .sort((a, b) => a.localeCompare(b)) // alphabetical
   const maintainerPills = ['All'].concat(maintainerTags)
-  
+
+  React.useEffect(async () => {
+    const reposResponse = await octokit.request('GET /orgs/{org}/repos', {
+      org: 'supabase',
+      type: 'public',
+      per_page: 6,
+      page: 1,
+    })
+
+    setRepos(
+      reposResponse.data
+        .filter((r) => !!r.stargazers_count)
+        .sort((a, b) => b.stargazers_count - a.stargazers_count)
+    )
+  })
+
   return (
     <Layout title={`${siteConfig.title}`} description={siteConfig.tagline}>
       <section className={'section-lg'}>
         <div className="container">
-          <div className={'row '}>
+          <div className={'row'}>
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
@@ -48,11 +66,11 @@ export default function Oss() {
         <div className="container">
           <h2>Community Maintainers</h2>
 
-          <ul class="pills">
+          <ul style={{ overflow: 'auto' }} className="pills">
             {maintainerPills.map((x) => (
               <li
                 key={x}
-                class={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
+                className={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
                 onClick={() => setActivePill(x)}
               >
                 {x}
@@ -90,18 +108,19 @@ export default function Oss() {
         <div className="container">
           <h2>Repositories</h2>
           <div className="row is-multiline">
-            {repos.map((props, idx) => (
-              <div className={'col col--6'}>
-                <GithubCard
-                  key={idx}
-                  title={props.name}
-                  description={props.description}
-                  href={props.html_url}
-                  stars={props.stargazers_count}
-                  handle={props.full_name}
-                />
-              </div>
-            ))}
+            {repos.length < 1 && <div></div>}
+            {repos.length >= 1 &&
+              repos.map((props, idx) => (
+                <div className={'col col--6'} key={idx}>
+                  <GithubCard
+                    title={props.name}
+                    description={props.description}
+                    href={props.html_url}
+                    stars={props.stargazers_count}
+                    handle={props.full_name}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </section>

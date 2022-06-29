@@ -74,7 +74,7 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => {
         return (
-          <div className="Code codeBlockWrapper">
+          <div className="Code codeBlockWrapper group">
             <pre ref={target} className={`codeBlock ${className}`}>
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i })
@@ -92,13 +92,16 @@ const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, meta
                 )
               })}
             </pre>
-            <Button
-              type="secondary"
-              onClick={() => handleCopyCode(children)}
-              style={{ padding: '2px 5px' }}
-            >
-              {showCopied ? 'Copied' : 'Copy'}
-            </Button>
+            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity absolute right-0 top-0">
+              <Button
+                size="tiny"
+                type="default"
+                onClick={() => handleCopyCode(children)}
+                // style={{ padding: '2px 5px' }}
+              >
+                {showCopied ? 'Copied' : 'Copy'}
+              </Button>
+            </div>
           </div>
         )
       }}

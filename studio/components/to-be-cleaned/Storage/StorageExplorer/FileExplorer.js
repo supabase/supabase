@@ -12,8 +12,6 @@ const FileExplorer = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
-  isSearching = false,
-  itemSearchString = '',
   onCheckItem = () => {},
   onSelectItemDelete = () => {},
   onSelectItemRename = () => {},
@@ -31,6 +29,8 @@ const FileExplorer = ({
   onSelectCreateFolder = () => {},
   onChangeView = () => {},
   onChangeSortBy = () => {},
+  onChangeSortByOrder = () => {},
+  onColumnLoadMore = () => {},
 }) => {
   const fileExplorerRef = useRef(null)
 
@@ -54,6 +54,7 @@ const FileExplorer = ({
         onSelectAllItems={onSelectAllItemsInColumn}
         onSelectView={onChangeView}
         onSelectSort={onChangeSortBy}
+        onSelectSortByOrder={onChangeSortByOrder}
       />
       <ItemContextMenu
         id={CONTEXT_MENU_KEYS.STORAGE_ITEM}
@@ -93,6 +94,7 @@ const FileExplorer = ({
               onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+              onColumnLoadMore={onColumnLoadMore}
             />
           ))}
         </div>
@@ -106,8 +108,6 @@ const FileExplorer = ({
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
-              isSearching={isSearching}
-              itemSearchString={itemSearchString}
               onCheckItem={onCheckItem}
               onSelectFile={onSelectFile}
               onRenameFile={onRenameFile}
@@ -122,6 +122,7 @@ const FileExplorer = ({
               onSelectItemMove={onSelectItemMove}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+              onColumnLoadMore={onColumnLoadMore}
             />
           )}
         </>

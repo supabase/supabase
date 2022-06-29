@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] API autogenerada
 - [x] Panell de control
 - [x] Emmagatzematge
-- [ ] Funcions (pròximament)
+- [x] Funcions
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentació
 
@@ -30,7 +33,7 @@ Per a veure la documentació completa, visita [supabase.com/docs](https://supaba
 ## Estat
 
 - [x] Alfa: Estem provant Supabase amb un cercle tancat de clients.
-- [x] Alfa pública: Qualsevol pot registrar-se a [app.supabase.io](https://app.supabase.io). Però sigues flexible amb nosaltres; encara poden existir obstacles.
+- [x] Alfa pública: Qualsevol pot registrar-se a [app.supabase.com](https://app.supabase.com). Però sigues flexible amb nosaltres; encara poden existir obstacles.
 - [x] Beta pública: Prou estable per a la majoria dels casos no empresarials.
 - [ ] Públic: Llest per a producció.
 
@@ -46,7 +49,7 @@ Supabase és una combinació d’eines de codi obert. Estem construint les funci
 
 **Arquitectura actual**
 
-Supabase és una [plataforma allotjada](https://app.supabase.io). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/self-hosting) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
+Supabase és una [plataforma allotjada](https://app.supabase.com). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

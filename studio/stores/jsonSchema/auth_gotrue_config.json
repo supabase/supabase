@@ -6,6 +6,7 @@
     "JWT_EXP",
     "JWT_AUD",
     "JWT_DEFAULT_GROUP_NAME",
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION",
     "EXTERNAL_EMAIL_ENABLED",
     "EXTERNAL_PHONE_ENABLED",
     "EXTERNAL_APPLE_ENABLED",
@@ -16,12 +17,15 @@
     "EXTERNAL_GITHUB_ENABLED",
     "EXTERNAL_GITLAB_ENABLED",
     "EXTERNAL_GOOGLE_ENABLED",
+    "EXTERNAL_KEYCLOAK_ENABLED",
+    "EXTERNAL_LINKEDIN_ENABLED",
+    "EXTERNAL_NOTION_ENABLED",
     "EXTERNAL_TWITCH_ENABLED",
     "EXTERNAL_TWITTER_ENABLED",
     "EXTERNAL_SLACK_ENABLED",
-    "EXTERNAL_SLACK_ENABLED",
     "EXTERNAL_SPOTIFY_ENABLED",
-    "EXTERNAL_SPOTIFY_ENABLED",
+    "EXTERNAL_WORKOS_ENABLED",
+    "EXTERNAL_ZOOM_ENABLED",
     "SMS_AUTOCONFIRM",
     "SMS_MAX_FREQUENCY",
     "SMS_OTP_EXP",
@@ -29,6 +33,7 @@
     "SMS_PROVIDER",
     "SMS_TEMPLATE",
     "MAILER_AUTOCONFIRM",
+    "MAILER_OTP_EXP",
     "MAILER_URLPATHS_INVITE",
     "MAILER_URLPATHS_CONFIRMATION",
     "MAILER_URLPATHS_RECOVERY",
@@ -51,27 +56,27 @@
       "help": "The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
     },
     "URI_ALLOW_LIST": {
-      "title": "Additional Redirect URLs",
+      "title": "Additional redirect URLs",
       "type": "string",
-      "help": "A comma separated list of *exact* URLs that auth providers are permitted to redirect to post authentication."
+      "help": "A comma separated list of URLs that auth providers are permitted to redirect to post authentication. Wildcards allowed (e.g. https://*.domain.com)"
     },
     "DISABLE_SIGNUP": {
-      "title": "Disable Signup",
+      "title": "Disable signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups to your project."
     },
     "EXTERNAL_EMAIL_ENABLED": {
-      "title": "Enable Email Signup",
+      "title": "Enable email signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups via email to your project."
     },
     "EXTERNAL_PHONE_ENABLED": {
-      "title": "Enable Phone Signup",
+      "title": "Enable phone signup",
       "type": "boolean",
       "help": "Allow/disallow new user signups via phone to your project."
     },
     "JWT_EXP": {
-      "title": "JWT Expiry",
+      "title": "JWT expiry",
       "type": "integer",
       "help": "How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).",
       "minimum": 1,
@@ -79,7 +84,7 @@
       "multipleof": 1
     },
     "JWT_AUD": {
-      "title": "JWT Audience",
+      "title": "JWT audience",
       "type": "string"
     },
     "JWT_DEFAULT_GROUP_NAME": {
@@ -108,6 +113,10 @@
     },
     "EXTERNAL_AZURE_SECRET": {
       "title": "Azure secret",
+      "type": "string"
+    },
+    "EXTERNAL_AZURE_URL": {
+      "title": "Azure tenant URL",
       "type": "string"
     },
     "EXTERNAL_BITBUCKET_ENABLED": {
@@ -186,6 +195,46 @@
       "title": "Google secret",
       "type": "string"
     },
+    "EXTERNAL_KEYCLOAK_ENABLED": {
+      "title": "Keycloak enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_KEYCLOAK_CLIENT_ID": {
+      "title": "Keycloak client ID",
+      "type": "string"
+    },
+    "EXTERNAL_KEYCLOAK_SECRET": {
+      "title": "Keycloak secret",
+      "type": "string"
+    },
+    "EXTERNAL_KEYCLOAK_URL": {
+      "title": "Keycloak URL",
+      "type": "string"
+    },
+    "EXTERNAL_LINKEDIN_ENABLED": {
+      "title": "Linkedin enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_LINKEDIN_CLIENT_ID": {
+      "title": "Linkedin client ID",
+      "type": "string"
+    },
+    "EXTERNAL_LINKEDIN_SECRET": {
+      "title": "Linkedin secret",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_ENABLED": {
+      "title": "Notion enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_NOTION_CLIENT_ID": {
+      "title": "Notion client ID",
+      "type": "string"
+    },
+    "EXTERNAL_NOTION_SECRET": {
+      "title": "Notion secret",
+      "type": "string"
+    },
     "EXTERNAL_TWITCH_ENABLED": {
       "title": "Twitch enabled",
       "type": "boolean"
@@ -234,36 +283,64 @@
       "title": "Spotify secret",
       "type": "string"
     },
+    "EXTERNAL_WORKOS_ENABLED": {
+      "title": "WorkOS enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_WORKOS_CLIENT_ID": {
+      "title": "WorkOS client ID",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_SECRET": {
+      "title": "WorkOS secret",
+      "type": "string"
+    },
+    "EXTERNAL_WORKOS_URL": {
+      "title": "WorkOS URL",
+      "type": "string"
+    },
+    "EXTERNAL_ZOOM_ENABLED": {
+      "title": "Zoom enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_ZOOM_CLIENT_ID": {
+      "title": "Zoom client ID",
+      "type": "string"
+    },
+    "EXTERNAL_ZOOM_SECRET": {
+      "title": "Zoom secret",
+      "type": "string"
+    },
     "SMTP_ADMIN_EMAIL": {
-      "title": "SMTP Admin Email",
+      "title": "SMTP admin email",
       "type": "string"
     },
     "SMTP_HOST": {
-      "title": "SMTP Host",
+      "title": "SMTP host",
       "type": "string"
     },
     "SMTP_PORT": {
-      "title": "SMTP Port",
+      "title": "SMTP port",
       "type": "string"
     },
     "SMTP_USER": {
-      "title": "SMTP User",
+      "title": "SMTP user",
       "type": "string"
     },
     "SMTP_PASS": {
-      "title": "SMTP Password",
+      "title": "SMTP password",
       "type": "string"
     },
     "SMTP_PASS_ENCRYPTED": {
-      "title": "SMTP Password",
+      "title": "SMTP password",
       "type": "string"
     },
     "SMTP_SENDER_NAME": {
-      "title": "SMTP Sender Name",
+      "title": "SMTP sender name",
       "type": "string"
     },
     "RATE_LIMIT_EMAIL_SENT": {
-      "title": "Rate Limit",
+      "title": "Rate limit",
       "type": "number",
       "help": "Maximum number of emails sent per hour (Default: 30, Max: 32,767)",
       "minimum": 1,
@@ -300,6 +377,12 @@
       "title": "Subject",
       "type": "string"
     },
+    "MAILER_OTP_EXP": {
+      "title": "Mailer Otp Expiration",
+      "type": "integer",
+      "help": "Duration before an email otp / link expires."
+    },
+    
     "MAILER_SUBJECTS_CONFIRMATION": {
       "title": "Subject",
       "type": "string"
@@ -351,13 +434,37 @@
       "title": "Body",
       "type": "string"
     },
+    "PASSWORD_MIN_LENGTH": {
+      "title": "Minimum password length",
+      "type": "integer"
+    },
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
+      "title": "Enable strict password updates",
+      "type": "boolean",
+      "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
+    },
+    "SECURITY_REFRESH_TOKEN_REUSE_INTERVAL": {
+      "title": "Reuse Interval",
+      "type": "integer",
+      "help": "Time interval where the same refresh token can be used to request for an access token."
+    },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",
       "type": "boolean",
       "help": "If enabled, users need to confirm their phone number before signing in."
     },
+    "SMS_OTP_EXP": {
+      "title": "Sms Otp Expiration",
+      "type": "integer",
+      "help": "Duration before an sms otp expires."
+    },
+    "SMS_OTP_LENGTH": {
+      "title": "Sms Otp Length",
+      "type": "integer",
+      "help": "Number of digits in otp."
+    },
     "SMS_PROVIDER": {
-      "title": "Sms Provider",
+      "title": "Sms provider",
       "type": "string",
       "options": [
         {
@@ -367,19 +474,36 @@
         {
           "value": "messagebird",
           "label": "Messagebird"
+        },
+        {
+          "value": "vonage",
+          "label": "Vonage"
+        },
+        {
+          "value": "textlocal",
+          "label": "Textlocal"
         }
       ]
     },
+    "SMS_TEXTLOCAL_API_KEY": {
+      "title": "Textlocal API key",
+      "type": "string"
+    },
+    "SMS_TEXTLOCAL_SENDER": {
+      "title": "Textlocal sender",
+      "type": "string",
+      "help": "Textlocal sender phone number"
+    },
     "SMS_TWILIO_ACCOUNT_SID": {
-      "title": "Twilio Account SID",
+      "title": "Twilio account SID",
       "type": "string"
     },
     "SMS_TWILIO_AUTH_TOKEN": {
-      "title": "Twilio Auth Token",
+      "title": "Twilio auth token",
       "type": "string"
     },
     "SMS_TWILIO_MESSAGE_SERVICE_SID": {
-      "title": "Twilio Message Service SID",
+      "title": "Twilio message service SID",
       "type": "string",
       "help": "Twilio message service SID or twilio phone number"
     },
@@ -391,6 +515,19 @@
       "title": "Messagebird originator",
       "type": "string",
       "help": "Messagebird sender name or phone number"
+    },
+    "SMS_VONAGE_API_KEY": {
+      "title": "Vonage API key",
+      "type": "string"
+    },
+    "SMS_VONAGE_API_SECRET": {
+      "title": "Vonage API secret",
+      "type": "string"
+    },
+    "SMS_VONAGE_FROM": {
+      "title": "Vonage sender",
+      "type": "string",
+      "help": "Vonage sender phone number"
     },
     "SMS_TEMPLATE": {
       "title": "Body",

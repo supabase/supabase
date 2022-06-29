@@ -1,7 +1,13 @@
-import { FC, useState, useEffect } from 'react'
-import { find, isUndefined } from 'lodash'
-import { Query, Dictionary } from '@supabase/grid'
-import { PostgresRelationship, PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { FC, useState } from 'react'
+import { find, isEmpty, isUndefined } from 'lodash'
+import { Query, Dictionary } from 'components/grid'
+import { Modal } from '@supabase/ui'
+import {
+  PostgresRelationship,
+  PostgresTable,
+  PostgresColumn,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import { RowEditor, ColumnEditor, TableEditor } from '.'
@@ -43,30 +49,19 @@ const SidePanelEditor: FC<Props> = ({
 }) => {
   const { meta, ui } = useStore()
 
-  const [enumTypes, setEnumTypes] = useState<any[]>([])
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
   const tables = meta.tables.list()
-
-  useEffect(() => {
-    let cancel = false
-    const fetchEnumTypes = async () => {
-      const enumTypes = await meta.schemas.getEnums()
-      if (!cancel) setEnumTypes(enumTypes)
-    }
-    fetchEnumTypes()
-
-    return () => {
-      cancel = true
-    }
-  }, [])
+  const enumTypes = meta.types.list(
+    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
+  )
 
   const saveRow = async (
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
-    resolve: any
+    onComplete: Function
   ) => {
     let saveRowError = false
     if (isNewRecord) {
@@ -83,31 +78,34 @@ const SidePanelEditor: FC<Props> = ({
         onRowCreated(res[0])
       }
     } else {
-      if (selectedTable!.primary_keys.length > 0) {
-        const updateQuery = new Query()
-          .from(selectedTable!.name, selectedTable!.schema)
-          .update(payload, { returning: true })
-          .match(configuration.identifiers)
-          .toSql()
+      const hasChanges = !isEmpty(payload)
+      if (hasChanges) {
+        if (selectedTable!.primary_keys.length > 0) {
+          const updateQuery = new Query()
+            .from(selectedTable!.name, selectedTable!.schema)
+            .update(payload, { returning: true })
+            .match(configuration.identifiers)
+            .toSql()
 
-        const res: any = await meta.query(updateQuery)
-        if (res.error) {
-          saveRowError = true
-          ui.setNotification({ category: 'error', message: res.error?.message })
+          const res: any = await meta.query(updateQuery)
+          if (res.error) {
+            saveRowError = true
+            ui.setNotification({ category: 'error', message: res.error?.message })
+          } else {
+            onRowUpdated(res[0], configuration.rowIdx)
+          }
         } else {
-          onRowUpdated(res[0], configuration.rowIdx)
+          saveRowError = true
+          ui.setNotification({
+            category: 'error',
+            message:
+              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
+          })
         }
-      } else {
-        saveRowError = true
-        ui.setNotification({
-          category: 'error',
-          message:
-            "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-        })
       }
     }
 
-    resolve()
+    onComplete()
     if (!saveRowError) {
       setIsEdited(false)
       closePanel()
@@ -150,13 +148,15 @@ const SidePanelEditor: FC<Props> = ({
       tableId?: number
       importContent?: ImportContent
       isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
       isDuplicateRows: boolean
     },
     resolve: any
   ) => {
     let toastId
     let saveTableError = false
-    const { tableId, importContent, isRLSEnabled, isDuplicateRows } = configuration
+    const { tableId, importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } =
+      configuration
 
     try {
       if (isDuplicating) {
@@ -167,6 +167,7 @@ const SidePanelEditor: FC<Props> = ({
         })
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
+          isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
@@ -181,7 +182,15 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Creating new table: ${payload.name}...`,
         })
-        const table = await meta.createTable(toastId, payload, isRLSEnabled, columns, importContent)
+
+        const table = await meta.createTable(
+          toastId,
+          payload,
+          columns,
+          isRLSEnabled,
+          isRealtimeEnabled,
+          importContent
+        )
         ui.setNotification({
           id: toastId,
           category: 'success',
@@ -193,12 +202,26 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Updating table: ${selectedTableToEdit?.name}...`,
         })
-        const table: any = await meta.updateTable(toastId, selectedTableToEdit, payload, columns)
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Successfully updated ${table.name}!`,
-        })
+        const { table, hasError }: any = await meta.updateTable(
+          toastId,
+          selectedTableToEdit,
+          payload,
+          columns,
+          isRealtimeEnabled
+        )
+        if (hasError) {
+          ui.setNotification({
+            id: toastId,
+            category: 'info',
+            message: `Table ${table.name} has been updated, but there were some errors`,
+          })
+        } else {
+          ui.setNotification({
+            id: toastId,
+            category: 'success',
+            message: `Successfully updated ${table.name}!`,
+          })
+        }
       }
     } catch (error: any) {
       saveTableError = true
@@ -247,8 +270,6 @@ const SidePanelEditor: FC<Props> = ({
       )}
       <TableEditor
         table={selectedTableToEdit}
-        tables={tables}
-        enumTypes={enumTypes}
         selectedSchema={selectedSchema}
         isDuplicating={isDuplicating}
         visible={sidePanelKey === 'table'}
@@ -258,8 +279,7 @@ const SidePanelEditor: FC<Props> = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        title="Confirm to close"
-        description="There are unsaved changes. Are you sure you want to close the panel? Your changes will be lost."
+        header="Confirm to close"
         buttonLabel="Confirm"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
@@ -267,6 +287,14 @@ const SidePanelEditor: FC<Props> = ({
           setIsEdited(false)
           closePanel()
         }}
+        children={
+          <Modal.Content>
+            <p className="text-scale-1100 py-4 text-sm">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        }
       />
     </>
   )

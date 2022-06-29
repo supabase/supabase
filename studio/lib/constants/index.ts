@@ -1,5 +1,3 @@
-import { sortBy, concat } from 'lodash'
-
 export * from './infrastructure'
 export * from './metrics'
 
@@ -10,17 +8,6 @@ export const PG_META_URL = IS_PLATFORM
   : process.env.STUDIO_PG_META_URL
 
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
-
-// Data types primarily for mapping icon in editor
-
-export const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8']
-export const JSON_TYPES = ['json', 'jsonb']
-export const TEXT_TYPES = ['text', 'varchar']
-export const TIMESTAMP_TYPES = ['date', 'time', 'timestamp', 'timetz', 'timestamptz']
-export const OTHER_DATA_TYPES = ['uuid', 'bool']
-export const POSTGRES_DATA_TYPES = sortBy(
-  concat(NUMERICAL_TYPES, JSON_TYPES, TEXT_TYPES, TIMESTAMP_TYPES, OTHER_DATA_TYPES)
-)
 
 // Keyboard Shortcuts Related
 export const SHORTCUT_KEYS = {
@@ -88,14 +75,9 @@ export const POLICY_MODAL_VIEWS = {
   REVIEW: 'REVIEW',
 }
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  rest: 'API',
-  realtime: 'Realtime',
-  auth: 'Auth',
-  storage: 'Storage',
-  database: 'Database',
-}
-
 export const GOTRUE_ERRORS = {
   UNVERIFIED_GITHUB_USER: 'Error sending confirmation mail',
 }
+
+export const STRIPE_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'

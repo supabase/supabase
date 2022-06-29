@@ -1,14 +1,14 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { FC, useState, useEffect } from 'react'
-import { Typography, Badge, Button, IconTrash, IconCreditCard } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { getURL } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
-import Panel from 'components/to-be-cleaned/Panel'
-import ProjectSubscription from './ProjectSubscription'
+import { get } from 'lib/common/fetch'
+
+import ProjectsSummary from './ProjectsSummary'
+import CreditBalance from './CreditBalance'
+import PaymentMethods from './PaymentMethods'
+import BillingAddress from './BillingAddress/BillingAddress'
+import TaxID from './TaxID/TaxID'
 
 interface Props {
   organization: any
@@ -16,16 +16,19 @@ interface Props {
 }
 
 const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
-  const router = useRouter()
   const { ui } = useStore()
+  const { slug } = organization
 
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<any>(undefined)
   const [customer, setCustomer] = useState<any>(null)
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
+
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
-  const { stripe_customer_id, name: orgName, slug: orgSlug } = organization
+  const [taxIds, setTaxIds] = useState<any>(null)
+  const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
 
+  const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
   const isCredit = customerBalance < 0
   const isDebt = customerBalance > 0
@@ -35,204 +38,82 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
       : customerBalance
 
   useEffect(() => {
-    if (stripe_customer_id) {
-      getStripeAccount()
-    }
-  }, [stripe_customer_id])
+    getCustomerProfile()
+    getPaymentMethods()
+    getTaxIds()
+  }, [slug])
 
-  /**
-   * Get stripe account to populate page
-   */
-  const getStripeAccount = async () => {
+  const getCustomerProfile = async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const { paymentMethods, customer, error } = await post(`${API_URL}/stripe/customer`, {
-        stripe_customer_id: stripe_customer_id,
-      })
-      if (error) throw error
-      setPaymentMethods(paymentMethods)
+      setIsLoadingCustomer(true)
+      const customer = await get(`${API_URL}/organizations/${slug}/customer`)
+      if (customer.error) throw customer.error
       setCustomer(customer)
+      setIsLoadingCustomer(false)
     } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
-        message: `Failed to get Stripe account: ${error.message}`,
+        message: `Failed to get organization information: ${error.message}`,
       })
-      setError(error)
-    } finally {
-      setLoading(false)
     }
   }
 
-  /**
-   * Get a link and then redirect them
-   * path is used to determine what path inside billing portal to redirect to
-   */
-  const redirectToPortal = async (path: any) => {
+  const getPaymentMethods = async () => {
     try {
-      setLoading(true)
-      let { billingPortal } = await post(`${API_URL}/stripe/billing`, {
-        stripe_customer_id,
-        returnTo: `${getURL()}${router.asPath}`,
-      })
-      window.location.replace(billingPortal + (path ? path : null))
+      setIsLoadingPaymentMethods(true)
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (error) throw error
+      setPaymentMethods(paymentMethods)
+      setIsLoadingPaymentMethods(false)
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: `Failed to redirect: ${error.message}` })
-    } finally {
-      setLoading(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get organization payment methods: ${error.message}`,
+      })
+    }
+  }
+
+  const getTaxIds = async () => {
+    try {
+      setIsLoadingTaxIds(true)
+      const { data: taxIds, error } = await get(`${API_URL}/organizations/${slug}/tax-ids`)
+      if (error) throw error
+      setTaxIds(taxIds)
+      setIsLoadingTaxIds(false)
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to get organization tax IDs: ${error.message}`,
+      })
     }
   }
 
   return (
-    <article className="my-4 container max-w-4xl space-y-8">
-      {organization.aws_marketplace ? (
-        <div className="flex flex-col space-y-4">
-          <Typography.Text>
-            This organization is subscribed via AWS Marketplace, with a limit of{' '}
-            {organization.project_limit} projects and expiring on{' '}
-            {organization.aws_marketplace.Entitlements[0].ExpirationDate.slice(0, 10)}.
-          </Typography.Text>
-
-          <Button>
-            <a
-              href="https://aws.amazon.com/marketplace/saas/ordering?productId=dc498450-cecf-44c2-8c99-c3c13f16e70a&offerId=d1htt16t3ygx5brtwhooms0ei"
-              target="_blank"
-            >
-              Manage AWS Marketplace subscription
-            </a>
-          </Button>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-12 gap-12">
-            <div className="col-span-12 lg:col-span-6">
-              <Panel
-                loading={loading}
-                title={[
-                  <Typography.Title key="panel-title" className="block" level={4}>
-                    Balance
-                  </Typography.Title>,
-                ]}
-              >
-                <Panel.Content>
-                  {isCredit && <Badge>You have credits available</Badge>}
-                  {isDebt && <Badge color="red">Outstanding payments</Badge>}
-
-                  <Typography.Title level={2} className="mb-0">
-                    <Typography.Text type="secondary">
-                      <span className="text-lg font-normal">$</span>
-                    </Typography.Text>
-
-                    <span>{balance}</span>
-                    <Typography.Text type="secondary">
-                      {isCredit && <span className="text-lg font-normal"> / credits</span>}
-                    </Typography.Text>
-                  </Typography.Title>
-                </Panel.Content>
-              </Panel>
-            </div>
-            <div className="col-span-12 lg:col-span-6">
-              <Panel
-                loading={loading}
-                title={[
-                  <Typography.Title key="panel-title" className="block" level={4}>
-                    Payment methods
-                  </Typography.Title>,
-                ]}
-                footer={[
-                  <Button
-                    key="panel-footer"
-                    type="outline"
-                    onClick={() => redirectToPortal('/payment-methods')}
-                  >
-                    {paymentMethods ? 'Add another payment method' : 'Add a payment method'}
-                  </Button>,
-                ]}
-              >
-                <Panel.Content>
-                  {paymentMethods && paymentMethods.data.length >= 1 ? (
-                    <div className="space-y-1">
-                      {paymentMethods.data.map((paymentMethod: any) => {
-                        return (
-                          <div
-                            key={paymentMethod.id}
-                            className="rounded border border-border-secondary-light dark:border-border-secondary-dark p-3 flex items-center justify-between"
-                          >
-                            <div className="flex items-center space-x-4">
-                              <img
-                                src={`/img/payment-methods/${paymentMethod.card.brand
-                                  .replace(' ', '-')
-                                  .toLowerCase()}.png`}
-                                width="32"
-                              />
-                              <Typography.Text>
-                                <span className="capitalize">{paymentMethod.card.brand}</span>{' '}
-                                ending in{' '}
-                                <span className="dark:text-white">{paymentMethod.card.last4}</span>
-                              </Typography.Text>
-                            </div>
-                            <div>
-                              <Typography.Text>
-                                <span className="dark:text-white">
-                                  {paymentMethod.card.exp_month}
-                                </span>
-                                /
-                                <span className="dark:text-white">
-                                  {paymentMethod.card.exp_year}
-                                </span>
-                              </Typography.Text>
-                            </div>
-                            <Button
-                              type="outline"
-                              icon={<IconTrash />}
-                              onClick={() => redirectToPortal('/')}
-                            >
-                              Edit
-                            </Button>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <div className="p-4 flex items-center rounded border border-border-secondary-light dark:border-border-secondary-dark border-dashed">
-                      <div className="flex items-center w-full justify-between space-x-2 hover:text-white hover:border-white">
-                        <Typography.Text className="flex items-center space-x-2">
-                          <div>
-                            <IconCreditCard />
-                          </div>
-                          <div>No payment methods</div>
-                        </Typography.Text>
-                      </div>
-                    </div>
-                  )}
-                </Panel.Content>
-                <div className="flex items-center w-full justify-between space-x-2 hover:text-white hover:border-white"></div>
-              </Panel>
-            </div>
-          </div>
-          <div>
-            {projects.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-16 py-12 border border-border-secondary-light dark:border-border-secondary-dark border-dashed rounded space-y-3">
-                <Typography.Text className="block" type="secondary">
-                  You have no projects in organization {orgName} yet
-                </Typography.Text>
-                <div>
-                  <Link href={`/new/${orgSlug}`}>
-                    <Button type="outline">Create a project</Button>
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <Typography.Text className="block mb-4">Projects in organization</Typography.Text>
-            )}
-            <div className="space-y-8">
-              {projects.map((project) => {
-                return <ProjectSubscription key={project.id} project={project} />
-              })}
-            </div>
-          </div>
-        </>
-      )}
+    <article className="container my-4 max-w-4xl space-y-8">
+      <div className="space-y-8">
+        <ProjectsSummary projects={projects} />
+        <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+        <PaymentMethods
+          loading={isLoadingCustomer || isLoadingPaymentMethods}
+          defaultPaymentMethod={defaultPaymentMethod}
+          paymentMethods={paymentMethods || []}
+          onDefaultMethodUpdated={setCustomer}
+          onPaymentMethodsDeleted={() => getPaymentMethods()}
+        />
+        <BillingAddress
+          loading={isLoadingCustomer}
+          address={customer?.address ?? {}}
+          onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
+        />
+        <TaxID
+          loading={isLoadingTaxIds}
+          taxIds={taxIds || []}
+          onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
+        />
+      </div>
     </article>
   )
 }

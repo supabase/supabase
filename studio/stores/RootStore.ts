@@ -1,8 +1,11 @@
-import { configure } from 'mobx'
+import { configure, reaction } from 'mobx'
+import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
-import ProjectContentStore, { IProjectContentStore } from './content/ProjectContentStore'
+import ProjectContentStore, { IProjectContentStore } from './project/ProjectContentStore'
+import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
+import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBackupsStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -11,38 +14,85 @@ configure({
 })
 
 export interface IRootStore {
-  ui: IUiStore
-  content: IProjectContentStore
-  meta: IMetaStore
   app: IAppStore
+  ui: IUiStore
+  meta: IMetaStore
+  content: IProjectContentStore
+  functions: IProjectFunctionsStore
+  backups: IProjectBackupsStore
   setProjectRef: (value?: string) => void
   setOrganizationSlug: (value?: string) => void
 }
 export class RootStore implements IRootStore {
-  ui: IUiStore
-  content: IProjectContentStore
-  meta: IMetaStore
   app: IAppStore
+  ui: IUiStore
+  meta: IMetaStore
+  content: IProjectContentStore
+  functions: IProjectFunctionsStore
+  backups: IProjectBackupsStore
 
   constructor() {
+    this.app = new AppStore(this)
     this.ui = new UiStore(this)
-    this.content = new ProjectContentStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
       projectRef: '',
       connectionString: '',
     })
-    this.app = new AppStore(this)
+
+    // @ts-ignore
+    this.content = new ProjectContentStore(this, { projectRef: '' })
+    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
+    this.backups = new ProjectBackupsStore(this, { projectRef: '' })
+
+    /**
+     * TODO: meta and content are not observable
+     * meaning that when meta and content object change mobx doesnt trigger new event
+     *
+     * Workaround for now
+     * we need to use ui.selectedProject along with meta and content
+     * cos whenever ui.selectedProject changes, the reaction will create new meta and content stores
+     */
+    reaction(
+      () => this.ui.selectedProject,
+      (selectedProject) => {
+        if (selectedProject) {
+          // @ts-ignore
+          this.meta = new MetaStore(this, {
+            projectRef: selectedProject.ref,
+            connectionString: selectedProject.connectionString ?? '',
+          })
+        } else {
+          // @ts-ignore
+          this.meta = new MetaStore(this, {
+            projectRef: '',
+            connectionString: '',
+          })
+        }
+      }
+    )
   }
 
+  /**
+   * Set selected project reference
+   *
+   * This method will also trigger project detail loading when it's not available
+   */
   setProjectRef(value?: string) {
-    if (this.ui.selectedProject?.ref != value) {
-      this.ui.setProjectRef(value)
-      this.content = new ProjectContentStore(this, { projectRef: value || '' })
-      this.meta = new MetaStore(this, {
-        projectRef: value || '',
-        connectionString: this.ui.selectedProject?.connectionString ?? '',
-      })
+    if (this.ui.selectedProject?.ref === value) return
+    if (value) {
+      // fetch project detail when
+      // - project not found yet. projectStore is loading
+      // - connectionString is not available. projectStore loaded
+      const found = this.app.projects.find((x: Project) => x.ref == value)
+      if (!found || !found.connectionString) {
+        this.app.projects.fetchDetail(value)
+      }
     }
+
+    this.ui.setProjectRef(value)
+    this.functions.setProjectRef(value)
+    this.content.setProjectRef(value)
+    this.backups.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {

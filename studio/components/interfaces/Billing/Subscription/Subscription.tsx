@@ -1,21 +1,22 @@
 import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
-import { Typography, Loading } from '@supabase/ui'
+import { useRouter } from 'next/router'
+import { Loading, Button } from '@supabase/ui'
 
-import UpgradeButton from './UpgradeButton'
+import { formatBytes } from 'lib/helpers'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { useStore, useFlag } from 'hooks'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
-import { formatBytes } from 'lib/helpers'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { Dictionary } from '@supabase/grid'
+import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
 
 interface Props {
   project: any
   subscription: StripeSubscription
-  paygStats?: Dictionary<number>
+  paygStats: PaygStats | undefined
   loading?: boolean
   showProjectName?: boolean
   currentPeriodStart: number
@@ -31,10 +32,16 @@ const Subscription: FC<Props> = ({
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
+  const router = useRouter()
+  const { ui } = useStore()
+  const isOrgOwner = ui.selectedOrganization?.is_owner
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
-
   const basePlanCost = subscription?.tier.unit_amount / 100
 
   const deriveTotalCost = (): number => {
@@ -47,53 +54,83 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading}>
-      <div className="w-full rounded overflow-hidden border border-panel-border-light dark:border-panel-border-dark mb-8">
+      <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
-          <div className="px-6 pt-4 flex items-center justify-between">
+          <div className="flex items-center justify-between px-6 pt-4">
             <div className="flex flex-col">
-              <Typography.Text>
+              <p className="text-scale-1100 text-sm">
                 {showProjectName ? project.name : 'Current subscription'}
-              </Typography.Text>
-              <Typography.Title level={3} className="mb-0">
-                {subscription?.tier.name ?? '-'}
-              </Typography.Title>
+              </p>
+              <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
-            {/* @ts-ignore */}
-            <UpgradeButton projectRef={project.ref} paid={paid} />
+            <div className="flex flex-col items-end space-y-2">
+              {isEnterprise ? (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() =>
+                    router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
+                  }
+                  type="primary"
+                >
+                  Change add-ons
+                </Button>
+              ) : (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                  type="primary"
+                >
+                  Change subscription
+                </Button>
+              )}
+              {!isOrgOwner ? (
+                <p className="text-scale-1100 text-xs">
+                  Only the organization owner can amend subscriptions
+                </p>
+              ) : projectUpdateDisabled ? (
+                <p className="text-scale-1100 text-right text-xs">
+                  Subscription changes are currently disabled
+                  <br />
+                  Our engineers are working on a fix
+                </p>
+              ) : (
+                <div />
+              )}
+            </div>
           </div>
           {paid && (
             <div className="px-6 pt-4">
-              <Typography.Text>
+              <p>
                 The next payment for this plan will be occur on{' '}
                 {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')}.
-              </Typography.Text>
+              </p>
             </div>
           )}
           <div className="mt-2 px-6 pb-4">
-            <Typography.Text type="secondary">
+            <p className="text-scale-1100 text-sm">
               See our{' '}
               <a href="https://supabase.com/pricing" target="_blank" className="underline">
                 pricing
               </a>{' '}
               for a more detailed analysis of what Supabase has on offer.
-            </Typography.Text>
+            </p>
           </div>
 
           {/* Cost Breakdown */}
           {!loading && subscription && (
             <>
-              <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
+              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[40%]">
-                  <Typography.Text>Item</Typography.Text>
+                  <p className="text-scale-900 text-xs uppercase">Item</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Amount</Typography.Text>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Amount</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Unit Price</Typography.Text>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Unit Price</p>
                 </div>
-                <div className="w-[20%] flex justify-end">
-                  <Typography.Text>Price</Typography.Text>
+                <div className="flex w-[20%] justify-end">
+                  <p className="text-scale-900 text-xs uppercase">Price</p>
                 </div>
               </div>
               <CostBreakdownRow
@@ -113,31 +150,33 @@ const Subscription: FC<Props> = ({
               ))}
               {isPayg &&
                 chargeableProducts.map((product) =>
-                  product.features.map((feature) => {
-                    const cost = deriveFeatureCost(paygStats, feature).toFixed(3)
+                  product.features.map((feature: ProductFeature) => {
+                    const derivedCost = deriveFeatureCost(paygStats, feature)
+                    const cost = derivedCost.toFixed(2)
                     return (
                       <CostBreakdownRow
                         key={feature.attribute}
                         item={feature.title}
-                        amount={formatBytes(paygStats?.[feature.attribute] ?? 0)}
+                        freeQuota={feature.freeQuota}
+                        amount={formatBytes(
+                          paygStats?.[feature.attribute]?.[feature.pricingModel] ?? 0
+                        )}
                         unitPrice={`${feature.costPerUnit}/GB`}
                         price={cost}
                       />
                     )
                   })
                 )}
-              <div className="px-6 py-3 relative border-t border-panel-border-light dark:border-panel-border-dark flex items-center">
+              <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[80%]">
-                  <Typography.Text>
+                  <p className="text-scale-1100 text-sm">
                     Estimated cost for {dayjs.unix(currentPeriodStart).utc().format('MMM D, YYYY')}{' '}
                     - {dayjs.unix(currentPeriodEnd).utc().format('MMM D, YYYY')} so far
-                  </Typography.Text>
+                  </p>
                 </div>
-                <div className="w-[20%] flex justify-end items-center space-x-1">
-                  <Typography.Text className="opacity-50">$</Typography.Text>
-                  <Typography.Title level={3} className="m-0">
-                    {deriveTotalCost().toFixed(2)}
-                  </Typography.Title>
+                <div className="flex w-[20%] items-center justify-end space-x-1">
+                  <p className="text-scale-1100">$</p>
+                  <h3 className="m-0 text-xl">{deriveTotalCost().toFixed(2)}</h3>
                 </div>
               </div>
             </>

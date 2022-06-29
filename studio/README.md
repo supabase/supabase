@@ -1,6 +1,6 @@
 # Supabase Studio
 
-A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://app.supabase.io). Built with:
+A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://app.supabase.com). Built with:
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
@@ -84,7 +84,7 @@ When simulating clicks on these components, do the following:
 import userEvent from '@testing-library/user-event'
 userEvent.click('Hello world')
 
-// for Popovers
+// for Dropdowns
 import clickDropdown from 'tests/helpers'
 clickDropdown('Hello world')
 ```

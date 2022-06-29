@@ -22,7 +22,6 @@ export function useProfile(returning?: 'minimal') {
       {
         first_name: updatedUser.first_name,
         last_name: updatedUser.last_name,
-        total_free_projects: updatedUser.total_free_projects,
       },
       revalidate ?? true
     )

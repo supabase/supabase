@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,11 +15,13 @@
 - [x] स्वतः गर्न सकिने API हरु
 - [x] ड्यासबोर्ड
 - [x] भण्डारण
-- [ ] प्रकार्यहरू (चाँडै आउँदैछ)
+- [x] प्रकार्यहरू
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## कागजात
 
-पूर्ण कागजातको लागि [supabase.io/docs](https://supabase.com/docs) मा जानुहोस्
+पूर्ण कागजातको लागि [supabase.com/docs](https://supabase.com/docs) मा जानुहोस्
 
 ## समुदाय र समर्थन सहयोग
 
@@ -29,7 +32,7 @@
 ## स्थिति
 
 - [x] अल्फा: हामी ग्राहकहरु को एक सानो समूह संग सुपबेस परीक्षण गर्दैछौं।
-- [x] सार्वजनिक अल्फा: सबैले [app.supabase.io](https://app.supabase.io) मा साइनअप गर्न सक्दछन्। तर तपाईं केहि अवरोधहरू प्राप्त गर्न सक्नुहुन्छ।
+- [x] सार्वजनिक अल्फा: सबैले [app.supabase.com](https://app.supabase.com) मा साइनअप गर्न सक्दछन्। तर तपाईं केहि अवरोधहरू प्राप्त गर्न सक्नुहुन्छ।
 - [x] सार्वजनिक बीटा: अधिकतर गैर-उद्यम प्रयोगका मामलाहरुका लागि पर्याप्त स्थिर।
 - [ ] सार्वजनिक: उत्पादन प्रयोगको लागि तयार।
 
@@ -45,7 +48,7 @@
 
 **वर्तमान योजना**
 
-सुपबेस एक [होस्ट गरिएको प्लेटफर्म](https://app.supabase.io) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
+सुपबेस एक [होस्ट गरिएको प्लेटफर्म](https://app.supabase.com) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
 
 ![आर्किटेक्चर](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

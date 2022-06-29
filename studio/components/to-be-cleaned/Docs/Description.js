@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
@@ -70,31 +70,27 @@ export default function Description({ content, metadata, onChange = () => {} }) 
         onChange={(e) => setValue(e.target.value)}
       />
       <div
-        className={`flex ${
+        className={`flex items-center gap-2 ${
           hasChanged ? 'opacity-100' : 'opacity-0 cursor-default h-0'
         } ${animateCss}`}
       >
-        <button
+        <Button
+          type="default"
           disabled={!hasChanged}
-          className={`${secondaryCss} ${hasChanged ? '' : ' cursor-default'} mr-2`}
           onClick={() => {
             setValue(contentText)
             setIsUpdating(false)
           }}
         >
           Cancel
-        </button>
-        <button
-          disabled={!hasChanged}
-          className={`${primaryCss} ${hasChanged ? '' : ' cursor-default'} mr-2`}
-          onClick={updateDescription}
-        >
+        </Button>
+        <Button disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
             <IconLoader className="animate-spin mx-auto" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   )

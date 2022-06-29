@@ -2,7 +2,7 @@ import { FC, ReactNode, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import BaseLayout from '../'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui } = useStore()
+  const { meta, ui, backups } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const project = ui.selectedProject
 
@@ -24,16 +24,22 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
 
   useEffect(() => {
-    // Eventually should only load the required stores based on the pages
-    meta.schemas.load()
-    meta.tables.load()
+    if (ui.selectedProject) {
+      // Eventually should only load the required stores based on the pages
+      meta.schemas.load()
+      meta.tables.load()
 
-    meta.roles.load()
-    meta.triggers.load()
-    meta.extensions.load()
-    meta.publications.load()
-  }, [])
+      meta.roles.load()
+      meta.triggers.load()
+      meta.extensions.load()
+      meta.publications.load()
 
+      backups.load()
+    }
+  }, [ui.selectedProject])
+
+  // Optimization required: load logic should be at the page level
+  // e.g backups page is waiting for meta.tables to load finish when it doesnt even need that data
   useEffect(() => {
     if (!isLoading && !loaded) {
       setLoaded(true)
@@ -61,4 +67,4 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
   )
 }
 
-export default observer(DatabaseLayout)
+export default withAuth(observer(DatabaseLayout))

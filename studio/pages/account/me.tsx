@@ -2,39 +2,42 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconMoon, IconSun, Typography, Input, Listbox } from '@supabase/ui'
 
-import { useProfile, useStore, withAuth } from 'hooks'
+import { useProfile, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { NextPageWithLayout } from 'types'
 
-const User = () => {
+const User: NextPageWithLayout = () => {
   return (
-    <AccountLayout
-      title="Supabase"
-      breadcrumbs={[
-        {
-          key: `supabase-settings`,
-          label: 'Preferences',
-        },
-      ]}
-    >
-      <div className="my-2">
-        <ProfileCard />
-      </div>
-    </AccountLayout>
+    <div className="my-2">
+      <ProfileCard />
+    </div>
   )
 }
 
-export default withAuth(User)
+User.getLayout = (page) => (
+  <AccountLayout
+    title="Supabase"
+    breadcrumbs={[
+      {
+        key: `supabase-settings`,
+        label: 'Preferences',
+      },
+    ]}
+  >
+    {page}
+  </AccountLayout>
+)
+
+export default User
 
 const ProfileCard = observer(() => {
   const { ui } = useStore()
   const { mutateProfile } = useProfile()
   const user = ui.profile
-
-  console.log('User', user?.username, user?.primary_email)
 
   const updateUser = async (model: any) => {
     try {
@@ -52,7 +55,7 @@ const ProfileCard = observer(() => {
   }
 
   return (
-    <article className="p-4 max-w-4xl">
+    <article className="max-w-4xl p-4">
       <section>
         <GithubProfile />
       </section>
@@ -87,11 +90,11 @@ const GithubProfile = observer(() => {
 
   return (
     <Panel
-      title={[
+      title={
         <Typography.Title key="panel-title" level={5} className="mb-0">
           Account Information
-        </Typography.Title>,
-      ]}
+        </Typography.Title>
+      }
     >
       <Panel.Content>
         <div className="space-y-2">
@@ -100,16 +103,14 @@ const GithubProfile = observer(() => {
             disabled
             label="Username"
             layout="horizontal"
-            value=""
-            placeholder={ui.profile?.username ?? ''}
+            value={ui.profile?.username ?? ''}
           />
           <Input
             readOnly
             disabled
             label="Email"
             layout="horizontal"
-            value=""
-            placeholder={ui.profile?.primary_email ?? ''}
+            value={ui.profile?.primary_email ?? ''}
           />
         </div>
       </Panel.Content>
@@ -122,11 +123,11 @@ const ThemeSettings = observer(() => {
 
   return (
     <Panel
-      title={[
+      title={
         <Typography.Title key="panel-title" level={5}>
           Theme
-        </Typography.Title>,
-      ]}
+        </Typography.Title>
+      }
     >
       <Panel.Content>
         <Listbox
@@ -144,9 +145,15 @@ const ThemeSettings = observer(() => {
           }
           onChange={(themeOption: any) => ui.onThemeOptionChange(themeOption)}
         >
-          <Listbox.Option label='System default' value="system">System default</Listbox.Option>
-          <Listbox.Option label='Dark' value="dark">Dark</Listbox.Option>
-          <Listbox.Option label='Light' value="light">Light</Listbox.Option>
+          <Listbox.Option label="System default" value="system">
+            System default
+          </Listbox.Option>
+          <Listbox.Option label="Dark" value="dark">
+            Dark
+          </Listbox.Option>
+          <Listbox.Option label="Light" value="light">
+            Light
+          </Listbox.Option>
         </Listbox>
       </Panel.Content>
     </Panel>

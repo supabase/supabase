@@ -27,7 +27,7 @@ There are two parts to every Auth system:
 - **Authorization:** once they are in, what are they allowed to do?
 
 Supabase Auth is designed to work either as a standalone product, or deeply integrated with the other Supabase products. 
-Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' build-in Auth functionality wherever possible.
+Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' built-in Auth functionality wherever possible.
 
 ## Authentication
 
@@ -128,7 +128,7 @@ let { data, error } = await supabase
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
 ```js
-let user = await supabase.from('users').select('user_id, name')
+let { data, error } = await supabase.from('users').select('user_id, name')
 
 // console.log(data)
 // Still => { id: 'd0714948', name: 'Jane' }
@@ -163,4 +163,4 @@ Supabase provides the routes to [sign up](/docs/reference/javascript/auth-signup
 
 ## Next Steps
 
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

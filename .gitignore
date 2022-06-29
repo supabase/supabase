@@ -6,8 +6,13 @@ out
 tmp
 
 coverage
+allure-results
+allure-report
 .nyc_output
 *.log
+
+# turbo
+.turbo
 
 # Logs
 *.log
@@ -74,8 +79,11 @@ typings/
 
 # dotenv environment variables file
 .env
+# excempt the apps/www .env
+!apps/www/.env
 .env.test
 .env.local
+.env.production
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -106,3 +114,7 @@ typings/
 !docker/.env
 !docker/supabase/.env
 !docker/supabase-traefik/.env
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp

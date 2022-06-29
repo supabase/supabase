@@ -1,8 +1,13 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Dictionary } from '@supabase/grid'
-import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
-import { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { Dictionary } from 'components/grid'
+import { Checkbox, SidePanel, Input } from '@supabase/ui'
+import {
+  PostgresColumn,
+  PostgresRelationship,
+  PostgresTable,
+  PostgresType,
+} from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import HeaderTitle from './HeaderTitle'
@@ -18,18 +23,14 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
-import {
-  EnumType,
-  ColumnField,
-  CreateColumnPayload,
-  UpdateColumnPayload,
-} from '../SidePanelEditor.types'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
   column?: PostgresColumn
   selectedTable: PostgresTable
   tables: PostgresTable[]
-  enumTypes: EnumType[]
+  enumTypes: PostgresType[]
   visible: boolean
   closePanel: () => void
   saveChanges: (
@@ -54,7 +55,7 @@ const ColumnEditor: FC<Props> = ({
 }) => {
   const isNewRecord = isUndefined(column)
   const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
-  const foreignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+  const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -70,7 +71,14 @@ const ColumnEditor: FC<Props> = ({
     }
   }, [visible])
 
+  if (!columnFields) return null
+
   const onUpdateField = (changes: Partial<ColumnField>) => {
+    const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
+    if (!isTextBasedColumn && changes.defaultValue === '') {
+      changes.defaultValue = null
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
@@ -98,7 +106,7 @@ const ColumnEditor: FC<Props> = ({
         : undefined,
       ...(!isUndefined(foreignKeyConfiguration) && {
         format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
+        defaultValue: null,
       }),
     })
     setIsEditingRelation(false)
@@ -124,17 +132,16 @@ const ColumnEditor: FC<Props> = ({
     }
   }
 
-  if (!columnFields) return null
-
   return (
     <SidePanel
-      wide
+      size="large"
       key="ColumnEditor"
       visible={visible}
       // @ts-ignore
-      title={<HeaderTitle table={selectedTable} column={column} />}
-      onCancel={closePanel}
       onConfirm={(resolve: () => void) => onSaveChanges(resolve)}
+      // @ts-ignore
+      header={<HeaderTitle table={selectedTable} column={column} />}
+      onCancel={closePanel}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
@@ -144,117 +151,130 @@ const ColumnEditor: FC<Props> = ({
         />
       }
     >
-      <Space direction="vertical" size={6} style={{ width: '100%' }}>
-        <Input
-          label="Name"
-          layout="horizontal"
-          type="text"
-          error={errors.name}
-          value={columnFields?.name ?? ''}
-          onChange={(event: any) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
-          placeholder="Optional"
-          layout="horizontal"
-          type="text"
-          value={columnFields?.comment ?? ''}
-          onChange={(event: any) => onUpdateField({ comment: event.target.value })}
-        />
-        {isNewRecord && !hasPrimaryKey && (
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 md:col-span-8 md:col-start-5">
-              <Checkbox
-                label={hasPrimaryKey ? 'Add to composite primary key' : 'Is Primary Key'}
-                description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
-                checked={columnFields?.isPrimaryKey ?? false}
-                onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
-              />
-            </div>
-          </div>
-        )}
-        <ColumnForeignKey
-          column={columnFields}
-          originalForeignKey={foreignKey}
-          onSelectEditRelation={() => setIsEditingRelation(true)}
-          onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
-        />
-        <Divider />
-        <ColumnType
-          value={columnFields?.format ?? ''}
-          enumTypes={enumTypes}
-          error={errors.format}
-          disabled={!isUndefined(columnFields?.foreignKey)}
-          onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: '' })}
-        />
-        {isUndefined(columnFields.foreignKey) && (
-          <div className="grid grid-cols-12 gap-4">
-            {columnFields.format.includes('int') && (
-              <div className="col-span-12 md:col-span-8 md:col-start-5">
-                <Checkbox
-                  label="Is Identity"
-                  description="Automatically assign a sequential unique number to the column"
-                  checked={columnFields.isIdentity}
-                  onChange={() => {
-                    const isIdentity = !columnFields.isIdentity
-                    const isArray = isIdentity ? false : columnFields.isArray
-                    onUpdateField({ isIdentity, isArray })
-                  }}
-                />
-              </div>
-            )}
-            {!columnFields.isPrimaryKey && (
-              <div className="col-span-12 md:col-span-8 md:col-start-5">
-                <Checkbox
-                  label="Define as Array"
-                  description="Allow column to be defined as variable-length multidimensional arrays"
-                  checked={columnFields.isArray}
-                  onChange={() => {
-                    const isArray = !columnFields.isArray
-                    const isIdentity = isArray ? false : columnFields.isIdentity
-                    onUpdateField({ isArray, isIdentity })
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        )}
-        <ColumnDefaultValue
-          columnFields={columnFields}
-          enumTypes={enumTypes}
-          onUpdateField={onUpdateField}
-        />
-        {!columnFields.isPrimaryKey && (
-          <>
+      <SidePanel.Content>
+        <div className="space-y-10 py-6">
+          <Input
+            label="Name"
+            layout="horizontal"
+            type="text"
+            error={errors.name}
+            value={columnFields?.name ?? ''}
+            onChange={(event: any) => onUpdateField({ name: event.target.value })}
+          />
+          <Input
+            label="Description"
+            placeholder="Optional"
+            layout="horizontal"
+            type="text"
+            value={columnFields?.comment ?? ''}
+            onChange={(event: any) => onUpdateField({ comment: event.target.value })}
+          />
+        </div>
+      </SidePanel.Content>
+
+      <SidePanel.Seperator />
+
+      <SidePanel.Content>
+        <div className="space-y-10 py-6">
+          {isNewRecord && !hasPrimaryKey && (
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-8 md:col-start-5">
                 <Checkbox
-                  label="Allow Nullable"
-                  description="Allow the column to assume a NULL value if no value is provided"
-                  checked={columnFields.isNullable}
-                  onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
-                />
-              </div>
-              <div className="col-span-12 md:col-span-8 md:col-start-5">
-                <Checkbox
-                  label="Is Unique"
-                  description="Enforce values in the column to be unique across rows"
-                  checked={columnFields.isUnique}
-                  onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                  label={hasPrimaryKey ? 'Add to composite primary key' : 'Is Primary Key'}
+                  description="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table."
+                  checked={columnFields?.isPrimaryKey ?? false}
+                  onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
                 />
               </div>
             </div>
-          </>
-        )}
-      </Space>
-      <ForeignKeySelector
-        tables={tables}
-        column={columnFields}
-        foreignKey={foreignKey}
-        visible={isEditingRelation}
-        closePanel={() => setIsEditingRelation(false)}
-        saveChanges={saveColumnForeignKey}
-      />
+          )}
+          <ColumnForeignKey
+            column={columnFields}
+            originalForeignKey={originalForeignKey}
+            onSelectEditRelation={() => setIsEditingRelation(true)}
+            onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
+          />
+        </div>
+      </SidePanel.Content>
+      <SidePanel.Seperator />
+      <SidePanel.Content>
+        <div className="space-y-10 py-6">
+          <ColumnType
+            value={columnFields?.format ?? ''}
+            enumTypes={enumTypes}
+            error={errors.format}
+            disabled={!isUndefined(columnFields?.foreignKey)}
+            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
+          />
+          {isUndefined(columnFields.foreignKey) && (
+            <div className="grid grid-cols-12 gap-4">
+              {columnFields.format.includes('int') && (
+                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                  <Checkbox
+                    label="Is Identity"
+                    description="Automatically assign a sequential unique number to the column"
+                    checked={columnFields.isIdentity}
+                    onChange={() => {
+                      const isIdentity = !columnFields.isIdentity
+                      const isArray = isIdentity ? false : columnFields.isArray
+                      onUpdateField({ isIdentity, isArray })
+                    }}
+                  />
+                </div>
+              )}
+              {!columnFields.isPrimaryKey && (
+                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                  <Checkbox
+                    label="Define as Array"
+                    description="Allow column to be defined as variable-length multidimensional arrays"
+                    checked={columnFields.isArray}
+                    onChange={() => {
+                      const isArray = !columnFields.isArray
+                      const isIdentity = isArray ? false : columnFields.isIdentity
+                      onUpdateField({ isArray, isIdentity })
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          <ColumnDefaultValue
+            columnFields={columnFields}
+            enumTypes={enumTypes}
+            onUpdateField={onUpdateField}
+          />
+          {!columnFields.isPrimaryKey && (
+            <>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                  <Checkbox
+                    label="Allow Nullable"
+                    description="Allow the column to assume a NULL value if no value is provided"
+                    checked={columnFields.isNullable}
+                    onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
+                  />
+                </div>
+                <div className="col-span-12 md:col-span-8 md:col-start-5">
+                  <Checkbox
+                    label="Is Unique"
+                    description="Enforce values in the column to be unique across rows"
+                    checked={columnFields.isUnique}
+                    onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <ForeignKeySelector
+            tables={tables}
+            column={columnFields}
+            visible={isEditingRelation}
+            closePanel={() => setIsEditingRelation(false)}
+            saveChanges={saveColumnForeignKey}
+          />
+        </div>
+      </SidePanel.Content>
     </SidePanel>
   )
 }

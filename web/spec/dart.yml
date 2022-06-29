@@ -30,6 +30,9 @@ info:
           - auth.update()
           - auth.onAuthStateChange()
           - Reset Password (Email)
+      - name: 'Functions'
+        items:
+          - invoke()
       - name: 'Database'
         items:
           - select()
@@ -151,10 +154,10 @@ pages:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
-      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - If "Email Confirmations" is turned on, both a `user` and a `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
     examples:
       - name: Sign up.
         isSpotlight: true
@@ -176,7 +179,7 @@ pages:
     notes: |
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.io](https://app.supabase.io)
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
       - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password. 
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
     examples:
@@ -362,6 +365,60 @@ pages:
 
           final error = res.error;
           ```
+  invoke():
+    title: 'invoke()'
+    description: |
+      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
+
+      :::caution
+
+      Supabase Functions are in Experimental release until 1 August 2022. There will breaking changes. Do not use them in Production.
+
+      :::
+
+      We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
+      There will be breaking changes with no notice.
+
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+    examples:
+      - name: Basic invocation.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'});
+          final data = res.data;
+          final error = res.error;
+          ```
+      - name: Specifying response type.
+        description: |
+          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            responseType: ResponseType.text,
+          );
+          final data = res.data;
+          final error = res.error;
+          ```
+      - name: Parsing custom headers.
+        description: |
+          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+        isSpotlight: true
+        dart: |
+          ```dart
+          final res = await supabaseClient.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            headers: {
+              'Authorization': 'Bearer ${supabase.auth.session()?.access_token}'
+            },
+          );
+          ```
   select():
     description: |
       Performs vertical filtering with SELECT.
@@ -370,6 +427,7 @@ pages:
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
+      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - name: Getting your data
         isSpotlight: true
@@ -429,8 +487,8 @@ pages:
         description: |
           If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
-        js: |
-          ```js
+        dart: |
+          ```dart
           final res = await supabase
             .from('messages')
             .select('*, users!inner(*)')
@@ -515,8 +573,7 @@ pages:
       Performs an UPDATE on the table.
     title: 'Modify data: update()'
     notes: |
-      TODO update the link to dart
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
     examples:
       - name: Updating your data
         isSpotlight: true
@@ -598,8 +655,7 @@ pages:
       Performs a DELETE on the table.
     title: 'Delete data: delete()'
     notes: |
-      TODO update link to dart
-      - `delete()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
     examples:
       - name: Delete records
         isSpotlight: true
@@ -1015,7 +1071,7 @@ pages:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.io](https://app.supabase.io), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none 
         - `objects` permissions: none
@@ -1214,6 +1270,14 @@ pages:
   .or():
     description: |
       Finds all rows satisfying at least one of the filters.
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
+        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1249,6 +1313,16 @@ pages:
   .not():
     description: |
       Finds all rows which doesn't satisfy the filter.
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .not('name','eq','Paris')
+        .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+        .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+        .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2145,7 +2219,13 @@ pages:
     description: |
       Finds all rows whose `column` satisfies the filter.
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter values, so it should only be used as an escape hatch in case other filters don't work.
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```dart
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+        ```
     examples:
       - name: With `select()`
         isSpotlight: true

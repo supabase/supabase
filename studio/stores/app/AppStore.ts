@@ -2,18 +2,21 @@ import { cloneDeep } from 'lodash'
 import { values } from 'mobx'
 import { Organization, Project } from 'types'
 
-import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { IRootStore } from '../RootStore'
 import DatabaseStore, { IDatabaseStore } from './DatabaseStore'
 import OrganizationStore from './OrganizationStore'
-import ProjectStore from './ProjectStore'
+import ProjectStore, { IProjectStore } from './ProjectStore'
 
 export interface IAppStore {
-  projects: ProjectStore
+  projects: IProjectStore
   organizations: OrganizationStore
   database: IDatabaseStore
+  onProjectCreated: (project: any) => void
   onProjectUpdated: (project: any) => void
-  onProjectDeleted: (project: any, mutateProfile: Function) => void
+  onProjectDeleted: (project: any) => void
+  onProjectStatusUpdated: (projectId: number, value: string) => void
+  onProjectPostgrestStatusUpdated: (projectId: number, value: 'OFFLINE' | 'ONLINE') => void
   onOrgAdded: (org: any) => void
   onOrgUpdated: (org: any) => void
   onOrgDeleted: (org: any) => void
@@ -37,38 +40,52 @@ export default class AppStore implements IAppStore {
     this.database = new DatabaseStore(rootStore, `${this.baseUrl}/database`, headers)
   }
 
-  onProjectUpdated(project: any) {
+  onProjectCreated(project: any) {
     if (project && project.id) {
-      const kpsVersion =
-        project.services?.length > 0
-          ? project.services[0]?.infrastructure[0]?.app_versions?.version
-          : undefined
-      const clone: any = cloneDeep((this.projects.data as any)[project.id])
-      clone.kpsVersion = kpsVersion
-      clone.name = project.name
-      clone.status = project.status
-      clone.services = project.services
-      ;(this.projects.data as any)[project.id] = clone
+      const temp: Project = {
+        id: project.id,
+        ref: project.ref,
+        name: project.name,
+        status: project.status,
+        organization_id: project.organization_id,
+        cloud_provider: project.cloud_provider,
+        region: project.region,
+        inserted_at: project.inserted_at,
+        subscription_id: project.subscription_id,
+      }
+      this.projects.data[project.id] = temp
     }
   }
 
-  onProjectDeleted(project: any, mutateProfile: Function) {
+  onProjectUpdated(project: any) {
     if (project && project.id) {
-      const profile = this.rootStore.ui.profile
-      const projectMetadata = this.projects.find((proj: any) => proj.id === project.id)
+      const clone = cloneDeep(this.projects.data[project.id])
+      // only update available param
+      if (project.name) clone.name = project.name
+      if (project.status) clone.status = project.status
+      this.projects.data[project.id] = clone
+    }
+  }
 
+  onProjectDeleted(project: any) {
+    if (project && project.id) {
       // cleanup project saved queries
       localStorage.removeItem(`supabase-queries-state-${project.ref}`)
       localStorage.removeItem(`supabase_${project.ref}`)
       delete this.projects.data[project.id]
-
-      if (profile && projectMetadata?.subscription_tier_prod_id === STRIPE_PRODUCT_IDS.FREE) {
-        mutateProfile({
-          ...profile,
-          total_free_projects: profile.total_free_projects - 1,
-        })
-      }
     }
+  }
+
+  onProjectStatusUpdated(projectId: number, value: string) {
+    const clone = cloneDeep(this.projects.data[projectId])
+    clone.status = value
+    this.projects.data[projectId] = clone
+  }
+
+  onProjectPostgrestStatusUpdated(projectId: number, value: 'OFFLINE' | 'ONLINE') {
+    const clone = cloneDeep(this.projects.data[projectId])
+    clone.postgrestStatus = value
+    this.projects.data[projectId] = clone
   }
 
   onOrgUpdated(updatedOrg: Organization) {

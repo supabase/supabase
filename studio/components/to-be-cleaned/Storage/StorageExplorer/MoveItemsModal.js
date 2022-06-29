@@ -40,41 +40,39 @@ const MoveItemsModal = ({
   return (
     <Modal
       visible={visible}
-      title={title}
+      header={title}
       description={description}
-      size="large"
+      size="medium"
+      onCancel={onSelectCancel}
       customFooter={
-        <Space>
-          <Button type="secondary" onClick={onSelectCancel}>
+        <div className="flex items-center gap-2">
+          <Button type="default" onClick={onSelectCancel}>
             Cancel
           </Button>
           <Button type="primary" loading={moving} onClick={onConfirmMove}>
             {moving ? 'Moving files' : 'Move files'}
           </Button>
-        </Space>
+        </div>
       }
     >
-      <div className="space-y-4 w-full pb-3">
-        <form>
-          <p className="mb-2">
-            <Typography.Text>Path to new directory in {bucketName}:</Typography.Text>
-          </p>
+      <Modal.Content>
+        <form className="my-4">
           <div className="flex items-center relative">
             <Input
               autoFocus
+              label={`Path to new directory in ${bucketName}`}
               type="text"
               className="w-full"
               placeholder="e.g folder1/subfolder2"
               value={newPath}
+              descriptionText="Leave blank to move items to the root of the bucket"
               onChange={(event) => setNewPath(event.target.value)}
             />
           </div>
-          <p className="opacity-50 mt-2">
-            <Typography.Text>Leave blank to move items to the root of the bucket</Typography.Text>
-          </p>
+
           <button className="hidden" type="submit" onClick={onConfirmMove} />
         </form>
-      </div>
+      </Modal.Content>
     </Modal>
   )
 }

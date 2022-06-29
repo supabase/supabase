@@ -10,6 +10,11 @@ export const STORAGE_SORT_BY = {
   LAST_ACCESSED_AT: 'last_accessed_at',
 }
 
+export const STORAGE_SORT_BY_ORDER = {
+  ASC: 'asc',
+  DESC: 'desc',
+}
+
 export const STORAGE_ROW_TYPES = {
   BUCKET: 'BUCKET',
   FILE: 'FILE',
@@ -40,6 +45,7 @@ export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   getObject: ['SELECT'],
   getSignedObject: [],
   getSignedUrl: ['SELECT'],
+  getSignedUrls: ['SELECT'],
   listObjects: ['SELECT'],
   moveObjects: ['SELECT', 'UPDATE'],
   updateObject: ['SELECT', 'UPDATE'],

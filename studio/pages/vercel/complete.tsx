@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
-import { Button, Typography, IconLoader } from '@supabase/ui'
+import { Button, IconLoader } from '@supabase/ui'
 
 const PageContext = createContext(null)
 function IntegrationComplete() {
@@ -34,20 +34,15 @@ function IntegrationComplete() {
       <VercelIntegrationLayout>
         <div className="max-w-sm mx-auto">
           <IconLoader className="animate-spin" size={30} />
-          <Typography.Title level={3}>
-            <p className="pt-4">Your new project is spinning up</p>
-          </Typography.Title>
-          <Typography.Text>
-            <p className="pt-2">This may take up to 2 mins, but you can continue on Vercel.</p>
-          </Typography.Text>
-
+          <p className="pt-4 text-lg">Your new project is spinning up</p>
+          <p className="pt-2">This may take up to 2 mins, but you can continue on Vercel.</p>
           <div className="py-4">
             <a
               href={`/project/${PageState.supabaseProjectRef}`}
               target="_blank"
               className="hover:text-green-500"
             >
-              <Typography.Text>Open Supabase Dashboard →</Typography.Text>
+              Open Supabase Dashboard →
             </a>
           </div>
 

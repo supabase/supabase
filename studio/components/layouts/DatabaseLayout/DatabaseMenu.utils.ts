@@ -26,23 +26,29 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/database/replication`,
           items: [],
         },
+        {
+          name: 'Backups',
+          key: 'backups',
+          url: `/project/${ref}/database/backups/scheduled`,
+          items: [],
+        },
       ],
     },
     ...(IS_PLATFORM
       ? [
           {
-            title: 'Settings',
+            title: 'Logs',
             items: [
               {
-                name: 'Backups',
-                key: 'backups',
-                url: `/project/${ref}/database/backups`,
+                name: 'API logs',
+                key: 'api-logs',
+                url: `/project/${ref}/database/api-logs`,
                 items: [],
               },
               {
-                name: 'Connection Pooling',
-                key: 'pooling',
-                url: `/project/${ref}/database/pooling`,
+                name: 'Postgres logs',
+                key: 'postgres-logs',
+                url: `/project/${ref}/database/postgres-logs`,
                 items: [],
               },
             ],
