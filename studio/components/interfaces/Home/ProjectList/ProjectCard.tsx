@@ -23,7 +23,7 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
-          <div className="flex w-full w-full flex-row justify-between gap-1">
+          <div className="flex w-full flex-row justify-between gap-1">
             <span className="flex-shrink truncate">{name}</span>
           </div>
         }
