@@ -24,6 +24,7 @@ body,
   height: 100vh;
   padding: 0;
   margin: 0;
+  overflow-y: hidden;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   @apply bg-bg-primary-light dark:bg-bg-primary-dark;
