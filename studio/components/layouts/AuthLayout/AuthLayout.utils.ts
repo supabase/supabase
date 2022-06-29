@@ -3,7 +3,6 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { useFlag } from 'hooks'
 
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
-  const logsAuth = useFlag('logsAuth')
   return [
     {
       title: 'General',
@@ -11,7 +10,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
         { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
-        ...(IS_PLATFORM && logsAuth
+        ...(IS_PLATFORM
           ? [
               {
                 name: 'Logs',

@@ -33,7 +33,7 @@ We only support PostgreSQL. It's unlikely we'll ever move away from Postgres; ho
 
 ### Do you have a library for `[some other language]`?
 
-We officially support [JavaScript](/docs/reference/javascript/supabase-client) and [Dart](/docs/reference/dart/installing). 
+We officially support [JavaScript](/docs/reference/javascript/installing) and [Dart](/docs/reference/dart/installing). 
 
 You can find community-supported libraries in our [GitHub Community](https://github.com/supabase-community), and you can also help us to identify the most popular languages by [voting for a new client library](https://github.com/supabase/supabase/discussions/5).
 
