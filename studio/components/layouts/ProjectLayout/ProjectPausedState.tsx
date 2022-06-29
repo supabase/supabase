@@ -1,5 +1,4 @@
 import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
 import { Alert, Button, IconAlertCircle, IconPauseCircle } from '@supabase/ui'
 
 import { Project } from 'types'
@@ -16,21 +15,9 @@ interface Props {
 const ProjectPausedState: FC<Props> = ({ project }) => {
   const { ui, app } = useStore()
   const subscriptionStats = useSubscriptionStats()
-  const {
-    total_free_projects: totalFreeProjects,
-    total_active_free_projects: totalActiveFreeProjects,
-    total_paused_free_projects: totalPausedFreeProjects,
-  } = subscriptionStats
+  const { total_active_free_projects: totalActiveFreeProjects } = subscriptionStats
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  console.log('ProjectPausedState', {
-    totalFreeProjects,
-    totalActiveFreeProjects,
-    totalPausedFreeProjects,
-    freeProjectsLimit,
-  })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const hasExceedActiveFreeProjectsLimit = totalActiveFreeProjects >= freeProjectsLimit
 
@@ -67,7 +54,6 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                 <Button
                   size="tiny"
                   type="primary"
-                  loading={isSubmitting}
                   disabled={hasExceedActiveFreeProjectsLimit}
                   onClick={() => setShowConfirmRestore(true)}
                 >
