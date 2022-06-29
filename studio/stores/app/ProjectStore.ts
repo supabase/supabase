@@ -48,7 +48,6 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
     const response = await get(url, { headers })
-    console.log('Fetch project detail', projectRef, response)
 
     if (!response.error) {
       const project = response as Project
