@@ -96,7 +96,7 @@ const TableList: FC<{
               <Table.th key="buttons"></Table.th>,
             ]}
             body={tables.map((x: any, i: any) => (
-              <Table.tr key={x.id} hoverable>
+              <Table.tr key={x.id}>
                 <Table.td>
                   <Typography.Text>{x.name}</Typography.Text>
                 </Table.td>

@@ -29,7 +29,6 @@ const NavBar = ({ currentPage }: { currentPage: string }) => {
       active: currentPage == 'Reference',
       link: '/reference/javascript/supabase-client',
     },
-    { text: 'Discussions', active: currentPage == 'Discussions', link: '/discussions' },
   ]
 
   return (

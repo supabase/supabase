@@ -55,8 +55,6 @@ export interface Member {
     primary_email: string
     username: string
   }
-  invited_id?: number
-  invited_at?: string
 }
 
 export interface ResponseError {

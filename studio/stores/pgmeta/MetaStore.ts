@@ -135,8 +135,6 @@ export default class MetaStore implements IMetaStore {
   projectRef?: string
   connectionString?: string
   baseUrl: string
-
-  // [Joshen] I'm going to treat this as a list of system schemas
   excludedSchemas = [
     'auth',
     'extensions',
@@ -148,7 +146,6 @@ export default class MetaStore implements IMetaStore {
     'storage',
     'supabase_functions',
     'graphql',
-    'graphql_public',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {

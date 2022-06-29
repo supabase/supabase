@@ -93,10 +93,11 @@ const TableEditorMenu: FC<Props> = ({
       ? schemaViews
       : schemaViews.filter((view) => view.name.includes(searchText))
 
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+  const isLocked = schema?.owner === 'supabase_admin'
+  const [protectedSchemas, openSchemas] = partition(
+    schemas,
+    (schema) => schema.owner === 'supabase_admin'
   )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   return (
     <div className="my-6 mx-4 flex flex-grow flex-col space-y-6">

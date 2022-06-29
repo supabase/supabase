@@ -1,5 +1,5 @@
 import { getAllDocs, getDocsBySlug } from '../lib/docs'
-import Layout from '../components/layouts/DocsLayout'
+import Layout from '../components/layouts/Layout'
 import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { MDXProvider } from '@mdx-js/react'

@@ -59,9 +59,6 @@ const nextConfig = {
       },
     ]
   },
-  images: {
-    domains: ['github.com']
-  },
 }
 
 // Export all config
