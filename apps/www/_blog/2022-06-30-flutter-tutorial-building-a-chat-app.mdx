@@ -259,7 +259,7 @@ class MyApp extends StatelessWidget {
 
 ### Step 3: Redirect users depending on auth state using splash page
 
-When the user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page. In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes. We can await for the `SupabaseAuth.instance.initialSession` to receive the session when the user first opens the app. We will await for the return value of initialSession and navigate to different pages.
+When the user launches the app, we want to redirect those who have already signed in to the Chat page and those who have not signed in yet to the register page. In order to achieve this, we will create a splash page, which is just a page with a preloader at the middle from the user, but takes care of fetching auth state and redirects users accordingly behind the scenes. We are using the `onAuthenticated` and `onUnauthenticated` to redirect the user to the proper pages. 
 
 ```dart title="lib/pages/splash_page.dart"
 import 'package:flutter/material.dart';
