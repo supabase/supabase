@@ -4,10 +4,11 @@ import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
 import { Alert, Input } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
-import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
 import { useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { post } from 'lib/common/fetch'
+import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
 import { SettingsLayout } from 'components/layouts'
 import {
   RestartServerButton,
@@ -17,7 +18,6 @@ import {
 
 import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
@@ -40,6 +40,8 @@ const GeneralSettings = observer(() => {
   const project = ui.selectedProject
   const formModel = toJS(project)
   const BASIC_FIELDS = ['name']
+
+  const isFreeProject = project?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE
 
   const handleUpdateProject = async (model: any) => {
     const response = await post(`${API_URL}/projects/${project?.ref}/update`, model)
@@ -101,19 +103,21 @@ const GeneralSettings = observer(() => {
               {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
-          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
-            <div className="flex w-full items-center justify-between">
-              <div>
-                <p>Pause project</p>
-                <div className="max-w-[420px]">
-                  <p className="text-scale-1100 text-sm">
-                    Your project will not be accessible while it is paused.
-                  </p>
+          {isFreeProject && (
+            <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
+              <div className="flex w-full items-center justify-between">
+                <div>
+                  <p>Pause project</p>
+                  <div className="max-w-[420px]">
+                    <p className="text-scale-1100 text-sm">
+                      Your project will not be accessible while it is paused.
+                    </p>
+                  </div>
                 </div>
+                {project && <PauseProjectButton projectId={project.id} projectRef={project.ref} />}
               </div>
-              {project && <PauseProjectButton projectId={project.id} projectRef={project.ref} />}
-            </div>
-          </Panel.Content>
+            </Panel.Content>
+          )}
         </Panel>
       </section>
 
