@@ -27,7 +27,6 @@ The concept is simple:
 For this scenario, let's imagine that you have a table called `profiles` in your database:
 
 ```sql hideCopy
-
 create table profiles (
   id serial primary key,
   name text,
@@ -63,7 +62,7 @@ grant select on profiles to exporter;
 
 Let's turn on RLS for this table and limit the data which `exporter` can access:
 
-```sql hideCopy
+```sql hideCopy hideLineNumbers
 -- Turn on Row Level Security
 alter table profiles
   enable row level security;
@@ -83,8 +82,7 @@ Now we can use `pg_dump` to get only the data that we need.
 
 Run the dump with the `exporter` user that we created above and use the `--enable-row-security` flag to ensure that the dump succeeds.
 
-```sh hideCopy
-
+```bash hideCopy hideLineNumbers
 # Dump all the data into a "seed.sql" file
 # which we can use to restore our local databases.
 pg_dump \
@@ -96,6 +94,10 @@ pg_dump \
 --enable-row-security \
 --table=profiles \
 > seed.sql
+```
+
+```bash hideCopy hideLineNumbers
+-h db.host.supabase.co \
 ```
 
 And that's it. You can follow this same pattern for any tables that you want to dump.
