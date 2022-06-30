@@ -51,13 +51,16 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
     Array.isArray(filter)
       ? filter
           .map((f) => {
-            const [column, operatorAbbrev, value] = f.split(':')
+            const [column, operatorAbbrev, ...value] = f.split(':')
+
+            // Allow usage of : in value, so join them back after spliting
+            const formattedValue = value.join(':')
             const operator = FilterOperatorOptions.find(
               (option) => option.abbrev === operatorAbbrev
             )
             // Reject any possible malformed filter param
             if (!column || !operatorAbbrev || !operator) return undefined
-            else return { column, operator: operator.value, value: value || '' }
+            else return { column, operator: operator.value, value: formattedValue || '' }
           })
           .filter((f) => f !== undefined)
       : []
