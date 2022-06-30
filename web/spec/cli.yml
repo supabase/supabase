@@ -39,8 +39,8 @@ info:
         items:
           - index
           - Installing and Updating
-          - Config reference
-      - name: 'Command reference'
+          - Config Reference
+      - name: 'Command Reference'
         items:
           - supabase help
           - supabase login
@@ -63,6 +63,9 @@ info:
           - supabase functions new
           - supabase functions serve
           - supabase migration new
+          - supabase orgs list
+          - supabase projects list
+          - supabase projects create
           - supabase secrets list
           - supabase secrets set
           - supabase secrets unset
@@ -315,6 +318,58 @@ pages:
           supabase migration new <migration name>
           ```
 
+  supabase orgs list:
+    description: |
+      List all organizations.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase orgs list
+          ```
+
+  supabase projects list:
+    description: |
+      List all projects.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase projects list
+          ```
+
+  supabase projects create:
+    description: |
+      Create a new project.
+
+      Flags:
+
+      `--org-id`: Organization ID to create the project in.
+
+      `--db-password`: Database password of the project.
+
+      `--region`: Select a region close to you for the best performance. Allowed values:
+        - `ap-northeast-1`
+        - `ap-northeast-2`
+        - `ap-south-1`
+        - `ap-southeast-1`
+        - `ap-southeast-2`
+        - `ca-central-1`
+        - `eu-central-1`
+        - `eu-west-1`
+        - `eu-west-2`
+        - `sa-east-1`
+        - `us-east-1`
+        - `us-west-1`
+
+      `--plan`: Select a plan that suits your needs. Allowed values: `free`, `pro`.
+    examples:
+      - name: Usage
+        sh: |
+          ```sh
+          supabase projects create my-project --org-id cool-green-pqdr0qc --db-password ******** --region us-east-1
+          ```
+
   supabase secrets list:
     description: |
       List all secrets in the linked project.
@@ -416,7 +471,7 @@ pages:
       - `sudo dpkg -i <...>.deb`
       - `sudo rpm -i <...>.rpm`
 
-  Config reference:
+  Config Reference:
     description: |
       A `config.toml` file is generated after running `supabase init`. 
       
