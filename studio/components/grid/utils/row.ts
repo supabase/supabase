@@ -8,7 +8,7 @@ export async function fetchCount(
   filter?: string[] // Come directly from URL param
 ) {
   if (!state.rowService) return
-  console.log('Fetch count')
+
   const filters = formatFilterURLParams(filter)
   const { data, error } = await state.rowService.count(filters)
   if (error) {
