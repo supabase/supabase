@@ -1,5 +1,5 @@
 ---
-title: Flutter Tutorial: building a flutter chat app
+title: Flutter Tutorial: building a Flutter chat app
 description: How to create a real time chat app using Flutter. 
 author: tyler_shukert
 image: flutter-chat/flutter-chat-app.png
@@ -14,7 +14,7 @@ toc_depth: 3
 
 This is the first of a series of Flutter Tutorials. During the series, you will learn how to build cross-platform apps without worrying about the backend.
 
-In the first part of the series, I will show you how to build a chat application , where users can sign up and talk to other users in a single chat room. The exchange of messages will happen in real time, meaning that you do not have to refresh the page to load new messages.
+In the first part, I will show you how to build a chat application, where users can sign up and talk to other users in a single chat room. The exchange of messages will happen in real time, meaning that you do not have to refresh the page to load new messages.
 
 In order to build this chat app, we will need a database to store all of the chat information. We will be using [Supabase](https://supabase.com/) to store the chat information. Supabase is a back end as a service that provides auth, database, storage and functions to easily create a scalable application. Supabase is a suitable backend for this app, because it provides a nice set of APIs on Postgres database that we can easily call by using the SDK. It is also perfect for chat apps like the one we are about to create, because we can subscribe to real time changes on the database.
 
@@ -68,9 +68,7 @@ Run `flutter pub get` to install the packages. Note that you will have to termin
 
 ### Creating a new Supabase project
 
-If you do not have a Supabase account yet, do not worry. All you need is a Github account. Go to "<https://supabase.com/>" and click the “Start your project” button at the top right corner.
-
-![Click start your project to create a Supabase account](/images/blog/flutter-chat/create-supabase-account.png)
+If you do not have a Supabase account yet, do not worry, you can [get started for free](https://app.supabase.com/).
 
 You will be prompted to sign in using your Github account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
 
@@ -865,3 +863,4 @@ We saw how easily it is to create a chat application when you combine amazing to
 - [Flutter Supabase Quick Starter Guide](https://supabase.com/docs/guides/with-flutter)
 - [Quickly prototype your app using DartPad](https://dartpad.dev/)
 - [Open source map based Flutter app with CI/CD and scalable statemanagement example](https://github.com/dshukertjr/spot)
+- [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)
