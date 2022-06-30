@@ -1,4 +1,4 @@
-import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
+import { BarChart } from 'components/ui/Charts/BarChart/BarChart'
 import dayjs from 'dayjs'
 import { LogData } from '.'
 import { useMemo } from 'react'

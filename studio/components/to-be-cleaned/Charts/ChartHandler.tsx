@@ -13,9 +13,10 @@ import { Dictionary } from 'components/grid'
 
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
-import { BarChart, AreaChart } from './ChartRenderer'
+import { AreaChart } from './ChartRenderer'
 import { ChartData } from './ChartHandler.types'
 import { AreaProps } from 'recharts'
+import { BarChart } from 'components/ui/Charts/BarChart/BarChart'
 
 interface Props {
   label: string

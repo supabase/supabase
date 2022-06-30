@@ -3,11 +3,11 @@ import { CategoricalChartState } from "recharts/types/chart/generateCategoricalC
 export type  BarChartProps = {
   data?: DataPoint[],
   attribute: string,
-  yAxisLimit: number | string | undefined,
+  yAxisLimit?: number | string,
   format?: string,
-  highlightedValue?: number,
+  highlightedValue?: number | string,
   customDateFormat?: string,
-  displayDateInUtc: boolean ,
+  displayDateInUtc?: boolean ,
   label: string,
   onBarClick?: (v: CategoricalChartState) => void,
   minimalHeader?: boolean,
@@ -21,7 +21,7 @@ export type HeaderType = {
   attribute: string,
   focus: number | null,
   format?: string,
-  highlightedValue?: number,
+  highlightedValue?: number | string,
   data?: DataPoint[],
   customDateFormat?: string,
   label: string,
@@ -30,5 +30,5 @@ export type HeaderType = {
 }
 
 export type DataPoint = {
-  [attribute: string]: number
+  [attribute: string]: number | string,
 }

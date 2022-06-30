@@ -16,6 +16,7 @@ import utc from 'dayjs/plugin/utc'
 import { CHART_COLORS } from '../Charts.constants'
 import { BarChartProps, DataPoint, HeaderType } from './BarChart.types'
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import { isNumber } from 'lodash'
 
 function dataCheck(data: DataPoint[] | undefined, attribute: string) {
   const hasData = data?.find(record => record[attribute])
@@ -55,7 +56,7 @@ const Header = ({
     }
   } else {
     if ((format === '%') && highlightedValue) {
-      title = highlightedValue.toFixed(2)
+      title = isNumber(highlightedValue) ? highlightedValue.toFixed(2) : highlightedValue
     } else if (attribute.includes('ingress') || attribute.includes('egress') || attribute.includes('bytes')) {
       title = formatBytes(highlightedValue)
     } else {
