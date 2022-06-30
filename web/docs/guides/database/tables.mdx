@@ -342,7 +342,8 @@ A View is a convenient shortcut to a query. Creating a view does not involve new
 
 :::caution
 
-PostgreSQL views do not support Row Level Security. This will be released in PostgreSQL v15. Only expose views to your API if the data is considered public.
+PostgreSQL views are called with the privileges of the role that created them. To enable Row Level Security you should change the owner to the "authenticated" role:
+`alter view view_name owner to authenticated;`.
 
 :::
 
