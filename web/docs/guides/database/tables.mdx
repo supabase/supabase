@@ -340,6 +340,12 @@ create table salaries (
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
 
+:::caution
+
+PostgreSQL views do not support Row Level Security. This will be released in PostgreSQL v15. Only expose views to your API if the data is considered public.
+
+:::
+
 Say we have the following tables from a database of a university:
 
 **`students`**
