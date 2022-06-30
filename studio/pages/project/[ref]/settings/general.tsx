@@ -4,7 +4,7 @@ import { projects } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
 import { Alert, Input } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -37,6 +37,8 @@ export default observer(ProjectSettings)
 
 const GeneralSettings = observer(() => {
   const { app, ui } = useStore()
+  const isProjectPauseEnabled = useFlag('projectPausing')
+
   const project = ui.selectedProject
   const formModel = toJS(project)
   const BASIC_FIELDS = ['name']
@@ -103,7 +105,7 @@ const GeneralSettings = observer(() => {
               {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
             </div>
           </Panel.Content>
-          {isFreeProject && (
+          {isProjectPauseEnabled && isFreeProject && (
             <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
               <div className="flex w-full items-center justify-between">
                 <div>
