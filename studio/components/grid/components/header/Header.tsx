@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
-import { Button, Divider, IconDownload, IconPlus, IconX, IconTrash, Typography } from '@supabase/ui'
+import { Button, Divider, IconDownload, IconPlus, IconX, IconTrash } from '@supabase/ui'
 import { saveAs } from 'file-saver'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
 import { exportRowsToCsv } from '../../utils'
-import { showConfirmAlert } from '../common'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 type HeaderProps = {
   onAddColumn?: () => void
@@ -91,7 +91,7 @@ const RowHeader: React.FC<RowHeaderProps> = ({}) => {
   const { selectedRows, rows: allRows, editable } = state
 
   const onRowsDelete = () => {
-    showConfirmAlert({
+    confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
       onConfirm: async () => {
