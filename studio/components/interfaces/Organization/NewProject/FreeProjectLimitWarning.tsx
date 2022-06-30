@@ -10,7 +10,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ limit }) => {
   return (
     <div className="mt-4">
       <InformationBox
-        icon={<IconAlertCircle className="text-white" size="large" strokeWidth={1.5} />}
+        icon={<IconAlertCircle className="text-scale-1200" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title="Your account has reached its free project limit"
