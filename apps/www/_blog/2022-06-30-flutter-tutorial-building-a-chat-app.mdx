@@ -93,7 +93,7 @@ Each message is associated with one profile to represent who posted the message.
 
 You can run the following SQL in your SQL editor of your Supabase dashboard.
 
-![we will create profiles and messages tables](/images/blog/flutter-chat/sql-editor.png.png)
+![we will create profiles and messages tables](/images/blog/flutter-chat/sql-editor.png)
 
 ```sql
 create table if not exists public.profiles (
@@ -857,6 +857,8 @@ With that, we are done creating our application. If you kept your `flutter run` 
 ## Conclusion / Future improvements
 
 We saw how easily it is to create a chat application when you combine amazing tools like Flutter and Supabase. One thing that was missing from this chat application is authorization. We did implement registration, but that was only to distinguish different users. In the coming up article, we will cover how you can add authorization using [row level security](https://supabase.com/docs/guides/auth/row-level-security) in Supabase to secure this chat application. With authorization, we can create private chat rooms so that messages can only be seen by those inside those rooms.
+
+If you have any questions please reach out via [Twitter](https://twitter.com/dshukertjr) or join our [Discord](https://discord.supabase.com).
 
 ## More Flutter Resources
 
