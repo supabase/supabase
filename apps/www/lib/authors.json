@@ -136,5 +136,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/alaister",
     "author_image_url": "https://github.com/alaister.png"
+  },
+  {
+    "author_id": "tyler_shukert",
+    "author": "Tyler Shukert",
+    "username": "dshukertjr",
+    "position": "DevRel & Flutter",
+    "author_url": "https://github.com/dshukertjr",
+    "author_image_url": "https://github.com/dshukertjr.png"
   }
 ]
