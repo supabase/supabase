@@ -8,13 +8,13 @@ import { DropdownControl } from 'components/grid/components/common'
 import { useTrackedState } from 'components/grid/store'
 import { FilterOperatorOptions } from './Filter.constants'
 
-type FilterRowProps = {
+interface Props {
   filter: Filter
   filterIdx: number
 }
 
 // [Area of improvement] Input field loses focus after the debounce (because of useUrlState?)
-const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
+const FilterRow: FC<Props> = ({ filter, filterIdx }) => {
   const state = useTrackedState()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter'] })
 
@@ -107,6 +107,13 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
   }
   const debounceHandler = useCallback(debounce(updateFilterValue, 600), [])
 
+  const placeholder =
+    column?.format === 'timestamptz'
+      ? 'yyyy-mm-dd hh:mm:ss+zz'
+      : column?.format === 'timestamp'
+      ? 'yyyy-mm-dd hh:mm:ss'
+      : 'Enter a value'
+
   return (
     <div className="sb-grid-filter-row px-3">
       <DropdownControl align="start" options={columnOptions} onSelect={onColumnChange}>
@@ -139,7 +146,7 @@ const FilterRow: FC<FilterRowProps> = ({ filter, filterIdx }) => {
       <Input
         size="tiny"
         className="w-full"
-        placeholder="Enter a value"
+        placeholder={placeholder}
         value={filterValue}
         onChange={onValueChange}
       />

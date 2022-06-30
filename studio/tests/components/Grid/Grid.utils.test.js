@@ -1,4 +1,5 @@
 import { formatSortURLParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { format } from 'path'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
@@ -43,6 +44,15 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
       column: 'id',
       operator: '<=',
       value: '40',
+    })
+  })
+  test('should format filters for timestamps correctly', () => {
+    const mockInput = ['created_at:gte:2022-05-30 03:00:00']
+    const output = formatFilterURLParams(mockInput)
+    expect(output[0]).toStrictEqual({
+      column: 'created_at',
+      operator: '>=',
+      value: '2022-05-30 03:00:00',
     })
   })
   test('should reject any malformed filter options based on URL params', () => {
