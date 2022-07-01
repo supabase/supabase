@@ -102,7 +102,7 @@ const GeneralSettings = observer(() => {
                   </p>
                 </div>
               </div>
-              {project && <RestartServerButton projectId={project.id} projectRef={project.ref} />}
+              {project && <RestartServerButton project={project} />}
             </div>
           </Panel.Content>
           {isProjectPauseEnabled && isFreeProject && (
