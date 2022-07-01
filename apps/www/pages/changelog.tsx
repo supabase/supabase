@@ -13,6 +13,7 @@ import Quote from '~/components/Quote'
 import { getPostdata } from '~/lib/posts'
 
 import fs from 'fs'
+import { IconCornerDownRight, IconGitCommit, IconPlus, IconPlusCircle } from '@supabase/ui'
 
 // import all components used in blog articles here
 
@@ -133,27 +134,36 @@ function ChangelogPage(props: any) {
 
           {/* Content */}
 
-          {props.changelog.map((x: any) => {
-            // const content = hydrate(x.content, { components })
-            const content = hydrate(x.content, { components })
+          <div>
+            {props.changelog.map((x: any) => {
+              // const content = hydrate(x.content, { components })
+              const content = hydrate(x.content, { components })
 
-            return (
-              <div className="grid border-b pb-10 last:border-none lg:grid-cols-12">
-                <div
-                  className="col-span-4 mb-8 self-start lg:sticky lg:top-0 lg:-mt-32 lg:pt-32
+              return (
+                <div className="grid pb-10 lg:grid-cols-12  lg:border-l">
+                  <div
+                    className="col-span-4 mb-8 self-start lg:sticky lg:top-0 lg:-mt-32 lg:pt-32
                 "
-                >
-                  <p className="text-scale-900 text-lg">{dayjs(x.date).format('MMM D, YYYY')}</p>
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-scale-300 border-scale-400 text-scale-900 flex h-5 w-5 items-center justify-center rounded border lg:-ml-2.5">
+                        <IconGitCommit size={14} strokeWidth={1.5} />
+                      </div>
+                      <p className="text-scale-900 text-lg">
+                        {dayjs(x.date).format('MMM D, YYYY')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="col-span-8">
+                    <article className={['prose prose-docs max-w-none'].join(' ')}>
+                      {' '}
+                      {content}
+                    </article>
+                  </div>
                 </div>
-                <div className="col-span-8">
-                  <article className={['prose prose-docs max-w-none'].join(' ')}>
-                    {' '}
-                    {content}
-                  </article>
-                </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
         <CTABanner />
