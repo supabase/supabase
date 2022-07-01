@@ -8,7 +8,7 @@ import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import monokaiCustomTheme from './CodeBlock.utils'
 
-interface Props {
+export interface CodeBlockProps {
   lang: 'js' | 'sql' | 'py' | 'bash'
   startingLineNumber?: number
   hideCopy?: boolean
@@ -18,7 +18,7 @@ interface Props {
   size?: 'small' | 'medium' | 'large'
 }
 
-function CodeBlock(props: Props) {
+function CodeBlock(props: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
 
   const firstLine = props.children ? props.children.split('\n')[0] : ''
