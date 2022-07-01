@@ -26,8 +26,6 @@ export const createSQLPolicy = (
       : definition,
     check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
-  console.log('Original', policyFormFields)
-  console.log('Formatted', formattedPolicyFormFields)
 
   if (isEmpty(originalPolicyFormFields)) {
     return createSQLStatementForCreatePolicy(formattedPolicyFormFields)
