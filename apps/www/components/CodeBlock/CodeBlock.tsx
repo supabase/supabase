@@ -9,7 +9,7 @@ import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import monokaiCustomTheme from './CodeBlock.utils'
 
 export interface CodeBlockProps {
-  lang: 'js' | 'sql' | 'py' | 'bash'
+  lang: 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx'
   startingLineNumber?: number
   hideCopy?: boolean
   showLineNumbers?: boolean
