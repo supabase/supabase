@@ -145,13 +145,16 @@ function ChangelogPage(props: any) {
                     className="col-span-4 mb-8 self-start lg:sticky lg:top-0 lg:-mt-32 lg:pt-32
                 "
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-baseline gap-3">
                       <div className="bg-scale-300 border-scale-400 text-scale-900 flex h-5 w-5 items-center justify-center rounded border lg:-ml-2.5">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
-                      <p className="text-scale-900 text-lg">
-                        {dayjs(x.date).format('MMM D, YYYY')}
-                      </p>
+                      <div className="flex flex-col gap-1">
+                        {x.title && <h3 className="text-scale-1200 text-2xl">{x.title}</h3>}
+                        <p className="text-scale-900 text-lg">
+                          {dayjs(x.date).format('MMM D, YYYY')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="col-span-8">
