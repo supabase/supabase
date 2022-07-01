@@ -184,7 +184,7 @@ const TableEditorMenu: FC<Props> = ({
                 <IconSearch size={12} strokeWidth={1.5} />
               </div>
             }
-            placeholder="Filter tables"
+            placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="tiny"
