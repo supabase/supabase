@@ -139,10 +139,13 @@ function ChangelogPage(props: any) {
 
             return (
               <div className="grid border-b pb-10 last:border-none lg:grid-cols-12">
-                <div className="col-span-5 mb-8">
+                <div
+                  className="col-span-4 mb-8 self-start lg:sticky lg:top-0 lg:-mt-32 lg:pt-32
+                "
+                >
                   <p className="text-scale-900 text-lg">{dayjs(x.date).format('MMM D, YYYY')}</p>
                 </div>
-                <div className="col-span-7">
+                <div className="col-span-8">
                   <article className={['prose prose-docs max-w-none'].join(' ')}>
                     {' '}
                     {content}
