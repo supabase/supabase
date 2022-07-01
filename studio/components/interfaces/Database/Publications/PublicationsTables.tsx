@@ -1,27 +1,19 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Toggle, Input, IconChevronLeft, IconSearch } from '@supabase/ui'
+import { Button, Input, IconChevronLeft, IconSearch } from '@supabase/ui'
+import { PostgresPublication } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
 import PublicationsTableItem from './PublicationsTableItem'
 import Table from 'components/to-be-cleaned/Table'
-// import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 interface Props {
-  selectedPublication: any
+  selectedPublication: PostgresPublication
   onSelectBack: () => void
-  onPublicationUpdated: (publication: any) => void
 }
 
-const PublicationsTables: FC<Props> = ({
-  selectedPublication,
-  onSelectBack,
-  // onPublicationUpdated,
-}) => {
-  const {
-    // ui,
-    meta,
-  } = useStore()
+const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) => {
+  const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
   const tables =
@@ -62,7 +54,7 @@ const PublicationsTables: FC<Props> = ({
   return (
     <>
       <div className="mb-4">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Button
               type="outline"
@@ -88,7 +80,7 @@ const PublicationsTables: FC<Props> = ({
           head={[
             <Table.th key="header-name">Name</Table.th>,
             <Table.th key="header-schema">Schema</Table.th>,
-            <Table.th key="header-desc" className="text-left hidden lg:table-cell">
+            <Table.th key="header-desc" className="hidden text-left lg:table-cell">
               Description
             </Table.th>,
             <Table.th key="header-all">
