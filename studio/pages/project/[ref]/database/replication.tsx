@@ -25,7 +25,6 @@ const DatabaseReplication: NextPageWithLayout = () => {
         <PublicationsTables
           selectedPublication={selectedPublication}
           onSelectBack={() => setSelectedPublicationId(undefined)}
-          // onPublicationUpdated={setSelectedPublication}
         />
       )}
     </div>
