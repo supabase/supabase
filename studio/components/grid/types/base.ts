@@ -25,7 +25,6 @@ export type FilterOperator =
   | 'is'
 
 export interface Filter {
-  id: string
   column: string
   operator: FilterOperator
   value: any
@@ -33,8 +32,8 @@ export interface Filter {
 
 export interface SavedState {
   filters: Filter[]
-  gridColumns: CalculatedColumn<any, any>[]
   sorts: Sort[]
+  gridColumns: CalculatedColumn<any, any>[]
 }
 
 export interface DragItem {

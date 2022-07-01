@@ -1,65 +1,68 @@
-import * as React from 'react';
-import { Button, IconMenu, Toggle, IconX } from '@supabase/ui';
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
-import { XYCoord } from 'dnd-core';
-import { useDispatch, useTrackedState } from '../../../store';
-import { DragItem } from '../../../types';
+import update from 'immutability-helper'
+import { FC, useRef, memo } from 'react'
+import { Button, IconMenu, Toggle, IconX } from '@supabase/ui'
+import { XYCoord } from 'dnd-core'
+import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+
+import { useUrlState } from 'hooks'
+import { DragItem, Sort } from 'components/grid/types'
+import { useTrackedState } from 'components/grid/store'
 
 type SortRowProps = {
-  columnName: string;
-  index: number;
-};
+  index: number
+  columnName: string
+  sort: Sort
+}
 
-const SortRow: React.FC<SortRowProps> = ({ columnName, index }) => {
-  const state = useTrackedState();
-  const dispatch = useDispatch();
-  const column = state?.table?.columns.find((x) => x.name === columnName);
-  const sort = state?.sorts.find((x) => x.column === columnName);
-  if (!column || !sort) return null;
+const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
+  const state = useTrackedState()
+  const [_, setParams] = useUrlState({ arrayKeys: ['sort'] })
 
-  const ref = React.useRef<HTMLDivElement>(null);
+  const column = state?.table?.columns.find((x) => x.name === columnName)
+  if (!column) return null
+
+  const ref = useRef<HTMLDivElement>(null)
 
   const [{ isDragging }, drag] = useDrag({
     type: 'sort-row',
     item: () => {
-      return { key: columnName, index };
+      return { key: columnName, index }
     },
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),
-  });
+  })
 
   const [{ handlerId }, drop] = useDrop({
     accept: 'sort-row',
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
-      };
+      }
     },
     hover(item: DragItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
-        return;
+        return
       }
-      const dragIndex = item.index;
-      const hoverIndex = index;
+      const dragIndex = item.index
+      const hoverIndex = index
 
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
-        return;
+        return
       }
 
       // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      const hoverBoundingRect = ref.current?.getBoundingClientRect()
 
       // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
 
       // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
+      const clientOffset = monitor.getClientOffset()
 
       // Get pixels to the top
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
 
       // Only perform the move when the mouse has crossed half of the items height
       // When dragging downwards, only move when the cursor is below 50%
@@ -67,49 +70,72 @@ const SortRow: React.FC<SortRowProps> = ({ columnName, index }) => {
 
       // Dragging downwards
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return;
+        return
       }
 
       // Dragging upwards
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return;
+        return
       }
 
       // Time to actually perform the action
-      moveSort(dragIndex, hoverIndex);
+      moveSort(dragIndex, hoverIndex)
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex;
+      item.index = hoverIndex
     },
-  });
+  })
 
-  function onToogle(value: boolean) {
-    dispatch({
-      type: 'UPDATE_SORT',
-      payload: { column: columnName, ascending: value },
-    });
+  function onToggle(value: boolean) {
+    setParams((prevParams) => {
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+      const updatedSorts = existingSorts.map((sort: string) => {
+        const [column] = sort.split(':')
+        return column === columnName ? `${columnName}:${value ? 'asc' : 'desc'}` : sort
+      })
+      return {
+        ...prevParams,
+        sort: updatedSorts,
+      }
+    })
   }
 
-  function onDeleteClick() {
-    dispatch({
-      type: 'REMOVE_SORT',
-      payload: { column: columnName },
-    });
+  function onRemoveSort() {
+    setParams((prevParams) => {
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+      const updatedSorts = existingSorts.filter((sort: string) => {
+        const [column] = sort.split(':')
+        if (column !== columnName) return sort
+      })
+      return {
+        ...prevParams,
+        sort: updatedSorts,
+      }
+    })
   }
 
   const moveSort = (dragIndex: number, hoverIndex: number) => {
-    if (dragIndex == hoverIndex) return;
-    dispatch({
-      type: 'MOVE_SORT',
-      payload: { fromIndex: dragIndex, toIndex: hoverIndex },
-    });
-  };
+    if (dragIndex == hoverIndex) return
+    setParams((prevParams) => {
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+      const updatedSorts = update(existingSorts, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, existingSorts[dragIndex]],
+        ],
+      })
+      return {
+        ...prevParams,
+        sort: updatedSorts,
+      }
+    })
+  }
 
-  const opacity = isDragging ? 0 : 1;
-  drag(drop(ref));
+  const opacity = isDragging ? 0 : 1
+  drag(drop(ref))
 
   return (
     <div
@@ -122,30 +148,28 @@ const SortRow: React.FC<SortRowProps> = ({ columnName, index }) => {
         icon={<IconX strokeWidth={1.5} size={14} />}
         size="tiny"
         type="text"
-        onClick={onDeleteClick}
+        onClick={onRemoveSort}
       />
       <div className="grow">
-        <span className="flex items-center gap-1 grow text-sm text-scale-1200 truncate">
-          <span className="text-xs text-scale-900">
-            {index > 0 ? 'then by' : 'sort by'}
-          </span>
+        <span className="text-scale-1200 flex grow items-center gap-1 truncate text-sm">
+          <span className="text-scale-900 text-xs">{index > 0 ? 'then by' : 'sort by'}</span>
           {column.name}
         </span>
       </div>
       <div className="flex items-center gap-1">
-        <label className="text-xs text-scale-900">ascending:</label>
+        <label className="text-scale-900 text-xs">ascending:</label>
         <Toggle
           size="tiny"
           layout="flex"
           defaultChecked={sort.ascending}
           // @ts-ignore
-          onChange={(e: boolean) => onToogle(e)}
+          onChange={(e: boolean) => onToggle(e)}
         />
       </div>
       <span className="transition-color text-scale-900 hover:text-scale-1100">
         <IconMenu strokeWidth={2} size={16} />
       </span>
     </div>
-  );
-};
-export default React.memo(SortRow);
+  )
+}
+export default memo(SortRow)
