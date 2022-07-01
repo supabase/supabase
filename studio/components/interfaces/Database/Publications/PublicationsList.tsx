@@ -7,7 +7,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import Table from 'components/to-be-cleaned/Table'
 
 interface Props {
-  onSelectPublication: (publication: any) => void
+  onSelectPublication: (id: number) => void
 }
 
 const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
@@ -48,7 +48,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div>
               <Input
@@ -63,7 +63,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           <div className=""></div>
         </div>
       </div>
-      <div className="rounded overflow-hidden">
+      <div className="overflow-hidden rounded">
         <Table
           head={[
             <Table.th key="header.name">Name</Table.th>,
@@ -131,11 +131,11 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                 </div>
               </Table.td>
               <Table.td className="px-4 py-3 pr-2">
-                <div className="flex gap-2 justify-end">
+                <div className="flex justify-end gap-2">
                   <Button
                     type="default"
                     style={{ paddingTop: 3, paddingBottom: 3 }}
-                    onClick={() => onSelectPublication(x)}
+                    onClick={() => onSelectPublication(x.id)}
                   >
                     {x.tables == null
                       ? 'All tables'
