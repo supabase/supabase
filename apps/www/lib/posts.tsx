@@ -7,7 +7,7 @@ import { generateReadingTime } from './helpers'
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-type Directories = '_blog' | '_case-studies' | '_alternatives'
+type Directories = '_blog' | '_case-studies' | '_alternatives' | '_changelog'
 
 export const getSortedPosts = (directory: Directories, limit?: number, tags?: any) => {
   //Finding directory named "blog" from the current working directory of Node.

@@ -91,6 +91,10 @@ module.exports = ui({
             a: {
               fontWeight: '400',
             },
+            ul: {
+              listStyleType: 'circle',
+              paddingLeft: '0.78rem',
+            },
             pre: {
               background: 'none',
               padding: 0,
