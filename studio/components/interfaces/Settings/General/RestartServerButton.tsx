@@ -3,28 +3,37 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, IconRefreshCcw } from '@supabase/ui'
 
+import { Project } from 'types'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
 interface Props {
-  projectId: number
-  projectRef: string
+  project: Project
 }
 
-const RestartServerButton: FC<Props> = observer(({ projectRef, projectId }) => {
+const RestartServerButton: FC<Props> = observer(({ project }) => {
   const { ui, app } = useStore()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const projectId = project.id
+  const projectRef = project.ref
+  const projectRegion = project.region
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
   const requestServerRestart = async () => {
     setLoading(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/restart`, {})
+    const res = await post(`${API_URL}/projects/${projectRef}/restart-services`, {
+      restartRequest: {
+        region: projectRegion,
+        services: ['postgresql'],
+      },
+    })
 
     if (res.error) {
       ui.setNotification({
