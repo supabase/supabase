@@ -142,14 +142,14 @@ function ChangelogPage(props: any) {
               return (
                 <div className="grid pb-10 lg:grid-cols-12  lg:border-l">
                   <div
-                    className="col-span-4 mb-8 self-start lg:sticky lg:top-0 lg:-mt-32 lg:pt-32
+                    className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
                   >
-                    <div className="flex items-baseline gap-3">
+                    <div className="flex w-full items-baseline gap-3">
                       <div className="bg-scale-300 border-scale-400 text-scale-900 flex h-5 w-5 items-center justify-center rounded border lg:-ml-2.5">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex w-full flex-col gap-1">
                         {x.title && <h3 className="text-scale-1200 text-2xl">{x.title}</h3>}
                         <p className="text-scale-900 text-lg">
                           {dayjs(x.date).format('MMM D, YYYY')}
@@ -157,7 +157,7 @@ function ChangelogPage(props: any) {
                       </div>
                     </div>
                   </div>
-                  <div className="col-span-8">
+                  <div className="col-span-8 ml-8 lg:ml-0">
                     <article className={['prose prose-docs max-w-none'].join(' ')}>
                       {' '}
                       {content}
