@@ -82,6 +82,12 @@ module.exports = ui({
             'h1, h2, h3, h4, h5': {
               fontWeight: '400',
             },
+            code: {
+              background: 'var(--colors-scale4)',
+              padding: '0.2rem 0.3rem',
+              borderRadius: '4px',
+              fontWeight: 400,
+            },
             h2: {
               fontWeight: '400',
             },
