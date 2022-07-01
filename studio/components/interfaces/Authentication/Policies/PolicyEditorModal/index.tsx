@@ -71,6 +71,9 @@ const PolicyEditorModal: FC<Props> = ({
   )
   const [policyStatementForReview, setPolicyStatementForReview] = useState<any>('')
 
+  console.log('initializedPolicyFormFields', initializedPolicyFormFields)
+  console.log('policyFormFields', policyFormFields)
+
   useEffect(() => {
     if (visible) {
       if (isNewPolicy) {
