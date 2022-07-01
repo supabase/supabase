@@ -47,8 +47,9 @@ const FilterRow: FC<Props> = ({ filter, filterIdx }) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
       const updatedFilters = existingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
-          const [_, operator, value] = filter.split(':')
-          return `${column}:${operator}:${value}`
+          const [_, operator, ...value] = filter.split(':')
+          const formattedValue = value.join(':')
+          return `${column}:${operator}:${formattedValue}`
         } else {
           return filter
         }
@@ -65,9 +66,10 @@ const FilterRow: FC<Props> = ({ filter, filterIdx }) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
       const updatedFilters = existingFilters.map((filter: string, idx: number) => {
         if (idx === filterIdx) {
-          const [column, _, value] = filter.split(':')
+          const [column, _, ...value] = filter.split(':')
+          const formattedValue = value.join(':')
           const selectedOperator = FilterOperatorOptions.find((option) => option.value === operator)
-          return `${column}:${selectedOperator?.abbrev}:${value}`
+          return `${column}:${selectedOperator?.abbrev}:${formattedValue}`
         } else {
           return filter
         }
