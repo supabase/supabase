@@ -2,7 +2,7 @@ import { FC } from 'react'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
-import { Loading, Button } from '@supabase/ui'
+import { Loading, Button, Alert } from '@supabase/ui'
 
 import { formatBytes } from 'lib/helpers'
 import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
@@ -37,6 +37,8 @@ const Subscription: FC<Props> = ({
   const isOrgOwner = ui.selectedOrganization?.is_owner
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  const projectIsOverLimits = true
+
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
@@ -54,6 +56,12 @@ const Subscription: FC<Props> = ({
 
   return (
     <Loading active={loading}>
+      {projectIsOverLimits && (
+        <Alert withIcon variant="warning" title="Your project is over limits" className="mb-4">
+          This project is currently over one or more limits of the Free plan. Please consider
+          upgrading before BAD_THING happens.
+        </Alert>
+      )}
       <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
         <div className="bg-panel-body-light dark:bg-panel-body-dark">
           <div className="flex items-center justify-between px-6 pt-4">
@@ -115,7 +123,6 @@ const Subscription: FC<Props> = ({
               for a more detailed analysis of what Supabase has on offer.
             </p>
           </div>
-
           {/* Cost Breakdown */}
           {!loading && subscription && (
             <>

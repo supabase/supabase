@@ -364,6 +364,8 @@ const Wizard: NextPageWithLayout = () => {
                   })}
                 </Listbox>
 
+                <FreeProjectLimitWarning limit={freeProjectsLimit} />
+
                 {isSelectFreeTier && isOverFreeProjectLimit && (
                   <FreeProjectLimitWarning limit={freeProjectsLimit} />
                 )}

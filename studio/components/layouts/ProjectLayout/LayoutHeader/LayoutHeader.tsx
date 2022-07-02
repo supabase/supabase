@@ -9,10 +9,13 @@ import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
+import { Badge, IconAlertCircle } from '@supabase/ui'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ui } = useStore()
   const { selectedOrganization, selectedProject } = ui
+
+  const projectIsOverLimits = true
 
   return (
     <div
@@ -46,7 +49,17 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   </svg>
                 </span>
                 {/* Project Dropdown */}
-                <ProjectDropdown />
+                <div className="flex items-center">
+                  <ProjectDropdown />
+                  {projectIsOverLimits && (
+                    <Badge color="red">
+                      <div className="flex items-center gap-2">
+                        <IconAlertCircle size={14} strokeWidth={2} />
+                        <span className="truncate">Project over limits</span>
+                      </div>
+                    </Badge>
+                  )}
+                </div>
               </>
             )}
           </>

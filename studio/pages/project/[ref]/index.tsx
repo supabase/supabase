@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Typography } from '@supabase/ui'
+import { Alert, Button, Typography } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
@@ -9,10 +9,13 @@ import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
+import Link from 'next/link'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
+
+  const projectIsOverLimits = true
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -24,6 +27,21 @@ const Home: NextPageWithLayout = () => {
       <div className="mx-6 flex items-center space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
       </div>
+      {projectIsOverLimits && (
+        <div className="relative mx-6">
+          <Alert withIcon variant="warning" title="Your project is over limits">
+            This project is currently over one or more limits of the Free plan. Please visit Billing{' '}
+            {'&'} Usage to learn more.
+            <p className="mt-4">
+              <Link passHref href={`/project/${project?.ref}/settings/billing`}>
+                <Button as="a" type="default">
+                  Billing {'&'} Usage
+                </Button>
+              </Link>
+            </p>
+          </Alert>
+        </div>
+      )}
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 

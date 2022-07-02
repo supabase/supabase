@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge, IconLoader, IconPauseCircle } from '@supabase/ui'
+import { Badge, IconLoader, IconPauseCircle, IconAlertCircle } from '@supabase/ui'
 
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'
@@ -17,6 +17,7 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
   const isPausing = project.status === PROJECT_STATUS.GOING_DOWN
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
+  const projectIsOverLimits = true
 
   return (
     <li className="col-span-1">
@@ -55,6 +56,18 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
                   <div className="flex items-center gap-2">
                     <IconPauseCircle size={14} strokeWidth={2} />
                     <span className="truncate">Paused</span>
+                  </div>
+                </Badge>
+              </div>
+            ) : projectIsOverLimits ? (
+              // [Terry] I think just putting this check at the end is ok here
+              // if a project is paused / pausing / restoring that will show first
+              // before this state
+              <div className="grow text-right">
+                <Badge color="red">
+                  <div className="flex items-center gap-2">
+                    <IconAlertCircle size={14} strokeWidth={2} />
+                    <span className="truncate">Over Limits</span>
                   </div>
                 </Badge>
               </div>
