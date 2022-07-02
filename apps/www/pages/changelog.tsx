@@ -140,13 +140,13 @@ function ChangelogPage(props: any) {
               const content = hydrate(x.content, { components })
 
               return (
-                <div className="grid pb-10 lg:grid-cols-12  lg:border-l">
+                <div className="grid border-l pb-10  lg:grid-cols-12">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
                   >
-                    <div className="flex w-full items-baseline gap-3">
-                      <div className="bg-scale-300 border-scale-400 text-scale-900 flex h-5 w-5 items-center justify-center rounded border lg:-ml-2.5">
+                    <div className="flex w-full items-baseline gap-6">
+                      <div className="bg-scale-300 border-scale-400 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border">
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
