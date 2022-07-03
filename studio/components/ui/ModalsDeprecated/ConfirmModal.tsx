@@ -9,7 +9,7 @@ function ConfirmModal({
   onConfirm,
   onAsyncConfirm,
   variant,
-}: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
+}: { title: string | React.ReactNode; message: string; onConfirm?: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   const [loading, setLoading] = useState(false)
 
   function onCancelClick() {
@@ -71,7 +71,7 @@ function removeElement() {
   }
 }
 
-function createElement(properties: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
+function createElement(properties: { title: string | React.ReactNode; message: string; onConfirm?: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   let divTarget = document.getElementById('supabase-ui-confirm-alert')
   if (divTarget) {
     render(<ConfirmModal {...properties} />, divTarget)
@@ -83,6 +83,6 @@ function createElement(properties: { title: string | React.ReactNode; message: s
   }
 }
 
-export function confirmAlert(properties: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
+export function confirmAlert(properties: { title: string | React.ReactNode; message: string; onConfirm?: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   createElement(properties)
 }
