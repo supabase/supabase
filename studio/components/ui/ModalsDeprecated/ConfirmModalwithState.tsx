@@ -8,6 +8,13 @@ export default function ConfirmModal({
   onClose,
   onAsyncConfirm,
   visible,
+}: {
+  title: string | React.ReactNode
+  message: string
+  onConfirm: () => void
+  onClose: () => void
+  onAsyncConfirm?: () => void
+  visible: boolean
 }) {
   const [loading, setLoading] = useState(false)
 
@@ -34,8 +41,8 @@ export default function ConfirmModal({
       description={message}
       showIcon={false}
       size="small"
-      onConfirmText="OK"
-      onCancelText="Cancel"
+      confirmText="OK"
+      cancelText="Cancel"
       onCancel={onCancelClick}
       onConfirm={onConfirmClick}
       loading={loading}

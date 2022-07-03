@@ -1,15 +1,7 @@
 import { Transition } from '@headlessui/react'
 import { clickOutsideListener, useKeyboardShortcuts } from 'hooks'
 
-/**
- * Base modal with trigger button and close button
- *
- * @param {Boolean}                     open              // The parent should hold the open state
- * @param {Function}                    handleCloseEvent  // Delegate the close event to the parent
- * @param {JSX.Element|JSX.Element[]}   children
- */
-
-export default function Modal({ children, open, handleCloseEvent }) {
+export default function Modal({ children, open, handleCloseEvent }: { children: React.ReactNode; open: boolean; handleCloseEvent: () => void }) {
   const ref = clickOutsideListener(handleCloseEvent)
 
   useKeyboardShortcuts({

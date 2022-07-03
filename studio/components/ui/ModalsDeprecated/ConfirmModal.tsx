@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { Button, Modal } from '@supabase/ui'
 import { render, unmountComponentAtNode } from 'react-dom'
+import reactVirtualizedAutoSizer from 'react-virtualized-auto-sizer';
 
 function ConfirmModal({
   title,
   message: description,
   onConfirm,
   onAsyncConfirm,
-  variant = 'danger',
-}) {
+  variant,
+}: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   const [loading, setLoading] = useState(false)
 
   function onCancelClick() {
@@ -65,11 +66,12 @@ function removeElement() {
   const target = document.getElementById('supabase-ui-confirm-alert')
   if (target) {
     unmountComponentAtNode(target)
+    // @ts-ignore
     target.parentNode.removeChild(target)
   }
 }
 
-function createElement(properties) {
+function createElement(properties: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   let divTarget = document.getElementById('supabase-ui-confirm-alert')
   if (divTarget) {
     render(<ConfirmModal {...properties} />, divTarget)
@@ -81,6 +83,6 @@ function createElement(properties) {
   }
 }
 
-export function confirmAlert(properties) {
+export function confirmAlert(properties: { title: string | React.ReactNode; message: string; onConfirm: () => void; onAsyncConfirm?: () => void; variant?: 'danger' }) {
   createElement(properties)
 }
