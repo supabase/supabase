@@ -3,7 +3,7 @@ import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
 import { IconTrash, IconClipboard, IconEdit } from '@supabase/ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { formatClipboardValue, copyToClipboard } from '../../utils'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 

@@ -3,7 +3,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from '@supabase/ui'
 import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
   dispatch({

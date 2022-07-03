@@ -12,7 +12,7 @@ import {
 } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { confirmAlert } from '../../../to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from '../../../ui/ModalsDeprecated/ConfirmModal'
 import Table from '../../../to-be-cleaned/Table'
 
 const Header: FC<{

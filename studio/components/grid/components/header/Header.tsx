@@ -7,7 +7,7 @@ import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
 import { exportRowsToCsv } from 'components/grid/utils'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 
 type HeaderProps = {

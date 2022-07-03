@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useDispatch, useTrackedState } from '../../store'
 import { exportRowsToCsv } from '../../utils'
 import { saveAs } from 'file-saver'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 type RowMenuProps = {}
 

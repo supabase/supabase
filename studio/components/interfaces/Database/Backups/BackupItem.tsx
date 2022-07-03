@@ -7,7 +7,7 @@ import { Badge, Button, IconDownload } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { post } from 'lib/common/fetch'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 interface Props {
   projectRef: string

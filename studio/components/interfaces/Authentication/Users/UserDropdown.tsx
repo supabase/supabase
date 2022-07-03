@@ -7,7 +7,7 @@ import { timeout } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 const UserDropdown: FC<{ user: any }> = ({ user }) => {
   const PageState: any = useContext(PageContext)

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Input, Toggle, IconSearch } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
 
 interface Props {

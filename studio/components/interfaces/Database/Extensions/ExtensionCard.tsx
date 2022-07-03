@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Badge, IconLoader, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { confirmAlert } from 'components/ui/ModalsDeprecated/ConfirmModal'
 
 interface Props {
   extension: any
