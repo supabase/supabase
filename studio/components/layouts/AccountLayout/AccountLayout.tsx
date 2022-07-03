@@ -83,7 +83,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
                 href: `/account/tokens`,
                 key: `/account/tokens`,
               },
-              logoutLink,
             ],
           },
         ]
@@ -106,6 +105,9 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           external: true,
         },
       ],
+    },
+    {
+      links: [logoutLink],
     },
   ]
   if (!organizationsLinks?.length)

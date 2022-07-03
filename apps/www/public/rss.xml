@@ -5,9 +5,17 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 22 Jun 2022 00:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 29 Jun 2022 00:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       
+<item>
+  <guid>https://supabase.com/blog/2022/06/29/visualizing-supabase-data-using-metabase</guid>
+  <title>Visualizing Supabase Data using Metabase</title>
+  <link>https://supabase.com/blog/2022/06/29/visualizing-supabase-data-using-metabase</link>
+  <description>How to create different kinds of charts out of data stored in Supabase using Metabase.</description>
+  <pubDate>Wed, 29 Jun 2022 00:00:00 GMT</pubDate>
+</item>
+
 <item>
   <guid>https://supabase.com/blog/2022/06/15/loading-data-supabase-python</guid>
   <title>Python data loading with Supabase</title>

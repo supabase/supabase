@@ -10,7 +10,6 @@ import NotFoundState from './NotFoundState'
 import GridHeaderActions from './GridHeaderActions'
 import SidePanelEditor from './SidePanelEditor'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
-import { SidePanel } from '@supabase/ui'
 
 interface Props {
   /** Theme for the editor */
@@ -64,8 +63,11 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
-
+  // @ts-ignore
+  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
+  const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
+
   const gridTable = !isViewSelected
     ? parseSupaTable({
         table: selectedTable as PostgresTable,
@@ -102,6 +104,7 @@ const TableGridEditor: FC<Props> = ({
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
     const tables: PostgresTable[] = meta.tables.list()
+    // @ts-ignore
     const table = tables.find((table) => table.id === Number(tableId))
     const column = find(table!.columns, { name }) as PostgresColumn
     if (column) {
@@ -135,11 +138,14 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && selectedTable.schema === 'public'}
+        editable={!isViewSelected && !isLocked}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          !isViewSelected && selectedTable.schema === 'public' && <GridHeaderActions table={selectedTable as PostgresTable} />
+          !isViewSelected &&
+          selectedTable.schema === 'public' && (
+            <GridHeaderActions table={selectedTable as PostgresTable} />
+          )
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}
