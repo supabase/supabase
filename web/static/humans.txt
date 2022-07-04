@@ -35,6 +35,7 @@ Michel Pelletier
 Monica El Khoury
 Nikita Kotlyarov
 Oli R
+Paul Cioanca
 Paul Copplestone
 Ramiro Nuñez Dosio
 Rodrigo Mansueli Nunes
