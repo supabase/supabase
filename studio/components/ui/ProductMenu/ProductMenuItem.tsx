@@ -25,7 +25,7 @@ const ProductMenuItem: FC<Props> = ({
   target = '_self',
   onClick,
   textClassName = '',
-  hoverText = ''
+  hoverText = '',
 }) => {
   const menuItem = (
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
