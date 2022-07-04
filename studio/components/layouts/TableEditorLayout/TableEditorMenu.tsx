@@ -220,49 +220,51 @@ const TableEditorMenu: FC<Props> = ({
             {schemaTables.map((table) => {
               const isActive = Number(id) === table.id
               return (
-                <ProductMenuItem
-                  key={table.name}
-                  url={`/project/${projectRef}/editor/${table.id}`}
-                  name={table.name}
-                  isActive={isActive}
-                  action={
-                    isActive && (
-                      <Dropdown
-                        size="small"
-                        side="bottom"
-                        align="start"
-                        overlay={[
-                          <Dropdown.Item
-                            key="edit-table"
-                            icon={<IconEdit size="tiny" />}
-                            onClick={() => onEditTable(table)}
+                    <ProductMenuItem
+                      key={table.name}
+                      url={`/project/${projectRef}/editor/${table.id}`}
+                      name={table.name}
+                      hoverText={table.comment ? table.comment : table.name}
+                      isActive={isActive}
+                      action={
+                        isActive && (
+                          <Dropdown
+                            size="small"
+                            side="bottom"
+                            align="start"
+                            overlay={[
+                              <Dropdown.Item
+                                key="edit-table"
+                                icon={<IconEdit size="tiny" />}
+                                onClick={() => onEditTable(table)}
+                              >
+                                Edit Table
+                              </Dropdown.Item>,
+                              <Dropdown.Item
+                                key="duplicate-table"
+                                icon={<IconCopy size="tiny" />}
+                                onClick={() => onDuplicateTable(table)}
+                              >
+                                Duplicate Table
+                              </Dropdown.Item>,
+                              <Dropdown.Seperator />,
+                              <Dropdown.Item
+                                key="delete-table"
+                                icon={<IconTrash size="tiny" />}
+                                onClick={() => onDeleteTable(table)}
+                              >
+                                Delete Table
+                              </Dropdown.Item>,
+                            ]}
                           >
-                            Edit Table
-                          </Dropdown.Item>,
-                          <Dropdown.Item
-                            key="duplicate-table"
-                            icon={<IconCopy size="tiny" />}
-                            onClick={() => onDuplicateTable(table)}
-                          >
-                            Duplicate Table
-                          </Dropdown.Item>,
-                          <Dropdown.Seperator />,
-                          <Dropdown.Item
-                            key="delete-table"
-                            icon={<IconTrash size="tiny" />}
-                            onClick={() => onDeleteTable(table)}
-                          >
-                            Delete Table
-                          </Dropdown.Item>,
-                        ]}
-                      >
-                        <div className="text-scale-900 hover:text-scale-1200 transition-colors">
-                          <IconChevronDown size={14} strokeWidth={2} />
-                        </div>
-                      </Dropdown>
-                    )
-                  }
-                />
+                            <div className="text-scale-900 hover:text-scale-1200 transition-colors">
+                              <IconChevronDown size={14} strokeWidth={2} />
+                            </div>
+                          </Dropdown>
+                        )
+                      }
+                    />
+
               )
             })}
           </div>
