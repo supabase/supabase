@@ -5,8 +5,8 @@ export interface PolicyFormField {
   table: string
   table_id?: number
   command: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL' | null
-  check: string
-  definition: string
+  check: string | null
+  definition: string | null
   roles: string[]
 }
 
