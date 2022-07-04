@@ -10,7 +10,6 @@ import NotFoundState from './NotFoundState'
 import GridHeaderActions from './GridHeaderActions'
 import SidePanelEditor from './SidePanelEditor'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
-import { SidePanel } from '@supabase/ui'
 
 interface Props {
   /** Theme for the editor */
