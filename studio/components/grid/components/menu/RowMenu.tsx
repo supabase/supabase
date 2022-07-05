@@ -7,6 +7,8 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 
 type RowMenuProps = {}
 
+// [JOSHEN] This file will be deprecated and to be removed
+
 const RowMenu: React.FC<RowMenuProps> = ({}) => {
   const state = useTrackedState()
   const dispatch = useDispatch()

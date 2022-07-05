@@ -63,6 +63,20 @@ export class SqlRowService implements IRowService {
     return {}
   }
 
+  async deleteAll(filters: Filter[]) {
+    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).delete()
+
+    filters
+      .filter((x) => x.value && x.value != '')
+      .forEach((x) => {
+        const value = this.formatFilterValue(x)
+        queryChains = queryChains.filter(x.column, x.operator, value)
+      })
+
+    const query = queryChains.toSql()
+    return await this.onSqlQuery(query)
+  }
+
   async fetchPage(page: number, rowsPerPage: number, filters: Filter[], sorts: Sort[]) {
     const pageFromZero = page > 0 ? page - 1 : page
     const from = pageFromZero * rowsPerPage
