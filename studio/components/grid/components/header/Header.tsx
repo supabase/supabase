@@ -10,7 +10,7 @@ import { exportRowsToCsv } from 'components/grid/utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 
-type HeaderProps = {
+interface HeaderProps {
   onAddColumn?: () => void
   onAddRow?: () => void
   headerActions?: ReactNode
@@ -36,7 +36,7 @@ const Header: FC<HeaderProps> = ({ onAddColumn, onAddRow, headerActions }) => {
 }
 export default Header
 
-type DefaultHeaderProps = {
+interface DefaultHeaderProps {
   onAddColumn?: () => void
   onAddRow?: () => void
 }
@@ -75,39 +75,54 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
   )
 }
 
-type RowHeaderProps = {}
+interface RowHeaderProps {}
 const RowHeader: FC<RowHeaderProps> = ({}) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
 
-  const { selectedRows, rows: allRows, editable } = state
+  const { selectedRows, rows: allRows, editable, allRowsSelected, totalRows } = state
+
+  const onSelectAllRows = () => {
+    dispatch({
+      type: 'SELECT_ALL_ROWS',
+      payload: { selectedRows: new Set(allRows.map((row) => row.idx)) },
+    })
+  }
 
   const onRowsDelete = () => {
     confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
       onConfirm: async () => {
-        const rowIdxs = Array.from(selectedRows) as number[]
-        const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
-        const { error } = state.rowService!.delete(rows)
-        if (error) {
-          if (state.onError) state.onError(error)
+        if (allRowsSelected) {
+          console.log('Need to query to delete everything')
         } else {
-          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
-          dispatch({
-            type: 'SELECTED_ROWS_CHANGE',
-            payload: { selectedRows: new Set() },
-          })
+          const rowIdxs = Array.from(selectedRows) as number[]
+          const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
+          const { error } = state.rowService!.delete(rows)
+          if (error) {
+            if (state.onError) state.onError(error)
+          } else {
+            dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
+            dispatch({
+              type: 'SELECTED_ROWS_CHANGE',
+              payload: { selectedRows: new Set() },
+            })
+          }
         }
       },
     })
   }
 
   function onRowsExportCsv() {
-    const rows = allRows.filter((x) => selectedRows.has(x.idx))
-    const csv = exportRowsToCsv(state.table!.columns, rows)
-    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    saveAs(csvData, `${state.table!.name}_rows.csv`)
+    if (allRowsSelected) {
+      console.log('Need to query to export everything')
+    } else {
+      const rows = allRows.filter((x) => selectedRows.has(x.idx))
+      const csv = exportRowsToCsv(state.table!.columns, rows)
+      const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      saveAs(csvData, `${state.table!.name}_rows.csv`)
+    }
   }
 
   function deselectRows() {
@@ -127,14 +142,22 @@ const RowHeader: FC<RowHeaderProps> = ({}) => {
           onClick={deselectRows}
         />
         <span className="text-scale-1200 text-xs">
-          {selectedRows.size > 1
+          {allRowsSelected
+            ? `${totalRows} rows selected`
+            : selectedRows.size > 1
             ? `${selectedRows.size} rows selected`
             : `${selectedRows.size} row selected`}
         </span>
+        {!allRowsSelected && (
+          <Button type="link" onClick={() => onSelectAllRows()}>
+            Select all {totalRows} rows
+          </Button>
+        )}
       </div>
+      <div className="h-[20px] border-r border-gray-700" />
       <div className="flex items-center gap-2">
         <Button type="primary" size="tiny" icon={<IconDownload />} onClick={onRowsExportCsv}>
-          Export to csv
+          Export to CSV
         </Button>
         {editable && (
           <Button
@@ -143,7 +166,9 @@ const RowHeader: FC<RowHeaderProps> = ({}) => {
             icon={<IconTrash size="tiny" />}
             onClick={onRowsDelete}
           >
-            {selectedRows.size > 1
+            {allRowsSelected
+              ? `Delete ${totalRows} rows`
+              : selectedRows.size > 1
               ? `Delete ${selectedRows.size} rows`
               : `Delete ${selectedRows.size} row`}
           </Button>
