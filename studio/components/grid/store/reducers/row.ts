@@ -48,7 +48,7 @@ type ROW_ACTIONTYPE =
   | { type: 'EDIT_ROW'; payload: { row: Dictionary<any>; idx: number } }
   | { type: 'REMOVE_ROWS'; payload: { rowIdxs: number[] } }
   | { type: 'SET_IS_LOADING'; payload: { isLoading: boolean } }
-  | { type: 'SELECT_ALL_ROWS' }
+  | { type: 'SELECT_ALL_ROWS'; payload: { selectedRows: ReadonlySet<number> } }
 
 const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
   switch (action.type) {
@@ -68,7 +68,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
       }
     }
     case 'SELECTED_ROWS_CHANGE': {
-      console.log('SELECTED_ROWS_CHANGE', action.payload)
       return {
         ...state,
         allRowsSelected: false,
