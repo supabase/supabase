@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['reference/javascript/index', 'reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
+      items: ['reference/javascript/installing', 'reference/javascript/initializing', 'reference/javascript/generating-types'],
       collapsed: true,
     },
     {

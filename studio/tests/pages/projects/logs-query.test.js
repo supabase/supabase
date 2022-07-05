@@ -179,6 +179,8 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end')) // should not have an end date
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
     },

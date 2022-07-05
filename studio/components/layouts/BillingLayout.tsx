@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 import { useStore, withAuth } from 'hooks'
-import { Button, IconX } from '@supabase/ui'
+import { observer } from 'mobx-react-lite'
+import { IconX } from '@supabase/ui'
 
-import { headWithTimeout } from 'lib/common/fetch'
 import BaseLayout from 'components/layouts'
 
 interface Props {
@@ -55,4 +55,4 @@ const BillingLayout: FC<Props> = ({ children }) => {
   )
 }
 
-export default withAuth(BillingLayout)
+export default withAuth(observer(BillingLayout))

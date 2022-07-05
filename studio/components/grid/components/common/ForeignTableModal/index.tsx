@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Button, Modal, Menu, IconExternalLink, IconTrash } from '@supabase/ui'
-import { useTrackedState } from '../../../store'
-import { Dictionary, Filter } from '../../../types'
+
 import { RowItem } from './RowItem'
 import { FilterHeader } from './FilterHeader'
-import Query from '../../../query'
+import Query from 'components/grid/query'
+import { useTrackedState } from 'components/grid/store'
+import { Dictionary, Filter } from 'components/grid/types'
 
 type ForeignTableModalProps = {
   columnName?: string

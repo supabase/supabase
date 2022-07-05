@@ -15,10 +15,10 @@ import {
   IconX,
   IconEdit2,
   IconLoader,
-  Typography,
+  Typography, IconChevronsUp,
 } from '@supabase/ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_VIEWS, STORAGE_SORT_BY } from '../Storage.constants.ts'
+import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
 
 const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
   return (
@@ -109,6 +109,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
 const FileExplorerHeader = ({
   view = STORAGE_VIEWS.COLUMNS,
   sortBy = STORAGE_SORT_BY.NAME,
+  sortByOrder = STORAGE_SORT_BY_ORDER.ASC,
   loading = {},
   breadcrumbs = [],
   backDisabled = false,
@@ -118,6 +119,7 @@ const FileExplorerHeader = ({
   onSetPathByString = () => {},
   onChangeView = () => {},
   onChangeSortBy = () => {},
+  onChangeSortByOrder = () => {},
   onToggleSearch = () => {},
   onFilesUpload = () => {},
   onSelectBack = () => {},
@@ -213,7 +215,7 @@ const FileExplorerHeader = ({
     <div
       className="
     bg-panel-header-light dark:bg-panel-header-dark
-    border-panel-border-light dark:border-panel-border-dark z-10
+    border-panel-border-light dark:border-panel-border-dark
     flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
     >
       {/* Navigation */}
@@ -328,6 +330,23 @@ const FileExplorerHeader = ({
               disabled={breadcrumbs.length === 0}
             >
               Sort
+            </Button>
+          </Dropdown>
+          <Dropdown
+            overlay={[
+              <Dropdown.RadioGroup key="sortOrderOptions" value={sortByOrder} onChange={onChangeSortByOrder}>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Asc</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Desc</Dropdown.Radio>
+              </Dropdown.RadioGroup>,
+            ]}
+          >
+            <Button
+              as="span"
+              icon={sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? <IconChevronsDown size={16} strokeWidth={2} />  : <IconChevronsUp size={16} strokeWidth={2} />}
+              type="text"
+              disabled={breadcrumbs.length === 0}
+            >
+              Sort Order
             </Button>
           </Dropdown>
         </div>

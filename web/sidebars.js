@@ -11,6 +11,7 @@ const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
+    'reference',
     {
       type: 'category',
       label: 'JavaScript',
@@ -34,6 +35,12 @@ module.exports = {
       label: 'CLI',
       collapsed: false,
       items: supabaseCli.docs,
+    },
+    {
+      type: 'category',
+      label: 'Tools',
+      collapsed: false,
+      items: ['reference/tools/reference-auth'],
     },
   ],
   docs: [
@@ -184,7 +191,13 @@ module.exports = {
       type: 'category',
       label: 'Platform',
       collapsed: false,
-      items: ['guides/platform/logs', 'guides/platform/metrics', 'going-into-prod'],
+      items: [
+        'guides/platform/logs',
+        'guides/platform/metrics',
+        'going-into-prod',
+        'guides/platform/performance',
+        'guides/platform/permissions'
+      ],
     },
     {
       type: 'category',
@@ -200,6 +213,7 @@ module.exports = {
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/clerk',
+        'guides/integrations/dashibase',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',

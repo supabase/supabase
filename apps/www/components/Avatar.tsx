@@ -12,6 +12,7 @@ export default function Avatar(props: Props) {
         src={'/images/blog/avatars/' + img}
         className="h-8 w-8 rounded-full object-cover text-center"
         style={{ margin: 0 }}
+        alt={`${caption} avatar`}
       />
       <figcaption style={{ marginTop: 0 }} className="text-scale-1000">
         <p>{caption}</p>
