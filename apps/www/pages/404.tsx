@@ -29,11 +29,7 @@ const Error404 = () => {
               <div className="flex w-full items-center justify-between md:w-auto">
                 <a href="/">
                   <Image
-                    src={
-                      isDarkMode
-                        ? supabaseLogoWordmarkDark
-                        : supabaseLogoWordmarkLight
-                    }
+                    src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                     alt="supabase logo"
                     height={24}
                     width={120}
