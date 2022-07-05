@@ -7,7 +7,6 @@ import {
 } from '@supabase/react-data-grid'
 import { Button, IconMaximize2 } from '@supabase/ui'
 import { SupaRow } from '../../types'
-import { RowMenu } from '../menu'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useFocusRef } from '../../utils'
 import { useTrackedState } from '../../store'
@@ -172,7 +171,6 @@ function SelectCellHeader({
         onChange={handleChange}
         onClick={onClick}
       />
-      <RowMenu />
     </div>
   )
 }
