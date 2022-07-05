@@ -28,7 +28,12 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
       {selectedRows.size > 0 ? (
         <RowHeader sorts={sorts} filters={filters} />
       ) : (
-        <DefaultHeader onAddColumn={onAddColumn} onAddRow={onAddRow} />
+        <DefaultHeader
+          sorts={sorts}
+          filters={filters}
+          onAddColumn={onAddColumn}
+          onAddRow={onAddRow}
+        />
       )}
       <div className="sb-grid-header__inner">
         {headerActions}
@@ -40,10 +45,12 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
 export default Header
 
 interface DefaultHeaderProps {
+  sorts: Sort[]
+  filters: Filter[]
   onAddColumn?: () => void
   onAddRow?: () => void
 }
-const DefaultHeader: FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
+const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, onAddRow }) => {
   const renderNewColumn = (onAddColumn?: () => void) => {
     if (!onAddColumn) return null
     return (
@@ -65,7 +72,7 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-1">
-        <RefreshButton />
+        <RefreshButton filters={filters} sorts={sorts} />
         <FilterDropdown />
         <SortPopover />
       </div>
@@ -131,7 +138,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
     })
   }
 
-  async function onRowsExportCsv() {
+  async function onRowsExportCSV() {
     setIsExporting(true)
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
@@ -180,7 +187,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
           icon={<IconDownload />}
           loading={isExporting}
           disabled={isExporting}
-          onClick={onRowsExportCsv}
+          onClick={onRowsExportCSV}
         >
           Export to CSV
         </Button>
