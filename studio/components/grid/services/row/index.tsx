@@ -15,6 +15,8 @@ export interface IRowService {
     error?: ServiceError
   }>
 
+  fetchAllData: (filters: Filter[], sorts: Sort[]) => any
+
   /**
    * TODO: should return a promise.
    * We should show loading indicator when deleting rows (on row level).

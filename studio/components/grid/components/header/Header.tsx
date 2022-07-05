@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC, useState, ReactNode } from 'react'
 import { Button, IconDownload, IconPlus, IconX, IconTrash } from '@supabase/ui'
 import { saveAs } from 'file-saver'
 
@@ -6,24 +6,27 @@ import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
 import RefreshButton from './RefreshButton'
-import { exportRowsToCsv } from 'components/grid/utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { Sort, Filter } from 'components/grid/types'
+import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 
 interface HeaderProps {
+  sorts: Sort[]
+  filters: Filter[]
   onAddColumn?: () => void
   onAddRow?: () => void
   headerActions?: ReactNode
 }
 
-const Header: FC<HeaderProps> = ({ onAddColumn, onAddRow, headerActions }) => {
+const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, headerActions }) => {
   const state = useTrackedState()
   const { selectedRows } = state
 
   return (
     <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5">
       {selectedRows.size > 0 ? (
-        <RowHeader />
+        <RowHeader sorts={sorts} filters={filters} />
       ) : (
         <DefaultHeader onAddColumn={onAddColumn} onAddRow={onAddRow} />
       )}
@@ -75,10 +78,15 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ onAddColumn, onAddRow }) => {
   )
 }
 
-interface RowHeaderProps {}
-const RowHeader: FC<RowHeaderProps> = ({}) => {
+interface RowHeaderProps {
+  sorts: Sort[]
+  filters: Filter[]
+}
+const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
+
+  const [isExporting, setIsExporting] = useState(false)
 
   const { selectedRows, rows: allRows, editable, allRowsSelected, totalRows } = state
 
@@ -114,15 +122,18 @@ const RowHeader: FC<RowHeaderProps> = ({}) => {
     })
   }
 
-  function onRowsExportCsv() {
-    if (allRowsSelected) {
-      console.log('Need to query to export everything')
-    } else {
-      const rows = allRows.filter((x) => selectedRows.has(x.idx))
-      const csv = exportRowsToCsv(state.table!.columns, rows)
-      const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-      saveAs(csvData, `${state.table!.name}_rows.csv`)
-    }
+  async function onRowsExportCsv() {
+    setIsExporting(true)
+    const rows = allRowsSelected
+      ? await state.rowService!.fetchAllData(filters, sorts)
+      : allRows.filter((x) => selectedRows.has(x.idx))
+
+    console.log('Rows', rows)
+
+    const csv = exportRowsToCsv(state.table!.columns, rows)
+    const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    saveAs(csvData, `${state.table!.name}_rows.csv`)
+    setIsExporting(false)
   }
 
   function deselectRows() {
@@ -156,7 +167,14 @@ const RowHeader: FC<RowHeaderProps> = ({}) => {
       </div>
       <div className="h-[20px] border-r border-gray-700" />
       <div className="flex items-center gap-2">
-        <Button type="primary" size="tiny" icon={<IconDownload />} onClick={onRowsExportCsv}>
+        <Button
+          type="primary"
+          size="tiny"
+          icon={<IconDownload />}
+          loading={isExporting}
+          disabled={isExporting}
+          onClick={onRowsExportCsv}
+        >
           Export to CSV
         </Button>
         {editable && (
