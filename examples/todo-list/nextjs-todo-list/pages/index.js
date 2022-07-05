@@ -9,12 +9,14 @@ export default function IndexPage() {
     <div className="w-full h-full bg-gray-300">
       {!user ? (
         <div className="w-full h-full flex justify-center items-center p-4">
-          <Auth
-            supabaseClient={supabase}
-            providers={['google', 'github']}
-            socialLayout="horizontal"
-            socialButtonSize="xlarge"
-          />
+          <div>
+            <Auth
+              supabaseClient={supabase}
+              providers={['google', 'github']}
+              socialLayout="horizontal"
+              socialButtonSize="xlarge"
+            />
+          </div>
         </div>
       ) : (
         <div

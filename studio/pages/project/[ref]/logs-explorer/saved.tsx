@@ -18,8 +18,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   if (content.isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
-  const saved = content.logSqlSnippets()
-
+  const saved = content.savedLogSqlSnippets()
   return (
     <>
       <div className="flex flex-col gap-3">
@@ -30,34 +29,29 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               <>
                 <Table.th>Name</Table.th>
                 <Table.th>Description</Table.th>
-                <Table.th className="">Created</Table.th>
-                <Table.th className="">Last updated</Table.th>
-                <Table.th className=""></Table.th>
+                <Table.th>Created</Table.th>
+                <Table.th>Last updated</Table.th>
+                <Table.th></Table.th>
               </>
             }
-            body={
-              <>
-                {saved.length > 0 &&
-                  saved.map((item: any) => <LogsSavedQueriesItem key={item.id} item={item} />)}
-              </>
-            }
+            body={saved.map((item) => (
+              <LogsSavedQueriesItem key={item.id} item={item} />
+            ))}
           />
         )}
       </div>
       {saved.length === 0 && (
-        <>
-          <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
-            <IconSave className="animate-bounce" />
-            <h3 className="text-scale-1200 text-lg">No Saved Queries Yet</h3>
-            <p className="text-scale-900 text-sm">
-              Saved queries will appear here. Queries can be saved from the{' '}
-              <Link href={`/project/${ref}/logs-explorer`}>
-                <span className="cursor-pointer font-bold text-white underline">Query</span>
-              </Link>{' '}
-              tab.
-            </p>
-          </div>
-        </>
+        <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+          <IconSave className="animate-bounce" />
+          <h3 className="text-scale-1200 text-lg">No Saved Queries Yet</h3>
+          <p className="text-scale-900 text-sm">
+            Saved queries will appear here. Queries can be saved from the{' '}
+            <Link href={`/project/${ref}/logs-explorer`}>
+              <span className="cursor-pointer font-bold underline">Query</span>
+            </Link>{' '}
+            tab.
+          </p>
+        </div>
       )}
     </>
   )

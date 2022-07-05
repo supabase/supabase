@@ -40,23 +40,6 @@ export default function Authentication({ autoApiService, selectedLang }) {
             </Link>{' '}
             page.
           </p>
-          <h4 className="mt-8">Realtime Security</h4>
-          <p>
-            Realtime server broadcasts database changes to authorized users depending on your Row
-            Level Security (RLS) policies. We recommend that you enable row level security and set
-            row security policies on tables that you add to the publication. However, you may choose
-            to disable RLS on a table and have changes broadcast to all connected clients.
-          </p>
-          <p>
-            You can get started by running{' '}
-            <code>
-              begin; drop publication if exists supabase_realtime; create publication
-              supabase_realtime; commit;
-            </code>
-            . This creates a publication which is not subscribed to any table and completely
-            disables Realtime on the Supabase client. Then, you can add any table from your `public`
-            schema and changes will be broadcast accordingly.
-          </p>
         </article>
         <article className="code">
           <CodeSnippet

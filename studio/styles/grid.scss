@@ -19,6 +19,11 @@
   line-height: inherit;
 }
 
+// Apply parent bg colour while editing
+.rdg-cell.rdg-editor-container > * {
+  background-color: inherit;
+}
+
 .rdg-cell > div[draggable='true'] {
   @apply h-full;
 }
@@ -702,3 +707,4 @@ header/sort/SortRow
 .sb-grid-sort-row__item__move {
   @apply flex cursor-move;
 }
+
