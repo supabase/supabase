@@ -15,7 +15,7 @@ export interface IRowService {
     error?: ServiceError
   }>
 
-  fetchAllData: (filters: Filter[], sorts: Sort[]) => any
+  fetchAllData: (filters: Filter[], sorts: Sort[]) => Promise<any[]>
 
   /**
    * TODO: should return a promise.
@@ -26,6 +26,7 @@ export interface IRowService {
    * and rows are already removed from the grid
    */
   delete: (rows: SupaRow[]) => { error?: ServiceError }
+  deleteAll: (filters: Filter[]) => Promise<{ error?: ServiceError }>
 
   update: (
     row: SupaRow,

@@ -101,9 +101,18 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
     confirmAlert({
       title: 'Confirm to delete',
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
-      onConfirm: async () => {
+      onAsyncConfirm: async () => {
         if (allRowsSelected) {
-          console.log('Need to query to delete everything')
+          const { error } = await state.rowService!.deleteAll(filters)
+          if (error) {
+            if (state.onError) state.onError(error)
+          } else {
+            dispatch({ type: 'REMOVE_ALL_ROWS' })
+            dispatch({
+              type: 'SELECTED_ROWS_CHANGE',
+              payload: { selectedRows: new Set() },
+            })
+          }
         } else {
           const rowIdxs = Array.from(selectedRows) as number[]
           const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
@@ -127,8 +136,6 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))
-
-    console.log('Rows', rows)
 
     const csv = exportRowsToCsv(state.table!.columns, rows)
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
