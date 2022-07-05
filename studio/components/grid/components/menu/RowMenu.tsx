@@ -41,6 +41,7 @@ const RowMenu: React.FC<RowMenuProps> = ({}) => {
   }
 
   function onAllRowsExportCsv() {
+    console.log('onAllRowsExportCSV', allRows)
     const csv = exportRowsToCsv(state.table!.columns, allRows)
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(csvData, `${state.table!.name}_allRows.csv`)
