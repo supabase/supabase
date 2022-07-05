@@ -193,11 +193,7 @@ const Nav = () => {
                   <Link href="/" as="/">
                     <a className="block h-6 w-auto">
                       <Image
-                        src={
-                          isDarkMode
-                            ? supabaseLogoWordmarkDark
-                            : supabaseLogoWordmarkLight
-                        }
+                        src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                         width={124}
                         height={24}
                         alt="Supabase Logo"

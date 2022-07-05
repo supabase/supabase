@@ -25,11 +25,7 @@ const Footer = () => {
             <Link href="#" as="/">
               <a className="w-40">
                 <Image
-                  src={
-                    isDarkMode
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                  }
+                  src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                   width={160}
                   height={30}
                   alt="Supabase"
