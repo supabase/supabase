@@ -50,7 +50,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
 
   const onValidate = (values: any) => {
     const errors = {} as any
-    if (values.fileSizeLimit > STORAGE_FILE_SIZE_LIMIT_MAX_BYTES) {
+    if (values.fileSizeLimit > formattedMaxLimit) {
       errors[
         'fileSizeLimit'
       ] = `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
