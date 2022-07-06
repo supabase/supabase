@@ -2,6 +2,7 @@ import { FC, useState, ReactNode } from 'react'
 import { Button, IconDownload, IconPlus, IconX, IconTrash } from '@supabase/ui'
 import { saveAs } from 'file-saver'
 
+import { useStore } from 'hooks'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 import StatusLabel from './StatusLabel'
@@ -10,6 +11,11 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { Sort, Filter } from 'components/grid/types'
 import { exportRowsToCsv } from 'components/grid/utils'
 import { useDispatch, useTrackedState } from 'components/grid/store'
+
+// [Joshen] CSV exports require this guard as a fail-safe if the table is
+// just too large for a browser to keep all the rows in memory before
+// exporting. Either that or export as multiple CSV sheets with max n rows each
+const MAX_EXPORT_ROW_COUNT = 500000
 
 interface HeaderProps {
   sorts: Sort[]
@@ -90,6 +96,7 @@ interface RowHeaderProps {
   filters: Filter[]
 }
 const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
+  const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -143,6 +150,15 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
 
   async function onRowsExportCSV() {
     setIsExporting(true)
+
+    if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
+      ui.setNotification({
+        category: 'error',
+        message: `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`,
+      })
+      return setIsExporting(false)
+    }
+
     const rows = allRowsSelected
       ? await state.rowService!.fetchAllData(filters, sorts)
       : allRows.filter((x) => selectedRows.has(x.idx))

@@ -115,9 +115,6 @@ export class SqlRowService implements IRowService {
 
   async fetchAllData(filters: Filter[], sorts: Sort[]) {
     // Paginate the request for very large tables to prevent stalling of API
-    // [TODO] Note we probably still need a fail-safe if the table is just
-    // too large for a browser to keep all the rows in memory before exporting
-    // Either that or export as multiple CSV sheets, max n rows
     const rows: any[] = []
 
     let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).select()
