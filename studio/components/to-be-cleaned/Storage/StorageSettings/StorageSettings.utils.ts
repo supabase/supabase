@@ -2,15 +2,20 @@ import { StorageSizeUnits } from './StorageSettings.constants'
 
 const k = 1024
 
-export const convertFromBytes = (bytes: number) => {
+export const convertFromBytes = (bytes: number, unit?: StorageSizeUnits) => {
   // Up to GB since that's our storage upload limit
   if (bytes <= 0) return { value: 0, unit: StorageSizeUnits.BYTES }
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  const formattedIdx = i > 3 ? 3 : i
-  const unit = Object.values(StorageSizeUnits)[formattedIdx]
+  const i =
+    unit !== undefined
+      ? Object.values(StorageSizeUnits).indexOf(unit)
+      : Math.floor(Math.log(bytes) / Math.log(k))
+
+  const formattedIdx = unit !== undefined ? (i < 0 ? 0 : i) : i > 3 ? 3 : i
+
+  const formattedUnit = Object.values(StorageSizeUnits)[formattedIdx]
   const value = bytes / Math.pow(k, formattedIdx)
-  return { value, unit }
+  return { value, unit: formattedUnit }
 }
 
 export const convertToBytes = (size: number, unit: StorageSizeUnits = StorageSizeUnits.BYTES) => {

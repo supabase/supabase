@@ -40,6 +40,19 @@ describe('StorageSettings.utils: convertFromBytes', () => {
     const output = convertFromBytes(mockInput)
     expect(output).toStrictEqual({ value: 10000, unit: StorageSizeUnits.GB })
   })
+  test('should be able to convert given input into specific output unit', () => {
+    const mockInput1 = 5368709120
+    const output1 = convertFromBytes(mockInput1, StorageSizeUnits.GB)
+    expect(output1).toStrictEqual({ value: 5, unit: StorageSizeUnits.GB })
+
+    const mockInput2 = 5368709120
+    const output2 = convertFromBytes(mockInput2, StorageSizeUnits.MB)
+    expect(output2).toStrictEqual({ value: 5120, unit: StorageSizeUnits.MB })
+
+    const mockInput3 = 5368709120
+    const output3 = convertFromBytes(mockInput3, StorageSizeUnits.KB)
+    expect(output3).toStrictEqual({ value: 5242880, unit: StorageSizeUnits.KB })
+  })
 })
 
 describe('StorageSettings.utils: convertToBytes', () => {
