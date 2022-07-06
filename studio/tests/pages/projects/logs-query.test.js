@@ -48,10 +48,9 @@ useStore.mockImplementation(() => ({
   },
 }))
 
-jest.mock('hooks/queries/useProjectSubscription')
-import useProjectSubscription from 'hooks/queries/useProjectSubscription'
-useProjectSubscription = jest.fn()
-useProjectSubscription.mockImplementation((ref) => ({
+jest.mock('hooks')
+import { useProjectSubscription } from 'hooks'
+useProjectSubscription = jest.fn((ref) => ({
   subscription: {
     tier: {
       supabase_prod_id: 'tier_free',
