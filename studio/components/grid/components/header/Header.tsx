@@ -192,7 +192,7 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
             ? `${selectedRows.size} rows selected`
             : `${selectedRows.size} row selected`}
         </span>
-        {!allRowsSelected && (
+        {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
             Select all {totalRows} rows
           </Button>
