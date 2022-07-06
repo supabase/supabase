@@ -4,7 +4,9 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="en" className="dark">
-        <Head></Head>
+        <Head>
+          <script async src="https://platform.twitter.com/widgets.js" />
+        </Head>
         <body>
           <Main />
           <NextScript />
