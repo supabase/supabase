@@ -110,7 +110,10 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
       message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
       onAsyncConfirm: async () => {
         if (allRowsSelected) {
-          const { error } = await state.rowService!.deleteAll(filters)
+          const { error } =
+            filters.length === 0
+              ? await state.rowService!.truncate()
+              : await state.rowService!.deleteAll(filters)
           if (error) {
             if (state.onError) state.onError(error)
           } else {
