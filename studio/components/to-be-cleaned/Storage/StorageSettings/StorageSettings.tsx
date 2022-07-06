@@ -43,12 +43,17 @@ const StorageConfig = ({ config, projectRef }: any) => {
     STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
   )} bytes`
 
+  const { value: formattedMaxLimit } = convertFromBytes(
+    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES,
+    selectedUnit
+  )
+
   const onValidate = (values: any) => {
     const errors = {} as any
     if (values.fileSizeLimit > STORAGE_FILE_SIZE_LIMIT_MAX_BYTES) {
-      errors['fileSizeLimit'] = `Must be a number up to ${new Intl.NumberFormat('en-US').format(
-        STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
-      )} bytes.`
+      errors[
+        'fileSizeLimit'
+      ] = `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
     }
     return errors
   }
