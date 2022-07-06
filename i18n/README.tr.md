@@ -172,7 +172,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
   </tr>
-</table>                                                    |
+</table>
 
 <!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
