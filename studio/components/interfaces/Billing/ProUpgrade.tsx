@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -300,9 +301,34 @@ const ProUpgrade: FC<Props> = ({
                 </div>
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
-                    <p className="w-[50%] text-sm">Auth Monthly Active Users</p>
-                    <p className="w-[25%] text-sm">10,000</p>
-                    <p className="w-[25%] text-sm">$1.50/100 users</p>
+                    <div className="flex w-[50%] items-center space-x-2">
+                      <p className="text-sm">Auth MAUs</p>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger>
+                          <IconHelpCircle
+                            size={16}
+                            strokeWidth={1.5}
+                            className="cursor-pointer opacity-50 transition hover:opacity-100"
+                          />
+                        </Tooltip.Trigger>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                              'border-scale-200 border ', //border
+                            ].join(' ')}
+                          >
+                            <span className="text-scale-1200 text-xs">
+                              Monthly Active Users: A user that has made an API request in the last
+                              month
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Root>
+                    </div>
+                    <p className="w-[25%] text-sm">100,000</p>
+                    <p className="w-[25%] text-sm">$0.00325/user</p>
                   </div>
                 </div>
                 <div className="py-1">

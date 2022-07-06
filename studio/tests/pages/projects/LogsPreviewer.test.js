@@ -61,10 +61,9 @@ LogsPreviewer.mockImplementation((props) => {
   )
 })
 
-jest.mock('hooks/queries/useProjectSubscription')
-import useProjectSubscription from 'hooks/queries/useProjectSubscription'
-useProjectSubscription = jest.fn()
-useProjectSubscription.mockImplementation((ref) => ({
+jest.mock('hooks')
+import { useProjectSubscription } from 'hooks'
+useProjectSubscription = jest.fn((ref) => ({
   subscription: {
     tier: {
       supabase_prod_id: 'tier_free',
@@ -74,7 +73,6 @@ useProjectSubscription.mockImplementation((ref) => ({
 
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { getToggleByText } from '../../helpers'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { logDataFixture } from '../../fixtures'
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
@@ -97,12 +95,10 @@ test('can display log data and metadata', async () => {
   })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
-  await waitFor(
-    () => {
-      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
-    },
-  )
+  await waitFor(() => {
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+  })
 
   fireEvent.click(await screen.findByText(/some-event-happened-id/))
   await screen.findByText(/my_key/)
