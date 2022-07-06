@@ -46,11 +46,15 @@ Supabase provides you with a few easy functions that you can use with your polic
 
 Returns the ID of the user making the request.
 
+### `auth.jwt()`
+
+Returns the JWT of the user making the request.
+
 ### `auth.role()`
 
 :::caution
 
-Deprecated
+Deprecated 
 
 :::
 
@@ -73,6 +77,12 @@ using (
 ```
 
 ### `auth.email()`
+
+:::caution
+
+Deprecated. Use `auth.role -> 'email'` instead.
+
+:::
 
 Returns the email of the user making the request.
 
