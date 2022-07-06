@@ -147,10 +147,10 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
 
     if (
       !state.table ||
-      (typeof props.table == 'string' &&
-        state.table!.name != props.table &&
-        state.table!.schema != props.schema) ||
-      (typeof props.table != 'string' &&
+      (typeof props.table === 'string' &&
+        state.table!.name !== props.table &&
+        state.table!.schema !== props.schema) ||
+      (typeof props.table !== 'string' &&
         JSON.stringify(props.table) !== JSON.stringify(state.table))
     ) {
       const { savedState } = initTable(props, state, dispatch, sort as string[], filter as string[])
