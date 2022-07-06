@@ -1,18 +1,17 @@
 import SVG from 'react-inlinesvg'
-import { Typography } from '@supabase/ui'
 
 export const NoSearchResults = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-64">
+    <div className="flex h-64 flex-col items-center justify-center">
       <SVG
         src="/img/no-search-results.svg"
         preProcessor={(code) =>
           code.replace(/svg/, 'svg className="mb-2 w-16 h-16 text-color-inherit"')
         }
       />
-      <Typography.Text className="text-sm w-64 text-center opacity-50">
+      <p className="w-64 text-center text-sm opacity-50">
         Hmm, we couldn't find any results that matches your query. Try another?
-      </Typography.Text>
+      </p>
     </div>
   )
 }
