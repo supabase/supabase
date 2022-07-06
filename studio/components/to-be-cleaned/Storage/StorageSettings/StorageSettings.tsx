@@ -59,8 +59,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   }
 
   const onSubmit = async (values: any) => {
-    const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
-    const errors = onValidate(payload)
+    const errors = onValidate(values)
 
     if (errors.fileSizeLimit) {
       ui.setNotification({
@@ -68,6 +67,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
         message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
       })
     } else {
+      const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
       const res = await patch(`${API_URL}/projects/${projectRef}/config?app=storage`, payload)
       if (res?.error) {
         ui.setNotification({
@@ -131,6 +131,12 @@ const StorageConfig = ({ config, projectRef }: any) => {
                               name="fileSizeLimit"
                               type="number"
                               disabled={isFreeTier}
+                              step={1}
+                              onKeyPress={(event) => {
+                                if (event.charCode < 48 || event.charCode > 57) {
+                                  event.preventDefault()
+                                }
+                              }}
                             />
                           </div>
                           <div className="col-span-4">
