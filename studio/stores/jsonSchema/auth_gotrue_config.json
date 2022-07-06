@@ -382,7 +382,7 @@
       "type": "integer",
       "help": "Duration before an email otp / link expires."
     },
-    
+
     "MAILER_SUBJECTS_CONFIRMATION": {
       "title": "Subject",
       "type": "string"
@@ -437,6 +437,16 @@
     "PASSWORD_MIN_LENGTH": {
       "title": "Minimum password length",
       "type": "integer"
+    },
+    "SECURITY_CAPTCHA_ENABLED": {
+      "title": "hCaptcha protection",
+      "type": "boolean",
+      "help": "Enables hCaptcha protection on all auth endpoints."
+    },
+    "SECURITY_CAPTCHA_SECRET": {
+      "title": "hCaptcha sitekey",
+      "type": "string",
+      "help": "Secret (sitekey) used to verify hCaptcha challenges."
     },
     "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
       "title": "Enable strict password updates",

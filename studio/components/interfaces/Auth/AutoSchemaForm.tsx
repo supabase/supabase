@@ -22,6 +22,8 @@ const AutoSchemaForm = observer(() => {
     JWT_EXP: authConfig.config.JWT_EXP,
     SITE_URL: authConfig.config.SITE_URL,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
+    SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
   }
 
   const schema = object({
@@ -33,6 +35,8 @@ const AutoSchemaForm = observer(() => {
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
       .min(0, 'Must be a value more than 0')
       .required('Must have a Reuse Interval value'),
+    SECURITY_CAPTCHA_ENABLED: boolean().required(),
+    SECURITY_CAPTCHA_SECRET: string(),
   })
 
   const isLoaded = authConfig.isLoaded
@@ -46,6 +50,7 @@ const AutoSchemaForm = observer(() => {
         onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
           const payload = { ...values }
           payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
+          payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
           try {
             setSubmitting(true)
             await authConfig.update(payload)
@@ -140,6 +145,25 @@ const AutoSchemaForm = observer(() => {
                       label="Reuse Interval"
                       descriptionText="Time interval where the same refresh token can be used to request for an access token."
                     />
+                  </FormSectionContent>
+                </FormSection>
+                <FormSection header={<FormSectionLabel>Security and Protection</FormSectionLabel>}>
+                  <FormSectionContent loading={!isLoaded}>
+                    <Toggle
+                      id="SECURITY_CAPTCHA_ENABLED"
+                      size="small"
+                      label="hCaptcha protection"
+                      layout="flex"
+                      descriptionText="If enabled, protects auth endpoints from abuse."
+                    />
+                    {values.SECURITY_CAPTCHA_ENABLED && (
+                      <Input
+                        id="SECURITY_CAPTCHA_SECRET"
+                        size="small"
+                        label="hCaptcha sitekey"
+                        descriptionText="hCaptcha secret (sitekey)"
+                      />
+                    )}
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>
