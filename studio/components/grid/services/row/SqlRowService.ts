@@ -63,16 +63,24 @@ export class SqlRowService implements IRowService {
     return {}
   }
 
+  // For deleting all rows based on a given filter
   async deleteAll(filters: Filter[]) {
     let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).delete()
 
     filters
-      .filter((x) => x.value && x.value != '')
+      .filter((x) => x.value && x.value !== '')
       .forEach((x) => {
         const value = this.formatFilterValue(x)
         queryChains = queryChains.filter(x.column, x.operator, value)
       })
 
+    const query = queryChains.toSql()
+    return await this.onSqlQuery(query)
+  }
+
+  // For deleting all rows without any filter (clear entire table)
+  async truncate() {
+    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).truncate()
     const query = queryChains.toSql()
     return await this.onSqlQuery(query)
   }

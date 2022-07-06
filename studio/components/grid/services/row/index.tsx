@@ -33,6 +33,8 @@ export interface IRowService {
     changedColumn?: string,
     onRowUpdate?: (value: any) => void
   ) => { row?: SupaRow; error?: ServiceError }
+
+  truncate: () => Promise<{ error?: ServiceError }>
 }
 
 export * from './SqlRowService'
