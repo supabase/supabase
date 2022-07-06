@@ -6,6 +6,7 @@ import { PostgresPublication } from '@supabase/postgres-meta'
 import { useStore } from 'hooks'
 import PublicationsTableItem from './PublicationsTableItem'
 import Table from 'components/to-be-cleaned/Table'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
 interface Props {
   selectedPublication: PostgresPublication
@@ -75,16 +76,19 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
           <div className=""></div>
         </div>
       </div>
-      <div>
-        <Table
-          head={[
-            <Table.th key="header-name">Name</Table.th>,
-            <Table.th key="header-schema">Schema</Table.th>,
-            <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-              Description
-            </Table.th>,
-            <Table.th key="header-all">
-              {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+      {tables.length === 0 ? (
+        <NoSearchResults />
+      ) : (
+        <div>
+          <Table
+            head={[
+              <Table.th key="header-name">Name</Table.th>,
+              <Table.th key="header-schema">Schema</Table.th>,
+              <Table.th key="header-desc" className="hidden text-left lg:table-cell">
+                Description
+              </Table.th>,
+              <Table.th key="header-all">
+                {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
               <div className="flex flex-row space-x-3 items-center justify-end">
                 <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
                   All Tables
@@ -98,17 +102,18 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
                   onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
                 />
               </div> */}
-            </Table.th>,
-          ]}
-          body={tables.map((table: any, i: number) => (
-            <PublicationsTableItem
-              key={table.id}
-              table={table}
-              selectedPublication={selectedPublication}
-            />
-          ))}
-        />
-      </div>
+              </Table.th>,
+            ]}
+            body={tables.map((table: any, i: number) => (
+              <PublicationsTableItem
+                key={table.id}
+                table={table}
+                selectedPublication={selectedPublication}
+              />
+            ))}
+          />
+        </div>
+      )}
     </>
   )
 }
