@@ -15,6 +15,8 @@ export interface IRowService {
     error?: ServiceError
   }>
 
+  fetchAllData: (filters: Filter[], sorts: Sort[]) => Promise<any[]>
+
   /**
    * TODO: should return a promise.
    * We should show loading indicator when deleting rows (on row level).
@@ -24,12 +26,15 @@ export interface IRowService {
    * and rows are already removed from the grid
    */
   delete: (rows: SupaRow[]) => { error?: ServiceError }
+  deleteAll: (filters: Filter[]) => Promise<{ error?: ServiceError }>
 
   update: (
     row: SupaRow,
     changedColumn?: string,
     onRowUpdate?: (value: any) => void
   ) => { row?: SupaRow; error?: ServiceError }
+
+  truncate: () => Promise<{ error?: ServiceError }>
 }
 
 export * from './SqlRowService'

@@ -18,6 +18,7 @@ export const PRICING_META = {
       'Up to 2GB bandwidth',
       'Up to 50MB file uploads',
       'Social OAuth providers',
+      '50,000 monthly active users',
       'Up to 500K Edge Function invocations',
       '1-day log retention',
       'Community support',
@@ -36,8 +37,9 @@ export const PRICING_META = {
     features: [
       '8GB database & 100GB file storage',
       '50GB bandwidth',
-      '3GB file uploads',
+      '5GB file uploads',
       'Social OAuth providers',
+      '100,000 monthly active users',
       '2M Edge Function invocations',
       'Daily backups',
       '7-day log retention',
