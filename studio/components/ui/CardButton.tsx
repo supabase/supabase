@@ -27,7 +27,7 @@ const CardButton: FC<Props> = ({
   imgAlt,
   onClick,
   icon,
-  containerHeightClassName="h-32"
+  containerHeightClassName = 'h-32',
 }) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>
@@ -48,7 +48,7 @@ const CardButton: FC<Props> = ({
     'border border-panel-border-light dark:border-panel-border-dark',
     'rounded-md py-4 px-6 flex flex-row',
     'transition ease-in-out duration-150',
-    containerHeightClassName
+    containerHeightClassName,
   ]
 
   if (isLink) {
@@ -62,7 +62,7 @@ const CardButton: FC<Props> = ({
   }
 
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {
-    return <div className="flex flex-col mr-4">{children}</div>
+    return <div className="mr-4 flex flex-col">{children}</div>
   }
 
   const contents = (
@@ -81,9 +81,9 @@ const CardButton: FC<Props> = ({
         </ImageContainer>
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
-      <div className="flex flex-col space-y-2 w-full h-full">
+      <div className="flex h-full w-full flex-col space-y-2">
         <h5 className="text-scale-1200">{title}</h5>
-        <div className="flex flex-col flex-1 w-full">
+        <div className="flex w-full flex-1 flex-col">
           <p className="text-scale-1100 text-sm">{description}</p>
           <div className="w-full">{children && children}</div>
         </div>
@@ -92,14 +92,14 @@ const CardButton: FC<Props> = ({
       {isLink && (
         <div
           className="
+          text-scale-900
+          group-hover:text-scale-1200
           absolute
           right-4
-          top-3
-          text-scale-900
-          transition-all 
-          duration-200 
+          top-4
+          transition-all
+          duration-200
           group-hover:right-3
-          group-hover:text-scale-1200
         "
         >
           <IconChevronRight />

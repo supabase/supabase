@@ -182,6 +182,7 @@ const SidePanelEditor: FC<Props> = ({
           category: 'loading',
           message: `Creating new table: ${payload.name}...`,
         })
+
         const table = await meta.createTable(
           toastId,
           payload,

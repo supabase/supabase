@@ -15,7 +15,7 @@ const PageLayout: NextPageWithLayout = () => {
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  if (authConfig)
+  if (authConfig) {
     return (
       <FormsContainer>
         <AutoSchemaForm />
@@ -23,6 +23,9 @@ const PageLayout: NextPageWithLayout = () => {
         <AuthProvidersForm />
       </FormsContainer>
     )
+  } else {
+    return <div />
+  }
 }
 
 PageLayout.getLayout = (page) => {
