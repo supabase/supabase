@@ -12,9 +12,9 @@ const InviteUserModal = () => {
   const inputRef = useRef<any>(null)
   const { ui } = useStore()
 
-  const [visible, setVisible] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [emailValue, setEmailValue] = useState<string>('')
+  const [visible, setVisible] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [emailValue, setEmailValue] = useState('')
 
   function handleToggle() {
     // reset data before showing modal again

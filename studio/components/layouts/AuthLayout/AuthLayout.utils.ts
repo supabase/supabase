@@ -1,16 +1,15 @@
 import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { useFlag } from 'hooks'
 
 export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
-  const logsAuth = useFlag('logsAuth')
   return [
     {
       title: 'General',
       items: [
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
-        ...(IS_PLATFORM && logsAuth
+        { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
+        ...(IS_PLATFORM
           ? [
               {
                 name: 'Logs',
@@ -27,7 +26,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           {
             title: 'Configuration',
             items: [
-              ...(IS_PLATFORM && logsAuth
+              ...(IS_PLATFORM
                 ? [
                     {
                       name: 'Settings',

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
 import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
 import { IconLoader } from '@supabase/ui'
@@ -11,25 +11,31 @@ function rowKeyGetter(row: SupaRow) {
   return row.idx
 }
 
+interface IGrid extends GridProps {
+  rows: any[]
+}
+
+// [Joshen] Just for visibility this is causing some hook errors in the browser
 export const Grid = memo(
-  React.forwardRef<DataGridHandle, GridProps>(
+  forwardRef<DataGridHandle, IGrid>(
     (
-      { width, height, containerClass, gridClass, rowClass },
+      { width, height, containerClass, gridClass, rowClass, rows },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
       const state = useTrackedState()
+
       // workaround to force state tracking on state.gridColumns
       const columnHeaders = state.gridColumns.map((x) => `${x.key}_${x.frozen}`)
-      const { gridColumns, rows, onError: onErrorFunc } = state
+      const { gridColumns, onError: onErrorFunc } = state
 
       function onColumnResize(index: number, width: number) {
         updateColumnResizeDebounced(index, width, dispatch)
       }
 
-      async function onRowsChange(rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) {
-        const rowData = rows[data.indexes[0]]
-        const originRowData = state.rows.find((x) => x.idx == rowData.idx)
+      async function onRowsChange(_rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) {
+        const rowData = _rows[data.indexes[0]]
+        const originRowData = rows.find((x) => x.idx == rowData.idx)
         const changedColumn = Object.keys(rowData).find(
           (name) => rowData[name] !== originRowData![name]
         )
@@ -40,14 +46,7 @@ export const Grid = memo(
               payload,
             })
           })
-          if (error) {
-            if (onErrorFunc) onErrorFunc(error)
-          } else {
-            // dispatch({
-            //   type: 'SET_ROWS',
-            //   payload: { rows },
-            // })
-          }
+          if (error && onErrorFunc) onErrorFunc(error)
         }
       }
 
@@ -80,6 +79,7 @@ export const Grid = memo(
           </div>
         )
       }
+
       return (
         <div
           className={containerClass}

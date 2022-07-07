@@ -22,38 +22,30 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        {recent.length > 0 && (
-          <>
-            <div className="flex flex-row justify-end">
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => {
-                  content.clearRecentLogSqlSnippets()
-                }}
-              >
-                Clear
-              </Button>
-            </div>
-            <Table
-              head={
-                <>
-                  <Table.th>Snippets</Table.th>
-                  <Table.th className="w-24"></Table.th>
-                </>
-              }
-              body={
-                <>
-                  {recent.map((item: LogSqlSnippets.Content) => (
-                    <RecentQueriesItem key={item.sql} item={item} />
-                  ))}
-                </>
-              }
-            />
-          </>
-        )}
-      </div>
+      {recent.length > 0 && (
+          <Table
+            head={
+              <>
+                <Table.th>Snippets</Table.th>
+                <Table.th className="w-24">
+                  <Button
+                    size="tiny"
+                    type="default"
+                    onClick={() => {
+                      content.clearRecentLogSqlSnippets()
+                    }}
+                  >
+                    Clear history
+                  </Button>
+                </Table.th>
+              </>
+            }
+            body={recent.map((item: LogSqlSnippets.Content) => (
+                  <RecentQueriesItem key={item.sql} item={item} />
+                ))
+            }
+          />
+      )}
       {recent.length === 0 && (
         <>
           <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
@@ -62,7 +54,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             <p className="text-scale-900 text-sm">
               Your recent queries run from the{' '}
               <Link href={`/project/${ref}/logs-explorer`}>
-                <span className="cursor-pointer font-bold text-white underline">Query</span>
+                <span className="cursor-pointer font-bold underline">Query</span>
               </Link>{' '}
               tab will show here.
             </p>

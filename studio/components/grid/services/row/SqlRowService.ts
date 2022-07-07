@@ -38,7 +38,6 @@ export class SqlRowService implements IRowService {
   }
 
   async create(row: SupaRow) {
-    console.log('create: ', row)
     return { error: { message: 'not implemented' } }
   }
 
@@ -62,6 +61,28 @@ export class SqlRowService implements IRowService {
     })
 
     return {}
+  }
+
+  // For deleting all rows based on a given filter
+  async deleteAll(filters: Filter[]) {
+    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).delete()
+
+    filters
+      .filter((x) => x.value && x.value !== '')
+      .forEach((x) => {
+        const value = this.formatFilterValue(x)
+        queryChains = queryChains.filter(x.column, x.operator, value)
+      })
+
+    const query = queryChains.toSql()
+    return await this.onSqlQuery(query)
+  }
+
+  // For deleting all rows without any filter (clear entire table)
+  async truncate() {
+    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).truncate()
+    const query = queryChains.toSql()
+    return await this.onSqlQuery(query)
   }
 
   async fetchPage(page: number, rowsPerPage: number, filters: Filter[], sorts: Sort[]) {
@@ -90,6 +111,50 @@ export class SqlRowService implements IRowService {
       })
       return { data: { rows } }
     }
+  }
+
+  async fetchAllData(filters: Filter[], sorts: Sort[]) {
+    // Paginate the request for very large tables to prevent stalling of API
+    const rows: any[] = []
+
+    let queryChains = this.query.from(this.table.name, this.table.schema ?? undefined).select()
+
+    filters
+      .filter((x) => x.value && x.value != '')
+      .forEach((x) => {
+        const value = this.formatFilterValue(x)
+        queryChains = queryChains.filter(x.column, x.operator, value)
+      })
+    sorts.forEach((x) => {
+      queryChains = queryChains.order(x.column, x.ascending, x.nullsFirst)
+    })
+
+    // Starting from page 0, fetch 500 records per call
+    let page = -1
+    let from = 0
+    let to = 0
+    let pageData = []
+    const rowsPerPage = 500
+
+    await (async () => {
+      do {
+        page += 1
+        from = page * rowsPerPage
+        to = (page + 1) * rowsPerPage - 1
+        const query = queryChains.range(from, to).toSql()
+        const { data, error } = await this.onSqlQuery(query)
+
+        if (error) {
+          this.onError(error)
+          return { data: { rows: [] } }
+        } else {
+          rows.push(...data)
+          pageData = data
+        }
+      } while (pageData.length === rowsPerPage)
+    })()
+
+    return rows
   }
 
   update(row: SupaRow, changedColumn?: string, onRowUpdate?: (value: any) => void) {

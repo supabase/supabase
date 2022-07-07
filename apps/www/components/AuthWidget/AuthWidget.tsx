@@ -84,6 +84,7 @@ function AuthPage() {
                               <img
                                 src="https://app.supabase.com/img/supabase-dark.svg"
                                 width="96"
+                                alt="supabase logo"
                               />
                               <h3>{companyName}</h3>
                             </Space>

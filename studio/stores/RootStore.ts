@@ -3,8 +3,9 @@ import { Project } from 'types'
 import AppStore, { IAppStore } from './app/AppStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import UiStore, { IUiStore } from './UiStore'
-import ProjectContentStore, { IProjectContentStore } from './content/ProjectContentStore'
-import ProjectFunctionsStore, { IProjectFunctionsStore } from './functions/ProjectFunctionsStore'
+import ProjectContentStore, { IProjectContentStore } from './project/ProjectContentStore'
+import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
+import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBackupsStore'
 import ProjectAuthConfigStore, {
   IProjectAuthConfigStore,
 } from './authConfig/ProjectAuthConfigStore'
@@ -16,34 +17,38 @@ configure({
 })
 
 export interface IRootStore {
+  app: IAppStore
   ui: IUiStore
+  meta: IMetaStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
+  backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
-  meta: IMetaStore
-  app: IAppStore
   setProjectRef: (value?: string) => void
   setOrganizationSlug: (value?: string) => void
 }
 export class RootStore implements IRootStore {
+  app: IAppStore
   ui: IUiStore
+  meta: IMetaStore
   content: IProjectContentStore
   functions: IProjectFunctionsStore
+  backups: IProjectBackupsStore
   authConfig: IProjectAuthConfigStore
-  meta: IMetaStore
-  app: IAppStore
 
   constructor() {
+    this.app = new AppStore(this)
     this.ui = new UiStore(this)
-    // @ts-ignore
-    this.content = new ProjectContentStore(this, { projectRef: '' })
-    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
-    this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
     this.meta = new MetaStore(this, {
       projectRef: '',
       connectionString: '',
     })
-    this.app = new AppStore(this)
+
+    // @ts-ignore
+    this.content = new ProjectContentStore(this, { projectRef: '' })
+    this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
+    this.backups = new ProjectBackupsStore(this, { projectRef: '' })
+    this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
 
     /**
      * TODO: meta and content are not observable
@@ -94,6 +99,7 @@ export class RootStore implements IRootStore {
     this.functions.setProjectRef(value)
     this.authConfig.setProjectRef(value)
     this.content.setProjectRef(value)
+    this.backups.setProjectRef(value)
   }
 
   setOrganizationSlug(value?: string) {
