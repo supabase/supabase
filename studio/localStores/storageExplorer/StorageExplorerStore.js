@@ -1183,9 +1183,18 @@ class StorageExplorerStore {
     }
 
     const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
-    const { data: folderContents } = await this.supabaseClient.storage
-      .from(this.selectedBucket.name)
-      .list(formattedPathToFolder, options)
+    let folderContents = []
+
+      for (;;) {
+        const { data } = await this.supabaseClient.storage
+          .from(this.selectedBucket.name)
+          .list(formattedPathToFolder, options)
+        folderContents = folderContents.concat(data)
+        options.offset += options.limit
+        if (data.length < options.limit) {
+          break
+        }
+      }
 
     const subfolders = folderContents?.filter((item) => isNull(item.id)) ?? []
     const folderItems = folderContents?.filter((item) => !isNull(item.id)) ?? []
