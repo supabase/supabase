@@ -46,7 +46,7 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-const BATCH_SIZE = 100
+const BATCH_SIZE = 10
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 
 class StorageExplorerStore {
