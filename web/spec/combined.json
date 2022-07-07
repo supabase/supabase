@@ -2754,7 +2754,7 @@
                       },
                       "comment": {
                         "shortText": "Gets the current user details.",
-                        "text": "This method is called by the GoTrueClient `update` where\nthe jwt is set to this.currentSession.access_token\nand therefore, acts like getting the currently authenticated used\n"
+                        "text": "This method is called by the GoTrueClient `update` where\nthe jwt is set to this.currentSession.access_token\nand therefore, acts like getting the currently authenticated user\n"
                       },
                       "parameters": [
                         {
@@ -27054,7 +27054,7 @@
                   "flags": {},
                   "comment": {
                     "shortText": "Gets the current user details.",
-                    "text": "This method is called by the GoTrueClient `update` where\nthe jwt is set to this.currentSession.access_token\nand therefore, acts like getting the currently authenticated used\n"
+                    "text": "This method is called by the GoTrueClient `update` where\nthe jwt is set to this.currentSession.access_token\nand therefore, acts like getting the currently authenticated user\n"
                   },
                   "parameters": [
                     {
