@@ -1126,11 +1126,13 @@ class StorageExplorerStore {
           .concat(pathSegments.slice(columnIndex + 1))
           .join('/')
         return () => {
-          return new Promise(async (resolve, reject) => {
+          return new Promise(async (resolve) => {
             const { error } = await this.supabaseClient.storage
               .from(this.selectedBucket.name)
               .move(fromPath, toPath)
-            if (error) reject()
+              if (error) {
+                toast.error(`Failed to move ${fromPath} to the new folder`)
+              }
             resolve()
           })
         }
