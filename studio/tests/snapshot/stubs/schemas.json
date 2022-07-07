@@ -1,0 +1,10 @@
+[
+  { "id": 2200, "name": "public", "owner": "postgres" },
+  { "id": 16387, "name": "extensions", "owner": "postgres" },
+  { "id": 16385, "name": "pgbouncer", "owner": "pgbouncer" },
+  { "id": 16599, "name": "graphql_public", "owner": "supabase_admin" },
+  { "id": 16591, "name": "realtime", "owner": "supabase_admin" },
+  { "id": 17671, "name": "graphql", "owner": "supabase_admin" },
+  { "id": 16528, "name": "storage", "owner": "supabase_admin" },
+  { "id": 16480, "name": "auth", "owner": "supabase_admin" }
+]

@@ -1,0 +1,10 @@
+[
+  { "name": "auth" },
+  { "name": "extensions" },
+  { "name": "graphql" },
+  { "name": "graphql_public" },
+  { "name": "pgbouncer" },
+  { "name": "public" },
+  { "name": "realtime" },
+  { "name": "storage" }
+]

@@ -1,0 +1,1934 @@
+[
+  {
+    "schemaname": "auth",
+    "tablename": "audit_log_entries",
+    "quoted_name": "auth.audit_log_entries",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16511",
+        "attname": "instance_id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16511",
+        "attname": "id",
+        "data_type": "uuid",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16511",
+        "attname": "payload",
+        "data_type": "json",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16511",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 4,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "auth",
+    "tablename": "identities",
+    "quoted_name": "auth.identities",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16628",
+        "attname": "identity_data",
+        "data_type": "jsonb",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "last_sign_in_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "provider",
+        "data_type": "text",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "id",
+        "data_type": "text",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16628",
+        "attname": "user_id",
+        "data_type": "uuid",
+        "attnum": 2,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "auth",
+    "tablename": "instances",
+    "quoted_name": "auth.instances",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16504",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16504",
+        "attname": "id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16504",
+        "attname": "uuid",
+        "data_type": "uuid",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16504",
+        "attname": "raw_base_config",
+        "data_type": "text",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16504",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 4,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "auth",
+    "tablename": "refresh_tokens",
+    "quoted_name": "auth.refresh_tokens",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16493",
+        "attname": "revoked",
+        "data_type": "boolean",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "instance_id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "user_id",
+        "data_type": "character varying(255)",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "id",
+        "data_type": "bigint",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "token",
+        "data_type": "character varying(255)",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16493",
+        "attname": "parent",
+        "data_type": "character varying(255)",
+        "attnum": 8,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "auth",
+    "tablename": "schema_migrations",
+    "quoted_name": "auth.schema_migrations",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16519",
+        "attname": "version",
+        "data_type": "character varying(255)",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "auth",
+    "tablename": "users",
+    "quoted_name": "auth.users",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16481",
+        "attname": "invited_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_confirmed_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "encrypted_password",
+        "data_type": "character varying(255)",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email",
+        "data_type": "character varying(255)",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "role",
+        "data_type": "character varying(255)",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "aud",
+        "data_type": "character varying(255)",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "id",
+        "data_type": "uuid",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "instance_id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "reauthentication_sent_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 32,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "reauthentication_token",
+        "data_type": "character varying(255)",
+        "attnum": 31,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "banned_until",
+        "data_type": "timestamp with time zone",
+        "attnum": 30,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_change_confirm_status",
+        "data_type": "smallint",
+        "attnum": 29,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_change_token_current",
+        "data_type": "character varying(255)",
+        "attnum": 28,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "confirmed_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 27,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "phone_change_sent_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 26,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "phone_change_token",
+        "data_type": "character varying(255)",
+        "attnum": 25,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "phone_change",
+        "data_type": "character varying(15)",
+        "attnum": 24,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "phone_confirmed_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 23,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "phone",
+        "data_type": "character varying(15)",
+        "attnum": 22,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 21,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 20,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "is_super_admin",
+        "data_type": "boolean",
+        "attnum": 19,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "raw_user_meta_data",
+        "data_type": "jsonb",
+        "attnum": 18,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "raw_app_meta_data",
+        "data_type": "jsonb",
+        "attnum": 17,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "last_sign_in_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 16,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_change_sent_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 15,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_change",
+        "data_type": "character varying(255)",
+        "attnum": 14,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "email_change_token_new",
+        "data_type": "character varying(255)",
+        "attnum": 13,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "recovery_sent_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 12,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "recovery_token",
+        "data_type": "character varying(255)",
+        "attnum": 11,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "confirmation_sent_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16481",
+        "attname": "confirmation_token",
+        "data_type": "character varying(255)",
+        "attnum": 9,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "extensions",
+    "tablename": "pg_stat_statements",
+    "quoted_name": "extensions.pg_stat_statements",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "16408",
+        "attname": "queryid",
+        "data_type": "bigint",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "userid",
+        "data_type": "oid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "dbid",
+        "data_type": "oid",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "toplevel",
+        "data_type": "boolean",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "wal_fpi",
+        "data_type": "bigint",
+        "attnum": 32,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "wal_records",
+        "data_type": "bigint",
+        "attnum": 31,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "blk_write_time",
+        "data_type": "double precision",
+        "attnum": 30,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "blk_read_time",
+        "data_type": "double precision",
+        "attnum": 29,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "temp_blks_written",
+        "data_type": "bigint",
+        "attnum": 28,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "temp_blks_read",
+        "data_type": "bigint",
+        "attnum": 27,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "local_blks_written",
+        "data_type": "bigint",
+        "attnum": 26,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "local_blks_dirtied",
+        "data_type": "bigint",
+        "attnum": 25,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "local_blks_read",
+        "data_type": "bigint",
+        "attnum": 24,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "local_blks_hit",
+        "data_type": "bigint",
+        "attnum": 23,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "shared_blks_written",
+        "data_type": "bigint",
+        "attnum": 22,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "shared_blks_dirtied",
+        "data_type": "bigint",
+        "attnum": 21,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "shared_blks_read",
+        "data_type": "bigint",
+        "attnum": 20,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "shared_blks_hit",
+        "data_type": "bigint",
+        "attnum": 19,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "rows",
+        "data_type": "bigint",
+        "attnum": 18,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "stddev_exec_time",
+        "data_type": "double precision",
+        "attnum": 17,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "mean_exec_time",
+        "data_type": "double precision",
+        "attnum": 16,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "max_exec_time",
+        "data_type": "double precision",
+        "attnum": 15,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "min_exec_time",
+        "data_type": "double precision",
+        "attnum": 14,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "total_exec_time",
+        "data_type": "double precision",
+        "attnum": 13,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "calls",
+        "data_type": "bigint",
+        "attnum": 12,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "stddev_plan_time",
+        "data_type": "double precision",
+        "attnum": 11,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "mean_plan_time",
+        "data_type": "double precision",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "max_plan_time",
+        "data_type": "double precision",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "min_plan_time",
+        "data_type": "double precision",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "total_plan_time",
+        "data_type": "double precision",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "plans",
+        "data_type": "bigint",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "query",
+        "data_type": "text",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16408",
+        "attname": "wal_bytes",
+        "data_type": "numeric",
+        "attnum": 33,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "extensions",
+    "tablename": "pg_stat_statements_info",
+    "quoted_name": "extensions.pg_stat_statements_info",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "16403",
+        "attname": "stats_reset",
+        "data_type": "timestamp with time zone",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16403",
+        "attname": "dealloc",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "_field",
+    "quoted_name": "graphql._field",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17930",
+        "attname": "column_name",
+        "data_type": "text",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "is_not_null",
+        "data_type": "boolean",
+        "attnum": 18,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "is_array",
+        "data_type": "boolean",
+        "attnum": 19,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "is_array_not_null",
+        "data_type": "boolean",
+        "attnum": 20,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "is_arg",
+        "data_type": "boolean",
+        "attnum": 21,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "is_hidden_from_schema",
+        "data_type": "boolean",
+        "attnum": 22,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 23,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "func",
+        "data_type": "regproc",
+        "attnum": 17,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "foreign_name_override",
+        "data_type": "text",
+        "attnum": 16,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "foreign_entity",
+        "data_type": "regclass",
+        "attnum": 15,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "foreign_columns",
+        "data_type": "text[]",
+        "attnum": 14,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "local_columns",
+        "data_type": "text[]",
+        "attnum": 13,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "column_type",
+        "data_type": "regtype",
+        "attnum": 12,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "column_attribute_num",
+        "data_type": "integer",
+        "attnum": 11,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "default_value",
+        "data_type": "text",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "parent_arg_field_id",
+        "data_type": "integer",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "constant_name",
+        "data_type": "text",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "meta_kind",
+        "data_type": "graphql.field_meta_kind",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "type_id",
+        "data_type": "integer",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "parent_type_id",
+        "data_type": "integer",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17930",
+        "attname": "id",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "_type",
+    "quoted_name": "graphql._type",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17852",
+        "attname": "constant_name",
+        "data_type": "text",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "enum",
+        "data_type": "regtype",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "is_builtin",
+        "data_type": "boolean",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "meta_kind",
+        "data_type": "graphql.meta_kind",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "type_kind",
+        "data_type": "graphql.type_kind",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "id",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "graphql_type_id",
+        "data_type": "integer",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17852",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 6,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "entity",
+    "quoted_name": "graphql.entity",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17681",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "entity_column",
+    "quoted_name": "graphql.entity_column",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17686",
+        "attname": "column_type",
+        "data_type": "regtype",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "is_generated",
+        "data_type": "boolean",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "is_serial",
+        "data_type": "boolean",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "column_attribute_num",
+        "data_type": "smallint",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "is_composite",
+        "data_type": "boolean",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "is_array",
+        "data_type": "boolean",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "column_name",
+        "data_type": "text",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17686",
+        "attname": "is_not_null",
+        "data_type": "boolean",
+        "attnum": 6,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "entity_unique_columns",
+    "quoted_name": "graphql.entity_unique_columns",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17694",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17694",
+        "attname": "index_name",
+        "data_type": "name",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17694",
+        "attname": "unique_column_set",
+        "data_type": "text[]",
+        "attnum": 3,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "enum_value",
+    "quoted_name": "graphql.enum_value",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17980",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17980",
+        "attname": "value",
+        "data_type": "text",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17980",
+        "attname": "type_",
+        "data_type": "text",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "field",
+    "quoted_name": "graphql.field",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17975",
+        "attname": "type_",
+        "data_type": "text",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "is_not_null",
+        "data_type": "boolean",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "is_array",
+        "data_type": "boolean",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "is_array_not_null",
+        "data_type": "boolean",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "is_arg",
+        "data_type": "boolean",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "meta_kind",
+        "data_type": "graphql.field_meta_kind",
+        "attnum": 21,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "is_hidden_from_schema",
+        "data_type": "boolean",
+        "attnum": 20,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "func",
+        "data_type": "regproc",
+        "attnum": 19,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "local_columns",
+        "data_type": "text[]",
+        "attnum": 18,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "foreign_columns",
+        "data_type": "text[]",
+        "attnum": 17,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "column_attribute_num",
+        "data_type": "integer",
+        "attnum": 16,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "column_type",
+        "data_type": "regtype",
+        "attnum": 15,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "column_name",
+        "data_type": "text",
+        "attnum": 14,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 13,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 12,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "default_value",
+        "data_type": "text",
+        "attnum": 11,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "parent_arg_field_id",
+        "data_type": "integer",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "parent_arg_field_name",
+        "data_type": "text",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "id",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "parent_type",
+        "data_type": "text",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17975",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 4,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "introspection_query_cache",
+    "quoted_name": "graphql.introspection_query_cache",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "18026",
+        "attname": "cache_key",
+        "data_type": "text",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "18026",
+        "attname": "response_data",
+        "data_type": "jsonb",
+        "attnum": 2,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "relationship",
+    "quoted_name": "graphql.relationship",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17888",
+        "attname": "foreign_columns",
+        "data_type": "text[]",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "local_cardinality",
+        "data_type": "graphql.cardinality",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "local_columns",
+        "data_type": "text[]",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "local_entity",
+        "data_type": "regclass",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "constraint_name",
+        "data_type": "name",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "foreign_name_override",
+        "data_type": "text",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "foreign_entity",
+        "data_type": "regclass",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17888",
+        "attname": "foreign_cardinality",
+        "data_type": "graphql.cardinality",
+        "attnum": 7,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "schema_version",
+    "quoted_name": "graphql.schema_version",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "18048",
+        "attname": "ver",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "graphql",
+    "tablename": "type",
+    "quoted_name": "graphql.type",
+    "is_table": false,
+    "columns": [
+      {
+        "attrelid": "17879",
+        "attname": "meta_kind",
+        "data_type": "graphql.meta_kind",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "constant_name",
+        "data_type": "text",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "graphql_type_id",
+        "data_type": "integer",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "enum",
+        "data_type": "regtype",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "id",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "type_kind",
+        "data_type": "graphql.type_kind",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17879",
+        "attname": "is_builtin",
+        "data_type": "boolean",
+        "attnum": 4,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "public",
+    "tablename": "launches",
+    "quoted_name": "public.launches",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17134",
+        "attname": "origin",
+        "data_type": "character varying",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "user_id",
+        "data_type": "uuid",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "id",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "version_id",
+        "data_type": "bigint",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "duration",
+        "data_type": "integer",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "name",
+        "data_type": "character varying",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17134",
+        "attname": "is_template",
+        "data_type": "boolean",
+        "attnum": 3,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "public",
+    "tablename": "projects",
+    "quoted_name": "public.projects",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17165",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17165",
+        "attname": "id",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17165",
+        "attname": "name",
+        "data_type": "character varying",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17165",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17165",
+        "attname": "owner_id",
+        "data_type": "uuid",
+        "attnum": 5,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "public",
+    "tablename": "results",
+    "quoted_name": "public.results",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17182",
+        "attname": "sub_suite",
+        "data_type": "character varying",
+        "attnum": 14,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "parent_suite",
+        "data_type": "character varying",
+        "attnum": 13,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "launch_id",
+        "data_type": "bigint",
+        "attnum": 12,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "fullname",
+        "data_type": "character varying",
+        "attnum": 11,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "duration",
+        "data_type": "integer",
+        "attnum": 10,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "steps",
+        "data_type": "json",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "description",
+        "data_type": "text",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "status",
+        "data_type": "character varying",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "feature",
+        "data_type": "character varying",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "suite",
+        "data_type": "character varying",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "name",
+        "data_type": "character varying",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17182",
+        "attname": "id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "public",
+    "tablename": "versions",
+    "quoted_name": "public.versions",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17148",
+        "attname": "secondary_id",
+        "data_type": "character varying",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17148",
+        "attname": "project_id",
+        "data_type": "bigint",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17148",
+        "attname": "repo",
+        "data_type": "character varying",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17148",
+        "attname": "version_name",
+        "data_type": "character varying",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17148",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17148",
+        "attname": "id",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "realtime",
+    "tablename": "schema_migrations",
+    "quoted_name": "realtime.schema_migrations",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17049",
+        "attname": "version",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17049",
+        "attname": "inserted_at",
+        "data_type": "timestamp(0) without time zone",
+        "attnum": 2,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "realtime",
+    "tablename": "subscription",
+    "quoted_name": "realtime.subscription",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "17071",
+        "attname": "claims_role",
+        "data_type": "regrole",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "claims",
+        "data_type": "jsonb",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "filters",
+        "data_type": "realtime.user_defined_filter[]",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "entity",
+        "data_type": "regclass",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "subscription_id",
+        "data_type": "uuid",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "id",
+        "data_type": "bigint",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "17071",
+        "attname": "created_at",
+        "data_type": "timestamp without time zone",
+        "attnum": 9,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "buckets",
+    "quoted_name": "storage.buckets",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16532",
+        "attname": "id",
+        "data_type": "text",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16532",
+        "attname": "public",
+        "data_type": "boolean",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16532",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 5,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16532",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16532",
+        "attname": "owner",
+        "data_type": "uuid",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16532",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 2,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "migrations",
+    "quoted_name": "storage.migrations",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16574",
+        "attname": "hash",
+        "data_type": "character varying(40)",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16574",
+        "attname": "name",
+        "data_type": "character varying(100)",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16574",
+        "attname": "id",
+        "data_type": "integer",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16574",
+        "attname": "executed_at",
+        "data_type": "timestamp without time zone",
+        "attnum": 4,
+        "attisdropped": false
+      }
+    ]
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "quoted_name": "storage.objects",
+    "is_table": true,
+    "columns": [
+      {
+        "attrelid": "16547",
+        "attname": "owner",
+        "data_type": "uuid",
+        "attnum": 4,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "name",
+        "data_type": "text",
+        "attnum": 3,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "bucket_id",
+        "data_type": "text",
+        "attnum": 2,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "id",
+        "data_type": "uuid",
+        "attnum": 1,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "metadata",
+        "data_type": "jsonb",
+        "attnum": 8,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "path_tokens",
+        "data_type": "text[]",
+        "attnum": 9,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "last_accessed_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 7,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "updated_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 6,
+        "attisdropped": false
+      },
+      {
+        "attrelid": "16547",
+        "attname": "created_at",
+        "data_type": "timestamp with time zone",
+        "attnum": 5,
+        "attisdropped": false
+      }
+    ]
+  }
+]

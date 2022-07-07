@@ -1,0 +1,166 @@
+{
+  "data": [
+    {
+      "id": "4b83a3ac-0000-0000-94af-72d960f9f03d",
+      "inserted_at": "2022-04-21T15:37:27.487163+00:00",
+      "updated_at": "2022-04-21T15:37:27.487163+00:00",
+      "type": "sql",
+      "name": "New Query",
+      "description": "",
+      "content": {
+        "sql": "select json_agg(distinct ( \n  case\n    when (r.feature != '') then r.feature\n    else r.parent_suite\n  end)) as features\nfrom results as r\n  inner join launches as l on r.launch_id = l.id\n  inner join versions as v on l.version_id = v.id\n  inner join projects as p on v.project_id = p.id\nwhere p.id = 1 and l.is_template = true",
+        "favorite": false,
+        "content_id": "4b83a3ac-0000-0000-94af-72d960f9f03d",
+        "schema_version": "1.0"
+      },
+      "visibility": "user",
+      "project_id": 121497,
+      "owner_id": 1,
+      "last_updated_by": 1,
+      "owner": { "id": 1, "username": "supaegor" },
+      "updated_by": { "id": 1, "username": "supaegor" }
+    },
+    {
+      "id": "326a2392-0000-0000-905d-d387c6be6451",
+      "inserted_at": "2022-04-22T09:23:10.025738+00:00",
+      "updated_at": "2022-04-22T09:23:10.025738+00:00",
+      "type": "sql",
+      "name": "aggregation",
+      "description": "",
+      "content": {
+        "sql": "select json_agg(j) from (select r.name as name, r.feature, r.parent_suite, r.suite, r.sub_suite, r.status, \n  l.name as launch_name, l.id as launch_id, l.created_at\nfrom results as r\n  join launches as l on r.launch_id = l.id\nwhere l.id in (\n  select ll.id \n  from launches as ll\n  where ll.version_id = 2\n  order by ll.created_at desc\n  limit 1\n  )\n) as j",
+        "favorite": false,
+        "content_id": "326a2392-0000-0000-905d-d387c6be6451",
+        "schema_version": "1.0"
+      },
+      "visibility": "user",
+      "project_id": 121497,
+      "owner_id": 1,
+      "last_updated_by": 1,
+      "owner": { "id": 1, "username": "supaegor" },
+      "updated_by": { "id": 1, "username": "supaegor" }
+    },
+    {
+      "id": "8a1ab5a1-6688-417c-850c-94d168d7799d",
+      "inserted_at": "2022-04-18T22:50:28.868881+00:00",
+      "updated_at": "2022-04-18T22:50:28.868881+00:00",
+      "type": "sql",
+      "name": "counters",
+      "description": "",
+      "content": {
+        "sql": "select distinct on (v.id) \n  v.id, v.version_name, v.repo, count(distinct l.id) as launch_count, v.created_at,\n  sq.last_launch_id, sq.last_launch_at, sq.is_template_launch, sq.launch_name, sq.results_number, \n  sq.passed_number, sq.skipped_number, sq.failed_number, sq.undefined_number\nfrom versions as v\n  left join launches as l on l.version_id = v.id\n  left join (\n    select ll.id as last_launch_id, ll.created_at as last_launch_at, vv.id as vv_id, \n    ll.is_template as is_template_launch, ll.name as launch_name,\n    count(distinct r.id) as results_number, rp.cnt as passed_number, rs.cnt as skipped_number,\n    rf.cnt as failed_number, ru.cnt as undefined_number\n    from launches as ll \n      left join versions as vv on vv.id = ll.version_id\n      left join results as r on r.launch_id = ll.id\n      left join (\n        select count(distinct rr.id) as cnt, rr.launch_id \n        from results as rr where rr.status = 'passed' \n        group by rr.launch_id\n      ) as rp on rp.launch_id = ll.id\n      left join (\n        select count(distinct rr.id) as cnt, rr.launch_id \n        from results as rr where rr.status = 'skipped' \n        group by rr.launch_id\n      ) as rs on rs.launch_id = ll.id\n      left join (\n        select count(distinct rr.id) as cnt, rr.launch_id \n        from results as rr where rr.status in ('failed', 'error')\n        group by rr.launch_id\n      ) as rf on rf.launch_id = ll.id\n      left join (\n        select count(distinct rr.id) as cnt, rr.launch_id \n        from results as rr where rr.status not in ('passed', 'skipped', 'failed', 'error')\n        group by rr.launch_id\n      ) as ru on ru.launch_id = ll.id\n    group by ll.id, vv.id, rp.cnt, rs.cnt, rf.cnt, ru.cnt\n    order by ll.created_at desc\n  ) as sq on sq.vv_id = v.id\nwhere v.project_id = 1\ngroup by v.id, sq.last_launch_id, sq.last_launch_at, sq.is_template_launch, sq.launch_name, sq.results_number, \n  sq.passed_number, sq.skipped_number, sq.failed_number, sq.undefined_number\norder by v.id, sq.last_launch_at desc",
+        "favorite": false,
+        "content_id": "8a1ab5a1-0000-0000-850c-94d168d7799d",
+        "schema_version": "1.0"
+      },
+      "visibility": "user",
+      "project_id": 121497,
+      "owner_id": 1,
+      "last_updated_by": 1,
+      "owner": { "id": 1, "username": "supaegor" },
+      "updated_by": { "id": 1, "username": "supaegor" }
+    },
+    {
+      "id": "fcc41f8b-0000-0000-a61b-f1ccf05ad130",
+      "inserted_at": "2022-04-27T13:42:55.873553+00:00",
+      "updated_at": "2022-04-27T13:42:55.873553+00:00",
+      "type": "report",
+      "name": "new report",
+      "description": "",
+      "content": {
+        "layout": [
+          {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 8,
+            "id": "8be93821-0000-0000-a138-0dbff30069f3",
+            "label": "Memory % usage",
+            "provider": "infra-monitoring",
+            "attribute": "ram_usage"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 0,
+            "id": "a70e4a7f-0000-0000-ada5-46702517475f",
+            "label": "All GET Requests",
+            "provider": "daily-stats",
+            "attribute": "total_get_requests"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 0,
+            "y": 0,
+            "id": "8012a23f-0000-0000-a0c8-87ebacdcf3e7",
+            "label": "All POST Requests",
+            "provider": "daily-stats",
+            "attribute": "total_post_requests"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 0,
+            "y": 8,
+            "id": "799d648f-0000-0000-b7fa-a60f1607894d",
+            "label": "CPU % usage",
+            "provider": "infra-monitoring",
+            "attribute": "cpu_usage"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 0,
+            "y": 4,
+            "id": "1c4f1fb0-0000-0000-9103-0a1849df39c8",
+            "label": "Auth Requests",
+            "provider": "daily-stats",
+            "attribute": "total_auth_requests"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 0,
+            "y": 12,
+            "id": "89f8d036-0000-0000-81f2-0321f0ad025c",
+            "label": "Daily Disk IO Budget % Remaining",
+            "provider": "infra-monitoring",
+            "attribute": "disk_io_budget"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 4,
+            "id": "cc3bc75f-0000-0000-ba71-78e96596b190",
+            "label": "All Requests",
+            "provider": "daily-stats",
+            "attribute": "total_requests"
+          },
+          {
+            "h": 4,
+            "w": 12,
+            "x": 12,
+            "y": 12,
+            "id": "8fc3d372-0000-0000-a623-9e454a4ae0b4",
+            "label": "API Requests",
+            "provider": "daily-stats",
+            "attribute": "total_rest_requests"
+          }
+        ],
+        "interval": "1d",
+        "period_end": { "date": "", "time_period": "today" },
+        "period_start": { "date": "", "time_period": "7d" },
+        "schema_version": 1
+      },
+      "visibility": "project",
+      "project_id": 121497,
+      "owner_id": 1,
+      "last_updated_by": 1,
+      "owner": { "id": 1, "username": "supaegor" },
+      "updated_by": { "id": 1, "username": "supaegor" }
+    }
+  ]
+}

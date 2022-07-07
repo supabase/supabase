@@ -1,0 +1,820 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "standard public schema",
+    "title": "PostgREST API",
+    "version": "9.0.0.20220211 (pre-release) (dcf7ade)"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "consumes": ["application/json", "application/vnd.pgrst.object+json", "text/csv"],
+  "produces": ["application/json", "application/vnd.pgrst.object+json", "text/csv"],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Introspection"],
+        "summary": "OpenAPI description (this document)",
+        "produces": ["application/openapi+json", "application/json"],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/launches": {
+      "get": {
+        "tags": ["launches"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.launches.id" },
+          { "$ref": "#/parameters/rowFilter.launches.created_at" },
+          { "$ref": "#/parameters/rowFilter.launches.is_template" },
+          { "$ref": "#/parameters/rowFilter.launches.origin" },
+          { "$ref": "#/parameters/rowFilter.launches.user_id" },
+          { "$ref": "#/parameters/rowFilter.launches.version_id" },
+          { "$ref": "#/parameters/rowFilter.launches.duration" },
+          { "$ref": "#/parameters/rowFilter.launches.name" },
+          { "$ref": "#/parameters/rowFilter.launches.updated_at" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
+        ],
+        "responses": {
+          "206": { "description": "Partial Content" },
+          "200": {
+            "description": "OK",
+            "schema": { "items": { "$ref": "#/definitions/launches" }, "type": "array" }
+          }
+        }
+      },
+      "post": {
+        "tags": ["launches"],
+        "parameters": [
+          { "$ref": "#/parameters/body.launches" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "201": { "description": "Created" } }
+      },
+      "delete": {
+        "tags": ["launches"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.launches.id" },
+          { "$ref": "#/parameters/rowFilter.launches.created_at" },
+          { "$ref": "#/parameters/rowFilter.launches.is_template" },
+          { "$ref": "#/parameters/rowFilter.launches.origin" },
+          { "$ref": "#/parameters/rowFilter.launches.user_id" },
+          { "$ref": "#/parameters/rowFilter.launches.version_id" },
+          { "$ref": "#/parameters/rowFilter.launches.duration" },
+          { "$ref": "#/parameters/rowFilter.launches.name" },
+          { "$ref": "#/parameters/rowFilter.launches.updated_at" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      },
+      "patch": {
+        "tags": ["launches"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.launches.id" },
+          { "$ref": "#/parameters/rowFilter.launches.created_at" },
+          { "$ref": "#/parameters/rowFilter.launches.is_template" },
+          { "$ref": "#/parameters/rowFilter.launches.origin" },
+          { "$ref": "#/parameters/rowFilter.launches.user_id" },
+          { "$ref": "#/parameters/rowFilter.launches.version_id" },
+          { "$ref": "#/parameters/rowFilter.launches.duration" },
+          { "$ref": "#/parameters/rowFilter.launches.name" },
+          { "$ref": "#/parameters/rowFilter.launches.updated_at" },
+          { "$ref": "#/parameters/body.launches" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    },
+    "/projects": {
+      "get": {
+        "tags": ["projects"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.projects.id" },
+          { "$ref": "#/parameters/rowFilter.projects.created_at" },
+          { "$ref": "#/parameters/rowFilter.projects.name" },
+          { "$ref": "#/parameters/rowFilter.projects.description" },
+          { "$ref": "#/parameters/rowFilter.projects.owner_id" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
+        ],
+        "responses": {
+          "206": { "description": "Partial Content" },
+          "200": {
+            "description": "OK",
+            "schema": { "items": { "$ref": "#/definitions/projects" }, "type": "array" }
+          }
+        }
+      },
+      "post": {
+        "tags": ["projects"],
+        "parameters": [
+          { "$ref": "#/parameters/body.projects" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "201": { "description": "Created" } }
+      },
+      "delete": {
+        "tags": ["projects"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.projects.id" },
+          { "$ref": "#/parameters/rowFilter.projects.created_at" },
+          { "$ref": "#/parameters/rowFilter.projects.name" },
+          { "$ref": "#/parameters/rowFilter.projects.description" },
+          { "$ref": "#/parameters/rowFilter.projects.owner_id" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      },
+      "patch": {
+        "tags": ["projects"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.projects.id" },
+          { "$ref": "#/parameters/rowFilter.projects.created_at" },
+          { "$ref": "#/parameters/rowFilter.projects.name" },
+          { "$ref": "#/parameters/rowFilter.projects.description" },
+          { "$ref": "#/parameters/rowFilter.projects.owner_id" },
+          { "$ref": "#/parameters/body.projects" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    },
+    "/results": {
+      "get": {
+        "tags": ["results"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.results.id" },
+          { "$ref": "#/parameters/rowFilter.results.created_at" },
+          { "$ref": "#/parameters/rowFilter.results.name" },
+          { "$ref": "#/parameters/rowFilter.results.suite" },
+          { "$ref": "#/parameters/rowFilter.results.feature" },
+          { "$ref": "#/parameters/rowFilter.results.status" },
+          { "$ref": "#/parameters/rowFilter.results.description" },
+          { "$ref": "#/parameters/rowFilter.results.steps" },
+          { "$ref": "#/parameters/rowFilter.results.duration" },
+          { "$ref": "#/parameters/rowFilter.results.fullname" },
+          { "$ref": "#/parameters/rowFilter.results.launch_id" },
+          { "$ref": "#/parameters/rowFilter.results.parent_suite" },
+          { "$ref": "#/parameters/rowFilter.results.sub_suite" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
+        ],
+        "responses": {
+          "206": { "description": "Partial Content" },
+          "200": {
+            "description": "OK",
+            "schema": { "items": { "$ref": "#/definitions/results" }, "type": "array" }
+          }
+        }
+      },
+      "post": {
+        "tags": ["results"],
+        "parameters": [
+          { "$ref": "#/parameters/body.results" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "201": { "description": "Created" } }
+      },
+      "delete": {
+        "tags": ["results"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.results.id" },
+          { "$ref": "#/parameters/rowFilter.results.created_at" },
+          { "$ref": "#/parameters/rowFilter.results.name" },
+          { "$ref": "#/parameters/rowFilter.results.suite" },
+          { "$ref": "#/parameters/rowFilter.results.feature" },
+          { "$ref": "#/parameters/rowFilter.results.status" },
+          { "$ref": "#/parameters/rowFilter.results.description" },
+          { "$ref": "#/parameters/rowFilter.results.steps" },
+          { "$ref": "#/parameters/rowFilter.results.duration" },
+          { "$ref": "#/parameters/rowFilter.results.fullname" },
+          { "$ref": "#/parameters/rowFilter.results.launch_id" },
+          { "$ref": "#/parameters/rowFilter.results.parent_suite" },
+          { "$ref": "#/parameters/rowFilter.results.sub_suite" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      },
+      "patch": {
+        "tags": ["results"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.results.id" },
+          { "$ref": "#/parameters/rowFilter.results.created_at" },
+          { "$ref": "#/parameters/rowFilter.results.name" },
+          { "$ref": "#/parameters/rowFilter.results.suite" },
+          { "$ref": "#/parameters/rowFilter.results.feature" },
+          { "$ref": "#/parameters/rowFilter.results.status" },
+          { "$ref": "#/parameters/rowFilter.results.description" },
+          { "$ref": "#/parameters/rowFilter.results.steps" },
+          { "$ref": "#/parameters/rowFilter.results.duration" },
+          { "$ref": "#/parameters/rowFilter.results.fullname" },
+          { "$ref": "#/parameters/rowFilter.results.launch_id" },
+          { "$ref": "#/parameters/rowFilter.results.parent_suite" },
+          { "$ref": "#/parameters/rowFilter.results.sub_suite" },
+          { "$ref": "#/parameters/body.results" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    },
+    "/versions": {
+      "get": {
+        "tags": ["versions"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.versions.id" },
+          { "$ref": "#/parameters/rowFilter.versions.created_at" },
+          { "$ref": "#/parameters/rowFilter.versions.version_name" },
+          { "$ref": "#/parameters/rowFilter.versions.repo" },
+          { "$ref": "#/parameters/rowFilter.versions.project_id" },
+          { "$ref": "#/parameters/rowFilter.versions.secondary_id" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
+        ],
+        "responses": {
+          "206": { "description": "Partial Content" },
+          "200": {
+            "description": "OK",
+            "schema": { "items": { "$ref": "#/definitions/versions" }, "type": "array" }
+          }
+        }
+      },
+      "post": {
+        "tags": ["versions"],
+        "parameters": [
+          { "$ref": "#/parameters/body.versions" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "201": { "description": "Created" } }
+      },
+      "delete": {
+        "tags": ["versions"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.versions.id" },
+          { "$ref": "#/parameters/rowFilter.versions.created_at" },
+          { "$ref": "#/parameters/rowFilter.versions.version_name" },
+          { "$ref": "#/parameters/rowFilter.versions.repo" },
+          { "$ref": "#/parameters/rowFilter.versions.project_id" },
+          { "$ref": "#/parameters/rowFilter.versions.secondary_id" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      },
+      "patch": {
+        "tags": ["versions"],
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.versions.id" },
+          { "$ref": "#/parameters/rowFilter.versions.created_at" },
+          { "$ref": "#/parameters/rowFilter.versions.version_name" },
+          { "$ref": "#/parameters/rowFilter.versions.repo" },
+          { "$ref": "#/parameters/rowFilter.versions.project_id" },
+          { "$ref": "#/parameters/rowFilter.versions.secondary_id" },
+          { "$ref": "#/parameters/body.versions" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    },
+    "/rpc/template": {
+      "post": {
+        "tags": ["(rpc) template"],
+        "produces": ["application/json", "application/vnd.pgrst.object+json"],
+        "parameters": [
+          {
+            "name": "args",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["version"],
+              "properties": { "version": { "type": "integer", "format": "bigint" } }
+            }
+          },
+          { "$ref": "#/parameters/preferParams" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/rpc/features": {
+      "post": {
+        "tags": ["(rpc) features"],
+        "produces": ["application/json", "application/vnd.pgrst.object+json"],
+        "parameters": [
+          { "name": "args", "required": true, "in": "body", "schema": { "type": "object" } },
+          { "$ref": "#/parameters/preferParams" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/rpc/results": {
+      "post": {
+        "tags": ["(rpc) results"],
+        "produces": ["application/json", "application/vnd.pgrst.object+json"],
+        "parameters": [
+          {
+            "name": "args",
+            "required": true,
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["version"],
+              "properties": { "version": { "type": "integer", "format": "bigint" } }
+            }
+          },
+          { "$ref": "#/parameters/preferParams" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/rpc/version": {
+      "post": {
+        "tags": ["(rpc) version"],
+        "produces": ["application/json", "application/vnd.pgrst.object+json"],
+        "parameters": [
+          { "name": "args", "required": true, "in": "body", "schema": { "type": "object" } },
+          { "$ref": "#/parameters/preferParams" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "definitions": {
+    "launches": {
+      "required": [
+        "id",
+        "created_at",
+        "is_template",
+        "user_id",
+        "version_id",
+        "name",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Primary Key.<pk/>"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "timestamp with time zone",
+          "default": "now()"
+        },
+        "is_template": { "type": "boolean", "format": "boolean", "default": false },
+        "origin": { "type": "string", "format": "character varying" },
+        "user_id": { "type": "string", "format": "uuid" },
+        "version_id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Foreign Key to `versions.id`.<fk table='versions' column='id'/>"
+        },
+        "duration": { "type": "integer", "format": "integer" },
+        "name": { "type": "string", "format": "character varying" },
+        "updated_at": { "type": "string", "format": "timestamp with time zone", "default": "now()" }
+      },
+      "type": "object"
+    },
+    "projects": {
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Primary Key.<pk/>"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "timestamp with time zone",
+          "default": "now()"
+        },
+        "name": { "type": "string", "format": "character varying" },
+        "description": { "type": "string", "format": "text" },
+        "owner_id": { "type": "string", "format": "uuid" }
+      },
+      "type": "object"
+    },
+    "results": {
+      "required": ["id", "created_at", "name", "suite", "feature", "launch_id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Note:\nThis is a Primary Key.<pk/>"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "timestamp with time zone",
+          "default": "now()"
+        },
+        "name": { "type": "string", "format": "character varying" },
+        "suite": { "type": "string", "format": "character varying" },
+        "feature": { "type": "string", "format": "character varying" },
+        "status": { "type": "string", "format": "character varying" },
+        "description": { "type": "string", "format": "text" },
+        "steps": { "type": "string", "format": "json" },
+        "duration": { "type": "integer", "format": "integer" },
+        "fullname": { "type": "string", "format": "character varying" },
+        "launch_id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Foreign Key to `launches.id`.<fk table='launches' column='id'/>"
+        },
+        "parent_suite": { "type": "string", "format": "character varying" },
+        "sub_suite": { "type": "string", "format": "character varying" }
+      },
+      "type": "object"
+    },
+    "versions": {
+      "required": ["id", "created_at", "version_name", "repo", "project_id"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Primary Key.<pk/>"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "timestamp with time zone",
+          "default": "now()"
+        },
+        "version_name": { "type": "string", "format": "character varying" },
+        "repo": { "type": "string", "format": "character varying" },
+        "project_id": {
+          "type": "integer",
+          "format": "bigint",
+          "description": "Note:\nThis is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>"
+        },
+        "secondary_id": {
+          "type": "string",
+          "format": "character varying",
+          "default": "suite",
+          "description": "what to use as second identifier (first - name) may be 'suite', 'parent_suite' or 'sub_suite'"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "parameters": {
+    "preferParams": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "type": "string",
+      "in": "header",
+      "enum": ["params=single-object"]
+    },
+    "preferReturn": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "type": "string",
+      "in": "header",
+      "enum": ["return=representation", "return=minimal", "return=none"]
+    },
+    "preferCount": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "type": "string",
+      "in": "header",
+      "enum": ["count=none"]
+    },
+    "select": {
+      "name": "select",
+      "description": "Filtering Columns",
+      "required": false,
+      "type": "string",
+      "in": "query"
+    },
+    "on_conflict": {
+      "name": "on_conflict",
+      "description": "On Conflict",
+      "required": false,
+      "type": "string",
+      "in": "query"
+    },
+    "order": {
+      "name": "order",
+      "description": "Ordering",
+      "required": false,
+      "type": "string",
+      "in": "query"
+    },
+    "range": {
+      "name": "Range",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "type": "string",
+      "in": "header"
+    },
+    "rangeUnit": {
+      "name": "Range-Unit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "type": "string",
+      "default": "items",
+      "in": "header"
+    },
+    "offset": {
+      "name": "offset",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "type": "string",
+      "in": "query"
+    },
+    "limit": {
+      "name": "limit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "type": "string",
+      "in": "query"
+    },
+    "body.launches": {
+      "name": "launches",
+      "description": "launches",
+      "required": false,
+      "in": "body",
+      "schema": { "$ref": "#/definitions/launches" }
+    },
+    "rowFilter.launches.id": {
+      "name": "id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.launches.created_at": {
+      "name": "created_at",
+      "required": false,
+      "type": "string",
+      "format": "timestamp with time zone",
+      "in": "query"
+    },
+    "rowFilter.launches.is_template": {
+      "name": "is_template",
+      "required": false,
+      "type": "string",
+      "format": "boolean",
+      "in": "query"
+    },
+    "rowFilter.launches.origin": {
+      "name": "origin",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.launches.user_id": {
+      "name": "user_id",
+      "required": false,
+      "type": "string",
+      "format": "uuid",
+      "in": "query"
+    },
+    "rowFilter.launches.version_id": {
+      "name": "version_id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.launches.duration": {
+      "name": "duration",
+      "required": false,
+      "type": "string",
+      "format": "integer",
+      "in": "query"
+    },
+    "rowFilter.launches.name": {
+      "name": "name",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.launches.updated_at": {
+      "name": "updated_at",
+      "required": false,
+      "type": "string",
+      "format": "timestamp with time zone",
+      "in": "query"
+    },
+    "body.projects": {
+      "name": "projects",
+      "description": "projects",
+      "required": false,
+      "in": "body",
+      "schema": { "$ref": "#/definitions/projects" }
+    },
+    "rowFilter.projects.id": {
+      "name": "id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.projects.created_at": {
+      "name": "created_at",
+      "required": false,
+      "type": "string",
+      "format": "timestamp with time zone",
+      "in": "query"
+    },
+    "rowFilter.projects.name": {
+      "name": "name",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.projects.description": {
+      "name": "description",
+      "required": false,
+      "type": "string",
+      "format": "text",
+      "in": "query"
+    },
+    "rowFilter.projects.owner_id": {
+      "name": "owner_id",
+      "required": false,
+      "type": "string",
+      "format": "uuid",
+      "in": "query"
+    },
+    "body.results": {
+      "name": "results",
+      "description": "results",
+      "required": false,
+      "in": "body",
+      "schema": { "$ref": "#/definitions/results" }
+    },
+    "rowFilter.results.id": {
+      "name": "id",
+      "required": false,
+      "type": "string",
+      "format": "uuid",
+      "in": "query"
+    },
+    "rowFilter.results.created_at": {
+      "name": "created_at",
+      "required": false,
+      "type": "string",
+      "format": "timestamp with time zone",
+      "in": "query"
+    },
+    "rowFilter.results.name": {
+      "name": "name",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.suite": {
+      "name": "suite",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.feature": {
+      "name": "feature",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.status": {
+      "name": "status",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.description": {
+      "name": "description",
+      "required": false,
+      "type": "string",
+      "format": "text",
+      "in": "query"
+    },
+    "rowFilter.results.steps": {
+      "name": "steps",
+      "required": false,
+      "type": "string",
+      "format": "json",
+      "in": "query"
+    },
+    "rowFilter.results.duration": {
+      "name": "duration",
+      "required": false,
+      "type": "string",
+      "format": "integer",
+      "in": "query"
+    },
+    "rowFilter.results.fullname": {
+      "name": "fullname",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.launch_id": {
+      "name": "launch_id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.results.parent_suite": {
+      "name": "parent_suite",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.results.sub_suite": {
+      "name": "sub_suite",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "body.versions": {
+      "name": "versions",
+      "description": "versions",
+      "required": false,
+      "in": "body",
+      "schema": { "$ref": "#/definitions/versions" }
+    },
+    "rowFilter.versions.id": {
+      "name": "id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.versions.created_at": {
+      "name": "created_at",
+      "required": false,
+      "type": "string",
+      "format": "timestamp with time zone",
+      "in": "query"
+    },
+    "rowFilter.versions.version_name": {
+      "name": "version_name",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.versions.repo": {
+      "name": "repo",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    },
+    "rowFilter.versions.project_id": {
+      "name": "project_id",
+      "required": false,
+      "type": "string",
+      "format": "bigint",
+      "in": "query"
+    },
+    "rowFilter.versions.secondary_id": {
+      "name": "secondary_id",
+      "description": "what to use as second identifier (first - name) may be 'suite', 'parent_suite' or 'sub_suite'",
+      "required": false,
+      "type": "string",
+      "format": "character varying",
+      "in": "query"
+    }
+  },
+  "externalDocs": {
+    "url": "https://postgrest.org/en/latest/api.html",
+    "description": "PostgREST Documentation"
+  }
+}

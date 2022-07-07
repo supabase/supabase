@@ -1,0 +1,16 @@
+{
+  "tier": {
+    "key": "FREE",
+    "name": "Free tier",
+    "prod_id": "prod_1IUYQkJwmaOcdA",
+    "unit_amount": 0,
+    "supabase_prod_id": "tier_free",
+    "price_id": "price_1IUYQwPjOwmaOcdNPlPj8cmd"
+  },
+  "addons": [],
+  "billing": {
+    "billing_cycle_anchor": 1650312586,
+    "current_period_end": 1658177986,
+    "current_period_start": 1655181986
+  }
+}

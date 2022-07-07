@@ -1,0 +1,70 @@
+{
+  "project": {
+    "id": 121497,
+    "name": "testres-example",
+    "ref": "gryakvurauftrjohzhbq",
+    "status": "ACTIVE_HEALTHY",
+    "inserted_at": "2022-04-18T19:53:04.049637",
+    "db_dns_name": "ec2-52-57-206-245.eu-central-1.compute.amazonaws.com",
+    "db_port": 5432,
+    "db_name": "postgres",
+    "db_ssl": false,
+    "db_host": "db.gryakvurauftrjohzhbq.supabase.co",
+    "db_user": "postgres",
+    "cloud_provider": "AWS",
+    "region": "eu-central-1",
+    "services": [
+      {
+        "id": 135924,
+        "name": "Default API",
+        "app_config": {
+          "endpoint": "gryakvurauftrjohzhbq.supabase.co",
+          "db_schema": "public",
+          "realtime_enabled": true
+        },
+        "app": { "id": 1, "name": "Auto API" },
+        "service_api_keys": [
+          {
+            "api_key_encrypted": "U2FsdGVkX18qlYNfSqqquchB7UZAgk9k359rxQK8oAf/DOh+jzP6toDxctViSW6w6erxoLeHs/tTfJsrl3Ufg71J55gkuBXXZA4zg+52KiBD9CtoDxctViSW6w6erxoLgmcrmLVsh9d/x7MQ5Gg3OA+mIDLptet7Yz1Imc3gmtbiGYQ/Ic43K2/0TsfMUtoDxctViSW6w6erxoLI4a1P0SHoiYE7qr3RaI5v9vugdfoskZOVfiMuMnDacyMnqxBC/IG9sd1GvcIwXe7Bq4ZxEBjp4S8XuDnbZwaEejPmAspGCd7HotLY653g2xQ2kpbR/6N",
+            "tags": "anon",
+            "name": "anon key",
+            "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeWFrdnVyeWZzcmdqb2h6aGJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTAzMTE1ODIsImV4cCI6MTk2NTg4NzU4Mn0.rTZU_X2QXaCJHboDbFO-P_SwLJcHEka27MmxF9aTITk"
+          },
+          {
+            "api_key_encrypted": "U2FsdGVkX1/JskCyyDYv1IYiXEo6DXy8IRSM2V95f3ALyBiRZzXlQEHHTW13OWgDBqHfsFvtduSDLRHx+tdo+UPtOf9CS0wWUtqPMvLgXHmjwqPatV530MIShOVOVHanYersWBHkmHV0fy2/af6jMmFtoDxctViSW6w6erxoLgJoTlL5vgTyGnWPgT8EBtoDxctViSW6w6erxoLoGsGhA2svIIuBmpF80usmphb0RU8Be4G0uVTLoMQ4trM5VWXIlK9M2x60bJvRd4PeSC5omJnIoUdP3MFO+QVri8OFWOrEKu2onLZ14ItotcMpzgje",
+            "tags": "service_role",
+            "name": "service_role key",
+            "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdtoDxctViSW6w6erxoLyeWFrdnVyeWZzcmdqb2h6aGJxIiwicm9sZSI6InNlcnZtoDxctViSW6w6erxoLdCI6MTY1MDMxMTUtoDxctViSW6w6erxoLg3NTgyfQ.UP2MgrFJTafZVRd87BmVgY0gADoywAmg_gAU0nhWf7E"
+          }
+        ]
+      }
+    ],
+    "jwt_secret": "79275efb-c8d1-464d-9643-b0d3c8450435"
+  },
+  "services": [
+    {
+      "id": 135924,
+      "name": "Default API",
+      "app_config": {
+        "endpoint": "gryakvurauftrjohzhbq.supabase.co",
+        "db_schema": "public",
+        "realtime_enabled": true
+      },
+      "app": { "id": 1, "name": "Auto API" },
+      "service_api_keys": [
+        {
+          "api_key_encrypted": "U2FsdGVkX18qlYNftoDxctViSW6w6erxoLK8oAf/DOh+jzP6toDxcttoDxctViSW6w6erxoLrxoLeHs/tTfJsrl3Ufg71J55gkuBXXZA4zg+52KiBD9CmX1DlEpbu0v3XyZmgmcrmLVsh9d/x7MQ5Gg3OA+mIDLptet7Yz1Imc3gmtbiGYQ/Ic43K2/0TsfMUSvwX8WL2CN+SOcKQaI4a1P0SHoiYE7qr3RaI5v9vugdfoskZOVfiMuMnDacyMnqxBC/IG9sd1GvcIwXe7Bq4ZxEBjp4S8XuDnbZwaEejPmAspGCd7HotLY653g2xQ2kpbR/6N",
+          "tags": "anon",
+          "name": "anon key",
+          "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFtoDxctViSW6w6erxoLyeWFrdnVyeWZzcmdqb2h6aGJxIiwicm9sZSI6ImtoDxctViSW6w6erxoLjE2NTAztoDxctViSW6w6erxoL2NTg4NzU4Mn0.rTZU_X2QXaCJHboDbFO-P_SwLJcHEka27MmxF9aTITk"
+        },
+        {
+          "api_key_encrypted": "U2FsdGVkX1/JskCyyDYv1IYiXEo6DXy8IRSM2toDxctViSW6w6erxoLTW13OWgDBqHfsFvtduSDLRHx+tdo+UPtOf9CS0wWUtqPMvLgXHmjwqPatV530MIShOVOVHanYersWBHkmHV0fy2/af6jMmFj0PAk+50+OecLdsqungJoTlL5vgTyGnWPgT8EBQSNlzoY+FuwASENzZCoGsGhA2svIIuBmpF80usmphb0RU8Be4G0uVTLoMQ4trM5VWXIlK9M2x60bJvRd4PeSC5omJnIoUdP3MFO+QVri8OFWOrEKu2onLZ14ItotcMpzgje",
+          "tags": "service_role",
+          "name": "service_role key",
+          "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJtoDxctViSW6w6erxoLcmdqb2h6aGJxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImltoDxctViSW6w6erxoLTU4MiwiZXhwIjoxOTY1ODg3NTgyfQ.UP2MgrFJTafZVRd87BmVgY0gADoywAmg_gAU0nhWf7E"
+        }
+      ]
+    }
+  ]
+}

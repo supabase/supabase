@@ -1,0 +1,67 @@
+{
+  "project": {
+    "id": 121497,
+    "name": "testres-linter",
+    "ref": "gryakvuasftgejohzhbq",
+    "status": "ACTIVE_HEALTHY",
+    "db_host": "db.gryakvuasftgejohzhbq.supabase.co",
+    "db_name": "postgres",
+    "db_user": "postgres",
+    "db_schema": "public, storage, graphql_public",
+    "db_port": 5432,
+    "db_ssl": false,
+    "api_key_supabase_encrypted": "U2FsdGVkX1+TFzQgKjtGCeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9WJLHp0RuywwEPtWu71k1kXSZO1ECxW8soYC1nUkBlqMv7XLuChdoV8B2pG1OjpKRacMAHxPnFX0HyFcytDUiW6H/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9+/XvmpI8gQDOkIEfrOjoVfdhMFbd6U0FDFWlyGFb5Je28uwltECPFkJWqKkJmpMSaYT++nmzmcFUn10Xfq8ROfr3VmVX4YB0uHrtTmYWmhzMxto+inCfeVILMgym30UIRofimkoRLgCFWH1XfHIVGHWkP",
+    "services": [
+      {
+        "id": 135924,
+        "name": "Default API",
+        "app_config": {
+          "endpoint": "gryakvuasftgejohzhbq.supabase.co",
+          "db_schema": "public",
+          "realtime_enabled": true
+        },
+        "app": { "id": 1, "name": "Auto API" },
+        "service_api_keys": [
+          {
+            "api_key_encrypted": "U2FsdGVkX18qlYNfSqqquchB7UZAgk9k359rxQK8oAf/DOh+jzP6toDxctViSW6w6erxoLeHs/tTfJsrl3Ufg71J55gkuBXXZA4zg+52KiBD9CmeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9Vsh9d/Lptet7Yz1Imc3gmtbiGYQ/Ic43K2/0TsfMUSvwX8WL2CN+SOcKQaI4a1P0SHoiYE7qr3RaI5v9vugdfoskZOVfiMuMnDacyMnqxBC/IG9sd1GvcIwXe7Bq4ZxEBjp4S8XuDnbZwaEejPmAspGCd7HotLY653g2xQ2kpbR/6N",
+            "tags": "anon",
+            "name": "anon key"
+          },
+          {
+            "api_key_encrypted": "U2FsdGVkX1/JskCyyDYv1IYiXEo6DXeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9DBqHfsFvtduSDLRHx+tdo+UPtOf9CS0wWUtqPMvLgXHmjwqPatV530MIShOVOVHanYersWBHkmHV0fy2/af6jMmFj0PAk+50+OecLdsqeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9Y+FuwASENzZCoGsGhA2svIIuBmpF80usmphb0RU8Be4G0uVTLoMQ4trM5VWXIlK9M2x60bJvRd4PeSC5omJnIoUdP3MFO+QVri8OFWOrEKu2onLZ14ItotcMpzgje",
+            "tags": "service_role",
+            "name": "service_role key"
+          }
+        ]
+      }
+    ]
+  },
+  "autoApiService": {
+    "id": 135924,
+    "name": "Default API",
+    "app_config": {
+      "endpoint": "gryakvuasftgejohzhbq.supabase.co",
+      "db_schema": "public",
+      "realtime_enabled": true
+    },
+    "app": { "id": 1, "name": "Auto API" },
+    "service_api_keys": [
+      {
+        "api_key_encrypted": "U2FsdGVkX18qlYNfSqqquchB7UZAgk9k359rxQK8oAf/DOh+jzP6toDxctViSW6w6erxoLeHs/tTfJsrg71J55gkuBXXZA4zg+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9/x7MQ5Gg3OA+mIDLptet7Yz1Imc3gmtbiGYQ/Ic43K2/0TsfMUSvwX8WL2CN+SOcKQaI4a1P0SHoiYE7qr3RaI5v9vugdfoskZOVfiMuMnDacyMnqxBC/IG9sd1GvcIwXe7Bq4ZxEBjp4S8XuDnbZwaEejPmAspGCd7HotLY653g2xQ2kpbR/6N",
+        "tags": "anon",
+        "name": "anon key"
+      },
+      {
+        "api_key_encrypted": "U2FsdGVkX1/JskCyyDYv1IYiXEo6DXy8IRSM2V95f3ALyBiRZzXlQEHHTW13OWgDBqHfsFvtduSDLRHx+tdo+UPtOf9CS0wWUteyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9HkmHV0fy2/af6jMmFj0PAk+50+OecLdsqungJoTlL5vgTyGnWPgT8EBQSNlzoY+FuwASENzZCoGsGhA2svIIuBmpF80usmphb0RU8Be4G0uVTLoMQ4trM5VWXIlK9M2x60bJvRd4PeSC5omJnIoUdP3MFO+QVri8OFWOrEKu2onLZ14ItotcMpzgje",
+        "tags": "service_role",
+        "name": "service_role key"
+      }
+    ],
+    "endpoint": "gryakvuasftgejohzhbq.supabase.co",
+    "restUrl": "https://gryakvuasftgejohzhbq.supabase.co/rest/v1/",
+    "project": { "ref": "gryakvuasftgejohzhbq" },
+    "internalApiKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeWFrdnVyeWZzcmdqb2h6sZSI6InN1cGFiYXNlX2FkbWluIiWluIiwiaWF0sZSI6InN1cGFiYXNlX2FkbWluIijU4ODc1ODJ9.xTXRgfyHS3ReI3VgswZthYbNQ2OoZMJ0LJXolk32H4k",
+    "defaultApiKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeWFrdnVyeWZzcmdqb2h6aGJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTAzMTE1OsZSI6InN1cGFiYXNlX2FkbWluIi.rTZU_X2QXaCJHboDbFO-sZSI6InN1cGFiYXNlX2FkbWluIi",
+    "serviceApiKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeWFrdnVyeWZzcmdqb2h6aGJxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSsZSI6InN1cGFiYXNlX2FkbWluIioxOTY1ODg3NTgyfQ.UP2MgrsZSI6InN1cGFiYXNlX2FkbWluIiwAmg_gAU0nhWf7E"
+  }
+}

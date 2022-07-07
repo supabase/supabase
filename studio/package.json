@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "test": "jest",
+    "test:snapshots": "npx playwright test",
+    "test:snapshots:update": "npx playwright test -u",
+    "test:snapshots:headed": "npx playwright test --headed",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
@@ -79,6 +82,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
+    "@faker-js/faker": "^7.3.0",
+    "@playwright/test": "^1.23.0",
     "@storybook/addon-actions": "^6.4.19",
     "@storybook/addon-essentials": "^6.4.19",
     "@storybook/addon-interactions": "^6.4.19",

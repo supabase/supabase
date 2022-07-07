@@ -1,0 +1,12 @@
+[
+  {
+    "id": 16413,
+    "name": "supabase_realtime",
+    "owner": "postgres",
+    "publish_insert": true,
+    "publish_update": true,
+    "publish_delete": true,
+    "publish_truncate": true,
+    "tables": []
+  }
+]

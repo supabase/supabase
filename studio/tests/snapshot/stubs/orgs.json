@@ -1,0 +1,34 @@
+[
+  {
+    "id": 17057,
+    "slug": "modern-indigo-hornet",
+    "name": "abc3's Org",
+    "stripe_customer_id": "cus_FJwCG8RD5OeoP3",
+    "billing_email": "sts@abc3.dev",
+    "is_owner": false
+  },
+  {
+    "id": 89201,
+    "slug": "hostile-olive-cow",
+    "name": "supaegor's Org",
+    "stripe_customer_id": "cus_JPsi1GSSJwnU89",
+    "billing_email": null,
+    "is_owner": true
+  },
+  {
+    "id": 102811,
+    "slug": "unnecessary-tan-cx8fcih",
+    "name": "testres-linter",
+    "stripe_customer_id": "cus_FJwCG8RVljSinV",
+    "billing_email": "egor@supabase.io",
+    "is_owner": true
+  },
+  {
+    "id": 105764,
+    "slug": "squealing-ivory-qshl8px",
+    "name": "verification",
+    "stripe_customer_id": "cus_FJwCG8RFOV0WD3",
+    "billing_email": "egor@supabase.io",
+    "is_owner": true
+  }
+]

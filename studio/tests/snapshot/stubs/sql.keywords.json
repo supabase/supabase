@@ -1,0 +1,3201 @@
+[
+  {
+    "word": "abort",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "absolute",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "access",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "action",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "add",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "admin",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "after",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "aggregate",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "all",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "also",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "alter",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "always",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "analyse",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "analyze",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "and",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "any",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "array",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "as",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "asc",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "asensitive",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "assertion",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "assignment",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "asymmetric",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "at",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "atomic",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "attach",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "attribute",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "authorization",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "backward",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "before",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "begin",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "between",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "bigint",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "binary",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "bit",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "boolean",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "both",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "breadth",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "by",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cache",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "call",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "called",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cascade",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cascaded",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "case",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cast",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "catalog",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "chain",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "char",
+    "catcode": "C",
+    "barelabel": false,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "character",
+    "catcode": "C",
+    "barelabel": false,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "characteristics",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "check",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "checkpoint",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "class",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "close",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cluster",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "coalesce",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "collate",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "collation",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "column",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "columns",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "comment",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "comments",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "commit",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "committed",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "compression",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "concurrently",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "configuration",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "conflict",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "connection",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "constraint",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "constraints",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "content",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "continue",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "conversion",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "copy",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cost",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "create",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "cross",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "csv",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cube",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_catalog",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_date",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_role",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_schema",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_time",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_timestamp",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "current_user",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cursor",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "cycle",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "data",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "database",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "day",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "deallocate",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "dec",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "decimal",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "declare",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "default",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "defaults",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "deferrable",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "deferred",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "definer",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "delete",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "delimiter",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "delimiters",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "depends",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "depth",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "desc",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "detach",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "dictionary",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "disable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "discard",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "distinct",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "do",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "document",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "domain",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "double",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "drop",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "each",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "else",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "enable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "encoding",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "encrypted",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "end",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "enum",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "escape",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "event",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "except",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "exclude",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "excluding",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "exclusive",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "execute",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "exists",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "explain",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "expression",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "extension",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "external",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "extract",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "false",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "family",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "fetch",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "filter",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "finalize",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "first",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "float",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "following",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "for",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "force",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "foreign",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "forward",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "freeze",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "from",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "full",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "function",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "functions",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "generated",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "global",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "grant",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "granted",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "greatest",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "group",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "grouping",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "groups",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "handler",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "having",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "header",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "hold",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "hour",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "identity",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "if",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "ilike",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "immediate",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "immutable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "implicit",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "import",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "in",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "include",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "including",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "increment",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "index",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "indexes",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "inherit",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "inherits",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "initially",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "inline",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "inner",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "inout",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "input",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "insensitive",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "insert",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "instead",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "int",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "integer",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "intersect",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "interval",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "into",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "invoker",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "is",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "isnull",
+    "catcode": "T",
+    "barelabel": false,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "isolation",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "join",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "key",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "label",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "language",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "large",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "last",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "lateral",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "leading",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "leakproof",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "least",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "left",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "level",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "like",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "limit",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "listen",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "load",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "local",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "localtime",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "localtimestamp",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "location",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "lock",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "locked",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "logged",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "mapping",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "match",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "materialized",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "maxvalue",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "method",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "minute",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "minvalue",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "mode",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "month",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "move",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "name",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "names",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "national",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "natural",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nchar",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "new",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "next",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nfc",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nfd",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nfkc",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nfkd",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "no",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "none",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "normalize",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "normalized",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "not",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nothing",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "notify",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "notnull",
+    "catcode": "T",
+    "barelabel": false,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "nowait",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "null",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nullif",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "nulls",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "numeric",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "object",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "of",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "off",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "offset",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "oids",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "old",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "on",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "only",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "operator",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "option",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "options",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "or",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "order",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "ordinality",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "others",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "out",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "outer",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "over",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "overlaps",
+    "catcode": "T",
+    "barelabel": false,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "overlay",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "overriding",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "owned",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "owner",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "parallel",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "parser",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "partial",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "partition",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "passing",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "password",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "placing",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "plans",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "policy",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "position",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "preceding",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "precision",
+    "catcode": "C",
+    "barelabel": false,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "prepare",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "prepared",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "preserve",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "primary",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "prior",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "privileges",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "procedural",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "procedure",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "procedures",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "program",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "publication",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "quote",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "range",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "read",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "real",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "reassign",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "recheck",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "recursive",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "ref",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "references",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "referencing",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "refresh",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "reindex",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "relative",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "release",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "rename",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "repeatable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "replace",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "replica",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "reset",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "restart",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "restrict",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "return",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "returning",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "returns",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "revoke",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "right",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "role",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "rollback",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "rollup",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "routine",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "routines",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "row",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "rows",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "rule",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "savepoint",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "schema",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "schemas",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "scroll",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "search",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "second",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "security",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "select",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "sequence",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "sequences",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "serializable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "server",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "session",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "session_user",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "set",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "setof",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "sets",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "share",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "show",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "similar",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "simple",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "skip",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "smallint",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "snapshot",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "some",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "sql",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "stable",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "standalone",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "start",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "statement",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "statistics",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "stdin",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "stdout",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "storage",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "stored",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "strict",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "strip",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "subscription",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "substring",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "support",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "symmetric",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "sysid",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "system",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "table",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "tables",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "tablesample",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "tablespace",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "temp",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "template",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "temporary",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "text",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "then",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "ties",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "time",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "timestamp",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "to",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "trailing",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "transaction",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "transform",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "treat",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "trigger",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "trim",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "true",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "truncate",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "trusted",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "type",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "types",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "uescape",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "unbounded",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "uncommitted",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "unencrypted",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "union",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "unique",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "unknown",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "unlisten",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "unlogged",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "until",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "update",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "user",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "using",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "vacuum",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "valid",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "validate",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "validator",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "value",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "values",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "varchar",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "variadic",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "varying",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "verbose",
+    "catcode": "T",
+    "barelabel": true,
+    "catdesc": "reserved (can be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "version",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "view",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "views",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "volatile",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "when",
+    "catcode": "R",
+    "barelabel": true,
+    "catdesc": "reserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "where",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "whitespace",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "window",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "with",
+    "catcode": "R",
+    "barelabel": false,
+    "catdesc": "reserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "within",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "without",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "work",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "wrapper",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "write",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xml",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlattributes",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlconcat",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlelement",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlexists",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlforest",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlnamespaces",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlparse",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlpi",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlroot",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmlserialize",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "xmltable",
+    "catcode": "C",
+    "barelabel": true,
+    "catdesc": "unreserved (cannot be function or type name)",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "year",
+    "catcode": "U",
+    "barelabel": false,
+    "catdesc": "unreserved",
+    "baredesc": "requires AS"
+  },
+  {
+    "word": "yes",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  },
+  {
+    "word": "zone",
+    "catcode": "U",
+    "barelabel": true,
+    "catdesc": "unreserved",
+    "baredesc": "can be bare label"
+  }
+]
