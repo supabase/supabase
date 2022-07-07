@@ -95,7 +95,7 @@ const GeneralSettings = observer(() => {
           <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t">
             <div className="flex w-full items-center justify-between">
               <div>
-                <p>Restart services</p>
+                <p>Restart project</p>
                 <div className="max-w-[420px]">
                   <p className="text-scale-1100 text-sm">
                     Your project will not be available for a few minutes.
