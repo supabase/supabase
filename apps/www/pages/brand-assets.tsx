@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
+import * as supabaseLogoPreview from 'common/assets/images/logo-preview.jpg'
 
 const Index = () => {
   // base path for images
@@ -48,7 +49,7 @@ const Index = () => {
           <SectionContainer>
             <div className="shadow-small grid grid-cols-12 rounded-lg border dark:border-gray-600">
               <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5">
-                <Image src={`/brand-assets/logo-preview.jpg`} layout="fill" objectFit="cover" />
+                <Image src={supabaseLogoPreview} layout="fill" objectFit="cover" />
               </div>
               <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">
@@ -61,7 +62,7 @@ const Index = () => {
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
                     </p>
-                    <form method="get" action={`/brand-assets/supabase-logos.zip`}>
+                    <form method="get" action={`/brand-assets.zip`}>
                       <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
                         Download logo kit
                       </Button>

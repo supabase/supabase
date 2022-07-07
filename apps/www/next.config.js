@@ -84,6 +84,26 @@ module.exports = withMDX({
   async redirects() {
     return [
       {
+        permanent: true,
+        source: '/auth/Auth',
+        destination: '/auth',
+      },
+      {
+        permanent: true,
+        source: '/database/Database',
+        destination: '/database',
+      },
+      {
+        permanent: true,
+        source: '/edge-functions/edge-functions',
+        destination: '/edge-functions',
+      },
+      {
+        permanent: true,
+        source: '/storage/Storage',
+        destination: '/storage',
+      },
+      {
         permanent: false,
         source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
         destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
