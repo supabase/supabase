@@ -804,13 +804,16 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
-    const batches = chunk(prefixes, BATCH_SIZE)
-    await Promise.all(
-      batches.map(
-        async (batchedPrefixes) =>
-          await this.supabaseClient.storage.from(this.selectedBucket.name).remove(batchedPrefixes)
-      )
-    )
+    // batch BATCH_SIZE prefixes per request
+    const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
+      return this.supabaseClient.storage.from(this.selectedBucket.name).remove(batch)
+    })
+
+    // make BATCH_SIZE requests at the same time
+    await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
+      await previousPromise
+      await Promise.all(nextBatch.map((batch) => batch()))
+    }, Promise.resolve())
 
     // Clear file preview cache if deleted files exist in cache
     const idsOfFilesDeleted = files.map((file) => file.id)
