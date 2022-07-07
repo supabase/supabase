@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconChevronDown, IconRefreshCcw } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconDatabase, IconRefreshCcw } from '@supabase/ui'
 
 import { Project } from 'types'
 import { useStore } from 'hooks'
@@ -85,37 +85,44 @@ const RestartServerButton: FC<Props> = observer(({ project }) => {
           }
         }}
       />
-      {/* <Button type="default" icon={<IconRefreshCcw />} onClick={openModal} loading={loading}>
-        Restart server
-      </Button> */}
-      <Dropdown
-        align="end"
-        side="bottom"
-        overlay={[
-          <Dropdown.Item
-            key="project"
-            disabled={loading}
-            onClick={() => {
-              setServiceToRestart('project')
-            }}
-          >
-            Restart project
-          </Dropdown.Item>,
-          <Dropdown.Item
-            key="database"
-            disabled={loading}
-            onClick={() => {
-              setServiceToRestart('database')
-            }}
-          >
-            Restart database only
-          </Dropdown.Item>,
-        ]}
-      >
-        <Button type="default" iconRight={<IconChevronDown />}>
-          Restart services
+      <div className="flex items-center">
+        <Button
+          type="default"
+          className="rounded-r-none px-3"
+          onClick={() => {
+            setServiceToRestart('project')
+          }}
+        >
+          Restart project
         </Button>
-      </Dropdown>
+        <Dropdown
+          align="end"
+          side="bottom"
+          overlay={[
+            <Dropdown.Item
+              key="database"
+              disabled={loading}
+              onClick={() => {
+                setServiceToRestart('database')
+              }}
+            >
+              <div className="space-y-1">
+                <p className="text-scale-1200 block">Fast database reboot</p>
+                <p className="text-scale-1100 block">
+                  Restarts only the database - faster but may not be able to recover from all
+                  failure modes
+                </p>
+              </div>
+            </Dropdown.Item>,
+          ]}
+        >
+          <Button
+            type="default"
+            className="rounded-l-none px-[4px] py-[5px]"
+            icon={<IconChevronDown />}
+          />
+        </Dropdown>
+      </div>
     </>
   )
 })
