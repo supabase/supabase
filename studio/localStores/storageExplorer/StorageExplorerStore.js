@@ -1116,6 +1116,7 @@ class StorageExplorerStore {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
       const files = await this.getAllItemsAlongFolder(folder)
 
+      let hasErrors = false
       // Make this batched promises into a reusable function for storage, i think this will be super helpful
       const promises = files.map((file) => {
         const fromPath = `${file.prefix}/${file.name}`
@@ -1131,6 +1132,7 @@ class StorageExplorerStore {
               .from(this.selectedBucket.name)
               .move(fromPath, toPath)
               if (error) {
+                hasErrors = true
                 toast.error(`Failed to move ${fromPath} to the new folder`)
               }
             resolve()
@@ -1147,7 +1149,11 @@ class StorageExplorerStore {
           await Promise.all(nextBatch.map((batch) => batch()))
         }, Promise.resolve())
 
-        toast.success(`Successfully renamed folder to ${newName}`)
+        if (!hasErrors) {
+          toast.success(`Successfully renamed folder to ${newName}`)
+        } else {
+          toast.error(`Renamed folder to ${newName} with some errors`)
+        }
         await this.refetchAllOpenedFolders()
 
         // Clear file preview cache if the moved file exists in the cache
