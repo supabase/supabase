@@ -1,74 +1,74 @@
-import React from 'react';
-import { Dictionary } from './base';
-import { SupaRow, SupaTable } from './table';
+import React from 'react'
+import { Dictionary } from './base'
+import { SupaRow, SupaTable } from './table'
 
 export interface GridProps {
-  width?: string | number;
-  height?: string | number;
-  defaultColumnWidth?: string | number;
-  containerClass?: string;
-  gridClass?: string;
-  rowClass?: ((row: SupaRow) => string | undefined) | undefined;
+  width?: string | number
+  height?: string | number
+  defaultColumnWidth?: string | number
+  containerClass?: string
+  gridClass?: string
+  rowClass?: ((row: SupaRow) => string | undefined) | undefined
 }
 
 export interface SupabaseGridProps {
   /**
    * database table swagger or table name
    */
-  table: SupaTable | string;
+  table: SupaTable | string
   /**
    * run sql query
    */
-  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>;
+  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
 
   /**
    * Optional react node to display in grid header
    */
-  headerActions?: React.ReactNode;
+  headerActions?: React.ReactNode
   /**
    * enable table editor
    */
-  editable?: boolean;
+  editable?: boolean
   /**
    * props to config grid view
    */
-  gridProps?: GridProps;
+  gridProps?: GridProps
   /**
    * table schema. Default set to 'public' if not provided
    */
-  schema?: string;
+  schema?: string
   /**
    * storageRef is used to save state on localstorage
    */
-  storageRef?: string;
+  storageRef?: string
   /**
    * Optional grid theme
    */
-  theme?: 'dark' | 'light';
+  theme?: 'dark' | 'light'
   /**
    * show create new column button if available
    */
-  onAddColumn?: () => void;
+  onAddColumn?: () => void
   /**
    * show add row button if available
    */
-  onAddRow?: () => void;
+  onAddRow?: () => void
   /**
    * show delete column menu if available
    */
-  onDeleteColumn?: (columnName: string) => void;
+  onDeleteColumn?: (columnName: string) => void
   /**
    * show edit column menu if available
    */
-  onEditColumn?: (columnName: string) => void;
+  onEditColumn?: (columnName: string) => void
   /**
    * show edit row button if available
    */
-  onEditRow?: (row: SupaRow) => void;
+  onEditRow?: (row: SupaRow) => void
   /**
    * error handler
    */
-  onError?: (error: any) => void;
+  onError?: (error: any) => void
 }
 
 export interface SupabaseGridRef {
@@ -77,12 +77,12 @@ export interface SupabaseGridRef {
    *
    * @param row   newly added row data
    */
-  rowAdded(row: Dictionary<any>): void;
+  rowAdded(row: Dictionary<any>): void
   /**
    * callback when a row is edited
    *
    * @param row   edited row data
    * @param idx   edited row index
    */
-  rowEdited(row: Dictionary<any>, idx: number): void;
+  rowEdited(row: Dictionary<any>, idx: number): void
 }

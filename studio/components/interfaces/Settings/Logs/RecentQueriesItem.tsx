@@ -13,26 +13,24 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
   const { ref } = router.query
 
   return (
-      <Table.tr key={item.sql}>
-        <Table.td
-          className={`transition-all expanded-row-content bg-scale-100 border-l border-r !pt-0 !pb-0 !px-3`}
+    <Table.tr key={item.sql}>
+      <Table.td
+        className={`transition-all expanded-row-content bg-scale-100 border-l border-r !pt-0 !pb-0 !px-3`}
+      >
+        <SqlSnippetCode>{item.sql}</SqlSnippetCode>
+      </Table.td>
+      <Table.td className="text-right">
+        <Button
+          type="alternative"
+          iconRight={<IconPlay size={10} />}
+          onClick={() =>
+            router.push(`/project/${ref}/logs-explorer?q=${encodeURIComponent(item.sql)}`)
+          }
         >
-          <SqlSnippetCode>{item.sql}</SqlSnippetCode>
-        </Table.td>
-        <Table.td className="text-right">
-          <Button
-            type="alternative"
-            iconRight={<IconPlay size={10} />}
-            onClick={() =>
-              router.push(
-                `/project/${ref}/logs-explorer?q=${encodeURIComponent(item.sql)}`
-              )
-            }
-          >
-            Run
-          </Button>
-        </Table.td>
-      </Table.tr>
+          Run
+        </Button>
+      </Table.td>
+    </Table.tr>
   )
 }
 

@@ -1,7 +1,7 @@
-import * as React from 'react';
+import * as React from 'react'
 
 function includes(array: string[], element: string) {
-  return array.indexOf(element) >= 0;
+  return array.indexOf(element) >= 0
 }
 
 /**
@@ -19,7 +19,7 @@ export function useKeyboardShortcuts(
   whitelistNodes: string[] = [],
   whitelistClasses: string[] = []
 ) {
-  const [lastKeydown, setLastKeydown] = React.useState<string | null>();
+  const [lastKeydown, setLastKeydown] = React.useState<string | null>()
 
   const handleKeydown = (event: any) => {
     if (
@@ -27,10 +27,10 @@ export function useKeyboardShortcuts(
       includes(whitelistNodes, event.target.nodeName) ||
       includes(whitelistClasses, event.target.className)
     ) {
-      return;
+      return
     }
 
-    let keyPressed = getKeyPresses(event);
+    let keyPressed = getKeyPresses(event)
 
     if (keyMap[keyPressed]) {
       /**
@@ -38,25 +38,25 @@ export function useKeyboardShortcuts(
        * while single keymap  will trigger action on KeyUp event
        */
       if (keyPressed.includes('+')) {
-        event.preventDefault();
-        keyMap[keyPressed](event);
-        setLastKeydown(null);
+        event.preventDefault()
+        keyMap[keyPressed](event)
+        setLastKeydown(null)
       } else {
-        setLastKeydown(event.key);
-        event.preventDefault();
+        setLastKeydown(event.key)
+        event.preventDefault()
       }
     }
-  };
+  }
 
   const handleKeyup = (event: any) => {
-    if (!keyMap) return;
+    if (!keyMap) return
 
     if (keyMap[event.key] && lastKeydown === event.key) {
-      event.preventDefault();
-      keyMap[event.key](event);
-      setLastKeydown(null);
+      event.preventDefault()
+      keyMap[event.key](event)
+      setLastKeydown(null)
     }
-  };
+  }
 
   function getKeyPresses(event: KeyboardEvent) {
     return event.metaKey && event.shiftKey
@@ -67,15 +67,15 @@ export function useKeyboardShortcuts(
       ? `Shift+${event.key}`
       : event.ctrlKey && event.key
       ? `Control+${event.key}`
-      : event.key;
+      : event.key
   }
 
   React.useEffect(() => {
-    window.addEventListener('keydown', handleKeydown);
-    window.addEventListener('keyup', handleKeyup);
+    window.addEventListener('keydown', handleKeydown)
+    window.addEventListener('keyup', handleKeyup)
     return () => {
-      window.removeEventListener('keydown', handleKeydown);
-      window.removeEventListener('keyup', handleKeyup);
-    };
-  });
+      window.removeEventListener('keydown', handleKeydown)
+      window.removeEventListener('keyup', handleKeyup)
+    }
+  })
 }
