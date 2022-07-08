@@ -8,7 +8,6 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
       items: [
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
-        { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
         ...(IS_PLATFORM
           ? [
               {

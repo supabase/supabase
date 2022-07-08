@@ -21,6 +21,8 @@ const PageLayout: NextPageWithLayout = () => {
         <EmailTemplates />
       </FormsContainer>
     )
+  } else {
+    return <div />
   }
 }
 
