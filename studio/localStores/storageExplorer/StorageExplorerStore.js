@@ -15,6 +15,7 @@ import {
 } from 'lodash'
 import toast from 'react-hot-toast'
 import { createClient } from '@supabase/supabase-js'
+import { useStore } from 'hooks'
 
 import {
   STORAGE_VIEWS,
@@ -71,6 +72,9 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
+  /* UI store */
+  ui = null
+
   /* Supabase client */
   supabaseClient = null
 
@@ -92,6 +96,7 @@ class StorageExplorerStore {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
     this.abortController = new AbortController()
+    this.ui = useStore().ui
   }
 
   initStore(projectRef, url, serviceKey) {
@@ -302,7 +307,11 @@ class StorageExplorerStore {
      * todo: move this to a util file, as renameFolder() uses same logic
      */
     if (formattedName.includes('/') || formattedName.includes('\\')) {
-      return toast.error('Folder names should not have forward or back slashes.')
+      return this.ui.setNotification({
+        message: 'Folder names should not have forward or back slashes.',
+        category: 'error',
+        duration: 8000,
+      })
     }
     if (formattedName.length === 0) {
       return this.removeTempRows(columnIndex)
@@ -383,7 +392,11 @@ class StorageExplorerStore {
     if (filePreview) {
       // Already generated signed URL
       copyToClipboard(filePreview.url, () => {
-        toast(`Copied URL for ${file.name} to clipboard.`)
+        this.ui.setNotification({
+          message: `Copied URL for ${file.name} to clipboard.`,
+          category: 'success',
+          duration: 4000,
+        })
       })
     } else {
       // Need to generate signed URL, and might as well save it to cache as well
@@ -392,7 +405,11 @@ class StorageExplorerStore {
       formattedUrl.searchParams.set('t', new Date().toISOString())
 
       copyToClipboard(formattedUrl.toString(), () => {
-        toast(`Copied URL for ${file.name} to clipboard.`)
+        this.ui.setNotification({
+          message: `Copied URL for ${file.name} to clipboard.`,
+          category: 'success',
+          duration: 4000,
+        })
       })
       const fileCache = {
         id: file.id,
@@ -409,14 +426,20 @@ class StorageExplorerStore {
 
   createBucket = async (bucketName, isPublic = false) => {
     if (isNil(this.supabaseClient)) {
-      return toast.error('Failed to initialize supabase client, try refreshing your browser.')
+      this.ui.setNotification({
+        message: 'Failed to initialize supabase client, try refreshing your browser.',
+        category: 'error',
+      })
     }
 
     const { error } = await this.supabaseClient.storage.createBucket(bucketName, {
       public: isPublic,
     })
     if (error) {
-      toast.error(error.message)
+      this.ui.setNotification({
+        message: error.message,
+        category: 'error',
+      })
       return this.closeCreateBucketModal()
     }
 
@@ -435,7 +458,7 @@ class StorageExplorerStore {
 
   fetchBuckets = async () => {
     const { data: buckets, error } = await this.supabaseClient.storage.listBuckets()
-    if (error) return toast(error.message)
+    if (error) return this.ui.setNotification({ message: error.message, category: 'error' })
 
     const formattedBuckets = buckets.map((bucket) => {
       return { ...bucket, type: STORAGE_ROW_TYPES.BUCKET, status: STORAGE_ROW_STATUS.READY }
@@ -451,13 +474,13 @@ class StorageExplorerStore {
 
     const { error: emptyBucketError } = await this.supabaseClient.storage.emptyBucket(id)
     if (emptyBucketError) {
-      toast(emptyBucketError.message)
+      this.ui.setNotification({ message: emptyBucketError.message, category: 'error' })
       return false
     }
 
     const { error: deleteBucketError } = await this.supabaseClient.storage.deleteBucket(id)
     if (deleteBucketError) {
-      toast(deleteBucketError.message)
+      this.ui.setNotification({ message: deleteBucketError.message, category: 'error' })
       return false
     }
 
@@ -479,7 +502,7 @@ class StorageExplorerStore {
       public: !bucket.public,
     })
     if (error) {
-      toast(error.message)
+      this.ui.setNotification({ message: error.message, category: 'error' })
       return this.closeToggleBucketPublicModal()
     }
 
@@ -646,7 +669,10 @@ class StorageExplorerStore {
 
           if (error) {
             numberOfFilesUploadedFail += 1
-            toast.error(`Failed to upload ${file.name}: ${error.message}`)
+            this.ui.setNotification({
+              message: `Failed to upload ${file.name}: ${error.message}`,
+              category: 'error',
+            })
             resolve()
           } else {
             numberOfFilesUploadedSuccess += 1
@@ -705,7 +731,10 @@ class StorageExplorerStore {
       }
     } catch (e) {
       console.error(e)
-      toast.error(`Failed to upload files`)
+      this.ui.setNotification({
+        message: 'Failed to upload files',
+        category: 'error',
+      })
     }
     const t2 = new Date()
 
@@ -737,19 +766,26 @@ class StorageExplorerStore {
 
         if (error) {
           numberOfFilesMovedFail += 1
-          toast.error(error.message)
+          this.ui.setNotification({
+            message: error.message,
+            category: 'error',
+          })
         }
       })
     )
 
     if (numberOfFilesMovedFail === this.selectedItemsToMove.length) {
-      toast.error(`Failed to move files`)
+      this.ui.setNotification({
+        message: 'Failed to move files',
+        category: 'error',
+      })
     } else {
-      toast.success(
-        `Successfully moved ${
+      this.ui.setNotification({
+        message: `Successfully moved ${
           this.selectedItemsToMove.length - numberOfFilesMovedFail
-        } to ${formattedNewPathToFile}`
-      )
+        } to ${formattedNewPathToFile}`,
+        category: 'success',
+      })
     }
 
     // Clear file preview cache if moved files exist in cache
@@ -837,8 +873,10 @@ class StorageExplorerStore {
       await Promise.all(
         parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
       )
-
-      toast.success(`Successfully deleted ${prefixes.length} file(s)`)
+      this.ui.setNotification({
+        message: `Successfully deleted ${prefixes.length} file(s)`,
+        category: 'success',
+      })
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
     }
@@ -927,7 +965,10 @@ class StorageExplorerStore {
         .move(fromPath, toPath)
 
       if (error) {
-        toast.error(error.message)
+        this.ui.setNotification({
+          message: error.message,
+          type: 'error',
+        })
       }
       await this.refetchAllOpenedFolders()
 
@@ -1099,7 +1140,10 @@ class StorageExplorerStore {
 
     await this.refetchAllOpenedFolders()
     this.clearSelectedItemsToDelete()
-    toast.success(`Successfully deleted ${folder.name}`)
+    this.ui.setNotification({
+      message: `Successfully deleted ${folder.name}`,
+      type: 'success',
+    })
   }
 
   renameFolder = async (folder, newName, columnIndex) => {
@@ -1114,7 +1158,10 @@ class StorageExplorerStore {
      * todo: move this to a util file, as createFolder() uses same logic
      */
     if (newName.includes('/') || newName.includes('\\')) {
-      return toast.error('Folder names should not have forward or back slashes.')
+      return this.ui.setNotification({
+        message: `Folder name cannot contain forward or back slashes.`,
+        type: 'error',
+      })
     }
 
     if (originalName === newName) {
@@ -1140,7 +1187,10 @@ class StorageExplorerStore {
               .move(fromPath, toPath)
             if (error) {
               hasErrors = true
-              toast.error(`Failed to move ${fromPath} to the new folder`)
+              this.ui.setNotification({
+                message: `Failed to move ${fromPath} to the new folder`,
+                category: 'error',
+              })
             }
             resolve()
           })
@@ -1157,9 +1207,15 @@ class StorageExplorerStore {
         }, Promise.resolve())
 
         if (!hasErrors) {
-          toast.success(`Successfully renamed folder to ${newName}`)
+          this.ui.setNotification({
+            message: `Successfully renamed folder to ${newName}`,
+            category: 'success',
+          })
         } else {
-          toast.error(`Renamed folder to ${newName} with some errors`)
+          this.ui.setNotification({
+            message: `Renamed folder to ${newName} with some errors`,
+            category: 'error',
+          })
         }
         await this.refetchAllOpenedFolders()
 
@@ -1170,7 +1226,10 @@ class StorageExplorerStore {
         )
         this.filePreviewCache = updatedFilePreviewCache
       } catch (e) {
-        toast.error(`Failed to rename folder to ${newName}`)
+        this.ui.setNotification({
+          message: `Failed to rename folder to ${newName}`,
+          category: 'error',
+        })
       }
     }
   }
@@ -1258,9 +1317,11 @@ class StorageExplorerStore {
         const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
         return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
       } else {
-        toast(
-          `The name ${name} already exists in the current directory. Please use a different name.`
-        )
+        this.ui.setNotification({
+          message: `The name ${name} already exists in the current directory. Please use a different name.`,
+          category: 'error',
+          duration: 4000,
+        })
         return null
       }
     }
