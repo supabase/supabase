@@ -1,0 +1,79 @@
+---
+id: dblink
+title: 'dblink: Connect Databases'
+description: Connect to other PostgreSQL databases from within a database.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+The `dblink` extension allows you to connect to other PostgreSQL databases from within a database.
+
+## Overview
+
+The `dblink` is an extension which allows to connect to other PostgreSQL database within a database. With `Foreign Data Wrappers (FDW)` you can uniquely define a remote foreign server in order to access its data.
+
+## Usage
+
+`dblink` is used To connect to other PostgreSQL databases from within a database.
+
+### Enabling
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the Database page.
+2. Click on "Extensions" in the sidebar.
+3. Search for "dblink".
+4. Click the toggle.
+```
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql
+
+--Example: enable the "dblink" extension and ensure it is installed
+CREATE EXTENSION dblink SCHEMA extensions;
+
+```
+
+</TabItem>
+
+</Tabs>
+
+### Test connection of database
+
+```
+SELECT dblink_connect('host=localhost user=postgres password=enjoy dbname=postgres');
+```
+
+### Returned values
+
+The function returns the row(s) produced by the query. Since dblink can be used with any query, it is declared to return record, rather than specifying any particular set of columns.
+
+```
+SELECT *
+    FROM dblink('dbname=mydb options=-csearch_path=',
+                'select proname, prosrc from pg_proc')
+      AS t1(proname name, prosrc text)
+    WHERE proname LIKE 'bytea%';
+
+```
+
+## Some instance of `dblink`
+
+`dblink` executes a query in a remote database.<br/>
+`dblink_connect` opens a persistent connection to a remote database. <br/>
+`dblink_disconnect` closes a persistent connection to a remote database.<br/>
+`dblink_connect_u` opens a persistent connection to a remote database, insecurely
+
+## Resources
+
+- Official [`dblink` PostgreSQL document](https://www.postgresql.org/docs/9.2/contrib-dblink-function.html).

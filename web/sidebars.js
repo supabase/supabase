@@ -99,6 +99,7 @@ module.exports = {
             'guides/database/extensions/plv8',
             'guides/database/extensions/http',
             'guides/database/extensions/uuid-ossp',
+            'guides/database/extensions/dblink',
           ],
         },
         {
@@ -196,7 +197,6 @@ module.exports = {
         'guides/platform/metrics',
         'going-into-prod',
         'guides/platform/performance',
-        'guides/platform/permissions'
       ],
     },
     {
