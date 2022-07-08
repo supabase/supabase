@@ -66,7 +66,7 @@ bg-panel-header-light dark:bg-panel-header-dark
             overlay={Object.values(LogsTableName).map((source) => (
               <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-white font-bold">{source}</span>
+                  <span className="font-mono text-scale-1100 font-bold">{source}</span>
                   <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
                 </div>
               </Dropdown.Item>
