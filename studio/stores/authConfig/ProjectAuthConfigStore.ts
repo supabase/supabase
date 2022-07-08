@@ -1,13 +1,8 @@
 import { makeAutoObservable, toJS } from 'mobx'
-import { keyBy } from 'lodash'
-
-import { get, post, patch, delete_ } from 'lib/common/fetch'
-import { UserContent, UserContentMap } from 'types'
+import { UserContentMap } from 'types'
 import { IRootStore } from '../RootStore'
 import { API_URL } from 'lib/constants'
-
-// [Joshen] This will be the new ProjectContentStore
-// but use the one under the stores folder projectContentStore first while we transition
+import { get, patch } from 'lib/common/fetch'
 
 export interface IProjectAuthConfigStore {
   isLoading: boolean
@@ -20,7 +15,7 @@ export interface IProjectAuthConfigStore {
   projectRef: string
 
   load: () => void
-  update: ({}) => void
+  update: (updates: any) => Promise<any>
   setProjectRef: (ref?: string) => void
 }
 

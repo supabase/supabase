@@ -2,7 +2,7 @@ import { boolean, number, object, string } from 'yup'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
-export const PROVIDER_EMAIL = {
+const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
@@ -50,7 +50,7 @@ export const PROVIDER_EMAIL = {
   },
 }
 
-export const PROVIDER_PHONE = {
+const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
@@ -176,29 +176,33 @@ export const PROVIDER_PHONE = {
      */
     SMS_AUTOCONFIRM: {
       title: 'Enable phone confirmations',
-      description: 'Users will need to confirm their phone number before signing in.',
       type: 'boolean',
+      description: 'Users will need to confirm their phone number before signing in.',
     },
 
     SMS_OTP_EXP: {
       title: 'SMS OTP Expiry',
       type: 'number',
       description: 'Duration before an SMS OTP expires',
-      descriptionOptional: 'Seconds',
+      descriptionOptional: 'In seconds',
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
-      descriptionOptional: 'Seconds',
+      descriptionOptional: 'In seconds',
+    },
+    SMS_TEMPLATE: {
+      title: 'SMS Message',
+      type: 'string',
+      description: 'To format the OPT code use `{{ .Code }}`',
     },
   },
   validationSchema: object().shape({
     EXTERNAL_PHONE_ENABLED: boolean().required(),
     SMS_PROVIDER: string().required(),
-    /**
-     * twilio
-     */
+
+    // Twilio
     SMS_TWILIO_ACCOUNT_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
@@ -220,9 +224,8 @@ export const PROVIDER_PHONE = {
       then: (schema) => schema.required('"Twilio Message Service Sid" is required'),
       otherwise: (schema) => schema,
     }),
-    /**
-     * messagebird
-     */
+
+    // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
@@ -237,9 +240,8 @@ export const PROVIDER_PHONE = {
       then: (schema) => schema.required('"Messagebird Originator" is required'),
       otherwise: (schema) => schema,
     }),
-    /**
-     * textlocal
-     */
+
+    // Textlocal
     SMS_TEXTLOCAL_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
@@ -254,9 +256,8 @@ export const PROVIDER_PHONE = {
       then: (schema) => schema.required('"Textlocal Sender" is required'),
       otherwise: (schema) => schema,
     }),
-    /**
-     * vonage
-     */
+
+    // Vonage
     SMS_VONAGE_API_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
@@ -278,8 +279,11 @@ export const PROVIDER_PHONE = {
       then: (schema) => schema.required('"Vonage From" is required'),
       otherwise: (schema) => schema,
     }),
+
+    // Phone SMS
     SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
     SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
+    SMS_TEMPLATE: string().required('SMS template is required.'),
   }),
   misc: {
     iconKey: 'phone-icon4',
@@ -288,7 +292,7 @@ export const PROVIDER_PHONE = {
   },
 }
 
-export const EXTERNAL_PROVIDER_APPLE = {
+const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
@@ -344,7 +348,7 @@ The secret key is a JWT token that must be generated.
   },
 }
 
-export const EXTERNAL_PROVIDER_AZURE = {
+const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
@@ -396,7 +400,7 @@ export const EXTERNAL_PROVIDER_AZURE = {
   },
 }
 
-export const EXTERNAL_PROVIDER_BITBUCKET = {
+const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
@@ -433,7 +437,7 @@ export const EXTERNAL_PROVIDER_BITBUCKET = {
   },
 }
 
-export const EXTERNAL_PROVIDER_DISCORD = {
+const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
@@ -470,7 +474,7 @@ export const EXTERNAL_PROVIDER_DISCORD = {
   },
 }
 
-export const EXTERNAL_PROVIDER_FACEBOOK = {
+const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
@@ -507,7 +511,7 @@ export const EXTERNAL_PROVIDER_FACEBOOK = {
   },
 }
 
-export const EXTERNAL_PROVIDER_GITHUB = {
+const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
@@ -544,7 +548,7 @@ export const EXTERNAL_PROVIDER_GITHUB = {
   },
 }
 
-export const EXTERNAL_PROVIDER_GITLAB = {
+const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
@@ -593,7 +597,7 @@ export const EXTERNAL_PROVIDER_GITLAB = {
   },
 }
 
-export const EXTERNAL_PROVIDER_GOOGLE = {
+const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
@@ -636,10 +640,8 @@ export const EXTERNAL_PROVIDER_GOOGLE = {
   },
 }
 
-/**
- * TO DO: clarify the EXTERNAL_KEYCLOAK_URL property
- */
-export const EXTERNAL_PROVIDER_KEYCLOAK = {
+// [TODO]: clarify the EXTERNAL_KEYCLOAK_URL property
+const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
@@ -686,7 +688,7 @@ export const EXTERNAL_PROVIDER_KEYCLOAK = {
   },
 }
 
-export const EXTERNAL_PROVIDER_LINKEDIN = {
+const EXTERNAL_PROVIDER_LINKEDIN = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'LinkedIn',
@@ -729,7 +731,7 @@ export const EXTERNAL_PROVIDER_LINKEDIN = {
   },
 }
 
-export const EXTERNAL_PROVIDER_NOTION = {
+const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
@@ -766,7 +768,7 @@ export const EXTERNAL_PROVIDER_NOTION = {
   },
 }
 
-export const EXTERNAL_PROVIDER_TWITCH = {
+const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'twitch',
@@ -803,7 +805,7 @@ export const EXTERNAL_PROVIDER_TWITCH = {
   },
 }
 
-export const EXTERNAL_PROVIDER_TWITTER = {
+const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter',
@@ -840,7 +842,7 @@ export const EXTERNAL_PROVIDER_TWITTER = {
   },
 }
 
-export const EXTERNAL_PROVIDER_SLACK = {
+const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack',
@@ -877,7 +879,7 @@ export const EXTERNAL_PROVIDER_SLACK = {
   },
 }
 
-export const EXTERNAL_PROVIDER_SPOTIFY = {
+const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
@@ -914,7 +916,7 @@ export const EXTERNAL_PROVIDER_SPOTIFY = {
   },
 }
 
-export const EXTERNAL_PROVIDER_WORKOS = {
+const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
@@ -962,7 +964,7 @@ export const EXTERNAL_PROVIDER_WORKOS = {
   },
 }
 
-export const EXTERNAL_PROVIDER_ZOOM = {
+const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'zoom',
@@ -1519,7 +1521,6 @@ export const OLD = {
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
-
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,

@@ -148,26 +148,4 @@ export const RECOVERY: FormSchema = {
   },
 }
 
-export const SMS: FormSchema = {
-  $schema: JSON_SCHEMA_VERSION,
-  id: 'SMS',
-  type: 'object',
-  title: 'SMS Message',
-  properties: {
-    SMS_TEMPLATE: {
-      title: 'Message',
-      type: 'string',
-      description: 'To format the OPT code use `{{ .Code }}`',
-    },
-  },
-  validationSchema: object().shape({
-    SMS_TEMPLATE: string().required('"SMS template is required.'),
-  }),
-  misc: {
-    iconKey: 'email-icon2',
-    helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/auth-apple#configure-your-services-id)`,
-  },
-}
-
-export const TEMPLATES_SCHEMAS = [CONFIRMATION, INVITE, MAGIC_LINK, EMAIL_CHANGE, RECOVERY, SMS]
+export const TEMPLATES_SCHEMAS = [CONFIRMATION, INVITE, MAGIC_LINK, EMAIL_CHANGE, RECOVERY]

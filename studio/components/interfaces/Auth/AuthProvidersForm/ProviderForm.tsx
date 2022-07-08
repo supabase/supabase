@@ -1,3 +1,5 @@
+import { FC, useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import {
   Alert,
   Button,
@@ -10,110 +12,42 @@ import {
   Listbox,
   Toggle,
 } from '@supabase/ui'
-import { FormHeader } from 'components/ui/Forms'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
+
 import { useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { PROVIDERS_SCHEMAS } from 'stores/authConfig/schema'
+import { Enum, Provider } from './AuthProvidersForm.types'
+import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 
-interface Enum {
-  label: string
-  value: string
-  icon: string
-}
-interface Provider {
-  $schema: string
-  type: 'object'
-  title: string
-  properties: {
-    [x: string]: {
-      title: string
-      type: 'boolean' | 'string' | 'select' | 'number'
-      description?: string
-      descriptionOptional?: string
-      enum: Enum[]
-      show: {
-        key: string
-        matches: string
-      }
-    }
-  }
-  validationSchema: any // todo: use Yup type
-  misc: {
-    iconKey: 'gitlab-icon'
-    requiresRedirect: true
-    helper: string
-    alert: {
-      title: string
-      description: string
-    }
-  }
+interface Props {
+  provider: Provider
 }
 
-const ProviderCollapsibleClasses = [
-  'bg-scale-100 dark:bg-scale-300 ',
-  'hover:bg-scale-200 dark:hover:bg-scale-500',
-  'data-open:bg-scale-200 dark:data-open:bg-scale-500 ',
-  'border-scale-300 ',
-  'dark:border-scale-500 hover:border-scale-500 ',
-  'dark:hover:border-scale-700 data-open:border-scale-700',
-  'data-open:pb-px col-span-12 mx-auto',
-  '-space-y-px overflow-hidden',
-  'border shadow',
-  'transition',
-  'first:rounded-tl',
-  'first:rounded-tr',
-  'last:rounded-bl',
-  'last:rounded-br',
-  'hover:z-50',
-]
-
-const AuthProvidersForm = () => {
-  const providers = PROVIDERS_SCHEMAS
-  const { authConfig } = useStore()
-
-  return (
-    <div>
-      <FormHeader
-        title="Auth Providers"
-        description={`URLs that auth providers are permitted to redirect to post authentication`}
-      />
-
-      <div className="-space-y-px">
-        {!authConfig.isLoaded
-          ? // true
-            providers.map((i) => (
-              <div className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}>
-                <HorizontalShimmerWithIcon />
-              </div>
-            ))
-          : // @ts-expect-error
-            // to do: fix type error, needs to be dynamic
-            providers.map((provider: Provider, i) => {
-              return <ProviderForm provider={provider} key={i} />
-            })}
-      </div>
-    </div>
-  )
-}
-
-const ProviderForm = ({ provider }: { provider: Provider }) => {
+const ProviderForm: FC<Props> = ({ provider }) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
-  const active = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+
+  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
   const INITIAL_VALUES: { [x: string]: string } = {}
 
-  /**
-   * construct values for INITIAL_VALUES
-   *
-   * return empty string `""` rather than `null`
-   * as it breaks form. null is not a valid value.
-   */
-  Object.keys(provider.properties).forEach((key) => {
-    INITIAL_VALUES[key] = authConfig.config[key] ?? ''
-  })
+  useEffect(() => {
+    /**
+     * Construct values for INITIAL_VALUES
+     * Return empty string `""` rather than `null`
+     * as it breaks form. null is not a valid value.
+     */
+    Object.keys(provider.properties).forEach((key) => {
+      INITIAL_VALUES[key] = authConfig.config[key] ?? ''
+    })
+  }, [provider])
+
+  const onSubmit = async (values: any, { setSubmitting }: any) => {
+    try {
+      await authConfig.update(values)
+      setSubmitting(false)
+      setOpen(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <Collapsible
@@ -124,12 +58,7 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
       <Collapsible.Trigger asChild>
         <button
           type="button"
-          className="
-              text-scale-1200
-              group
-              flex 
-              w-full items-center justify-between rounded 
-              py-3 px-6"
+          className="text-scale-1200 group flex w-full items-center justify-between rounded py-3 px-6"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
@@ -137,17 +66,15 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
               strokeWidth={2}
               width={14}
             />
-
             <img
               src={`/img/icons/${provider.misc.iconKey}.svg`}
               width={18}
               alt={`${provider.title} auth icon`}
             />
-
             <span className="text-sm">{provider.title}</span>
           </div>
           <div className="flex items-center gap-3">
-            {active ? (
+            {isActive ? (
               <div className="bg-brand-200 border-brand-700 text-brand-900 flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
                 <span className="bg-brand-900 text-brand-200 rounded-full p-0.5 text-xs">
                   <IconCheck strokeWidth={2} size={12} />
@@ -166,23 +93,10 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
         name={`provider-${provider.title}-form`}
         initialValues={INITIAL_VALUES}
         validationSchema={provider.validationSchema}
-        onSubmit={async (values: any, { setSubmitting }: any) => {
-          try {
-            await authConfig.update(values)
-            setSubmitting(false)
-            setOpen(false)
-          } catch (error) {
-            console.error(error)
-          }
-        }}
+        onSubmit={onSubmit}
       >
         {({ isSubmitting, handleReset, values }: any) => {
           const noChanges = JSON.stringify(INITIAL_VALUES) === JSON.stringify(values)
-
-          // if (open) {
-          //   handleReset()
-          // }
-
           return (
             <Collapsible.Content>
               <div
@@ -193,21 +107,14 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
               >
                 <div className="mx-auto my-6 max-w-md space-y-6">
                   {Object.keys(provider.properties).map((x: string) => {
-                    /**
-                     * Properties of the form
-                     */
                     const properties = provider.properties[x]
-
-                    /**
-                     * Conditionally hide properties based on value of key
-                     */
+                    // Conditionally hide properties based on value of key
                     if (
                       properties.show &&
                       values[properties.show.key] !== properties.show.matches
                     ) {
                       return null
                     }
-
                     switch (properties.type) {
                       case 'string':
                         return (
@@ -225,11 +132,6 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            //
-                            // @ts-expect-error
-                            //
-                            // to do: change to "string" | React.ReactNode | undefined
-                            //
                             labelOptional={
                               properties.descriptionOptional ? (
                                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -239,7 +141,6 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                             }
                           />
                         )
-                        break
 
                       case 'number':
                         return (
@@ -249,9 +150,7 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                             id={x}
                             key={x}
                             name={x}
-                            // style={{ width: '50%' }}
                             label={properties.title}
-                            // @ts-expect-error
                             descriptionText={
                               properties.description ? (
                                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -259,11 +158,6 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            //
-                            // @ts-expect-error
-                            //
-                            // to do: change to "string" | React.ReactNode | undefined
-                            //
                             labelOptional={
                               properties.descriptionOptional ? (
                                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -273,20 +167,17 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                             }
                           />
                         )
-                        break
 
                       case 'boolean':
                         return (
                           <Toggle
                             size="small"
-                            // layout="horizontal"
                             key={x}
                             name={x}
                             label={properties.title}
                             descriptionText={properties.description}
                           />
                         )
-                        break
 
                       case 'select':
                         return (
@@ -314,7 +205,6 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                             })}
                           </Listbox>
                         )
-                        break
 
                       default:
                         break
@@ -331,11 +221,11 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
                         {provider.misc.helper}
                       </ReactMarkdown>
                       <Input
-                        label="Redirect url"
-                        readOnly
-                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
                         copy
+                        readOnly
                         disabled
+                        label="Redirect url"
+                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
                       />
                     </>
                   )}
@@ -364,4 +254,4 @@ const ProviderForm = ({ provider }: { provider: Provider }) => {
   )
 }
 
-export default observer(AuthProvidersForm)
+export default ProviderForm

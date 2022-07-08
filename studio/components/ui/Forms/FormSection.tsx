@@ -14,7 +14,7 @@ const FormSection = ({
   className?: string
 }) => {
   const classes = [
-    'grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12',
+    'grid grid-cols-12 gap-6 px-8 py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
     `${visible ? ' block' : ' hidden'}`,
     `${className}`,

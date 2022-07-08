@@ -1,5 +1,5 @@
-import AuthProvidersForm from './AuthProvidersForm'
-import { SmtpForm } from './SmtpForm'
-import { EmailTemplates } from './EmailTemplates'
+import AuthProvidersForm from './AuthProvidersForm/AuthProvidersForm'
+import EmailTemplates from './EmailTemplates/EmailTemplates'
+import SmtpForm from './SmtpForm/SmtpForm'
 
-export { AuthProvidersForm, SmtpForm, EmailTemplates }
+export { AuthProvidersForm, EmailTemplates, SmtpForm }
