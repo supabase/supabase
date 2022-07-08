@@ -1383,6 +1383,25 @@ details summary:hover {
 /*
 * typesense doc search input
 */
+
+div[class^='searchBox_'] {
+  position: inherit !important;
+}
+
+div[class^='searchBox_'] button {
+  padding: 8px 14px !important;
+  font-size: inherit !important;
+}
+
+div[class^='searchBox_'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/*
+* typesense doc search input - for reference
+
+
 .searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module {
   padding: 0 !important;
 }
@@ -1403,3 +1422,5 @@ details summary:hover {
   width: 16px;
   height: 16px;
 }
+
+*/
