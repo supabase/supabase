@@ -16,7 +16,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   if (authConfig) {
     return (
-      <FormsContainer header="Email">
+      <FormsContainer>
         <SmtpForm />
         <EmailTemplates />
       </FormsContainer>

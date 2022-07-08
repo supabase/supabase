@@ -10,7 +10,7 @@ const EmailTemplates = observer(() => {
     <div>
       <FormHeader
         title="Email Templates"
-        description="You can use your own SMTP server instead of the built-in email service."
+        description="Customize the emails that will be sent out to your users."
       />
       <FormPanel>
         <Tabs

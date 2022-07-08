@@ -80,7 +80,7 @@ const AutoSchemaForm = observer(() => {
           <>
             <FormHeader
               title="General settings"
-              description={`URLs that auth providers are permitted to redirect to post authentication`}
+              description="Configure authentication sessions for your users"
             />
             <FormPanel
               disabled={true}
