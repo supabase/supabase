@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { EditorProps } from '@supabase/react-data-grid';
+import * as React from 'react'
+import { EditorProps } from '@supabase/react-data-grid'
 
 export function BooleanEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -8,11 +8,11 @@ export function BooleanEditor<TRow, TSummaryRow = unknown>({
   onClose,
 }: EditorProps<TRow, TSummaryRow>) {
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    onRowChange({ ...row, [column.key]: event.target.checked });
+    onRowChange({ ...row, [column.key]: event.target.checked })
   }
 
   function onBlur() {
-    onClose(true);
+    onClose(true)
   }
 
   return (
@@ -26,5 +26,5 @@ export function BooleanEditor<TRow, TSummaryRow = unknown>({
         style={{ margin: 'auto' }}
       />
     </div>
-  );
+  )
 }

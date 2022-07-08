@@ -1,7 +1,7 @@
-import { IQueryAction, QueryAction } from './QueryAction';
+import { IQueryAction, QueryAction } from './QueryAction'
 
 interface IQuery {
-  from: (table: string, schema?: string) => IQueryAction;
+  from: (table: string, schema?: string) => IQueryAction
 }
 
 export class Query implements IQuery {
@@ -13,6 +13,6 @@ export class Query implements IQuery {
     return new QueryAction({
       name,
       schema: schema ?? 'public',
-    });
+    })
   }
 }
