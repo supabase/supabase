@@ -1,0 +1,109 @@
+---
+id: pgcron
+title: "pg_cron: Postgres Schedular"
+description: An HTTP Client for PostgreSQL Functions.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The `pg-cron` extension allows you to schedule job for PostgreSQL.
+## Overview
+
+Let's cover some basic concepts:
+
+- pg_corn:pg_cron is a simple cron-based job scheduler for PostgreSQL (10 or higher) that runs inside the database as an extension.
+  - `schedule` − Schedules a job to be executed during a certain span of time.
+  - `unschedule` − Stops a scheduling of a job.
+  - `alter_job` − Function to change job properties.
+  - `schedule_in_database` - Function to schedule in a custom database.
+  - `log_min_messages` - Setting to control log_min_messages in pg_corn launcher.
+  - `enable_superuser_jobs` - Setting to disallow superuser jobs.
+
+You can use the `pg_cron` extension to make these network requests from Postgres.
+
+## Usage
+
+
+### Enabling
+
+<Tabs
+defaultValue="UI"
+values={[
+  {label: 'UI', value: 'UI'},
+  {label: 'SQL', value: 'SQL'},
+]}>
+<TabItem value="UI">
+
+```sh
+1. Go to the Database page.
+2. Click on "Extensions" in the sidebar.
+3. Search for "pg_cron".
+4. Click the toggle.
+```
+
+
+
+</TabItem>
+<TabItem value="SQL">
+
+```sql 
+
+-- Example: enable the "pg_cron" extension 
+create extension pg_cron ;
+
+-- Example: disable the "pg_cron" extension 
+drop extension pg_cron;
+
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
+To disable an extension you can call `drop extension`.
+
+It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+
+</TabItem>
+
+</Tabs>
+
+### Available functions
+
+While the main usage is simply `pg_cron` enabling cron jobs in postgres , there are different functions for specific functionality:
+
+- `cron.schedule()` 
+- `cron.unschedule()` 
+- `cron.alter_job()`
+- `schedule_in_database`
+- `log_min_messages`
+- `enable_superuser_jobs`
+
+
+## Examples
+
+### Simple `pg_cron` example
+
+```sql
+
+create extension pg_corn version '1.0';
+
+select extversion from pg_extension where extname='pg_corn';
+```
+This query creates a pg_corn extension of version 1.0
+
+### Simple `schedule` example
+
+```sql
+select cron.schedule('0 10 * * *', 'VACUUM');
+```
+This query Vacuums every day at 10:00am (GMT)
+
+### Simple `unschedule` example
+```sql
+select cron.unschedule(1);
+```
+This query stops scheduling a job.
+
+
+## Resources 
+
+- Official [`pg_corn` GitHub Repository](https://github.com/citusdata/pg_cron).
