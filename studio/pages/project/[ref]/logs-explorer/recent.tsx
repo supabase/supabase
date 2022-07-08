@@ -23,28 +23,27 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   return (
     <>
       {recent.length > 0 && (
-          <Table
-            head={
-              <>
-                <Table.th>Snippets</Table.th>
-                <Table.th className="w-24">
-                  <Button
-                    size="tiny"
-                    type="default"
-                    onClick={() => {
-                      content.clearRecentLogSqlSnippets()
-                    }}
-                  >
-                    Clear history
-                  </Button>
-                </Table.th>
-              </>
-            }
-            body={recent.map((item: LogSqlSnippets.Content) => (
-                  <RecentQueriesItem key={item.sql} item={item} />
-                ))
-            }
-          />
+        <Table
+          head={
+            <>
+              <Table.th>Snippets</Table.th>
+              <Table.th className="w-24">
+                <Button
+                  size="tiny"
+                  type="default"
+                  onClick={() => {
+                    content.clearRecentLogSqlSnippets()
+                  }}
+                >
+                  Clear history
+                </Button>
+              </Table.th>
+            </>
+          }
+          body={recent.map((item: LogSqlSnippets.Content) => (
+            <RecentQueriesItem key={item.sql} item={item} />
+          ))}
+        />
       )}
       {recent.length === 0 && (
         <>

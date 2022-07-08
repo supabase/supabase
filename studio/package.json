@@ -9,7 +9,9 @@
     "test": "jest",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -112,6 +114,7 @@
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
     "postcss": "^8.4.6",
+    "prettier": "^2.7.1",
     "storybook-dark-mode": "^1.0.4",
     "tailwindcss": "^3.0.22",
     "ts-jest": "^27.0.7",

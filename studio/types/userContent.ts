@@ -1,4 +1,6 @@
-export interface UserContent<T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content> {
+export interface UserContent<
+  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content
+> {
   id?: string
   name: string
   description?: string
