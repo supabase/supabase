@@ -1,14 +1,14 @@
-import * as React from 'react';
-import Editor from '@monaco-editor/react';
+import * as React from 'react'
+import Editor from '@monaco-editor/react'
 
 type MonacoEditorProps = {
-  width?: string | number | undefined;
-  height?: string | number | undefined;
-  value?: string | undefined;
-  language?: string | undefined;
-  onChange: (value: string | undefined) => void;
-  onMount?: (editor: any) => void;
-};
+  width?: string | number | undefined
+  height?: string | number | undefined
+  value?: string | undefined
+  language?: string | undefined
+  onChange: (value: string | undefined) => void
+  onMount?: (editor: any) => void
+}
 
 export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   width,
@@ -25,20 +25,20 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
         afterLineNumber: 0,
         heightInPx: 4,
         domNode: document.createElement('div'),
-      });
-    });
+      })
+    })
 
     // move cursor to the end of document
-    const model = editor.getModel();
-    const position = model.getPositionAt(value?.length);
-    editor.setPosition(position);
+    const model = editor.getModel()
+    const position = model.getPositionAt(value?.length)
+    editor.setPosition(position)
 
     // auto focus on mount
     setTimeout(() => {
-      editor?.focus();
-    }, 0);
+      editor?.focus()
+    }, 0)
 
-    if (onMount) onMount(editor);
+    if (onMount) onMount(editor)
   }
 
   return (
@@ -68,5 +68,5 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
         wordWrap: 'on',
       }}
     />
-  );
-};
+  )
+}
