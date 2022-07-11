@@ -9,7 +9,9 @@
     "test": "jest",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -24,9 +26,9 @@
     "@stripe/stripe-js": "^1.25.0",
     "@supabase/postgres-meta": "^0.26.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
-    "@supabase/shared-types": "^0.1.21",
-    "@supabase/supabase-js": "^1.36.0-next.3",
-    "@supabase/ui": "0.37.0-alpha.58",
+    "@supabase/shared-types": "^0.1.24",
+    "@supabase/supabase-js": "^1.36.0-next.9",
+    "@supabase/ui": "0.37.0-alpha.65",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "awesome-debounce-promise": "^2.1.0",
@@ -74,6 +76,7 @@
     "swr": "^1.2.1",
     "uniforms-bootstrap4": "^3.6.2",
     "uniforms-bridge-json-schema": "^3.6.2",
+    "uuid": "^8.3.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
@@ -104,12 +107,14 @@
     "@types/react-window-infinite-loader": "^1.0.5",
     "@types/semver": "^7.3.9",
     "@types/sqlstring": "^2.3.0",
+    "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
     "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.3",
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
     "postcss": "^8.4.6",
+    "prettier": "^2.7.1",
     "storybook-dark-mode": "^1.0.4",
     "tailwindcss": "^3.0.22",
     "ts-jest": "^27.0.7",

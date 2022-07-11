@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
@@ -23,6 +23,12 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
+
+  useEffect(() => {
+    if (ui.selectedProject) {
+      meta.types.load()
+    }
+  }, [ui.selectedProject])
 
   const onAddTable = () => {
     setSidePanelKey('table')
