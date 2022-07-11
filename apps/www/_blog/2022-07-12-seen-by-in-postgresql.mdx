@@ -28,7 +28,7 @@ Sure, this scenario isn't real, but it could be - that last part about Postgres 
 
 We've got the following simple table layout:
 
-![basic table layout diagram](./supabase-seen-by-basic-table-layout.png)
+![basic table layout diagram](/images/blog/seen-by/supabase-seen-by-basic-table-layout.png)
 
 In SQL migration form:
 
@@ -437,7 +437,7 @@ An average of `2.15ms` versus `2.05ms` with the simpler counter is a ~4% increas
 
 A likely requirement from the original scenario that we've completely ignored is remembering _which_ users liked a certain post to. The easiest solution here is an "associative" table like this one:
 
-![tables with associative table](./posts-seen-by-users-assoc-table.png)
+![tables with associative table](/images/blog/seen-by/posts-seen-by-users-assoc-table.png)
 
 In SQL:
 
@@ -664,7 +664,7 @@ As is usually the case in academia and practice, we can make our problem drastic
 
 One such reconfiguration would be storing the information as a graph:
 
-![graph of seen by relation](graph-seen-by.png)
+![graph of seen by relation](/images/blog/seen-by/graph-seen-by.png)
 
 As you might imagine, finding the number of "seen-by" relations would simply be counting the number of edges out of one of the nodes!
 
@@ -676,7 +676,7 @@ We won't pursue it in this post but it would be a great way to model this proble
 
 OK, so what's the answer at the end of the day? What's the best way to get to that useful v1? Here are the numbers:
 
-![latency graph showing simple-hstore,hll,hll,and assoc table in speed order](latency-graph.png)
+![latency graph showing simple-hstore,hll,hll,and assoc table in speed order](/images/blog/seen-by/latency-graph.png)
 
 In tabular form:
 
