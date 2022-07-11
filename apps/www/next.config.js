@@ -49,6 +49,12 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
       },
       {
+        // redirect /docs/
+        // trailing slash caused by docusaurus issue with multizone
+        source: '/docs/',
+        destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
+      },
+      {
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
@@ -77,6 +83,26 @@ module.exports = withMDX({
   },
   async redirects() {
     return [
+      {
+        permanent: true,
+        source: '/auth/Auth',
+        destination: '/auth',
+      },
+      {
+        permanent: true,
+        source: '/database/Database',
+        destination: '/database',
+      },
+      {
+        permanent: true,
+        source: '/edge-functions/edge-functions',
+        destination: '/edge-functions',
+      },
+      {
+        permanent: true,
+        source: '/storage/Storage',
+        destination: '/storage',
+      },
       {
         permanent: false,
         source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',

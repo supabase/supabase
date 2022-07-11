@@ -29,6 +29,20 @@ const components = {
     return <CodeBlock {...props} />
   },
   ImageGrid,
+  img: (props: any) => {
+    return (
+      <div
+        className="
+          next-image--dynamic-fill 
+          to-scale-400  
+          from-scale-500 rounded-md
+          border bg-gradient-to-r
+        "
+      >
+        <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
+      </div>
+    )
+  },
 }
 
 // plugins for next-mdx-remote

@@ -48,14 +48,16 @@ const ConnectionPooling: FC<Props> = () => {
   if (!project.pgbouncer_enabled && project.pool_mode == null)
     return (
       <Panel
-      title={
-        <Typography.Title key="panel-title" level={5} className="mb-0">
-         Connection Pooling is not available for this project
-        </Typography.Title>
-      }
-    >
+        title={
+          <Typography.Title key="panel-title" level={5} className="mb-0">
+            Connection Pooling is not available for this project
+          </Typography.Title>
+        }
+      >
         <Panel.Content>
-          <Typography.Text type="secondary">Please start a new project to enable this feature.</Typography.Text>
+          <Typography.Text type="secondary">
+            Please start a new project to enable this feature.
+          </Typography.Text>
         </Panel.Content>
       </Panel>
     )
@@ -71,7 +73,11 @@ const ConnectionPooling: FC<Props> = () => {
   const bouncerInfo = pluckObjectFields(formModel, BOUNCER_FIELDS)
 
   return (
-      <PgbouncerConfig projectRef={projectRef} bouncerInfo={bouncerInfo} connectionInfo={connectionInfo} />
+    <PgbouncerConfig
+      projectRef={projectRef}
+      bouncerInfo={bouncerInfo}
+      connectionInfo={connectionInfo}
+    />
   )
 }
 
@@ -79,140 +85,152 @@ export default observer(ConnectionPooling)
 
 interface ConfigProps {
   projectRef: string
-  bouncerInfo: {default_pool_size: number, ignore_startup_parameters: 'string', pool_mode: string, pgbouncer_enabled: boolean},
-  connectionInfo: {db_host: string, db_name: string, db_port: number, db_user: string, inserted_at: string}
+  bouncerInfo: {
+    default_pool_size: number
+    ignore_startup_parameters: 'string'
+    pool_mode: string
+    pgbouncer_enabled: boolean
+  }
+  connectionInfo: {
+    db_host: string
+    db_name: string
+    db_port: number
+    db_user: string
+    inserted_at: string
+  }
 }
 
-export const PgbouncerConfig: FC<ConfigProps> = observer(({ projectRef, bouncerInfo, connectionInfo }) => {
+export const PgbouncerConfig: FC<ConfigProps> = observer(
+  ({ projectRef, bouncerInfo, connectionInfo }) => {
+    const { ui } = useStore()
 
-  const { ui } = useStore()
+    const [updates, setUpdates] = useState<any>({
+      pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
+      pool_mode: bouncerInfo.pool_mode || 'transaction',
+      default_pool_size: bouncerInfo.default_pool_size || '',
+      ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
+    })
 
-  const [updates, setUpdates] = useState<any>({
-    pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
-    pool_mode: bouncerInfo.pool_mode || 'transaction',
-    default_pool_size: bouncerInfo.default_pool_size || '',
-    ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
-  })
-
-  const updateConfig = async (updatedConfig: any) => {
-    try {
-      const response = await patch(`${API_URL}/props/pooling/${projectRef}/config`, updatedConfig)
-      if (response.error) {
-        throw response.error
-      } else {
-        setUpdates({ ...response.project })
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+    const updateConfig = async (updatedConfig: any) => {
+      try {
+        const response = await patch(`${API_URL}/props/pooling/${projectRef}/config`, updatedConfig)
+        if (response.error) {
+          throw response.error
+        } else {
+          setUpdates({ ...response.project })
+          ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        }
+      } catch (error: any) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to update config: ${error.message}`,
+        })
       }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update config: ${error.message}`,
-      })
     }
+
+    const formSchema = {
+      properties: {
+        pgbouncer_enabled: {
+          title: 'Enabled',
+          type: 'boolean',
+          help: 'Activates / deactivates Connection Pooling.',
+        },
+        pool_mode: {
+          title: 'Pool Mode',
+          type: 'string',
+          options: [
+            {
+              label: 'Transaction',
+              value: 'transaction',
+            },
+            {
+              label: 'Session',
+              value: 'session',
+            },
+            {
+              label: 'Statement',
+              value: 'statement',
+            },
+          ],
+        },
+        ignore_startup_parameters: {
+          title: 'Ignore Startup Parameters',
+          type: 'string',
+          readOnly: true,
+          help: 'Defaults are either blank or "extra_float_digits"',
+        },
+      },
+      required: ['pool_mode'],
+      type: 'object',
+    }
+
+    return (
+      <SchemaFormPanel
+        title="Connection Pooling"
+        schema={formSchema}
+        model={updates}
+        submitLabel="Save"
+        cancelLabel="Cancel"
+        onChangeModel={(model: any) => setUpdates(model)}
+        onSubmit={(model: any) => updateConfig(model)}
+        onReset={() => setUpdates(bouncerInfo)}
+      >
+        <div className="space-y-6 py-4">
+          <ToggleField name="pgbouncer_enabled" />
+
+          <Divider light />
+
+          {updates.pgbouncer_enabled && (
+            <>
+              <AutoField
+                name="pool_mode"
+                showInlineError
+                errorMessage="You must select one of the three options"
+              />
+              <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+                <p className="text-sm text-scale-900">
+                  Specify when a connection can be returned to the pool. To find out the most
+                  suitable mode for your use case,{' '}
+                  <a
+                    className="text-green-900"
+                    target="_blank"
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                  >
+                    click here
+                  </a>
+                  .
+                </p>
+              </div>
+              <Divider light />
+              <AutoField name="ignore_startup_parameters" />
+            </>
+          )}
+          <Divider light />
+          <Input
+            className="input-mono"
+            layout="horizontal"
+            readOnly
+            copy
+            disabled
+            value={connectionInfo.db_port}
+            label="Port"
+          />
+          <Divider light />
+          <Input
+            className="input-mono"
+            layout="vertical"
+            readOnly
+            copy
+            disabled
+            label="Connection string"
+            value={
+              `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
+              `${connectionInfo.db_host}:${connectionInfo.db_port}` +
+              `/${connectionInfo.db_name}`
+            }
+          />
+        </div>
+      </SchemaFormPanel>
+    )
   }
-
-  const formSchema = {
-    properties: {
-      pgbouncer_enabled: {
-        title: 'Enabled',
-        type: 'boolean',
-        help: 'Activates / deactivates Connection Pooling.',
-      },
-      pool_mode: {
-        title: 'Pool Mode',
-        type: 'string',
-        options: [
-          {
-            label: 'Transaction',
-            value: 'transaction',
-          },
-          {
-            label: 'Session',
-            value: 'session',
-          },
-          {
-            label: 'Statement',
-            value: 'statement',
-          },
-        ],
-      },
-      ignore_startup_parameters: {
-        title: 'Ignore Startup Parameters',
-        type: 'string',
-        readOnly: true,
-        help: 'Defaults are either blank or "extra_float_digits"',
-      },
-    },
-    required: ['pool_mode'],
-    type: 'object',
-  }
-
-  return (
-    <SchemaFormPanel
-      title="Connection Pooling"
-      schema={formSchema}
-      model={updates}
-      submitLabel="Save"
-      cancelLabel="Cancel"
-      onChangeModel={(model: any) => setUpdates(model)}
-      onSubmit={(model: any) => updateConfig(model)}
-      onReset={() => setUpdates(bouncerInfo)}
-    >
-      <div className="space-y-6 py-4">
-        <ToggleField name="pgbouncer_enabled" />
-
-        <Divider light />
-
-        {updates.pgbouncer_enabled && (
-          <>
-            <AutoField
-              name="pool_mode"
-              showInlineError
-              errorMessage="You must select one of the three options"
-            />
-            <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-              <p className="text-sm text-scale-900">
-                Specify when a connection can be returned to the pool. To find out the most
-                suitable mode for your use case,{' '}
-                <a
-                  className="text-green-900"
-                  target="_blank"
-                  href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                >
-                  click here
-                </a>
-                .
-              </p>
-            </div>
-            <Divider light />
-            <AutoField name="ignore_startup_parameters" />
-          </>
-        )}
-        <Divider light />
-        <Input
-          className="input-mono"
-          layout="horizontal"
-          readOnly
-          copy
-          disabled
-          value={connectionInfo.db_port}
-          label="Port"
-        />
-        <Divider light />
-        <Input
-          className="input-mono"
-          layout="vertical"
-          readOnly
-          copy
-          disabled
-          label="Connection string"
-          value={
-            `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-            `${connectionInfo.db_host}:${connectionInfo.db_port}` +
-            `/${connectionInfo.db_name}`
-          }
-        />
-      </div>
-    </SchemaFormPanel>
-  )
-})
+)
