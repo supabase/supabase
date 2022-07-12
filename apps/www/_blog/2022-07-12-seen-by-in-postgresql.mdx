@@ -680,16 +680,16 @@ OK, so what's the answer at the end of the day? What's the best way to get to th
 
 In tabular form:
 
-| Approach       | Avg (ms) | 99%ile (ms) | 99.999%%ile (ms) |
-| -------------- | -------- | ----------- | ---------------- |
-| simple-counter | 2.03     | 6           | 23               |
-| simple-hstore  | 2.15     | 6           | 16               |
-| assoc-table    | 2.5      | 8           | 30               |
-| hll            | 2.16     | 7           | 27               |
+| Approach       | Avg (ms) | 99%ile (ms) | 99.999%ile (ms) |
+| -------------- | -------- | ----------- | --------------- |
+| simple-counter | 2.03     | 6           | 23              |
+| simple-hstore  | 2.15     | 6           | 16              |
+| assoc-table    | 2.5      | 8           | 30              |
+| hll            | 2.16     | 7           | 27              |
 
 **If we go strictly with the data, the best way _looks_ to be the `hstore`-powered solution, but I think the HLL is probably the right choice.**
 
-The HLL results were quite variable -- some runs were faster than others, so I've taken the best of ~3 runs.
+The HLL results were quite variable -- some runs were faster than others, so I've taken the best of 3 runs.
 
 Even though the data says `hstore`, knowing that posts will be seen by more and more people over time, I _might_ choose the HLL solution for an actual implementation. It's far less likely to pose a bloated row problem, and it has the absolute correctness (and later recall) of the assoc-table solution, while performing better over all (as you can imagine, no need to `COUNT` rows).
 
