@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { EditorProps } from '@supabase/react-data-grid';
+import * as React from 'react'
+import { EditorProps } from '@supabase/react-data-grid'
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
-  input?.focus();
-  input?.select();
+  input?.focus()
+  input?.select()
 }
 
 export function NumberEditor<TRow, TSummaryRow = unknown>({
@@ -12,16 +12,16 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
 }: EditorProps<TRow, TSummaryRow>) {
-  const value = (row[column.key as keyof TRow] as unknown) as string;
+  const value = row[column.key as keyof TRow] as unknown as string
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const _value = event.target.value;
-    if (_value == '') onRowChange({ ...row, [column.key]: null });
-    else onRowChange({ ...row, [column.key]: _value });
+    const _value = event.target.value
+    if (_value == '') onRowChange({ ...row, [column.key]: null })
+    else onRowChange({ ...row, [column.key]: _value })
   }
 
   function onBlur() {
-    onClose(true);
+    onClose(true)
   }
 
   return (
@@ -33,5 +33,5 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
       onBlur={onBlur}
       type="number"
     />
-  );
+  )
 }
