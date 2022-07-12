@@ -32,23 +32,21 @@ const DomainList: FC<Props> = ({ onSelectDomainToDelete }) => {
       ) : URI_ALLOW_LIST_ARRAY.length > 0 ? (
         URI_ALLOW_LIST_ARRAY.map((domain: string) => {
           return (
-            <>
-              <ValueContainer>
-                <div className="flex items-center gap-2 font-mono">
-                  <span className="text-scale-900">
-                    <IconGlobe strokeWidth={2} size={14} />
-                  </span>
-                  {domain}
-                </div>
-                <Button
-                  type="default"
-                  icon={<IconTrash />}
-                  onClick={() => onSelectDomainToDelete(domain)}
-                >
-                  Remove
-                </Button>
-              </ValueContainer>
-            </>
+            <ValueContainer key={domain}>
+              <div className="flex items-center gap-2 font-mono">
+                <span className="text-scale-900">
+                  <IconGlobe strokeWidth={2} size={14} />
+                </span>
+                {domain}
+              </div>
+              <Button
+                type="default"
+                icon={<IconTrash />}
+                onClick={() => onSelectDomainToDelete(domain)}
+              >
+                Remove
+              </Button>
+            </ValueContainer>
           )
         })
       ) : (
