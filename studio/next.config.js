@@ -60,7 +60,7 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['github.com']
+    domains: ['github.com'],
   },
 }
 

@@ -46,7 +46,7 @@ const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
-const BATCH_SIZE = 100
+const BATCH_SIZE = 10
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 
 class StorageExplorerStore {
@@ -65,7 +65,11 @@ class StorageExplorerStore {
   selectedItemsToMove = []
   selectedFilePreview = {}
 
-  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
+  DEFAULT_OPTIONS = {
+    limit: LIMIT,
+    offset: OFFSET,
+    sortBy: { column: this.sortBy, order: this.sortByOrder },
+  }
 
   /* Supabase client */
   supabaseClient = null
@@ -804,13 +808,16 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
-    const batches = chunk(prefixes, BATCH_SIZE)
-    await Promise.all(
-      batches.map(
-        async (batchedPrefixes) =>
-          await this.supabaseClient.storage.from(this.selectedBucket.name).remove(batchedPrefixes)
-      )
-    )
+    // batch BATCH_SIZE prefixes per request
+    const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
+      return this.supabaseClient.storage.from(this.selectedBucket.name).remove(batch)
+    })
+
+    // make BATCH_SIZE requests at the same time
+    await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
+      await previousPromise
+      await Promise.all(nextBatch.map((batch) => batch()))
+    }, Promise.resolve())
 
     // Clear file preview cache if deleted files exist in cache
     const idsOfFilesDeleted = files.map((file) => file.id)
@@ -1116,6 +1123,7 @@ class StorageExplorerStore {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
       const files = await this.getAllItemsAlongFolder(folder)
 
+      let hasErrors = false
       // Make this batched promises into a reusable function for storage, i think this will be super helpful
       const promises = files.map((file) => {
         const fromPath = `${file.prefix}/${file.name}`
@@ -1126,11 +1134,14 @@ class StorageExplorerStore {
           .concat(pathSegments.slice(columnIndex + 1))
           .join('/')
         return () => {
-          return new Promise(async (resolve, reject) => {
+          return new Promise(async (resolve) => {
             const { error } = await this.supabaseClient.storage
               .from(this.selectedBucket.name)
               .move(fromPath, toPath)
-            if (error) reject()
+            if (error) {
+              hasErrors = true
+              toast.error(`Failed to move ${fromPath} to the new folder`)
+            }
             resolve()
           })
         }
@@ -1145,7 +1156,11 @@ class StorageExplorerStore {
           await Promise.all(nextBatch.map((batch) => batch()))
         }, Promise.resolve())
 
-        toast.success(`Successfully renamed folder to ${newName}`)
+        if (!hasErrors) {
+          toast.success(`Successfully renamed folder to ${newName}`)
+        } else {
+          toast.error(`Renamed folder to ${newName} with some errors`)
+        }
         await this.refetchAllOpenedFolders()
 
         // Clear file preview cache if the moved file exists in the cache
@@ -1182,10 +1197,23 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
-    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
-    const { data: folderContents } = await this.supabaseClient.storage
-      .from(this.selectedBucket.name)
-      .list(formattedPathToFolder, options)
+    const options = {
+      limit: LIMIT,
+      offset: OFFSET,
+      sortBy: { column: this.sortBy, order: this.sortByOrder },
+    }
+    let folderContents = []
+
+    for (;;) {
+      const { data } = await this.supabaseClient.storage
+        .from(this.selectedBucket.name)
+        .list(formattedPathToFolder, options)
+      folderContents = folderContents.concat(data)
+      options.offset += options.limit
+      if (data.length < options.limit) {
+        break
+      }
+    }
 
     const subfolders = folderContents?.filter((item) => isNull(item.id)) ?? []
     const folderItems = folderContents?.filter((item) => !isNull(item.id)) ?? []

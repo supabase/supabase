@@ -128,7 +128,7 @@ const ChartHandler: FC<Props> = ({
     ? chartData?.total
     : provider === 'log-stats'
     ? chartData?.totalGrouped?.[attribute]
-    : chartData?.data[chartData?.data.length -1]?.[attribute]
+    : chartData?.data[chartData?.data.length - 1]?.[attribute]
 
   if (loading) {
     return (
