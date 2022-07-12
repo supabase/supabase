@@ -86,8 +86,8 @@ const WithSidebar: FC<Props> = ({
 export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
-  return links.map((x: any) => (
-    <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
+  return links.map((x: any, i: number) => (
+    <div key={x.heading || `${i}`} className="dark:border-dark border-b py-5 px-6">
       {x.heading && <Menu.Group title={x.heading} />}
       {x.versionLabel && (
         <div className="mb-1 px-3">
