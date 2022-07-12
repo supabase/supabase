@@ -15,7 +15,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 
 - Create and configure a GitLab Application on [GitLab](https://gitlab.com)
 - Add your GitLab Application keys to your [Supabase Project](https://app.supabase.com)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js) | [Dart](https://github.com/supabase/supabase-dart).
 
 ## Steps
 
@@ -66,7 +66,17 @@ The next step requires a callback URL, which looks like this:
 
 ### Add login code to your client app
 
-The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+Add logins using our client libraries:
+
+- [JavaScript](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+- [Dart](/docs/reference/dart/auth-signin#sign-in-using-third-party-providers)
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
@@ -74,7 +84,32 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 ```
 
-Add this function which you can call from a button, link, or UI element.
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+final res = await supabase.auth.signIn({
+  provider: 'gitlab',
+});
+
+final user = res.data?.user;
+final session = res.data?.session;
+final error = res.error;
+```
+
+</TabItem>
+
+</Tabs>
+
+Add a function which you can call from a button, link, or UI element.
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 async function signInWithGitLab() {
@@ -84,13 +119,50 @@ async function signInWithGitLab() {
 }
 ```
 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+Future<void> signInWithGitLab() async {
+  await supabase.auth.signIn({
+    provider: 'gitlab',
+});
+}
+```
+
+</TabItem>
+
+</Tabs>
+
 To log out:
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 async function signout() {
   const { error } = await supabase.auth.signOut()
 }
 ```
+
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+Future<void> signOut() async {
+   await supabase.auth.signOut();
+}
+```
+
+</TabItem>
+
+</Tabs>
 
 ## Resources
 

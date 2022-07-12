@@ -40,7 +40,7 @@ This is the number that will be receiving the SMS OTPs.
 
 ![Get your API Keys](/img/guides/auth-messagebird/2.png)
 
-Navigate to the [dashboard settings](https://dashboard.messagebird.com/en/settings/sms) to set the default originator. The messagebird originator is the name or number from which the message is sent. 
+Navigate to the [dashboard settings](https://dashboard.messagebird.com/en/settings/sms) to set the default originator. The messagebird originator is the name or number from which the message is sent.
 For more information, you can refer to the messagebird article on choosing an originator [here](https://support.messagebird.com/hc/en-us/articles/115002628665-Choosing-an-originator)
 
 ![Set the default originator](/img/guides/auth-messagebird/3.png)
@@ -59,9 +59,10 @@ You should see an option to enable Phone Signup.
 Toggle it on, and copy the 2 values over from the messagebird dashboard. Click save.
 
 Note: If you use the Test API Key, the OTP will not be delivered to the mobile number specified but messagebird will log the response in the dashboard.
-If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits. 
+If the Live API Key is used instead, the OTP will be delivered and there will be a deduction in your free credits.
 
 <!-- TODO: Add screenshot of UI -->
+
 Plugin MessageBird credentials
 
 Now the backend should be setup, we can proceed to add our client-side code!
@@ -85,6 +86,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'Dart'}
 ]}>
 <TabItem value="JS">
 
@@ -109,6 +111,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 ```
 
 </TabItem>
+<TabItem value="Dart">
+
+```dart
+final res = await supabase.auth.signUp({
+  phone: '+13334445555',
+  password: 'some-password'
+});
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+</TabItem>
 </Tabs>
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
@@ -120,6 +135,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'Dart'}
 ]}>
 <TabItem value="JS">
 
@@ -142,6 +158,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
   "phone": "+13334445555",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="Dart">
+
+```dart
+final res = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456'
+});
+
+final session = res.data?.session;
+final error = res.error;
 ```
 
 </TabItem>
@@ -167,6 +196,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'Dart'}
 ]}>
 <TabItem value="JS">
 
@@ -191,6 +221,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 ```
 
 </TabItem>
+<TabItem value="Dart">
+
+```dart
+final res = await supabase.auth.signIn({
+  phone: '+13334445555',
+  password: 'some-password'
+});
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+</TabItem>
 </Tabs>
 
 ### Using OTP as a passwordless sign-in mechanism
@@ -204,6 +247,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'Dart'}
 ]}>
 <TabItem value="JS">
 
@@ -226,6 +270,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 ```
 
 </TabItem>
+<TabItem value="Dart">
+
+```dart
+final res = await supabase.auth.signIn({
+  phone: '+13334445555',
+});
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+</TabItem>
+
 </Tabs>
 
 The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
@@ -235,6 +292,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'Dart'}
 ]}>
 <TabItem value="JS">
 
@@ -257,6 +315,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
   "phone": "+13334445555",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="Dart">
+
+```dart
+final res = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456',
+});
+
+final session = res.data?.session;
+final error = res.error;
 ```
 
 </TabItem>

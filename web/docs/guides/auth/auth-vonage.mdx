@@ -77,6 +77,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -101,6 +102,19 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/signup' \
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.signUp({
+  phone: '491512223334444',
+  password: 'some-password',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+```
+
+</TabItem>
 </Tabs>
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
@@ -112,6 +126,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -134,6 +149,19 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
   "phone": "491512223334444",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.verifyOTP({
+  phone: '491512223334444',
+  token: '123456',
+});
+
+final session = res.data?.session;
+final error = res.data.error;
 ```
 
 </TabItem>
@@ -159,6 +187,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -183,6 +212,20 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/token?grant_type=password' \
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.signIn({
+  phone: '491512223334444',
+  password: 'some-password',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+
+```
+
+</TabItem>
 </Tabs>
 
 ### Using OTP as a passwordless sign-in mechanism
@@ -196,6 +239,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value:'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -218,6 +262,19 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/otp' \
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.signIn({
+  phone: '491512223334444',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+
+```
+
+</TabItem>
 </Tabs>
 
 The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
@@ -227,6 +284,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -249,6 +307,19 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/verify' \
   "phone": "491512223334444",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.verifyOTP({
+  phone: '491512223334444',
+  token: '123456',
+});
+
+final session = res.data?.session;
+final error = res.data.error;
 ```
 
 </TabItem>

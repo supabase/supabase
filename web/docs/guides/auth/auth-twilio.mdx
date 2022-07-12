@@ -31,7 +31,7 @@ What you'll need:
 ## Video
 
 <iframe
-  className="w-full video-with-border"
+  className="video-with-border w-full"
   width="640"
   height="385"
   src="https://www.youtube-nocookie.com/embed/akScoPO01bc"
@@ -89,7 +89,7 @@ The SMS message sent to a phone containing an OTP code can be customized. This i
 
 Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
 
-Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template. 
+Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template.
 
 ![example in the SMS template](/img/guides/auth-twilio/9.png)
 
@@ -104,6 +104,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -128,6 +129,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.signUp({
+  phone: '+13334445555',
+  password: 'some-password',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+```
+
+</TabItem>
 </Tabs>
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
@@ -139,6 +153,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'}
 ]}>
 <TabItem value="JS">
 
@@ -161,6 +176,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
   "phone": "+13334445555",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456',
+});
+
+final session = res.data?.session;
+final error = res.data.error;
 ```
 
 </TabItem>
@@ -186,6 +214,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'DART', value: 'DART'},
 ]}>
 <TabItem value="JS">
 
@@ -210,6 +239,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/token?grant_type=
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```dart
+final res = await supabase.auth.signIn({
+  phone: '+13334445555',
+  password: 'some-password',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+```
+
+</TabItem>
 </Tabs>
 
 ### Using OTP as a passwordless sign-in mechanism
@@ -223,6 +265,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="JS">
 
@@ -245,6 +288,18 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/otp' \
 ```
 
 </TabItem>
+<TabItem value="DART">
+
+```js
+final res = await supabase.auth.signIn({
+  phone: '+13334445555',
+});
+
+final user = res.data?.user;
+final error = res.data.error;
+```
+
+</TabItem>
 </Tabs>
 
 The second step is the same as the previous section, you need to collect the 6-digit pin from the user and pass it along with their phone number to the verify method:
@@ -254,6 +309,7 @@ defaultValue="JS"
 values={[
   {label: 'JavaScript', value: 'JS'},
   {label: 'HTTP', value: 'HTTP'},
+  {label: 'Dart', value: 'DART'},
 ]}>
 <TabItem value="JS">
 
@@ -276,6 +332,19 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
   "phone": "+13334445555",
   "token": "123456"
 }'
+```
+
+</TabItem>
+<TabItem value="DART">
+
+```js
+final res = await supabase.auth.verifyOTP({
+  phone: '+13334445555',
+  token: '123456',
+});
+
+final session = res.data?.session;
+final error = res.data.error;
 ```
 
 </TabItem>

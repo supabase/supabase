@@ -11,7 +11,7 @@ To enable Keycloak Auth for your project, you need to set up an Keycloak OAuth a
 
 ## Overview
 
-To get started with Keycloak, you can run it in a docker container with: `docker run -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -p 8080:8080 jboss/keycloak:latest` 
+To get started with Keycloak, you can run it in a docker container with: `docker run -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -p 8080:8080 jboss/keycloak:latest`
 
 This guide will be assuming that you are running keycloak in a docker container as described in the command above.
 
@@ -28,7 +28,7 @@ Keycloak OAuth consists of five broad steps:
 
 ### Access your Keycloak Admin console
 
-- Login by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console". 
+- Login by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console".
 
 ### Create a Keycloak Realm
 
@@ -47,6 +47,7 @@ The "Client ID" of the created client will serve as the `client_id` when you mak
 ### Client Settings
 
 After you've created the client successfully, ensure that you set the following settings:
+
 1. The "Client Protocol" should be set to "openid-connect".
 2. The "Access Type" should be set to "confidential".
 3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
@@ -57,13 +58,23 @@ After you've created the client successfully, ensure that you set the following 
 ### Obtain the Client Secret
 
 This will serve as the `client_secret` when you make API calls to authenticate the user.
-Under the "Credentials" tab, the `Secret` value will be used as the `client secret`. 
+Under the "Credentials" tab, the `Secret` value will be used as the `client secret`.
 
 ![Obtain the client secret](/img/guides/auth-keycloak/keycloak-client-secret.png)
 
 ### Add login code to your client app
 
-The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
+Add logins using our client libraries:
+
+- [JavaScript](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+- [Dart](/docs/reference/dart/auth-signin#sign-in-using-third-party-providers)
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 const { user, session, error } = await supabase.auth.signIn({
@@ -71,17 +82,65 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 ```
 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+final res = await supabase.auth.signIn({
+  provider: 'keycloak',
+});
+
+final user = res.data?.user;
+final session = res.data?.session;
+final error = res.error;
+```
+
+</TabItem>
+
+</Tabs>
+
 Add a function which you can call from a button, link, or UI element.
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 async function signInWithKeycloak() {
   const { user, session, error } = await supabase.auth.signIn({
     provider: 'keycloak',
-  }
+  })
 }
 ```
 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+Future<void> signInWithKeycloak() async {
+  await supabase.auth.signIn({
+    provider: 'keycloak',
+});
+}
+```
+
+</TabItem>
+
+</Tabs>
+
 To log out:
+
+<Tabs
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' }, { label: 'Dart', value: 'dart' }]}
+>
+
+<TabItem value="js">
 
 ```js
 async function signout() {
@@ -89,7 +148,21 @@ async function signout() {
 }
 ```
 
-## Resources 
+</TabItem>
+
+<TabItem value="dart">
+
+```dart
+Future<void> signOut() async {
+   await supabase.auth.signOut();
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Resources
 
 - You can find the keycloak openid endpoint configuration under the realm settings.
-![Keycloak OpenID Endpoint Configuration](/img/guides/auth-keycloak/keycloak-openid-endpoint-config.png)
+  ![Keycloak OpenID Endpoint Configuration](/img/guides/auth-keycloak/keycloak-openid-endpoint-config.png)
