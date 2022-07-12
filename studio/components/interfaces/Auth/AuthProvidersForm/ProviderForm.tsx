@@ -224,19 +224,19 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         copy
                         readOnly
                         disabled
-                        label="Redirect url"
+                        label="Redirect URL"
                         value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
                       />
                     </>
                   )}
                   <div className="flex items-center justify-end gap-3">
                     <Button
+                      type="default"
                       htmlType="reset"
                       onClick={() => {
                         handleReset()
                         setOpen(false)
                       }}
-                      type="default"
                     >
                       Cancel
                     </Button>
