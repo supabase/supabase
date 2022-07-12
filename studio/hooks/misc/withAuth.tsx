@@ -40,10 +40,10 @@ export function withAuth<T>(
         } else if (returning !== 'minimal') {
           ui.setProfile(profile)
 
-          if (!app.organizations.isInitialized) {
+          if (!app.organizations.isInitialized && !app.organizations.isLoading) {
             app.organizations.load()
           }
-          if (!app.projects.isInitialized) {
+          if (!app.projects.isInitialized && !app.projects.isLoading) {
             app.projects.load()
           }
         }
