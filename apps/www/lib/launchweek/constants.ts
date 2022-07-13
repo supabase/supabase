@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-export const SITE_URL = 'https://supabase.com/launchweek'
+export const SITE_URL =
+  'https://zone-www-dot-com-git-feat-launchweek-landing-supabase.vercel.app/launchweek'
 export const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_ORIGIN || new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
 export const BRAND_NAME = 'Supabase'
