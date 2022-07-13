@@ -38,7 +38,10 @@ const AutoSchemaForm = observer(() => {
       .min(0, 'Must be a value more than 0')
       .required('Must have a Reuse Interval value'),
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
-    SECURITY_CAPTCHA_SECRET: string().required(),
+    SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
+      is: true,
+      then: string().required('Must have a hCaptcha secret'),
+    }),
   })
 
   return (
