@@ -1,7 +1,7 @@
-import { format } from '@scaleleap/pg-format';
+import { format } from '@scaleleap/pg-format'
 
 export function getColumnsSql(filter_schema: string, filter_name: string) {
-  return format(columnsSql, filter_schema, filter_name);
+  return format(columnsSql, filter_schema, filter_name)
 }
 const columnsSql = `
 SELECT
@@ -101,10 +101,10 @@ WHERE
       'SELECT, INSERT, UPDATE, REFERENCES'
     )
   )
-`;
+`
 
 export function getPrimaryKeysSql(filter_schema: string, filter_name: string) {
-  return format(primaryKeysSql, filter_schema, filter_name);
+  return format(primaryKeysSql, filter_schema, filter_name)
 }
 const primaryKeysSql = `
 SELECT
@@ -125,13 +125,10 @@ WHERE
   AND a.attrelid = c.oid
   AND a.attnum = ANY (i.indkey)
   AND i.indisprimary
-`;
+`
 
-export function getRelationshipsSql(
-  filter_schema: string,
-  filter_name: string
-) {
-  return format(relationshipsSql, filter_schema, filter_name);
+export function getRelationshipsSql(filter_schema: string, filter_name: string) {
+  return format(relationshipsSql, filter_schema, filter_name)
 }
 const relationshipsSql = `
 SELECT
@@ -161,10 +158,10 @@ WHERE
   c.contype = 'f'
   AND nsa.nspname = %L
   AND csa.relname = %L;
-`;
+`
 
 export function getTableSql(filter_schema: string, filter_name: string) {
-  return format(tableSql, filter_schema, filter_name);
+  return format(tableSql, filter_schema, filter_name)
 }
 const tableSql = `
 SELECT
@@ -189,4 +186,4 @@ WHERE
     )
     OR has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
   )
-`;
+`

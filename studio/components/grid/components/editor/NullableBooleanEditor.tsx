@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { EditorProps } from '@supabase/react-data-grid';
-import { Button, IconX } from '@supabase/ui';
+import React, { useEffect } from 'react'
+import { EditorProps } from '@supabase/react-data-grid'
+import { Button, IconX } from '@supabase/ui'
 
 export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
   row,
@@ -8,25 +8,25 @@ export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
 }: EditorProps<TRow, TSummaryRow>) {
-  const value = row[column.key as keyof TRow] as unknown as boolean | null;
+  const value = row[column.key as keyof TRow] as unknown as boolean | null
 
   useEffect(() => {
     // if value is null, set it to false on initial render
     if (value === null) {
-      onRowChange({ ...row, [column.key]: false });
+      onRowChange({ ...row, [column.key]: false })
     }
-  }, []);
+  }, [])
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    onRowChange({ ...row, [column.key]: event.target.checked });
+    onRowChange({ ...row, [column.key]: event.target.checked })
   }
 
   function onBlur() {
-    onClose(true);
+    onClose(true)
   }
 
   function onClear() {
-    onRowChange({ ...row, [column.key]: null }, true);
+    onRowChange({ ...row, [column.key]: null }, true)
   }
 
   return (
@@ -47,5 +47,5 @@ export function NullableBooleanEditor<TRow, TSummaryRow = unknown>({
         style={{ padding: '3px', margin: 'auto 5px auto auto' }}
       />
     </div>
-  );
+  )
 }
