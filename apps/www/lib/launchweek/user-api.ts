@@ -26,7 +26,7 @@ export async function register(email: string, token?: string) {
 }
 
 export async function saveGithubToken({ id, token }: { id?: string; token: string }) {
-  return await fetch('/api/save-github-token', {
+  return await fetch('/api/launchweek/save-github-token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
