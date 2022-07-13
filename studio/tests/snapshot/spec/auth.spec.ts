@@ -133,8 +133,10 @@ test.describe('Auth Users page', () => {
       const body = page.locator('main > .flex')
       await body.locator('"New Policy"').click()
 
+      await page.isVisible('[alt="policy-template"]')
+      await page.isVisible('[alt="policy-template"]')
       await page.waitForLoadState('networkidle')
-      await expect(page).toHaveScreenshot()
+      await expect(page).toHaveScreenshot({ threshold: 0.5 })
     })
 
     test('policies new from template', async ({ page }) => {
@@ -143,6 +145,7 @@ test.describe('Auth Users page', () => {
 
       await page.click('"Create a policy from a template"')
 
+      await page.isVisible('.active-line-number')
       await page.waitForLoadState('networkidle')
       await expect(page).toHaveScreenshot()
     })
@@ -153,6 +156,7 @@ test.describe('Auth Users page', () => {
 
       await page.click('"Create a policy from scratch"')
 
+      await page.isVisible('.view-line')
       await page.waitForLoadState('networkidle')
       await expect(page).toHaveScreenshot()
     })

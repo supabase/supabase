@@ -173,10 +173,8 @@ test.describe('Table editor', () => {
       await filters.locator('"Add filter"').click()
       await filters.locator('"id"').click()
       await filters.locator('"status"').click()
-      await filters.locator('input').fill('passed')
 
-      // waiting for the filter to be applied and new query requests to be sent
-      await Promise.all([
+      const filteredRequests = Promise.all([
         page.waitForResponse((r) =>
           r
             .request()
@@ -190,6 +188,11 @@ test.describe('Table editor', () => {
             ?.query?.includes("select count(*) from public.results where status = 'passed'")
         ),
       ])
+
+      await filters.locator('input').fill('passed')
+
+      // waiting for the filter to be applied and new query requests to be sent
+      await filteredRequests
 
       // to remove focus from input for sure
       await filters.click()
