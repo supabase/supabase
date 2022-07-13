@@ -1,0 +1,80 @@
+/**
+ * Copyright 2020 Vercel Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.wrapper {
+  margin-top: var(--space-12x);
+}
+
+.hero {
+  font-size: 52px;
+  line-height: 1.15;
+  letter-spacing: -0.05em;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 25px;
+}
+
+.info {
+  font-size: 20px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--space-8x);
+  color: var(--brand);
+}
+
+.description {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.4;
+  text-align: center;
+  margin: auto auto 30px;
+  color: var(--secondary-color);
+  max-width: 355px;
+}
+
+.description-separator {
+  height: 24px;
+  width: 1px;
+  background: var(--secondary-color);
+  margin: 0 var(--space-4x);
+}
+
+.info :global(p) {
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    font-size: 100px;
+    line-height: 1;
+    font-weight: 800;
+    margin: 0 0px 40px;
+  }
+
+  .info {
+    font-size: 24px;
+    margin-bottom: 80px;
+  }
+
+  .description {
+    font-size: var(--space-8x);
+    max-width: 531px;
+    margin: 40px auto;
+  }
+}
