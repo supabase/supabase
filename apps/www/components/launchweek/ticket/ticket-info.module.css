@@ -1,0 +1,82 @@
+/**
+ * Copyright 2020 Vercel Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@media (min-width: 768px) {
+  .info {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: calc(var(--space-4x) * var(--size));
+    font-size: calc(1em * var(--size));
+  }
+}
+
+.logo {
+  margin-bottom: var(--space-6x);
+  font-size: 18px;
+}
+
+@media (min-width: 768px) {
+  .logo {
+    margin-bottom: 0;
+    font-size: calc(16px * var(--size));
+  }
+}
+
+.date {
+  text-transform: uppercase;
+  font-size: calc(20px * var(--size));
+  line-height: 1.15;
+  margin-bottom: var(--space-4x);
+}
+
+@media (min-width: 768px) {
+  .date {
+    margin-bottom: 0;
+  }
+}
+
+.created-by {
+  display: flex;
+  align-items: center;
+  color: var(--accents-4);
+}
+
+@media (min-width: 768px) {
+  .created-by {
+    margin-right: var(--space-4x);
+  }
+}
+
+.created-by-text {
+  white-space: nowrap;
+  margin-right: var(--space);
+}
+
+.created-by-logo {
+  height: calc(16px * var(--size));
+  display: inline-flex;
+}
+
+.url {
+  color: var(--accents-4);
+  margin-bottom: var(--space-12x);
+}
+
+@media (min-width: 768px) {
+  .url {
+    margin-bottom: 0;
+  }
+}

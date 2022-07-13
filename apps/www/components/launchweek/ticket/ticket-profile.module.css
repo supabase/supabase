@@ -1,0 +1,159 @@
+/**
+ * Copyright 2020 Vercel Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.profile {
+  display: flex;
+  align-items: center;
+}
+
+.image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid #333;
+}
+
+@media (min-width: 768px) {
+  .image {
+    width: calc(80px * var(--size));
+    height: calc(80px * var(--size));
+  }
+}
+
+.text {
+  flex: 1;
+  margin-left: 10px;
+}
+
+@media (min-width: 768px) {
+  .text {
+    margin-left: calc(15px * var(--size));
+  }
+}
+
+.name {
+  font-size: 24px;
+  display: inline-block;
+  font-weight: bold;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .name {
+    font-size: calc(var(--space-8x) * var(--size));
+    margin-bottom: 5px;
+  }
+}
+
+.username {
+  display: inline-block;
+  font-size: calc(1em * var(--size));
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.githubIcon {
+  margin-right: calc(5px * var(--size));
+  display: inline-flex;
+}
+
+.empty-icon {
+  display: block;
+  background: linear-gradient(135deg, #b4b6b8, #7f8183);
+  width: 60px;
+}
+
+@media (min-width: 768px) {
+  .empty-icon {
+    width: calc(80px * var(--size));
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.skeleton.loaded {
+  width: unset !important;
+}
+
+.skeleton:not(.wrapper):not(.show) {
+  display: none;
+}
+
+.wrapper:not(.show)::before {
+  content: none;
+}
+
+.skeleton:not(.wrapper):not(.loaded) {
+  border-radius: var(--space);
+  background-image: linear-gradient(270deg, #252729, #34383d, #34383d, #252729);
+  background-size: 200% 100%;
+  animation: loading 2s ease-in-out infinite;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.wrapper::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--space);
+  z-index: 100;
+  background-image: linear-gradient(270deg, #111111, #333333, #333333, #111111);
+  background-size: 200% 100%;
+  animation: loading 2s ease-in-out infinite;
+}
+
+.inline {
+  display: inline-block !important;
+}
+
+.rounded,
+.rounded.wrapper::before {
+  width: 62px;
+  height: 62px;
+  border-radius: 50% !important;
+}
+
+@media (min-width: 768px) {
+  .rounded,
+  .rounded.wrapper::before {
+    width: calc(82px * var(--size));
+    height: calc(82px * var(--size));
+    border-radius: 50% !important;
+  }
+}
