@@ -6,7 +6,7 @@ image: supabase-auth-helpers-sveltekit.png
 thumb: supabase-auth-helpers-sveltekit.png
 tags:
   - release-notes
-date: '2022-07-12'
+date: '2022-07-13'
 toc_depth: 9
 ---
 
@@ -31,7 +31,7 @@ We’ve changed the name from `@supabase/supabase-auth-helpers` to `@supabase/au
 
 We’ve moved the Auth Helpers into a monorepo so that we can publish packages individually rather than using the same package name for every framework. Each package only includes relevant dependencies - (eg, Next.js helpers don’t include SvelteKit dependencies).
 
-We use [Turborepo](https://turborepo.org/) for managing our monorepo pipelines and have been incredibly pleased with its caching and performance. For packaging, we use [changesets](https://github.com/changesets/changesets) and GitHub Actions to create the release and publish to the npm registry. Each library lives in its own directory inside of the **[packages** directory](https://github.com/supabase-community/auth-helpers/tree/main/packages), with an accompanying example application making use of the library inside the **[examples** directory](https://github.com/supabase-community/auth-helpers/tree/main/examples).
+We use [Turborepo](https://turborepo.org/) for managing our monorepo pipelines and have been incredibly pleased with its caching and performance. For packaging, we use [changesets](https://github.com/changesets/changesets) and GitHub Actions to create the release and publish to the npm registry. Each library lives in its own directory inside of the [**packages**](https://github.com/supabase-community/auth-helpers/tree/main/packages) directory, with accompanying example applications making use of the library inside the [**examples**](https://github.com/supabase-community/auth-helpers/tree/main/examples) directory.
 
 ## Migration path
 
