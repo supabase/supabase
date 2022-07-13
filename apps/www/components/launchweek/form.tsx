@@ -72,7 +72,7 @@ export default function Form({ sharePage }: Props) {
                   )}`
               )
               .join('&')
-            await router.replace(`/?${queryString}`, '/')
+            await router.replace(`/launchweek/?${queryString}`, '/launchweek')
           } else {
             setUserData(params)
             setPageState('ticket')

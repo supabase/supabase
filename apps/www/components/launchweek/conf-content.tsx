@@ -31,7 +31,7 @@ export default function ConfContent({
       <DefaultLayout>
         <SectionContainer className="space-y-12">
           <div>
-            {pageState === 'registration' ? (
+            {pageState === 'registration' && !sharePage ? (
               <>
                 <Hero />
                 <Form />
