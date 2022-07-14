@@ -58,7 +58,7 @@ const AutoSchemaForm = observer(() => {
           setSubmitting(false)
           ui.setNotification({
             category: 'success',
-            message: `Updated settings`,
+            message: `Successfully updated settings`,
           })
           resetForm({ values: values, initialValues: values })
         } catch (error) {
@@ -109,7 +109,7 @@ const AutoSchemaForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-scale-400 border-t"></div>
+              <div className="border-t border-scale-400"></div>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={!isLoaded}>
                   {/* Permitted redirects for anything on that domain */}

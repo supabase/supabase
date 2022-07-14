@@ -44,8 +44,13 @@ const ProviderForm: FC<Props> = ({ provider }) => {
       await authConfig.update(values)
       setSubmitting(false)
       setOpen(false)
-    } catch (error) {
-      console.error(error)
+      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+    } catch (error: any) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update settings:  ${error?.message}`,
+      })
     }
   }
 
@@ -58,11 +63,11 @@ const ProviderForm: FC<Props> = ({ provider }) => {
       <Collapsible.Trigger asChild>
         <button
           type="button"
-          className="text-scale-1200 group flex w-full items-center justify-between rounded py-3 px-6"
+          className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
-              className="text-scale-800 data-open-parent:rotate-0 data-closed-parent:rotate-180 transition"
+              className="text-scale-800 transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
               strokeWidth={2}
               width={14}
             />
@@ -75,14 +80,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
           </div>
           <div className="flex items-center gap-3">
             {isActive ? (
-              <div className="bg-brand-200 border-brand-700 text-brand-900 flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
-                <span className="bg-brand-900 text-brand-200 rounded-full p-0.5 text-xs">
+              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
+                <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
                   <IconCheck strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
               </div>
             ) : (
-              <div className="bg-scale-100 dark:bg-scale-300 border-scale-500 dark:border-scale-700 text-scale-900 rounded-md border py-1 px-3 text-xs">
+              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-scale-900 dark:border-scale-700 dark:bg-scale-300">
                 Disabled
               </div>
             )}
@@ -101,8 +106,8 @@ const ProviderForm: FC<Props> = ({ provider }) => {
             <Collapsible.Content>
               <div
                 className="
-                  bg-scale-100 dark:bg-scale-300
-                  text-scale-1200 border-scale-500 group border-t py-6 px-6
+                  group border-t
+                  border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300
                 "
               >
                 <div className="mx-auto my-6 max-w-md space-y-6">
@@ -217,7 +222,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   )}
                   {provider.misc.requiresRedirect && (
                     <>
-                      <ReactMarkdown className="text-scale-900 text-xs">
+                      <ReactMarkdown className="text-xs text-scale-900">
                         {provider.misc.helper}
                       </ReactMarkdown>
                       <Input
