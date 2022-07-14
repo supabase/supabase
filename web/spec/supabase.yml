@@ -882,7 +882,7 @@ pages:
           What about join tables
           If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
           you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
-          For more details, [follow the link](https://postgrest.org/en/v9.0/api.html#embedding-through-join-tables).
+          For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
       - name: Query the same foreign table multiple times
         description: |
           Sometimes you will need to query the same foreign table twice. 
