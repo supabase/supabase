@@ -1,4 +1,5 @@
 import { boolean, number, object, string } from 'yup'
+import { domainRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -36,7 +37,7 @@ const PROVIDER_EMAIL = {
   },
   validationSchema: object().shape({
     PASSWORD_MIN_LENGTH: number()
-      .required('"Minimum password length" is required.')
+      .required('A password is required.')
       .min(8, 'Password length must be at least 8 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
@@ -72,9 +73,7 @@ const PROVIDER_PHONE = {
       ],
     },
 
-    /**
-     * twilio
-     * */
+    // Twilio
     SMS_TWILIO_ACCOUNT_SID: {
       type: 'string',
       title: 'Twilio Account Sid',
@@ -100,9 +99,7 @@ const PROVIDER_PHONE = {
       },
     },
 
-    /**
-     * messagebird
-     * */
+    // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: {
       type: 'string',
       title: 'Messagebird Access Key',
@@ -120,9 +117,7 @@ const PROVIDER_PHONE = {
       },
     },
 
-    /**
-     * textlocal
-     * */
+    // Textloczl
     SMS_TEXTLOCAL_API_KEY: {
       type: 'string',
       title: 'Textlocal API Key',
@@ -140,9 +135,7 @@ const PROVIDER_PHONE = {
       },
     },
 
-    /**
-     * vonage
-     * */
+    // Vonage
     SMS_VONAGE_API_KEY: {
       type: 'string',
       title: 'Vonage API Key',
@@ -159,9 +152,7 @@ const PROVIDER_PHONE = {
         matches: 'vonage',
       },
     },
-    /**
-     * to do: verify what this is?
-     */
+    // [TODO] verify what this is?
     SMS_VONAGE_FROM: {
       type: 'string',
       title: 'Vonage From',
@@ -171,9 +162,7 @@ const PROVIDER_PHONE = {
       },
     },
 
-    /**
-     * SMS confirm setting
-     */
+    // SMS Confirm settings
     SMS_AUTOCONFIRM: {
       title: 'Enable phone confirmations',
       type: 'boolean',
@@ -207,21 +196,21 @@ const PROVIDER_PHONE = {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
       },
-      then: (schema) => schema.required('"Twilio Account Sid" is required'),
+      then: (schema) => schema.required('Twilio Account SID is required'),
       otherwise: (schema) => schema,
     }),
     SMS_TWILIO_AUTH_TOKEN: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
       },
-      then: (schema) => schema.required('"Twilio Auth Token" is required'),
+      then: (schema) => schema.required('Twilio Auth Token is required'),
       otherwise: (schema) => schema,
     }),
     SMS_TWILIO_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio'
       },
-      then: (schema) => schema.required('"Twilio Message Service Sid" is required'),
+      then: (schema) => schema.required('Twilio Message Service SID is required'),
       otherwise: (schema) => schema,
     }),
 
@@ -230,14 +219,14 @@ const PROVIDER_PHONE = {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
       },
-      then: (schema) => schema.required('"Messagebird Access Key" is required'),
+      then: (schema) => schema.required('Messagebird Access Key is required'),
       otherwise: (schema) => schema,
     }),
     SMS_MESSAGEBIRD_ORIGINATOR: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'messagebird'
       },
-      then: (schema) => schema.required('"Messagebird Originator" is required'),
+      then: (schema) => schema.required('Messagebird Originator is required'),
       otherwise: (schema) => schema,
     }),
 
@@ -246,14 +235,14 @@ const PROVIDER_PHONE = {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
       },
-      then: (schema) => schema.required('"Textlocal API Key" is required'),
+      then: (schema) => schema.required('Textlocal API Key is required'),
       otherwise: (schema) => schema,
     }),
     SMS_TEXTLOCAL_SENDER: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'textlocal'
       },
-      then: (schema) => schema.required('"Textlocal Sender" is required'),
+      then: (schema) => schema.required('Textlocal Sender is required'),
       otherwise: (schema) => schema,
     }),
 
@@ -262,21 +251,21 @@ const PROVIDER_PHONE = {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
       },
-      then: (schema) => schema.required('"Vonage API" is required'),
+      then: (schema) => schema.required('Vonage API is required'),
       otherwise: (schema) => schema,
     }),
     SMS_VONAGE_API_SECRET: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
       },
-      then: (schema) => schema.required('"Vonage API Secret" is required'),
+      then: (schema) => schema.required('Vonage API Secret is required'),
       otherwise: (schema) => schema,
     }),
     SMS_VONAGE_FROM: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
       is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
         return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'vonage'
       },
-      then: (schema) => schema.required('"Vonage From" is required'),
+      then: (schema) => schema.required('Vonage From is required'),
       otherwise: (schema) => schema,
     }),
 
@@ -327,12 +316,12 @@ The secret key is a JWT token that must be generated.
     EXTERNAL_APPLE_ENABLED: boolean().required(),
     EXTERNAL_APPLE_CLIENT_ID: string().when('EXTERNAL_APPLE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Services ID" is required'),
+      then: (schema) => schema.required('Services ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Secret key" is required'),
+      then: (schema) => schema.required('Secret key is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -358,24 +347,18 @@ const EXTERNAL_PROVIDER_AZURE = {
       type: 'boolean',
     },
     EXTERNAL_AZURE_CLIENT_ID: {
-      /**
-       * to do: change docs
-       */
+      // [TODO] Change docs
       title: 'Application (client) ID',
       type: 'string',
     },
     EXTERNAL_AZURE_SECRET: {
-      /**
-       * to do: change docs
-       */
+      // [TODO] Change docs
       title: 'Secret ID',
       type: 'string',
     },
     EXTERNAL_AZURE_URL: {
-      /**
-       * to do: change docs
-       */
-      title: 'Azure tenant URL',
+      // [TODO] Change docs
+      title: 'Azure Tenant URL',
       descriptionOptional: 'Optional',
       type: 'string',
     },
@@ -384,15 +367,15 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_ENABLED: boolean().required(),
     EXTERNAL_AZURE_CLIENT_ID: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Application (client) ID" is required'),
+      then: (schema) => schema.required('Application (client) ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Secret ID" is required'),
+      then: (schema) => schema.required('Secret ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().url('Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -422,12 +405,12 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
     EXTERNAL_BITBUCKET_ENABLED: boolean().required(),
     EXTERNAL_BITBUCKET_CLIENT_ID: string().when('EXTERNAL_BITBUCKET_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Key" is required'),
+      then: (schema) => schema.required('Key is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_BITBUCKET_SECRET: string().when('EXTERNAL_BITBUCKET_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Secret" is required'),
+      then: (schema) => schema.required('Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -459,12 +442,12 @@ const EXTERNAL_PROVIDER_DISCORD = {
     EXTERNAL_DISCORD_ENABLED: boolean().required(),
     EXTERNAL_DISCORD_CLIENT_ID: string().when('EXTERNAL_DISCORD_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_DISCORD_SECRET: string().when('EXTERNAL_DISCORD_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -533,12 +516,12 @@ const EXTERNAL_PROVIDER_GITHUB = {
     EXTERNAL_GITHUB_ENABLED: boolean().required(),
     EXTERNAL_GITHUB_CLIENT_ID: string().when('EXTERNAL_GITHUB_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_GITHUB_SECRET: string().when('EXTERNAL_GITHUB_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -557,16 +540,12 @@ const EXTERNAL_PROVIDER_GITLAB = {
       title: 'GitLab enabled',
       type: 'boolean',
     },
-    /**
-     * to do: update docs
-     */
+    // [TODO] Update docs
     EXTERNAL_GITLAB_CLIENT_ID: {
       title: 'Application ID',
       type: 'string',
     },
-    /**
-     * to do: update docs
-     */
+    // [TODO] Update docs
     EXTERNAL_GITLAB_SECRET: {
       title: 'Secret',
       type: 'string',
@@ -581,15 +560,15 @@ const EXTERNAL_PROVIDER_GITLAB = {
     EXTERNAL_GITLAB_ENABLED: boolean().required(),
     EXTERNAL_GITLAB_CLIENT_ID: string().when('EXTERNAL_GITLAB_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_GITLAB_SECRET: string().when('EXTERNAL_GITLAB_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().url('Not a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -606,16 +585,12 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       title: 'Google enabled',
       type: 'boolean',
     },
-    /**
-     * to do: update docs
-     */
+    // [TODO] Update docs
     EXTERNAL_GOOGLE_CLIENT_ID: {
       title: 'Client ID',
       type: 'string',
     },
-    /**
-     * to do: update docs
-     */
+    // [TODO] Update docs
     EXTERNAL_GOOGLE_SECRET: {
       title: 'Client Secret',
       type: 'string',
@@ -625,12 +600,12 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
     EXTERNAL_GOOGLE_CLIENT_ID: string().when('EXTERNAL_GOOGLE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -668,18 +643,19 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_ENABLED: boolean().required(),
     EXTERNAL_KEYCLOAK_CLIENT_ID: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_KEYCLOAK_SECRET: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Realm URL" is required').url(),
-      otherwise: (schema) => schema.url(),
+      then: (schema) =>
+        schema.matches(domainRegex, 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(domainRegex, 'Must be a valid URL'),
     }),
   }),
   misc: {
@@ -697,16 +673,12 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
       title: 'Linkedin enabled',
       type: 'boolean',
     },
-    /**
-     * to do: change in docs
-     */
+    // [TODO] Update docs
     EXTERNAL_LINKEDIN_CLIENT_ID: {
       title: 'API Key',
       type: 'string',
     },
-    /**
-     * to do: change in docs
-     */
+    // [TODO] Update docs
     EXTERNAL_LINKEDIN_SECRET: {
       title: 'API Secret Key',
       type: 'string',
@@ -716,12 +688,12 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
     EXTERNAL_LINKEDIN_ENABLED: boolean().required(),
     EXTERNAL_LINKEDIN_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"API Key" is required'),
+      then: (schema) => schema.required('API Key is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_LINKEDIN_SECRET: string().when('EXTERNAL_LINKEDIN_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"API Secret Key" is required'),
+      then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -753,12 +725,12 @@ const EXTERNAL_PROVIDER_NOTION = {
     EXTERNAL_NOTION_ENABLED: boolean().required(),
     EXTERNAL_NOTION_CLIENT_ID: string().when('EXTERNAL_NOTION_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"OAuth client ID" is required'),
+      then: (schema) => schema.required('OAuth client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_NOTION_SECRET: string().when('EXTERNAL_NOTION_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"OAuth client secret" is required'),
+      then: (schema) => schema.required('OAuth client secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -790,12 +762,12 @@ const EXTERNAL_PROVIDER_TWITCH = {
     EXTERNAL_TWITCH_ENABLED: boolean().required(),
     EXTERNAL_TWITCH_CLIENT_ID: string().when('EXTERNAL_TWITCH_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_TWITCH_SECRET: string().when('EXTERNAL_TWITCH_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client secret" is required'),
+      then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -827,12 +799,12 @@ const EXTERNAL_PROVIDER_TWITTER = {
     EXTERNAL_TWITTER_ENABLED: boolean().required(),
     EXTERNAL_TWITTER_CLIENT_ID: string().when('EXTERNAL_TWITTER_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"API Key" is required'),
+      then: (schema) => schema.required('API Key is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_TWITTER_SECRET: string().when('EXTERNAL_TWITTER_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"API Secret Key" is required'),
+      then: (schema) => schema.required('API Secret Key is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -864,12 +836,12 @@ const EXTERNAL_PROVIDER_SLACK = {
     EXTERNAL_SLACK_ENABLED: boolean().required(),
     EXTERNAL_SLACK_CLIENT_ID: string().when('EXTERNAL_SLACK_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_SLACK_SECRET: string().when('EXTERNAL_SLACK_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -901,12 +873,12 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
     EXTERNAL_SPOTIFY_ENABLED: boolean().required(),
     EXTERNAL_SPOTIFY_CLIENT_ID: string().when('EXTERNAL_SPOTIFY_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_SPOTIFY_SECRET: string().when('EXTERNAL_SPOTIFY_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -941,20 +913,20 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .url('WorkOS URL must be a valid URL')
+      .matches(domainRegex, 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
-        then: (schema) => schema.required('"WorkOS URL" is required'),
+        then: (schema) => schema.required('WorkOS URL is required'),
         otherwise: (schema) => schema,
       }),
     EXTERNAL_WORKOS_CLIENT_ID: string().when('EXTERNAL_WORKOS_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_WORKOS_SECRET: string().when('EXTERNAL_WORKOS_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client Secret" is required'),
+      then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -986,12 +958,12 @@ const EXTERNAL_PROVIDER_ZOOM = {
     EXTERNAL_ZOOM_ENABLED: boolean().required(),
     EXTERNAL_ZOOM_CLIENT_ID: string().when('EXTERNAL_ZOOM_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client ID" is required'),
+      then: (schema) => schema.required('Client ID is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_ZOOM_SECRET: string().when('EXTERNAL_ZOOM_ENABLED', {
       is: true,
-      then: (schema) => schema.required('"Client secret" is required'),
+      then: (schema) => schema.required('Client secret is required'),
       otherwise: (schema) => schema,
     }),
   }),
@@ -1118,7 +1090,7 @@ export const OLD = {
       type: 'string',
     },
     EXTERNAL_AZURE_URL: {
-      title: 'Azure tenant URL',
+      title: 'Azure Tenant URL',
       type: 'string',
     },
     EXTERNAL_BITBUCKET_ENABLED: {
