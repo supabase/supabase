@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { createContext, useEffect, useContext, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
@@ -16,30 +17,32 @@ import {
   Alert,
   Input,
   Dropdown,
-  Modal,
   IconSearch,
   IconUser,
-  Form,
 } from '@supabase/ui'
 
-import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore, withAuth } from 'hooks'
+import { Member, NextPageWithLayout, Project } from 'types'
+import { API_URL } from 'lib/constants'
 import { post, delete_, patch } from 'lib/common/fetch'
+
+import Panel from 'components/ui/Panel'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
-import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import {
+  BillingSettings,
+  InvoicesSettings,
+  InviteMemberModal,
+  DeleteOrganizationButton,
+} from 'components/interfaces/Organization'
 
 import Table from 'components/to-be-cleaned/Table'
-import Panel from 'components/ui/Panel'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import InviteMemberModal from 'components/interfaces/Organization/InviteMemberModal'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Member, NextPageWithLayout, Project } from 'types'
-import Image from 'next/image'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
-const PageContext = createContext(null)
+export const PageContext = createContext(null)
 
 // Invite is expired if older than 24hrs
 function inviteExpired(timestamp: Date) {
@@ -179,22 +182,10 @@ const TabsView = observer(() => {
         </section>
         <nav className="">
           <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
-            {/* @ts-ignore */}
-            <Tabs.Panel id="GENERAL" label="General">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="TEAM" label="Team">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="BILLING" label="Billing">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="INVOICES" label="Invoices">
-              <></>
-            </Tabs.Panel>
+            <Tabs.Panel id="GENERAL" label="General" />
+            <Tabs.Panel id="TEAM" label="Team" />
+            <Tabs.Panel id="BILLING" label="Billing" />
+            <Tabs.Panel id="INVOICES" label="Invoices" />
           </Tabs>
         </nav>
       </div>
@@ -289,120 +280,10 @@ const OrgDeletePanel = observer(() => {
           <p className="text-red-900">
             Make sure you have made a backup if you want to keep your data
           </p>
-          <OrgDeleteModal />
+          <DeleteOrganizationButton />
         </Alert>
       </Panel.Content>
     </Panel>
-  )
-})
-
-const OrgDeleteModal = observer(() => {
-  const PageState: any = useContext(PageContext)
-  const router = useRouter()
-  const { ui } = useStore()
-
-  const { slug: orgSlug, name: orgName } = PageState.organization
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [value, setValue] = useState('')
-
-  function toggle() {
-    setIsOpen(!isOpen)
-  }
-
-  return (
-    <>
-      <div className="mt-2">
-        <Button onClick={toggle} type="danger">
-          Delete organization
-        </Button>
-      </div>
-      <Modal
-        visible={isOpen}
-        onCancel={toggle}
-        header={
-          <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
-            <span className="text-scale-900 text-xs">Are you sure?</span>
-          </div>
-        }
-        size="small"
-        hideFooter
-        closable
-      >
-        <Form
-          initialValues={{
-            orgName: '',
-          }}
-          validateOnBlur
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
-            const response = await delete_(`${API_URL}/organizations/${orgSlug}`)
-            if (response.error) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to delete organization: ${response.error.message}`,
-              })
-              setSubmitting(false)
-            } else {
-              PageState.onOrgDeleted(PageState.organization)
-              setSubmitting(false)
-              router.push('/')
-            }
-          }}
-          validate={(values) => {
-            const errors: any = {}
-            if (!values.orgName) {
-              errors.orgName = 'Enter the name of the organization.'
-            }
-            if (values.orgName !== orgSlug) {
-              errors.orgName = 'Value entered does not match name of the organization.'
-            }
-            return errors
-          }}
-        >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
-              <Modal.Content>
-                <p className="text-scale-900 text-sm">
-                  This action <span className="text-scale-1200">cannot</span> be undone. This will
-                  permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
-                  organization and remove all of its projects.
-                </p>
-              </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Input
-                  id="orgName"
-                  label={
-                    <span>
-                      Please type <Typography.Text strong>{orgSlug}</Typography.Text> to confirm
-                    </span>
-                  }
-                  onChange={(e) => setValue(e.target.value)}
-                  value={value}
-                  placeholder="Type in the orgnaization name"
-                  className="w-full"
-                />
-              </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Button
-                  type="danger"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                  size="small"
-                  block
-                  danger
-                >
-                  I understand, delete this organization
-                </Button>
-              </Modal.Content>
-            </div>
-          )}
-        </Form>
-      </Modal>
-    </>
   )
 })
 
@@ -574,19 +455,18 @@ const MembersView = observer(() => {
 })
 
 const OwnerDropdown = observer(({ members, member }: any) => {
-  const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
-  const [isOpen, setIsOpen] = useState(false)
+
+  const PageState: any = useContext(PageContext)
   const [loading, setLoading] = useState(false)
 
   // handle modal visibility
   const [ownerTransferIsVisble, setOwnerTransferIsVisble] = useState(false)
 
-  const { id: orgId, slug: orgSlug, stripe_customer_id, name: orgName } = PageState.organization
+  const { id: orgId, slug: orgSlug, name: orgName } = PageState.organization
 
   async function handleMemberDelete() {
-    setIsOpen(false)
     await timeout(200)
 
     confirmAlert({
