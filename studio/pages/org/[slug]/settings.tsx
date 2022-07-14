@@ -36,20 +36,11 @@ import {
 import Table from 'components/to-be-cleaned/Table'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { isInviteExpired } from 'components/interfaces/Organization/Organization.utils'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
 export const PageContext = createContext(null)
-
-// Invite is expired if older than 24hrs
-function isInviteExpired(timestamp: Date) {
-  const inviteDate = new Date(timestamp)
-  const now = new Date()
-  var timeBetween = now.valueOf() - inviteDate.valueOf()
-  if (timeBetween / 1000 / 60 / 60 < 24) {
-    return true
-  }
-}
 
 const OrgSettingsLayout = withAuth(
   observer(({ children }) => {
