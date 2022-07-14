@@ -65,7 +65,11 @@ class StorageExplorerStore {
   selectedItemsToMove = []
   selectedFilePreview = {}
 
-  DEFAULT_OPTIONS = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
+  DEFAULT_OPTIONS = {
+    limit: LIMIT,
+    offset: OFFSET,
+    sortBy: { column: this.sortBy, order: this.sortByOrder },
+  }
 
   /* Supabase client */
   supabaseClient = null
@@ -1134,10 +1138,10 @@ class StorageExplorerStore {
             const { error } = await this.supabaseClient.storage
               .from(this.selectedBucket.name)
               .move(fromPath, toPath)
-              if (error) {
-                hasErrors = true
-                toast.error(`Failed to move ${fromPath} to the new folder`)
-              }
+            if (error) {
+              hasErrors = true
+              toast.error(`Failed to move ${fromPath} to the new folder`)
+            }
             resolve()
           })
         }
@@ -1193,19 +1197,23 @@ class StorageExplorerStore {
       formattedPathToFolder = `${prefix}/${name}`
     }
 
-    const options = { limit: LIMIT, offset: OFFSET, sortBy: { column: this.sortBy, order: this.sortByOrder } }
+    const options = {
+      limit: LIMIT,
+      offset: OFFSET,
+      sortBy: { column: this.sortBy, order: this.sortByOrder },
+    }
     let folderContents = []
 
-      for (;;) {
-        const { data } = await this.supabaseClient.storage
-          .from(this.selectedBucket.name)
-          .list(formattedPathToFolder, options)
-        folderContents = folderContents.concat(data)
-        options.offset += options.limit
-        if (data.length < options.limit) {
-          break
-        }
+    for (;;) {
+      const { data } = await this.supabaseClient.storage
+        .from(this.selectedBucket.name)
+        .list(formattedPathToFolder, options)
+      folderContents = folderContents.concat(data)
+      options.offset += options.limit
+      if (data.length < options.limit) {
+        break
       }
+    }
 
     const subfolders = folderContents?.filter((item) => isNull(item.id)) ?? []
     const folderItems = folderContents?.filter((item) => !isNull(item.id)) ?? []

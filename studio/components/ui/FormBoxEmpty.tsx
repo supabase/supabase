@@ -2,8 +2,8 @@ import { ReactText } from 'react'
 import { Typography } from '@supabase/ui'
 
 interface Props {
-  icon: JSX.Element;
-  text: ReactText;
+  icon: JSX.Element
+  text: ReactText
 }
 
 const FormBoxEmpty = ({ icon, text }: Props) => {

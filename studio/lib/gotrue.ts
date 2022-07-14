@@ -1,6 +1,7 @@
 import { GoTrueClient, User } from '@supabase/gotrue-js'
 
-export const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL || `${process.env.SUPABASE_URL}/auth/v1`
+export const GOTRUE_URL =
+  process.env.NEXT_PUBLIC_GOTRUE_URL || `${process.env.SUPABASE_URL}/auth/v1`
 
 export const auth = new GoTrueClient({
   url: GOTRUE_URL,

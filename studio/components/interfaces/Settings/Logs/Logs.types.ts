@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 interface Metadata {
   [key: string]: string | number | Object | Object[]
@@ -59,7 +59,7 @@ export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | "auth"
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'auth'
 
 export type Mode = 'simple' | 'custom'
 
