@@ -12,6 +12,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TwitterSocialSection from '~/components/TwitterSocialSection'
 
 // Import Swiper styles if swiper used on page
+
 import 'swiper/swiper.min.css'
 
 type Props = {}
