@@ -1,6 +1,7 @@
 import { GoTrueClient, User } from '@supabase/gotrue-js'
 
-export const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL || `${process.env.SUPABASE_URL}/auth/v1`
+export const GOTRUE_URL =
+  process.env.NEXT_PUBLIC_GOTRUE_URL || `${process.env.SUPABASE_URL}/auth/v1`
 
 export const auth = new GoTrueClient({
   url: GOTRUE_URL,
@@ -9,7 +10,7 @@ export const auth = new GoTrueClient({
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
-    const { data: user, error } = await auth.api.getUser(token.replace('Bearer ', ''))
+    const { user, error } = await auth.api.getUser(token.replace('Bearer ', ''))
     if (error) throw error
 
     return { user, error: null }

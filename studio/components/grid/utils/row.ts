@@ -1,9 +1,15 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { InitialStateType } from '../store/reducers'
+import { Sort, Filter } from '../types'
 
-export async function fetchCount(state: InitialStateType, dispatch: (value: unknown) => void) {
+export async function fetchCount(
+  state: InitialStateType,
+  dispatch: (value: unknown) => void,
+  filters: Filter[]
+) {
   if (!state.rowService) return
-  const { data, error } = await state.rowService.count(state.filters)
+
+  const { data, error } = await state.rowService.count(filters)
   if (error) {
     // TODO: handle fetch rows count error
   } else {
@@ -14,14 +20,20 @@ export async function fetchCount(state: InitialStateType, dispatch: (value: unkn
   }
 }
 
-export async function fetchPage(state: InitialStateType, dispatch: (value: unknown) => void) {
+export async function fetchPage(
+  state: InitialStateType,
+  dispatch: (value: unknown) => void,
+  sorts: Sort[],
+  filters: Filter[]
+) {
   if (!state.rowService) return
   dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: true } })
+
   const { data, error } = await state.rowService.fetchPage(
     state.page,
     state.rowsPerPage,
-    state.filters,
-    state.sorts
+    filters,
+    sorts
   )
   if (error) {
     // TODO: handle fetch rows data error

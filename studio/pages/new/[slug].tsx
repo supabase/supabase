@@ -59,7 +59,7 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const totalFreeProjects = subscriptionStats.total_free_projects
+  const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
   const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized

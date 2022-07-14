@@ -1,8 +1,9 @@
 import { FC, useState, useEffect } from 'react'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { Button, InputNumber, IconArrowRight, IconArrowLeft, IconLoader } from '@supabase/ui'
-import { DropdownControl, showConfirmAlert } from '../../common'
+import { DropdownControl } from '../../common'
 import { useDispatch, useTrackedState } from '../../../store'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
   dispatch({
@@ -41,7 +42,7 @@ const Pagination: FC<PaginationProps> = () => {
   const onPreviousPage = () => {
     if (state.page > 1) {
       if (state.selectedRows.size >= 1) {
-        showConfirmAlert({
+        confirmAlert({
           title: 'Confirm moving to previous page',
           message: 'The currently selected lines will be deselected, do you want to proceed?',
           onConfirm: () => {
@@ -61,7 +62,7 @@ const Pagination: FC<PaginationProps> = () => {
   const onNextPage = () => {
     if (state.page < maxPages) {
       if (state.selectedRows.size >= 1) {
-        showConfirmAlert({
+        confirmAlert({
           title: 'Confirm moving to next page',
           message: 'The currently selected lines will be deselected, do you want to proceed?',
           onConfirm: () => {

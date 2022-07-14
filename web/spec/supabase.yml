@@ -2655,7 +2655,7 @@ pages:
               config: 'english' 
             })
           ```
-      - name: Full normalization
+      - name: Websearch
         description: |
           Uses PostgreSQL's `websearch_to_tsquery` function. 
           This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 

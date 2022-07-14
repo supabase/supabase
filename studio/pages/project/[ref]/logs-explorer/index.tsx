@@ -35,8 +35,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
-      iso_timestamp_start: its ? its as string : undefined,
-      iso_timestamp_end: ite ? ite as string : undefined,
+      iso_timestamp_start: its ? (its as string) : undefined,
+      iso_timestamp_end: ite ? (ite as string) : undefined,
     })
 
   useEffect(() => {

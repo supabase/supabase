@@ -49,7 +49,7 @@ export default observer(ProjectSettings)
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const ref = router.query.ref as string;
+  const ref = router.query.ref as string
 
   return (
     <>
@@ -297,7 +297,7 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
             <Typography.Text className="block">SSL Connection</Typography.Text>
             <div style={{ maxWidth: '420px' }}>
               <p className="text-sm opacity-50">
-                Use this cert when connecting to your database to prevent snooping and
+                Use this certificate when connecting to your database to prevent snooping and
                 man-in-the-middle attacks.
               </p>
             </div>

@@ -33,8 +33,8 @@ import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 
 dayjs.extend(customParseFormat)
-dayjs.extend(timezone)
 dayjs.extend(utc)
+dayjs.extend(timezone)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [queryClient] = useState(() => new QueryClient())
