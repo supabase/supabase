@@ -13,15 +13,6 @@ const PageTelemetry: FC = ({ children }) => {
   const { profile } = ui
 
   useEffect(() => {
-    // `routeChangeComplete` won't run for the first page load unless the query string is
-    // hydrated later on, so here we log a page view if this is the first render and
-    // there's no query string
-    if (!router.asPath.includes('[') && !router.asPath.includes(']')) {
-      handlePageTelemetry(profile)
-    }
-  }, [profile])
-
-  useEffect(() => {
     function handleRouteChange() {
       handlePageTelemetry(profile)
     }
