@@ -32,9 +32,14 @@ const RedirectDomains = () => {
       authConfig.update({ URI_ALLOW_LIST: payload.toString() })
       setSubmitting(false)
       setOpen(false)
+      ui.setNotification({ category: 'success', message: 'Successfully added domain' })
     } catch (error: any) {
       setSubmitting(false)
-      ui.notification?.error('Failed to update domain: ', error?.message)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update domain: ${error?.message}`,
+      })
     }
   }
 
@@ -48,9 +53,14 @@ const RedirectDomains = () => {
       await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
       setIsDeleting(false)
       setSelectedDomainToDelete(undefined)
+      ui.setNotification({ category: 'success', message: 'Successfully removed domain' })
     } catch (error: any) {
       setIsDeleting(false)
-      ui.notification?.error('Failed to remove domain: ', error?.message)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to remove domain: ${error?.message}`,
+      })
     }
   }
 
