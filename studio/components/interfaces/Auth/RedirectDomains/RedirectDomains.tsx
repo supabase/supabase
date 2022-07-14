@@ -5,7 +5,7 @@ import { Button, Form, Input, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
-import { domainRegex } from './RedirectDomains.constants'
+import { domainRegex } from '../Auth.constants'
 import DomainList from './DomainList'
 
 const RedirectDomains = () => {
