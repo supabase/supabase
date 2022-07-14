@@ -7,6 +7,7 @@ import { useOrganizationDetail, useStore } from 'hooks'
 import { Member } from 'types'
 import { API_URL } from 'lib/constants'
 import { post, delete_ } from 'lib/common/fetch'
+import { isInviteExpired } from './Organization.utils'
 import { PageContext } from 'pages/org/[slug]/settings'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -22,16 +23,6 @@ const OwnerDropdown = observer(({ members, member }: any) => {
   const [ownerTransferIsVisble, setOwnerTransferIsVisble] = useState(false)
 
   const { id: orgId, slug: orgSlug, name: orgName } = PageState.organization
-
-  // Invite is expired if older than 24hrs
-  function isInviteExpired(timestamp: Date) {
-    const inviteDate = new Date(timestamp)
-    const now = new Date()
-    var timeBetween = now.valueOf() - inviteDate.valueOf()
-    if (timeBetween / 1000 / 60 / 60 < 24) {
-      return true
-    }
-  }
 
   async function handleMemberDelete() {
     await timeout(200)
