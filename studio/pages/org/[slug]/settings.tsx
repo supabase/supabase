@@ -42,7 +42,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 export const PageContext = createContext(null)
 
 // Invite is expired if older than 24hrs
-function inviteExpired(timestamp: Date) {
+function isInviteExpired(timestamp: Date) {
   const inviteDate = new Date(timestamp)
   const now = new Date()
   var timeBetween = now.valueOf() - inviteDate.valueOf()
@@ -410,8 +410,8 @@ const MembersView = observer(() => {
 
                 <Table.td>
                   {x.invited_id && (
-                    <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
-                      {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                    <Badge color={isInviteExpired(x.invited_at) ? 'yellow' : 'red'}>
+                      {isInviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
                     </Badge>
                   )}
                 </Table.td>
