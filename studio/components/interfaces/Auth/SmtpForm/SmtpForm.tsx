@@ -216,11 +216,10 @@ const SmtpForm = () => {
                     label="Host"
                     descriptionText="Hostname or IP address of your SMTP server."
                   />
-                  <Input
-                    type="number"
+                  <InputNumber
                     name="SMTP_PORT"
-                    placeholder="587"
                     id="SMTP_PORT"
+                    placeholder="587"
                     label="Port number"
                     descriptionText={
                       <>
@@ -236,12 +235,18 @@ const SmtpForm = () => {
                     }
                   />
                   <InputNumber
-                    name="SMTP_MAX_FREQUENCY"
                     id="SMTP_MAX_FREQUENCY"
-                    min={0}
+                    name="SMTP_MAX_FREQUENCY"
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
-                    actions={<span className="text-scale-900 mr-3">In seconds</span>}
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                  />
+                  <InputNumber
+                    id="RATE_LIMIT_EMAIL_SENT"
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
+                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                   />
                   <InputNumber
                     name="RATE_LIMIT_EMAIL_SENT"
