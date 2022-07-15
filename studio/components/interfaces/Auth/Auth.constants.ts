@@ -35,5 +35,3 @@ export const domainRegex = new RegExp(
   `(${baseDomainRegex.source})|(${localhostRegex.source})|(${appRegex.source})`,
   'i'
 )
-
-// zone-www-dot-*-supabase.vercel.app
