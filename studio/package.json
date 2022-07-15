@@ -28,7 +28,7 @@
     "@supabase/react-data-grid": "^7.1.0-beta.7",
     "@supabase/shared-types": "^0.1.24",
     "@supabase/supabase-js": "^1.35.3",
-    "@supabase/ui": "0.37.0-alpha.68",
+    "@supabase/ui": "0.37.0-alpha.71",
     "ajv": "^8.6.3",
     "analytics-node": "^3.5.0",
     "awesome-debounce-promise": "^2.1.0",

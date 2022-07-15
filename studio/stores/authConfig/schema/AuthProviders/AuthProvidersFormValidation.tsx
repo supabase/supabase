@@ -28,7 +28,7 @@ const PROVIDER_EMAIL = {
       title: 'Mailer OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Min password length',
@@ -174,13 +174,13 @@ const PROVIDER_PHONE = {
       title: 'SMS OTP Expiry',
       type: 'number',
       description: 'Duration before an SMS OTP expires',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
