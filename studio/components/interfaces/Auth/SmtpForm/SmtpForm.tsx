@@ -12,7 +12,8 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { domainRegex, defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { domainRegex } from './../Auth.constants'
 import { isSmtpEnabled, generateFormValues } from './SmtpForm.utils'
 
 const SmtpForm = () => {
