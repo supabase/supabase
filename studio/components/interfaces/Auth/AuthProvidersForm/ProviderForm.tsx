@@ -155,12 +155,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.descriptionOptional ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.descriptionOptional}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
                             }
                           />
                         )
@@ -181,12 +183,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.descriptionOptional ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.descriptionOptional}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
                             }
                           />
                         )
