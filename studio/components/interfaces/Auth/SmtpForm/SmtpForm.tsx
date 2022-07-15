@@ -248,6 +248,14 @@ const SmtpForm = () => {
                     descriptionText="How many emails can be sent per hour."
                     actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                   />
+                  <InputNumber
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    id="RATE_LIMIT_EMAIL_SENT"
+                    min={0}
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
+                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                  />
                   <Input
                     name="SMTP_USER"
                     id="SMTP_USER"
