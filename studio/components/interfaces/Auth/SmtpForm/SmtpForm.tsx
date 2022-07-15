@@ -240,9 +240,9 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     id="SMTP_MAX_FREQUENCY"
                     min={0}
-                    label="Rate limit"
-                    descriptionText="Maximum number of emails sent per hour"
-                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                    label="Minimum interval between emails being sent"
+                    descriptionText="How long between each email can a new email be sent via your SMTP server."
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
                   />
                   <Input
                     name="SMTP_USER"
