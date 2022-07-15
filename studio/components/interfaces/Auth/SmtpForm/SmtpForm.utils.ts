@@ -27,5 +27,6 @@ export const generateFormValues = (config?: Partial<AuthConfig>): Partial<AuthCo
     SMTP_PASS: config?.SMTP_PASS ?? '',
     SMTP_PORT: config?.SMTP_PORT ?? 465,
     SMTP_MAX_FREQUENCY: config?.SMTP_MAX_FREQUENCY ?? 60,
+    RATE_LIMIT_EMAIL_SENT: config?.RATE_LIMIT_EMAIL_SENT ?? 30,
   }
 }
