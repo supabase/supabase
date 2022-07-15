@@ -28,6 +28,7 @@ const PROVIDER_EMAIL = {
       title: 'Mailer OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
+      descriptionOptional: 'In seconds',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Min password length',
