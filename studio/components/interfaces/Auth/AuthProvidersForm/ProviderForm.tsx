@@ -148,6 +148,13 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                             key={x}
                             name={x}
                             label={properties.title}
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
                             descriptionText={
                               properties.description ? (
                                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -155,12 +162,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.units ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.units}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
                             }
                           />
                         )
@@ -174,6 +183,13 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                             key={x}
                             name={x}
                             label={properties.title}
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
                             descriptionText={
                               properties.description ? (
                                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -181,12 +197,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                                 </ReactMarkdown>
                               ) : null
                             }
-                            labelOptional={
-                              properties.descriptionOptional ? (
-                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                  {properties.descriptionOptional}
-                                </ReactMarkdown>
-                              ) : null
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.units ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.units}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
                             }
                           />
                         )
