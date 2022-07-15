@@ -1,5 +1,4 @@
 import { boolean, number, object, string } from 'yup'
-import { domainRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -376,7 +375,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret ID is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().url('Not a valid URL or IP address.'),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -569,7 +568,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(domainRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().url('Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -654,9 +653,8 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     }),
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
-      then: (schema) =>
-        schema.matches(domainRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(domainRegex, 'Must be a valid URL'),
+      then: (schema) => schema.url('Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.url('Must be a valid URL'),
     }),
   }),
   misc: {
@@ -914,7 +912,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(domainRegex, 'Must be a valid URL')
+      .url('Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),

@@ -12,7 +12,6 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useStore } from 'hooks'
-import { domainRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
@@ -50,9 +49,7 @@ const SmtpForm = () => {
         return enableSmtp
       },
       then: (schema) =>
-        schema
-          .matches(domainRegex, 'Must be a valid URL or IP address')
-          .required('Host URL is required.'),
+        schema.url('Not a valid URL or IP address').required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
     SMTP_PORT: number().when([], {

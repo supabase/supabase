@@ -5,7 +5,6 @@ import { Button, Form, Input, Modal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
-import { domainRegex } from '../Auth.constants'
 import DomainList from './DomainList'
 
 const RedirectDomains = () => {
@@ -20,7 +19,8 @@ const RedirectDomains = () => {
   const [selectedDomainToDelete, setSelectedDomainToDelete] = useState<string>()
 
   const newDomainSchema = object({
-    domain: string().matches(domainRegex, 'URL is not valid').required(),
+    // intentionally not using yup's .url() because it does not support schemeless URLs
+    domain: string().url('Not a valid redirect URL'),
   })
 
   const onAddNewDomain = async (values: any, { setSubmitting }: any) => {
