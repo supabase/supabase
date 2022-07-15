@@ -13,11 +13,9 @@ You will need to run the marketing website and docs website separately. To learn
 cd supabase
 
 # step 2
-cd apps/www
-
-# step 3
 npm install
 npm run dev
+
 
 # visit website
 http://localhost:3000
