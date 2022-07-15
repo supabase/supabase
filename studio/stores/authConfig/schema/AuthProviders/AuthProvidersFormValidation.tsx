@@ -38,7 +38,7 @@ const PROVIDER_EMAIL = {
   validationSchema: object().shape({
     PASSWORD_MIN_LENGTH: number()
       .required('A password is required.')
-      .min(8, 'Password length must be at least 8 characters long'),
+      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
