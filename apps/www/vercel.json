@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "src/pages/api/launchweek/ticket-images/*.ts": {
+      "memory": 3008,
+      "maxDuration": 30
+    }
+  }
+}

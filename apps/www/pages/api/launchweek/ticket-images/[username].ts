@@ -27,7 +27,6 @@ export default async function ticketImages(req: NextApiRequest, res: NextApiResp
   if (username) {
     const usernameString = username.toString()
     const user = await getUserByUsername(usernameString)
-    console.log(user)
     name = user.name
     ticketNumber = user.ticketNumber
     url = `${SITE_URL}/ticket-image?username=${encodeURIComponent(
@@ -36,7 +35,6 @@ export default async function ticketImages(req: NextApiRequest, res: NextApiResp
     if (name) {
       url = `${url}&name=${encodeURIComponent(name)}`
     }
-    console.log(url)
     const file = await screenshot(url)
     res.setHeader('Content-Type', `image/png`)
     res.setHeader(
