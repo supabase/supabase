@@ -38,10 +38,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
      * as it breaks form. null is not a valid value.
      */
     Object.keys(provider.properties).forEach((key) => {
-      /**
-       * when the key is a 'double negative' key,
-       * we must reverse the boolean before adding it to the form
-       */
+      // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       INITIAL_VALUES[key] = isDoubleNegative
@@ -52,22 +49,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     try {
-      /**
-       * payload used to update the auth config
-       */
       const payload = { ...values }
 
-      /**
-       * when the key is a 'double negative' key,
-       * we must reverse the boolean before the payload can be sent
-       */
+      // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
       Object.keys(values).map((x: string) => {
         if (doubleNegativeKeys.includes(x)) {
           payload[x] = !values[x]
         }
       })
-
-      console.log('payload', payload)
 
       await authConfig.update(payload)
 
