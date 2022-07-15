@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import cn from 'classnames';
-import styles from './icon-transition.module.css';
+import cn from 'classnames'
+import styles from './icon-transition.module.css'
 
-type Props = { width: number | string };
+type Props = { width: number | string }
 
 export default function IconDownload({ width }: Props) {
   return (
@@ -44,5 +44,5 @@ export default function IconDownload({ width }: Props) {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

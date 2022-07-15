@@ -28,6 +28,6 @@ const BringToStageIcon = () => (
       strokeLinejoin="round"
     />
   </svg>
-);
+)
 
-export default BringToStageIcon;
+export default BringToStageIcon

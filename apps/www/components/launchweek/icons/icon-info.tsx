@@ -1,5 +1,5 @@
-import React from 'react';
-import { SVGProps } from 'react';
+import React from 'react'
+import { SVGProps } from 'react'
 
 const InfoIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
@@ -16,7 +16,7 @@ const InfoIcon = (props: SVGProps<SVGSVGElement>) => {
         fill="#fff"
       />
     </svg>
-  );
-};
+  )
+}
 
-export default InfoIcon;
+export default InfoIcon

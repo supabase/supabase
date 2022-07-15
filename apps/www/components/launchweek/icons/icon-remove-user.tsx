@@ -14,6 +14,6 @@ const RemoveUserIcon = () => (
       strokeLinejoin="round"
     />
   </svg>
-);
+)
 
-export default RemoveUserIcon;
+export default RemoveUserIcon

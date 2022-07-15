@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'next/router';
-import Head from 'next/head';
-import TicketVisual from './ticket-visual';
-import styles from './ticket-image.module.css';
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import TicketVisual from './ticket-visual'
+import styles from './ticket-image.module.css'
 
 export default function TicketImage() {
-  const { query } = useRouter();
+  const { query } = useRouter()
   if (query.ticketNumber) {
     return (
       <div className={styles.background}>
@@ -46,7 +46,7 @@ export default function TicketImage() {
           />
         </div>
       </div>
-    );
+    )
   }
-  return <></>;
+  return <></>
 }

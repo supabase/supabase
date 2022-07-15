@@ -54,5 +54,5 @@ export default function IconAvatar() {
         strokeLinejoin="round"
       />
     </svg>
-  );
+  )
 }

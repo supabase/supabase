@@ -37,5 +37,5 @@ export default function TicketMono() {
       />
       <path d="M512 5V326" stroke="#444444" strokeDasharray="6 6" />
     </svg>
-  );
+  )
 }

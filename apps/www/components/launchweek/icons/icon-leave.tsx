@@ -1,4 +1,4 @@
-import { SVGProps } from 'react';
+import { SVGProps } from 'react'
 
 const LeaveIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width={24} height={24} fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -9,6 +9,6 @@ const LeaveIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#fff"
     />
   </svg>
-);
+)
 
-export default LeaveIcon;
+export default LeaveIcon

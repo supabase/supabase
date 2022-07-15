@@ -16,7 +16,7 @@ function HorizontalMenuIcon(props: React.SVGProps<SVGSVGElement>) {
       <circle cx={19} cy={12} r={1} fill="currentColor" />
       <circle cx={5} cy={12} r={1} fill="currentColor" />
     </svg>
-  );
+  )
 }
 
-export default HorizontalMenuIcon;
+export default HorizontalMenuIcon

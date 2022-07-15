@@ -1,4 +1,4 @@
-import { SVGProps } from 'react';
+import { SVGProps } from 'react'
 
 const InviteIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width={24} height={24} fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -9,6 +9,6 @@ const InviteIcon = (props: SVGProps<SVGSVGElement>) => (
       fill="#fff"
     />
   </svg>
-);
+)
 
-export default InviteIcon;
+export default InviteIcon

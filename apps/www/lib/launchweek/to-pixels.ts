@@ -20,10 +20,10 @@
 
 const toPixels = (value: string | number) => {
   if (typeof value === 'number') {
-    return `${value}px`;
+    return `${value}px`
   }
 
-  return value;
-};
+  return value
+}
 
-export default toPixels;
+export default toPixels

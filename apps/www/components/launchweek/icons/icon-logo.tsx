@@ -65,5 +65,5 @@ export default function IconLogo({
         </linearGradient>
       </defs>
     </svg>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import { SVGProps } from 'react';
+import React from 'react'
+import { SVGProps } from 'react'
 
 const HmsLogo = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -222,6 +222,6 @@ const HmsLogo = (props: SVGProps<SVGSVGElement>) => (
       />
     </defs>
   </svg>
-);
+)
 
-export default HmsLogo;
+export default HmsLogo

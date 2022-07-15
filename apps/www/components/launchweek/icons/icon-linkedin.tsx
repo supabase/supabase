@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import styles from './icon-transition.module.css';
+import styles from './icon-transition.module.css'
 
-type Props = { width: number | string };
+type Props = { width: number | string }
 
 export default function IconLinkedin({ width }: Props) {
   return (
@@ -28,5 +28,5 @@ export default function IconLinkedin({ width }: Props) {
         className={styles['fill-black']}
       />
     </svg>
-  );
+  )
 }

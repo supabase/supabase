@@ -16,7 +16,7 @@ function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
       <circle cx={12} cy={5} r={1} fill="currentColor" />
       <circle cx={12} cy={19} r={1} fill="currentColor" />
     </svg>
-  );
+  )
 }
 
-export default MenuIcon;
+export default MenuIcon

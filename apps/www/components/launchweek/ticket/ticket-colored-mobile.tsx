@@ -37,5 +37,5 @@ export default function TicketColoredMobile() {
       />
       <path d="M326 446H5" stroke="#444444" strokeDasharray="6 6" />
     </svg>
-  );
+  )
 }
