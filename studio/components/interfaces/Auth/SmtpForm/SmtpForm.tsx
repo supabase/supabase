@@ -1,9 +1,8 @@
+import { Alert, Form, Input, Toggle } from '@supabase/ui'
+import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
-import { observer } from 'mobx-react-lite'
-import { Form, Input, Toggle, Alert } from '@supabase/ui'
 
-import { useStore } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -12,9 +11,10 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { useStore } from 'hooks'
 import { domainRegex } from './../Auth.constants'
-import { isSmtpEnabled, generateFormValues } from './SmtpForm.utils'
+import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
   const { authConfig, ui } = useStore()
@@ -240,9 +240,9 @@ const SmtpForm = () => {
                     name="SMTP_MAX_FREQUENCY"
                     id="SMTP_MAX_FREQUENCY"
                     min={0}
-                    label="Rate limit"
-                    descriptionText="Maximum number of emails sent per hour"
-                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                    label="Minimum interval between emails being sent"
+                    labelOptional="In seconds"
+                    descriptionText="How long between each email can a new email be sent via your SMTP server."
                   />
                   <Input
                     name="SMTP_USER"
