@@ -124,16 +124,16 @@ const AutoSchemaForm = observer(() => {
                     id="JWT_EXP"
                     size="small"
                     label="JWT expiry limit"
-                    labelOptional="In seconds"
                     descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
                   />
                   <InputNumber
                     id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                     size="small"
                     min={0}
                     label="Reuse Interval"
-                    labelOptional="In seconds"
                     descriptionText="Time interval where the same refresh token can be used to request for an access token."
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
                   />
                 </FormSectionContent>
               </FormSection>
