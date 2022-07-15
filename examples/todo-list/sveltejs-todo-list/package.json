@@ -34,7 +34,7 @@
     "prettier-plugin-svelte": "^1.4.0",
     "rollup-plugin-inject-process-env": "^1.3.0",
     "snowpack": "^2.5.0",
-    "svelte": "^3.21.0",
+    "svelte": "^3.49.0",
     "svelte-jester": "^1.1.5",
     "svelte-preprocess": "^3.9.7"
   },
