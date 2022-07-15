@@ -245,6 +245,15 @@ const SmtpForm = () => {
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
                   />
                   <Input
+                    type="number"
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    id="RATE_LIMIT_EMAIL_SENT"
+                    min={0}
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
+                    actions={<span className="text-scale-900 mr-3">per hour</span>}
+                  />
+                  <Input
                     name="SMTP_USER"
                     id="SMTP_USER"
                     label="Username"
