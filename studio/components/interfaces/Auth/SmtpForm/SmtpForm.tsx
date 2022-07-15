@@ -1,4 +1,4 @@
-import { Alert, Form, Input, Toggle } from '@supabase/ui'
+import { Alert, Form, Input, InputNumber, Toggle } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
@@ -235,8 +235,7 @@ const SmtpForm = () => {
                       </>
                     }
                   />
-                  <Input
-                    type="number"
+                  <InputNumber
                     name="SMTP_MAX_FREQUENCY"
                     id="SMTP_MAX_FREQUENCY"
                     min={0}
@@ -244,14 +243,13 @@ const SmtpForm = () => {
                     labelOptional="In seconds"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
                   />
-                  <Input
-                    type="number"
+                  <InputNumber
                     name="RATE_LIMIT_EMAIL_SENT"
                     id="RATE_LIMIT_EMAIL_SENT"
                     min={0}
                     label="Rate limit for sending emails"
                     descriptionText="How many emails can be sent per hour."
-                    actions={<span className="text-scale-900 mr-3">per hour</span>}
+                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                   />
                   <Input
                     name="SMTP_USER"
