@@ -41,7 +41,7 @@ const Error404 = () => {
         </div>
         <div className="absolute">
           <h1
-            className={`text-scale-1200 select-none text-9xl opacity-[5%] filter transition duration-200 ${
+            className={`text-scale-1200 select-none text-[12rem] opacity-[15%] filter transition duration-200 sm:text-[16rem] ${
               show404 ? 'blur-sm' : 'blur-none'
             }`}
           >
