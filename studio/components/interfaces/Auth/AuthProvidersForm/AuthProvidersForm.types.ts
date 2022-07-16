@@ -14,6 +14,7 @@ export interface Provider {
       type: 'boolean' | 'string' | 'select' | 'number'
       description?: string
       descriptionOptional?: string
+      units?: string
       enum: Enum[]
       show: {
         key: string

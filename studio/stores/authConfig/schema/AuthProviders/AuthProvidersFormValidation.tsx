@@ -28,6 +28,7 @@ const PROVIDER_EMAIL = {
       title: 'Mailer OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
+      units: 'seconds',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Min password length',
@@ -38,7 +39,7 @@ const PROVIDER_EMAIL = {
   validationSchema: object().shape({
     PASSWORD_MIN_LENGTH: number()
       .required('A password is required.')
-      .min(8, 'Password length must be at least 8 characters long'),
+      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
@@ -173,13 +174,13 @@ const PROVIDER_PHONE = {
       title: 'SMS OTP Expiry',
       type: 'number',
       description: 'Duration before an SMS OTP expires',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',

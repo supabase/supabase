@@ -1,4 +1,4 @@
-import { Alert, Form, Input, Toggle } from '@supabase/ui'
+import { Alert, Form, Input, InputNumber, Toggle } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
@@ -216,11 +216,10 @@ const SmtpForm = () => {
                     label="Host"
                     descriptionText="Hostname or IP address of your SMTP server."
                   />
-                  <Input
-                    type="number"
+                  <InputNumber
                     name="SMTP_PORT"
-                    placeholder="587"
                     id="SMTP_PORT"
+                    placeholder="587"
                     label="Port number"
                     descriptionText={
                       <>
@@ -235,13 +234,26 @@ const SmtpForm = () => {
                       </>
                     }
                   />
-                  <Input
-                    type="number"
-                    name="SMTP_MAX_FREQUENCY"
+                  <InputNumber
                     id="SMTP_MAX_FREQUENCY"
+                    name="SMTP_MAX_FREQUENCY"
+                    label="Minimum interval between emails being sent"
+                    descriptionText="How long between each email can a new email be sent via your SMTP server."
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                  />
+                  <InputNumber
+                    id="RATE_LIMIT_EMAIL_SENT"
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
+                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                  />
+                  <InputNumber
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    id="RATE_LIMIT_EMAIL_SENT"
                     min={0}
-                    label="Rate limit"
-                    descriptionText="Maximum number of emails sent per hour"
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
                     actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                   />
                   <Input
