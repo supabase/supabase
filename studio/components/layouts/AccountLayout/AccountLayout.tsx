@@ -7,6 +7,24 @@ import { useStore, withAuth, useFlag } from 'hooks'
 import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
 
+export type SidebarLink = {
+  label: string
+  href?: string
+  key: string
+  icon?: string
+  external?: boolean
+  isActive?: Boolean
+  subitemsKey?: string
+  onClick?: () => Promise<void>
+}
+
+export type SidebarSection = {
+  key: string
+  heading?: string
+  versionLabel?: string
+  links: SidebarLink[]
+}
+
 /**
  * layout for dashboard homepage, account and org settings
  *
@@ -38,57 +56,64 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
 
   const organizationsLinks = app.organizations
     .list()
-    .map((x: any) => ({
-      isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug == x.slug,
-      label: x.name,
-      href: `/org/${x.slug}/settings`,
+    .map((organization) => ({
+      isActive:
+        router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug == organization.slug,
+      label: organization.name,
+      href: `/org/${organization.slug}/settings`,
+      key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
-  let linksWithHeaders = [
+  let sectionsWithHeaders: SidebarSection[] = [
     {
       heading: 'Projects',
+      key: 'projects',
       links: [
         {
           isActive: router.pathname == '/',
           label: 'All projects',
           href: '/',
+          key: 'all-projects-item',
         },
       ],
     },
-    ...(IS_PLATFORM
-      ? [
+  ]
+
+  if (IS_PLATFORM) {
+    sectionsWithHeaders.push(
+      {
+        heading: 'Organizations',
+        key: 'organizations',
+        links: organizationsLinks,
+      },
+      {
+        heading: 'Account',
+        key: 'account',
+        links: [
           {
-            heading: 'Organizations',
-            links: organizationsLinks,
+            isActive: router.pathname == `/account/me`,
+            icon: '/img/user.svg',
+            label: 'Preferences',
+            href: `/account/me`,
+            key: `/account/me`,
           },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
           {
-            heading: 'Account',
-            links: [
-              {
-                isActive: router.pathname == `/account/me`,
-                icon: '/img/user.svg',
-                label: 'Preferences',
-                href: `/account/me`,
-                key: `/account/me`,
-              },
-              {
-                isActive: router.pathname == `/account/tokens`,
-                icon: '/img/user.svg',
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
-            ],
+            isActive: router.pathname == `/account/tokens`,
+            icon: '/img/user.svg',
+            label: 'Access Tokens',
+            href: `/account/tokens`,
+            key: `/account/tokens`,
           },
-        ]
-      : []),
+        ],
+      }
+    )
+  }
+
+  sectionsWithHeaders.push(
     {
       heading: 'Documentation',
+      key: 'documentation',
       links: [
         {
           key: 'ext-guides',
@@ -107,11 +132,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
       ],
     },
     {
+      key: 'logout-link',
       links: [logoutLink],
-    },
-  ]
+    }
+  )
+
   if (!organizationsLinks?.length)
-    linksWithHeaders = linksWithHeaders.filter((x: any) => x.heading != 'Organizations')
+    sectionsWithHeaders = sectionsWithHeaders.filter((x) => x.heading != 'Organizations')
   return (
     <>
       <Head>
@@ -124,7 +151,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           style={{ height: maxHeight, maxHeight }}
           className="flex w-full flex-1 flex-col overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} links={linksWithHeaders}>
+          <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
             {children}
           </WithSidebar>
         </main>
