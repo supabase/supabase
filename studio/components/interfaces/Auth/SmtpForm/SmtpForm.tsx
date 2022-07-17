@@ -107,6 +107,7 @@ const SmtpForm = () => {
       await authConfig.update(payload)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
 
+      setHidden(true)
       const updatedFormValues = generateFormValues(payload)
       resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
     } catch (error) {
