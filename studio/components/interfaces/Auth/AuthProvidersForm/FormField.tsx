@@ -115,6 +115,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
             return (
               <Listbox.Option
                 id={option.value}
+                key={option.value}
                 label={option.label}
                 value={option.value}
                 addOnBefore={() => <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />}
