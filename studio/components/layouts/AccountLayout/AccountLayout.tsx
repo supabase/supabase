@@ -6,6 +6,7 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useStore, withAuth, useFlag } from 'hooks'
 import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
+import { ReactNode } from 'react'
 
 export type SidebarLink = {
   label: string
@@ -13,7 +14,7 @@ export type SidebarLink = {
   key: string
   icon?: string
   external?: boolean
-  isActive?: Boolean
+  isActive?: boolean
   subitemsKey?: string
   onClick?: () => Promise<void>
 }
@@ -25,6 +26,14 @@ export type SidebarSection = {
   links: SidebarLink[]
 }
 
+type AccountLayoutProps = {
+  title: string;
+  breadcrumbs: {
+    key: string;
+    label: string
+  }[]
+  children: ReactNode
+}
 /**
  * layout for dashboard homepage, account and org settings
  *
@@ -33,7 +42,7 @@ export type SidebarSection = {
  * @param {Array<Object>}               breadcrumbs
  */
 
-const AccountLayout = ({ children, title, breadcrumbs }: any) => {
+const AccountLayout = ({ children, title, breadcrumbs }: AccountLayoutProps) => {
   const router = useRouter()
   const { app, ui } = useStore()
 
