@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'todos'
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'supatodo.urls'
+DEFAULT_FILE_STORAGE = 'django_storage_supabase.supabase'
+SUPABASE_ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoeXB3d3FxbW1vZnloZHJkdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE2NDc0NTMsImV4cCI6MTk2NzIyMzQ1M30.RfrXahMPjL_G31SUqm0WM8JiAgizR_dybMKR7iSeJYY'
+SUPABASE_URL = "https://thypwwqqmmofyhdrduye.supabase.co"
+SUPABASE_ROOT_PATH = '/dir/'
 
 TEMPLATES = [
     {
@@ -76,10 +81,10 @@ WSGI_APPLICATION = 'supatodo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'supatodo',
+        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db.dtfipkryibjdsrvghhjk.supabase.co',
+        'PASSWORD': 'testsupabasenow',
+        'HOST': 'db.thypwwqqmmofyhdrduye.supabase.co',
         'PORT': '5432',
     }
 }# Password validation
