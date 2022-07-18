@@ -5,7 +5,7 @@ import { FC, useState, useEffect } from 'react'
 interface Props {
   visible: boolean
   danger?: boolean
-  header: string
+  header: string | JSX.Element
   description?: string
   size?: 'small' | 'tiny' | 'medium' | 'large'
   buttonLabel: string
