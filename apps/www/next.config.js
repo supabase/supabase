@@ -698,7 +698,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: 'https://supabase.com/_app',
-        destination: 'app.supabase.com',
+        destination: 'https://app.supabase.com',
       },
     ]
   },
