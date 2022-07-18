@@ -81,6 +81,9 @@ module.exports = ui({
       dark: 'var(--colors-scale2)',
     }),
     extend: {
+      transitionProperty: {
+        height: 'height',
+      },
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
