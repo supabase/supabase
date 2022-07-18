@@ -76,66 +76,62 @@ const TemplateEditor: FC<Props> = ({ template }) => {
 
         return (
           <>
-            <FormSection
-              className="!border-t-0"
-              header={
-                <FormSectionLabel>
-                  <span>SMTP Provider Settings</span>
-                  <p className="text-scale-900 my-4">
-                    Your SMTP Credentials will always be encrypted in our database.
-                  </p>
-                </FormSectionLabel>
-              }
-            >
+            <FormSection className="!border-t-0 pb-8 pt-4">
               <FormSectionContent loading={!isLoaded}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]
                   if (property.type === 'string') {
                     return (
-                      <Input
-                        size="small"
-                        layout="vertical"
-                        id={x}
-                        key={x}
-                        name={x}
-                        label={property.title}
-                        descriptionText={
-                          property.description ? (
-                            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                              {property.description}
-                            </ReactMarkdown>
-                          ) : null
-                        }
-                        labelOptional={
-                          property.descriptionOptional ? (
-                            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                              {property.descriptionOptional}
-                            </ReactMarkdown>
-                          ) : null
-                        }
-                      />
+                      <div className="space-y-3">
+                        <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">
+                          {property.title}
+                        </label>
+                        <Input
+                          size="small"
+                          layout="vertical"
+                          id={x}
+                          key={x}
+                          name={x}
+                          descriptionText={
+                            property.description ? (
+                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                {property.description}
+                              </ReactMarkdown>
+                            ) : null
+                          }
+                          labelOptional={
+                            property.descriptionOptional ? (
+                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                {property.descriptionOptional}
+                              </ReactMarkdown>
+                            ) : null
+                          }
+                        />
+                      </div>
                     )
                   }
                 })}
               </FormSectionContent>
             </FormSection>
             <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
-              <FormSectionContent loading={!isLoaded} fullWidth>
+              <FormSectionContent fullWidth loading={!isLoaded}>
                 {messageProperty && (
                   <>
-                    <FormSectionLabel>
-                      <span>{messageProperty.title}</span>
-                    </FormSectionLabel>
-                    <InformationBox
-                      title={'Message variables'}
-                      hideCollapse={false}
-                      defaultVisibility={true}
-                      description={
-                        messageProperty.description && (
-                          <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
-                        )
-                      }
-                    />
+                    <div className="space-y-3">
+                      <FormSectionLabel>
+                        <span>{messageProperty.title}</span>
+                      </FormSectionLabel>
+                      <InformationBox
+                        defaultVisibility
+                        title="Message variables"
+                        hideCollapse={false}
+                        description={
+                          messageProperty.description && (
+                            <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
+                          )
+                        }
+                      />
+                    </div>
                     <div className="relative h-96">
                       <CodeEditor
                         id="code-id"
