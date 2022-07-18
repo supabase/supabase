@@ -112,12 +112,18 @@ class StorageExplorerStore {
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
     this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
-      localStorage: {
-        getItem: (key) => {
-          return undefined
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        multiTab: false,
+        detectSessionInUrl: false,
+        localStorage: {
+          getItem: (key) => {
+            return undefined
+          },
+          setItem: (key, value) => {},
+          removeItem: (key) => {},
         },
-        setItem: (key, value) => {},
-        removeItem: (key) => {},
       },
     })
   }
