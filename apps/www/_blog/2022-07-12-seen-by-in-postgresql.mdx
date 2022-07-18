@@ -695,13 +695,23 @@ Even though the data says `hstore`, knowing that posts will be seen by more and 
 
 Another benefit of the HLL solution is that [PostgreSQL tablespaces][pg-tablespaces] allow us to put the association table on a different, slower storage mechanism, and keep our `posts` table fast. Arguably in a real system we might have the HLL in something like `redis` but for a v1, it looks like Postgres does quite well!
 
-# Wrap-up
+## Wrap-up
 
 I hope you enjoyed this look down the trunk hole, and you've got an idea of how to implement solutions to surprisingly complex problems like this one with Postgres.
 
 As usual, Postgres has the tools to solve the problem _reasonably_ well (if not completely) before you reach out for more complicated/standalone solutions.
 
 **See any problems with the code, solutions that haven't been tried? -- reach out, or open an issue!**
+
+## More Postgres resources
+
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/2022/06/28/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://supabase.com/blog/2020/11/18/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/2022/03/08/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/2021/02/27/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/2020/07/09/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/2021/12/01/realtime-row-level-security-in-postgresql)
+
 
 [pew-twitter-user-stats]: https://www.pewresearch.org/internet/2019/04/24/sizing-up-twitter-users/
 [k6]: https://k6.io
