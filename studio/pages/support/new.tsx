@@ -421,7 +421,7 @@ const SupportNew = () => {
                   <div className="px-6">
                     <Input.TextArea
                       label="Message"
-                      descriptionText="Describe the issue your facing, with any relevant information we may need"
+                      placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
                       limit={500}
                       labelOptional="500 character limit"
                       onChange={(e) => handleOnChange({ name: 'body', value: e.target.value })}
