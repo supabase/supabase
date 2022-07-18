@@ -687,13 +687,18 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '',
-        destination: '',
+        source: 'https://supabase.com/join',
+        destination: 'https://supabase.com/',
       },
       {
         permanent: true,
         source: 'https://supabase.com/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
         destination: 'https://supabase.com/blog/2022/06/29/visualizing-supabase-data-using-metabase',
+      },
+      {
+        permanent: true,
+        source: 'https://supabase.com/_app',
+        destination: 'app.supabase.com',
       },
     ]
   },
