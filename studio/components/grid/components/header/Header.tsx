@@ -60,7 +60,7 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
   const renderNewColumn = (onAddColumn?: () => void) => {
     if (!onAddColumn) return null
     return (
-      <Button type="text" onClick={onAddColumn}>
+      <Button size="tiny" icon={<IconPlus size={14} strokeWidth={2} />} onClick={onAddColumn}>
         New Column
       </Button>
     )
