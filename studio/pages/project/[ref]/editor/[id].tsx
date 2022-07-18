@@ -188,7 +188,9 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         children={
           <Modal.Content>
             <p className="text-scale-1100 py-4 text-sm">
