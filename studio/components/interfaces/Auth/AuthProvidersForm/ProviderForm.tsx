@@ -1,11 +1,22 @@
 import { FC, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from '@supabase/ui'
+import {
+  Alert,
+  Button,
+  Collapsible,
+  Form,
+  IconCheck,
+  IconChevronUp,
+  Input,
+  InputNumber,
+  Listbox,
+  Toggle,
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { Provider } from './AuthProvidersForm.types'
+import { Enum, Provider } from './AuthProvidersForm.types'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import FormField from './FormField'
+import { createConsoleLogger } from 'configcat-js'
 
 interface Props {
   provider: Provider
@@ -118,14 +129,128 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                 "
               >
                 <div className="mx-auto my-6 max-w-md space-y-6">
-                  {Object.keys(provider.properties).map((x: string) => (
-                    <FormField
-                      key={x}
-                      name={x}
-                      properties={provider.properties[x]}
-                      formValues={values}
-                    />
-                  ))}
+                  {Object.keys(provider.properties).map((x: string) => {
+                    const properties = provider.properties[x]
+                    // Conditionally hide properties based on value of key
+                    if (
+                      properties.show &&
+                      values[properties.show.key] !== properties.show.matches
+                    ) {
+                      return null
+                    }
+                    switch (properties.type) {
+                      case 'string':
+                        return (
+                          <Input
+                            size="small"
+                            layout="vertical"
+                            id={x}
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            descriptionText={
+                              properties.description ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.description}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.units ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.units}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
+                            }
+                          />
+                        )
+
+                      case 'number':
+                        return (
+                          <InputNumber
+                            size="small"
+                            layout="vertical"
+                            id={x}
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            labelOptional={
+                              properties.descriptionOptional ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.descriptionOptional}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            descriptionText={
+                              properties.description ? (
+                                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                  {properties.description}
+                                </ReactMarkdown>
+                              ) : null
+                            }
+                            actions={
+                              <span className="text-scale-900 mr-3">
+                                {properties.units ? (
+                                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                    {properties.units}
+                                  </ReactMarkdown>
+                                ) : null}
+                              </span>
+                            }
+                          />
+                        )
+
+                      case 'boolean':
+                        return (
+                          <Toggle
+                            size="small"
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            descriptionText={properties.description}
+                          />
+                        )
+
+                      case 'select':
+                        return (
+                          <Listbox
+                            size="small"
+                            key={x}
+                            name={x}
+                            label={properties.title}
+                            descriptionText={properties.description}
+                            defaultValue={properties.enum[0]}
+                          >
+                            {properties.enum.map((option: Enum) => {
+                              return (
+                                <Listbox.Option
+                                  id={option.value}
+                                  label={option.label}
+                                  value={option.value}
+                                  addOnBefore={() => (
+                                    <img className="h-6 w-6" src={`/img/icons/${option.icon}`} />
+                                  )}
+                                >
+                                  {option.label}
+                                </Listbox.Option>
+                              )
+                            })}
+                          </Listbox>
+                        )
+
+                      default:
+                        break
+                    }
+                  })}
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
                       <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
