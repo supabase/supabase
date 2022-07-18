@@ -95,12 +95,8 @@ class StorageExplorerStore {
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
+    this.abortController = new AbortController()
     this.ui = useStore().ui
-
-    // ignore when in a non-browser environment
-    if (typeof window !== 'undefined') {
-      this.abortController = new AbortController()
-    }
   }
 
   initStore(projectRef, url, serviceKey) {

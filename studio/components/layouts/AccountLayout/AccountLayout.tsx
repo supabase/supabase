@@ -1,22 +1,21 @@
 import Head from 'next/head'
-import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { IS_PLATFORM } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { useStore, withAuth, useFlag } from 'hooks'
 import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
 
-// Layout for dashboard homepage, account and org settings
+/**
+ * layout for dashboard homepage, account and org settings
+ *
+ * @param {String}                      title
+ * @param {JSX.Element|JSX.Element[]}   children
+ * @param {Array<Object>}               breadcrumbs
+ */
 
-interface Props {
-  title: string
-  breadcrumbs: Object[]
-  children: ReactNode
-}
-
-const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
+const AccountLayout = ({ children, title, breadcrumbs }: any) => {
   const router = useRouter()
   const { app, ui } = useStore()
 
@@ -28,29 +27,36 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
     router.reload()
   }
 
+  const baseLogoutLink = {
+    icon: '/icons/feather/power.svg',
+    label: 'Logout',
+    href: `${API_URL}/logout`,
+    key: `${API_URL}/logout`,
+  }
+
+  const logoutLink = { ...baseLogoutLink, href: undefined, onClick: onClickLogout }
+
   const organizationsLinks = app.organizations
     .list()
     .map((x: any) => ({
-      key: `${x.slug}-settings`,
-      href: `/org/${x.slug}/settings`,
+      isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug == x.slug,
       label: x.name,
-      isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === x.slug,
+      href: `/org/${x.slug}/settings`,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
-  const sidebarLinks = [
+  let linksWithHeaders = [
     {
       heading: 'Projects',
       links: [
         {
-          key: 'all-projects',
-          href: '/',
+          isActive: router.pathname == '/',
           label: 'All projects',
-          isActive: router.pathname === '/',
+          href: '/',
         },
       ],
     },
-    ...(IS_PLATFORM && organizationsLinks.length > 0
+    ...(IS_PLATFORM
       ? [
           {
             heading: 'Organizations',
@@ -64,18 +70,18 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
             heading: 'Account',
             links: [
               {
-                key: 'account-me',
-                href: '/account/me',
+                isActive: router.pathname == `/account/me`,
                 icon: '/img/user.svg',
                 label: 'Preferences',
-                isActive: router.pathname === '/account/me',
+                href: `/account/me`,
+                key: `/account/me`,
               },
               {
-                key: 'account-tokens',
-                href: '/account/tokens',
+                isActive: router.pathname == `/account/tokens`,
                 icon: '/img/user.svg',
                 label: 'Access Tokens',
-                isActive: router.pathname === '/account/tokens',
+                href: `/account/tokens`,
+                key: `/account/tokens`,
               },
             ],
           },
@@ -86,33 +92,26 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       links: [
         {
           key: 'ext-guides',
-          href: 'https://supabase.com/docs',
           icon: '/img/book.svg',
           label: 'Guides',
-          isExternal: true,
+          href: 'https://supabase.com/docs',
+          external: true,
         },
         {
           key: 'ext-guides',
-          href: 'https://supabase.com/docs/guides/api',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          isExternal: true,
+          href: 'https://supabase.com/docs/guides/api',
+          external: true,
         },
       ],
     },
     {
-      heading: '',
-      links: [
-        {
-          key: 'logout',
-          icon: '/icons/feather/power.svg',
-          label: 'Logout',
-          onClick: onClickLogout,
-        },
-      ],
+      links: [logoutLink],
     },
   ]
-
+  if (!organizationsLinks?.length)
+    linksWithHeaders = linksWithHeaders.filter((x: any) => x.heading != 'Organizations')
   return (
     <>
       <Head>
@@ -125,7 +124,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           style={{ height: maxHeight, maxHeight }}
           className="flex w-full flex-1 flex-col overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} links={sidebarLinks}>
+          <WithSidebar title={title} breadcrumbs={breadcrumbs} links={linksWithHeaders}>
             {children}
           </WithSidebar>
         </main>
