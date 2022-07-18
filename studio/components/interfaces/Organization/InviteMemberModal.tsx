@@ -75,7 +75,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     setEmailAddress(e.target.value)
   }
 
-  let schema = object({
+  const schema = object({
     email: string().email('Must be a valid email address').required('Email is required'),
   })
 
