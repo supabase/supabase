@@ -8,7 +8,7 @@ const BackupsError = () => {
         <IconInfo size={20} strokeWidth={1.5} />
         <p className="text-sm">
           Failed to retrieve backups for this project. Please contact{' '}
-          <Link href="mailto:support@supabase.com">
+          <Link href="/support/new">
             <a className="text-brand-900">support</a>
           </Link>
           .
