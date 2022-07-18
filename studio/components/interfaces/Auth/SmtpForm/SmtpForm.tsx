@@ -1,7 +1,7 @@
-import { Alert, Form, Input, InputNumber, Toggle } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
+import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from '@supabase/ui'
 
 import {
   FormActions,
@@ -18,8 +18,10 @@ import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
   const { authConfig, ui } = useStore()
-  const [enableSmtp, setEnableSmtp] = useState(false)
   const { config, isLoaded } = authConfig
+
+  const [enableSmtp, setEnableSmtp] = useState(false)
+  const [hidden, setHidden] = useState(true)
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig.config)
@@ -105,6 +107,7 @@ const SmtpForm = () => {
       await authConfig.update(payload)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
 
+      setHidden(true)
       const updatedFormValues = generateFormValues(payload)
       resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
     } catch (error) {
@@ -265,8 +268,16 @@ const SmtpForm = () => {
                   <Input
                     name="SMTP_PASS"
                     id="SMTP_PASS"
+                    type={hidden ? 'password' : 'text'}
                     label="Password"
                     placeholder="SMTP Password"
+                    actions={
+                      <Button
+                        icon={hidden ? <IconEye /> : <IconEyeOff />}
+                        type="default"
+                        onClick={() => setHidden(!hidden)}
+                      />
+                    }
                   />
                 </FormSectionContent>
               </FormSection>
