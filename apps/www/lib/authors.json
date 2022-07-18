@@ -144,5 +144,13 @@
     "position": "DevRel & Flutter",
     "author_url": "https://github.com/dshukertjr",
     "author_image_url": "https://github.com/dshukertjr.png"
+  },
+  {
+    "author_id": "andrew_smith",
+    "author": "Andrew Smith",
+    "username": "silentworks",
+    "position": "DevRel & DX",
+    "author_url": "https://github.com/silentworks",
+    "author_image_url": "https://github.com/silentworks.png"
   }
 ]
