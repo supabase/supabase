@@ -1,14 +1,15 @@
-import Link from 'next/link'
 import { FC, ReactNode } from 'react'
-import { isUndefined } from 'lodash'
-import { Menu, Typography, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
+import { Menu, Badge } from '@supabase/ui'
+
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
+import SidebarItem from './SidebarItem'
+import { SidebarLink, SidebarLinkGroup } from './AccountLayout.types'
 
 interface Props {
   title: string
   breadcrumbs: any[]
-  links: any[]
+  links: SidebarLinkGroup[] | SidebarLink[]
   header?: ReactNode
   subitems?: any[]
   subitemsParentKey?: number
@@ -29,7 +30,7 @@ const WithSidebar: FC<Props> = ({
   customSidebarContent,
 }) => {
   const noContent = !links && !customSidebarContent
-  const linksHaveHeaders = links && links[0].heading
+  const linksHaveHeaders = links && (links[0] as any)?.heading
 
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
@@ -46,28 +47,24 @@ const WithSidebar: FC<Props> = ({
           ].join(' ')}
         >
           {title && (
-            <div className="mb-2">
-              <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6">
-                <Typography.Title level={4} className="mb-0">
-                  {title}
-                </Typography.Title>
-              </div>
+            <div className="dark:border-dark flex h-12 max-h-12 items-center border-b px-6 mb-2">
+              <h4>{title}</h4>
             </div>
           )}
-          {header && header}
+          {header !== undefined && header}
           <div className="-mt-1">
             <Menu>
               {customSidebarContent}
               {links && linksHaveHeaders ? (
                 <LinksWithHeaders
-                  links={links}
+                  links={links as SidebarLinkGroup[]}
                   subitems={subitems}
                   subitemsParentKey={subitemsParentKey}
                 />
               ) : null}
               {!linksHaveHeaders && links ? (
                 <LinksWithoutHeaders
-                  links={links}
+                  links={links as SidebarLink[]}
                   subitems={subitems}
                   subitemsParentKey={subitemsParentKey}
                 />
@@ -86,8 +83,8 @@ const WithSidebar: FC<Props> = ({
 export default WithSidebar
 
 const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
-  return links.map((x: any) => (
-    <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
+  return links.map((x: any, i: number) => (
+    <div key={x.heading || `heading_${i}`} className="dark:border-dark border-b py-5 px-6">
       {x.heading && <Menu.Group title={x.heading} />}
       {x.versionLabel && (
         <div className="mb-1 px-3">
@@ -104,23 +101,26 @@ const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
     </div>
   ))
 }
-const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
+
+const LinksWithoutHeaders: FC<{
+  links: SidebarLink[]
+  subitems?: any[]
+  subitemsParentKey?: number
+}> = ({ links, subitems, subitemsParentKey }) => {
   return (
     <ul className="space-y-1">
-      {links.map((x: any, i: number) => {
-        // disable active state for link with subitems
+      {links.map((x: SidebarLink, i: number) => {
+        // Disable active state for link with subitems
         const isActive = x.isActive && !subitems
-
         let render: any = (
           <SidebarItem
-            key={`${x.key || x.as}-${i}-sidebarItem`}
-            id={`${x.key || x.as}-${i}`}
-            slug={x.key}
+            key={`${x.key}-${i}-sidebarItem`}
+            id={`${x.key}-${i}`}
             isActive={isActive}
             label={x.label}
             href={x.href}
             onClick={x.onClick}
-            external={x.external || false}
+            isExternal={x.isExternal || false}
           />
         )
 
@@ -129,11 +129,10 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
             <SidebarItem
               key={`${y.key || y.as}-${i}-sidebarItem`}
               id={`${y.key || y.as}-${i}`}
-              slug={y.key}
-              isSubitem={true}
               label={y.label}
               onClick={y.onClick}
-              external={x.external || false}
+              isSubitem={true}
+              isExternal={x.isExternal || false}
             />
           ))
           render = [render, ...subItemsRender]
@@ -142,56 +141,5 @@ const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) =>
         return render
       })}
     </ul>
-  )
-}
-
-const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, external }) => {
-  if (isUndefined(href)) {
-    let icon
-    if (external) {
-      icon = <IconArrowUpRight size={'tiny'} />
-    }
-
-    if (label === 'Logout') {
-      icon = <IconLogOut size={'tiny'} />
-    }
-
-    return (
-      <Menu.Item
-        rounded
-        key={id}
-        style={{
-          marginLeft: isSubitem && '.5rem',
-        }}
-        active={isActive ? true : false}
-        onClick={onClick || (() => {})}
-        icon={icon}
-      >
-        {isSubitem ? <p className="text-sm">{label}</p> : label}
-      </Menu.Item>
-    )
-  }
-
-  return (
-    <Link href={href || ''}>
-      <a className="block" target={external ? '_blank' : '_self'}>
-        <button
-          className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
-          onClick={onClick || (() => {})}
-        >
-          {external && (
-            <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
-              <IconArrowUpRight size={'tiny'} />
-            </span>
-          )}
-          <span
-            title={label}
-            className="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
-          >
-            {isSubitem ? <p>{label}</p> : label}
-          </span>
-        </button>
-      </a>
-    </Link>
   )
 }
