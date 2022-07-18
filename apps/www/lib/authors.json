@@ -152,5 +152,13 @@
     "position": "Guest Author",
     "author_url": "https://github.com/t3hmrman",
     "author_image_url": "https://github.com/t3hmrman.png"
+  },
+  {
+    "author_id": "andrew_smith",
+    "author": "Andrew Smith",
+    "username": "silentworks",
+    "position": "DevRel & DX",
+    "author_url": "https://github.com/silentworks",
+    "author_image_url": "https://github.com/silentworks.png"
   }
 ]
