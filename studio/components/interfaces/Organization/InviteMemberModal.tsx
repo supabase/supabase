@@ -35,7 +35,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     setAddMemberLoading(true)
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
-      invited_email: emailAddress,
+      invited_email: emailAddress.toLowerCase(),
       owner_id: toJS(user.id),
     })
 
