@@ -26,7 +26,12 @@ import { StoreProvider } from 'hooks'
 import { getParameterByName } from 'lib/common/fetch'
 import { GOTRUE_ERRORS } from 'lib/constants'
 
-import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
+import {
+  PortalToast,
+  GoTrueWrapper,
+  RouteValidationWrapper,
+  AppBannerWrapper,
+} from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 
@@ -59,11 +64,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
           <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
         </Head>
-        <PageTelemetry>
-          <RouteValidationWrapper>
-            <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-          </RouteValidationWrapper>
-        </PageTelemetry>
+        <GoTrueWrapper>
+          <PageTelemetry>
+            <RouteValidationWrapper>
+              <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+            </RouteValidationWrapper>
+          </PageTelemetry>
+        </GoTrueWrapper>
         <PortalToast />
       </FlagProvider>
     </StoreProvider>
