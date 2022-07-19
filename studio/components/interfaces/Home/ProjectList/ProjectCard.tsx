@@ -1,69 +1,65 @@
 import { FC } from 'react'
+import { Badge, IconLoader, IconPauseCircle } from '@supabase/ui'
 
-import { Badge, Button, IconClock } from '@supabase/ui'
 import { Project } from 'types'
 import CardButton from 'components/ui/CardButton'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface Props {
   project: Project
-  paused: boolean
-  onSelectRestore?: () => void
-  onSelectDelete?: () => void
   rewriteHref?: string
 }
 
-const ProjectCard: FC<Props> = ({
-  project,
-  paused,
-  onSelectRestore,
-  onSelectDelete,
-  rewriteHref,
-}) => {
+const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
+
+  const isPausing = project.status === PROJECT_STATUS.GOING_DOWN
+  const isPaused = project.status === PROJECT_STATUS.INACTIVE
+  const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
   return (
     <li className="col-span-1">
       <CardButton
-        linkHref={rewriteHref ? rewriteHref : paused ? '' : `/project/${projectRef}`}
+        linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
-          <div className="flex flex-row gap-1 w-full justify-between w-full">
-            <span className="truncate flex-shrink">{name}</span>
-            {paused && (
-              <div className="grow text-right">
-                <Badge color="scale">
-                  <div className="flex items-center gap-2">
-                    <IconClock size={14} strokeWidth={2} />
-                    <span className="truncate">Project paused</span>
-                  </div>
-                </Badge>
-              </div>
-            )}
+          <div className="flex w-full flex-row justify-between gap-1">
+            <span className="flex-shrink truncate">{name}</span>
           </div>
         }
         description={''}
         footer={
-          <div className="lowercase flex justify-between items-end">
-            <span className="text-sm text-scale-900">{desc}</span>
-            {paused && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="tiny"
-                    type="primary"
-                    onClick={() => onSelectRestore && onSelectRestore()}
-                  >
-                    Restore
-                  </Button>
-                  <Button
-                    size="tiny"
-                    type="default"
-                    onClick={() => onSelectDelete && onSelectDelete()}
-                  >
-                    Delete
-                  </Button>
-                </div>
+          <div className="flex items-end justify-between">
+            <span className="text-scale-900 text-sm lowercase">{desc}</span>
+            {isRestoring ? (
+              <div className="grow text-right">
+                <Badge color="brand">
+                  <div className="flex items-center gap-2">
+                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                    <span className="truncate">Restoring</span>
+                  </div>
+                </Badge>
               </div>
+            ) : isPausing ? (
+              <div className="grow text-right">
+                <Badge color="scale">
+                  <div className="flex items-center gap-2">
+                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                    <span className="truncate">Pausing</span>
+                  </div>
+                </Badge>
+              </div>
+            ) : isPaused ? (
+              <div className="grow text-right">
+                <Badge color="scale">
+                  <div className="flex items-center gap-2">
+                    <IconPauseCircle size={14} strokeWidth={2} />
+                    <span className="truncate">Paused</span>
+                  </div>
+                </Badge>
+              </div>
+            ) : (
+              <></>
             )}
           </div>
         }

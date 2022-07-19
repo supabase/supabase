@@ -7,7 +7,7 @@ import { API_URL } from 'lib/constants'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { WizardLayout } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { NextPageWithLayout } from 'types'
 
 /**
@@ -58,12 +58,12 @@ const Wizard: NextPageWithLayout = () => {
   return (
     <Panel
       hideHeaderStyling
-      title={[
+      title={
         <div key="panel-title">
           <h4>Create a new organization</h4>
-        </div>,
-      ]}
-      footer={[
+        </div>
+      }
+      footer={
         <div key="panel-footer" className="flex w-full items-center justify-between">
           <Button type="default" onClick={() => router.push('/')}>
             Cancel
@@ -74,8 +74,8 @@ const Wizard: NextPageWithLayout = () => {
               Create organization
             </Button>
           </div>
-        </div>,
-      ]}
+        </div>
+      }
     >
       <Panel.Content className="pt-0">
         <p className="text-sm">This is your organization's name within Supabase.</p>

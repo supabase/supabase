@@ -53,7 +53,7 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://supabase.com/database`,
           images: [
             {
               url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
@@ -109,6 +109,7 @@ function Database() {
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
                     height={30}
+                    alt="postgresql icon"
                   />
                 </div>
               </div>

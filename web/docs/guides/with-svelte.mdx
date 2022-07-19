@@ -31,7 +31,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project 
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -51,7 +51,7 @@ values={[
 <TabItem value="UI">
 
 ```sh
-1. Go to the "SQL" section.
+1. Go to the "SQL Editor" section.
 2. Click "User Management Starter".
 3. Click "Run".
 ```
@@ -159,27 +159,9 @@ cd supabase-svelte
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm install @supabase/supabase-js
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add @supabase/supabase-js
-```
-
-</TabItem>
-</Tabs>
 
 And finally we want to save the environment variables in a `.env`. 
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -192,51 +174,15 @@ SVELTE_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 Our app is almost functional, to make svelte work with supabase and .env files we first need to change the `rollup.config.js` file a bit.
 Supabase imports `json` files, to convert .json files to ES6 modules we need the `@rollup/plugin-json` install it by running: 
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
-npm install --save-dev @rollup/plugin-json
+  npm install --save-dev @rollup/plugin-json
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add --save-dev @rollup/plugin-json
-```
-
-</TabItem>
-</Tabs>
 
 Furthermore, to use the .env with svelte we need another rollup plugin. Install:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
-npm install --save-dev dotenv @rollup/plugin-replace
+  npm install --save-dev dotenv @rollup/plugin-replace
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add --save-dev dotenv @rollup/plugin-replace
-```
-
-</TabItem>
-</Tabs>
 
 and add these plugins to the `rollup.config.js` file.
 
@@ -475,27 +421,9 @@ Now that we have all the components in place, let's update `App.svelte`:
 
 Once that's done, run this in a terminal window:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm run dev
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn dev
-```
-
-</TabItem>
-</Tabs>
 
 And then open the browser to [localhost:5000](http://localhost:5000) and you should see the completed app.
 
@@ -620,4 +548,4 @@ And then we can add the widget to the Account page:
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

@@ -81,7 +81,11 @@ function AuthPage() {
                         <Space size={8} direction="vertical">
                           <div>
                             <Space size={3} direction="vertical">
-                              <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
+                              <img
+                                src="https://app.supabase.com/img/supabase-dark.svg"
+                                width="96"
+                                alt="supabase logo"
+                              />
                               <h3>{companyName}</h3>
                             </Space>
                           </div>

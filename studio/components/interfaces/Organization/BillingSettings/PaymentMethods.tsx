@@ -18,7 +18,7 @@ import { useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { getURL } from 'lib/helpers'
 import { API_URL } from 'lib/constants'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
 
 interface Props {

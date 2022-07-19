@@ -1,18 +1,21 @@
-import { FC } from 'react'
+import { Button, Loading } from '@supabase/ui'
 import dayjs from 'dayjs'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
-import { Button, Loading } from '@supabase/ui'
+import { FC } from 'react'
 
-import { formatBytes } from 'lib/helpers'
+import { usePermissions, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { usePermissions, useStore, useSubscriptionStats } from 'hooks'
-import CostBreakdownRow from './CostBreakdownRow'
-import { StripeSubscription } from './Subscription.types'
-import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
+import { formatBytes } from 'lib/helpers'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
+import CostBreakdownRow from './CostBreakdownRow'
+import { StripeSubscription } from './Subscription.types'
 
 interface Props {
   project: any
@@ -36,6 +39,7 @@ const Subscription: FC<Props> = ({
   const router = useRouter()
   const { ui } = useStore()
   const isOrgOwner = ui.selectedOrganization?.is_owner
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canChangeSubscription = usePermissions(
     PermissionAction.BILLING_WRITE,
@@ -43,9 +47,10 @@ const Subscription: FC<Props> = ({
   )
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
+  const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   const addOns = subscription?.addons ?? []
   const paid = subscription && subscription.tier.unit_amount > 0
-
   const basePlanCost = subscription?.tier.unit_amount / 100
 
   const deriveTotalCost = (): number => {
@@ -68,17 +73,37 @@ const Subscription: FC<Props> = ({
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
             <div className="flex flex-col items-end space-y-2">
-              <Button
-                disabled={!canChangeSubscription || !isOrgOwner}
-                onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
-                type="primary"
-              >
-                Change subscription
-              </Button>
-              {!isOrgOwner && (
-                <p className="text-scale-1100 text-sm">
+              {isEnterprise ? (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() =>
+                    router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
+                  }
+                  type="primary"
+                >
+                  Change add-ons
+                </Button>
+              ) : (
+                <Button
+                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
+                  type="primary"
+                >
+                  Change subscription
+                </Button>
+              )}
+              {!isOrgOwner ? (
+                <p className="text-scale-1100 text-xs">
                   Only the organization owner can amend subscriptions
                 </p>
+              ) : projectUpdateDisabled ? (
+                <p className="text-scale-1100 text-right text-xs">
+                  Subscription changes are currently disabled
+                  <br />
+                  Our engineers are working on a fix
+                </p>
+              ) : (
+                <div />
               )}
             </div>
           </div>

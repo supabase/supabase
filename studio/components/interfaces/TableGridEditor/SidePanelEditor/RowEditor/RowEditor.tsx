@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, partition, isEmpty } from 'lodash'
 import { SidePanel } from '@supabase/ui'
-import { Dictionary, Query } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
 import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -81,6 +82,7 @@ const RowEditor: FC<Props> = ({
       ui.setNotification({
         category: 'error',
         message: `Please enter a value in the ${row.name} field first`,
+        duration: 4000,
       })
     }
     const foreignKey = row.foreignKey
@@ -107,6 +109,7 @@ const RowEditor: FC<Props> = ({
         return ui.setNotification({
           category: 'error',
           message: `Unable to find the corresponding row in ${foreignKey.target_table_schema}.${foreignKey.target_table_name} where ${foreignKey.target_column_name} equals ${row.value}`,
+          duration: 4000,
         })
       }
       setReferenceRow({ loading: false, foreignKey, row: res[0] })

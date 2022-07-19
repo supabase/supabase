@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -33,7 +33,7 @@ Um die gesamte Dokumentation einzusehen, schaue auf [supabase.com/docs](https://
 ## Status
 
 - [x] Alpha: Wir testen Supabase mit einer eingeschränkten Anzahl an Kunden.
-- [x] Public Alpha: Jeder kann sich bei [app.supabase.io](https://app.supabase.io) anmelden. Aber sei gnädig, der Feinschliff fehlt noch.
+- [x] Public Alpha: Jeder kann sich bei [app.supabase.com](https://app.supabase.com) anmelden. Aber sei gnädig, der Feinschliff fehlt noch.
 - [x] Public Beta: Stabil genug für die meisten Use-Cases außerhalb des Enterprise-Bereiches.
 - [ ] Public: Bereit für Produktion
 
@@ -49,7 +49,7 @@ Supabase ist eine Kombination von Open-Source Tools. Wir bauen die Features von 
 
 **Aktuelle Architektur**
 
-Supabase ist eine [gehostete Plattform](https://app.supabase.io).
+Supabase ist eine [gehostete Plattform](https://app.supabase.com).
 Du kannst dich bei Supabase anmelden und sofort loslegen, ohne etwas zu installieren.
 Du kannst Supabase auch selbst hosten und lokal entwickeln.
 

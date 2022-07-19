@@ -53,7 +53,7 @@ const ProductMenuItem: FC<Props> = ({
     }
 
     return (
-      <Link href={url}>
+      <Link href={url} passHref>
         <a className="block" target={target}>
           {menuItem}
         </a>

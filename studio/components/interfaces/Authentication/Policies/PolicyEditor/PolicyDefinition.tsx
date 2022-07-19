@@ -1,14 +1,14 @@
 import { FC, useEffect } from 'react'
 import { usePrevious } from 'hooks'
 
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 
 interface Props {
   operation: string
   definition: string
   check: string
-  onUpdatePolicyUsing: (using: string | null) => void
-  onUpdatePolicyCheck: (check: string | null) => void
+  onUpdatePolicyUsing: (using: string | undefined) => void
+  onUpdatePolicyCheck: (check: string | undefined) => void
 }
 
 const PolicyDefinition: FC<Props> = ({
@@ -24,8 +24,8 @@ const PolicyDefinition: FC<Props> = ({
 
   const previousOperation = usePrevious(operation) || ''
   useEffect(() => {
-    if (showUsing(previousOperation) && !showUsing(operation)) onUpdatePolicyUsing(null)
-    if (showCheck(previousOperation) && !showCheck(operation)) onUpdatePolicyCheck(null)
+    if (showUsing(previousOperation) && !showUsing(operation)) onUpdatePolicyUsing(undefined)
+    if (showCheck(previousOperation) && !showCheck(operation)) onUpdatePolicyCheck(undefined)
   }, [operation])
 
   return (

@@ -216,7 +216,7 @@
   --ifm-color-gray-800: rgba(224, 235, 247, 0.5);
   --ifm-color-gray-900: rgba(224, 235, 247, 0.45);
   --ifm-color-secondary-darker: #000;
-  --ifm-color-secondary-dark: #1f1f1f;
+  --ifm-color-secondary-dark: #888888;
   --ifm-color-secondary: #2a2a2a;
   --ifm-color-secondary-light: #2f2f2f;
   --ifm-color-secondary-lighter: #313131;
@@ -349,6 +349,10 @@ li + li {
   font-size: 0.9rem;
 }
 
+.alert--warning .admonition-icon svg {
+  fill: var(--custom-color-orange-600);
+}
+
 .navbar__brand strong {
   font-family: var(--ifm-heading-font-family);
   font-size: 1.5rem;
@@ -390,7 +394,7 @@ article header {
 /* Sidebar */
 
 .navbar__logo {
-  max-width: 200px;
+  max-width: 128px;
 }
 
 @media (max-width: 750px) {
@@ -457,6 +461,11 @@ a.card:hover {
   transition: all 0.2s ease;
   border: 1px solid var(--custom-primary);
   box-shadow: var(--custom-shadow-xl), 0 0 0 1px var(--custom-primary) !important;
+}
+
+.menu > .menu__list > .menu__list-item > .menu__link {
+  margin-left: 0.5rem;
+  pointer-events: all !important;
 }
 
 /*
@@ -1276,6 +1285,7 @@ h4.method-list-item-label {
 h4.method-list-item-label .method-list-item-label-name {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
+  margin-right: 4px;
   padding: var(--ifm-code-padding-vertical) 0;
 }
 h4.method-list-item-label .method-list-item-label-badge {
@@ -1364,3 +1374,53 @@ details summary:hover {
 .admonition.admonition-caution .admonition-heading h5 {
   color: var(--custom-color-orange-800) !important;
 }
+
+.theme-back-to-top-button {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+/*
+* typesense doc search input
+*/
+
+div[class^='searchBox_'] {
+  position: inherit !important;
+}
+
+div[class^='searchBox_'] button {
+  padding: 8px 14px !important;
+  font-size: inherit !important;
+}
+
+div[class^='searchBox_'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/*
+* typesense doc search input - for reference
+
+
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module {
+  padding: 0 !important;
+}
+
+.searchBox_node_modules-docusaurus-theme-search-typesense-src-theme-SearchBar-styles-module {
+  position: relative !important;
+  right: 0 !important;
+  padding: 0 !important;
+  margin-left: 16px;
+}
+
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module button {
+  padding: 8px 14px !important;
+  font-size: inherit !important;
+}
+
+.searchBox_node_modules-\@docusaurus-theme-classic-lib-theme-Navbar-Search-styles-module svg {
+  width: 16px;
+  height: 16px;
+}
+
+*/

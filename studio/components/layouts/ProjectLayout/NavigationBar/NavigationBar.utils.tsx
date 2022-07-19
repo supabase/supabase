@@ -6,19 +6,18 @@ import {
   IconFileText,
   IconList,
   IconSettings,
-  IconUsers,
+  IconUsers
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Route } from 'components/ui/ui.types'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-import { useFlag, usePermissions } from 'hooks'
-import { ProjectBase } from 'types'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { usePermissions } from 'hooks'
+import { ProjectBase } from 'types'
 
 export const generateProductRoutes = (ref: string, project?: ProjectBase): Route[] => {
-  const functionsUi = useFlag('functionsUi')
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
@@ -67,13 +66,16 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       icon: <IconDatabase size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`,
     },
-    {
-      key: 'functions',
-      label: 'Functions',
-      icon: <IconCode size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
-      hidden: !IS_PLATFORM || !functionsUi,
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'functions',
+            label: 'Functions',
+            icon: <IconCode size={18} strokeWidth={2} />,
+            link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
+          },
+        ]
+      : []),
   ]
 }
 

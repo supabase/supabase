@@ -49,7 +49,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -68,7 +68,7 @@ values={[
 <TabItem value="UI">
 
 ```sh
-1. Go to the "SQL" section.
+1. Go to the "SQL Editor" section.
 2. Click "User Management Starter".
 3. Click "Run".
 ```
@@ -167,53 +167,16 @@ Let's start building the React app from scratch.
 We can use [Create React App](https://create-react-app.dev/docs/getting-started/) to initialize
 an app called `supabase-react`:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npx create-react-app supabase-react
 cd supabase-react
 ```
 
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn create react-app supabase-react
-cd supabase-react
-```
-
-</TabItem>
-</Tabs>
-
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
-
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
 
 ```bash
 npm install @supabase/supabase-js
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add @supabase/supabase-js
-```
-
-</TabItem>
-</Tabs>
 
 And finally we want to save the environment variables in a `.env`.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
@@ -444,27 +407,9 @@ export default function App() {
 
 Once that's done, run this in a terminal window:
 
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
 ```bash
 npm start
 ```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn start
-```
-
-</TabItem>
-</Tabs>
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
@@ -476,29 +421,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 ### Add @reach/visually-hidden
 
-The upload widget uses one additional npm library `@reach/visually-hidden`. You can install it like so:
-
-<Tabs
-defaultValue="NPM"
-values={[
-  {label: 'npm', value: 'NPM'},
-  {label: 'Yarn', value: 'YARN'},
-]}>
-<TabItem value="NPM">
-
-```bash
-npm install @reach/visually-hidden
-```
-
-</TabItem>
-<TabItem value="YARN">
-
-```bash
-yarn add @reach/visually-hidden
-```
-
-</TabItem>
-</Tabs>
+The upload widget uses one additional npm library. You can install it like so: `npm install @reach/visually-hidden`.
 
 ### Create an upload widget
 
@@ -617,4 +540,4 @@ return (
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

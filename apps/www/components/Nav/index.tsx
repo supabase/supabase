@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { Button, Badge, IconStar, IconChevronDown } from '@supabase/ui'
 import FlyOut from '~/components/UI/FlyOut'
@@ -15,9 +14,10 @@ import Announcement from '~/components/Nav/Announcement'
 import { useTheme } from '~/components/Providers'
 import TextLink from '../TextLink'
 import Image from 'next/image'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
-  const { basePath } = useRouter()
   const { isDarkMode } = useTheme()
   const [open, setOpen] = useState(false)
 
@@ -193,11 +193,7 @@ const Nav = () => {
                   <Link href="/" as="/">
                     <a className="block h-6 w-auto">
                       <Image
-                        src={
-                          isDarkMode
-                            ? `${basePath}/brand-assets/supabase-logo-wordmark--dark.svg`
-                            : `${basePath}/brand-assets/supabase-logo-wordmark--light.svg`
-                        }
+                        src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                         width={124}
                         height={24}
                         alt="Supabase Logo"
@@ -270,14 +266,14 @@ const Nav = () => {
                   Star us on GitHub
                 </Button>
 
-                <Link href="https://app.supabase.io/">
+                <Link href="https://app.supabase.com/">
                   <a>
                     <Button type="default" className="hidden lg:block">
                       Sign in
                     </Button>
                   </a>
                 </Link>
-                <Link href="https://app.supabase.io/">
+                <Link href="https://app.supabase.com/">
                   <a>
                     <Button className="hidden text-white lg:block">Start your project</Button>
                   </a>
@@ -328,7 +324,7 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="space-y-1 pt-2 pb-4">
-                  <Link href="https://app.supabase.io/">
+                  <Link href="https://app.supabase.com/">
                     <a className="text-scale-900 block pl-3 pr-4 text-base font-medium dark:text-white">
                       Sign in
                     </a>
