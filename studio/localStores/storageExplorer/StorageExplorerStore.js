@@ -95,8 +95,12 @@ class StorageExplorerStore {
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
-    this.abortController = new AbortController()
     this.ui = useStore().ui
+
+    // ignore when in a non-browser environment
+    if (typeof window !== 'undefined') {
+      this.abortController = new AbortController()
+    }
   }
 
   initStore(projectRef, url, serviceKey) {
@@ -108,12 +112,18 @@ class StorageExplorerStore {
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
     this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
-      localStorage: {
-        getItem: (key) => {
-          return undefined
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        multiTab: false,
+        detectSessionInUrl: false,
+        localStorage: {
+          getItem: (key) => {
+            return undefined
+          },
+          setItem: (key, value) => {},
+          removeItem: (key) => {},
         },
-        setItem: (key, value) => {},
-        removeItem: (key) => {},
       },
     })
   }
