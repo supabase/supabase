@@ -1,15 +1,17 @@
-export interface SidebarLinkGroup {
-  heading: string
-  links: SidebarLink[]
+export type SidebarLink = {
+  label: string
+  href?: string
+  key: string
+  icon?: string
+  isExternal?: boolean
+  isActive?: boolean
+  subitemsKey?: string // I dont think this is being used at all
+  onClick?: () => Promise<void>
 }
 
-export interface SidebarLink {
+export type SidebarSection = {
   key: string
-  label: string
-  icon?: string
-  href?: string
-  subitemsKey?: string // I dont think this is being used at all
-  isActive?: boolean
-  isExternal?: boolean
-  onClick?: () => void
+  heading?: string
+  versionLabel?: string
+  links: SidebarLink[]
 }

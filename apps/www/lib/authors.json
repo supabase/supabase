@@ -146,6 +146,14 @@
     "author_image_url": "https://github.com/dshukertjr.png"
   },
   {
+    "author_id": "victor",
+    "author": "Victor",
+    "username": "t3hmrman",
+    "position": "Guest Author",
+    "author_url": "https://github.com/t3hmrman",
+    "author_image_url": "https://github.com/t3hmrman.png"
+  },
+  {
     "author_id": "andrew_smith",
     "author": "Andrew Smith",
     "username": "silentworks",
