@@ -4,7 +4,7 @@ import { isUndefined } from 'lodash'
 import { Menu, Typography, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout'
+import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface Props {
   title: string
@@ -17,6 +17,7 @@ interface Props {
   customSidebarContent?: ReactNode
   children: ReactNode
 }
+
 /*
 The information heirarchy for WithSidebar is:
   WithSidebar
@@ -75,7 +76,7 @@ const WithSidebar: FC<Props> = ({
                   />
                 ) : (
                   <div className="dark:border-dark border-b py-5 px-6" key={section.key}>
-                    <SidebarItem                      
+                    <SidebarItem
                       links={section.links}
                       subitems={subitems}
                       subitemsParentKey={subitemsParentKey}
@@ -144,7 +145,7 @@ const SidebarItem: FC<SidebarItemProps> = ({ links, subitems, subitemsParentKey 
             label={link.label}
             href={link.href}
             onClick={link.onClick}
-            external={link.external || false}
+            isExternal={link.isExternal || false}
           />
         )
 
@@ -156,7 +157,7 @@ const SidebarItem: FC<SidebarItemProps> = ({ links, subitems, subitemsParentKey 
               isSubitem={true}
               label={y.label}
               onClick={y.onClick}
-              external={link.external || false}
+              isExternal={link.isExternal || false}
             />
           ))
           render = [render, ...subItemsRender]
@@ -178,12 +179,12 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   href,
   isActive,
   isSubitem,
+  isExternal,
   onClick,
-  external,
 }) => {
   if (isUndefined(href)) {
     let icon
-    if (external) {
+    if (isExternal) {
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
@@ -209,12 +210,12 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
 
   return (
     <Link href={href || ''}>
-      <a className="block" target={external ? '_blank' : '_self'}>
+      <a className="block" target={isExternal ? '_blank' : '_self'}>
         <button
           className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
           onClick={onClick || (() => {})}
         >
-          {external && (
+          {isExternal && (
             <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
               <IconArrowUpRight size={'tiny'} />
             </span>
