@@ -48,10 +48,9 @@ useStore.mockImplementation(() => ({
   },
 }))
 
-jest.mock('hooks/queries/useProjectSubscription')
-import useProjectSubscription from 'hooks/queries/useProjectSubscription'
-useProjectSubscription = jest.fn()
-useProjectSubscription.mockImplementation((ref) => ({
+jest.mock('hooks')
+import { useProjectSubscription } from 'hooks'
+useProjectSubscription = jest.fn((ref) => ({
   subscription: {
     tier: {
       supabase_prod_id: 'tier_free',
@@ -179,6 +178,8 @@ test('custom sql querying', async () => {
       expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('select'))
       expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'))
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end')) // should not have an end date
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('where'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining(encodeURIComponent('limit 123')))
     },

@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -32,7 +32,7 @@ Besøk [supabase.com/docs](https://supabase.com/docs) for full dokumentasjon.
 ## Status
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
-- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.io](https://app.supabase.io). Merk at enkelte feil og quirks kan forekomme.
+- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [app.supabase.com](https://app.supabase.com). Merk at enkelte feil og quirks kan forekomme.
 - [x] Offentlig Beta: Stabilt nok for de fleste ikke-enterprise-bruksområder
 - [ ] Offentlig: Produksjonsklar
 
@@ -48,7 +48,7 @@ Supabase er en samling av open source-verktøy. Vi bygger funksjonaliteten til F
 
 **Nåværende arkitektur**
 
-Supabase er en [hostet plattform](https://app.supabase.io). Du kan registrere deg og begynne å bruke Supabase uten å installere noe. Vi holder fortsatt på å bygge verktøy for lokalt bruk – dette er nå vårt kjernefokus, i tillegg til plattformstabilitet.
+Supabase er en [hostet plattform](https://app.supabase.com). Du kan registrere deg og begynne å bruke Supabase uten å installere noe. Vi holder fortsatt på å bygge verktøy for lokalt bruk – dette er nå vårt kjernefokus, i tillegg til plattformstabilitet.
 
 ![Arkitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

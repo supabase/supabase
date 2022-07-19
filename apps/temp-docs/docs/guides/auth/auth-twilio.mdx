@@ -25,13 +25,13 @@ We'll cover:
 What you'll need:
 
 - A twilio account (sign up here: https://www.twilio.com/try-twilio)
-- A Supabase project (create one here: https://app.supabase.io)
+- A Supabase project (create one here: https://app.supabase.com)
 - A mobile phone capable of receiving SMS
 
 ## Video
 
 <iframe
-  className="w-full video-with-border"
+  className="video-with-border w-full"
   width="640"
   height="385"
   src="https://www.youtube-nocookie.com/embed/akScoPO01bc"
@@ -69,7 +69,7 @@ You should now be able to see all three values you'll need to get started:
 
 ![All the credentials you'll need](/docs/img/guides/auth-twilio/6.png)
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/settings).
 
 You should see an option to enable Phone Signup.
 
@@ -87,7 +87,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.io/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
 
 Use the variable `.Code` in the template to display the code.
 
@@ -295,5 +295,5 @@ The user does not have a password therefore will need to sign in via this method
 ## Resources
 
 - [Twilio Signup](https://www.twilio.com/try-twilio)
-- [Supabase Dashboard](https://app.supabase.io)
+- [Supabase Dashboard](https://app.supabase.com)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)

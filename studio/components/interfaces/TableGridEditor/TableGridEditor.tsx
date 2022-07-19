@@ -1,16 +1,16 @@
-import { FC, useRef } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { find, isUndefined } from 'lodash'
-import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from '@supabase/grid'
+import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isUndefined } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { FC, useRef } from 'react'
 
-import { usePermissions, useStore } from 'hooks'
-import NotFoundState from './NotFoundState'
-import GridHeaderActions from './GridHeaderActions'
-import SidePanelEditor from './SidePanelEditor'
-import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
+import { usePermissions, useStore } from 'hooks'
+import GridHeaderActions from './GridHeaderActions'
+import NotFoundState from './NotFoundState'
+import SidePanelEditor from './SidePanelEditor'
 
 interface Props {
   /** Theme for the editor */
@@ -70,7 +70,11 @@ const TableGridEditor: FC<Props> = ({
   // const canEdit = canAdminWrite && canInsert && canUpdate
   const canEdit = true
 
+  // @ts-ignore
+  const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2
+  const isLocked = meta.excludedSchemas.includes(schema?.name ?? '')
+
   const gridTable = !isViewSelected
     ? parseSupaTable({
         table: selectedTable as PostgresTable,
@@ -107,6 +111,7 @@ const TableGridEditor: FC<Props> = ({
     // For some reason, selectedTable here is stale after adding a table
     // temporary workaround is to list grab the selected table again
     const tables: PostgresTable[] = meta.tables.list()
+    // @ts-ignore
     const table = tables.find((table) => table.id === Number(tableId))
     const column = find(table!.columns, { name }) as PostgresColumn
     if (column) {
@@ -140,11 +145,14 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && selectedTable.schema === 'public' && canEdit}
+        editable={!isViewSelected && !isLocked && canEdit}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          !isViewSelected && selectedTable.schema === 'public' && <GridHeaderActions table={selectedTable as PostgresTable} />
+          !isViewSelected &&
+          selectedTable.schema === 'public' && (
+            <GridHeaderActions table={selectedTable as PostgresTable} />
+          )
         }
         onAddColumn={onAddColumn}
         onEditColumn={onSelectEditColumn}

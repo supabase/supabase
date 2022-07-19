@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { IconChevronRight } from '@supabase/ui'
 import { isNull } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 interface Props {
   pane: number

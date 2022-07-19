@@ -72,7 +72,7 @@ const InputField: FC<Props> = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button type="default" onClick={onViewForeignKey} icon={<IconLink />}>
+          <Button type="default" htmlType="button" onClick={onViewForeignKey} icon={<IconLink />}>
             View data
           </Button>
         }

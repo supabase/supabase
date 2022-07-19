@@ -1,4 +1,4 @@
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { Suggestion } from './ColumnEditor.types'
 
 const defaultTimeBasedExpressions: Suggestion[] = [

@@ -40,7 +40,6 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
         break
 
       default:
-
         if (log && isDefaultLogPreviewFormat(log)) {
           return <DefaultPreviewSelectionRenderer log={log} />
         }

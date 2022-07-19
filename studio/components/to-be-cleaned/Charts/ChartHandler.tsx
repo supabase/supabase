@@ -9,7 +9,7 @@ import {
   IconLoader,
   Typography,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
@@ -128,7 +128,7 @@ const ChartHandler: FC<Props> = ({
     ? chartData?.total
     : provider === 'log-stats'
     ? chartData?.totalGrouped?.[attribute]
-    : chartData?.totalAverage
+    : chartData?.data[chartData?.data.length - 1]?.[attribute]
 
   if (loading) {
     return (

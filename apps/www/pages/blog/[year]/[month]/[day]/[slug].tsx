@@ -13,6 +13,7 @@ import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
+import Avatar from '~/components/Avatar'
 import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
@@ -23,10 +24,25 @@ import blogStyles from './[slug].module.css'
 const components = {
   CodeBlock,
   Quote,
+  Avatar,
   code: (props: any) => {
     return <CodeBlock {...props} />
   },
   ImageGrid,
+  img: (props: any) => {
+    return (
+      <div
+        className="
+          next-image--dynamic-fill 
+          to-scale-400  
+          from-scale-500 rounded-md
+          border bg-gradient-to-r
+        "
+      >
+        <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
+      </div>
+    )
+  },
 }
 
 // plugins for next-mdx-remote

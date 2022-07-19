@@ -5,9 +5,10 @@ import { Button, Input, Toggle, IconSearch } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
 interface Props {
-  onSelectPublication: (publication: any) => void
+  onSelectPublication: (id: number) => void
 }
 
 const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
@@ -48,7 +49,7 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
   return (
     <>
       <div className="mb-4">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div>
               <Input
@@ -63,92 +64,96 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
           <div className=""></div>
         </div>
       </div>
-      <div className="rounded overflow-hidden">
-        <Table
-          head={[
-            <Table.th key="header.name">Name</Table.th>,
-            <Table.th key="header.id" className="hidden lg:table-cell">
-              System ID
-            </Table.th>,
-            <Table.th key="header.insert" className="text-center">
-              Insert
-            </Table.th>,
-            <Table.th key="header.update" className="text-center">
-              Update
-            </Table.th>,
-            <Table.th key="header.delete" className="text-center">
-              Delete
-            </Table.th>,
-            <Table.th key="header.truncate" className="text-center">
-              Truncate
-            </Table.th>,
-            <Table.th key="header.source" className="text-right">
-              Source
-            </Table.th>,
-          ]}
-          body={publications.map((x: any, i: number) => (
-            <Table.tr className="border-t " key={x.name}>
-              <Table.td className="px-4 py-3" style={{ width: '25%' }}>
-                {x.name}
-              </Table.td>
-              <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
-                {x.id}
-              </Table.td>
-              <Table.td>
-                <div className="flex justify-center">
-                  <Toggle
-                    size="tiny"
-                    checked={x.publish_insert}
-                    onChange={() => toggleListenEvent(x, 'insert', x.publish_insert)}
-                  />
-                </div>
-              </Table.td>
-              <Table.td>
-                <div className="flex justify-center">
-                  <Toggle
-                    size="tiny"
-                    checked={x.publish_update}
-                    onChange={() => toggleListenEvent(x, 'update', x.publish_update)}
-                  />
-                </div>
-              </Table.td>
-              <Table.td>
-                <div className="flex justify-center">
-                  <Toggle
-                    size="tiny"
-                    checked={x.publish_delete}
-                    onChange={() => toggleListenEvent(x, 'delete', x.publish_delete)}
-                  />
-                </div>
-              </Table.td>
-              <Table.td>
-                <div className="flex justify-center">
-                  <Toggle
-                    size="tiny"
-                    checked={x.publish_truncate}
-                    onChange={() => toggleListenEvent(x, 'truncate', x.publish_truncate)}
-                  />
-                </div>
-              </Table.td>
-              <Table.td className="px-4 py-3 pr-2">
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    type="default"
-                    style={{ paddingTop: 3, paddingBottom: 3 }}
-                    onClick={() => onSelectPublication(x)}
-                  >
-                    {x.tables == null
-                      ? 'All tables'
-                      : `${x.tables.length} ${
-                          x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                        }`}
-                  </Button>
-                </div>
-              </Table.td>
-            </Table.tr>
-          ))}
-        />
-      </div>
+      {publications.length === 0 ? (
+        <NoSearchResults />
+      ) : (
+        <div className="overflow-hidden rounded">
+          <Table
+            head={[
+              <Table.th key="header.name">Name</Table.th>,
+              <Table.th key="header.id" className="hidden lg:table-cell">
+                System ID
+              </Table.th>,
+              <Table.th key="header.insert" className="text-center">
+                Insert
+              </Table.th>,
+              <Table.th key="header.update" className="text-center">
+                Update
+              </Table.th>,
+              <Table.th key="header.delete" className="text-center">
+                Delete
+              </Table.th>,
+              <Table.th key="header.truncate" className="text-center">
+                Truncate
+              </Table.th>,
+              <Table.th key="header.source" className="text-right">
+                Source
+              </Table.th>,
+            ]}
+            body={publications.map((x: any, i: number) => (
+              <Table.tr className="border-t " key={x.name}>
+                <Table.td className="px-4 py-3" style={{ width: '25%' }}>
+                  {x.name}
+                </Table.td>
+                <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
+                  {x.id}
+                </Table.td>
+                <Table.td>
+                  <div className="flex justify-center">
+                    <Toggle
+                      size="tiny"
+                      checked={x.publish_insert}
+                      onChange={() => toggleListenEvent(x, 'insert', x.publish_insert)}
+                    />
+                  </div>
+                </Table.td>
+                <Table.td>
+                  <div className="flex justify-center">
+                    <Toggle
+                      size="tiny"
+                      checked={x.publish_update}
+                      onChange={() => toggleListenEvent(x, 'update', x.publish_update)}
+                    />
+                  </div>
+                </Table.td>
+                <Table.td>
+                  <div className="flex justify-center">
+                    <Toggle
+                      size="tiny"
+                      checked={x.publish_delete}
+                      onChange={() => toggleListenEvent(x, 'delete', x.publish_delete)}
+                    />
+                  </div>
+                </Table.td>
+                <Table.td>
+                  <div className="flex justify-center">
+                    <Toggle
+                      size="tiny"
+                      checked={x.publish_truncate}
+                      onChange={() => toggleListenEvent(x, 'truncate', x.publish_truncate)}
+                    />
+                  </div>
+                </Table.td>
+                <Table.td className="px-4 py-3 pr-2">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="default"
+                      style={{ paddingTop: 3, paddingBottom: 3 }}
+                      onClick={() => onSelectPublication(x.id)}
+                    >
+                      {x.tables == null
+                        ? 'All tables'
+                        : `${x.tables.length} ${
+                            x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                          }`}
+                    </Button>
+                  </div>
+                </Table.td>
+              </Table.tr>
+            ))}
+          />
+        </div>
+      )}
     </>
   )
 }

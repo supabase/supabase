@@ -68,11 +68,11 @@ module.exports = {
         },
         {
           label: 'Reference',
-          to: '/docs/reference/javascript/supabase-client',
-          activeBasePath: '/docs/reference/',
+          to: '/docs/reference',
+          activeBasePath: '/docs/reference',
           position: 'left',
         },
-        { href: 'https://app.supabase.io', label: 'Login', position: 'left' },
+        { href: 'https://app.supabase.com', label: 'Login', position: 'left' },
         {
           href: 'https://github.com/supabase/supabase',
           className: 'navbar-item-github',
@@ -175,7 +175,7 @@ module.exports = {
           items: [
             {
               label: 'Join our beta',
-              href: 'https://app.supabase.io',
+              href: 'https://app.supabase.com',
             },
           ],
         },
@@ -204,7 +204,7 @@ module.exports = {
       },
     ],
   ],
-  scripts: [{ src: '/scripts/telemetry.js' }],
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',

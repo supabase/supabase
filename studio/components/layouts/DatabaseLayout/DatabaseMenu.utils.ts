@@ -29,63 +29,63 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
         {
           name: 'Backups',
           key: 'backups',
-          url: `/project/${ref}/database/backups`,
+          url: `/project/${ref}/database/backups/scheduled`,
           items: [],
         },
       ],
     },
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Logs',
-          items: [
-            {
-              name: 'API logs',
-              key: 'api-logs',
-              url: `/project/${ref}/database/api-logs`,
-              items: [],
-            },
-            {
-              name: 'Postgres logs',
-              key: 'postgres-logs',
-              url: `/project/${ref}/database/postgres-logs`,
-              items: [],
-            },
-          ],
-        },
-      ]
+          {
+            title: 'Logs',
+            items: [
+              {
+                name: 'API logs',
+                key: 'api-logs',
+                url: `/project/${ref}/database/api-logs`,
+                items: [],
+              },
+              {
+                name: 'Postgres logs',
+                key: 'postgres-logs',
+                url: `/project/${ref}/database/postgres-logs`,
+                items: [],
+              },
+            ],
+          },
+        ]
       : []),
     ...(IS_PLATFORM
       ? [
-        {
-          title: 'Alpha Preview',
-          isPreview: true,
-          items: [
-            {
-              name: 'Triggers',
-              key: 'triggers',
-              url: `/project/${ref}/database/triggers`,
-              items: [],
-            },
-            {
-              name: 'Functions',
-              key: 'functions',
-              url: `/project/${ref}/database/functions`,
-              items: [],
-            },
-            ...(showHooksRoute
-              ? [
-                {
-                  name: 'Function Hooks',
-                  key: 'hooks',
-                  url: `/project/${ref}/database/hooks`,
-                  items: [],
-                },
-              ]
-              : []),
-          ],
-        },
-      ]
+          {
+            title: 'Alpha Preview',
+            isPreview: true,
+            items: [
+              {
+                name: 'Triggers',
+                key: 'triggers',
+                url: `/project/${ref}/database/triggers`,
+                items: [],
+              },
+              {
+                name: 'Functions',
+                key: 'functions',
+                url: `/project/${ref}/database/functions`,
+                items: [],
+              },
+              ...(showHooksRoute
+                ? [
+                    {
+                      name: 'Function Hooks',
+                      key: 'hooks',
+                      url: `/project/${ref}/database/hooks`,
+                      items: [],
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
       : []),
   ]
 }

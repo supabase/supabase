@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
@@ -167,6 +167,7 @@ const TableEditorPage: NextPage = () => {
         onEditColumn={onEditColumn}
         onDeleteColumn={onDeleteColumn}
         onClosePanel={onClosePanel}
+        theme={ui.themeOption == 'dark' ? 'dark' : 'light'}
       />
       <ConfirmationModal
         danger
@@ -187,7 +188,9 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         children={
           <Modal.Content>
             <p className="text-scale-1100 py-4 text-sm">
