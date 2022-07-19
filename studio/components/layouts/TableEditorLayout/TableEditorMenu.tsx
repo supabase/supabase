@@ -223,6 +223,7 @@ const TableEditorMenu: FC<Props> = ({
                 <ProductMenuItem
                   key={table.name}
                   url={`/project/${projectRef}/editor/${table.id}`}
+                  description={table.comment}
                   name={table.name}
                   isActive={isActive}
                   action={
