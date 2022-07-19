@@ -3,16 +3,18 @@ import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
-import { IS_PLATFORM } from 'lib/constants'
-import { useStore, withAuth, useFlag } from 'hooks'
-import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
-
-// Layout for dashboard homepage, account and org settings
+import { useStore, withAuth, useFlag } from 'hooks'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import WithSidebar from './WithSidebar'
+import { SidebarSection } from './AccountLayout.types'
 
 interface Props {
   title: string
-  breadcrumbs: Object[]
+  breadcrumbs: {
+    key: string
+    label: string
+  }[]
   children: ReactNode
 }
 
@@ -30,30 +32,33 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
 
   const organizationsLinks = app.organizations
     .list()
-    .map((x: any) => ({
-      key: `${x.slug}-settings`,
-      href: `/org/${x.slug}/settings`,
-      label: x.name,
-      isActive: router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === x.slug,
+    .map((organization) => ({
+      isActive:
+        router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
+      label: organization.name,
+      href: `/org/${organization.slug}/settings`,
+      key: organization.slug,
     }))
     .sort((a, b) => a.label.localeCompare(b.label))
 
-  const sidebarLinks = [
+  const sectionsWithHeaders: SidebarSection[] = [
     {
       heading: 'Projects',
+      key: 'projects',
       links: [
         {
-          key: 'all-projects',
-          href: '/',
-          label: 'All projects',
           isActive: router.pathname === '/',
+          label: 'All projects',
+          href: '/',
+          key: 'all-projects-item',
         },
       ],
     },
-    ...(IS_PLATFORM && organizationsLinks.length > 0
+    ...(IS_PLATFORM && organizationsLinks?.length > 0
       ? [
           {
             heading: 'Organizations',
+            key: 'organizations',
             links: organizationsLinks,
           },
         ]
@@ -62,20 +67,21 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       ? [
           {
             heading: 'Account',
+            key: 'account',
             links: [
               {
-                key: 'account-me',
-                href: '/account/me',
+                isActive: router.pathname === `/account/me`,
                 icon: '/img/user.svg',
                 label: 'Preferences',
-                isActive: router.pathname === '/account/me',
+                href: `/account/me`,
+                key: `/account/me`,
               },
               {
-                key: 'account-tokens',
-                href: '/account/tokens',
+                isActive: router.pathname === `/account/tokens`,
                 icon: '/img/user.svg',
                 label: 'Access Tokens',
-                isActive: router.pathname === '/account/tokens',
+                href: `/account/tokens`,
+                key: `/account/tokens`,
               },
             ],
           },
@@ -83,30 +89,32 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       : []),
     {
       heading: 'Documentation',
+      key: 'documentation',
       links: [
         {
           key: 'ext-guides',
-          href: 'https://supabase.com/docs',
           icon: '/img/book.svg',
           label: 'Guides',
+          href: 'https://supabase.com/docs',
           isExternal: true,
         },
         {
           key: 'ext-guides',
-          href: 'https://supabase.com/docs/guides/api',
           icon: '/img/book-open.svg',
           label: 'API Reference',
+          href: 'https://supabase.com/docs/guides/api',
           isExternal: true,
         },
       ],
     },
     {
-      heading: '',
+      key: 'logout-link',
       links: [
         {
-          key: 'logout',
+          key: `logout`,
           icon: '/icons/feather/power.svg',
           label: 'Logout',
+          href: undefined,
           onClick: onClickLogout,
         },
       ],
@@ -125,7 +133,7 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           style={{ height: maxHeight, maxHeight }}
           className="flex w-full flex-1 flex-col overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} links={sidebarLinks}>
+          <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
             {children}
           </WithSidebar>
         </main>
