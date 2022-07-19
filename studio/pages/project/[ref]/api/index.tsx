@@ -243,7 +243,13 @@ const GeneralContent = ({ autoApiService, selectedLang, page, showApiKey }: any)
   if (selected == 'intro' || selected == null)
     return <Introduction autoApiService={autoApiService} selectedLang={selectedLang} />
   if (selected == 'auth')
-    return <Authentication autoApiService={autoApiService} selectedLang={selectedLang} />
+    return (
+      <Authentication
+        autoApiService={autoApiService}
+        selectedLang={selectedLang}
+        showApiKey={showApiKey}
+      />
+    )
   if (selected == 'users')
     return (
       <UserManagement
