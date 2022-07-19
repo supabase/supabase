@@ -91,6 +91,14 @@ supabase functions deploy hello-world
 This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform.
 The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
+:::note
+
+By default Edge Functions require a valid JWT to be send in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
+
+If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks), or [chat bot webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
+
+:::
+
 ### Executing Remote Functions
 
 You can execute Edge Functions using curl. Copy the curl command from the Dashboard. It should look like this:
@@ -234,7 +242,7 @@ supabase secrets list
 
 ## Examples
 
-You can find a list of useful [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/flutter-user-management) in our GitHub repository.
+You can find a list of useful [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
 
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
@@ -256,7 +264,7 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 ### Database Functions vs Edge Functions
 
 For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
-and can be called remotely using the [REST and GraphQL API](/docs/guides/database/api).
+and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
 
 For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in Typescript.
 
@@ -272,9 +280,9 @@ We recommend developing “fat functions”. This means that you should develop 
     │   |   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
     │ 	│   └── supabaseClient.ts # Supabase client with ANON key
     │ 	├── function-one # use hyphens to name functions
-    │ 	│ 	└── index.ts
+    │ 	│   └── index.ts
     │ 	└── function-two
-    │ 			└── index.ts
+    │       └── index.ts
     ├── migrations
     └── config.toml
 ```
@@ -292,5 +300,5 @@ Edge Functions are Experimental. They aren't going away, but there will be break
   - Cannot write to File System
 - Edge Functions
   - Local development - only one function at a time
-  - Supabase Functions only supports `POST` responses.
-  - Supabase Functions does not support HTML responses.
+  - Supabase Functions only supports `POST` requests.
+  - Supabase Functions do not support HTML responses.

@@ -49,7 +49,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -68,7 +68,7 @@ values={[
 <TabItem value="UI">
 
 ```sh
-1. Go to the "SQL" section.
+1. Go to the "SQL Editor" section.
 2. Click "User Management Starter".
 3. Click "Run".
 ```
@@ -191,14 +191,14 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 ```js title="src/supabaseClient.jsx"
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
 
@@ -245,7 +245,7 @@ export default function Auth() {
               value={email()}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="button block" aria-live="polite">
+            <button type="submit" className="button block" aria-live="polite">
               Send magic link
             </button>
           </form>
@@ -359,7 +359,7 @@ const Account = (props) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button type="submit" className="button block primary" disabled={loading()}>
               Update profile
             </button>
           </div>
@@ -426,14 +426,13 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```jsx title="src/Avatar.jsx"
 import { createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
-// import VisuallyHidden from '@reach/visually-hidden'
 
 export default (props) => {
   const [avatarUrl, setAvatarUrl] = createSignal(null)
   const [uploading, setUploading] = createSignal(false)
 
   createEffect(() => {
-    if (props.url) downloadImage(props.url)
+    if (props.url()) downloadImage(props.url())
   })
 
   const downloadImage = async (path) => {
@@ -468,7 +467,7 @@ export default (props) => {
         throw uploadError
       }
 
-      props.onUpload(filePath)
+      props.onUpload(event, filePath)
     } catch (error) {
       alert(error.message)
     } finally {
@@ -523,9 +522,9 @@ return (
     <Avatar
       url={avatar_url}
       size={150}
-      onUpload={(url) => {
+      onUpload={(e, url) => {
         setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
+        updateProfile(e)
       }}
     />
     {/* ... */}
@@ -538,4 +537,4 @@ return (
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

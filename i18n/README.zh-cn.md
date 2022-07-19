@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -20,6 +21,8 @@
 - [x] 文件存储。[文档](https://supabase.com/docs/guides/storage)
 - [x] 仪表盘。
 
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
 ## 文档
 
 完整的文档，请访问 [supabase.com/docs](https://supabase.com/docs)
@@ -36,7 +39,7 @@
 ## 状态
 
 - [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] Public Alpha：任何人都可以在 [app.supabase.io](https://app.supabase.io)上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Public Alpha：任何人都可以在 [app.supabase.com](https://app.supabase.com)上注册。只是务必手下留情，还有一些纠结的地方。
 - [x] Public Beta：足够稳定，适合大多数非企业使用场景
 - [ ] Public：生产就绪
 
@@ -52,7 +55,7 @@ Supabase 是一个开源工具的组合。我们正在使用企业级的开源�
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://app.supabase.io)。你可以注册并开始使用 Supabase，而无需安装任何软件。
+Supabase 是一个[托管平台](https://app.supabase.com)。你可以注册并开始使用 Supabase，而无需安装任何软件。
 你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
 
 ![架构](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)

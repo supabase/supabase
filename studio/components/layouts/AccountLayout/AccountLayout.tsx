@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
 import WithSidebar from './WithSidebar'
 import { auth } from 'lib/gotrue'
 
@@ -17,8 +17,10 @@ import { auth } from 'lib/gotrue'
 
 const AccountLayout = ({ children, title, breadcrumbs }: any) => {
   const router = useRouter()
-
   const { app, ui } = useStore()
+
+  const ongoingIncident = useFlag('ongoingIncident')
+  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const onClickLogout = async () => {
     await auth.signOut()
@@ -81,7 +83,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
                 href: `/account/tokens`,
                 key: `/account/tokens`,
               },
-              logoutLink,
             ],
           },
         ]
@@ -100,10 +101,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
           key: 'ext-guides',
           icon: '/img/book-open.svg',
           label: 'API Reference',
-          href: 'https://supabase.com/docs/reference/javascript/supabase-client',
+          href: 'https://supabase.com/docs/guides/api',
           external: true,
         },
       ],
+    },
+    {
+      links: [logoutLink],
     },
   ]
   if (!organizationsLinks?.length)
@@ -117,7 +121,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: any) => {
       </Head>
       <div className="flex h-full">
         <main
-          style={{ maxHeight: '100vh' }}
+          style={{ height: maxHeight, maxHeight }}
           className="flex w-full flex-1 flex-col overflow-y-auto"
         >
           <WithSidebar title={title} breadcrumbs={breadcrumbs} links={linksWithHeaders}>

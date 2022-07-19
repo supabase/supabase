@@ -6,6 +6,7 @@ import {
   Input,
   IconChevronLeft,
   IconChevronRight,
+  IconRefreshCw,
   IconColumns,
   IconChevronsDown,
   IconSearch,
@@ -15,8 +16,10 @@ import {
   IconEdit2,
   IconLoader,
   Typography,
+  IconChevronsUp,
 } from '@supabase/ui'
-import { STORAGE_VIEWS, STORAGE_SORT_BY } from '../Storage.constants.ts'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
 
 const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
   return (
@@ -30,15 +33,15 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
             <IconLoader size={16} strokeWidth={2} className="animate-spin" />
           </Typography.Text>
           <Typography.Text>
-            <p className="text-sm ml-3">{loading.message}</p>
+            <p className="ml-3 text-sm">{loading.message}</p>
           </Typography.Text>
         </div>
       ) : (
-        <div className="cursor-pointer flex items-center">
+        <div className="flex cursor-pointer items-center">
           <Typography.Text>
-            <p className="text-sm ml-3">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
+            <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           </Typography.Text>
-          <div className="ml-3 space-x-2 flex items-center transition opacity-0 group-hover:opacity-100">
+          <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
             <Button type="text" icon={<IconEdit2 />}>
               Navigate
             </Button>
@@ -76,11 +79,11 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
         <IconLoader size={16} strokeWidth={2} className="animate-spin" />
       </Typography.Text>
       <Typography.Text>
-        <p className="text-sm ml-3">{loading.message}</p>
+        <p className="ml-3 text-sm">{loading.message}</p>
       </Typography.Text>
     </div>
   ) : (
-    <div className="flex items-center ml-3">
+    <div className="ml-3 flex items-center">
       {formattedBreadcrumbs.map((crumb, idx) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && (
@@ -91,7 +94,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
           <Typography.Text>
             <p
               key={crumb.name}
-              className={`text-sm truncate ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
+              className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
               style={{ maxWidth: '6rem' }}
               onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
             >
@@ -107,6 +110,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
 const FileExplorerHeader = ({
   view = STORAGE_VIEWS.COLUMNS,
   sortBy = STORAGE_SORT_BY.NAME,
+  sortByOrder = STORAGE_SORT_BY_ORDER.ASC,
   loading = {},
   breadcrumbs = [],
   backDisabled = false,
@@ -116,6 +120,7 @@ const FileExplorerHeader = ({
   onSetPathByString = () => {},
   onChangeView = () => {},
   onChangeSortBy = () => {},
+  onChangeSortByOrder = () => {},
   onToggleSearch = () => {},
   onFilesUpload = () => {},
   onSelectBack = () => {},
@@ -124,11 +129,15 @@ const FileExplorerHeader = ({
 }) => {
   const debounceDuration = 300
   const [isEditingPath, setIsEditingPath] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
 
   const uploadButtonRef = useRef(null)
   const previousBreadcrumbs = useRef(null)
+
+  const storageExplorerStore = useStorageStore()
+  const { refetchAllOpenedFolders } = storageExplorerStore
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -197,12 +206,18 @@ const FileExplorerHeader = ({
     onSelectBreadcrumb(columnIndex)
   }
 
+  const refreshData = async () => {
+    setIsRefreshing(true)
+    await refetchAllOpenedFolders()
+    setIsRefreshing(false)
+  }
+
   return (
     <div
       className="
     bg-panel-header-light dark:bg-panel-header-dark
-    border-b border-panel-border-light dark:border-panel-border-dark
-    px-3 h-[40px] flex rounded-t-md items-center justify-between z-10"
+    border-panel-border-light dark:border-panel-border-dark
+    flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
@@ -266,6 +281,16 @@ const FileExplorerHeader = ({
       {/* Actions */}
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-1">
+          <Button
+            className="mr-2"
+            size="tiny"
+            icon={<IconRefreshCw />}
+            type="text"
+            loading={isRefreshing}
+            onClick={refreshData}
+          >
+            Reload
+          </Button>
           <Dropdown
             overlay={[
               <Dropdown.RadioGroup key="viewOptions" value={view} onChange={onChangeView}>
@@ -308,8 +333,35 @@ const FileExplorerHeader = ({
               Sort
             </Button>
           </Dropdown>
+          <Dropdown
+            overlay={[
+              <Dropdown.RadioGroup
+                key="sortOrderOptions"
+                value={sortByOrder}
+                onChange={onChangeSortByOrder}
+              >
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Asc</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Desc</Dropdown.Radio>
+              </Dropdown.RadioGroup>,
+            ]}
+          >
+            <Button
+              as="span"
+              icon={
+                sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
+                  <IconChevronsDown size={16} strokeWidth={2} />
+                ) : (
+                  <IconChevronsUp size={16} strokeWidth={2} />
+                )
+              }
+              type="text"
+              disabled={breadcrumbs.length === 0}
+            >
+              Sort Order
+            </Button>
+          </Dropdown>
         </div>
-        <div className="border-r border-panel-border-light dark:border-panel-border-dark h-6" />
+        <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
         <div className="flex items-center space-x-1">
           <div className="hidden">
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
@@ -335,7 +387,7 @@ const FileExplorerHeader = ({
         {/* Search: Disabled for now */}
         {view === STORAGE_VIEWS.LIST && (
           <>
-            <div className="border-r border-panel-border-light dark:border-panel-border-dark h-6" />
+            <div className="border-panel-border-light dark:border-panel-border-dark h-6 border-r" />
             <div className="flex items-center">
               {isSearching ? (
                 <Input
@@ -346,7 +398,7 @@ const FileExplorerHeader = ({
                   actions={[
                     <IconX
                       key="close"
-                      className="text-white cursor-pointer mx-2"
+                      className="mx-2 cursor-pointer text-white"
                       size={'tiny'}
                       strokeWidth={2}
                       onClick={onCancelSearch}

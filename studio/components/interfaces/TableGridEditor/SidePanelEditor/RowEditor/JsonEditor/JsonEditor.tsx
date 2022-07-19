@@ -33,8 +33,8 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
     } catch (error: any) {
       const message = error.message
         ? `Error: ${error.message}`
-        : 'Hmm, invalid JSON seems to have an invalid structure.'
-      ui.setNotification({ category: 'error', message })
+        : 'JSON seems to have an invalid structure.'
+      ui.setNotification({ category: 'error', message, duration: 4000 })
     } finally {
       resolve()
     }
@@ -64,7 +64,7 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
           onClickOption={onToggleClick}
         />
 
-        <div className="flex-auto flex flex-col mt-4 space-y-2">
+        <div className="mt-4 flex flex-auto flex-col space-y-2">
           {view === 'edit' ? (
             <Editor column={column} value={jsonStr} onChange={onInputChange} />
           ) : (
@@ -89,7 +89,7 @@ const Editor: FC<EditorProps> = ({ column, value, onChange }) => {
     <>
       <Typography.Title level={4}>Edit JSON Field: {column}</Typography.Title>
 
-      <div className="w-full h-96 flex-grow border dark:border-dark">
+      <div className="dark:border-dark h-96 w-full flex-grow border">
         <JsonEditor onInputChange={onChange} defaultValue={value} />
       </div>
     </>

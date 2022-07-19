@@ -17,11 +17,18 @@ const GridHeaderActions: FC<Props> = ({ table }) => {
   return (
     <div className="space-x-3 flex items-center">
       <Link href={urlToRLSPolicies}>
-          <Button
-            type={table.rls_enabled ? 'link' : 'warning'}
-            icon={table.rls_enabled ? <IconLock strokeWidth={2} size={14} /> : <IconAlertCircle strokeWidth={2} size={14} />}>
-            RLS {table.rls_enabled ? 'is' : 'not'} enabled
-          </Button>
+        <Button
+          type={table.rls_enabled ? 'link' : 'warning'}
+          icon={
+            table.rls_enabled ? (
+              <IconLock strokeWidth={2} size={14} />
+            ) : (
+              <IconAlertCircle strokeWidth={2} size={14} />
+            )
+          }
+        >
+          RLS {table.rls_enabled ? 'is' : 'not'} enabled
+        </Button>
       </Link>
     </div>
   )

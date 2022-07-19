@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] Automatycznie generowany interfejs API
 - [x] Panel zarządzania
 - [x] Przechowywanie danych
-- [ ] Funkcje (dostępne w krótce)
+- [x] Funkcje
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentacja
 
@@ -29,7 +32,7 @@ Po pełną dokumentację, odwiedź [supabase.com/docs](https://supabase.com/docs
 ## Status
 
 - [x] Alpha: Testujemy Supabase z zamkniętą listą klientów.
-- [x] Publiczna Alpha: Każdy może zapisać się do testów na [app.supabase.io](https://app.supabase.io). Nie bądźcie dla nas zbyt surowi, jest kilka problemów.
+- [x] Publiczna Alpha: Każdy może zapisać się do testów na [app.supabase.com](https://app.supabase.com). Nie bądźcie dla nas zbyt surowi, jest kilka problemów.
 - [x] Publiczna Beta: Wystarczająco stabilna do użytku poza przedsiębiorstwami.
 - [ ] Publiczna: Gotowa wersja do użytku produkcyjnego.
 
@@ -45,7 +48,7 @@ Supabase jest połączeniem narzędzi open source. Budujemy funkcjonalności Fir
 
 **Aktualna architektura**
 
-Supabase jest [hostowaną platformą](https://app.supabase.io). Możesz się zarejestrować i zacząć używać Supabase bez potrzeby instalacji dodatkowych narzędzi. Cały czas tworzymy lokalne środowisko deweloperskie - jest to teraz nasz priorytet, razem ze stabilnością platformy.
+Supabase jest [hostowaną platformą](https://app.supabase.com). Możesz się zarejestrować i zacząć używać Supabase bez potrzeby instalacji dodatkowych narzędzi. Cały czas tworzymy lokalne środowisko deweloperskie - jest to teraz nasz priorytet, razem ze stabilnością platformy.
 
 ![Architektura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

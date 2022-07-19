@@ -15,6 +15,7 @@ import InvestorData from 'data/Investors'
 import TeamData from 'data/Team'
 
 import Image from 'next/image'
+import Link from 'next/link'
 
 import {
   Button,
@@ -247,7 +248,7 @@ const Investors = () => {
             <>
               <p>
                 <p className="text-lg">
-                  We've raised over $36 million in funding, backed by some of the world's leading
+                  We've raised over $116 million in funding, backed by some of the world's leading
                   investors.
                 </p>
               </p>
@@ -256,7 +257,7 @@ const Investors = () => {
         />
       </div>
 
-      <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-3">
+      <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
             <div
@@ -311,32 +312,40 @@ const Press = () => {
       <div>
         <SectionHeader title={'Press'} />
       </div>
-      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-2">
+      <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (
-          <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                  <p className="text-scale-1100 text-base">{x.title}</p>
-                </div>
-              </Space>
-            </Card>
-          </a>
+          <Link href={x.href} key={x.href}>
+            <a target="_blank">
+              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+                <Space className="h-40 justify-between" direction="vertical">
+                  <div>
+                    <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
+                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                      {x.title}
+                    </p>
+                  </div>
+                </Space>
+              </Card>
+            </a>
+          </Link>
         ))}
       </div>
       <div className="mx-auto mt-5 grid gap-5 sm:grid-cols-2 lg:max-w-none lg:grid-cols-4">
         {PressData.filter((x) => x.type == 'podcast').map((x) => (
-          <a href={x.href} key={x.href} target="_blank">
-            <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 bg-white">
-              <Space className="h-40 justify-between" direction="vertical">
-                <div>
-                  <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
-                  <p className="text-scale-1100 text-base">{x.title}</p>
-                </div>
-              </Space>
-            </Card>
-          </a>
+          <Link href={x.href} key={x.href}>
+            <a target="_blank">
+              <Card key={`press_${x.href}`} hoverable className="dark:bg-scale-400 h-36 bg-white">
+                <Space className="h-40 justify-between" direction="vertical">
+                  <div>
+                    <h1 className="text-scale-1200 text-xl">{x.type.toUpperCase()}</h1>
+                    <p className="text-scale-1100 line-clamp block h-12 overflow-hidden text-ellipsis text-base">
+                      {x.title}
+                    </p>
+                  </div>
+                </Space>
+              </Card>
+            </a>
+          </Link>
         ))}
       </div>
     </SectionContainer>

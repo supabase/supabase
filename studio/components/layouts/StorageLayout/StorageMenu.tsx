@@ -94,14 +94,11 @@ const StorageMenu: FC<Props> = () => {
 
         <div className="">
           <Menu.Group title="Configuration" />
-
-          <Flag name="storageSettings">
-            <Link href={`/project/${projectRef}/storage/settings`}>
-              <Menu.Item rounded active={page === 'settings'}>
-                <Typography.Text className="truncate">Settings</Typography.Text>
-              </Menu.Item>
-            </Link>
-          </Flag>
+          <Link href={`/project/${projectRef}/storage/settings`}>
+            <Menu.Item rounded active={page === 'settings'}>
+              <Typography.Text className="truncate">Settings</Typography.Text>
+            </Menu.Item>
+          </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
               <Typography.Text className="truncate">Policies</Typography.Text>

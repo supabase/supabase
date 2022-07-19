@@ -71,14 +71,31 @@ The Docker setup doesn't include a management database for managing users and lo
 
 ## Configuration
 
+Each system can be [configured](/docs/guides/hosting/overview#configuration) to suit your particular use-case.
+
 To keep the setup simple, we made some choices that may not be optimal for production:
 
 - the database is in the same machine as the servers
-- the storage uses the filesystem backend instead of S3
+- Storage uses the filesystem backend instead of S3
+- Auth should be configured with a production-ready SMTP server
 
-We strongly [recommend](/docs/guides/hosting/overview#managing-your-database) that you decouple your database
-before deploying.
-Each system can be [configured](/docs/guides/hosting/overview#configuration) to suit your particular use-case.
+### Using an external database
+
+We strongly [recommend](/docs/guides/hosting/overview#managing-your-database) that you decouple your database from `docker-compose` before deploying.
+The middleware will run with any PostgreSQL database that has logical replication enabled. The following environment variables should be updated
+in the `.env` file to point to your external database:
+
+```env title=".env"
+POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password
+
+POSTGRES_HOST=db
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PORT=5432
+```
+
+Once you have done this, you can safely comment out the `db` section of the `docker-compose` file, and remove any instances where the services `depends_on` the `db` image.
+
 
 ## Deploying
 
@@ -92,4 +109,4 @@ See the following guides to deploy Docker Compose setup using your preferred too
 ## Next steps
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

@@ -1,19 +1,33 @@
-import { observer } from 'mobx-react-lite'
-import { withAuth, useStore } from 'hooks'
+import { EmailTemplates, SmtpForm } from 'components/interfaces'
 import { AuthLayout } from 'components/layouts'
-import { Templates } from 'components/interfaces/Authentication'
+import { FormsContainer } from 'components/ui/Forms'
+import { useStore } from 'hooks'
+import { observer } from 'mobx-react-lite'
+import { useEffect } from 'react'
+import { NextPageWithLayout } from 'types'
 
-const Auth = () => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
+const PageLayout: NextPageWithLayout = () => {
+  const { ui, authConfig } = useStore()
 
-  return (
-    <AuthLayout title="Auth">
-      <div className="p-4">
-        <Templates project={project} />
-      </div>
-    </AuthLayout>
-  )
+  useEffect(() => {
+    // temporary store loader
+    authConfig.load()
+  }, [ui.selectedProjectRef])
+
+  if (authConfig) {
+    return (
+      <FormsContainer>
+        <SmtpForm />
+        <EmailTemplates />
+      </FormsContainer>
+    )
+  } else {
+    return <div />
+  }
 }
 
-export default withAuth(observer(Auth))
+PageLayout.getLayout = (page) => {
+  return <AuthLayout>{page}</AuthLayout>
+}
+
+export default observer(PageLayout)

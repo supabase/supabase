@@ -54,9 +54,8 @@ const ScrollableCodeBlock = ({
           className="transition-transform duration-500"
           style={{ transform: `translate3d(0, -${position}px, 0)` }}
         >
-          <CodeBlock highlightLines={highlightLinesRange} hideBorder={true} {...props}>
-            {children + '\n'.repeat(100)}
-          </CodeBlock>
+          {/* <CodeBlock highlightLines={highlightLinesRange} hideBorder={true} {...props}> */}
+          <CodeBlock {...props}>{children + '\n'.repeat(100)}</CodeBlock>
         </div>
       </div>
     </div>

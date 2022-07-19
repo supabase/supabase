@@ -1,5 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -14,7 +15,9 @@
 - [x] Automatisk genererede APIer
 - [x] Instrumentbræt
 - [x] Opbevaring af data
-- [ ] Serverbaserede funktioner (på vej)
+- [x] Serverbaserede funktioner
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentation
 
@@ -29,7 +32,7 @@ For fuld dokumentation, besøg [supabase.com/docs](https://supabase.com/docs)
 ## Status
 
 - [x] Alpha: Vi tester Supabase med et begrænset antal kunder
-- [x] Offentlig alpha: Alle kan tilmelde sig på [app.supabase.io](https://app.supabase.io). Vær opmærksom på, at uhensigtsmæssigheder kan forekomme.
+- [x] Offentlig alpha: Alle kan tilmelde sig på [app.supabase.com](https://app.supabase.com). Vær opmærksom på, at uhensigtsmæssigheder kan forekomme.
 - [x] Offentlig beta: Stabil til de fleste ikke-kommercielle formål
 - [ ] Offentlig: Klar til produktion
 
@@ -45,7 +48,7 @@ Supabase er en kombination af open source værktøjer. Vi bygger Firebase fuktio
 
 **Nuværende arkitektur**
 
-Supabase er en [hosted platform](https://app.supabase.io). Du kan skrive dig op og starte med at anvende Supabase uden nogen form for installation. Vi er stadig i gang med at forbedre den lokale udvikleroplevelse - dette er pt vores hovedfokus sammen med platformens generelle stabilitet.
+Supabase er en [hosted platform](https://app.supabase.com). Du kan skrive dig op og starte med at anvende Supabase uden nogen form for installation. Vi er stadig i gang med at forbedre den lokale udvikleroplevelse - dette er pt vores hovedfokus sammen med platformens generelle stabilitet.
 
 ![Arkitektur](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

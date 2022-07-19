@@ -1267,7 +1267,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "A unique identifier for the bucket you are creating.\n"
+												"text": "A unique identifier for the bucket you are updating.\n"
 											},
 											"type": {
 												"type": "intrinsic",
@@ -2809,7 +2809,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"text": "A unique identifier for the bucket you are creating.\n"
+												"text": "A unique identifier for the bucket you are updating.\n"
 											},
 											"type": {
 												"type": "intrinsic",

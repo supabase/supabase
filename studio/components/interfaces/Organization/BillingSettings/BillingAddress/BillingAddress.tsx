@@ -1,13 +1,13 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { Form, Input, Button, Listbox } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 interface Props {
   loading: boolean
