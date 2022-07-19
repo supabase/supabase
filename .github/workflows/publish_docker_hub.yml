@@ -33,3 +33,35 @@ jobs:
           push: true
           tags: supabase/studio:latest
           target: production
+
+  snapshot-tests:
+    name:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: studio
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Setup dependencies
+        run: |
+          npm run test:snapshots:compose:up
+          npm ci
+
+      - name: Run tests
+        run: npm run test:snapshots:ci
+
+      - name: Stop infrastructure
+        run: npm run test:snapshots:compose:down
+
+      - uses: actions/upload-artifact@v1
+        if: ${{ always() }}
+        with:
+          name: snapshot-test-results
+          path: test-results
