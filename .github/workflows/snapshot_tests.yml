@@ -22,10 +22,18 @@ jobs:
         with:
           node-version: 16
 
-      - uses: docker-practice/actions-setup-docker@master
+      - name: Install docker
+        run: |
+          mkdir -p ~/.docker/machine/cache
+          curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+          brew install --cask virtualbox
+          brew install docker docker-machine
+          docker-machine create --driver virtualbox default
+          docker-machine env default
 
       - name: Setup dependencies
         run: |
+          eval "$(docker-machine env default)" 
           npm run test:snapshots:compose:up
           npm ci
           npx playwright install --with-deps
@@ -40,4 +48,4 @@ jobs:
         if: ${{ always() }}
         with:
           name: snapshot-test-results
-          path: test-results
+          path: studio/test-results
