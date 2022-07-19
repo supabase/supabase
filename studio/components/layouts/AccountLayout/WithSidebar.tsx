@@ -4,11 +4,12 @@ import { isUndefined } from 'lodash'
 import { Menu, Typography, IconArrowUpRight, Badge, IconLogOut } from '@supabase/ui'
 import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
+import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface Props {
   title: string
   breadcrumbs: any[]
-  links: any[]
+  sections: SidebarSection[]
   header?: ReactNode
   subitems?: any[]
   subitemsParentKey?: number
@@ -17,20 +18,27 @@ interface Props {
   children: ReactNode
 }
 
+/*
+The information heirarchy for WithSidebar is:
+  WithSidebar
+    SectionsWithHeaders
+      SidebarItem
+        SidebarLink
+    SidebarItem
+      SidebarLink
+*/
 const WithSidebar: FC<Props> = ({
   title,
   header,
   breadcrumbs = [],
   children,
-  links,
+  sections,
   subitems,
   subitemsParentKey,
   hideSidebar = false,
   customSidebarContent,
 }) => {
-  const noContent = !links && !customSidebarContent
-  const linksHaveHeaders = links && links[0].heading
-
+  const noContent = !sections && !customSidebarContent
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
@@ -58,20 +66,24 @@ const WithSidebar: FC<Props> = ({
           <div className="-mt-1">
             <Menu>
               {customSidebarContent}
-              {links && linksHaveHeaders ? (
-                <LinksWithHeaders
-                  links={links}
-                  subitems={subitems}
-                  subitemsParentKey={subitemsParentKey}
-                />
-              ) : null}
-              {!linksHaveHeaders && links ? (
-                <LinksWithoutHeaders
-                  links={links}
-                  subitems={subitems}
-                  subitemsParentKey={subitemsParentKey}
-                />
-              ) : null}
+              {sections.map((section, i) => {
+                return Boolean(section.heading) ? (
+                  <SectionWithHeaders
+                    key={section.key}
+                    section={section}
+                    subitems={subitems}
+                    subitemsParentKey={subitemsParentKey}
+                  />
+                ) : (
+                  <div className="dark:border-dark border-b py-5 px-6" key={section.key}>
+                    <SidebarItem
+                      links={section.links}
+                      subitems={subitems}
+                      subitemsParentKey={subitemsParentKey}
+                    />
+                  </div>
+                )
+              })}
             </Menu>
           </div>
         </div>
@@ -85,70 +97,94 @@ const WithSidebar: FC<Props> = ({
 }
 export default WithSidebar
 
-const LinksWithHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
-  return links.map((x: any) => (
-    <div key={x.heading} className="dark:border-dark border-b py-5 px-6">
-      {x.heading && <Menu.Group title={x.heading} />}
-      {x.versionLabel && (
-        <div className="mb-1 px-3">
-          <Badge color="yellow">{x.versionLabel}</Badge>
-        </div>
-      )}
-      {
-        <LinksWithoutHeaders
-          links={x.links}
-          subitems={subitems}
-          subitemsParentKey={subitemsParentKey}
-        />
-      }
-    </div>
-  ))
+interface SectionWithHeadersProps {
+  section: SidebarSection
+  subitems?: any[]
+  subitemsParentKey?: number
 }
-const LinksWithoutHeaders: FC<any> = ({ links, subitems, subitemsParentKey }) => {
+
+const SectionWithHeaders: FC<SectionWithHeadersProps> = ({
+  section,
+  subitems,
+  subitemsParentKey,
+}) => (
+  <div key={section.heading} className="dark:border-dark border-b py-5 px-6">
+    {section.heading && <Menu.Group title={section.heading} />}
+    {section.versionLabel && (
+      <div className="mb-1 px-3">
+        <Badge color="yellow">{section.versionLabel}</Badge>
+      </div>
+    )}
+    {
+      <SidebarItem
+        links={section.links}
+        subitems={subitems}
+        subitemsParentKey={subitemsParentKey}
+      />
+    }
+  </div>
+)
+interface SidebarItemProps {
+  links: SidebarLink[]
+  subitems?: any[]
+  subitemsParentKey?: number
+}
+
+const SidebarItem: FC<SidebarItemProps> = ({ links, subitems, subitemsParentKey }) => {
   return (
     <ul className="space-y-1">
-      {links.map((x: any, i: number) => {
+      {links.map((link, i: number) => {
         // disable active state for link with subitems
-        const isActive = x.isActive && !subitems
+        const isActive = link.isActive && !subitems
 
         let render: any = (
-          <SidebarItem
-            key={`${x.key || x.as}-${i}-sidebarItem`}
-            id={`${x.key || x.as}-${i}`}
-            slug={x.key}
+          <SidebarLinkItem
+            key={`${link.key}-${i}-sidebarItem`}
+            id={`${link.key}-${i}`}
             isActive={isActive}
-            label={x.label}
-            href={x.href}
-            onClick={x.onClick}
-            external={x.external || false}
+            label={link.label}
+            href={link.href}
+            onClick={link.onClick}
+            isExternal={link.isExternal || false}
           />
         )
 
-        if (subitems && x.subitemsKey === subitemsParentKey) {
+        if (subitems && link.subitemsKey === subitemsParentKey) {
           const subItemsRender = subitems.map((y: any, i: number) => (
-            <SidebarItem
+            <SidebarLinkItem
               key={`${y.key || y.as}-${i}-sidebarItem`}
               id={`${y.key || y.as}-${i}`}
-              slug={y.key}
               isSubitem={true}
               label={y.label}
               onClick={y.onClick}
-              external={x.external || false}
+              isExternal={link.isExternal || false}
             />
           ))
           render = [render, ...subItemsRender]
         }
-
         return render
       })}
     </ul>
   )
 }
 
-const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, external }) => {
+interface SidebarLinkProps extends SidebarLink {
+  id: string
+  isSubitem?: boolean
+}
+
+const SidebarLinkItem: FC<SidebarLinkProps> = ({
+  id,
+  label,
+  href,
+  isActive,
+  isSubitem,
+  isExternal,
+  onClick,
+}) => {
   if (isUndefined(href)) {
     let icon
-    if (external) {
+    if (isExternal) {
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
@@ -161,7 +197,7 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
         rounded
         key={id}
         style={{
-          marginLeft: isSubitem && '.5rem',
+          marginLeft: isSubitem ? '.5rem' : '0rem',
         }}
         active={isActive ? true : false}
         onClick={onClick || (() => {})}
@@ -174,12 +210,12 @@ const SidebarItem: FC<any> = ({ id, label, href, isActive, isSubitem, onClick, e
 
   return (
     <Link href={href || ''}>
-      <a className="block" target={external ? '_blank' : '_self'}>
+      <a className="block" target={isExternal ? '_blank' : '_self'}>
         <button
           className="ring-scale-1200 border-scale-500 group-hover:border-scale-900 group flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal outline-none focus-visible:z-10 focus-visible:ring-1"
           onClick={onClick || (() => {})}
         >
-          {external && (
+          {isExternal && (
             <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
               <IconArrowUpRight size={'tiny'} />
             </span>
