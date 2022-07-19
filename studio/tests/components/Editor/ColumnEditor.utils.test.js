@@ -50,9 +50,9 @@ describe('ColumnEditor.utils: unescapeLiteral', () => {
     const value2 = unescapeLiteral(mockInput2)
     expect(value2).toStrictEqual("(('hi' || 'bye') || 'hello')")
 
-    const mockInput3 = "(uuid_generate_v4() || 'helo'::text)"
+    const mockInput3 = "(uuid_generate_v4() || 'hello'::text)"
     const value3 = unescapeLiteral(mockInput3)
-    expect(value3).toStrictEqual("(uuid_generate_v4() || 'helo')")
+    expect(value3).toStrictEqual("(uuid_generate_v4() || 'hello')")
   })
   test('should return json object properly', () => {
     const mockInput = `'{\"version\": 10, \"dimensions\": {\"width\": 50, \"height\": 20}}'::jsonb`
