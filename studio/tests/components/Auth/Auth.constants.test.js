@@ -45,6 +45,18 @@ describe('Auth.constants: domainRegex', () => {
     const mockInput2 = 'https://supabase.com/*'
     const output2 = domainRegex.test(mockInput2)
     expect(output2).toBe(true)
+
+    const mockInput3 = 'https://new-*-domain.com/*'
+    const output3 = domainRegex.test(mockInput3)
+    expect(output3).toBe(true)
+
+    const mockInput4 = 'https://new-*-domain.com/*/*/*'
+    const output4 = domainRegex.test(mockInput4)
+    expect(output4).toBe(true)
+
+    const mockInput5 = 'https://sub-*-domain.new-*-domain.com/*/*/*'
+    const output5 = domainRegex.test(mockInput5)
+    expect(output5).toBe(true)
   })
   test('should invalidate invalid URLs', () => {
     const mockInput1 = 'supabase'
