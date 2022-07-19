@@ -1,13 +1,13 @@
 ---
 id: pgcron
 title: "pg_cron: Postgres Schedular"
-description: An HTTP Client for PostgreSQL Functions.
+description: A cron jobs schedular for PostgreSQL Functions.
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The `pg_cron` extension allows you to schedule job for PostgreSQL.
+The `pg-cron` extension allows you to schedule job for PostgreSQL.
 ## Overview
 
 Let's cover some basic concepts:
@@ -20,7 +20,7 @@ Let's cover some basic concepts:
   - `log_min_messages` - Setting to control log_min_messages in pg_cron launcher.
   - `enable_superuser_jobs` - Setting to disallow superuser jobs.
 
-You can use the `pg_cron` extension to make these network requests from Postgres.
+You can use the `pg_cron` extension to schedule cron jobs from Postgres.
 
 ## Usage
 
@@ -68,7 +68,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ### Available functions
 
-While the main usage is simply enabling cron jobs in Postgres, there are different functions for specific functionality:
+While the main usage is simply `pg_cron` enabling cron jobs in postgres , there are different functions for specific functionality:
 
 - `cron.schedule()` 
 - `cron.unschedule()` 
@@ -84,11 +84,11 @@ While the main usage is simply enabling cron jobs in Postgres, there are differe
 
 ```sql
 
-create extension pg_corn version '1.0';
+create extension pg_cron version '1.0';
 
-select extversion from pg_extension where extname='pg_corn';
+select extversion from pg_extension where extname='pg_cron';
 ```
-This query creates a pg_corn extension of version 1.0
+This query creates a pg_cron extension of version 1.0
 
 ### Simple `schedule` example
 
@@ -106,4 +106,4 @@ This query stops scheduling a job.
 
 ## Resources 
 
-- Official [`pg_corn` GitHub Repository](https://github.com/citusdata/pg_cron).
+- Official [`pg_cron` GitHub Repository](https://github.com/citusdata/pg_cron).
