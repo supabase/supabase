@@ -36,7 +36,7 @@ const InformationBox: FC<Props> = ({
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
           <div className="flex w-full space-x-3 lg:items-center">
-            <span className="text-scale-900">{icon}</span>
+            {icon && <span className="text-scale-900">{icon}</span>}
             <div className="flex-grow">
               <h5 className="text-scale-1200 text-sm">{title}</h5>
             </div>
