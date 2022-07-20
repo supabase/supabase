@@ -435,7 +435,13 @@ const SupportNew = () => {
                 )}
                 <div className="px-6">
                   <div className="flex justify-end">
-                    <Button htmlType="submit" icon={<IconMail />} size="medium" loading={loading}>
+                    <Button
+                      htmlType="submit"
+                      icon={<IconMail />}
+                      size="medium"
+                      disabled={loading}
+                      loading={loading}
+                    >
                       Send support request
                     </Button>
                   </div>
