@@ -85,8 +85,6 @@ export function initTable(
       return { savedState: { sorts: savedState.sorts, filters: savedState.filters } }
     }
 
-    console.log('onInitTable', table)
-
     const gridColumns = getGridColumns(table, {
       editable: props.editable,
       defaultWidth: props.gridProps?.defaultColumnWidth,
