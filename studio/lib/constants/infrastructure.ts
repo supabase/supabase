@@ -7,7 +7,7 @@ export const REGIONS = {
   CENTRAL_CANADA: 'Canada (Central)',
   WEST_EU: 'West EU (Ireland)',
   WEST_EU_2: 'West EU (London)',
-  // 'North EU': 'North Europe',
+  // 'North EU': 'North EU',
   CENTRAL_EU: 'Central EU (Frankfurt)',
   SOUTH_ASIA: 'South Asia (Mumbai)',
   SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
