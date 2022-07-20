@@ -143,7 +143,7 @@ const OwnerDropdown = observer(({ members, member }: any) => {
                   </div>
                 </Dropdown.Item>
 
-                {!isInviteExpired(member.invited_at) && (
+                {isInviteExpired(member.invited_at) && (
                   <>
                     <Dropdown.Seperator />
                     <Dropdown.Item onClick={() => handleResendInvite(member)}>
