@@ -1,0 +1,91 @@
+---
+title: Loading SportsDB into Supabase
+description: TODO
+author: jon_meyers
+image: seen-by/seen-by-postgresql-thumb.png
+thumb: seen-by/seen-by-postgresql-thumb.png
+tags:
+  - postgres
+  - sql
+  - data
+date: '2022-07-21'
+toc_depth: 3
+---
+
+In the real world, data is raw and complex, requiring a relational database to store and model it. One example is a complex dataset like SportDB, which contains more than 80000 rows of data and more than 100 tables. It is often used to model a sports betting application, and it has been utilized in research projects dealing with sports data. The figure below shows just how complex SportsDB's schema is and the relationships between the various entities.
+
+![SportsDB ER diagram](http://www.sportsdb.org/modules/sd/assets/downloads/sportsdb-29.jpg)
+
+Supabase is a backend-as-a-service built on top of PostgreSQL that can handle complex datasets like SportsDB and provide you with insights. Its easy-to-use APIs and superior querying capabilities make it the ideal backend-as-a-service for building today's modern applications. Supabase also natively includes security features like [authentication](https://supabase.com/docs/guides/auth/intro#authentication) and [authorization](https://supabase.com/docs/guides/auth/intro#authorization) using [Row Level Security (RLS)](https://supabase.com/docs/guides/auth/row-level-security), which means more time can be spent developing your app.
+
+Now let's look at how we can load SportsDB data into Supabase.
+
+## Loading SportsDB into Supabase
+
+Supabase is built for developers, and you can get started for free using your [existing Github account](https://app.supabase.io). Once your supabase account is set up, you will access the Supabase dashboard. From here, go to **All Projects > New Project**.
+
+![New Supabase project](/images/blog/sports-db/new-project-button.png)
+
+Give your project a name and set the database password. You can also choose the region and adjust the [pricing plan](https://supabase.com/pricing) based on the requirements of your project. Now click the *Create new project* button.
+
+![New Supabase project](/images/blog/sports-db/create-new-project.png)
+
+Your project will take some time to initialize.
+
+Download the SportsDB dataset using this [link](http://sportsdb.org/modules/sd/assets/downloads/sportsdb_sample_postgresql.zip). The SportDB dataset consists of four tables: player table, team table, league table, and competition table. The table names are self-explanatory, so it is easy to find the table you want to work with. These four tables are related to one another through keys (IDs) which identify the relationships between them.
+
+To run simple queries, we can use the [built-in](https://supabase.com/docs/guides/database#the-sql-editor) SQL Editor in the Supabase UI. With more complex queries, you can use [psql](https://www.postgresql.org/docs/13/app-psql.html), a terminal-based tool to work with a Postgres database. To learn how to install psql, check the documentation [here](https://www.postgresql.org/download/).
+
+To establish a connection with Supabase, you need a few details like Host, User, and Password or you can use an existing connection string. All these details can be found under *Connection info* in the **Settings > Database** section of our Supabase project page.
+
+Database Information:
+
+![Database Information](/images/blog/sports-db/database-information.png)
+
+Connection String:
+
+![Connection String](/images/blog/sports-db/connection-string.png)
+
+Here, we’re using the connection string to connect to the database.
+
+*Note:* The password for the database will be the password that was provided when we created the project.
+
+![psql prompt](/images/blog/sports-db/psql-prompt.png)
+
+Once you are connected to the database, use the below command to load the SportsDB dataset.
+
+```bash
+\i  <path that has the SQL file>
+```
+
+![psql example](/images/blog/sports-db/psql-example.png)
+
+After executing the command, you should see the SportsDB objects getting created and loaded with data.
+
+This may take some time, but once the data loading is finished, you can verify these newly created tables from your Supabase project page by going to the Table Editor tab. You can see all the newly created tables here.
+
+![Populated Table](/images/blog/sports-db/populated-table.png)
+
+Now go to the [API section](https://supabase.com/docs/guides/api#accessing-the-docs) on your Project page. Here we can see that Supabase has created all the required REST API endpoints to perform the CRUD operations.
+
+![Auto-generated documentation](/images/blog/sports-db/auto-generated-documentation.png)
+
+Next, let’s make an HTTP request using cURL using anonymous access (key type as “anon”) for simplicity.
+
+![Toggle anon key](/images/blog/sports-db/toggle-anon-key.png)
+
+Now copy the required cURL command and run it in your terminal. The output should look like the screenshot below:
+
+![Select query output](/images/blog/sports-db/select-query-output.png)
+
+
+Here, we have selected all rows from the affiliations table. Similarly, we can perform all the other CRUD operations using the respective APIs.
+
+## Conclusion
+
+Whether you have a simple or complex application, Supabase provides an excellent backend-as-a-service allowing you to build apps more easily and faster. With its inbuilt enterprise features such as [authentication](https://supabase.com/docs/guides/auth/intro#authentication), [file storage](https://supabase.com/docs/guides/storage#files), and [autogenerated APIs](https://supabase.com/docs/guides/api),  you can now free up your time and focus more on building critical business app requirements, without worrying about the data management issues.
+
+![Legacy DB meme](/images/blog/sports-db/legacy-db-meme.png)
+TODO! Add meme of legacy db
+
+Now, become a Supabase developer today by starting [a new project on our free tier](https://api.supabase.io/platform/login).

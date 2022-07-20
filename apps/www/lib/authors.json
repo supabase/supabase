@@ -160,5 +160,13 @@
     "position": "DevRel & DX",
     "author_url": "https://github.com/silentworks",
     "author_image_url": "https://github.com/silentworks.png"
+  },
+  {
+    "author_id": "jon_meyers",
+    "author": "Jon Meyers",
+    "username": "jonmeyers",
+    "position": "Developer Advocate",
+    "author_url": "https://github.com/dijonmusters",
+    "author_image_url": "https://github.com/dijonmusters.png"
   }
 ]
