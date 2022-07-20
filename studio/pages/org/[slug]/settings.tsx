@@ -415,7 +415,7 @@ const MembersView = observer(() => {
                 <Table.td>
                   {PageState.isOrgOwner && !x.is_owner && (
                     // @ts-ignore
-                    <OwnerDropdown members={PageState.members} member={x} />
+                    <OwnerDropdown members={PageState.members} member={x} user={PageState.user} />
                   )}
                 </Table.td>
               </Table.tr>
