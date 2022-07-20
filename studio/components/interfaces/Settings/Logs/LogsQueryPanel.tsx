@@ -63,14 +63,16 @@ bg-panel-header-light dark:bg-panel-header-dark
           <Dropdown
             side="bottom"
             align="start"
-            overlay={Object.values(LogsTableName).map((source) => (
-              <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
-                <div className="flex flex-col gap-1">
-                  <span className="font-mono text-white font-bold">{source}</span>
-                  <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
-                </div>
-              </Dropdown.Item>
-            ))}
+            overlay={Object.values(LogsTableName)
+              .sort((a, b) => a.localeCompare(b))
+              .map((source) => (
+                <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-mono text-scale-1100 font-bold">{source}</span>
+                    <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
+                  </div>
+                </Dropdown.Item>
+              ))}
           >
             <Button as="span" type="default" iconRight={<IconChevronDown />}>
               Insert source
@@ -80,11 +82,13 @@ bg-panel-header-light dark:bg-panel-header-dark
           <Dropdown
             side="bottom"
             align="start"
-            overlay={templates.map((template: LogTemplate) => (
-              <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
-                <Typography.Text>{template.label}</Typography.Text>
-              </Dropdown.Item>
-            ))}
+            overlay={templates
+              .sort((a, b) => a.label!.localeCompare(b.label!))
+              .map((template: LogTemplate) => (
+                <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
+                  <Typography.Text>{template.label}</Typography.Text>
+                </Dropdown.Item>
+              ))}
           >
             <Button as="span" type="default" iconRight={<IconChevronDown />}>
               Templates
