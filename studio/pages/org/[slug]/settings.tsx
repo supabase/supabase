@@ -42,17 +42,7 @@ import Image from 'next/image'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
-const PageContext = createContext(null)
-
-// Invite is expired if older than 24hrs
-function inviteExpired(timestamp: Date) {
-  const inviteDate = new Date(timestamp)
-  const now = new Date()
-  var timeBetween = now.valueOf() - inviteDate.valueOf()
-  if (timeBetween / 1000 / 60 / 60 < 24) {
-    return true
-  }
-}
+export const PageContext = createContext(null)
 
 const OrgSettingsLayout = withAuth(
   observer(({ children }) => {
@@ -218,22 +208,10 @@ const TabsView = observer(() => {
         </section>
         <nav className="">
           <Tabs onChange={(id: any) => setSelectedTab(id)} type="underlined">
-            {/* @ts-ignore */}
-            <Tabs.Panel id="GENERAL" label="General">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="TEAM" label="Team">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="BILLING" label="Billing">
-              <></>
-            </Tabs.Panel>
-            {/* @ts-ignore */}
-            <Tabs.Panel id="INVOICES" label="Invoices">
-              <></>
-            </Tabs.Panel>
+            <Tabs.Panel id="GENERAL" label="General" />
+            <Tabs.Panel id="TEAM" label="Team" />
+            <Tabs.Panel id="BILLING" label="Billing" />
+            <Tabs.Panel id="INVOICES" label="Invoices" />
           </Tabs>
         </nav>
       </div>
@@ -337,120 +315,10 @@ const OrgDeletePanel = observer(() => {
           <p className="text-red-900">
             Make sure you have made a backup if you want to keep your data
           </p>
-          <OrgDeleteModal />
+          <DeleteOrganizationButton />
         </Alert>
       </Panel.Content>
     </Panel>
-  )
-})
-
-const OrgDeleteModal = observer(() => {
-  const PageState: any = useContext(PageContext)
-  const router = useRouter()
-  const { ui } = useStore()
-
-  const { slug: orgSlug, name: orgName } = PageState.organization
-
-  const [isOpen, setIsOpen] = useState(false)
-  const [value, setValue] = useState('')
-
-  function toggle() {
-    setIsOpen(!isOpen)
-  }
-
-  return (
-    <>
-      <div className="mt-2">
-        <Button onClick={toggle} type="danger">
-          Delete organization
-        </Button>
-      </div>
-      <Modal
-        visible={isOpen}
-        onCancel={toggle}
-        header={
-          <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Delete organisation</h5>
-            <span className="text-scale-900 text-xs">Are you sure?</span>
-          </div>
-        }
-        size="small"
-        hideFooter
-        closable
-      >
-        <Form
-          initialValues={{
-            orgName: '',
-          }}
-          validateOnBlur
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
-            const response = await delete_(`${API_URL}/organizations/${orgSlug}`)
-            if (response.error) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to delete organization: ${response.error.message}`,
-              })
-              setSubmitting(false)
-            } else {
-              PageState.onOrgDeleted(PageState.organization)
-              setSubmitting(false)
-              router.push('/')
-            }
-          }}
-          validate={(values) => {
-            const errors: any = {}
-            if (!values.orgName) {
-              errors.orgName = 'Enter the name of the organization.'
-            }
-            if (values.orgName !== orgSlug) {
-              errors.orgName = 'Value entered does not match name of the organization.'
-            }
-            return errors
-          }}
-        >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
-            <div className="space-y-4 py-3">
-              <Modal.Content>
-                <p className="text-scale-900 text-sm">
-                  This action <span className="text-scale-1200">cannot</span> be undone. This will
-                  permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
-                  organization and remove all of its projects.
-                </p>
-              </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Input
-                  id="orgName"
-                  label={
-                    <span>
-                      Please type <Typography.Text strong>{orgSlug}</Typography.Text> to confirm
-                    </span>
-                  }
-                  onChange={(e) => setValue(e.target.value)}
-                  value={value}
-                  placeholder="Type in the orgnaization name"
-                  className="w-full"
-                />
-              </Modal.Content>
-              <Modal.Seperator />
-              <Modal.Content>
-                <Button
-                  type="danger"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                  size="small"
-                  block
-                  danger
-                >
-                  I understand, delete this organization
-                </Button>
-              </Modal.Content>
-            </div>
-          )}
-        </Form>
-      </Modal>
-    </>
   )
 })
 

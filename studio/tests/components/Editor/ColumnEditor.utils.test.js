@@ -41,6 +41,19 @@ describe('ColumnEditor.utils: unescapeLiteral', () => {
     const value = unescapeLiteral(mockInput)
     expect(value).toStrictEqual("(now() at time zone 'utc')")
   })
+  test('should return expressions that combine values properly', () => {
+    const mockInput1 = "('hi_'::text || uuid_generate_v4())"
+    const value1 = unescapeLiteral(mockInput1)
+    expect(value1).toStrictEqual("('hi_' || uuid_generate_v4())")
+
+    const mockInput2 = "(('hi'::text || 'bye'::text) || 'hello'::text)"
+    const value2 = unescapeLiteral(mockInput2)
+    expect(value2).toStrictEqual("(('hi' || 'bye') || 'hello')")
+
+    const mockInput3 = "(uuid_generate_v4() || 'hello'::text)"
+    const value3 = unescapeLiteral(mockInput3)
+    expect(value3).toStrictEqual("(uuid_generate_v4() || 'hello')")
+  })
   test('should return json object properly', () => {
     const mockInput = `'{\"version\": 10, \"dimensions\": {\"width\": 50, \"height\": 20}}'::jsonb`
     const value = unescapeLiteral(mockInput)

@@ -26,7 +26,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
   }, [])
 
   useEffect(() => {
-    if (!project.restUrl || !project.internalApiKey) return
+    if (!project.restUrl) return
 
     // Check project connection status every 4 seconds
     // pingPostgrest timeouts in 2s, wait for another 2s before checking again
@@ -37,7 +37,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
   }, [project])
 
   const testProjectConnection = async () => {
-    const result = await pingPostgrest(project.restUrl!, project.internalApiKey!, {
+    const result = await pingPostgrest(project.restUrl!, {
       kpsVersion: project.kpsVersion,
     })
     if (result) {
