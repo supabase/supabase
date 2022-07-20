@@ -4,7 +4,7 @@ import { timeout } from 'lib/helpers'
 import { Button, IconMoreHorizontal, IconTrash, Dropdown } from '@supabase/ui'
 
 import { useOrganizationDetail, useStore } from 'hooks'
-import { Member } from 'types'
+import { Member, User } from 'types'
 import { API_URL } from 'lib/constants'
 import { post, delete_ } from 'lib/common/fetch'
 import { isInviteExpired } from './Organization.utils'
@@ -12,7 +12,7 @@ import { PageContext } from 'pages/org/[slug]/settings'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
-const OwnerDropdown = observer(({ members, member }: any) => {
+const OwnerDropdown = observer(({ members, member, user }: any) => {
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
 
@@ -75,12 +75,12 @@ const OwnerDropdown = observer(({ members, member }: any) => {
     }
   }
 
-  async function handleResendInvite(member: Member) {
+  async function handleResendInvite(member: Member, user: User) {
     setLoading(true)
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
       invited_email: member.profile.primary_email,
-      owner_id: member.invited_id,
+      owner_id: user.id,
     })
 
     if (response.error) {
@@ -143,10 +143,10 @@ const OwnerDropdown = observer(({ members, member }: any) => {
                   </div>
                 </Dropdown.Item>
 
-                {!isInviteExpired(member.invited_at) && (
+                {isInviteExpired(member.invited_at) && (
                   <>
                     <Dropdown.Seperator />
-                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                    <Dropdown.Item onClick={() => handleResendInvite(member, user)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
