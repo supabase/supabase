@@ -42,7 +42,7 @@ const PolicyEditorModalTitle: FC<Props> = ({
   }
   return (
     <div className="flex items-center space-x-3">
-      <h4 className="m-0 text-lg">{getTitle()}</h4>
+      <h4 className="m-0 text-lg truncate">{getTitle()}</h4>
     </div>
   )
 }
