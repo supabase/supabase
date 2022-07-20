@@ -1,20 +1,19 @@
+import { useStore } from 'hooks'
 import jsonLogic from 'json-logic-js'
+import { IS_PLATFORM } from 'lib/constants'
 import { find } from 'lodash'
 import { useRouter } from 'next/router'
-import useSWR from 'swr'
-import { useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
 
 export function usePermissions(action: string, resource: string, data?: object) {
   if (!IS_PLATFORM) return true
 
-  const { app } = useStore()
+  const { app, ui } = useStore()
   const router = useRouter()
-  const url = `${API_URL}/profile/permissions`
-  const { data: permissions, error } = useSWR<any>(url, get)
-  if (error || !permissions || permissions.error) return false
+
+  // const url = `${API_URL}/profile/permissions`
+  // const { data: permissions, error } = useSWR<any>(url, get)
+  // if (error || !permissions || permissions.error) return false
 
   let organization_id: number | undefined
   const { ref, slug } = router.query
@@ -26,7 +25,7 @@ export function usePermissions(action: string, resource: string, data?: object) 
     organization_id = organization?.id
   }
 
-  return permissions
+  return ui.permissions
     .filter(
       (permission: {
         actions: string[]
@@ -34,11 +33,13 @@ export function usePermissions(action: string, resource: string, data?: object) 
         organization_id: number
         resources: string[]
       }) =>
-        permission.actions.some((act) => action.match(act.replace('.', '.').replace('%', '.*'))) &&
+        permission.actions.some((act) =>
+          action ? action.match(act.replace('.', '.').replace('%', '.*')) : null
+        ) &&
         permission.resources.some((res) =>
           resource.match(res.replace('.', '.').replace('%', '.*'))
         ) &&
-        permission.organization_id === organization_id
+        permission.organization_id === ui?.selectedOrganization?.id
     )
     .some(
       ({ condition }: { condition: jsonLogic.RulesLogic }) =>

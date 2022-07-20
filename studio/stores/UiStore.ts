@@ -16,7 +16,7 @@ export interface IUiStore {
   selectedOrganization?: Organization
   notification?: Notification
   profile?: User
-
+  permissions?: any // todo: type this
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
   onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void
@@ -24,6 +24,7 @@ export interface IUiStore {
   setOrganizationSlug: (slug?: string) => void
   setNotification: (notification: Notification) => string
   setProfile: (value?: User) => void
+  setPermissions: (permissions?: any) => void // todo: type this
 }
 export default class UiStore implements IUiStore {
   rootStore: IRootStore
@@ -35,6 +36,7 @@ export default class UiStore implements IUiStore {
   selectedOrganizationSlug?: string
   notification?: Notification
   profile?: User
+  permissions?: any // todo: define this
 
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore
@@ -149,5 +151,9 @@ export default class UiStore implements IUiStore {
     }
 
     this.profile = value
+  }
+
+  setPermissions(permissions?: any) {
+    this.permissions = permissions
   }
 }

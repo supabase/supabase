@@ -3,6 +3,7 @@ import { ComponentType, useEffect, useState } from 'react'
 import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
 import Connecting from 'components/ui/Loading'
+import { usePermissions2 } from 'hooks/queries/usePermissionsQuery'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -28,6 +29,7 @@ export function withAuth<T>(
     const returning =
       app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
     const { profile, isLoading } = useProfile(returning)
+    const { permissions, isLoading: isPermissionLoading } = usePermissions2(returning)
 
     const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
     const isRedirecting =
@@ -41,6 +43,8 @@ export function withAuth<T>(
           ui.setProfile(undefined)
         } else if (returning !== 'minimal') {
           ui.setProfile(profile)
+
+          ui.setPermissions(permissions) // todo: might be race condition
 
           if (!app.organizations.isInitialized) {
             app.organizations.load()
