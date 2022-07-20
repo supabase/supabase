@@ -5,9 +5,9 @@ import { API_URL } from 'lib/constants'
 
 export function useOrganizationDetail(slug: string) {
   // Get org members
-  const url = `${API_URL}/props/org/${slug}?member_roles`
+  const url = `${API_URL}/organizations/${slug}/members?member_roles`
   const { data, error } = useSWR<any>(url, get)
-  let { members, products } = data ?? []
+  let members = data ?? []
 
   // Get pending invite users
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
@@ -19,18 +19,15 @@ export function useOrganizationDetail(slug: string) {
       is_owner: false,
       invited_at: x.invited_at,
       invited_id: x.invited_id,
-      profile: {
-        // Use the first letter of the email to allow for member list sorting
-        username: x.invited_email.slice(0, 1),
-        primary_email: x.invited_email,
-      },
+      username: x.invited_email.slice(0, 1),
+      role_ids: ['Developer'], // todo: hardcoded this for now, should be based on the actual role of the invited user from api
+      primary_email: x.invited_email,
     }))
 
     members = [...members, ...invitedMembers]
   }
 
   const anyError = data?.error || error || inviteError
-
 
   function mutateOrgMembers(updatedMembers: Member[], revalidate?: boolean) {
     mutate(url, { members: updatedMembers }, revalidate ?? true)

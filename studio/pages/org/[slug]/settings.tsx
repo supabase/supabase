@@ -13,6 +13,7 @@ import {
   Tabs,
   Typography,
   IconUser,
+  Listbox,
 } from '@supabase/ui'
 import { pluckJsonSchemaFields, pluckObjectFields, timeout } from 'lib/helpers'
 import { toJS } from 'mobx'
@@ -57,40 +58,60 @@ const OrgSettingsLayout = withAuth(
   observer(({ children }) => {
     const { app, ui } = useStore()
     const router = useRouter()
+
+    console.log('ui.permissions', ui.permissions)
+
     const PageState: any = useLocalObservable(() => ({
       user: {} as any,
       organization: {},
       projects: [],
       members: [],
+      roles: [] as any,
       membersFilterString: '',
       get isOrgOwner() {
-        console.log(this.members[0])
-        console.log(this.user.id)
-        return (
-          this.members.find((x: Member) => {
-            return x.profile.id === this.user?.id && x.is_owner
-          }) != undefined
-        )
+        return true
+        // to do : need logic in here to check the role of the user
+
+        // console.log(this.members[0])
+        // console.log(this.user.id)
+        // return (
+        //   this.members.find((x: Member) => {
+        //     // console.log('member', x)
+        //     return (
+        //       x.role_ids &&
+        //       x.role_ids.find((x: number) => {
+        //         console.log(x)
+        //         const roleId = x
+        //         return this.roles.find((x: any) => {
+        //           x.name === 'Owner' && roleId === x.id
+        //         })
+        //       })
+        //     ) // sx.id === this.user?.id // && x.is_owner
+        //   }) != undefined
+        // )
+        // usePermissions(PermissionAction)
       },
       get filteredMembers() {
+        // console.log('this.members', this.members)
         const temp = this.members.filter((x: any) => {
-          let profile = x.profile
-          if (profile) {
+          if (x.invited_at) {
+            return x.primary_email.includes(this.membersFilterString)
+          }
+          if (x.gotrue_id) {
             return (
-              profile.username.includes(this.membersFilterString) ||
-              profile.primary_email.includes(this.membersFilterString)
+              x.username.includes(this.membersFilterString) ||
+              x.primary_email.includes(this.membersFilterString)
             )
           }
-          if (x.invited_email) {
-            return x.invited_email.includes(this.membersFilterString)
-          }
         })
-        return temp.sort((a: any, b: any) => a.profile.username.localeCompare(b.profile.username))
+        // console.log('temp', temp)
+        return temp.sort((a: any, b: any) => a.username.localeCompare(b.username))
       },
-      initData(organization: any, user: any, projects: any) {
+      initData(organization: any, user: any, projects: any, roles: any) {
         this.organization = organization
         this.user = user
         this.projects = projects
+        this.roles = roles
       },
       onOrgUpdated(updatedOrg: any) {
         app.onOrgUpdated(updatedOrg)
@@ -114,7 +135,21 @@ const OrgSettingsLayout = withAuth(
       const organization = ui.selectedOrganization
       const user = ui.profile
       const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
-      PageState.initData(organization, user, projects)
+
+      const roles = async () => {
+        try {
+          const { data: roles, error: rolesError } = useSWR(
+            `${API_URL}/organizations/${PageState.organization.slug}/roles`,
+            get
+          )
+          if (rolesError) throw rolesError
+          return roles
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      PageState.initData(organization, user, projects, roles)
     }, [ui.selectedOrganization, ui.profile])
 
     return (
@@ -149,7 +184,7 @@ const OrganizationSettings = observer(() => {
 
   const {
     members,
-    products,
+    // products,
     isError: isOrgDetailError,
   } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
 
@@ -502,99 +537,215 @@ const MembersFilterInput = observer(() => {
 
 const MembersView = observer(() => {
   const PageState: any = useContext(PageContext)
+  const { ui } = useStore()
+  const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
+
+  // handling visibility of role change modal
+  const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
+  // handling the user details of a user who is being changed
+  interface SelectedUserProps extends User {
+    oldRoleId: number
+    newRoleId: number
+  }
+  const [selectedUser, setSelectedUser] = useState<SelectedUserProps>()
+  // loading state of role change fetch request
+  const [loading, setLoading] = useState(false)
+  // fetch roles available for this org
   const { data: roles, error: rolesError } = useSWR(
     `${API_URL}/organizations/${PageState.organization.slug}/roles`,
     get
   )
 
+  async function handleRoleChange(
+    checked: boolean,
+    roleId: number,
+    gotrueId: number,
+    member: Member
+  ) {
+    setLoading(true)
+    const response = await (checked ? post : delete_)(
+      `${API_URL}/users/${gotrueId}/roles/${roleId}`,
+      {}
+    )
+    if (response.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to ${checked ? 'add' : 'remove'} member's role: ${response.error.message}`,
+      })
+    } else {
+      const updatedMembers = [...PageState.members]
+      const updatedMember = updatedMembers.find((x) => x.id == member.id)
+      if (checked) {
+        updatedMember.role_ids.push(roleId)
+      } else {
+        updatedMember.role_ids = updatedMember.role_ids.filter(
+          (role_id: number) => role_id != roleId
+        )
+      }
+      mutateOrgMembers(updatedMembers)
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully ${checked ? 'added' : 'removed'} member's role`,
+      })
+    }
+    setLoading(false)
+  }
+
   return (
-    <div className="rounded">
-      <Loading active={!PageState.filteredMembers}>
-        <Table
-          head={[
-            <Table.th key="header-user">User</Table.th>,
-            <Table.th key="header-status"></Table.th>,
-            <Table.th key="header-role">Role</Table.th>,
-            <Table.th key="header-action"></Table.th>,
-          ]}
-          body={[
-            PageState.filteredMembers.map((x: any) => (
-              <Table.tr key={x.member_id}>
-                <Table.td>
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      {x.invited_id ? (
-                        <span className="border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2">
-                          <IconUser size={18} strokeWidth={2} />
-                        </span>
-                      ) : (
-                        <Image
-                          src={`https://github.com/${x.profile?.username}.png?size=80`}
-                          width="40"
-                          height="40"
-                          className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
-                        />
-                      )}
-                    </div>
-                    <div>
-                      {x.profile?.username && !x.invited_id && (
-                        <>
-                          <Typography.Text>{x.profile?.username}</Typography.Text>
-                          <br />
-                        </>
-                      )}
-                      <Typography.Text type="secondary">
-                        {x.profile ? x.profile.primary_email : ''}
-                      </Typography.Text>
-                    </div>
-                  </div>
-                </Table.td>
+    <>
+      <div className="rounded">
+        <Loading active={!PageState.filteredMembers}>
+          <Table
+            head={[
+              <Table.th key="header-user">User</Table.th>,
+              <Table.th key="header-status"></Table.th>,
+              <Table.th key="header-role">Role</Table.th>,
+              <Table.th key="header-action"></Table.th>,
+            ]}
+            body={[
+              PageState.filteredMembers.map((x: any, i: number) => {
+                function findIdOfRole(roles: any, roleName: string) {
+                  const found = roles.find((x: any) => x.name === roleName)
+                  return found.id
+                }
 
-                <Table.td>
-                  {x.invited_id && (
-                    <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
-                      {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
-                    </Badge>
-                  )}
-                </Table.td>
+                const OwnerRoleId = roles && findIdOfRole(roles, 'Owner')
+                const AdminRoleId = roles && findIdOfRole(roles, 'Administrator')
+                const DeveloperRoleId = roles && findIdOfRole(roles, 'Developer')
 
-                <Table.td>
+                let activeRoleId: number | undefined = undefined
+
+                /**
+                 * Move through the roles and find the one that matches the user's role
+                 * The bottom roles are the most senior ie, Owner
+                 */
+                if (x.role_ids?.includes(DeveloperRoleId)) {
+                  activeRoleId = DeveloperRoleId
+                }
+                if (x.role_ids?.includes(AdminRoleId)) {
+                  activeRoleId = AdminRoleId
+                }
+                if (x.role_ids?.includes(OwnerRoleId)) {
+                  activeRoleId = OwnerRoleId
+                }
+
+                console.log(x.username, activeRoleId)
+
+                return (
+                  <>
+                    <Table.tr key={i}>
+                      <Table.td>
+                        <div className="flex items-center space-x-4">
+                          <div>
+                            {x.invited_id ? (
+                              <span className="border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2">
+                                <IconUser size={18} strokeWidth={2} />
+                              </span>
+                            ) : (
+                              <Image
+                                src={`https://github.com/${x.username}.png?size=80`}
+                                width="40"
+                                height="40"
+                                className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                              />
+                            )}
+                          </div>
+                          <div>
+                            {x.username && !x.invited_id && (
+                              <>
+                                <Typography.Text>{x.username}</Typography.Text>
+                                <br />
+                              </>
+                            )}
+                            <Typography.Text type="secondary">{x.primary_email}</Typography.Text>
+                          </div>
+                        </div>
+                      </Table.td>
+
+                      <Table.td>
+                        {x.invited_id && (
+                          <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
+                            {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                          </Badge>
+                        )}
+                      </Table.td>
+
+                      <Table.td>
+                        {activeRoleId && (
+                          <Listbox
+                            value={activeRoleId ?? roles[0].id}
+                            onChange={(roleId) => {
+                              setUserRoleChangeModalVisible(true)
+                              setSelectedUser({
+                                ...x,
+                                oldRoleId: activeRoleId,
+                                newRoleId: roleId,
+                              })
+                            }}
+                          >
+                            {roles.map((role: any) => (
+                              <Listbox.Option key={role.id} value={role.id} label={role.name}>
+                                {role.name}
+                              </Listbox.Option>
+                            ))}
+                          </Listbox>
+                        )}
+                      </Table.td>
+                      <Table.td>
+                        {PageState.isOrgOwner && (
+                          // @ts-ignore
+                          <OwnerDropdown members={PageState.members} member={x} roles={roles} />
+                        )}
+                      </Table.td>
+                    </Table.tr>
+                  </>
+                )
+              }),
+              <Table.tr
+                key="footer"
+                // @ts-ignore
+                colSpan="3"
+                className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
+              >
+                {/* @ts-ignore */}
+                <Table.td colSpan="4">
                   <Typography.Text type="secondary">
-                    {roles &&
-                      x.role_ids &&
-                      x.role_ids
-                        .map((roleId) => roles.find(({ id }) => roleId === id).name)
-                        .sort()
-                        .join(', ')}
+                    {PageState.membersFilterString ? `${PageState.filteredMembers.length} of ` : ''}
+                    {PageState.members.length || '0'}{' '}
+                    {PageState.members.length == 1 ? 'user' : 'users'}
                   </Typography.Text>
                 </Table.td>
-                <Table.td>
-                  {PageState.isOrgOwner && (
-                    // @ts-ignore
-                    <OwnerDropdown members={PageState.members} member={x} roles={roles} />
-                  )}
-                </Table.td>
-              </Table.tr>
-            )),
-            <Table.tr
-              key="footer"
-              // @ts-ignore
-              colSpan="3"
-              className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
-            >
-              {/* @ts-ignore */}
-              <Table.td colSpan="4">
-                <Typography.Text type="secondary">
-                  {PageState.membersFilterString ? `${PageState.filteredMembers.length} of ` : ''}
-                  {PageState.members.length || '0'}{' '}
-                  {PageState.members.length == 1 ? 'user' : 'users'}
-                </Typography.Text>
-              </Table.td>
-            </Table.tr>,
-          ]}
-        />
-      </Loading>
-    </div>
+              </Table.tr>,
+            ]}
+          />
+        </Loading>
+      </div>
+      <Modal
+        visible={userRoleChangeModalVisible}
+        hideFooter
+        header="Change role of member"
+        size="small"
+      >
+        <div className="flex flex-col gap-2 my-3">
+          <Modal.Content>
+            <h3 className="text-scale-1200">
+              By changing the role of this member their permissions will change.
+            </h3>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <div className="flex gap-3">
+              <Button type="default" block size="medium">
+                Cancel
+              </Button>
+              <Button type="warning" block size="medium">
+                Confirm
+              </Button>
+            </div>
+          </Modal.Content>
+        </div>
+      </Modal>
+    </>
   )
 })
 
@@ -616,7 +767,7 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
 
     confirmAlert({
       title: 'Confirm to remove',
-      message: `This is permanent! Are you sure you want to remove ${member.profile.primary_email}?`,
+      message: `This is permanent! Are you sure you want to remove ${member.primary_email}?`,
       onAsyncConfirm: async () => {
         setLoading(true)
         const response = await delete_(`${API_URL}/organizations/${orgSlug}/members/remove`, {
@@ -702,7 +853,7 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
     setLoading(true)
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
-      invited_email: member.profile.primary_email,
+      invited_email: member.primary_email,
       owner_id: member.invited_id,
     })
 
@@ -779,17 +930,17 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
                   </div>
                 </Dropdown.Item>
 
-                {!inviteExpired(member.invited_at) && (
-                  <>
-                    <Dropdown.Seperator />
-                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
-                      <div className="flex flex-col">
-                        <p>Resend invitation</p>
-                        <p className="block opacity-50">Invites expire after 24hrs.</p>
-                      </div>
-                    </Dropdown.Item>
-                  </>
-                )}
+                {/* {!inviteExpired(member.invited_at) && ( */}
+                <>
+                  <Dropdown.Seperator />
+                  <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                    <div className="flex flex-col">
+                      <p>Resend invitation</p>
+                      <p className="block opacity-50">Invites expire after 24hrs.</p>
+                    </div>
+                  </Dropdown.Item>
+                </>
+                {/* )} */}
               </>
             )}
 

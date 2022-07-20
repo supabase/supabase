@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react'
-import { isNil } from 'lodash'
-import { post } from 'lib/common/fetch'
-import { Button, IconKey, IconMail, Form, Input, Modal } from '@supabase/ui'
-import { API_URL } from 'lib/constants'
+import { Button, Form, IconMail, Input, Listbox, Modal } from '@supabase/ui'
 import { useOrganizationDetail, useStore } from 'hooks'
+import { get, post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { isNil } from 'lodash'
 import { toJS } from 'mobx'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import { Member } from 'types'
 import { object, string } from 'yup'
 
 function InviteMemberModal({ organization, members = [], user }: any) {
   const initialValues = { email: '' }
   const { ui } = useStore()
+  const router = useRouter()
+  const { slug } = router.query
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
   const [isOpen, setIsOpen] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
@@ -53,12 +57,8 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         // [Joshen] Setting a random id for now to fit the Member interface
         id: 0,
         invited_at: response.invited_at,
-        is_owner: false,
-        profile: {
-          id: 0,
-          primary_email: response.invited_email,
-          username: response.invited_email[0],
-        },
+        primary_email: response.invited_email,
+        username: response.invited_email[0],
       }
 
       mutateOrgMembers([...memberList, newMember])
@@ -79,6 +79,8 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     email: string().email('Must be a valid email address').required('Email is required'),
   })
 
+  const { data: roles, error: rolesError } = useSWR(`${API_URL}/organizations/${slug}/roles`, get)
+
   return (
     <>
       <Button onClick={toggle}>Invite</Button>
@@ -97,6 +99,27 @@ function InviteMemberModal({ organization, members = [], user }: any) {
             {() => (
               <div className="w-full py-4">
                 <div className="space-y-4">
+                  {roles && (
+                    <Listbox
+                      label="Member role"
+                      value={roles[0].id}
+                      // onChange={(roleId) => {
+                      //   setUserRoleChangeModalVisible(true)
+                      //   setSelectedUser({
+                      //     ...x,
+                      //     oldRoleId: activeRoleId,
+                      //     newRoleId: roleId,
+                      //   })
+                      // }}
+                    >
+                      {roles.map((role: any) => (
+                        <Listbox.Option key={role.id} value={role.id} label={role.name}>
+                          {role.name}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox>
+                  )}
+
                   <Input
                     id="email"
                     icon={<IconMail />}

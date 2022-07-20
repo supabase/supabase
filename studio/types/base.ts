@@ -49,12 +49,12 @@ export interface User {
 
 export interface Member {
   id: number
-  is_owner: boolean
-  profile: {
-    id: number
-    primary_email: string
-    username: string
-  }
+  // is_owner: boolean
+
+  primary_email: string
+  username: string
+  role_ids?: number[]
+  // }
   invited_id?: number
   invited_at?: string
 }
