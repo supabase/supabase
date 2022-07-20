@@ -209,7 +209,7 @@ const RowEditor: FC<Props> = ({
               column={selectedValueForJsonEdit?.column ?? ''}
               jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}
-              onSaveJSON={(value: string) => {
+              onSaveJSON={(value: string | number) => {
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
                 setSelectedValueForJsonEdit(undefined)
               }}
