@@ -45,7 +45,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
           restUrl: process.env.SUPABASE_REST_URL || 'http://localhost:8000/rest/v1/',
           defaultApiKey: process.env.SUPABASE_ANON_KEY,
           serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
-          internalApiKey: process.env.SUPABASE_ANON_KEY,
           service_api_keys: [
             {
               api_key_encrypted: '-',
@@ -75,7 +74,6 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
       restUrl: process.env.SUPABASE_REST_URL,
       defaultApiKey: process.env.SUPABASE_ANON_KEY,
       serviceApiKey: process.env.SUPABASE_SERVICE_KEY,
-      internalApiKey: process.env.SUPABASE_ANON_KEY,
       service_api_keys: [
         {
           api_key_encrypted: '-',

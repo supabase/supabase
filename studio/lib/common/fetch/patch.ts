@@ -10,7 +10,7 @@ export async function patch<T = any>(
   const requestId = uuidv4()
   try {
     const { headers: optionHeaders, ...otherOptions } = options ?? {}
-    const headers = constructHeaders(requestId, optionHeaders)
+    const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'PATCH',
       body: JSON.stringify(data),

@@ -36,7 +36,7 @@ export default class UiStore implements IUiStore {
   selectedOrganizationSlug?: string
   notification?: Notification
   profile?: User
-  permissions?: any // todo: define this
+  permissions?: any = [] // todo: define this
 
   constructor(rootStore: IRootStore) {
     this.rootStore = rootStore

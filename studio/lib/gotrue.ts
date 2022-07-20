@@ -10,7 +10,7 @@ export const auth = new GoTrueClient({
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
-    const { data: user, error } = await auth.api.getUser(token.replace('Bearer ', ''))
+    const { user, error } = await auth.api.getUser(token.replace('Bearer ', ''))
     if (error) throw error
 
     return { user, error: null }
