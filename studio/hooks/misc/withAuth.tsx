@@ -35,14 +35,16 @@ export function withAuth<T>(
       checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // this should run before redirecting
+      // This should run before redirecting
       if (!isLoading) {
         if (!profile) {
           ui.setProfile(undefined)
         } else if (returning !== 'minimal') {
           ui.setProfile(profile)
 
-          ui.setPermissions(permissions) // todo: might be race condition
+          // [TODO] Potential race condition issue
+          // UI may be loaded prior to permissions
+          ui.setPermissions(permissions)
 
           if (!app.organizations.isInitialized) {
             app.organizations.load()
@@ -53,7 +55,7 @@ export function withAuth<T>(
         }
       }
 
-      // this should run after setting store data
+      // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }

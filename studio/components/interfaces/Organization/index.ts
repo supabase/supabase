@@ -1,13 +1,6 @@
+import GeneralSettings from './GeneralSettings/GeneralSettings'
+import TeamSettings from './TeamSettings/TeamSettings'
 import BillingSettings from './BillingSettings/BillingSettings'
 import InvoicesSettings from './InvoicesSettings/InvoicesSettings'
-import InviteMemberModal from './InviteMemberModal'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
-import OwnerDropdown from './OwnerDropdown'
 
-export {
-  BillingSettings,
-  InvoicesSettings,
-  InviteMemberModal,
-  DeleteOrganizationButton,
-  OwnerDropdown,
-}
+export { GeneralSettings, TeamSettings, BillingSettings, InvoicesSettings }

@@ -7,9 +7,10 @@ import { Typography } from '@supabase/ui'
 import { AutoField, LongTextField } from 'uniforms-bootstrap4'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { usePermissions, useProjectAuthConfig, useStore } from 'hooks'
+import { useProjectAuthConfig, useStore } from 'hooks'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { patch } from 'lib/common/fetch'
+import { checkPermissions } from 'lib/common/permissions'
 import { authConfig } from 'stores/jsonSchema'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -17,7 +18,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 const Templates: FC<any> = ({ project }) => {
   const router = useRouter()
   const { ui } = useStore()
-  const canUpdate = usePermissions(
+  const canUpdate = checkPermissions(
     PermissionAction.SQL_UPDATE,
     'postgres.public.custom_config_gotrue'
   )
