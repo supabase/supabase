@@ -1,28 +1,25 @@
-import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
-import { useOrganizationDetail, useStore } from 'hooks'
-import { get, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { isNil } from 'lodash'
 import { toJS } from 'mobx'
+import { isNil } from 'lodash'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import useSWR from 'swr'
-import { Member } from 'types'
 import { object, string } from 'yup'
+import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
+
+import { Member } from 'types'
+import { useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 
 function InviteMemberModal({ organization, members = [], user }: any) {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const { ui } = useStore()
-
   const router = useRouter()
   const { slug } = router.query
 
+  const { roles } = useOrganizationRoles((slug as string) || '')
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
-
-  // to do: move to a store @joshenlim
-  const { data: roles, error: rolesError } = useSWR(`${API_URL}/organizations/${slug}/roles`, get)
 
   const initialValues = { email: '', role: '' }
 
