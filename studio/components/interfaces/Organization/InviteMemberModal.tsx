@@ -54,11 +54,12 @@ function InviteMemberModal({ organization, members = [], user }: any) {
               const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
                 invited_email: values.email.toLowerCase(),
                 owner_id: toJS(user.id),
-                role: values.role,
+                role_id: values.role,
               })
 
               if (isNil(response)) {
                 ui.setNotification({ category: 'error', message: 'Failed to add member' })
+                setLoading(false)
               } else if (response?.error) {
                 ui.setNotification({
                   category: 'error',
@@ -73,8 +74,6 @@ function InviteMemberModal({ organization, members = [], user }: any) {
                   primary_email: response.invited_email,
                   username: response.invited_email[0],
                 }
-                // console.log('members for addMember', members)
-                // console.log('members being sent to mututa', [...toJS(members), newMember])
                 mutateOrgMembers([...members, newMember])
 
                 ui.setNotification({
@@ -82,6 +81,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
                   message: 'Successfully added new member.',
                 })
                 setIsOpen(!isOpen)
+                setLoading(false)
                 resetForm({ initialValues: { ...initialValues, role: roles[0].id } })
               }
             }}
