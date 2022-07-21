@@ -423,6 +423,30 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 The upload widget uses one additional npm library. You can install it like so: `npm install @reach/visually-hidden`.
 
+:::note
+The `@reach/visually-hidden` package currently does not support the most recent of React (React 18). 
+This means when you install the package the installation will fail. As a workaround you can do the following in `src/Avatar.js` where the `VisuallyHidden`
+component is used:
+
+```jsx 
+<div style={{display: "none"}}>
+   <input
+   type="file"
+   id="single"
+   accept="image/*"
+   onChange={uploadAvatar}
+   disabled={uploading}
+   />
+</div>
+```
+You will also need to remove the `import` of the package as well:
+
+```jsx
+import VisuallyHidden from '@reach/visually-hidden'
+```
+
+:::
+
 ### Create an upload widget
 
 Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
