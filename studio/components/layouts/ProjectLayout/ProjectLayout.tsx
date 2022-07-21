@@ -114,8 +114,6 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const isProjectPausing = ui.selectedProject?.status === PROJECT_STATUS.GOING_DOWN
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
-  console.log('ui.selectedProject', ui.selectedProject)
-
   return (
     <>
       {isLoading || ui.selectedProject === undefined ? (
