@@ -4610,7 +4610,7 @@
 												"isOptional": true
 											},
 											"comment": {
-												"text": "Search options, including `limit`, `offset`, `sortBy`, and `search`."
+												"text": "Search options, including `limit`, `offset`, and `sortBy`."
 											},
 											"type": {
 												"type": "reference",
