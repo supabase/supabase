@@ -18,7 +18,7 @@ This example provides the steps to build a simple user management app (from scra
 
 By the end of this guide you'll have an app which allows users to login and update some basic profile details:
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![Supabase User Management example](/img/user-management-demo.png)
 
 ### Github
 
@@ -223,7 +223,7 @@ const handleLogin = async () => {
 
 ### User state
 
-To access the user information in other places, will create a user state. Create a new file called `states.js` and utilize `useState` method of Nuxt 3.
+To access the user information in other places, will create a user state. Create a new file called `states.ts` and utilize `useState` method of Nuxt 3.
 
 ```typescript title="composables/states.ts"
 export const useUser = () => useState('user', () => null)
@@ -342,7 +342,7 @@ npm run dev
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Nuxt 3](/docs/img/supabase-vue-3-demo.png)
+![Supabase Nuxt 3](/img/supabase-vue-3-demo.png)
 
 ## Bonus: Profile photos
 
