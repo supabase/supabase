@@ -24,15 +24,22 @@ export function useOrganizationDetail(slug: string) {
       primary_email: x.invited_email,
     }))
 
+    console.log('there are invites')
+    console.log('members', members)
+    console.log('invitedMembers', invitedMembers)
+
     members = [...members, ...invitedMembers]
   }
 
   const anyError = data?.error || error || inviteError
 
   function mutateOrgMembers(updatedMembers: Member[], revalidate?: boolean) {
-    mutate(url, { members: updatedMembers }, revalidate ?? true)
+    mutate(url, [...updatedMembers], revalidate ?? true)
     mutate(pendingInviteUrl, {}, revalidate ?? true)
   }
+
+  console.log('about to set')
+  console.log('final members', members)
 
   return {
     members: members as Member[],

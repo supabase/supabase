@@ -1,4 +1,5 @@
 import { Button, Form, IconMail, Input, Listbox, Modal } from '@supabase/ui'
+import { createConsoleLogger } from 'configcat-js'
 import { useOrganizationDetail, useStore } from 'hooks'
 import { get, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -23,9 +24,9 @@ function InviteMemberModal({ organization, members = [], user }: any) {
 
   const { slug: orgSlug } = organization
 
-  useEffect(() => {
-    setMemberList(members)
-  }, [members])
+  // useEffect(() => {
+  //   setMemberList(members)
+  // }, [members])
 
   function toggle() {
     // reset data before showing modal again
@@ -60,8 +61,9 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         primary_email: response.invited_email,
         username: response.invited_email[0],
       }
-
-      mutateOrgMembers([...memberList, newMember])
+      console.log('members for addMember', members)
+      console.log('members being sent to mututa', [...toJS(members), newMember])
+      mutateOrgMembers([...members, newMember])
 
       ui.setNotification({
         category: 'success',
