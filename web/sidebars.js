@@ -68,6 +68,7 @@ module.exports = {
         'guides/with-ionic-react',
         'guides/with-ionic-vue',
         'guides/with-nextjs',
+        'guides/with-nuxt-3',
         'guides/with-react',
         'guides/with-redwoodjs',
         'guides/with-solidjs',

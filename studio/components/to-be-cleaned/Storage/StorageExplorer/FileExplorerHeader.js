@@ -15,7 +15,8 @@ import {
   IconX,
   IconEdit2,
   IconLoader,
-  Typography, IconChevronsUp,
+  Typography,
+  IconChevronsUp,
 } from '@supabase/ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
@@ -334,7 +335,11 @@ const FileExplorerHeader = ({
           </Dropdown>
           <Dropdown
             overlay={[
-              <Dropdown.RadioGroup key="sortOrderOptions" value={sortByOrder} onChange={onChangeSortByOrder}>
+              <Dropdown.RadioGroup
+                key="sortOrderOptions"
+                value={sortByOrder}
+                onChange={onChangeSortByOrder}
+              >
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Asc</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Desc</Dropdown.Radio>
               </Dropdown.RadioGroup>,
@@ -342,7 +347,13 @@ const FileExplorerHeader = ({
           >
             <Button
               as="span"
-              icon={sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? <IconChevronsDown size={16} strokeWidth={2} />  : <IconChevronsUp size={16} strokeWidth={2} />}
+              icon={
+                sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
+                  <IconChevronsDown size={16} strokeWidth={2} />
+                ) : (
+                  <IconChevronsUp size={16} strokeWidth={2} />
+                )
+              }
               type="text"
               disabled={breadcrumbs.length === 0}
             >

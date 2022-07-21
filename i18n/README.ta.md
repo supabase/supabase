@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -27,7 +27,7 @@
 
 முழு ஆவணங்களுக்கு, பார்வையிடவும் [supabase.com/docs](https://supabase.com/docs)
 
-எவ்வாறு பங்களிப்பது என்பதைப் பார்க்க, பார்வையிடவும் [தொடங்குதல்](./DEVELOPERS.md)
+எவ்வாறு பங்களிப்பது என்பதைப் பார்க்க, பார்வையிடவும் [தொடங்குதல்](../DEVELOPERS.md)
 
 ## சமூகம் மற்றும் ஆதரவு
 
