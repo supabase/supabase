@@ -1,13 +1,10 @@
-import useSWR from 'swr'
 import { Tabs } from '@supabase/ui'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { NextPageWithLayout, Project } from 'types'
-import { useOrganizationDetail, useStore, withAuth } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { Member, NextPageWithLayout, Organization, Project, Role, User } from 'types'
+import { useOrganizationDetail, useOrganizationRoles, useStore, withAuth } from 'hooks'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
 import {
   GeneralSettings,
@@ -23,37 +20,25 @@ const OrgSettingsLayout = withAuth(
     const { app, ui } = useStore()
     const router = useRouter()
 
-    console.log('ui.permissions', ui.permissions)
+    const slug = ui.selectedOrganization?.slug || ''
+    const { roles } = useOrganizationRoles(slug)
 
+    // [Refactor] Eventually move away from useLocalObservable
     const PageState: any = useLocalObservable(() => ({
-      user: {} as any,
-      organization: {},
-      projects: [],
-      members: [],
-      roles: [] as any,
+      user: {} as User,
+      organization: {} as Organization[],
+      projects: [] as Project[],
+      members: [] as Member[],
+      roles: [] as Role[],
+
       membersFilterString: '',
       get isOrgOwner() {
-        return true
-        // to do : need logic in here to check the role of the user
-
-        // console.log(this.members[0])
-        // console.log(this.user.id)
-        // return (
-        //   this.members.find((x: Member) => {
-        //     // console.log('member', x)
-        //     return (
-        //       x.role_ids &&
-        //       x.role_ids.find((x: number) => {
-        //         console.log(x)
-        //         const roleId = x
-        //         return this.roles.find((x: any) => {
-        //           x.name === 'Owner' && roleId === x.id
-        //         })
-        //       })
-        //     ) // sx.id === this.user?.id // && x.is_owner
-        //   }) != undefined
-        // )
-        // usePermissions(PermissionAction)
+        const userMember = this.members.find(
+          (member: Member) => member.gotrue_id === this.user.gotrue_id
+        )
+        const [memberRoleId] = userMember?.role_ids ?? []
+        const memberRole = (this.roles || []).find((role) => role.id === memberRoleId)
+        return memberRole?.name === 'Owner'
       },
       get filteredMembers() {
         const temp = this.members.filter((x: any) => {
@@ -67,13 +52,12 @@ const OrgSettingsLayout = withAuth(
             )
           }
         })
-        // console.log('temp', temp)
         return temp.sort((a: any, b: any) => a.username.localeCompare(b.username))
       },
-      initData(organization: any, user: any, projects: any, roles: any) {
-        this.organization = organization
+      initData(organization: Organization[], user: User, projects: Project[], roles: Role[]) {
         this.user = user
         this.projects = projects
+        this.organization = organization
         this.roles = roles
       },
       onOrgUpdated(updatedOrg: any) {
@@ -95,25 +79,12 @@ const OrgSettingsLayout = withAuth(
     }, [router.query])
 
     useEffect(() => {
-      const organization = ui.selectedOrganization
       const user = ui.profile
+      const organization = ui.selectedOrganization
       const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
 
-      const roles = async () => {
-        try {
-          const { data: roles, error: rolesError } = useSWR(
-            `${API_URL}/organizations/${PageState.organization.slug}/roles`,
-            get
-          )
-          if (rolesError) throw rolesError
-          return roles
-        } catch (error) {
-          console.log(error)
-        }
-      }
-
       PageState.initData(organization, user, projects, roles)
-    }, [ui.selectedOrganization, ui.profile])
+    }, [ui.selectedOrganization, ui.profile, roles])
 
     return (
       <AccountLayoutWithoutAuth

@@ -14,20 +14,17 @@ import { PageContext } from 'pages/org/[slug]/settings'
 
 const OwnerDropdown = observer(({ members, member, roles }: any) => {
   const PageState: any = useContext(PageContext)
+
   const { ui } = useStore()
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
-  const [isOpen, setIsOpen] = useState(false)
+
   const [loading, setLoading] = useState(false)
+  const [ownerTransferIsVisible, setOwnerTransferIsVisible] = useState(false)
 
-  // handle modal visibility
-  const [ownerTransferIsVisble, setOwnerTransferIsVisble] = useState(false)
-
-  const { id: orgId, slug: orgSlug, stripe_customer_id, name: orgName } = PageState.organization
+  const { id: orgId, slug: orgSlug, name: orgName } = PageState.organization
 
   async function handleMemberDelete() {
-    setIsOpen(false)
     await timeout(200)
-
     confirmAlert({
       title: 'Confirm to remove',
       message: `This is permanent! Are you sure you want to remove ${member.primary_email}?`,
@@ -74,42 +71,12 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
       const newOwner = updatedMembers.find((x) => x.id == member.id)
       if (newOwner) newOwner.is_owner = true
       mutateOrgMembers(updatedMembers)
-      setOwnerTransferIsVisble(false)
+      setOwnerTransferIsVisible(false)
       ui.setNotification({
         category: 'success',
         message: 'Successfully transfered organization',
       })
     }
-  }
-
-  async function handleRoleChecked(checked: boolean, roleId: number) {
-    setLoading(true)
-    const response = await (checked ? post : delete_)(
-      `${API_URL}/users/${member.gotrue_id}/roles/${roleId}`,
-      {}
-    )
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to ${checked ? 'add' : 'remove'} member's role: ${response.error.message}`,
-      })
-    } else {
-      const updatedMembers = [...members]
-      const updatedMember = updatedMembers.find((x) => x.id == member.id)
-      if (checked) {
-        updatedMember.role_ids.push(roleId)
-      } else {
-        updatedMember.role_ids = updatedMember.role_ids.filter(
-          (role_id: number) => role_id != roleId
-        )
-      }
-      mutateOrgMembers(updatedMembers)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully ${checked ? 'added' : 'removed'} member's role`,
-      })
-    }
-    setLoading(false)
   }
 
   async function handleResendInvite(member: Member) {
@@ -162,21 +129,8 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
         align="end"
         overlay={
           <>
-            <Dropdown.Label>Roles</Dropdown.Label>
-            {roles &&
-              roles
-                ?.filter(({ name }: { name: string }) => name !== 'Owner')
-                .map(({ id, name }: { id: number; name: string }) => (
-                  <Dropdown.Checkbox
-                    checked={member?.role_ids?.includes(id)}
-                    onChange={(checked) => handleRoleChecked(checked, id)}
-                  >
-                    {name}
-                  </Dropdown.Checkbox>
-                ))}
-            <Dropdown.Seperator />
             {!member.invited_at && (
-              <Dropdown.Item onClick={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}>
+              <Dropdown.Item onClick={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}>
                 <div className="flex flex-col">
                   <p>Make owner</p>
                   <p className="block opacity-50">Transfer ownership of "{orgName}"</p>
@@ -192,18 +146,13 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
                     <p className="block opacity-50">Revoke this invitation.</p>
                   </div>
                 </Dropdown.Item>
-
-                {/* {!inviteExpired(member.invited_at) && ( */}
-                <>
-                  <Dropdown.Seperator />
-                  <Dropdown.Item onClick={() => handleResendInvite(member)}>
-                    <div className="flex flex-col">
-                      <p>Resend invitation</p>
-                      <p className="block opacity-50">Invites expire after 24hrs.</p>
-                    </div>
-                  </Dropdown.Item>
-                </>
-                {/* )} */}
+                <Dropdown.Seperator />
+                <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                  <div className="flex flex-col">
+                    <p>Resend invitation</p>
+                    <p className="block opacity-50">Invites expire after 24hrs.</p>
+                  </div>
+                </Dropdown.Item>
               </>
             )}
 
@@ -220,21 +169,21 @@ const OwnerDropdown = observer(({ members, member, roles }: any) => {
       >
         <Button
           as="span"
+          type="text"
           disabled={loading}
           loading={loading}
-          type="text"
           icon={<IconMoreHorizontal />}
-        ></Button>
+        />
       </Dropdown>
 
       <TextConfirmModal
         title="Transfer organization"
-        visible={ownerTransferIsVisble}
+        visible={ownerTransferIsVisible}
         confirmString={orgSlug}
         loading={loading}
         confirmLabel="I understand, transfer ownership"
         confirmPlaceholder="Type in name of orgnization"
-        onCancel={() => setOwnerTransferIsVisble(!ownerTransferIsVisble)}
+        onCancel={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}
         onConfirm={handleTransfer}
         alert="Payment methods such as credit cards will also be transferred. You may want to delete credit card information first before transferring."
         text={
