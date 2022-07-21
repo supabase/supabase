@@ -435,6 +435,7 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
     calcTo: () => '',
+    default: true,
   },
   {
     text: 'Last 3 hours',
@@ -445,7 +446,6 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     text: 'Last day',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
