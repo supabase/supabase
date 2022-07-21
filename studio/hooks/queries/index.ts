@@ -1,5 +1,6 @@
 export * from './useJwtSecretUpdateStatus'
 export * from './useOrganizationDetail'
+export * from './useOrganizationRoles'
 export * from './usePermissions'
 export * from './useProfile'
 export * from './useProjectAuthConfig'

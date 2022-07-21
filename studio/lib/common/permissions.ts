@@ -24,7 +24,7 @@ export function checkPermissions(action: string, resource: string, data?: object
     organization_id = organization?.id
   }
 
-  return ui.permissions
+  return (ui?.permissions ?? [])
     .filter(
       (permission: {
         actions: string[]

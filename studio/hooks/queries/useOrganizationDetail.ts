@@ -20,13 +20,11 @@ export function useOrganizationDetail(slug: string) {
       invited_at: x.invited_at,
       invited_id: x.invited_id,
       username: x.invited_email.slice(0, 1),
-      role_ids: ['Developer'], // todo: hardcoded this for now, should be based on the actual role of the invited user from api
+      // todo: hardcoded this for now, should be based on the actual role of the invited
+      //user from api, 465 is Developer
+      role_ids: [465],
       primary_email: x.invited_email,
     }))
-
-    console.log('there are invites')
-    console.log('members', members)
-    console.log('invitedMembers', invitedMembers)
 
     members = [...members, ...invitedMembers]
   }
@@ -38,8 +36,8 @@ export function useOrganizationDetail(slug: string) {
     mutate(pendingInviteUrl, {}, revalidate ?? true)
   }
 
-  console.log('about to set')
-  console.log('final members', members)
+  // console.log('about to set')
+  // console.log('final members', members)
 
   return {
     members: members as Member[],

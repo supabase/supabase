@@ -42,10 +42,6 @@ export function withAuth<T>(
         } else if (returning !== 'minimal') {
           ui.setProfile(profile)
 
-          // [TODO] Potential race condition issue
-          // UI may be loaded prior to permissions
-          ui.setPermissions(permissions)
-
           if (!app.organizations.isInitialized) {
             app.organizations.load()
           }
@@ -55,11 +51,15 @@ export function withAuth<T>(
         }
       }
 
+      if (!isPermissionLoading) {
+        ui.setPermissions(permissions)
+      }
+
       // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isRedirecting, profile])
+    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
 
     useEffect(() => {
       if (!isLoading && router.isReady) {
