@@ -260,32 +260,31 @@ Now that our backend is setup we can modify our frontend to retrieve the user's 
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import ThirdPartyEmailPassword from 'supertokens-auth-react/recipe/thirdpartyemailpassword'
+import ThirdPartyEmailPassword, {
+    ThirdPartyEmailPasswordAuth,
+} from "supertokens-auth-react/recipe/thirdpartyemailpassword";
 import dynamic from 'next/dynamic'
 import { useSessionContext } from 'supertokens-auth-react/recipe/session'
 import { getSupabase } from '../utils/supabase'
 
-const ThirdPartyEmailPasswordAuthWrapper = dynamic(
-  new Promise<typeof ThirdPartyEmailPassword.ThirdPartyEmailPasswordAuth>((res) =>
-    res(ThirdPartyEmailPassword.ThirdPartyEmailPasswordAuth)
-  ),
-  { ssr: false }
-)
-
 export default function Home() {
   return (
-    // We will wrap the ProtectedPage component with the ThirdPartyEmailPasswordAuthWrapper so only an
+    // We will wrap the ProtectedPage component with ThirdPartyEmailPasswordAuth so only an
     // authenticated user can access it. This will also allow us to access the users session information
     // within the component.
-    <ThirdPartyEmailPasswordAuthWrapper>
+    <ThirdPartyEmailPasswordAuth>
       <ProtectedPage />
-    </ThirdPartyEmailPasswordAuthWrapper>
+    </ThirdPartyEmailPasswordAuth>
   )
 }
 
 function ProtectedPage() {
   // retrieve the authenticated user's accessTokenPayload and userId from the sessionContext
   const { accessTokenPayload, userId } = useSessionContext()
+
+  if (sessionContext.loading === true) {
+        return null;
+  }
 
   const [userEmail, setEmail] = useState('')
   useEffect(() => {
