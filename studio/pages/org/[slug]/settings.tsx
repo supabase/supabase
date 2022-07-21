@@ -459,6 +459,8 @@ const MembersView = observer(() => {
     setLoading(false)
   }
 
+  const canEditMembers = false // usePermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
+
   return (
     <>
       <div className="rounded">
@@ -514,7 +516,7 @@ const MembersView = observer(() => {
                                 src={`https://github.com/${x.username}.png?size=80`}
                                 width="40"
                                 height="40"
-                                className="border-border-secondary-light dark:border-border-secondary-dark rounded-full border"
+                                className="rounded-full border"
                               />
                             )}
                           </div>
@@ -541,6 +543,7 @@ const MembersView = observer(() => {
                       <Table.td>
                         {activeRoleId && (
                           <Listbox
+                            disabled={!canEditMembers}
                             value={activeRoleId ?? roles[0].id}
                             onChange={(roleId) => {
                               setUserRoleChangeModalVisible(true)
