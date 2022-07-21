@@ -23,7 +23,11 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { organizations } from 'stores/jsonSchema'
 import { AutoField } from 'uniforms-bootstrap4'
 
-import { BillingSettings, InvoicesSettings } from 'components/interfaces/Organization'
+import {
+  BillingSettings,
+  DeleteOrganizationButton,
+  InvoicesSettings,
+} from 'components/interfaces/Organization'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
 import { useOrganizationDetail, usePermissions, useStore, withAuth } from 'hooks'
 import { delete_, get, patch, post } from 'lib/common/fetch'
@@ -39,6 +43,7 @@ import Panel from 'components/ui/Panel'
 import useSWR from 'swr'
 import { Member, NextPageWithLayout, Project, User } from 'types'
 import Image from 'next/image'
+import { isInviteExpired } from 'components/interfaces/Organization/Organization.utils'
 
 // [Joshen] Low prio refactor: Bring out general and team settings into their own components too
 
@@ -459,7 +464,7 @@ const MembersView = observer(() => {
     setLoading(false)
   }
 
-  const canEditMembers = false // usePermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
+  const canEditMembers = usePermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
 
   return (
     <>
@@ -501,6 +506,8 @@ const MembersView = observer(() => {
 
                 console.log(x.username, activeRoleId)
 
+                const memberIsUser = x.primary_email == PageState.user.primary_email
+
                 return (
                   <>
                     <Table.tr key={i}>
@@ -534,8 +541,8 @@ const MembersView = observer(() => {
 
                       <Table.td>
                         {x.invited_id && (
-                          <Badge color={inviteExpired(x.invited_at) ? 'yellow' : 'red'}>
-                            {inviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                          <Badge color={isInviteExpired(x.invited_at) ? 'yellow' : 'red'}>
+                            {isInviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
                           </Badge>
                         )}
                       </Table.td>
@@ -543,7 +550,7 @@ const MembersView = observer(() => {
                       <Table.td>
                         {activeRoleId && (
                           <Listbox
-                            disabled={!canEditMembers}
+                            disabled={!canEditMembers || memberIsUser}
                             value={activeRoleId ?? roles[0].id}
                             onChange={(roleId) => {
                               setUserRoleChangeModalVisible(true)
