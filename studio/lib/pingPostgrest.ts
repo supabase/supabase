@@ -16,12 +16,12 @@ import { API_URL } from './constants'
  */
 async function pingPostgrest(
   restUrl: string,
+  projectRef: string,
   options?: {
     kpsVersion?: string
     timeout?: number
   }
 ) {
-  const projectRef = restUrl.match(/https:\/\/(\w+)\.supabase\./)?.[1]
   if (projectRef === undefined) return false
   const serviceApiKey = await getServiceApiKey(projectRef, options?.timeout)
   if (serviceApiKey === undefined) return false
@@ -41,7 +41,10 @@ async function pingPostgrest(
 }
 export default pingPostgrest
 
-const getServiceApiKey = async (projectRef: string, timeout = DEFAULT_TIMEOUT_MILLISECONDS): Promise<string | undefined> => {
+const getServiceApiKey = async (
+  projectRef: string,
+  timeout = DEFAULT_TIMEOUT_MILLISECONDS
+): Promise<string | undefined> => {
   const response = await getWithTimeout(`${API_URL}/props/project/${projectRef}/api`, { timeout })
   if (response.error || response.autoApiService.service_api_keys.length === 0) return undefined
   return response.autoApiService.serviceApiKey
