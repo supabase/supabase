@@ -23,7 +23,6 @@ async function pingPostgrest(
     timeout?: number
   }
 ) {
-  console.log('projectRef inside ping postgres', projectRef)
   if (projectRef === undefined) return false
   const serviceApiKey = await getServiceApiKey(projectRef, options?.timeout)
   if (serviceApiKey === undefined) return false
