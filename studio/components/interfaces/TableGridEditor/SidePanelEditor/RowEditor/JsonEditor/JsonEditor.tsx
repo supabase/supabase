@@ -13,7 +13,7 @@ type JsonEditProps = {
   jsonString: string
   visible: boolean
   closePanel: () => void
-  onSaveJSON: (value: string) => void
+  onSaveJSON: (value: string | number) => void
 }
 
 const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, onSaveJSON }) => {
@@ -90,7 +90,7 @@ const Editor: FC<EditorProps> = ({ column, value, onChange }) => {
       <Typography.Title level={4}>Edit JSON Field: {column}</Typography.Title>
 
       <div className="dark:border-dark h-96 w-full flex-grow border">
-        <JsonEditor onInputChange={onChange} defaultValue={value} />
+        <JsonEditor onInputChange={onChange} defaultValue={value.toString()} />
       </div>
     </>
   )

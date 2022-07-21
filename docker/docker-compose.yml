@@ -40,7 +40,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.5.21
+    image: supabase/gotrue:v2.7.1
     depends_on:
       - db # Disable this if you are using an external Postgres database
     restart: unless-stopped
@@ -147,6 +147,9 @@ services:
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
+      PG_META_DB_PORT: ${POSTGRES_PORT}
+      PG_META_DB_NAME: ${POSTGRES_DB}
+      PG_META_DB_USER: ${POSTGRES_USER}
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   # Comment out everything below this point if you are using an external Postgres database

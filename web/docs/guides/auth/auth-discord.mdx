@@ -76,6 +76,12 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 ```
 
+:::note
+
+If you call `signIn()` when already logged in, Discord will prompt the user again for authorization.
+
+:::
+
 Add this function which you can call from a button, link, or UI element.
 
 ```js

@@ -49,7 +49,7 @@ export default observer(ProjectSettings)
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const ref = router.query.ref as string;
+  const ref = router.query.ref as string
 
   return (
     <>

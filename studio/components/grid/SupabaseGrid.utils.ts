@@ -189,29 +189,34 @@ export function parseSupaTable(data: {
   relationships: Dictionary<any>[]
 }): SupaTable {
   const { table, columns, primaryKeys, relationships } = data
-  const supaColumns: SupaColumn[] = columns.map((x) => {
+
+  const supaColumns: SupaColumn[] = columns.map((column) => {
     const temp = {
-      position: x.ordinal_position,
-      name: x.name,
-      defaultValue: x.default_value,
-      dataType: x.data_type,
-      format: x.format,
+      position: column.ordinal_position,
+      name: column.name,
+      defaultValue: column.default_value,
+      dataType: column.data_type,
+      format: column.format,
       isPrimaryKey: false,
-      isIdentity: x.is_identity,
-      isGeneratable: x.identity_generation == 'BY DEFAULT',
-      isNullable: x.is_nullable,
-      isUpdatable: x.is_updatable,
-      enum: x.enums,
-      comment: x.comment,
+      isIdentity: column.is_identity,
+      isGeneratable: column.identity_generation == 'BY DEFAULT',
+      isNullable: column.is_nullable,
+      isUpdatable: column.is_updatable,
+      enum: column.enums,
+      comment: column.comment,
       targetTableSchema: null,
       targetTableName: null,
       targetColumnName: null,
     }
-    const primaryKey = primaryKeys.find((pk) => pk.name == x.name)
+    const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
     temp.isPrimaryKey = !!primaryKey
 
-    const relationship = relationships.find((r) => {
-      return r.source_column_name == x.name
+    const relationship = relationships.find((relation) => {
+      return (
+        relation.source_schema === column.schema &&
+        relation.source_table_name === column.table &&
+        relation.source_column_name === column.name
+      )
     })
     if (relationship) {
       temp.targetTableSchema = relationship.target_table_schema
