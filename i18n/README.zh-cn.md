@@ -27,7 +27,7 @@
 
 完整的文档，请访问 [supabase.com/docs](https://supabase.com/docs)
 
-了解如何贡献，请访问[入门](./DEVELOPERS.md)
+了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 
