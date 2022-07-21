@@ -159,8 +159,8 @@ const MembersView = observer(() => {
 
                       <Table.td>
                         {x.invited_id && (
-                          <Badge color={isInviteExpired(x.invited_at) ? 'yellow' : 'red'}>
-                            {isInviteExpired(x.invited_at) ? 'Invited' : 'Expired'}
+                          <Badge color={isInviteExpired(x.invited_at) ? 'red' : 'yellow'}>
+                            {isInviteExpired(x.invited_at) ? 'Expired' : 'Invited'}
                           </Badge>
                         )}
                       </Table.td>
