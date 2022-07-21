@@ -429,12 +429,14 @@ const MembersView = observer(() => {
     get
   )
 
+  // TO DO - refactor to use new endpoints
   async function handleRoleChange(
     checked: boolean,
     roleId: number,
     gotrueId: number,
     member: Member
   ) {
+    return true
     setLoading(true)
     const response = await (checked ? post : delete_)(
       `${API_URL}/users/${gotrueId}/roles/${roleId}`,
@@ -465,6 +467,11 @@ const MembersView = observer(() => {
   }
 
   const canEditMembers = usePermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
+
+  function getRoleNameById(id: number | undefined) {
+    if (!roles) return id
+    return roles.find((x: any) => x.id === id)?.name
+  }
 
   return (
     <>
@@ -601,22 +608,33 @@ const MembersView = observer(() => {
       <Modal
         visible={userRoleChangeModalVisible}
         hideFooter
+        onCancel={() => setUserRoleChangeModalVisible(false)}
         header="Change role of member"
         size="small"
       >
         <div className="flex flex-col gap-2 my-3">
           <Modal.Content>
-            <h3 className="text-scale-1200">
+            <p className="text-scale-1200 mb-3">
               By changing the role of this member their permissions will change.
-            </h3>
+            </p>
+            <p className="text-sm text-scale-1100">
+              You are going to change the role of {selectedUser?.primary_email} from{' '}
+              <span className="text-scale-1200">{getRoleNameById(selectedUser?.oldRoleId)}</span> to{' '}
+              <span className="text-scale-1200">{getRoleNameById(selectedUser?.newRoleId)}</span>
+            </p>
           </Modal.Content>
           <Modal.Seperator />
           <Modal.Content>
             <div className="flex gap-3">
-              <Button type="default" block size="medium">
+              <Button
+                type="default"
+                block
+                size="medium"
+                onClick={() => setUserRoleChangeModalVisible(false)}
+              >
                 Cancel
               </Button>
-              <Button type="warning" block size="medium">
+              <Button type="warning" block size="medium" onClick={() => handleRoleChange()}>
                 Confirm
               </Button>
             </div>
