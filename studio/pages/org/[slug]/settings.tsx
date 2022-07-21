@@ -87,7 +87,6 @@ const OrgSettingsLayout = withAuth(
     useEffect(() => {
       // User added a new payment method
       if (router.query.setup_intent && router.query.redirect_status) {
-        console.log('Yay')
         ui.setNotification({
           category: 'success',
           message: 'Successfully added new payment method',
