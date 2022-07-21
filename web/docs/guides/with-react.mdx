@@ -229,7 +229,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="row flex flex-center">
+    <div className="row flex-center flex">
       <div className="col-6 form-widget" aria-live="polite">
         <h1 className="header">Supabase + React</h1>
         <p className="description">Sign in via magic link with your email below</p>
@@ -359,7 +359,7 @@ const Account = ({ session }) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button className="button primary block" disabled={loading}>
               Update profile
             </button>
           </div>
@@ -424,21 +424,16 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 The upload widget uses one additional npm library. You can install it like so: `npm install @reach/visually-hidden`.
 
 :::note
-The `@reach/visually-hidden` package currently does not support the most recent of React (React 18). 
+The `@reach/visually-hidden` package currently does not support the most recent of React (React 18).
 This means when you install the package the installation will fail. As a workaround you can do the following in `src/Avatar.js` where the `VisuallyHidden`
 component is used:
 
-```jsx 
-<div style={{display: "none"}}>
-   <input
-   type="file"
-   id="single"
-   accept="image/*"
-   onChange={uploadAvatar}
-   disabled={uploading}
-   />
+```jsx
+<div style={{ display: 'none' }}>
+  <input type="file" id="single" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
 </div>
 ```
+
 You will also need to remove the `import` of the package as well:
 
 ```jsx
@@ -512,7 +507,9 @@ export default function Avatar({ url, size, onUpload }) {
         className="avatar image"
         style={{ height: size, width: size }}
       />
-      {uploading ? "Uploading..." : (
+      {uploading ? (
+        'Uploading...'
+      ) : (
         <>
           <label className="button primary block" htmlFor="single">
             Upload an avatar
