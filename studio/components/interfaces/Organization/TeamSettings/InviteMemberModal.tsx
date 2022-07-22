@@ -1,16 +1,20 @@
-import { toJS } from 'mobx'
 import { isNil } from 'lodash'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
 
-import { Member } from 'types'
+import { Member, User } from 'types'
 import { useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
-function InviteMemberModal({ organization, members = [], user }: any) {
+interface Props {
+  members: Member[]
+  user: User
+}
+
+const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -28,6 +32,44 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     role: string().required('Role is required'),
   })
 
+  const onInviteMember = async (values: any, resetForm: any) => {
+    setLoading(true)
+
+    const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
+      invited_email: values.email.toLowerCase(),
+      owner_id: user.id,
+      role_id: values.role,
+    })
+
+    if (isNil(response)) {
+      ui.setNotification({ category: 'error', message: 'Failed to add member' })
+      setLoading(false)
+    } else if (response?.error) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to add member: ${response.error.message}`,
+      })
+      setLoading(false)
+    } else {
+      const newMember: Member = {
+        // [Joshen] Setting a random id for now to fit the Member interface
+        id: 0,
+        invited_at: response.invited_at,
+        primary_email: response.invited_email,
+        username: response.invited_email[0],
+      }
+      mutateOrgMembers([...members, newMember])
+
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully added new member.',
+      })
+      setIsOpen(!isOpen)
+      setLoading(false)
+      resetForm({ initialValues: { ...initialValues, role: roles[0].id } })
+    }
+  }
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Invite</Button>
@@ -42,51 +84,9 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         hideFooter
       >
         <Modal.Content>
-          <Form
-            validationSchema={schema}
-            initialValues={initialValues}
-            onSubmit={async (values: any, resetForm: any) => {
-              setLoading(true)
-
-              const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
-                invited_email: values.email.toLowerCase(),
-                owner_id: toJS(user.id),
-                role_id: values.role,
-              })
-
-              if (isNil(response)) {
-                ui.setNotification({ category: 'error', message: 'Failed to add member' })
-                setLoading(false)
-              } else if (response?.error) {
-                ui.setNotification({
-                  category: 'error',
-                  message: `Failed to add member: ${response.error.message}`,
-                })
-                setLoading(false)
-              } else {
-                const newMember: Member = {
-                  // [Joshen] Setting a random id for now to fit the Member interface
-                  id: 0,
-                  invited_at: response.invited_at,
-                  primary_email: response.invited_email,
-                  username: response.invited_email[0],
-                }
-                mutateOrgMembers([...members, newMember])
-
-                ui.setNotification({
-                  category: 'success',
-                  message: 'Successfully added new member.',
-                })
-                setIsOpen(!isOpen)
-                setLoading(false)
-                resetForm({ initialValues: { ...initialValues, role: roles[0].id } })
-              }
-            }}
-          >
+          <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
             {({ resetForm }: any) => {
-              /**
-               * catches 'roles' when its available and then adds a default value for role select
-               */
+              // Catches 'roles' when its available and then adds a default value for role select
               useEffect(() => {
                 if (roles) {
                   resetForm({
@@ -110,9 +110,9 @@ function InviteMemberModal({ organization, members = [], user }: any) {
                     )}
 
                     <Input
+                      autoFocus
                       id="email"
                       icon={<IconMail />}
-                      autoFocus
                       placeholder="Enter email address"
                       label="Email address"
                     />

@@ -62,11 +62,7 @@ const TeamSettings = observer(() => {
           />
           {PageState.isOrgOwner ? (
             <div>
-              <InviteMemberModal
-                organization={PageState.organization}
-                members={PageState.members}
-                user={PageState.user}
-              />
+              <InviteMemberModal members={PageState.members} user={PageState.user} />
             </div>
           ) : (
             <div>

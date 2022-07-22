@@ -50,12 +50,15 @@ export interface User {
 }
 
 export interface Member {
+  // [JOSHEN TODO] This is deprecated with the BE update i think
   id: number
+
   primary_email: string
   username: string
-
   gotrue_id?: string
   role_ids?: number[]
+
+  // This is purely from studio
   invited_id?: number
   invited_at?: string
 }
