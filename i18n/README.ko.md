@@ -25,16 +25,16 @@
 
 ## 커뮤니티 및 지원
 
-- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions) 어떤 때 사용하는지：데이터베이스의 모범 사례를 구축하고 토론하는데 도움이 됩니다.
-- [GitHub Issue](https://github.com/supabase/supabase/issues) 어떤 때 사용하는지: Supabase에서 사용하면서 발생한 버그와 오류가 발생할 때.
-- [Email 지원](https://supabase.com/docs/support#business-support) 어떤 때 사용하는지: 데이터베이스 또는 인프라 문제
+- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions)：데이터베이스의 모범 사례를 구축하고 토론하는데 도움이 됩니다.
+- [GitHub Issue](https://github.com/supabase/supabase/issues) : Supabase에서 사용하면서 발생한 버그와 오류가 발생할 때.
+- [Email 지원](https://supabase.com/docs/support#business-support): 데이터베이스 또는 인프라 문제
 
 ## 상태
 
 - [x] Alpha: 제한된 사용자를 대상으로 테스트
 - [x] Public Alpha: 누구나[app.supabase.com](https://app.supabase.com)에서 등록 할 수 있습니다. 그러나, 버그 등이 있을 수 있으므로 양해 바랍니다.
 - [x] Public Beta: 기업을 제외한 대부분의 유스 케이스에 적합할 정도로 안정적
-- [ ] Public: 제품 준비중
+- [ ] Public: 프로덕션 준비 완료
 
 현재 Public Beta를 실시하고 있습니다. 주요 업데이트에 대한 알림을 받으려면 이 저장소의 "releases"를 Watch 해주세요.
 
@@ -44,7 +44,7 @@
 
 ## Supabase의 구조
 
-Supabase는 오픈 소스 툴들을 조합한 것입니다. 엔터프라이즈 급 오픈 소스 제품을 사용하여 Firebase의 기능을 구축하고 있습니다. MIT, Apache 2 또는 이에 상응하는 오픈 라이선스가 있는 도구 및 커뮤니티가 있는 경우 해당 도구를 사용하고 지원합니다. 도구가 존재하지 않으면 우리가 직접 빌드하고 오픈 소스합니다. Supabase는 Firebase의 일대일 매핑이 아닙니다. 우리의 목표는 개발자에게 오픈 소스 도구를 사용하여 Firebase와 같은 개발자 환경을 제공하는 것입니다.
+Supabase는 오픈 소스 도구의 조합입니다. 엔터프라이즈급 오픈 소스 제품을 사용하여 Firebase의 기능을 구축하고 있습니다. 도구 및 커뮤니티가 존재하고 MIT, Apache 2 또는 이에 상응하는 공개 라이선스가 있는 경우. 우리는 이러한 도구를 사용하고 지원할 것입니다. 도구가 존재하지 않으면 우리가 직접 빌드하고 소스를 공개합니다. Supabase는 Firebase의 1:1 매핑이 아닙니다. 우리의 목표는 오픈 소스 도구를 사용하여 개발자에게 Firebase와 같은 개발자 경험을 제공하는 것입니다.
 
 **현재 아키텍쳐**
 
@@ -63,7 +63,7 @@ Supabase는 [호스팅 플랫폼](https://app.supabase.com)입니다. 아무것�
 
 #### 클라이언트 라이브러리
 
-Supabase 클라이언트 라이브러리는 모듈식 입니다. 각 하위 라이브러리는 단일 외부 시스템에 대한 독립 실행형 구조입니다. 이는 기존 도구를 지원하는 방법 중 하나입니다.
+Supabase 클라이언트 라이브러리에 대한 접근 방식은 모듈식입니다. 각 하위 라이브러리는 단일 외부 시스템에 대한 독립 실행형 구현입니다. 이것은 우리가 기존 도구를 지원하는 방법 중 하나입니다.
 
 - **`supabase-{lang}`**: 아래 모든 라이브러리를 내포 한 클라이언트 라이브러리
   - `postgrest-{lang}`: [PostgREST](https://github.com/postgrest/postgrest)용 클라이언트 라이브러리
