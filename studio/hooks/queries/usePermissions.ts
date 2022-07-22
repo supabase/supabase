@@ -5,6 +5,8 @@ import { find } from 'lodash'
 import { useRouter } from 'next/router'
 import { Organization, Project } from 'types'
 
+// [JOSHEN TODO] TO BE DEPRECATED
+
 export function usePermissions(action: string, resource: string, data?: object) {
   if (!IS_PLATFORM) return true
 

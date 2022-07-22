@@ -1,8 +1,17 @@
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import useSWR from 'swr'
+import jsonLogic from 'json-logic-js'
+import { find } from 'lodash'
+import { useRouter } from 'next/router'
 
-export function usePermissions2(returning?: 'minimal') {
+import { useStore } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { Organization, Project } from 'types'
+import { toJS } from 'mobx'
+
+// [JOSHEN TODO] USE THIS INSTEAD RENAME TO usePermissions
+
+export function usePermissions(returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
 
   if (returning) {
@@ -20,4 +29,47 @@ export function usePermissions2(returning?: 'minimal') {
     isLoading: !anyError && !data,
     isError: !!anyError,
   }
+}
+
+export function checkPermissions(action: string, resource: string, data?: object) {
+  if (!IS_PLATFORM) return true
+
+  const { app, ui } = useStore()
+  const router = useRouter()
+
+  let organization_id: number | undefined
+  const { ref, slug } = router.query
+  if (ref) {
+    const project = find(app.projects.list(), { ref }) as Project | undefined
+    organization_id = project?.organization_id
+  } else if (slug) {
+    const organization = find(app.projects.list(), { ref }) as Organization | undefined
+    organization_id = organization?.id
+  }
+
+  // console.log('CheckPermissions', ui.permissions)
+  // console.log(
+  //   toJS(ui.permissions).filter((p) => p.resources.indexOf('postgres.public.organizations') >= 0)
+  // )
+
+  return (ui?.permissions ?? [])
+    .filter(
+      (permission: {
+        actions: string[]
+        condition: jsonLogic.RulesLogic
+        organization_id: number
+        resources: string[]
+      }) =>
+        permission.actions.some((act) =>
+          action ? action.match(act.replace('.', '.').replace('%', '.*')) : null
+        ) &&
+        permission.resources.some((res) =>
+          resource.match(res.replace('.', '.').replace('%', '.*'))
+        ) &&
+        permission.organization_id === ui?.selectedOrganization?.id
+    )
+    .some(
+      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
+        condition === null || jsonLogic.apply(condition, data)
+    )
 }

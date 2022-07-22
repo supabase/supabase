@@ -7,7 +7,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Member } from 'types'
 import { useStore, useOrganizationDetail, useOrganizationRoles } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { checkPermissions } from 'lib/common/permissions'
+import { checkPermissions } from 'hooks/queries/usePermissionsQuery'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -85,6 +85,8 @@ const MembersView = () => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
                 const memberIsUser = x.primary_email == PageState.user.primary_email
+
+                console.log(x.gotrue_id, x.primary_email, x.role_ids)
 
                 return (
                   <>
