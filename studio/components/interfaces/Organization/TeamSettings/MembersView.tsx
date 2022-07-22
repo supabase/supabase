@@ -85,7 +85,11 @@ const MembersView = () => {
                 const role = (roles || []).find((role) => role.id === memberRoleId)
                 const memberIsUser = x.primary_email == PageState.user.primary_email
 
-                console.log(x.gotrue_id, x.primary_email, x.role_ids)
+                console.log({
+                  id: x.gotrue_id,
+                  email: x.primary_email,
+                  roleIds: x.role_ids,
+                })
 
                 return (
                   <>
