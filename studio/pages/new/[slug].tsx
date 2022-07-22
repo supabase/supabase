@@ -1,7 +1,3 @@
-/**
- * Org is selected, creating a new project
- */
-
 import Router, { useRouter } from 'next/router'
 import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
@@ -9,6 +5,7 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
 import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
 import { passwordStrength } from 'lib/helpers'
@@ -36,7 +33,6 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -63,7 +59,7 @@ const Wizard: NextPageWithLayout = () => {
   const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
+  const isAdmin = checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.projects')
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
@@ -71,16 +67,10 @@ const Wizard: NextPageWithLayout = () => {
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
 
   const canCreateProject =
-    currentOrg?.is_owner &&
+    isAdmin &&
     !subscriptionStats.isError &&
     !subscriptionStats.isLoading &&
     (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
-
-  const canCreateProject2 = checkPermissions(
-    PermissionAction.SQL_INSERT,
-    'postgres.public.projects'
-  )
-  console.log('CanCreateProject2', currentOrg?.name, canCreateProject2)
 
   const canSubmit =
     projectName != '' &&
@@ -259,7 +249,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Listbox>
               )}
 
-              {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
+              {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
             {canCreateProject && (
               <>
@@ -330,7 +320,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
               </>
             )}
-            {currentOrg?.is_owner && (
+            {isAdmin && (
               <Panel.Content className="Form section-block--body has-inputs-centered ">
                 <Listbox
                   label="Pricing Plan"
