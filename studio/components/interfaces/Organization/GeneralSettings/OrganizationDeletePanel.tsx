@@ -5,12 +5,7 @@ import { Alert } from '@supabase/ui'
 import Panel from 'components/ui/Panel'
 import DeleteOrganizationButton from './DeleteOrganizationButton'
 
-import { PageContext } from 'pages/org/[slug]/settings'
-
 const OrganizationDeletePanel = observer(() => {
-  const PageState: any = useContext(PageContext)
-
-  if (!PageState.isOrgOwner) return null
   return (
     <Panel
       title={
