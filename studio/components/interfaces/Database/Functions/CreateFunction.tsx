@@ -12,6 +12,7 @@ import {
   Radio,
   IconPlus,
   Toggle,
+  Listbox,
 } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
@@ -537,7 +538,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
   }
 
   function onTypeChange(e: FormEvent<HTMLSelectElement>) {
-    const _value = e.currentTarget.value
+    const _value = e
     _localState!.onFormArrayChange({
       key: 'args',
       value: { name, type: _value },
@@ -566,7 +567,7 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         error={error}
         disabled={readonly}
       />
-      <Select
+      <Listbox
         id={`type-${idx}`}
         className="flex-1"
         value={type}
@@ -574,13 +575,13 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         size="small"
         disabled={readonly}
       >
-        <Select.Option value="integer">integer</Select.Option>
+        <Listbox.Option value="integer" label='integer'>integer</Listbox.Option>
         {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Select.Option key={x} value={x}>
+          <Listbox.Option key={x} value={x} label={x}>
             {x}
-          </Select.Option>
+          </Listbox.Option>
         ))}
-      </Select>
+      </Listbox>
       {!readonly && (
         <div>
           <Button
@@ -738,9 +739,8 @@ const InputDefinition: FC = observer(({}) => {
 
 const SelectSchema: FC = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
-
   return (
-    <Select
+    <Listbox
       id="schema"
       label="Schema"
       layout="horizontal"
@@ -748,7 +748,7 @@ const SelectSchema: FC = observer(({}) => {
       onChange={(e) =>
         _localState!.onFormChange({
           key: 'schema',
-          value: e.target.value,
+          value: e,
         })
       }
       placeholder="Pick a schema"
@@ -756,11 +756,11 @@ const SelectSchema: FC = observer(({}) => {
       descriptionText="Tables made in the table editor will be in 'public'"
     >
       {_localState!.schemas.map((x) => (
-        <Select.Option key={x.name} value={x.name}>
+        <Listbox.Option key={x.name} value={x.name} label={x.name}>
           {x.name}
-        </Select.Option>
+        </Listbox.Option>
       ))}
-    </Select>
+    </Listbox>
   )
 })
 
@@ -775,7 +775,7 @@ const SelectLanguage: FC = observer(({}) => {
 
   return (
     <div className="space-y-4">
-      <Select
+      <Listbox
         id="language"
         label="Language"
         layout="horizontal"
@@ -783,13 +783,13 @@ const SelectLanguage: FC = observer(({}) => {
         onChange={(e) =>
           _localState!.onFormChange({
             key: 'language',
-            value: e.target.value,
+            value: e,
           })
         }
         placeholder="Pick a language"
         size="small"
       >
-        <Select.Option value="sql">sql</Select.Option>
+        <Listbox.Option value="sql" label='sql'>sql</Listbox.Option>
         {
           //map through all selected extensions that start with pl
           enabledExtensions
@@ -797,12 +797,12 @@ const SelectLanguage: FC = observer(({}) => {
               return ex.name.startsWith('pl')
             })
             .map((ex) => (
-              <Select.Option key={ex.name} value={ex.name}>
+              <Listbox.Option key={ex.name} label={ex.name} value={ex.name}>
                 {ex.name}
-              </Select.Option>
+              </Listbox.Option>
             ))
         }
-      </Select>
+      </Listbox>
     </div>
   )
 })
@@ -812,7 +812,7 @@ const SelectReturnType: FC = observer(({}) => {
 
   return (
     <div className="space-y-4">
-      <Select
+      <Listbox
         id="returnType"
         label="Return type"
         layout="horizontal"
@@ -820,21 +820,21 @@ const SelectReturnType: FC = observer(({}) => {
         onChange={(e) =>
           _localState!.onFormChange({
             key: 'returnType',
-            value: e.target.value,
+            value: e,
           })
         }
         size="small"
       >
-        <Select.Option value="void">void</Select.Option>
-        <Select.Option value="record">record</Select.Option>
-        <Select.Option value="trigger">trigger</Select.Option>
-        <Select.Option value="integer">integer</Select.Option>
+        <Listbox.Option value="void" label='void'>void</Listbox.Option>
+        <Listbox.Option value="record" label='record'>record</Listbox.Option>
+        <Listbox.Option value="trigger" label='trigger'>trigger</Listbox.Option>
+        <Listbox.Option value="integer" label='integer'>integer</Listbox.Option>
         {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Select.Option key={x} value={x}>
+          <Listbox.Option key={x} value={x} label={x}>
             {x}
-          </Select.Option>
+          </Listbox.Option>
         ))}
-      </Select>
+      </Listbox>
     </div>
   )
 })
@@ -844,7 +844,7 @@ const SelectBehavior: FC = observer(({}) => {
 
   return (
     <div className="space-y-4">
-      <Select
+      <Listbox
         id="behavior"
         label="Behavior"
         layout="horizontal"
@@ -852,15 +852,15 @@ const SelectBehavior: FC = observer(({}) => {
         onChange={(e) =>
           _localState!.onFormChange({
             key: 'behavior',
-            value: e.target.value,
+            value: e,
           })
         }
         size="small"
       >
-        <Select.Option value="IMMUTABLE">immutable</Select.Option>
-        <Select.Option value="STABLE">stable</Select.Option>
-        <Select.Option value="VOLATILE">volatile</Select.Option>
-      </Select>
+        <Listbox.Option value="IMMUTABLE" label='immutable'>immutable</Listbox.Option>
+        <Listbox.Option value="STABLE" label='stable'>stable</Listbox.Option>
+        <Listbox.Option value="VOLATILE" label='volatile'>volatile</Listbox.Option>
+      </Listbox>
     </div>
   )
 })
