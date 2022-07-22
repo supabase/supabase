@@ -7,9 +7,6 @@ import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
-import { toJS } from 'mobx'
-
-// [JOSHEN TODO] USE THIS INSTEAD RENAME TO usePermissions
 
 export function usePermissions(returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
@@ -19,9 +16,7 @@ export function usePermissions(returning?: 'minimal') {
     url = `${url}?${query}`
   }
 
-  const { data: data, error } = useSWR<any>(url, get, {
-    loadingTimeout: 10000,
-  })
+  const { data: data, error } = useSWR<any>(url, get, { loadingTimeout: 10000 })
   const anyError = data?.error || error
 
   return {
@@ -46,11 +41,6 @@ export function checkPermissions(action: string, resource: string, data?: object
     const organization = find(app.projects.list(), { ref }) as Organization | undefined
     organization_id = organization?.id
   }
-
-  // console.log('CheckPermissions', ui.permissions)
-  // console.log(
-  //   toJS(ui.permissions).filter((p) => p.resources.indexOf('postgres.public.organizations') >= 0)
-  // )
 
   return (ui?.permissions ?? [])
     .filter(
