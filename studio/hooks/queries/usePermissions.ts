@@ -1,21 +1,41 @@
-import { useStore } from 'hooks'
+import useSWR from 'swr'
 import jsonLogic from 'json-logic-js'
-import { IS_PLATFORM } from 'lib/constants'
 import { find } from 'lodash'
 import { useRouter } from 'next/router'
+
+import { useStore } from 'hooks'
+import { get } from 'lib/common/fetch'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
+import { toJS } from 'mobx'
 
-// [JOSHEN TODO] TO BE DEPRECATED
+// [JOSHEN TODO] USE THIS INSTEAD RENAME TO usePermissions
 
-export function usePermissions(action: string, resource: string, data?: object) {
+export function usePermissions(returning?: 'minimal') {
+  let url = `${API_URL}/profile/permissions`
+
+  if (returning) {
+    const query = new URLSearchParams({ returning }).toString()
+    url = `${url}?${query}`
+  }
+
+  const { data: data, error } = useSWR<any>(url, get, {
+    loadingTimeout: 10000,
+  })
+  const anyError = data?.error || error
+
+  return {
+    permissions: anyError ? undefined : data,
+    isLoading: !anyError && !data,
+    isError: !!anyError,
+  }
+}
+
+export function checkPermissions(action: string, resource: string, data?: object) {
   if (!IS_PLATFORM) return true
 
   const { app, ui } = useStore()
   const router = useRouter()
-
-  // const url = `${API_URL}/profile/permissions`
-  // const { data: permissions, error } = useSWR<any>(url, get)
-  // if (error || !permissions || permissions.error) return false
 
   let organization_id: number | undefined
   const { ref, slug } = router.query
@@ -27,7 +47,12 @@ export function usePermissions(action: string, resource: string, data?: object) 
     organization_id = organization?.id
   }
 
-  return ui.permissions
+  // console.log('CheckPermissions', ui.permissions)
+  // console.log(
+  //   toJS(ui.permissions).filter((p) => p.resources.indexOf('postgres.public.organizations') >= 0)
+  // )
+
+  return (ui?.permissions ?? [])
     .filter(
       (permission: {
         actions: string[]

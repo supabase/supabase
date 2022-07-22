@@ -1,8 +1,8 @@
-import { useProfile, useStore } from 'hooks'
 import { ComponentType, useEffect } from 'react'
 import { NextRouter, useRouter } from 'next/router'
+
 import { IS_PLATFORM } from 'lib/constants'
-import { usePermissions } from 'hooks/queries/usePermissionsQuery'
+import { useProfile, useStore, usePermissions } from 'hooks'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 

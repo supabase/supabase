@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { usePermissions, useStore, withAuth } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import Loading from 'components/ui/Loading'
@@ -23,7 +23,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const canCreateReport = usePermissions(
+  const canCreateReport = checkPermissions(
     PermissionAction.SQL_INSERT,
     'postgres.public.user_content',
     {

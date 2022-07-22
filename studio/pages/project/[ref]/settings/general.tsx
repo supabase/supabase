@@ -8,7 +8,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { SettingsLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
-import { usePermissions, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { pluckJsonSchemaFields, pluckObjectFields } from 'lib/helpers'
@@ -46,8 +46,9 @@ const GeneralSettings = observer(() => {
   const formModel = toJS(project)
   const BASIC_FIELDS = ['name']
 
-  const canReboot = usePermissions(PermissionAction.TENANT_INFRA_EXECUTE, 'reboot')
-  const canUpdateProject = usePermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+  // @ts-ignore
+  const canReboot = checkPermissions(PermissionAction.TENANT_INFRA_EXECUTE, 'reboot')
+  const canUpdateProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
   const isFreeProject = project?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE
 
   const handleUpdateProject = async (model: any) => {

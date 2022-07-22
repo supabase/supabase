@@ -5,9 +5,8 @@ import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Member } from 'types'
-import { useStore, useOrganizationDetail, useOrganizationRoles } from 'hooks'
+import { checkPermissions, useStore, useOrganizationDetail, useOrganizationRoles } from 'hooks'
 import { API_URL } from 'lib/constants'
-import { checkPermissions } from 'hooks/queries/usePermissionsQuery'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'

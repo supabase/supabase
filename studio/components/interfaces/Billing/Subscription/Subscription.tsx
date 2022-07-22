@@ -4,7 +4,7 @@ import { sum } from 'lodash'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 
-import { usePermissions, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
@@ -41,7 +41,7 @@ const Subscription: FC<Props> = ({
   const isOrgOwner = ui.selectedOrganization?.is_owner
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canChangeSubscription = usePermissions(
+  const canChangeSubscription = checkPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
