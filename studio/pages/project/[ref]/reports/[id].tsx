@@ -17,7 +17,7 @@ import {
   IconSettings,
 } from '@supabase/ui'
 
-import { usePermissions } from 'hooks'
+import { checkPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -66,7 +66,7 @@ const Reports = () => {
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
 
-  const canSaveReport = usePermissions(
+  const canSaveReport = checkPermissions(
     PermissionAction.SQL_UPDATE,
     'postgres.public.user_content',
     {

@@ -1,15 +1,18 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectBase } from 'types'
-import { usePermissions } from '../../../hooks'
+import { checkPermissions } from '../../../hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export const generateSettingsMenu = (ref: string, project?: ProjectBase): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
-  const canReadInvoices = usePermissions(PermissionAction.BILLING_READ, 'stripe.invoices')
-  const canReadSubscriptions = usePermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
+  const canReadInvoices = checkPermissions(PermissionAction.BILLING_READ, 'stripe.invoices')
+  const canReadSubscriptions = checkPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
 
   return [
     {
@@ -44,7 +47,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           key: 'storage',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/settings`,
           items: [],
-          hidden: !usePermissions(PermissionAction.STORAGE_ADMIN_READ, '*'),
+          hidden: !checkPermissions(PermissionAction.STORAGE_ADMIN_READ, '*'),
         },
         {
           name: 'Billing & Usage',

@@ -7,7 +7,7 @@ import { FC, useRef } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
-import { usePermissions, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -64,9 +64,9 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
-  const canAdminWrite = usePermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
-  const canInsert = usePermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
-  const canUpdate = usePermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
+  const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
+  const canInsert = checkPermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
+  const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
   // const canEdit = canAdminWrite && canInsert && canUpdate
   const canEdit = true
 

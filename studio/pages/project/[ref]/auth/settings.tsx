@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { usePermissions, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 import { AuthProvidersForm } from 'components/interfaces'
@@ -18,7 +18,7 @@ const PageLayout: NextPageWithLayout = () => {
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  const canUpdate = usePermissions(
+  const canUpdate = checkPermissions(
     PermissionAction.SQL_UPDATE,
     'postgres.public.custom_config_gotrue'
   )
