@@ -3,6 +3,14 @@ import { test, expect, type Page } from '@playwright/test'
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 900 })
   await page.goto('http://localhost:3000')
+
+  await page.route(/rest\/v1/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({}),
+    })
+  })
 })
 
 test.describe('Start page', () => {

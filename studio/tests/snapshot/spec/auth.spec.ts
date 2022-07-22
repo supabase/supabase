@@ -44,6 +44,13 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify(config),
     })
   })
+  await page.route(/rest\/v1/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({}),
+    })
+  })
 })
 
 test.describe('Auth Users page', () => {
@@ -60,14 +67,14 @@ test.describe('Auth Users page', () => {
     })
 
     test('users management header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()
     })
 
     test('users management sidebar', async ({ page }) => {
-      const sidebar = page.locator('css=main >> xpath=../div[1]')
+      const sidebar = page.locator('css=main >> xpath=../div[1]').first()
 
       await page.waitForLoadState('networkidle')
       await expect(sidebar).toHaveScreenshot()
@@ -81,14 +88,14 @@ test.describe('Auth Users page', () => {
     })
 
     test('users management table', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
 
       await page.waitForLoadState('networkidle')
       await expect(body).toHaveScreenshot()
     })
 
-    test('users management invite', async ({ page }) => {
-      const body = page.locator('main > .flex')
+    test.skip('users management invite', async ({ page }) => {
+      const body = page.locator('main > main')
       await body.locator('"Invite"').click()
 
       await page.waitForLoadState('networkidle')
@@ -102,14 +109,14 @@ test.describe('Auth Users page', () => {
     })
 
     test('policies header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()
     })
 
     test('policies sidebar', async ({ page }) => {
-      const sidebar = page.locator('css=main >> xpath=../div[1]')
+      const sidebar = page.locator('css=main >> xpath=../div[1]').first()
 
       await page.waitForLoadState('networkidle')
       await expect(sidebar).toHaveScreenshot()
@@ -123,14 +130,14 @@ test.describe('Auth Users page', () => {
     })
 
     test('policies table', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
 
       await page.waitForLoadState('networkidle')
       await expect(body).toHaveScreenshot()
     })
 
     test('policies new', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
       await body.locator('"New Policy"').click()
 
       await page.isVisible('[alt="policy-template"]')
@@ -140,10 +147,10 @@ test.describe('Auth Users page', () => {
     })
 
     test('policies new from template', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
       await body.locator('"New Policy"').click()
 
-      await page.click('"Create a policy from a template"')
+      await page.click('"Get started quickly"')
 
       await page.isVisible('.active-line-number')
       await page.waitForLoadState('networkidle')
@@ -151,10 +158,10 @@ test.describe('Auth Users page', () => {
     })
 
     test('policies new from scratch', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
       await body.locator('"New Policy"').click()
 
-      await page.click('"Create a policy from scratch"')
+      await page.click('"For full customization"')
 
       await page.isVisible('.view-line')
       await page.waitForLoadState('networkidle')
@@ -168,14 +175,14 @@ test.describe('Auth Users page', () => {
     })
 
     test('templates header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()
     })
 
     test('templates sidebar', async ({ page }) => {
-      const sidebar = page.locator('css=main >> xpath=../div[1]')
+      const sidebar = page.locator('css=main >> xpath=../div[1]').first()
 
       await page.waitForLoadState('networkidle')
       await expect(sidebar).toHaveScreenshot()
@@ -189,7 +196,7 @@ test.describe('Auth Users page', () => {
     })
 
     test('templates body', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('main > main')
 
       await page.waitForLoadState('networkidle')
       await expect(body).toHaveScreenshot()

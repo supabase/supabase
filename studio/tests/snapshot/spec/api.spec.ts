@@ -21,6 +21,14 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify(spec),
     })
   })
+
+  await page.route(/rest\/v1/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({}),
+    })
+  })
 })
 
 test.describe('API page', () => {
@@ -37,7 +45,7 @@ test.describe('API page', () => {
     })
 
     test('api header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()

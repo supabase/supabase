@@ -64,6 +64,14 @@ test.beforeEach(async ({ page }) => {
     }
   })
 
+  await page.route(/rest\/v1/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({}),
+    })
+  })
+
   // open table editor page
   await page.goto('http://localhost:3000/project/default/editor')
 })
@@ -76,14 +84,14 @@ test.describe('Table editor', () => {
 
   test.describe('Snapshot base views for table editor', () => {
     test('table editor header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()
     })
 
     test('table editor sidebar', async ({ page }) => {
-      const sidebar = page.locator('css=main >> xpath=../div[1]')
+      const sidebar = page.locator('css=main >> xpath=../div[1]').first()
 
       await page.waitForLoadState('networkidle')
       await expect(sidebar).toHaveScreenshot()
@@ -97,7 +105,7 @@ test.describe('Table editor', () => {
     })
 
     test('table editor select or create table', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('css=main >> xpath=./div[2]')
 
       await page.waitForLoadState('networkidle')
       await expect(body).toHaveScreenshot()
@@ -106,7 +114,7 @@ test.describe('Table editor', () => {
     test('table editor stub table', async ({ page }) => {
       await page.waitForLoadState('networkidle')
       await page.goto('http://localhost:3000/project/default/editor/17182')
-      const body = page.locator('main > .flex')
+      const body = page.locator('css=main >> xpath=./div[2]')
 
       await page.waitForLoadState('networkidle')
       await expect(body).toHaveScreenshot()
@@ -115,7 +123,7 @@ test.describe('Table editor', () => {
 
   test.describe('Snapshot table editor menu interactions', () => {
     test('table editor search table', async ({ page }) => {
-      const search = page.locator('input[placeholder="Search for a table"]')
+      const search = page.locator('input[placeholder="Search tables"]')
       await search.type('l')
       const menu = page.locator('css=main >> xpath=../div[2]')
 
@@ -125,7 +133,7 @@ test.describe('Table editor', () => {
 
     test('table editor search table not found', async ({ page }) => {
       const menu = page.locator('css=main >> xpath=../div[2]')
-      const search = menu.locator('input[placeholder="Search for a table"]')
+      const search = menu.locator('input[placeholder="Search tables"]')
       await search.type('asd')
 
       await page.waitForLoadState('networkidle')
@@ -134,7 +142,7 @@ test.describe('Table editor', () => {
 
     test('table editor change schema', async ({ page }) => {
       const menu = page.locator('css=main >> xpath=../div[2]')
-      await page.click('#headlessui-listbox-button-1')
+      await page.click('"public"')
 
       await page.waitForLoadState('networkidle')
       await expect(menu).toHaveScreenshot()
@@ -142,7 +150,7 @@ test.describe('Table editor', () => {
 
     test('table editor select auth schema', async ({ page }) => {
       const menu = page.locator('css=main >> xpath=../div[2]')
-      await page.click('#headlessui-listbox-button-1')
+      await page.click('"public"')
       await page.click('"auth"')
 
       await page.waitForLoadState('networkidle')
@@ -158,7 +166,7 @@ test.describe('Table editor', () => {
     })
 
     test('table editor filters', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('css=main >> xpath=./div[2]')
       await body.locator('"Filter"').click()
 
       await page.waitForLoadState('networkidle')
@@ -166,7 +174,7 @@ test.describe('Table editor', () => {
     })
 
     test('table editor add filters', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('css=main >> xpath=./div[2]')
       await body.locator('"Filter"').click()
 
       const filters = page.locator('[data-radix-popper-content-wrapper]')

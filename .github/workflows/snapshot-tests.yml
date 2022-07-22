@@ -22,27 +22,22 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install docker
-        run: |
-          mkdir -p ~/.docker/machine/cache
-          curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
-          brew install --cask virtualbox
-          brew install docker docker-machine
-          docker-machine create --driver virtualbox default
-          docker-machine env default
-
       - name: Setup dependencies
         run: |
-          eval "$(docker-machine env default)" 
-          npm run test:snapshots:compose:up
           npm ci
+          npm run build
+          (npx next start -p 3000 &)
           npx playwright install --with-deps
+        env:
+          STUDIO_PG_META_URL: http://localhost:3000/pg
+          POSTGRES_PASSWORD: postgres
+          SUPABASE_URL: http://localhost:3000/kong
+          SUPABASE_REST_URL: http://localhost:3000/rest/v1/
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE
+          SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q
 
       - name: Run tests
         run: npm run test:snapshots:ci
-
-      - name: Stop infrastructure
-        run: npm run test:snapshots:compose:down
 
       - uses: actions/upload-artifact@v1
         if: ${{ always() }}

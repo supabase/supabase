@@ -55,6 +55,14 @@ test.beforeEach(async ({ page }) => {
       })
     }
   })
+
+  await page.route(/rest\/v1/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({}),
+    })
+  })
 })
 
 test.describe('SQL editor page', () => {
@@ -71,14 +79,14 @@ test.describe('SQL editor page', () => {
     })
 
     test('sql editor header', async ({ page }) => {
-      const header = page.locator('css=.PageHeader >> xpath=..')
+      const header = page.locator('main > div').first()
 
       await page.waitForLoadState('networkidle')
       await expect(header).toHaveScreenshot()
     })
 
     test('sql editor sidebar', async ({ page }) => {
-      const sidebar = page.locator('css=main >> xpath=../div[1]')
+      const sidebar = page.locator('css=main >> xpath=../div[1]').first()
 
       await page.waitForLoadState('networkidle')
       await expect(sidebar).toHaveScreenshot()
@@ -92,10 +100,10 @@ test.describe('SQL editor page', () => {
     })
 
     test('sql editor with query', async ({ page }) => {
-      const body = page.locator('main > .flex')
+      const body = page.locator('.SQLTabContainer')
 
+      await page.locator('"Results"').click()
       await page.waitForLoadState('networkidle')
-      await page.locator('css=main >> xpath=../div[2]').click()
       await expect(body).toHaveScreenshot()
     })
   })
