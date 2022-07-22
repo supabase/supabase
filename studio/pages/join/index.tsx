@@ -21,7 +21,7 @@ type TokenInfo = ITokenInfo | undefined
 
 const JoinOrganizationPage = () => {
   const router = useRouter()
-  const { slug, token } = router.query
+  const { slug, token, name } = router.query
   const { ui, app } = useStore()
   const { profile } = useProfile()
 
@@ -164,7 +164,7 @@ const JoinOrganizationPage = () => {
           {organization_name ? (
             <>
               <p className="text-scale-1200 text-3xl">
-                {organization_name ? `${organization_name}` : 'an organization'}{' '}
+                {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
                 <p className="text-scale-900 text-sm">an organization on Supabase</p>

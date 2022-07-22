@@ -64,10 +64,9 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
   async pingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
     if (
       project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-      project.restUrl &&
-      project.internalApiKey
+      project.restUrl
     ) {
-      const success = await pingPostgrest(project.restUrl, project.internalApiKey, {
+      const success = await pingPostgrest(project.restUrl, {
         kpsVersion: project.kpsVersion,
       })
       return success ? 'ONLINE' : 'OFFLINE'

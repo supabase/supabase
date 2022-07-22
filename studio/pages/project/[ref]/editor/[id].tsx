@@ -36,7 +36,9 @@ const TableEditorPage: NextPage = () => {
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
       tables.find((table) => table.id === Number(id))
-    : tryParseJson(Base64.decode(id))
+    : id !== undefined
+    ? tryParseJson(Base64.decode(id))
+    : undefined
 
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
@@ -188,7 +190,9 @@ const TableEditorPage: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         children={
           <Modal.Content>
             <p className="text-scale-1100 py-4 text-sm">
