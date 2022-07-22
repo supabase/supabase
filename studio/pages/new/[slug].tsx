@@ -25,7 +25,7 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats, checkPermissions } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -36,6 +36,7 @@ import {
   NotOrganizationOwnerWarning,
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -74,6 +75,12 @@ const Wizard: NextPageWithLayout = () => {
     !subscriptionStats.isError &&
     !subscriptionStats.isLoading &&
     (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
+
+  const canCreateProject2 = checkPermissions(
+    PermissionAction.SQL_INSERT,
+    'postgres.public.projects'
+  )
+  console.log('CanCreateProject2', currentOrg?.name, canCreateProject2)
 
   const canSubmit =
     projectName != '' &&

@@ -31,7 +31,7 @@ const FormActions = ({
   return (
     <div
       className={[
-        'flex w-full items-center gap-2',
+        'flex items-center gap-2',
         // justify actions to right if no helper text
         helper ? 'justify-between' : 'justify-end',
       ].join(' ')}

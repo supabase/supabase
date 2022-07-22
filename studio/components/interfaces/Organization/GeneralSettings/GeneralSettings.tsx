@@ -67,15 +67,19 @@ const GeneralSettings = observer(() => {
   return (
     <div className="container my-4 max-w-4xl space-y-8">
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
-        {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+        {({ isSubmitting, handleReset, values, initialValues }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
           return (
             <FormPanel
               disabled
               footer={
-                <div className="flex justify-between py-4 px-8">
+                <div
+                  className={`flex py-4 px-8 ${
+                    canUpdateOrganization ? 'justify-end' : 'justify-between'
+                  }`}
+                >
                   {!canUpdateOrganization && (
-                    <p className="w-4/5 text-sm text-scale-1000">
+                    <p className="text-sm text-scale-1000">
                       You need additional permissions to manage your organization's settings
                     </p>
                   )}
