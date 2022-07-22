@@ -8,7 +8,7 @@ import { Member } from 'types'
 import { useStore, useOrganizationDetail, useOrganizationRoles } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { checkPermissions } from 'lib/common/permissions'
-import { isInviteExpired } from '../Organization.utils'
+import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import OwnerDropdown from './OwnerDropdown'
@@ -20,7 +20,7 @@ interface SelectedMember extends Member {
   newRoleId: number
 }
 
-const MembersView = observer(() => {
+const MembersView = () => {
   const PageState: any = useContext(PageContext)
 
   const { ui } = useStore()
@@ -34,11 +34,6 @@ const MembersView = observer(() => {
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
   const canEditMembers = checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
-
-  const getUserDisplayName = (user: Member | SelectedMember) => {
-    const { username, primary_email, invited_id } = user || {}
-    return invited_id !== undefined ? primary_email : username || ''
-  }
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -151,7 +146,7 @@ const MembersView = observer(() => {
                       </Table.td>
                       <Table.td>
                         {PageState.isOrgOwner && (
-                          <OwnerDropdown members={PageState.members} member={x} roles={roles} />
+                          <OwnerDropdown members={PageState.members} member={x} />
                         )}
                       </Table.td>
                     </Table.tr>
@@ -221,6 +216,6 @@ const MembersView = observer(() => {
       </Modal>
     </>
   )
-})
+}
 
-export default MembersView
+export default observer(MembersView)
