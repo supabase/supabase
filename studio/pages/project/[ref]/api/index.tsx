@@ -78,7 +78,7 @@ const DocView: FC<any> = observer(({}) => {
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
   const { data, error }: any = useSWR(`${API_URL}/props/project/${PageState.projectRef}/api`, get)
-  const API_KEY = data?.autoApiService?.internalApiKey
+  const API_KEY = data?.autoApiService?.serviceApiKey
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
 

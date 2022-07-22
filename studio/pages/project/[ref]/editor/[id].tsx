@@ -36,7 +36,9 @@ const TableEditorPage: NextPage = () => {
   const selectedTable = !isNaN(Number(id))
     ? // @ts-ignore
       tables.find((table) => table.id === Number(id))
-    : tryParseJson(Base64.decode(id))
+    : id !== undefined
+    ? tryParseJson(Base64.decode(id))
+    : undefined
 
   useEffect(() => {
     if (selectedTable && 'schema' in selectedTable) {
