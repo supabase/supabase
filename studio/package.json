@@ -8,7 +8,7 @@
     "start": "next start",
     "test": "jest",
     "test:snapshots": "npx playwright test",
-    "test:snapshots:ci": "PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/results.json npx playwright test --retries=1 --forbid-only --max-failures=24 --reporter=github,dot,json --shard=1/27",
+    "test:snapshots:ci": "PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/results.json npx playwright test --retries=1 --forbid-only --max-failures=24 --reporter=github,dot,json --shard=10/27",
     "test:snapshots:flaky-check": "npx playwright test --repeat-each 5 --retries 2",
     "test:snapshots:update": "npx playwright test -u",
     "test:snapshots:headed": "npx playwright test --headed",

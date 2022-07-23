@@ -15,7 +15,13 @@ jobs:
         working-directory: studio
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout github repo (+ lfs dependencies)
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
 
       - name: Set up Node
         uses: actions/setup-node@v3
@@ -26,15 +32,8 @@ jobs:
         run: |
           npm ci
           npm run build
-          (npx next start -p 3000 &)
+          (npm run start &)
           npx playwright install --with-deps
-        env:
-          STUDIO_PG_META_URL: http://localhost:3000/pg
-          POSTGRES_PASSWORD: postgres
-          SUPABASE_URL: http://localhost:3000/kong
-          SUPABASE_REST_URL: http://localhost:3000/rest/v1/
-          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE
-          SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q
 
       - name: Run tests
         run: npm run test:snapshots:ci
