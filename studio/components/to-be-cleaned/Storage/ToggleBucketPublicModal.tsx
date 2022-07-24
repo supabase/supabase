@@ -1,8 +1,15 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Modal, Alert, Button } from '@supabase/ui'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
-const ToggleBucketPublicModal = ({
+interface Props {
+  visible: boolean
+  bucket: object
+  onSelectCancel: () => {}
+  onSelectSave: () => {}
+}
+
+const ToggleBucketPublicModal: FC<Props> = ({
   visible = false,
   bucket = {},
   onSelectCancel = () => {},
