@@ -1,7 +1,13 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Modal, Alert, Button, Input, Space, Typography, Toggle } from '@supabase/ui'
 
-const CreateBucketModal = ({
+interface Props {
+  visible : boolean
+  onSelectCancel: () => {}
+  onSelectSave: () => {}
+}
+
+const CreateBucketModal: FC<Props> = ({
   visible = false,
   onSelectCancel = () => {},
   onSelectSave = () => {},
