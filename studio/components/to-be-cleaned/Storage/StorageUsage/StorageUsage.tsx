@@ -1,12 +1,14 @@
 import { FC } from 'react'
 import SVG from 'react-inlinesvg'
 
-const StorageUsage: FC = () => {
+interface Props {}
+
+const StorageUsage: FC<Props> = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <SVG
         src={'/img/storage-usage.svg'}
-        alt={'storage-usage'}
+        title={'storage-usage'}
         preProcessor={(code) =>
           code.replace(/svg/, 'svg class="w-20 h-20 text-color-inherit opacity-75"')
         }
