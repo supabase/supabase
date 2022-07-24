@@ -10,7 +10,7 @@ interface Props {
 const CreateBucketModal: FC<Props> = ({
   visible = false,
   onSelectCancel = () => {},
-  onSelectSave = () => {},
+  onSelectSave = (bucketName: string, isPublic: boolean) => {},
 }) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -25,7 +25,7 @@ const CreateBucketModal: FC<Props> = ({
     setIsPublic(false)
   }, [visible])
 
-  const onCreateBucket = (event) => {
+  const onCreateBucket = (event: React.MouseEvent<HTMLElement>) => {
     if (event) {
       event.preventDefault()
     }
