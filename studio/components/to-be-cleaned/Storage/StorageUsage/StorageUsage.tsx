@@ -1,6 +1,7 @@
+import { FC } from 'react'
 import SVG from 'react-inlinesvg'
 
-const StorageUsage = () => {
+const StorageUsage: FC<Props> = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <SVG
