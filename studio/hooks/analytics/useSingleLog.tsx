@@ -37,14 +37,15 @@ function useSingleLog(
     mutate,
   } = useSWR<Logs>(id && table ? endpointUrl : null, get, {
     revalidateOnFocus: false,
-    dedupingInterval: 3000,
+    revalidateIfStale: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 5000,
   })
 
   let error: null | string | object = swrError ? swrError.message : null
-
   return [
     {
-      logData: data ? data.result[0] : undefined,
+      logData: data?.result ? data.result[0] : undefined,
       isLoading: isValidating,
       error,
     },
