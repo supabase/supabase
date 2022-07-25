@@ -58,7 +58,6 @@ export interface Member {
   gotrue_id?: string
   role_ids?: number[]
 
-  // This is purely from studio
   invited_id?: number
   invited_at?: string
 }

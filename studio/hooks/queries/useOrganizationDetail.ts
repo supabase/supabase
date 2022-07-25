@@ -1,7 +1,8 @@
 import useSWR, { mutate } from 'swr'
-import { get } from 'lib/common/fetch'
+
 import { Member } from 'types'
 import { API_URL } from 'lib/constants'
+import { get } from 'lib/common/fetch'
 
 export function useOrganizationDetail(slug: string) {
   // Get org members
@@ -20,9 +21,8 @@ export function useOrganizationDetail(slug: string) {
       invited_at: x.invited_at,
       invited_id: x.invited_id,
       username: x.invited_email.slice(0, 1),
-      // todo: hardcoded this for now, should be based on the actual role of the invited
-      //user from api, 465 is Developer
-      role_ids: [465],
+      // [Joshen TODO]: hardcoded this for now, should be based on the actual role of the invited user
+      role_ids: [-1],
       primary_email: x.invited_email,
     }))
 
@@ -35,9 +35,6 @@ export function useOrganizationDetail(slug: string) {
     mutate(url, [...updatedMembers], revalidate ?? true)
     mutate(pendingInviteUrl, {}, revalidate ?? true)
   }
-
-  // console.log('about to set')
-  // console.log('final members', members)
 
   return {
     members: members as Member[],

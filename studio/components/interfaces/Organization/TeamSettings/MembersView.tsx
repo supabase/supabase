@@ -86,12 +86,6 @@ const MembersView = () => {
                 const memberIsUser = x.primary_email == PageState.user.primary_email
                 const disableRoleEdit = !canEditMembers || memberIsUser
 
-                console.log({
-                  id: x.gotrue_id,
-                  email: x.primary_email,
-                  roleIds: x.role_ids,
-                })
-
                 return (
                   <>
                     <Table.tr key={i}>
@@ -129,31 +123,35 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
-                        {role && (
-                          <Listbox
-                            className={disableRoleEdit ? 'pointer-events-none' : ''}
-                            disabled={disableRoleEdit}
-                            value={role.id}
-                            onChange={(roleId): any => {
-                              setUserRoleChangeModalVisible(true)
-                              setSelectedMember({
-                                ...x,
-                                oldRoleId: role.id,
-                                newRoleId: roleId,
-                              })
-                            }}
-                          >
-                            {roles.map((role: any) => (
-                              <Listbox.Option
-                                key={role.id}
-                                value={role.id}
-                                label={role.name}
-                                disabled={disableRoleEdit}
-                              >
-                                {role.name}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox>
+                        {role ? (
+                          <p>{role?.name}</p>
+                        ) : (
+                          // [Joshen TODO] Commented out until roles management is completed
+                          // <Listbox
+                          //   className={disableRoleEdit ? 'pointer-events-none' : ''}
+                          //   disabled={disableRoleEdit}
+                          //   value={role.id}
+                          //   onChange={(roleId): any => {
+                          //     setUserRoleChangeModalVisible(true)
+                          //     setSelectedMember({
+                          //       ...x,
+                          //       oldRoleId: role.id,
+                          //       newRoleId: roleId,
+                          //     })
+                          //   }}
+                          // >
+                          //   {roles.map((role: any) => (
+                          //     <Listbox.Option
+                          //       key={role.id}
+                          //       value={role.id}
+                          //       label={role.name}
+                          //       disabled={disableRoleEdit}
+                          //     >
+                          //       {role.name}
+                          //     </Listbox.Option>
+                          //   ))}
+                          // </Listbox>
+                          <p>Developer</p>
                         )}
                       </Table.td>
                       <Table.td>
