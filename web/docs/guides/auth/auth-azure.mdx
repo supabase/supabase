@@ -56,6 +56,15 @@ This will serve as the `client_secret` when you make API calls to authenticate t
 
 ![Obtain the client secret](/img/guides/auth-azure/azure-client-secret.png)
 
+## Obtain the Tenant URL
+
+This will using your custom Azure login page when user login.
+
+- Select the Directory (Tenant) ID value.
+- The Azure Tenat URL should look like this: `https://login.microsoftonline.com/<tenant-id>`
+
+![Obtain the tenant url](/img/guides/auth-azure/azure-tenant-url.png)
+
 ### Add login code to your client app
 
 The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
