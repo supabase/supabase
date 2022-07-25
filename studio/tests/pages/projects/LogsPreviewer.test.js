@@ -108,20 +108,30 @@ test('can display log data and metadata', async () => {
 test('Refresh page', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) return { result: { count: 0 } }
+    if (url.includes('where+id')) {
+      return {
+        result: [
+          {
+            id: 'some-id',
+            metadata: [{ request: [{ method: 'POST' }] }],
+          },
+        ],
+      }
+    }
     return {
       result: [
         logDataFixture({
-          id: 'some-event-id',
-          metadata: { my_key: 'something_value' },
+          id: 'some-id',
+          request: { path: 'some-event' },
         }),
       ],
     }
   })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+  render(<LogsPreviewer projectRef="123" queryType="api" tableName={LogsTableName.EDGE} />)
 
-  const row = await screen.findByText(/some-event-id/)
+  const row = await screen.findByText(/some-event/)
   fireEvent.click(row)
-  await screen.findByText(/my_key/)
+  await screen.findAllByText(/POST/)
 })
 
 test('Search will trigger a log refresh', async () => {
