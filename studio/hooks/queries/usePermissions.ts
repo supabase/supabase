@@ -3,7 +3,7 @@ import jsonLogic from 'json-logic-js'
 import { find } from 'lodash'
 import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
@@ -28,6 +28,9 @@ export function usePermissions(returning?: 'minimal') {
 
 export function checkPermissions(action: string, resource: string, data?: object) {
   if (!IS_PLATFORM) return true
+
+  const enablePermissions = useFlag('enablePermissions')
+  if (!enablePermissions) return true
 
   const { app, ui } = useStore()
   const router = useRouter()
