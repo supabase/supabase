@@ -15,12 +15,11 @@ interface Props {
 }
 
 const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-
   const { ui } = useStore()
   const router = useRouter()
   const { slug } = router.query
+
+  const [isOpen, setIsOpen] = useState(false)
 
   const { roles } = useOrganizationRoles((slug as string) || '')
   const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
@@ -32,42 +31,60 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
     role: string().required('Role is required'),
   })
 
-  const onInviteMember = async (values: any, resetForm: any) => {
-    setLoading(true)
+  const onInviteMember = async (values: any, { setSubmitting, resetForm }: any) => {
+    const existingMember = members.find(
+      (member) => member.primary_email === values.email.toLowerCase()
+    )
+    if (existingMember !== undefined) {
+      if (existingMember.invited_id) {
+        return ui.setNotification({
+          category: 'info',
+          message: 'User has already been invited to this organization',
+        })
+      } else {
+        return ui.setNotification({
+          category: 'info',
+          message: 'User is already in this organization',
+        })
+      }
+    }
 
+    setSubmitting(true)
+
+    const developerRole = roles.find((role) => role.name === 'Developer')
+    const roleId = developerRole?.id ?? roles[0].id
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
       owner_id: user.id,
-      role_id: values.role,
+      // [Joshen TODO] to be based on selected role when roles management is completed.
+      // Defaulting to Developer for now
+      role_id: roleId,
     })
 
-    if (isNil(response)) {
-      ui.setNotification({ category: 'error', message: 'Failed to add member' })
-      setLoading(false)
-    } else if (response?.error) {
+    if (response.error) {
       ui.setNotification({
         category: 'error',
         message: `Failed to add member: ${response.error.message}`,
       })
-      setLoading(false)
+    } else if (isNil(response)) {
+      ui.setNotification({ category: 'error', message: 'Failed to add member' })
     } else {
       const newMember: Member = {
-        // [Joshen] Setting a random id for now to fit the Member interface
         id: 0,
+        invited_id: response.invited_id,
         invited_at: response.invited_at,
         primary_email: response.invited_email,
         username: response.invited_email[0],
+        role_ids: [roleId],
       }
       mutateOrgMembers([...members, newMember])
+      ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
 
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully added new member.',
-      })
       setIsOpen(!isOpen)
-      setLoading(false)
-      resetForm({ initialValues: { ...initialValues, role: roles[0].id } })
+      resetForm({ initialValues: { ...initialValues, role: roleId } })
     }
+
+    setSubmitting(false)
   }
 
   return (
@@ -85,7 +102,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
       >
         <Modal.Content>
           <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
-            {({ resetForm }: any) => {
+            {({ isSubmitting, resetForm }: any) => {
               // Catches 'roles' when its available and then adds a default value for role select
               useEffect(() => {
                 if (roles) {
@@ -99,7 +116,8 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
               return (
                 <div className="w-full py-4">
                   <div className="space-y-4">
-                    {roles && (
+                    {/* [Joshen TODO] Commented out for now until roles management is completed */}
+                    {/* {roles && (
                       <Select name="role" label="Member role">
                         {roles.map((role: any) => (
                           <Select.Option key={role.id} value={role.id}>
@@ -107,7 +125,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
                           </Select.Option>
                         ))}
                       </Select>
-                    )}
+                    )} */}
 
                     <Input
                       autoFocus
@@ -117,7 +135,13 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
                       label="Email address"
                     />
 
-                    <Button block size="medium" htmlType="submit" loading={loading}>
+                    <Button
+                      block
+                      size="medium"
+                      htmlType="submit"
+                      disabled={isSubmitting}
+                      loading={isSubmitting}
+                    >
                       Invite new member
                     </Button>
                   </div>
