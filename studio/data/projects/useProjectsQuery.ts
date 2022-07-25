@@ -1,8 +1,8 @@
+import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { NotFoundError } from 'data/utils'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { useQuery, useQueryClient, UseQueryOptions } from 'react-query'
 import { Project } from 'types'
 import { projectKeys } from './keys'
 

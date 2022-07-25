@@ -1,5 +1,5 @@
+import { UseQueryOptions } from '@tanstack/react-query'
 import { Content, ContentData, ContentError, useContentQuery } from 'data/content/useContentQuery'
-import { UseQueryOptions } from 'react-query'
 
 export type SqlSnippet = Extract<Content, { type: 'sql' }>
 

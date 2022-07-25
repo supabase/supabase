@@ -1,6 +1,6 @@
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useMutation, UseMutationOptions } from 'react-query'
 
 /* Execute Query */
 

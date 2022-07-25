@@ -1,8 +1,8 @@
 import { Button, IconHeart } from '@supabase/ui'
+import { useQueryClient } from '@tanstack/react-query'
 import { contentKeys } from 'data/content/keys'
 import { Content, ContentData } from 'data/content/useContentQuery'
 import { useProjectContext } from 'data/projects/ProjectContext'
-import { useQueryClient } from 'react-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type FavoriteButtonProps = { id: string }
