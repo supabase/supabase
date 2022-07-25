@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { NextPageWithLayout } from 'types'
 import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
-import { ProjectLayoutWithAuth } from 'components/layouts'
-import Loading from 'components/ui/Loading'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
+import Loading from 'components/ui/Loading'
+import { ProjectLayoutWithAuth } from 'components/layouts'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
-import { NextPageWithLayout } from 'types'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const PageLayout: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -26,11 +25,7 @@ const PageLayout: NextPageWithLayout = () => {
   const canCreateReport = checkPermissions(
     PermissionAction.SQL_INSERT,
     'postgres.public.user_content',
-    {
-      resource: {
-        type: 'report',
-      },
-    }
+    { resource: { type: 'report' } }
   )
   const contentStore = useProjectContentStore(ref)
 
@@ -63,8 +58,6 @@ const PageLayout: NextPageWithLayout = () => {
         <ProductEmptyState
           title="Reports"
           ctaButtonLabel="Create report"
-          // infoButtonLabel="About reports"
-          // infoButtonUrl="https://supabase.com/docs/guides/storage"
           onClickCta={() => {
             try {
               createReport({ router })
@@ -75,7 +68,6 @@ const PageLayout: NextPageWithLayout = () => {
               })
             }
           }}
-          disabled={!canCreateReport}
         >
           <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
           <p className="text-scale-1100 text-sm">

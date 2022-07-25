@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
-
+import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useStore } from 'hooks'
-import { NextPageWithLayout } from 'types'
 
+import { NextPageWithLayout } from 'types'
+import { checkPermissions, useStore } from 'hooks'
 import { AuthProvidersForm } from 'components/interfaces'
 import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
 import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'

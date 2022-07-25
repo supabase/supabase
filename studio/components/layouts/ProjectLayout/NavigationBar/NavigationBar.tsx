@@ -1,9 +1,9 @@
-import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
+import Link from 'next/link'
+import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC } from 'react'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

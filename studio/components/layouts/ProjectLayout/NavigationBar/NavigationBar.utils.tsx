@@ -32,7 +32,7 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
         />
       ),
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/editor`,
-      hidden: !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public'),
+      // disabled: !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public'),
     },
     {
       key: 'auth',
@@ -40,13 +40,16 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       icon: <IconUsers size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`,
     },
-    {
-      key: 'storage',
-      label: 'Storage',
-      icon: <IconArchive size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
-      hidden: !IS_PLATFORM,
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'storage',
+            label: 'Storage',
+            icon: <IconArchive size={18} strokeWidth={2} />,
+            link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
+          },
+        ]
+      : []),
     {
       key: 'sql',
       label: 'SQL Editor',
@@ -98,33 +101,42 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
   )
 
   return [
-    {
-      key: 'logs-explorer',
-      label: 'Logs Explorer',
-      icon: <IconList size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`,
-      hidden: !IS_PLATFORM,
-    },
-    {
-      key: 'reports',
-      label: 'Reports',
-      icon: <IconBarChart size={18} strokeWidth={2} />,
-      link: isProjectBuilding ? buildingUrl : `/project/${ref}/reports`,
-      hidden: !IS_PLATFORM || !canReadReport || !canReadStats,
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'logs-explorer',
+            label: 'Logs Explorer',
+            icon: <IconList size={18} strokeWidth={2} />,
+            link: isProjectBuilding ? buildingUrl : `/project/${ref}/logs-explorer`,
+          },
+        ]
+      : []),
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'reports',
+            label: 'Reports',
+            icon: <IconBarChart size={18} strokeWidth={2} />,
+            link: isProjectBuilding ? buildingUrl : `/project/${ref}/reports`,
+          },
+        ]
+      : []),
     {
       key: 'api',
       label: 'API',
       icon: <IconFileText size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/api`,
     },
-    {
-      key: 'settings',
-      label: 'Settings',
-      icon: <IconSettings size={18} strokeWidth={2} />,
-      link: `/project/${ref}/settings/general`,
-      hidden:
-        !IS_PLATFORM || !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public.projects'),
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            key: 'settings',
+            label: 'Settings',
+            icon: <IconSettings size={18} strokeWidth={2} />,
+            link: `/project/${ref}/settings/general`,
+            // disabled: !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public.projects'),
+          },
+        ]
+      : []),
   ]
 }
