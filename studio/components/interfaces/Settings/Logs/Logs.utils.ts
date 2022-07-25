@@ -169,4 +169,4 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) => `select id, timestamp, event_message, metadata from ${table} where id = '${id}'' limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string) => `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`

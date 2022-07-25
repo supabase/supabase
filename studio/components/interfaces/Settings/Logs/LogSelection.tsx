@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconX } from '@supabase/ui'
+import { IconX, Loading } from '@supabase/ui'
 
 import { LogData, QueryType } from './Logs.types'
 
@@ -15,6 +15,7 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import { isDefaultLogPreviewFormat, LogsTableName } from '.'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import Connecting from 'components/ui/Loading/Loading'
 
 interface Props {
   log: LogData | null
@@ -125,7 +126,10 @@ const LogSelection: FC<Props> = ({ projectRef, log: partialLog, onClose, queryTy
         >
           <IconX size={14} strokeWidth={2} />
         </div>
-        <div className="bg-scale-300 py-8 flex flex-col space-y-6">{fullLog && <Formatter />}</div>
+        {isLoading && <Connecting />}
+        <div className="bg-scale-300 py-8 flex flex-col space-y-6">
+          {!isLoading && fullLog && <Formatter />}
+        </div>
       </div>
     </div>
   )

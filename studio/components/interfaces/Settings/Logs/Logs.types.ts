@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface Metadata {
-  [key: string]: string | number | Object | Object[]
+  [key: string]: string | number | Object | Object[] | any
 }
 
 export type DatePickerToFrom = { to: string | null; from: string | null }
