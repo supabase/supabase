@@ -82,57 +82,58 @@ beforeEach(() => {
   useRouter.mockReset()
   useRouter.mockReturnValue(defaultRouterMock())
 })
-test('can display log data and metadata', async () => {
-  get.mockResolvedValue({
-    result: [
-      logDataFixture({
-        id: 'some-event-happened-id',
-        metadata: {
-          my_key: 'something_value',
-        },
-      }),
-    ],
-  })
-  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
 
-  await waitFor(() => {
-    expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
-    expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
-  })
-
-  fireEvent.click(await screen.findByText(/some-event-happened-id/))
-  await screen.findByText(/my_key/)
-  await screen.findByText(/something_value/)
-})
-
-test('Refresh page', async () => {
-  get.mockImplementation((url) => {
-    if (url.includes('count')) return { result: { count: 0 } }
-    if (url.includes('where+id')) {
-      return {
-        result: [
-          {
-            id: 'some-id',
-            metadata: [{ request: [{ method: 'POST' }] }],
-          },
-        ],
+test.each([
+  {
+    queryType: 'api',
+    tableName: undefined,
+    allLog: logDataFixture({
+      id: 'some-id',
+      request: { path: 'some-path', method: 'POST' },
+      status_code: '400',
+      metadata: undefined,
+    }),
+    singleLog: {
+      id: 'some-id',
+      metadata: [{ request: [{ method: 'POST' }] }],
+    },
+    tableTexts: [/POST/, /some\-path/, /400/],
+    selectionTexts: [/POST/],
+  },
+  // TODO: add more tests for each type of ui
+])(
+  'selection $queryType $tableName , can display log data and metadata',
+  async ({ queryType, tableName, allLog, singleLog, tableTexts, selectionTexts }) => {
+    get.mockImplementation((url) => {
+      // counts
+      if (url.includes('count')) {
+        return { result: [{ count: 0 }] }
       }
-    }
-    return {
-      result: [
-        logDataFixture({
-          id: 'some-id',
-          request: { path: 'some-event' },
-        }),
-      ],
-    }
-  })
-  render(<LogsPreviewer projectRef="123" queryType="api" tableName={LogsTableName.EDGE} />)
+      // single
+      if (url.includes('where+id')) {
+        return { result: [singleLog] }
+      }
+      // all
+      return { result: [allLog] }
+    })
+    render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
-  const row = await screen.findByText(/some-event/)
-  fireEvent.click(row)
-  await screen.findAllByText(/POST/)
-})
+    await waitFor(() => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+    })
+
+    for (const text of tableTexts) {
+      await screen.findByText(text)
+    }
+    const row = await screen.findByText(tableTexts[0])
+    fireEvent.click(row)
+
+    for (const text of selectionTexts) {
+      await screen.findAllByText(text)
+    }
+  }
+)
 
 test('Search will trigger a log refresh', async () => {
   get.mockImplementation((url) => {

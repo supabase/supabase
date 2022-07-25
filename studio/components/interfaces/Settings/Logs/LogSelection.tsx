@@ -45,10 +45,13 @@ const LogSelection: FC<Props> = ({ projectRef, log: partialLog, onClose, queryTy
         return <FunctionLogsSelectionRender log={fullLog} />
 
       default:
-        if (fullLog && isDefaultLogPreviewFormat(fullLog)) {
+        if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {
           return <DefaultPreviewSelectionRenderer log={fullLog} />
         }
-
+        if (queryType && !fullLog) {
+          return null
+        }
+        if (!partialLog) return null
         return <DefaultExplorerSelectionRenderer log={partialLog} />
     }
   }
@@ -128,7 +131,7 @@ const LogSelection: FC<Props> = ({ projectRef, log: partialLog, onClose, queryTy
         </div>
         {isLoading && <Connecting />}
         <div className="bg-scale-300 py-8 flex flex-col space-y-6">
-          {!isLoading && fullLog && <Formatter />}
+          {!isLoading && <Formatter />}
         </div>
       </div>
     </div>
