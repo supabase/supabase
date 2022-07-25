@@ -5,7 +5,7 @@ import {
   IconMessageCircle,
   Popover,
   IconBookOpen,
-  IconActivity
+  IconActivity,
 } from '@supabase/ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
