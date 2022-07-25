@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Form, Input } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useFlag, useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 
@@ -28,10 +28,15 @@ const GeneralSettings = observer(() => {
     billing_email: PageState.organization?.billing_email ?? '',
   }
 
+  const enablePermissions = useFlag('enablePermissions')
   const canUpdateOrganization = checkPermissions(
     PermissionAction.SQL_UPDATE,
     'postgres.public.organizations'
   )
+  // [Joshen TODO] This is a fallback to original behaviour if permissions is not enabled
+  const canDeleteOrganization = enablePermissions
+    ? checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.organizations')
+    : PageState.isOrgOwner
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -112,7 +117,7 @@ const GeneralSettings = observer(() => {
         }}
       </Form>
 
-      {canUpdateOrganization && <OrganizationDeletePanel />}
+      {canDeleteOrganization && <OrganizationDeletePanel />}
     </div>
   )
 })
