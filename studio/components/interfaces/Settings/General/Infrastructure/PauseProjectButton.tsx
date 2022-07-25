@@ -1,9 +1,11 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconPause } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -21,6 +23,8 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
+
+  const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestPauseProject = async () => {
     setLoading(true)
@@ -45,6 +49,34 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
 
   return (
     <>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button
+            type="default"
+            icon={<IconPause />}
+            onClick={openModal}
+            loading={loading}
+            disabled={!canReboot}
+          >
+            Pause Project
+          </Button>
+        </Tooltip.Trigger>
+        {!canReboot && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                'border-scale-200 border ', //border
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to pause this project
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <ConfirmModal
         danger
         visible={isModalOpen}
@@ -55,9 +87,6 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
         onSelectCancel={closeModal}
         onSelectConfirm={requestPauseProject}
       />
-      <Button type="default" icon={<IconPause />} onClick={openModal} loading={loading}>
-        Pause Project
-      </Button>
     </>
   )
 })

@@ -1,21 +1,19 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Alert, Button } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { delete_ } from 'lib/common/fetch'
+import Panel from 'components/ui/Panel'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { Project } from 'types'
 
-interface Props {
-  project: Project
-  type?: 'danger' | 'default'
-}
+interface Props {}
 
-const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
+const DeleteProjectPanel: FC<Props> = ({}) => {
   const router = useRouter()
-  const { ui, app } = useStore()
+  const { app, ui } = useStore()
+  const project = ui.selectedProject
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -26,6 +24,8 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
   }
 
   async function handleDeleteProject() {
+    if (project === undefined) return
+
     setLoading(true)
     try {
       const response = await delete_(`${API_URL}/projects/${project.ref}`)
@@ -42,13 +42,32 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
     }
   }
 
+  if (project === undefined) return <></>
+
   return (
     <>
-      <div className="flex items-center">
-        <Button onClick={toggle} type={type}>
-          Delete project
-        </Button>
-      </div>
+      <section>
+        <Panel title={<p className="uppercase">Danger Zone</p>}>
+          <Panel.Content>
+            <Alert
+              variant="danger"
+              withIcon
+              title="Deleting this project will also remove your database."
+            >
+              <div className="flex flex-col">
+                <p className="mb-4 block">
+                  Make sure you have made a backup if you want to keep your data.
+                </p>
+                <div className="flex items-center">
+                  <Button onClick={toggle} type="danger">
+                    Delete project
+                  </Button>
+                </div>
+              </div>
+            </Alert>
+          </Panel.Content>
+        </Panel>
+      </section>
       <TextConfirmModal
         visible={isOpen}
         loading={loading}
@@ -65,4 +84,4 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
   )
 }
 
-export default DeleteProjectButton
+export default DeleteProjectPanel

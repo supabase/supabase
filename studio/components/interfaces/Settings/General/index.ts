@@ -1,6 +1,5 @@
-import PauseProjectButton from './PauseProjectButton'
-import RestartServerButton from './RestartServerButton'
+import General from './General'
+import Infrastructure from './Infrastructure/Infrastructure'
+import DeleteProjectPanel from './DeleteProjectPanel'
 
-import DeleteProjectButton from './DeleteProjectButton'
-
-export { PauseProjectButton, RestartServerButton, DeleteProjectButton }
+export { General, Infrastructure, DeleteProjectPanel }
