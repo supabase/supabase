@@ -5,6 +5,7 @@ import {
   IconMessageCircle,
   Popover,
   IconBookOpen,
+  IconActivity
 } from '@supabase/ui'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
@@ -46,6 +47,13 @@ const HelpPopover: FC<Props> = () => {
                 <a>
                   <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
                     Docs
+                  </Button>
+                </a>
+              </Link>
+              <Link href="https://status.supabase.com/">
+                <a>
+                  <Button type="secondary" size="tiny" icon={<IconActivity />}>
+                    Status
                   </Button>
                 </a>
               </Link>
