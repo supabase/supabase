@@ -24,10 +24,10 @@ const RestartServerButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canRestartProject = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestServerRestart = async () => {
-    if (!canReboot) {
+    if (!canRestartProject) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restart this project',
@@ -61,12 +61,12 @@ const RestartServerButton: FC<Props> = observer(({ projectRef, projectId }) => {
             icon={<IconRefreshCcw />}
             onClick={openModal}
             loading={loading}
-            disabled={!canReboot}
+            disabled={!canRestartProject}
           >
             Restart server
           </Button>
         </Tooltip.Trigger>
-        {!canReboot && (
+        {!canRestartProject && (
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
