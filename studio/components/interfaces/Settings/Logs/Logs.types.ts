@@ -32,7 +32,7 @@ export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
-  metadata: Metadata
+  metadata?: Metadata
 }
 export type LogData = CustomLogData & PreviewLogData
 
