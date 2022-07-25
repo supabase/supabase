@@ -145,7 +145,6 @@ function useLogsPreview(
       setFilters((prev) => ({ ...prev, ...newFilters, ...filterOverride }))
     }
   }
-  console.log(logData)
   return [
     {
       newCount,
