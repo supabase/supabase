@@ -71,7 +71,6 @@ const GeneralSettings = observer(() => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
           return (
             <FormPanel
-              disabled
               footer={
                 <div
                   className={`flex py-4 px-8 ${
@@ -80,7 +79,7 @@ const GeneralSettings = observer(() => {
                 >
                   {!canUpdateOrganization && (
                     <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage your organization's settings
+                      You need additional permissions to manage this organization's settings
                     </p>
                   )}
                   <FormActions
