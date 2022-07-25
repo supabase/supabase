@@ -27,6 +27,13 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestPauseProject = async () => {
+    if (!canReboot) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to pause this project',
+      })
+    }
+
     setLoading(true)
     const res = await post(`${API_URL}/projects/${projectRef}/pause`, {})
 
