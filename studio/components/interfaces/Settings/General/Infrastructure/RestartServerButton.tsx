@@ -27,6 +27,13 @@ const RestartServerButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestServerRestart = async () => {
+    if (!canReboot) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to restart this project',
+      })
+    }
+
     setLoading(true)
     const res = await post(`${API_URL}/projects/${projectRef}/restart`, {})
 

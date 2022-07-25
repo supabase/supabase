@@ -25,6 +25,16 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
 
   const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
+  const onSelectRestore = () => {
+    if (!canReboot) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to restore this project',
+      })
+    }
+    setShowConfirmRestore(true)
+  }
+
   const onConfirmRestore = async () => {
     await post(`${API_URL}/projects/${project.ref}/restore`, {})
     app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
@@ -61,7 +71,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                       size="tiny"
                       type="primary"
                       disabled={hasExceedActiveFreeProjectsLimit || !canReboot}
-                      onClick={() => setShowConfirmRestore(true)}
+                      onClick={onSelectRestore}
                     >
                       Restore project
                     </Button>
