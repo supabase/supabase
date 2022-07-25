@@ -1,6 +1,8 @@
 import { useMonaco } from '@monaco-editor/react'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { SQLEditorLayout } from 'components/layouts'
+import { useProjectContext } from 'data/projects/ProjectContext'
+import { useFormatQueryMutation } from 'data/sql/useFormatQueryMutation'
 import { useSqlSnippetsQuery } from 'data/sql/useSqlSnippetsQuery'
 import { useParams } from 'lib/params'
 import { useEffect } from 'react'
@@ -9,6 +11,7 @@ import { NextPageWithLayout } from 'types'
 
 const SqlEditorQueryPage: NextPageWithLayout = () => {
   const { ref: projectRef, id } = useParams()
+  const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
 
   useSqlSnippetsQuery(projectRef, {
@@ -44,50 +47,60 @@ const SqlEditorQueryPage: NextPageWithLayout = () => {
     }
   }, [monaco, isDarkTheme])
 
-  // async function formatPgsql(value: any) {
-  //   try {
-  //     const formatted = await meta.formatQuery(value)
-  //     if (formatted.error) throw formatted.error
-  //     return formatted
-  //   } catch (error) {
-  //     console.error('formatPgsql error:', error)
-  //     return value
-  //   }
-  // }
+  const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
-  // useEffect(() => {
-  //   if (monaco) {
-  //     // Enable pgsql format
-  //     const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-  //       async provideDocumentFormattingEdits(model: any) {
-  //         const value = model.getValue()
-  //         const formatted = await formatPgsql(value)
-  //         return [
-  //           {
-  //             range: model.getFullModelRange(),
-  //             text: formatted,
-  //           },
-  //         ]
-  //       },
-  //     })
+  async function formatPgsql(value: string) {
+    try {
+      if (!project) {
+        throw new Error('No project')
+      }
 
-  //     // register completion item provider for pgsql
-  //     const completeProvider = monaco.languages.registerCompletionItemProvider(
-  //       'pgsql',
-  //       getPgsqlCompletionProvider(monaco, sqlEditorStore)
-  //     )
-  //     const signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
-  //       'pgsql',
-  //       getPgsqlSignatureHelpProvider(monaco, sqlEditorStore)
-  //     )
+      const formatted = await formatQuery({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: value,
+      })
 
-  //     return () => {
-  //       formatProvider.dispose()
-  //       completeProvider.dispose()
-  //       signatureHelpProvider.dispose()
-  //     }
-  //   }
-  // }, [monaco])
+      return formatted.result
+    } catch (error) {
+      console.error('formatPgsql error:', error)
+      return value
+    }
+  }
+
+  useEffect(() => {
+    if (monaco) {
+      // Enable pgsql format
+      const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+        async provideDocumentFormattingEdits(model: any) {
+          const value = model.getValue()
+          const formatted = await formatPgsql(value)
+          return [
+            {
+              range: model.getFullModelRange(),
+              text: formatted,
+            },
+          ]
+        },
+      })
+
+      // register completion item provider for pgsql
+      // const completeProvider = monaco.languages.registerCompletionItemProvider(
+      //   'pgsql',
+      //   getPgsqlCompletionProvider(monaco, sqlEditorStore)
+      // )
+      // const signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
+      //   'pgsql',
+      //   getPgsqlSignatureHelpProvider(monaco, sqlEditorStore)
+      // )
+
+      return () => {
+        formatProvider.dispose()
+        // completeProvider.dispose()
+        // signatureHelpProvider.dispose()
+      }
+    }
+  }, [monaco])
 
   // Todo: handle 404 state
 
