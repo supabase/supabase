@@ -1,22 +1,28 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Alert, Button } from '@supabase/ui'
+import { Button } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { delete_ } from 'lib/common/fetch'
-import Panel from 'components/ui/Panel'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-interface Props {}
+interface Props {
+  type?: 'danger' | 'default'
+}
 
-const DeleteProjectPanel: FC<Props> = ({}) => {
+const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
   const router = useRouter()
   const { app, ui } = useStore()
+
   const project = ui.selectedProject
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const canDeleteProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
 
   const toggle = () => {
     if (loading) return
@@ -42,32 +48,32 @@ const DeleteProjectPanel: FC<Props> = ({}) => {
     }
   }
 
-  if (project === undefined) return <></>
-
   return (
     <>
-      <section>
-        <Panel title={<p className="uppercase">Danger Zone</p>}>
-          <Panel.Content>
-            <Alert
-              variant="danger"
-              withIcon
-              title="Deleting this project will also remove your database."
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <div className="flex items-center">
+            <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
+              Delete project
+            </Button>
+          </div>
+        </Tooltip.Trigger>
+        {!canDeleteProject && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                'border-scale-200 border ', //border
+              ].join(' ')}
             >
-              <div className="flex flex-col">
-                <p className="mb-4 block">
-                  Make sure you have made a backup if you want to keep your data.
-                </p>
-                <div className="flex items-center">
-                  <Button onClick={toggle} type="danger">
-                    Delete project
-                  </Button>
-                </div>
-              </div>
-            </Alert>
-          </Panel.Content>
-        </Panel>
-      </section>
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to delete this project
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <TextConfirmModal
         visible={isOpen}
         loading={loading}
@@ -75,7 +81,7 @@ const DeleteProjectPanel: FC<Props> = ({}) => {
         confirmPlaceholder="Type the project name in here"
         alert="This action cannot be undone."
         text={`This will permanently delete the ${project?.name} project and all of its data.`}
-        confirmString={project?.name}
+        confirmString={project?.name || ''}
         confirmLabel="I understand, delete this project"
         onConfirm={handleDeleteProject}
         onCancel={toggle}
@@ -84,4 +90,4 @@ const DeleteProjectPanel: FC<Props> = ({}) => {
   )
 }
 
-export default DeleteProjectPanel
+export default DeleteProjectButton

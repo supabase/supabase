@@ -59,7 +59,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                 >
                   Restore project
                 </Button>
-                <DeleteProjectButton project={project} type="default" />
+                <DeleteProjectButton type="default" />
               </div>
 
               {!hasExceedActiveFreeProjectsLimit && (
