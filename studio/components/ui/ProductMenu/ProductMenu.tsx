@@ -26,19 +26,17 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                   }
                 />
                 <div>
-                  {group.items
-                    .filter(({ hidden }) => !hidden)
-                    .map((item: ProductMenuGroupItem) => (
-                      <ProductMenuItem
-                        key={item.key}
-                        url={item.url}
-                        name={item.name}
-                        icon={item.icon}
-                        isActive={page === item.key}
-                        isExternal={item.isExternal}
-                        target={item.isExternal ? '_blank' : '_self'}
-                      />
-                    ))}
+                  {group.items.map((item: ProductMenuGroupItem) => (
+                    <ProductMenuItem
+                      key={item.key}
+                      url={item.url}
+                      name={item.name}
+                      icon={item.icon}
+                      isActive={page === item.key}
+                      isExternal={item.isExternal}
+                      target={item.isExternal ? '_blank' : '_self'}
+                    />
+                  ))}
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
+  const canReadStorage = checkPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
   const canReadInvoices = checkPermissions(PermissionAction.BILLING_READ, 'stripe.invoices')
   const canReadSubscriptions = checkPermissions(
     PermissionAction.BILLING_READ,
@@ -47,14 +48,14 @@ export const generateSettingsMenu = (ref: string, project?: ProjectBase): Produc
           key: 'storage',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/settings`,
           items: [],
-          hidden: !checkPermissions(PermissionAction.STORAGE_ADMIN_READ, '*'),
+          // disabled: canReadStorage,
         },
         {
           name: 'Billing & Usage',
           key: 'billing',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing`,
           items: [],
-          hidden: canReadInvoices && canReadSubscriptions,
+          // disabled: canReadInvoices && canReadSubscriptions,
         },
       ],
     },

@@ -68,7 +68,6 @@ const TableGridEditor: FC<Props> = ({
   const canInsert = checkPermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
   const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
   // const canEdit = canAdminWrite && canInsert && canUpdate
-  const canEdit = true
 
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
@@ -145,7 +144,7 @@ const TableGridEditor: FC<Props> = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isViewSelected && !isLocked && canEdit}
+        editable={!isViewSelected && !isLocked}
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={

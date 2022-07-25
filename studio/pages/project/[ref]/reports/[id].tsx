@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import RGL, { WidthProvider } from 'react-grid-layout'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
@@ -69,9 +69,7 @@ const Reports = () => {
   const canSaveReport = checkPermissions(
     PermissionAction.SQL_UPDATE,
     'postgres.public.user_content',
-    {
-      resource: { type: 'report' },
-    }
+    { resource: { type: 'report' } }
   )
   const contentStore = useProjectContentStore(ref)
 
@@ -302,12 +300,7 @@ const Reports = () => {
                         <Dropdown.Checkbox
                           key={metric.key}
                           checked={config.layout?.find((x: any) => x.attribute === metric.key)}
-                          onChange={(e) =>
-                            handleChartSelection({
-                              metric,
-                              value: e,
-                            })
-                          }
+                          onChange={(e) => handleChartSelection({ metric, value: e })}
                         >
                           <div className="flex flex-col space-y-0">
                             <span>{metric.label}</span>
@@ -368,7 +361,7 @@ const Reports = () => {
               <Badge color="green">There are unsaved changes</Badge>
             </div>
           )}
-          {canSaveReport && hasEdits && (
+          {hasEdits && (
             <Button
               type={!hasEdits ? 'default' : 'primary'}
               disabled={!hasEdits}
