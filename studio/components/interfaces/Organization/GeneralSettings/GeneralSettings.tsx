@@ -37,7 +37,7 @@ const GeneralSettings = observer(() => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
         category: 'error',
-        message: 'You do not have sufficient permissions to update your organization settings',
+        message: 'You do not have the required permissions to update this organization',
       })
     }
 

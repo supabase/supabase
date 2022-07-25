@@ -2,8 +2,9 @@ import { useState, useContext } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Button, Form, Modal, Input } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/org/[slug]/settings'
@@ -18,6 +19,11 @@ const DeleteOrganizationButton = observer(() => {
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
+  const canDeleteOrganization = checkPermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.organizations'
+  )
+
   const onValidate = (values: any) => {
     const errors: any = {}
     if (!values.orgName) {
@@ -30,6 +36,13 @@ const DeleteOrganizationButton = observer(() => {
   }
 
   const onConfirmDelete = async (values: any, { setSubmitting }: any) => {
+    if (!canDeleteOrganization) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to delete this organization',
+      })
+    }
+
     setSubmitting(true)
     const response = await delete_(`${API_URL}/organizations/${orgSlug}`)
     if (response.error) {

@@ -84,6 +84,7 @@ const MembersView = () => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
                 const memberIsUser = x.primary_email == PageState.user.primary_email
+                const disableRoleEdit = !canEditMembers || memberIsUser
 
                 console.log({
                   id: x.gotrue_id,
@@ -130,7 +131,8 @@ const MembersView = () => {
                       <Table.td>
                         {role && (
                           <Listbox
-                            disabled={!canEditMembers || memberIsUser}
+                            className={disableRoleEdit ? 'pointer-events-none' : ''}
+                            disabled={disableRoleEdit}
                             value={role.id}
                             onChange={(roleId): any => {
                               setUserRoleChangeModalVisible(true)
@@ -142,7 +144,12 @@ const MembersView = () => {
                             }}
                           >
                             {roles.map((role: any) => (
-                              <Listbox.Option key={role.id} value={role.id} label={role.name}>
+                              <Listbox.Option
+                                key={role.id}
+                                value={role.id}
+                                label={role.name}
+                                disabled={disableRoleEdit}
+                              >
                                 {role.name}
                               </Listbox.Option>
                             ))}
@@ -150,7 +157,7 @@ const MembersView = () => {
                         )}
                       </Table.td>
                       <Table.td>
-                        {PageState.isOrgOwner && (
+                        {PageState.isOrgOwner && !memberIsUser && (
                           <OwnerDropdown members={PageState.members} member={x} />
                         )}
                       </Table.td>
