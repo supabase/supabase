@@ -24,10 +24,13 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canPauseProject = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_jobs.projects.pause'
+  )
 
   const requestPauseProject = async () => {
-    if (!canReboot) {
+    if (!canPauseProject) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to pause this project',
@@ -63,12 +66,12 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
             icon={<IconPause />}
             onClick={openModal}
             loading={loading}
-            disabled={!canReboot}
+            disabled={!canPauseProject}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {!canReboot && (
+        {!canPauseProject && (
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div

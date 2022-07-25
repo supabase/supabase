@@ -23,10 +23,13 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const hasExceedActiveFreeProjectsLimit = totalActiveFreeProjects >= freeProjectsLimit
 
-  const canReboot = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canResumeProject = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_jobs.projects.resume'
+  )
 
   const onSelectRestore = () => {
-    if (!canReboot) {
+    if (!canResumeProject) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restore this project',
@@ -70,13 +73,13 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
                     <Button
                       size="tiny"
                       type="primary"
-                      disabled={hasExceedActiveFreeProjectsLimit || !canReboot}
+                      disabled={hasExceedActiveFreeProjectsLimit || !canResumeProject}
                       onClick={onSelectRestore}
                     >
                       Restore project
                     </Button>
                   </Tooltip.Trigger>
-                  {!canReboot && (
+                  {!canResumeProject && (
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
