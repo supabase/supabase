@@ -101,7 +101,7 @@
     "@types/crypto-js": "^4.0.2",
     "@types/file-saver": "^2.0.2",
     "@types/lodash": "^4.14.172",
-    "@types/markdown-table": "^3.0.0",
+    "@types/markdown-table": "^2.0.0",
     "@types/papaparse": "^5.3.1",
     "@types/react": "17.0.11",
     "@types/react-beautiful-dnd": "^13.1.2",

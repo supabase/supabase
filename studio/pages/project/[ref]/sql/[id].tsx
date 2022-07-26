@@ -135,7 +135,7 @@ const SqlEditorQueryPage: NextPageWithLayout = () => {
     let completeProvider: any
     let signatureHelpProvider: any
 
-    if (isPgInfoReady) {
+    if (monaco && isPgInfoReady) {
       // register completion item provider for pgsql
       completeProvider = monaco.languages.registerCompletionItemProvider(
         'pgsql',
