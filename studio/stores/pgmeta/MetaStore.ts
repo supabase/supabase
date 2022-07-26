@@ -270,11 +270,18 @@ export default class MetaStore implements IMetaStore {
     const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
 
     const realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
-    const { id, tables: publicationTables } = realtimePublication
+    if (realtimePublication === undefined) {
+      return this.rootStore.ui.setNotification({
+        category: 'error',
+        message: `Unable to update realtime for ${table.name}: Missing publication`,
+      })
+    }
 
+    const { id, tables: publicationTables } = realtimePublication
     if (publicationTables === null) {
       // UI doesn't have support for toggling realtime for ALL tables
       // Switch it to individual tables via an array of strings
+      // Refer to PublicationStore for more information about this
       const realtimeTables = enable
         ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
         : publicTables
