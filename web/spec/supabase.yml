@@ -255,6 +255,30 @@ pages:
             email: 'example@email.com',
             password: 'example-password',
           })
+          //where
+          user <Object> = {
+            app_metadata <Object>,
+            aud <String>, 
+            created_at <Date>, 
+            email <String>, 
+            email_confirmed_at <Date>, 
+            id <String>, 
+            identities <Array>, 
+            last_sign_in_at <Date>, 
+            phone <String>, 
+            role <String>, 
+            updated_at <Date>, 
+            user_metadata <Object>,
+            }
+          session <Object> = {
+            access_token <String>, 
+            expires_at <Number>, 
+            expires_in <Number>, 
+            refresh_token <String>, 
+            token_type <String>,
+            }
+          error <Object> = null
+          //for successful signup.
           ```
       - name: Sign up with additional user meta data.
         isSpotlight: true
@@ -1276,7 +1300,7 @@ pages:
           ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: | 
+        notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
