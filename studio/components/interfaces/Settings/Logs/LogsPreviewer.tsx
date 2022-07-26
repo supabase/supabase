@@ -156,6 +156,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
+            projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
             queryType={queryType}

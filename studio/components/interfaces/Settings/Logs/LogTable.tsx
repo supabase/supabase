@@ -21,6 +21,7 @@ interface Props {
   isLoading?: boolean
   error?: any
   showDownload?: boolean
+  projectRef: string
 }
 type LogMap = { [id: string]: LogData }
 
@@ -55,6 +56,7 @@ const LogTable = ({
   isLoading,
   showDownload,
   error,
+  projectRef,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -390,7 +392,7 @@ const LogTable = ({
               }
             >
               <LogSelection
-                isLoading={isLoading}
+                projectRef={projectRef}
                 onClose={() => setFocusedLog(null)}
                 log={focusedLog}
                 queryType={queryType}

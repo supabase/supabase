@@ -17,14 +17,14 @@ const BillingLayout: FC<Props> = ({ children }) => {
     <BaseLayout hideHeader hideIconBar>
       <div className="flex h-full w-full flex-col">
         {/* Header */}
-        <div className="dark:border-dark flex items-center space-x-3 border-b py-4 px-5">
+        <div className="dark:border-dark flex items-center space-x-4 border-b py-4 px-5">
           <Link href={`/project/${ui.selectedProject?.ref}/settings/billing`} passHref>
             <a className="text-scale-900 hover:text-scale-1200 transition-colors">
               <IconX size={16} strokeWidth={1.5} />
             </a>
           </Link>
           <div className="flex items-center space-x-6">
-            <h1 className="text-scale-1200 text-base">Customize your plan</h1>
+            <h1 className="text-scale-1200 text-sm">Customize your plan</h1>
             <div className="bg-scale-600 h-6 w-px"></div>
             <div className="flex items-center space-x-3">
               <p className="text-scale-1100 text-sm">{ui.selectedOrganization?.name}</p>
