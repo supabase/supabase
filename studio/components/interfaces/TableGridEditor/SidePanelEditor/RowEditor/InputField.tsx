@@ -123,7 +123,7 @@ const InputField: FC<Props> = ({
             onClick={() => onEditJson({ column: field.name, jsonString: field.value })}
             icon={<IconLink />}
           >
-            View data
+            View JSON
           </Button>
         }
       />

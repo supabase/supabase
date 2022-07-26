@@ -10,7 +10,7 @@ export async function post<T = any>(
   const requestId = uuidv4()
   try {
     const { headers: optionHeaders, ...otherOptions } = options ?? {}
-    const headers = constructHeaders(requestId, optionHeaders)
+    const headers = await constructHeaders(requestId, optionHeaders)
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(data),

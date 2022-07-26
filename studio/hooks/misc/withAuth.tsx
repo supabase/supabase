@@ -1,8 +1,7 @@
 import { useProfile, useStore } from 'hooks'
-import { ComponentType, useEffect, useState } from 'react'
+import { ComponentType, useEffect } from 'react'
 import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
-import Connecting from 'components/ui/Loading'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -16,7 +15,6 @@ export function withAuth<T>(
   return (props: any) => {
     const router = useRouter()
     const rootStore = useStore()
-    const [isConnecting, setConnecting] = useState(true)
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
@@ -63,14 +61,6 @@ export function withAuth<T>(
         rootStore.setOrganizationSlug(slug ? String(slug) : undefined)
       }
     }, [isLoading, router.isReady, ref, slug])
-
-    useEffect(() => {
-      if (!isLoading && !isRedirecting && router.isReady) {
-        setConnecting(false)
-      }
-    }, [isLoading, isRedirecting, router.isReady])
-
-    if (isConnecting) return <Connecting />
 
     return <WrappedComponent {...props} />
   }

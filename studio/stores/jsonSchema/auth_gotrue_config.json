@@ -438,16 +438,6 @@
       "title": "Minimum password length",
       "type": "integer"
     },
-    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
-      "title": "Enable strict password updates",
-      "type": "boolean",
-      "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
-    },
-    "SECURITY_REFRESH_TOKEN_REUSE_INTERVAL": {
-      "title": "Reuse Interval",
-      "type": "integer",
-      "help": "Time interval where the same refresh token can be used to request for an access token."
-    },
     "SECURITY_CAPTCHA_ENABLED": {
       "title": "hCaptcha protection",
       "type": "boolean",
@@ -457,6 +447,16 @@
       "title": "hCaptcha sitekey",
       "type": "string",
       "help": "Secret (sitekey) used to verify hCaptcha challenges."
+    },
+    "SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION": {
+      "title": "Enable strict password updates",
+      "type": "boolean",
+      "help": "If enabled, users need to reauthenticate via email or phone before updating their passwords."
+    },
+    "SECURITY_REFRESH_TOKEN_REUSE_INTERVAL": {
+      "title": "Reuse Interval",
+      "type": "integer",
+      "help": "Time interval where the same refresh token can be used to request for an access token."
     },
     "SMS_AUTOCONFIRM": {
       "title": "Enable phone confirmations",

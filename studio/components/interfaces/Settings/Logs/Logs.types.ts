@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface Metadata {
-  [key: string]: string | number | Object | Object[]
+  [key: string]: string | number | Object | Object[] | any
 }
 
 export type DatePickerToFrom = { to: string | null; from: string | null }
@@ -32,7 +32,7 @@ export interface PreviewLogData extends CustomLogData {
   id: string
   timestamp: number
   event_message: string
-  metadata: Metadata
+  metadata?: Metadata
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -59,7 +59,7 @@ export type Count = LFResponse<CountData>
 
 export type Logs = LFResponse<LogData>
 
-export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'auth'
+export type QueryType = 'api' | 'database' | 'functions' | 'fn_edge' | 'auth' | 'realtime'
 
 export type Mode = 'simple' | 'custom'
 
