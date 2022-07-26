@@ -15,7 +15,7 @@ interface Props {
   metadata?: any
   visible: boolean
   closePanel: () => void
-  saveChanges: (value: any) => void
+  saveChanges: (value: { table: PostgresTable; column: PostgresColumn } | undefined) => void
 }
 
 const ForeignKeySelector: FC<Props> = ({
@@ -92,7 +92,7 @@ const ForeignKeySelector: FC<Props> = ({
     }
     setErrors(errors)
     if (isEmpty(errors)) {
-      if (!selectedTable) {
+      if (!selectedTable || !selectedColumn) {
         // Remove foreign key since no table selected
         saveChanges(undefined)
       } else {
