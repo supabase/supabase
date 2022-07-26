@@ -105,11 +105,15 @@ export class SqlRowService implements IRowService {
     if (error) {
       this.onError(error)
       return { data: { rows: [] } }
-    } else {
+    } else if (Array.isArray(data)) {
       const rows = data?.map((x: any, index: number) => {
         return { idx: index, ...x } as SupaRow
       })
       return { data: { rows } }
+    } else {
+      console.error('Fetch page:', data)
+      this.onError({ message: 'Data received is not formatted properly' })
+      return { data: { rows: [] } }
     }
   }
 
