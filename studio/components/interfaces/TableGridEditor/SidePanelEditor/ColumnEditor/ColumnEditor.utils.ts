@@ -199,6 +199,19 @@ const formatArrayToPostgresArray = (arrayString: string) => {
 export const unescapeLiteral = (value: string) => {
   if (!value) return value
 
+  // Handle combinations - this is really not the best solution imo
+  // It's a log(n) attempt to strip off the ::type strings
+  if (value.includes('||')) {
+    const formattedValue = []
+    let found = false
+    for (let i = 0; i < value.length; i++) {
+      if (value[i] === ':') found = true
+      if (((value[i] === ' ' || value[i] === ')') && found) || i === value.length - 1) found = false
+      if (!found) formattedValue.push(value[i])
+    }
+    return formattedValue.join('')
+  }
+
   const splits = value.split("'::")
   if (splits.length <= 1) return value
 

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { NextRouter, useRouter } from 'next/router'
 
 import { NextPageWithLayout } from 'types'
-import { useStore, withAuth } from 'hooks'
+import { useProfile, useStore, withAuth } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { IS_PLATFORM } from 'lib/constants'
 
@@ -72,10 +72,12 @@ const UnauthorizedLanding = () => {
 
 const IndexLayout = withAuth(
   observer(({ children }) => {
-    const { ui } = useStore()
-    const { profile } = ui
-
     const router = useRouter()
+    const { profile, isLoading } = useProfile()
+
+    if (isLoading) {
+      return <Connecting />
+    }
 
     if (!profile) {
       return <UnauthorizedLanding />
@@ -98,6 +100,7 @@ const IndexLayout = withAuth(
         } else {
           router.push('/')
         }
+
         return <Connecting />
       }
     }

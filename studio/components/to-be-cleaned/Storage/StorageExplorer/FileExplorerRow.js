@@ -115,7 +115,7 @@ const FileExplorerRow = ({
               mimeType={item.metadata?.mimetype}
             />
           </div>
-          <form className="h-9">
+          <form className="h-9" onSubmit={onSetItemName}>
             <input
               autoFocus
               ref={inputRef}
