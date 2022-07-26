@@ -1,9 +1,8 @@
+import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
-import { observer } from 'mobx-react-lite'
-import { Form, Input, Toggle, Alert } from '@supabase/ui'
+import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from '@supabase/ui'
 
-import { useStore } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -12,13 +11,17 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { domainRegex, defaultDisabledSmtpFormValues } from './SmtpForm.constants'
-import { isSmtpEnabled, generateFormValues } from './SmtpForm.utils'
+import { useStore } from 'hooks'
+import { domainRegex } from './../Auth.constants'
+import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
   const { authConfig, ui } = useStore()
-  const [enableSmtp, setEnableSmtp] = useState(false)
   const { config, isLoaded } = authConfig
+
+  const [enableSmtp, setEnableSmtp] = useState(false)
+  const [hidden, setHidden] = useState(true)
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig.config)
@@ -104,6 +107,7 @@ const SmtpForm = () => {
       await authConfig.update(payload)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
 
+      setHidden(true)
       const updatedFormValues = generateFormValues(payload)
       resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
     } catch (error) {
@@ -215,11 +219,10 @@ const SmtpForm = () => {
                     label="Host"
                     descriptionText="Hostname or IP address of your SMTP server."
                   />
-                  <Input
-                    type="number"
+                  <InputNumber
                     name="SMTP_PORT"
-                    placeholder="587"
                     id="SMTP_PORT"
+                    placeholder="587"
                     label="Port number"
                     descriptionText={
                       <>
@@ -234,13 +237,26 @@ const SmtpForm = () => {
                       </>
                     }
                   />
-                  <Input
-                    type="number"
-                    name="SMTP_MAX_FREQUENCY"
+                  <InputNumber
                     id="SMTP_MAX_FREQUENCY"
+                    name="SMTP_MAX_FREQUENCY"
+                    label="Minimum interval between emails being sent"
+                    descriptionText="How long between each email can a new email be sent via your SMTP server."
+                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                  />
+                  <InputNumber
+                    id="RATE_LIMIT_EMAIL_SENT"
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
+                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                  />
+                  <InputNumber
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    id="RATE_LIMIT_EMAIL_SENT"
                     min={0}
-                    label="Rate limit"
-                    descriptionText="Maximum number of emails sent per hour"
+                    label="Rate limit for sending emails"
+                    descriptionText="How many emails can be sent per hour."
                     actions={<span className="text-scale-900 mr-3">emails per hour</span>}
                   />
                   <Input
@@ -252,8 +268,16 @@ const SmtpForm = () => {
                   <Input
                     name="SMTP_PASS"
                     id="SMTP_PASS"
+                    type={hidden ? 'password' : 'text'}
                     label="Password"
                     placeholder="SMTP Password"
+                    actions={
+                      <Button
+                        icon={hidden ? <IconEye /> : <IconEyeOff />}
+                        type="default"
+                        onClick={() => setHidden(!hidden)}
+                      />
+                    }
                   />
                 </FormSectionContent>
               </FormSection>

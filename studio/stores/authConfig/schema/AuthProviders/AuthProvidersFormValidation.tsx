@@ -28,6 +28,7 @@ const PROVIDER_EMAIL = {
       title: 'Mailer OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
+      units: 'seconds',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Min password length',
@@ -38,7 +39,7 @@ const PROVIDER_EMAIL = {
   validationSchema: object().shape({
     PASSWORD_MIN_LENGTH: number()
       .required('A password is required.')
-      .min(8, 'Password length must be at least 8 characters long'),
+      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
@@ -85,6 +86,7 @@ const PROVIDER_PHONE = {
     SMS_TWILIO_AUTH_TOKEN: {
       type: 'string',
       title: 'Twilio Auth Token',
+      isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
         matches: 'twilio',
@@ -173,13 +175,13 @@ const PROVIDER_PHONE = {
       title: 'SMS OTP Expiry',
       type: 'number',
       description: 'Duration before an SMS OTP expires',
-      descriptionOptional: 'In seconds',
+      units: 'seconds',
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
-      descriptionOptional: 'In seconds',
+      units: 'digits',
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
@@ -310,6 +312,7 @@ Client identifier when authenticating or validating users.
 The secret key is a JWT token that must be generated. 
 [Learn more](https://supabase.com/docs/guides/auth/auth-apple#generate-a-client_secret)`,
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -355,6 +358,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       // [TODO] Change docs
       title: 'Secret ID',
       type: 'string',
+      isSecret: true,
     },
     EXTERNAL_AZURE_URL: {
       // [TODO] Change docs
@@ -399,6 +403,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
     EXTERNAL_BITBUCKET_SECRET: {
       title: 'Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -436,6 +441,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
     EXTERNAL_DISCORD_SECRET: {
       title: 'Client Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -473,6 +479,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
     EXTERNAL_FACEBOOK_SECRET: {
       title: 'Facebook secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -510,6 +517,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
     EXTERNAL_GITHUB_SECRET: {
       title: 'Client Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -549,6 +557,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
     EXTERNAL_GITLAB_SECRET: {
       title: 'Secret',
       type: 'string',
+      isSecret: true,
     },
     EXTERNAL_GITLAB_URL: {
       title: 'Self Hosted GitLab URL',
@@ -594,6 +603,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_SECRET: {
       title: 'Client Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -632,6 +642,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_SECRET: {
       title: 'Secret',
       type: 'string',
+      isSecret: true,
     },
     EXTERNAL_KEYCLOAK_URL: {
       title: 'Realm URL',
@@ -682,6 +693,7 @@ const EXTERNAL_PROVIDER_LINKEDIN = {
     EXTERNAL_LINKEDIN_SECRET: {
       title: 'API Secret Key',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -719,6 +731,7 @@ const EXTERNAL_PROVIDER_NOTION = {
     EXTERNAL_NOTION_SECRET: {
       title: 'OAuth client secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -756,6 +769,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
     EXTERNAL_TWITCH_SECRET: {
       title: 'Client secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -793,6 +807,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
     EXTERNAL_TWITTER_SECRET: {
       title: 'API Secret Key',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -830,6 +845,7 @@ const EXTERNAL_PROVIDER_SLACK = {
     EXTERNAL_SLACK_SECRET: {
       title: 'Client Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -867,6 +883,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
     EXTERNAL_SPOTIFY_SECRET: {
       title: 'Client Secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -908,6 +925,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
     EXTERNAL_WORKOS_SECRET: {
       title: 'Secret Key',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({
@@ -952,6 +970,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
     EXTERNAL_ZOOM_SECRET: {
       title: 'Client secret',
       type: 'string',
+      isSecret: true,
     },
   },
   validationSchema: object().shape({

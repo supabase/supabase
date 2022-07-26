@@ -11,7 +11,7 @@ export default [
             <span className="text-xs">{dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}</span>
           </span>
           <div className="w-16 flex items-center">
-            <SeverityFormatter value={data?.row?.metadata[0].parsed[0].error_severity} />
+            <SeverityFormatter value={data.row.error_severity} />
           </div>
         </div>
         <div className="flex truncate">

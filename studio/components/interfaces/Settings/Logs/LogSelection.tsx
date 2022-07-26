@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconX } from '@supabase/ui'
+import { IconX, Loading } from '@supabase/ui'
 
 import { LogData, QueryType } from './Logs.types'
 
@@ -13,52 +13,46 @@ import FunctionInvocationSelectionRender, {
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { isDefaultLogPreviewFormat } from '.'
+import { isDefaultLogPreviewFormat, LogsTableName } from '.'
+import useSingleLog from 'hooks/analytics/useSingleLog'
+import Connecting from 'components/ui/Loading/Loading'
 
 interface Props {
   log: LogData | null
   onClose: () => void
   queryType?: QueryType
-  isLoading?: boolean
+  projectRef: string
 }
 
-const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
+const LogSelection: FC<Props> = ({ projectRef, log: partialLog, onClose, queryType }) => {
+  const [{ logData: fullLog, isLoading }] = useSingleLog(projectRef, queryType, partialLog?.id)
   const Formatter = () => {
     switch (queryType) {
       case 'api':
-        return <DatabaseApiSelectionRender log={log} />
+        if (!fullLog) return null
+        return <DatabaseApiSelectionRender log={fullLog} />
 
       case 'database':
-        return <DatabasePostgresSelectionRender log={log} />
+        if (!fullLog) return null
+        return <DatabasePostgresSelectionRender log={fullLog} />
 
       case 'fn_edge':
-        return <FunctionInvocationSelectionRender log={log} />
-        break
+        if (!fullLog) return null
+        return <FunctionInvocationSelectionRender log={fullLog} />
 
       case 'functions':
-        return <FunctionLogsSelectionRender log={log} />
-        break
+        if (!fullLog) return null
+        return <FunctionLogsSelectionRender log={fullLog} />
 
       default:
-        if (log && isDefaultLogPreviewFormat(log)) {
-          return <DefaultPreviewSelectionRenderer log={log} />
+        if (queryType && fullLog && isDefaultLogPreviewFormat(fullLog)) {
+          return <DefaultPreviewSelectionRenderer log={fullLog} />
         }
-
-        return <DefaultExplorerSelectionRenderer log={log} />
-    }
-  }
-
-  function header() {
-    switch (queryType) {
-      case 'api':
-        return DatabaseApiSelectionHeaderRender(log)
-
-        break
-      case 'fn_edge':
-        return FunctionInvocationHeaderRender(log)
-
-      default:
-        return null
+        if (queryType && !fullLog) {
+          return null
+        }
+        if (!partialLog) return null
+        return <DefaultExplorerSelectionRenderer log={partialLog} />
     }
   }
 
@@ -74,7 +68,7 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
         className={
           `overflow-y-scroll transition-all
           bg-scale-200 absolute w-full h-full text-center flex-col gap-2 flex items-center justify-center opacity-0 ` +
-          (log ? 'opacity-0 z-0' : 'opacity-100 z-10')
+          (partialLog ? 'opacity-0 z-0' : 'opacity-100 z-10')
         }
       >
         <div
@@ -90,7 +84,7 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
           gap-6
           max-w-sm
           text-center scale-95 opacity-0 ` +
-            (log || isLoading ? 'mt-0 opacity-0 scale-95' : 'mt-8 opacity-100 scale-100')
+            (partialLog || isLoading ? 'mt-0 opacity-0 scale-95' : 'mt-8 opacity-100 scale-100')
           }
         >
           <div className="relative border border-scale-600 dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
@@ -135,7 +129,10 @@ const LogSelection: FC<Props> = ({ log, onClose, queryType, isLoading }) => {
         >
           <IconX size={14} strokeWidth={2} />
         </div>
-        <div className="bg-scale-300 py-8 flex flex-col space-y-6">{log && <Formatter />}</div>
+        {isLoading && <Connecting />}
+        <div className="bg-scale-300 py-8 flex flex-col space-y-6">
+          {!isLoading && <Formatter />}
+        </div>
       </div>
     </div>
   )
