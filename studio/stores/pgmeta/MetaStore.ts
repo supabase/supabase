@@ -381,8 +381,9 @@ export default class MetaStore implements IMetaStore {
       )
 
       const id = realtimePublication?.id
+      const existingRealtimeTables = realtimePublication.tables || []
       const realtimeTables = [`${duplicateTable.schema}.${duplicatedTableName}`].concat(
-        realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+        existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
       )
       let payload = { id, tables: realtimeTables }
       const { error: publicationsUpdateError } = await this.publications.update(id, payload)
@@ -425,8 +426,9 @@ export default class MetaStore implements IMetaStore {
         )
 
         const id = realtimePublication?.id
+        const existingRealtimeTables = realtimePublication.tables || []
         const realtimeTables = [`${table.schema}.${table.name}`].concat(
-          realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+          existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
         )
         let payload = { id, tables: realtimeTables }
         const { error: publicationsUpdateError } = await this.publications.update(id, payload)
@@ -652,10 +654,11 @@ export default class MetaStore implements IMetaStore {
     )
 
     const id = realtimePublication?.id
-    const realtimeEnabled = realtimePublication.tables.some((x: any) => x.id == table.id)
+    const existingRealtimeTables = realtimePublication.tables || []
+    const realtimeEnabled = existingRealtimeTables.some((x: any) => x.id == table.id)
     if (realtimeEnabled && !isRealtimeEnabled) {
       // Toggle realtime off
-      const realtimeTables = realtimePublication.tables
+      const realtimeTables = existingRealtimeTables
         .filter((x: any) => x.id != table.id)
         .map((x: any) => `${x.schema}.${x.name}`)
       let payload = { id, tables: realtimeTables }
@@ -663,7 +666,7 @@ export default class MetaStore implements IMetaStore {
     } else if (!realtimeEnabled && isRealtimeEnabled) {
       // Toggle realtime on
       const realtimeTables = [`${table.schema}.${table.name}`].concat(
-        realtimePublication.tables.map((t: any) => `${t.schema}.${t.name}`)
+        existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
       )
       let payload = { id, tables: realtimeTables }
       await this.publications.update(id, payload)
