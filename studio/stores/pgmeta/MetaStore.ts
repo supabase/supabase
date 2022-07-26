@@ -265,6 +265,46 @@ export default class MetaStore implements IMetaStore {
     return await this.query(query)
   }
 
+  async updateTableRealtime(table: PostgresTable, enable: boolean) {
+    const publications = this.publications.list()
+    const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
+
+    const realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
+    const { id, tables: publicationTables } = realtimePublication
+
+    if (publicationTables === null) {
+      // UI doesn't have support for toggling realtime for ALL tables
+      // Switch it to individual tables via an array of strings
+      const realtimeTables = enable
+        ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
+        : publicTables
+            .filter((t: any) => t.id !== table.id)
+            .map((t: any) => `${t.schema}.${t.name}`)
+      await this.publications.recreate(id, realtimeTables)
+    } else {
+      const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
+
+      const realtimeTables =
+        isAlreadyEnabled && !enable
+          ? // Toggle realtime off
+            publicationTables
+              .filter((t: any) => t.id !== table.id)
+              .map((t: any) => `${t.schema}.${t.name}`)
+          : !isAlreadyEnabled && enable
+          ? // Toggle realtime on
+            [`${table.schema}.${table.name}`].concat(
+              publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+            )
+          : null
+
+      if (realtimeTables === null) return
+
+      const payload = { id, tables: realtimeTables }
+      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
+      if (publicationsUpdateError) throw publicationsUpdateError
+    }
+  }
+
   async createColumn(payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) {
     try {
       const column: any = await this.columns.create(payload)
@@ -374,21 +414,7 @@ export default class MetaStore implements IMetaStore {
       if (updateTable.error) throw updateTable.error
     }
 
-    if (isRealtimeEnabled) {
-      const publications = this.publications.list()
-      const realtimePublication = publications.find(
-        (publication) => publication.name === 'supabase_realtime'
-      )
-
-      const id = realtimePublication?.id
-      const existingRealtimeTables = realtimePublication.tables || []
-      const realtimeTables = [`${duplicateTable.schema}.${duplicatedTableName}`].concat(
-        existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
-      )
-      let payload = { id, tables: realtimeTables }
-      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
-      if (publicationsUpdateError) throw publicationsUpdateError
-    }
+    if (isRealtimeEnabled && duplicatedTable) this.updateTableRealtime(duplicatedTable, true)
 
     return duplicatedTable
   }
@@ -419,21 +445,7 @@ export default class MetaStore implements IMetaStore {
       }
 
       // Toggle Realtime if configured to be
-      if (isRealtimeEnabled) {
-        const publications = this.publications.list()
-        const realtimePublication = publications.find(
-          (publication) => publication.name === 'supabase_realtime'
-        )
-
-        const id = realtimePublication?.id
-        const existingRealtimeTables = realtimePublication.tables || []
-        const realtimeTables = [`${table.schema}.${table.name}`].concat(
-          existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
-        )
-        let payload = { id, tables: realtimeTables }
-        const { error: publicationsUpdateError } = await this.publications.update(id, payload)
-        if (publicationsUpdateError) throw publicationsUpdateError
-      }
+      if (isRealtimeEnabled) this.updateTableRealtime(table, true)
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
       // of the column order during creation. Note that we add primary key constraints separately
@@ -647,7 +659,6 @@ export default class MetaStore implements IMetaStore {
       if (primaryKeys.error) throw primaryKeys.error
     }
 
-    // Update realtime configuration
     const publications = this.publications.list()
     const realtimePublication = publications.find(
       (publication) => publication.name === 'supabase_realtime'
