@@ -90,7 +90,9 @@ const ColumnEditor: FC<Props> = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (foreignKeyConfiguration: any) => {
+  const saveColumnForeignKey = (
+    foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
+  ) => {
     onUpdateField({
       foreignKey: !isUndefined(foreignKeyConfiguration)
         ? {
