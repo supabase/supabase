@@ -4,7 +4,7 @@ import { Button, IconExternalLink, Menu } from '@supabase/ui'
 
 interface Props {
   name: string | ReactNode
-  description: string
+  description?: string | ReactNode
   isActive: boolean
   isExternal?: boolean
   icon?: ReactNode
@@ -31,7 +31,7 @@ const ProductMenuItem: FC<Props> = ({
     <Menu.Item icon={icon} rounded active={isActive} onClick={onClick}>
       <div className="flex w-full items-center justify-between">
         <span
-          title={typeof description === 'string' ? description : ''}
+          title={typeof description === 'string' ? description : typeof name === 'string' ? name : ''}
           className={'flex items-center truncate ' + textClassName}
         >
           {name}
