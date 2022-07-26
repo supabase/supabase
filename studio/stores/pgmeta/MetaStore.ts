@@ -414,7 +414,7 @@ export default class MetaStore implements IMetaStore {
       if (updateTable.error) throw updateTable.error
     }
 
-    if (isRealtimeEnabled && duplicatedTable) this.updateTableRealtime(duplicatedTable, true)
+    if (isRealtimeEnabled && duplicatedTable) await this.updateTableRealtime(duplicatedTable, true)
 
     return duplicatedTable
   }
@@ -445,7 +445,7 @@ export default class MetaStore implements IMetaStore {
       }
 
       // Toggle Realtime if configured to be
-      if (isRealtimeEnabled) this.updateTableRealtime(table, true)
+      if (isRealtimeEnabled) await this.updateTableRealtime(table, true)
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
       // of the column order during creation. Note that we add primary key constraints separately
@@ -659,29 +659,8 @@ export default class MetaStore implements IMetaStore {
       if (primaryKeys.error) throw primaryKeys.error
     }
 
-    const publications = this.publications.list()
-    const realtimePublication = publications.find(
-      (publication) => publication.name === 'supabase_realtime'
-    )
-
-    const id = realtimePublication?.id
-    const existingRealtimeTables = realtimePublication.tables || []
-    const realtimeEnabled = existingRealtimeTables.some((x: any) => x.id == table.id)
-    if (realtimeEnabled && !isRealtimeEnabled) {
-      // Toggle realtime off
-      const realtimeTables = existingRealtimeTables
-        .filter((x: any) => x.id != table.id)
-        .map((x: any) => `${x.schema}.${x.name}`)
-      let payload = { id, tables: realtimeTables }
-      await this.publications.update(id, payload)
-    } else if (!realtimeEnabled && isRealtimeEnabled) {
-      // Toggle realtime on
-      const realtimeTables = [`${table.schema}.${table.name}`].concat(
-        existingRealtimeTables.map((t: any) => `${t.schema}.${t.name}`)
-      )
-      let payload = { id, tables: realtimeTables }
-      await this.publications.update(id, payload)
-    }
+    // Update table's realtime configuration
+    await this.updateTableRealtime(table, isRealtimeEnabled)
 
     return { table: await this.tables.loadById(table.id), hasError }
   }
