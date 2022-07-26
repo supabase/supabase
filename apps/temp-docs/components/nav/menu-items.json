@@ -12,6 +12,7 @@
     "Tutorials": [
       { "text": "Quickstart: Angular", "link": "/guides/with-angular" },
       { "text": "Quickstart: Next.js", "link": "/guides/with-nextjs" },
+      { "text": "Quickstart: Nuxt 3", "link": "/guides/with-nuxt-3" },
       { "text": "Quickstart: Flutter", "link": "/guides/with-flutter" },
       { "text": "Quickstart: React", "link": "/guides/with-react" },
       { "text": "Quickstart: RedwoodJS", "link": "/guides/with-redwoodjs" },

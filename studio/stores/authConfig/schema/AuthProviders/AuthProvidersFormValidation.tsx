@@ -181,7 +181,7 @@ const PROVIDER_PHONE = {
       title: 'SMS OTP Length',
       type: 'number',
       description: 'Number of digits in OTP',
-      units: 'seconds',
+      units: 'digits',
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',

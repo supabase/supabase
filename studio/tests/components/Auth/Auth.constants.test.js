@@ -18,6 +18,15 @@ describe('Auth.constants: domainRegex', () => {
     const output4 = domainRegex.test(mockInput4)
     expect(output4).toBe(true)
   })
+  test('should validate app-based domains', () => {
+    const mockInput1 = 'exp://exp.host/some-app'
+    const output1 = domainRegex.test(mockInput1)
+    expect(output1).toBe(true)
+
+    const mockInput2 = 'exp://exp.host/some-app?release-channel=default'
+    const output2 = domainRegex.test(mockInput2)
+    expect(output2).toBe(true)
+  })
   test('should validate subdomains', () => {
     const mockInput1 = 'https://app.supabase.com'
     const output1 = domainRegex.test(mockInput1)
