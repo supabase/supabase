@@ -217,6 +217,11 @@ const Templates: FC<any> = ({ project }) => {
           />
         </SchemaFormPanel>
       </div>
+      <div className="my-8">
+        <footer className="footer mb-0">
+          <p>Powered by Supabase</p>
+        </footer>
+      </div>
     </div>
   )
 }
