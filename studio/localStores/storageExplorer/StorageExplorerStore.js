@@ -436,7 +436,7 @@ class StorageExplorerStore {
 
   createBucket = async (bucketName, isPublic = false) => {
     if (isNil(this.supabaseClient)) {
-      this.ui.setNotification({
+      return this.ui.setNotification({
         message: 'Failed to initialize supabase client, try refreshing your browser.',
         category: 'error',
       })
