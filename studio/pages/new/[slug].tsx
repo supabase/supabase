@@ -27,6 +27,7 @@ import {
   useFlag,
   withAuth,
   useSubscriptionStats,
+  checkIsOwner,
   checkPermissions,
   useOrganizationDetail,
   useOrganizationRoles,
@@ -51,16 +52,6 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const subscriptionStats = useSubscriptionStats()
 
-  const { roles } = useOrganizationRoles(router.query.slug as string)
-  const { members } = useOrganizationDetail(router.query.slug as string)
-
-  const isOrganizationOwner = () => {
-    const userMember = (members || []).find((member) => member.gotrue_id === ui?.profile?.gotrue_id)
-    const [memberRoleId] = userMember?.role_ids ?? []
-    const memberRole = (roles || []).find((role) => role.id === memberRoleId)
-    return memberRole?.name === 'Owner'
-  }
-
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
@@ -75,13 +66,14 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
+  const isOrganizationOwner = checkIsOwner()
   const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
   // [Joshen TODO] This is a fallback to original behaviour if permissions is not enabled
   const isAdmin = enablePermissions
     ? checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.projects')
-    : isOrganizationOwner()
+    : isOrganizationOwner
 
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
   const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
