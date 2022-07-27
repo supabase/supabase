@@ -32,18 +32,7 @@ export function checkPermissions(action: string, resource: string, data?: object
   const enablePermissions = useFlag('enablePermissions')
   if (!enablePermissions) return true
 
-  const { app, ui } = useStore()
-  const router = useRouter()
-
-  let organization_id: number | undefined
-  const { ref, slug } = router.query
-  if (ref) {
-    const project = find(app.projects.list(), { ref }) as Project | undefined
-    organization_id = project?.organization_id
-  } else if (slug) {
-    const organization = find(app.organizations.list(), { slug }) as Organization | undefined
-    organization_id = organization?.id
-  }
+  const { ui } = useStore()
 
   return (ui?.permissions ?? [])
     .filter(
@@ -86,8 +75,8 @@ export function checkIsOwner() {
 
   if (!organization) return false
 
-  const { roles } = useOrganizationRoles(router.query.slug as string)
-  const { members } = useOrganizationDetail(router.query.slug as string)
+  const { roles } = useOrganizationRoles(slug as string)
+  const { members } = useOrganizationDetail(slug as string)
 
   const userMember = (members || []).find((member) => member.gotrue_id === ui?.profile?.gotrue_id)
   const [memberRoleId] = userMember?.role_ids ?? []

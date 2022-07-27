@@ -10,7 +10,7 @@ import { Role } from 'types'
 
 export function useOrganizationRoles(slug: string) {
   const url = `${API_URL}/organizations/${slug}/roles`
-  const { data, error } = useSWR<any>(url, get)
+  const { data, error } = useSWR<any>(slug ? url : null, get)
   const anyError = data?.error || error
 
   return {

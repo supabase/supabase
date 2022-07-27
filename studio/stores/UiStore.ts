@@ -17,6 +17,7 @@ export interface IUiStore {
   notification?: Notification
   profile?: User
   permissions?: any // [Joshen TODO]: type this
+
   load: () => void
   setTheme: (theme: 'dark' | 'light') => void
   onThemeOptionChange: (themeOption: 'dark' | 'light' | 'system') => void

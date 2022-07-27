@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { useState, useContext } from 'react'
+import { useState, useContext, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -87,8 +87,8 @@ const MembersView = () => {
                 const disableRoleEdit = !canEditMembers || memberIsUser
 
                 return (
-                  <>
-                    <Table.tr key={i}>
+                  <Fragment key={`member-row-${i}`}>
+                    <Table.tr>
                       <Table.td>
                         <div className="flex items-center space-x-4">
                           <div>
@@ -160,7 +160,7 @@ const MembersView = () => {
                         )}
                       </Table.td>
                     </Table.tr>
-                  </>
+                  </Fragment>
                 )
               }),
               <Table.tr
