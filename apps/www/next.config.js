@@ -692,8 +692,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: 'blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
-        destination: 'blog/2022/06/29/visualizing-supabase-data-using-metabase',
+        source: '/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
+        destination: '/blog/2022/06/29/visualizing-supabase-data-using-metabase',
       },
       {
         permanent: true,
