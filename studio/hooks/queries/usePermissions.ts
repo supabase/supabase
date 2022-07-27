@@ -1,12 +1,9 @@
 import useSWR from 'swr'
 import jsonLogic from 'json-logic-js'
-import { find } from 'lodash'
-import { useRouter } from 'next/router'
 
-import { useFlag, useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { Organization, Project } from 'types'
 
 export function usePermissions(returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
