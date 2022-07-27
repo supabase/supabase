@@ -47,7 +47,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(REGIONS_DEFAULT)
+  const [dbRegion, setDbRegion] = useState<string | undefined>(undefined)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
   const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
@@ -78,7 +78,7 @@ const Wizard: NextPageWithLayout = () => {
   const canSubmit =
     projectName != '' &&
     passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH &&
-    dbRegion != '' &&
+    dbRegion &&
     dbPricingTierKey != '' &&
     (isSelectFreeTier || (!isSelectFreeTier && !isEmptyPaymentMethod))
 
@@ -301,6 +301,14 @@ const Wizard: NextPageWithLayout = () => {
                     onChange={(value: string) => onDbRegionChange(value)}
                     descriptionText="Select a region close to you for the best performance."
                   >
+                    <Listbox.Option
+                      key={'empty-label'}
+                      label={'Please choose a region'}
+                      value={''}
+                      disabled
+                    >
+                      <span className="text-scale-1200">{'Please choose a region'}</span>
+                    </Listbox.Option>
                     {Object.keys(REGIONS).map((option: string, i) => {
                       const label = Object.values(REGIONS)[i]
                       return (
