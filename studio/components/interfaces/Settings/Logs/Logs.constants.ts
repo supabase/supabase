@@ -234,6 +234,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   auth_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  realtime_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -242,6 +245,7 @@ export enum LogsTableName {
   FUNCTIONS = 'function_logs',
   FN_EDGE = 'function_edge_logs',
   AUTH = 'auth_logs',
+  REALTIME = 'realtime_logs',
 }
 
 export const LOGS_TABLES = {
@@ -250,6 +254,7 @@ export const LOGS_TABLES = {
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
+  realtime: LogsTableName.REALTIME
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -258,6 +263,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
   [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
+  [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
@@ -435,6 +441,7 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
     calcTo: () => '',
+    default: true,
   },
   {
     text: 'Last 3 hours',
@@ -445,7 +452,6 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     text: 'Last day',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
