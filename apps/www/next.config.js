@@ -685,6 +685,21 @@ module.exports = withMDX({
         source: '/docs/reference/javascript/supabase-client',
         destination: '/docs/reference',
       },
+      {
+        permanent: true,
+        source: '/join',
+        destination: 'https://supabase.com/',
+      },
+      {
+        permanent: true,
+        source: '/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
+        destination: '/blog/2022/06/29/visualizing-supabase-data-using-metabase',
+      },
+      {
+        permanent: true,
+        source: '/_app',
+        destination: 'https://app.supabase.com',
+      },
     ]
   },
 })
