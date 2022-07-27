@@ -4,14 +4,14 @@ import LogsDivider from '../Logs.Divider'
 import { jsonSyntaxHighlight, ResponseCodeFormatter } from '../LogsFormatters'
 
 const DatabaseApiSelectionRender = ({ log }: any) => {
-  const request = log?.metadata[0]?.request[0]
-  const response = log?.metadata[0]?.response[0]
-  const method = log?.metadata[0]?.request[0]?.method
-  const status = log?.metadata[0]?.response[0].status_code
-  const ipAddress = log?.metadata[0]?.request[0].headers[0]?.cf_connecting_ip
-  const countryOrigin = log?.metadata[0]?.request[0].headers[0]?.cf_ipcountry
-  const clientInfo = log?.metadata[0]?.request[0].headers[0]?.x_client_info
-  const referer = log?.metadata[0]?.request[0].headers[0]?.referer
+  const request = log?.metadata[0]?.request?.[0]
+  const response = log?.metadata[0]?.response?.[0]
+  const method = request?.method
+  const status = response?.status_code
+  const ipAddress = request?.headers?.[0]?.cf_connecting_ip
+  const countryOrigin = request?.headers?.[0]?.cf_ipcountry
+  const clientInfo = request?.headers?.[0]?.x_client_info
+  const referer = request?.headers?.[0]?.referer
 
   const DetailedRow = ({ label, value }: { label: string; value: string | React.ReactNode }) => {
     return (
