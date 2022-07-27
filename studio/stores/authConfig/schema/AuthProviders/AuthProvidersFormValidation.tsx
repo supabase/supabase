@@ -756,7 +756,7 @@ const EXTERNAL_PROVIDER_NOTION = {
 const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'twitch',
+  title: 'Twitch',
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -957,7 +957,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
 const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'zoom',
+  title: 'Zoom',
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
