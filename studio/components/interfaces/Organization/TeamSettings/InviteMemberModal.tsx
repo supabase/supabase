@@ -22,7 +22,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const { roles } = useOrganizationRoles((slug as string) || '')
-  const { mutateOrgMembers } = useOrganizationDetail(ui.selectedOrganization?.slug || '')
+  const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
   const initialValues = { email: '', role: '' }
 

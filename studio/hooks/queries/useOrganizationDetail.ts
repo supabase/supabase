@@ -7,12 +7,12 @@ import { get } from 'lib/common/fetch'
 export function useOrganizationDetail(slug: string) {
   // Get org members
   const url = `${API_URL}/organizations/${slug}/members?member_roles`
-  const { data, error } = useSWR<any>(url, get)
+  const { data, error } = useSWR<any>(slug ? url : null, get)
   let members = data ?? []
 
   // Get pending invite users
   const pendingInviteUrl = `${API_URL}/organizations/${slug}/members/invite`
-  const { data: inviteData, error: inviteError } = useSWR<any>(pendingInviteUrl, get)
+  const { data: inviteData, error: inviteError } = useSWR<any>(slug ? pendingInviteUrl : null, get)
 
   if (data && inviteData && inviteData.length > 0) {
     // remap invite data to look like existing members data
