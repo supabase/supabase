@@ -41,7 +41,7 @@ export function checkPermissions(action: string, resource: string, data?: object
     const project = find(app.projects.list(), { ref }) as Project | undefined
     organization_id = project?.organization_id
   } else if (slug) {
-    const organization = find(app.projects.list(), { ref }) as Organization | undefined
+    const organization = find(app.organizations.list(), { slug }) as Organization | undefined
     organization_id = organization?.id
   }
 
@@ -74,16 +74,17 @@ export function checkIsOwner() {
   const { app, ui } = useStore()
   const router = useRouter()
 
-  let organization_id: number | undefined
+  let organization: Organization | undefined
   const { ref, slug } = router.query
 
   if (ref) {
     const project = find(app.projects.list(), { ref }) as Project | undefined
-    organization_id = project?.organization_id
+    organization = find(app.organizations.list(), { id: project?.organization_id })
   } else if (slug) {
-    const organization = find(app.projects.list(), { ref }) as Organization | undefined
-    organization_id = organization?.id
+    organization = find(app.organizations.list(), { slug }) as Organization | undefined
   }
+
+  if (!organization) return false
 
   const { roles } = useOrganizationRoles(router.query.slug as string)
   const { members } = useOrganizationDetail(router.query.slug as string)
