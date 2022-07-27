@@ -55,32 +55,3 @@ export function checkPermissions(action: string, resource: string, data?: object
         condition === null || jsonLogic.apply(condition, data)
     )
 }
-
-// [Joshen TODO] This method is just to support legacy permissions where
-// a couple of the UI was checking only if the user is an owner or not
-// Will deprecate once ABAC is fully rolled out.
-export function checkIsOwner() {
-  const { app, ui } = useStore()
-  const router = useRouter()
-
-  let organization: Organization | undefined
-  const { ref, slug } = router.query
-
-  if (ref) {
-    const project = find(app.projects.list(), { ref }) as Project | undefined
-    organization = find(app.organizations.list(), { id: project?.organization_id })
-  } else if (slug) {
-    organization = find(app.organizations.list(), { slug }) as Organization | undefined
-  }
-
-  if (!organization) return false
-
-  const { roles } = useOrganizationRoles(slug as string)
-  const { members } = useOrganizationDetail(slug as string)
-
-  const userMember = (members || []).find((member) => member.gotrue_id === ui?.profile?.gotrue_id)
-  const [memberRoleId] = userMember?.role_ids ?? []
-  const memberRole = (roles || []).find((role) => role.id === memberRoleId)
-
-  return memberRole?.name === 'Owner'
-}

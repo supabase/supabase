@@ -22,16 +22,7 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import {
-  useStore,
-  useFlag,
-  withAuth,
-  useSubscriptionStats,
-  checkIsOwner,
-  checkPermissions,
-  useOrganizationDetail,
-  useOrganizationRoles,
-} from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats, checkPermissions } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import Panel from 'components/ui/Panel'
@@ -66,7 +57,7 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const isOrganizationOwner = checkIsOwner()
+  const isOrganizationOwner = ui.selectedOrganization?.is_owner
   const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 

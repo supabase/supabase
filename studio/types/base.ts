@@ -5,7 +5,7 @@ export interface Organization {
   slug: string
   name: string
   billing_email: string
-  is_owner?: boolean // [Joshen] This will be deprecated after ABAC full roll out
+  is_owner?: boolean
   stripe_customer_id?: string
 }
 

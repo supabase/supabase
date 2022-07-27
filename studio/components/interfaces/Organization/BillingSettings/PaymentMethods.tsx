@@ -14,7 +14,7 @@ import {
 } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore, checkIsOwner } from 'hooks'
+import { useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { getURL } from 'lib/helpers'
 import { API_URL } from 'lib/constants'
@@ -38,7 +38,7 @@ const PaymentMethods: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
-  const isOwner = checkIsOwner()
+  const isOwner = ui.selectedOrganization?.is_owner
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()

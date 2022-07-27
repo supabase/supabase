@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Button, Loading } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useFlag, checkIsOwner } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 
@@ -35,8 +35,9 @@ const Subscription: FC<Props> = ({
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
+  const { ui } = useStore()
   const router = useRouter()
-  const isOrgOwner = checkIsOwner()
+  const isOrgOwner = ui.selectedOrganization?.is_owner
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const canChangeSubscription = checkPermissions(
