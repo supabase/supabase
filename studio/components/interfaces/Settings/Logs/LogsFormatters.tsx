@@ -5,6 +5,8 @@
  */
 
 import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import dayjs from 'dayjs'
+import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 
 export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
@@ -164,6 +166,23 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
   }
+}
+
+/**
+ * Formats a timestamp into a local timestamp display
+ *
+ * Accepts either unix microsecond or iso timestamp.
+ * For LogTable column rendering
+ */
+export const TimestampLocalFormatter = ({
+  value,
+}: {
+  className?: string
+  value: string | number
+}) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  const formattedTimestamp = dayjs(timestamp).format('DD MMM, HH:mm:ss')
+  return <span className={'text-xs'}>{formattedTimestamp}</span>
 }
 
 /*
