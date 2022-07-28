@@ -24,7 +24,7 @@ export async function getStaticProps() {
     props: {
       partners,
     },
-    // TODO: consider using Next.js' On-demand Revalidation with Supabase function hooks instead
+    // TODO: consider using Next.js' On-demand Revalidation with Supabase database webhooks instead
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }
