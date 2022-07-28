@@ -1,5 +1,4 @@
-import dayjs from 'dayjs'
-import { HeaderFormmater, SeverityFormatter } from '../LogsFormatters'
+import { HeaderFormmater, SeverityFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
 export default [
   {
@@ -11,15 +10,7 @@ export default [
     ),
     name: 'timestamp',
     formatter: (data: any) => (
-      <span className="flex w-full h-full items-center gap-1">
-        <span className="text-xs !text-scale-1100">
-          {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-        </span>
-        <span className="text-xs !text-scale-1100">
-          {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-        </span>
-        {/* {data?.row?.timestamp} */}
-      </span>
+      <TimestampLocalFormatter className="!text-scale-1100" value={data.row.timestamp!} />
     ),
     width: 128,
     resizable: true,
