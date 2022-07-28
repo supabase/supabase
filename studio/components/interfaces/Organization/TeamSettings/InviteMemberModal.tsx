@@ -5,7 +5,7 @@ import { object, string } from 'yup'
 import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
 
 import { Member, User } from 'types'
-import { useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
+import { useFlag, useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
@@ -19,8 +19,9 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
   const router = useRouter()
   const { slug } = router.query
 
-  const [isOpen, setIsOpen] = useState(false)
+  const enablePermissions = useFlag('enablePermissions')
 
+  const [isOpen, setIsOpen] = useState(false)
   const { roles } = useOrganizationRoles((slug as string) || '')
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
@@ -51,13 +52,13 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
 
     setSubmitting(true)
 
-    const developerRole = roles.find((role) => role.name === 'Developer')
-    const roleId = developerRole?.id ?? roles[0].id
+    const roleId = enablePermissions
+      ? Number(values.role)
+      : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
       owner_id: user.id,
-      // [Joshen TODO] to be based on selected role when roles management is completed.
-      // Defaulting to Developer for now
       role_id: roleId,
     })
 
@@ -75,7 +76,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
         invited_at: response.invited_at,
         primary_email: response.invited_email,
         username: response.invited_email[0],
-        role_ids: [roleId],
+        role_ids: [response.role_id],
       }
       mutateOrgMembers([...members, newMember])
       ui.setNotification({ category: 'success', message: 'Successfully added new member.' })
@@ -116,8 +117,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
               return (
                 <div className="w-full py-4">
                   <div className="space-y-4">
-                    {/* [Joshen TODO] Commented out for now until roles management is completed */}
-                    {/* {roles && (
+                    {roles && enablePermissions && (
                       <Select name="role" label="Member role">
                         {roles.map((role: any) => (
                           <Select.Option key={role.id} value={role.id}>
@@ -125,7 +125,7 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
                           </Select.Option>
                         ))}
                       </Select>
-                    )} */}
+                    )}
 
                     <Input
                       autoFocus
