@@ -58,6 +58,14 @@ module.exports = withMDX({
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
+      {
+        source: '/launch-week',
+        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
+      },
+      {
+        source: '/launch-week/:path*',
+        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
+      },
       // misc rewrites
       {
         source: '/humans.txt',
