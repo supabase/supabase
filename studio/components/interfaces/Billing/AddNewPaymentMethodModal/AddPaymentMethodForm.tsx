@@ -46,7 +46,11 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
   return (
     <form onSubmit={handleSubmit}>
       <Modal.Content>
-        <PaymentElement />
+        <div
+          className={`transition ${isSaving ? 'opacity-75 pointer-events-none' : 'opacity-100'}`}
+        >
+          <PaymentElement />
+        </div>
       </Modal.Content>
       <Modal.Seperator />
       <Modal.Content>
