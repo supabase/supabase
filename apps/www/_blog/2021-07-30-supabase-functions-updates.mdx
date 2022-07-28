@@ -122,7 +122,7 @@ type DeletePayload = {
 
 ## Hooks technical design: `pg_net v0.1`
 
-As with most of the Supabase platform, we leverage PostgreSQL's native functionality to implement Database Webhooks (previosuly called "Function Hooks").
+As with most of the Supabase platform, we leverage PostgreSQL's native functionality to implement Database Webhooks (previously called "Function Hooks").
 
 To build hooks, we've released a new PostgreSQL Extension, [pg_net](https://github.com/supabase/pg_net/), an asynchronous networking extension with an emphasis on scalability/throughput. In its initial (unstable) release we expose:
 
