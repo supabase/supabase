@@ -50,7 +50,7 @@ export interface User {
 }
 
 export interface Member {
-  // [JOSHEN TODO] This is deprecated with the BE update i think
+  // [Joshen TODO] This is deprecated with the BE update i think
   id: number
 
   primary_email: string

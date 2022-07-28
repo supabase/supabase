@@ -19,7 +19,7 @@ const NoPermission: FC<Props> = ({ resourceText }) => (
       </div>
       <div className="flex w-full items-center justify-between">
         <div className="space-y-1">
-          <p className="text-sm">You do not have permission to {resourceText}</p>
+          <p className="text-sm">You need additional permissions to {resourceText}</p>
           <div>
             <p className="text-scale-1100 text-sm">
               Contact your organization owner or adminstrator for assistance.
