@@ -15,6 +15,7 @@ import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
 import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
 import CostBreakdownRow from './CostBreakdownRow'
 import { StripeSubscription } from './Subscription.types'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   project: any
@@ -42,6 +43,10 @@ const Subscription: FC<Props> = ({
   const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
+  const canReadSubscription = checkPermissions(
+    PermissionAction.SQL_SELECT,
+    'postgres.public.subscriptions'
+  )
   const canUpdateSubscription = enablePermissions
     ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
     : isOrgOwner
@@ -125,8 +130,12 @@ const Subscription: FC<Props> = ({
             </p>
           </div>
 
-          {/* Cost Breakdown */}
-          {!loading && subscription && (
+          {!canReadSubscription ? (
+            <div className="px-6 pb-4">
+              <NoPermission resourceText="view this project's subscription" />
+            </div>
+          ) : !loading && subscription ? (
+            // Cost breakdown
             <>
               <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[40%]">
@@ -189,6 +198,8 @@ const Subscription: FC<Props> = ({
                 </div>
               </div>
             </>
+          ) : (
+            <></>
           )}
         </div>
       </div>
