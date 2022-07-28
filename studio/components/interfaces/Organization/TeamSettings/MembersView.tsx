@@ -68,8 +68,11 @@ const MembersView = () => {
       })
     } else {
       const updatedMembers = PageState.members.map((member: Member) => {
-        if (member.id === selectedMember.id) return { ...member, role_ids: [newRoleId] }
-        else return member
+        if (member.gotrue_id === selectedMember.gotrue_id) {
+          return { ...member, role_ids: [newRoleId] }
+        } else {
+          return member
+        }
       })
       mutateOrgMembers(updatedMembers)
       ui.setNotification({
@@ -210,7 +213,7 @@ const MembersView = () => {
                                       ].join(' ')}
                                     >
                                       <span className="text-scale-1200 text-xs">
-                                        You do not have permission to update the role of other
+                                        You need additional permissions to update the role of other
                                         members in this organization
                                       </span>
                                     </div>
@@ -225,7 +228,7 @@ const MembersView = () => {
                       </Table.td>
                       <Table.td>
                         {PageState.isOrgOwner && !memberIsUser && (
-                          <OwnerDropdown members={PageState.members} member={x} />
+                          <OwnerDropdown members={PageState.members} member={x} roles={roles} />
                         )}
                       </Table.td>
                     </Table.tr>

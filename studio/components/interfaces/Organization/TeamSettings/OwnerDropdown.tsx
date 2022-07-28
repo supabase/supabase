@@ -2,9 +2,9 @@ import { FC, useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Dropdown, IconTrash, IconMoreHorizontal } from '@supabase/ui'
 
-import { Member } from 'types'
+import { Member, Role } from 'types'
 import { useStore, useOrganizationDetail, useFlag } from 'hooks'
-import { delete_, post } from 'lib/common/fetch'
+import { delete_, post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -15,9 +15,10 @@ import { getUserDisplayName } from '../Organization.utils'
 interface Props {
   members: Member[]
   member: Member
+  roles: Role[]
 }
 
-const OwnerDropdown: FC<Props> = ({ members, member }) => {
+const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
   const PageState: any = useContext(PageContext)
   const { slug, name: orgName } = PageState.organization
 
@@ -58,7 +59,43 @@ const OwnerDropdown: FC<Props> = ({ members, member }) => {
 
   // [Joshen] This will be deprecated after ABAC is fully rolled out
   const handleTransferOwnership = async () => {
-    // TODO - make new person owner, then change current owner to developer
+    setLoading(true)
+    // Make new member the owner first
+    const ownerRole = roles.find((role) => role.name === 'Owner')
+    const ownerResponse = await patch(
+      `${API_URL}/organizations/${slug}/members/${member.gotrue_id}`,
+      { role_id: ownerRole!.id }
+    )
+    if (ownerResponse.error) {
+      return ui.setNotification({
+        category: 'error',
+        message: `Failed to transfer ownership: ${ownerResponse.error.message}`,
+      })
+    }
+
+    // Then change the user to the role of a developer
+    const developerRole = roles.find((role) => role.name === 'Developer')
+    const developerResponse = await patch(
+      `${API_URL}/organizations/${slug}/members/${ui.profile!.gotrue_id}`,
+      { role_id: developerRole!.id }
+    )
+    if (developerResponse.error) {
+      return ui.setNotification({
+        category: 'error',
+        message: `Failed to transfer ownership: ${ownerResponse.error.message}`,
+      })
+    }
+
+    const updatedMembers = PageState.members.map((m: Member) => {
+      if (m.gotrue_id === member.gotrue_id) return { ...m, role_ids: [ownerRole!.id] }
+      else return member
+    })
+    mutateOrgMembers(updatedMembers)
+    ui.setNotification({
+      category: 'success',
+      message: `Successfully transferred organization ownership to ${getUserDisplayName(member)}`,
+    })
+    setLoading(false)
   }
 
   async function handleResendInvite(member: Member) {

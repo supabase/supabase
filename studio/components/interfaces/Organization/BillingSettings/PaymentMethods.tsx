@@ -120,40 +120,21 @@ const PaymentMethods: FC<Props> = ({
                 <div className="flex justify-between w-full">
                   {!canUpdatePaymentMethods ? (
                     <p className="text-sm text-scale-1000">
-                      You need additional permissions to update this organization's payment methods
+                      You need additional permissions to manage this organization's payment methods
                     </p>
                   ) : (
                     <div />
                   )}
                   <div>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <Button
-                          key="panel-footer"
-                          type="default"
-                          icon={<IconPlus />}
-                          disabled={!canUpdatePaymentMethods}
-                          onClick={() => setShowAddPaymentMethodModal(true)}
-                        >
-                          Add new card
-                        </Button>
-                      </Tooltip.Trigger>
-                      {!canUpdatePaymentMethods && (
-                        <Tooltip.Content side="right">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                              'border-scale-200 w-48 border text-center', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-scale-1200 text-xs">
-                              Only organization owners can update payment methods
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      )}
-                    </Tooltip.Root>
+                    <Button
+                      key="panel-footer"
+                      type="default"
+                      icon={<IconPlus />}
+                      disabled={!canUpdatePaymentMethods}
+                      onClick={() => setShowAddPaymentMethodModal(true)}
+                    >
+                      Add new card
+                    </Button>
                   </div>
                 </div>
               )
