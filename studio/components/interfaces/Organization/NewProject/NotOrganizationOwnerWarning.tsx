@@ -1,6 +1,7 @@
 import { IconAlertCircle } from '@supabase/ui'
 import InformationBox from 'components/ui/InformationBox'
 
+// [Joshen] This can just use NoPermission component i think
 const NotOrganizationOwnerWarning = () => {
   return (
     <div className="mt-4">
