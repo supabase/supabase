@@ -15,14 +15,13 @@ export function useOrganizationDetail(slug: string) {
   const { data: inviteData, error: inviteError } = useSWR<any>(slug ? pendingInviteUrl : null, get)
 
   if (data && inviteData && inviteData.length > 0) {
-    // remap invite data to look like existing members data
+    // Remap invite data to look like existing members data
     const invitedMembers = inviteData.map((x: any) => ({
       is_owner: false,
       invited_at: x.invited_at,
       invited_id: x.invited_id,
       username: x.invited_email.slice(0, 1),
-      // [Joshen TODO]: hardcoded this for now, should be based on the actual role of the invited user
-      role_ids: [-1],
+      role_ids: [x.role_id],
       primary_email: x.invited_email,
     }))
 

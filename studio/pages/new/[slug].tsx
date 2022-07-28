@@ -61,7 +61,6 @@ const Wizard: NextPageWithLayout = () => {
   const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
-  // [Joshen TODO] This is a fallback to original behaviour if permissions is not enabled
   const isAdmin = enablePermissions
     ? checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.projects')
     : isOrganizationOwner

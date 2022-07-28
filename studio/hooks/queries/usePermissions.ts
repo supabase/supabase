@@ -32,15 +32,6 @@ export function checkPermissions(action: string, resource: string, data?: object
 
   const { ui } = useStore()
 
-  const xxx = ui.permissions
-    .filter(
-      (p: any) =>
-        p.organization_id === ui.selectedOrganization?.id &&
-        p.resources.filter((r: any) => r.indexOf('postgres.public') > -1)
-    )
-    .map((p: any) => toJS(p))
-  console.log(xxx)
-
   return (ui?.permissions ?? [])
     .filter(
       (permission: {
