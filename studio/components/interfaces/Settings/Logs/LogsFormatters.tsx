@@ -176,13 +176,14 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
  */
 export const TimestampLocalFormatter = ({
   value,
+  className,
 }: {
   className?: string
   value: string | number
 }) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
   const formattedTimestamp = dayjs(timestamp).format('DD MMM, HH:mm:ss')
-  return <span className={'text-xs'}>{formattedTimestamp}</span>
+  return <span className={`text-xs ${className}`}>{formattedTimestamp}</span>
 }
 
 /*

@@ -1,5 +1,4 @@
-import dayjs from 'dayjs'
-import { HeaderFormmater, ResponseCodeFormatter } from '../LogsFormatters'
+import { HeaderFormmater, ResponseCodeFormatter, TimestampLocalFormatter } from '../LogsFormatters'
 
 export default [
   {
@@ -10,13 +9,7 @@ export default [
       </div>
     ),
     name: 'timestamp',
-    formatter: (data: any) => (
-      <span className="flex w-full h-full items-center gap-1">
-        <span className="text-xs">{dayjs(data?.row?.timestamp / 1000).format('DD MMM')}</span>
-        <span className="text-xs">{dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}</span>
-        {/* {data?.row?.timestamp} */}
-      </span>
-    ),
+    formatter: (data: any) => <TimestampLocalFormatter value={data.row.timestamp!} />,
     width: 128,
   },
   {
