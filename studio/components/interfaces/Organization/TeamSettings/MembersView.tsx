@@ -1,18 +1,26 @@
 import Image from 'next/image'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState, useContext, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Member } from 'types'
-import { checkPermissions, useStore, useOrganizationDetail, useOrganizationRoles } from 'hooks'
+import {
+  checkPermissions,
+  useStore,
+  useFlag,
+  useOrganizationDetail,
+  useOrganizationRoles,
+} from 'hooks'
 import { API_URL } from 'lib/constants'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import OwnerDropdown from './OwnerDropdown'
 import { PageContext } from 'pages/org/[slug]/settings'
-import { post } from 'lib/common/fetch'
+import { patch } from 'lib/common/fetch'
+import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -25,6 +33,7 @@ const MembersView = () => {
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug || ''
 
+  const enablePermissions = useFlag('enablePermissions')
   const { roles } = useOrganizationRoles(slug)
   const { mutateOrgMembers } = useOrganizationDetail(slug)
 
@@ -32,20 +41,25 @@ const MembersView = () => {
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
-  const canEditMembers = checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.members')
+  const rolesPermissions = getRolesManagementPermissions(roles)
+  const canEditMemberRoles = checkPermissions(
+    PermissionAction.SQL_INSERT,
+    'postgres.auth.subject_roles'
+  )
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
     return roles.find((x: any) => x.id === id)?.name
   }
 
-  // [Joshen] This will need to be updated to use new PATCH endpoint once API is ready
   const handleRoleChange = async () => {
     if (!selectedMember) return
 
     setLoading(true)
     const { gotrue_id, newRoleId } = selectedMember
-    const response = await post(`${API_URL}/users/${gotrue_id}/roles/${newRoleId}`, {})
+    const response = await patch(`${API_URL}/organizations/${slug}/members/${gotrue_id}`, {
+      role_id: newRoleId,
+    })
 
     if (response.error) {
       ui.setNotification({
@@ -84,7 +98,30 @@ const MembersView = () => {
                 const [memberRoleId] = x.role_ids ?? []
                 const role = (roles || []).find((role) => role.id === memberRoleId)
                 const memberIsUser = x.primary_email == PageState.user.primary_email
-                const disableRoleEdit = !canEditMembers || memberIsUser
+                const memberIsPendingInvite = !!x.invited_id
+                const disableRoleEdit = !canEditMemberRoles || memberIsUser || memberIsPendingInvite
+
+                const validateSelectedRoleToChange = (roleId: any) => {
+                  if (!role) return
+
+                  const selectedRole = (roles || []).find((role) => role.id === roleId)
+                  const rolePermission = rolesPermissions[roleId]
+                  if (!rolePermission || !rolePermission.canChangeTo) {
+                    return ui.setNotification({
+                      category: 'error',
+                      message: `You do not have permission to update members to ${
+                        selectedRole!.name
+                      }`,
+                    })
+                  }
+
+                  setUserRoleChangeModalVisible(true)
+                  setSelectedMember({
+                    ...x,
+                    oldRoleId: role.id,
+                    newRoleId: roleId,
+                  })
+                }
 
                 return (
                   <Fragment key={`member-row-${i}`}>
@@ -123,35 +160,67 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
-                        {role ? (
-                          <p>{role?.name}</p>
-                        ) : (
-                          // [Joshen TODO] Commented out until roles management is completed
-                          // <Listbox
-                          //   className={disableRoleEdit ? 'pointer-events-none' : ''}
-                          //   disabled={disableRoleEdit}
-                          //   value={role.id}
-                          //   onChange={(roleId): any => {
-                          //     setUserRoleChangeModalVisible(true)
-                          //     setSelectedMember({
-                          //       ...x,
-                          //       oldRoleId: role.id,
-                          //       newRoleId: roleId,
-                          //     })
-                          //   }}
-                          // >
-                          //   {roles.map((role: any) => (
-                          //     <Listbox.Option
-                          //       key={role.id}
-                          //       value={role.id}
-                          //       label={role.name}
-                          //       disabled={disableRoleEdit}
-                          //     >
-                          //       {role.name}
-                          //     </Listbox.Option>
-                          //   ))}
-                          // </Listbox>
-                          <p>Developer</p>
+                        {role && (
+                          <>
+                            {!enablePermissions ? (
+                              <p>{role?.name ?? 'Developer'}</p>
+                            ) : (
+                              <Tooltip.Root delayDuration={0}>
+                                <Tooltip.Trigger>
+                                  <Listbox
+                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
+                                    disabled={disableRoleEdit}
+                                    value={role.id}
+                                    onChange={validateSelectedRoleToChange}
+                                  >
+                                    {roles.map((role: any) => (
+                                      <Listbox.Option
+                                        key={role.id}
+                                        value={role.id}
+                                        label={role.name}
+                                        disabled={disableRoleEdit}
+                                      >
+                                        {role.name}
+                                      </Listbox.Option>
+                                    ))}
+                                  </Listbox>
+                                </Tooltip.Trigger>
+                                {memberIsPendingInvite ? (
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                                        'border-scale-200 border ', //border
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-scale-1200 text-xs">
+                                        Role can only be changed after the user has accepted the
+                                        invite
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                ) : !canEditMemberRoles ? (
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                                        'border-scale-200 border ', //border
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-scale-1200 text-xs">
+                                        You do not have permission to update the role of other
+                                        members in this organization
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                ) : (
+                                  <></>
+                                )}
+                              </Tooltip.Root>
+                            )}
+                          </>
                         )}
                       </Table.td>
                       <Table.td>

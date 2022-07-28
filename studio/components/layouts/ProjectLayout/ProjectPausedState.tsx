@@ -25,7 +25,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
 
   const canResumeProject = checkPermissions(
     PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.resume'
+    'queue_jobs.projects.initialize_or_resume'
   )
 
   const onSelectRestore = () => {
