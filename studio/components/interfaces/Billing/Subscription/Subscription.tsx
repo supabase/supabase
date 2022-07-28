@@ -38,12 +38,13 @@ const Subscription: FC<Props> = ({
   const { ui } = useStore()
   const router = useRouter()
   const isOrgOwner = ui.selectedOrganization?.is_owner
+
+  const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canChangeSubscription = checkPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
-  )
+  const canUpdateSubscription = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+    : isOrgOwner
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -74,7 +75,7 @@ const Subscription: FC<Props> = ({
             <div className="flex flex-col items-end space-y-2">
               {isEnterprise ? (
                 <Button
-                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  disabled={!canUpdateSubscription || projectUpdateDisabled}
                   onClick={() =>
                     router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
                   }
@@ -84,14 +85,14 @@ const Subscription: FC<Props> = ({
                 </Button>
               ) : (
                 <Button
-                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  disabled={!canUpdateSubscription || projectUpdateDisabled}
                   onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
                   type="primary"
                 >
                   Change subscription
                 </Button>
               )}
-              {!isOrgOwner ? (
+              {!canUpdateSubscription ? (
                 <p className="text-scale-1100 text-xs">
                   Only the organization owner can amend subscriptions
                 </p>
