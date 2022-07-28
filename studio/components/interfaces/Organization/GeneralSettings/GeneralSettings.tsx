@@ -29,15 +29,19 @@ const GeneralSettings = observer(() => {
   }
 
   const enablePermissions = useFlag('enablePermissions')
-  // [Joshen TODO] This is a fallback to original behaviour if permissions is not enabled
+
   const canUpdateOrganization = enablePermissions
     ? checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.organizations')
     : ui.selectedOrganization?.is_owner
 
-  // [Joshen TODO] This is a fallback to original behaviour if permissions is not enabled
   const canDeleteOrganization = enablePermissions
     ? checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.organizations')
     : ui.selectedOrganization?.is_owner
+
+  const canReadBillingEmail = checkPermissions(
+    PermissionAction.SQL_SELECT,
+    'postgres.public.organizations'
+  )
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -109,6 +113,7 @@ const GeneralSettings = observer(() => {
                     id="billing_email"
                     size="small"
                     label="Billing email"
+                    type={canReadBillingEmail ? 'text' : 'password'}
                     disabled={!canUpdateOrganization}
                   />
                 </FormSectionContent>
