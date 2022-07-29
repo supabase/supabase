@@ -30,26 +30,16 @@ const components = {
   },
   ImageGrid,
   img: (props: any) => {
-    const classes = [
-      'next-image--dynamic-fill',
-      'from-brand-500 to-brand-500',
-      'rounded border bg-gradient-to-r via-blue-500',
-    ]
-
     return (
       <div
         className="
           next-image--dynamic-fill 
-            to-scale-400  
-            from-scale-500 rounded-md
-            border bg-gradient-to-r
-      "
+          to-scale-400  
+          from-scale-500 rounded-md
+          border bg-gradient-to-r
+        "
       >
-        <Image
-          {...props}
-          className="next-image--dynamic-fill to-brand-1000 from-brand-900 rounded-md border bg-gradient-to-r"
-          layout="fill"
-        />
+        <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
       </div>
     )
   },

@@ -11,6 +11,8 @@
 
 - Live demo: https://supabase-nextjs-todo-list.vercel.app/
 
+**NOTE:** Both the Google and Github sign in buttons are not enabled on the Live demo.
+
 ## Deploy with Vercel
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀

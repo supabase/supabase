@@ -35,8 +35,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
-      iso_timestamp_start: its ? its as string : undefined,
-      iso_timestamp_end: ite ? ite as string : undefined,
+      iso_timestamp_start: its ? (its as string) : undefined,
+      iso_timestamp_end: ite ? (ite as string) : undefined,
     })
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <div className="relative flex flex-grow flex-col">
           <LoadingOpacity active={isLoading}>
             <div className="flex h-full flex-grow">
-              <LogTable data={logData} error={error} />
+              <LogTable data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">

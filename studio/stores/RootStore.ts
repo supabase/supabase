@@ -6,6 +6,9 @@ import UiStore, { IUiStore } from './UiStore'
 import ProjectContentStore, { IProjectContentStore } from './project/ProjectContentStore'
 import ProjectFunctionsStore, { IProjectFunctionsStore } from './project/ProjectFunctionsStore'
 import ProjectBackupsStore, { IProjectBackupsStore } from './project/ProjectBackupsStore'
+import ProjectAuthConfigStore, {
+  IProjectAuthConfigStore,
+} from './authConfig/ProjectAuthConfigStore'
 
 // Temporary disable mobx warnings
 // TODO: need to remove this after refactoring old stores.
@@ -20,6 +23,7 @@ export interface IRootStore {
   content: IProjectContentStore
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
+  authConfig: IProjectAuthConfigStore
   setProjectRef: (value?: string) => void
   setOrganizationSlug: (value?: string) => void
 }
@@ -30,6 +34,7 @@ export class RootStore implements IRootStore {
   content: IProjectContentStore
   functions: IProjectFunctionsStore
   backups: IProjectBackupsStore
+  authConfig: IProjectAuthConfigStore
 
   constructor() {
     this.app = new AppStore(this)
@@ -43,6 +48,7 @@ export class RootStore implements IRootStore {
     this.content = new ProjectContentStore(this, { projectRef: '' })
     this.functions = new ProjectFunctionsStore(this, { projectRef: '' })
     this.backups = new ProjectBackupsStore(this, { projectRef: '' })
+    this.authConfig = new ProjectAuthConfigStore(this, { projectRef: '' })
 
     /**
      * TODO: meta and content are not observable
@@ -91,6 +97,7 @@ export class RootStore implements IRootStore {
 
     this.ui.setProjectRef(value)
     this.functions.setProjectRef(value)
+    this.authConfig.setProjectRef(value)
     this.content.setProjectRef(value)
     this.backups.setProjectRef(value)
   }

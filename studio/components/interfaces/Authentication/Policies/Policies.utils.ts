@@ -19,8 +19,12 @@ export const createSQLPolicy = (
   const { definition, check } = policyFormFields
   const formattedPolicyFormFields = {
     ...policyFormFields,
-    definition: definition ? definition.replace(/\s+/g, ' ').trim() : definition,
-    check: check ? check.replace(/\s+/g, ' ').trim() : check,
+    definition: definition
+      ? definition.replace(/\s+/g, ' ').trim()
+      : definition === undefined
+      ? null
+      : definition,
+    check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
 
   if (isEmpty(originalPolicyFormFields)) {

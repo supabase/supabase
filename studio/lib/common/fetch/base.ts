@@ -1,3 +1,4 @@
+import { auth } from 'lib/gotrue'
 import { tryParseJson } from 'lib/helpers'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
@@ -83,22 +84,22 @@ export async function handleResponseError<T = unknown>(
   }
 }
 
-export function getAccessToken() {
+export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
 
-  const tokenData = window?.localStorage['supabase.auth.token']
-  if (!tokenData) {
+  const { session } = await auth.getSession()
+  if (!session) {
     // try to get from url fragment
-    const access_token = getParameterByName('access_token')
-    if (access_token) return access_token
-    else return undefined
+    const accessToken = getParameterByName('access_token')
+    if (accessToken) {
+      return accessToken
+    } else {
+      return undefined
+    }
   }
-  const tokenObj = tryParseJson(tokenData)
-  if (tokenObj === false) {
-    return ''
-  }
-  return tokenObj.currentSession.access_token
+
+  return session.access_token
 }
 
 // get param from URL fragment
@@ -116,7 +117,7 @@ export function getParameterByName(name: string, url?: string) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
-export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
+export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
   let headers: { [prop: string]: any } = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -126,7 +127,7 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
 
   const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
   if (!hasAuthHeader) {
-    const accessToken = getAccessToken()
+    const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
 

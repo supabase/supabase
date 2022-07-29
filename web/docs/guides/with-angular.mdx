@@ -528,7 +528,11 @@ export class AvatarComponent {
   async downloadImage(path: string) {
     try {
       const {data} = await this.supabase.downLoadImage(path);
-      this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
+       if (data instanceof Blob) {
+        this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(
+          URL.createObjectURL(data)
+        );
+      }
     } catch (error) {
       console.error('Error downloading image: ', error.message);
     }

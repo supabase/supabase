@@ -1,19 +1,23 @@
-import * as React from 'react'
+import { FC, useState } from 'react'
 import { Button, IconRefreshCw } from '@supabase/ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { fetchCount, fetchPage } from '../../utils'
+import { Filter, Sort } from 'components/grid/types'
+import { useDispatch, useTrackedState } from 'components/grid/store'
+import { fetchCount, fetchPage } from 'components/grid/utils'
 
-type RefreshButtonProps = {}
+interface Props {
+  sorts: Sort[]
+  filters: Filter[]
+}
 
-const RefreshButton: React.FC<RefreshButtonProps> = ({}) => {
-  const [loading, setLoading] = React.useState(false)
+const RefreshButton: FC<Props> = ({ sorts, filters }) => {
+  const [loading, setLoading] = useState(false)
   const state = useTrackedState()
   const dispatch = useDispatch()
 
   async function onClick() {
     setLoading(true)
-    await fetchCount(state, dispatch)
-    await fetchPage(state, dispatch)
+    await fetchCount(state, dispatch, filters)
+    await fetchPage(state, dispatch, sorts, filters)
     setLoading(false)
   }
 

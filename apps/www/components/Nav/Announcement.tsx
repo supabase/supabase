@@ -56,14 +56,9 @@ const Announcement = () => {
             lg:px-16 xl:px-20
           "
         >
-          <span className="hidden px-3 lg:block">{announcement.text}</span>
-          <span className="flex items-center space-x-2 px-3">
-            <span>
-              {
-                // @ts-ignore
-                announcement.cta
-              }
-            </span>
+          <span className="px-3">{announcement.text}</span>
+          <span className="hidden items-center space-x-2 px-3 lg:flex">
+            <span>{announcement.cta}</span>
             <IconChevronRight size={14} />
           </span>
         </div>

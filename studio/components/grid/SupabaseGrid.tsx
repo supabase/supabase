@@ -1,25 +1,30 @@
 import { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { createPortal } from 'react-dom'
-import { useMonaco } from '@monaco-editor/react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
+import { useMonaco } from '@monaco-editor/react'
 import { DataGridHandle } from '@supabase/react-data-grid'
-import { RowContextMenu } from './components/menu'
+
+import { useUrlState } from 'hooks'
+import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
 import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from './constants'
-import { Grid } from './components/grid'
 import { Shortcuts } from './components/common'
+import { Grid } from './components/grid'
 import Header from './components/header'
 import Footer from './components/footer'
-import { cleanupProps, initTable, saveStorageDebounced } from './SupabaseGrid.utils'
+import { RowContextMenu } from './components/menu'
+import {
+  cleanupProps,
+  initTable,
+  saveStorageDebounced,
+  formatFilterURLParams,
+  formatSortURLParams,
+} from './SupabaseGrid.utils'
 
-/**
- * Supabase Grid.
- *
- * React component to render database table.
- */
+/** Supabase Grid: React component to render database table */
+
 export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((props, ref) => {
   const monaco = useMonaco()
   const _props = cleanupProps(props)
@@ -56,8 +61,15 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const { editable, storageRef, gridProps, headerActions } = props
   const dispatch = useDispatch()
   const state = useTrackedState()
+
   const gridRef = useRef<DataGridHandle>(null)
-  const [mounted, setMount] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  const [{ sort, filter }, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
+  const sorts = formatSortURLParams(sort as string[])
+  const filters = formatFilterURLParams(filter as string[])
 
   useImperativeHandle(ref, () => ({
     rowAdded(row: Dictionary<any>) {
@@ -75,35 +87,47 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   }))
 
   useEffect(() => {
-    if (!mounted) setMount(true)
+    if (!mounted) setMounted(true)
   }, [])
 
   useEffect(() => {
-    if (state.isInitialComplete && storageRef && state.table) {
-      saveStorageDebounced(state, storageRef)
-    }
-  }, [
-    state.table,
-    state.isInitialComplete,
-    state.gridColumns,
-    state.sorts,
-    state.filters,
-    storageRef,
-  ])
-
-  useEffect(() => {
     if (state.refreshPageFlag == REFRESH_PAGE_IMMEDIATELY) {
-      fetchPage(state, dispatch)
-    } else if (state.refreshPageFlag != 0) {
-      refreshPageDebounced(state, dispatch)
+      fetchPage(state, dispatch, sorts, filters)
+    } else if (state.refreshPageFlag !== 0) {
+      refreshPageDebounced(state, dispatch, sorts, filters)
     }
   }, [state.refreshPageFlag])
 
   useEffect(() => {
     if (state.totalRows === TOTAL_ROWS_RESET) {
-      fetchCount(state, dispatch)
+      fetchCount(state, dispatch, filters)
     }
   }, [state.totalRows])
+
+  useEffect(() => {
+    if (mounted) {
+      dispatch({ type: 'UPDATE_FILTERS', payload: {} })
+    }
+  }, [JSON.stringify(filters)])
+
+  useEffect(() => {
+    if (mounted) {
+      dispatch({ type: 'UPDATE_SORTS', payload: {} })
+    }
+  }, [JSON.stringify(sorts)])
+
+  useEffect(() => {
+    if (state.isInitialComplete && storageRef && state.table) {
+      saveStorageDebounced(state, storageRef, sort as string[], filter as string[])
+    }
+  }, [
+    state.table,
+    state.isInitialComplete,
+    state.gridColumns,
+    JSON.stringify(sorts),
+    JSON.stringify(filters),
+    storageRef,
+  ])
 
   useEffect(() => {
     if (!state.metaService) {
@@ -123,19 +147,30 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
 
     if (
       !state.table ||
-      (typeof props.table == 'string' &&
-        state.table!.name != props.table &&
-        state.table!.schema != props.schema) ||
-      (typeof props.table != 'string' &&
+      (typeof props.table === 'string' &&
+        state.table!.name !== props.table &&
+        state.table!.schema !== props.schema) ||
+      (typeof props.table !== 'string' &&
         JSON.stringify(props.table) !== JSON.stringify(state.table))
     ) {
-      initTable(props, state, dispatch)
+      const { savedState } = initTable(props, state, dispatch, sort as string[], filter as string[])
+      if (savedState.sorts || savedState.filters) {
+        setParams((prevParams) => {
+          return {
+            ...prevParams,
+            ...(savedState.sorts && { sort: savedState.sorts }),
+            ...(savedState.filters && { filter: savedState.filters }),
+          }
+        })
+      }
     }
   }, [state.metaService, state.table, props.table, props.schema])
 
   return (
     <div className="sb-grid">
       <Header
+        sorts={sorts}
+        filters={filters}
         onAddRow={editable ? props.onAddRow : undefined}
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}

@@ -155,7 +155,7 @@ pages:
       Creates a new user.
     notes: |
       - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - If "Email Confirmations" is turned on, both a `user` and a `session` will be null
+      - If "Email Confirmations" is turned on, a user is returned but session will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
       - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
     examples:

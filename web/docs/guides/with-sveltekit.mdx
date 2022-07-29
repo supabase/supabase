@@ -151,11 +151,12 @@ Let's start building the Svelte app from scratch.
 ### Initialize a Svelte app
 
 We can use the [SvelteKit Skeleton Project](https://kit.svelte.dev/docs) to initialize 
-an app called `supabase-sveltekit`:
+an app called `supabase-sveltekit` (for this tutorial you do not need TypeScript, ESLint, Prettier, or Playwright):
 
 ```bash
-npm init svelte@next supabase-sveltekit
+npm create svelte supabase-sveltekit
 cd supabase-sveltekit
+npm install
 ```
 
 Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
@@ -168,8 +169,8 @@ And finally we want to save the environment variables in a `.env`.
 All we need are the `SUPABASE_URL` and the `SUPABASE_KEY` key that you copied [earlier](#get-the-api-keys).
 
 ```bash title=".env"
-VITE_SUPABASE_URL=YOUR_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_KEY
+VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
+VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
@@ -234,9 +235,9 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 ### User store
 To access the user information in other places, we use a writable store. Create a new file called `sessionStore.js`
 ```javascript title="lib/sessionStore.js"
-import { writable } from 'svelte/store';
+import { writable } from 'svelte/store'
 
-export const user = writable(false);
+export const user = writable(false)
 ```
 
 
@@ -402,7 +403,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 ```html title="lib/Avatar.svelte"
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte'
   import { supabase } from '$lib/supabaseClient'
 
   export let path;

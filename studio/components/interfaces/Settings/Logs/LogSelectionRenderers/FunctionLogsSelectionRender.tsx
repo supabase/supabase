@@ -4,6 +4,7 @@ import { jsonSyntaxHighlight, SeverityFormatter } from '../LogsFormatters'
 
 const FunctionLogsSelectionRender = ({ log }: any) => {
   const timestamp = dayjs(log.timestamp / 1000)
+  const metadata = log.metadata[0]
 
   const DetailedRow = ({
     label,
@@ -38,12 +39,12 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
       </div>
       <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        <DetailedRow label="Severity" value={<SeverityFormatter value={log.metadata.level} />} />
-        <DetailedRow label="Log ID" value={log.id} />
-        <DetailedRow label="Deployment version" value={log?.metadata?.version} />
+        {console.log(log)}
+        <DetailedRow label="Severity" value={<SeverityFormatter value={metadata.level} />} />
+        <DetailedRow label="Deployment version" value={metadata.version} />
         <DetailedRow label="Timestamp" value={timestamp.format('DD MMM, YYYY HH:mm')} />
-        <DetailedRow label="Execution ID" value={log.metadata.execution_id} />
-        <DetailedRow label="Deployment ID" value={log.metadata.deployment_id} />
+        <DetailedRow label="Execution ID" value={metadata.execution_id} />
+        <DetailedRow label="Deployment ID" value={metadata.deployment_id} />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>
@@ -51,7 +52,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
-              __html: log.metadata ? jsonSyntaxHighlight(log.metadata) : '',
+              __html: metadata ? jsonSyntaxHighlight(metadata) : '',
             }}
           />
         </pre>
