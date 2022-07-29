@@ -659,7 +659,9 @@ export default function IndexPage() {
                           header={<span className="text-scale-1200">{faq.question}</span>}
                           id={`faq--${i.toString()}`}
                         >
-                          <ReactMarkdown className="text-scale-900">{faq.answer}</ReactMarkdown>
+                          <ReactMarkdown className="text-scale-900 prose">
+                            {faq.answer}
+                          </ReactMarkdown>
                         </Accordion.Item>
                       </div>
                     )

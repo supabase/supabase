@@ -545,14 +545,10 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
               }
               emptyMessage={
                 <>
-                  <Typography.Text className="mb-2">
-                    <IconAlertCircle />
-                  </Typography.Text>
-                  <Typography.Text>No schema available to choose</Typography.Text>
-                  <div>
-                    <Typography.Text small className="opacity-50">
-                      New schema you create will appear here
-                    </Typography.Text>
+                  <IconAlertCircle strokeWidth={2} />
+                  <div className="mt-2 flex flex-col text-center">
+                    <p className="text-sm align-center">No schema available to choose</p>
+                    <p className="text-xs opacity-50">New schemas you create will appear here</p>
                   </div>
                 </>
               }

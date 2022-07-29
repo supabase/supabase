@@ -193,7 +193,7 @@ const ColumnManagement: FC<Props> = ({
             block
             icon={<IconKey className="text-white" size="large" />}
             title="Composite primary key selected"
-            description="The columns that you've selected will grouped as a primary key, and will serve
+            description="The columns that you've selected will be grouped as a primary key, and will serve
             as the unique identifier for the rows in your table"
           />
         )}

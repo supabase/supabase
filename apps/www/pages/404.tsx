@@ -7,6 +7,9 @@ import DefaultLayout from '../components/Layouts/Default'
 
 import { useTheme } from '~/components/Providers'
 
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+
 const Error404 = () => {
   const [show404, setShow404] = useState<boolean>(false)
   const { isDarkMode } = useTheme()
@@ -26,11 +29,7 @@ const Error404 = () => {
               <div className="flex w-full items-center justify-between md:w-auto">
                 <a href="/">
                   <Image
-                    src={
-                      isDarkMode
-                        ? '/images/supabase-logo-wordmark--dark.svg'
-                        : '/images/supabase-logo-wordmark--light.svg'
-                    }
+                    src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                     alt="supabase logo"
                     height={24}
                     width={120}

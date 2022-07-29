@@ -6,6 +6,7 @@ import { API_URL } from 'lib/constants'
 import { useOrganizationDetail, useStore } from 'hooks'
 import { toJS } from 'mobx'
 import { Member } from 'types'
+import { object, string } from 'yup'
 
 function InviteMemberModal({ organization, members = [], user }: any) {
   const initialValues = { email: '' }
@@ -35,7 +36,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     setAddMemberLoading(true)
 
     const response = await post(`${API_URL}/organizations/${orgSlug}/members/invite`, {
-      invited_email: emailAddress,
+      invited_email: emailAddress.toLowerCase(),
       owner_id: toJS(user.id),
     })
 
@@ -74,6 +75,10 @@ function InviteMemberModal({ organization, members = [], user }: any) {
     setEmailAddress(e.target.value)
   }
 
+  const schema = object({
+    email: string().email('Must be a valid email address').required('Email is required'),
+  })
+
   return (
     <>
       <Button onClick={toggle}>Invite</Button>
@@ -88,17 +93,7 @@ function InviteMemberModal({ organization, members = [], user }: any) {
         hideFooter
       >
         <Modal.Content>
-          <Form
-            validate={(values) => {
-              const errors: any = {}
-              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-                errors.email = 'Please enter a valid email address'
-              }
-              return errors
-            }}
-            initialValues={initialValues}
-            onSubmit={addMember}
-          >
+          <Form validationSchema={schema} initialValues={initialValues} onSubmit={addMember}>
             {() => (
               <div className="w-full py-4">
                 <div className="space-y-4">

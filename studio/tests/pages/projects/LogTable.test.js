@@ -1,6 +1,7 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+
 test('can display log data', async () => {
   render(
     <LogTable
@@ -19,8 +20,8 @@ test('can display log data', async () => {
 
   const row = await screen.findByText(/some-uuid/)
   userEvent.click(row)
-  await waitFor(() => screen.getByText(/my_key/))
-  await waitFor(() => screen.getByText(/something_value/))
+  await screen.findByText(/my_key/)
+  await screen.findByText(/something_value/)
 })
 
 test('dedupes log lines with exact id', async () => {
@@ -64,14 +65,13 @@ test('toggle histogram', async () => {
   expect(mockFn).toBeCalled()
 })
 
-
 test('error message handling', async () => {
-  const {rerender} = render(<LogTable error="some \nstring" />)
-  await expect(screen.findByText("some \nstring")).rejects.toThrow()
+  const { rerender } = render(<LogTable error="some \nstring" />)
+  await expect(screen.findByText('some \nstring')).rejects.toThrow()
   await screen.findByDisplayValue(/some/)
   await screen.findByDisplayValue(/string/)
 
-  rerender(<LogTable error={{my_error: "some \nstring"}} />)
+  rerender(<LogTable error={{ my_error: 'some \nstring' }} />)
   await screen.findByText(/some \\nstring/)
   await screen.findByText(/some/)
   await screen.findByText(/string/)

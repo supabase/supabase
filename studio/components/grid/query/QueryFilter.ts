@@ -1,4 +1,3 @@
-import { uuidv4 } from 'lib/helpers'
 import { Dictionary, Filter, FilterOperator, QueryTable, Sort } from '../types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
 
@@ -14,19 +13,19 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update',
+    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected actionValue?: string[] | Dictionary<any> | Dictionary<any>[],
     protected actionOptions?: { returning: boolean }
   ) {}
 
   filter(column: string, operator: FilterOperator, value: any) {
-    this.filters.push({ id: uuidv4(), column, operator, value })
+    this.filters.push({ column, operator, value })
     return this
   }
 
   match(criteria: Dictionary<any>) {
     Object.entries(criteria).map(([column, value]) => {
-      this.filters.push({ id: uuidv4(), column, operator: '=', value })
+      this.filters.push({ column, operator: '=', value })
     })
     return this
   }
