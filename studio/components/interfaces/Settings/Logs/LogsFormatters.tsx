@@ -29,8 +29,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
         <div className="flex items-center h-full">
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300 dark:bg-scale-600
-            
+            bg-scale-500 dark:bg-scale-400 border
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -45,7 +44,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-red-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-red-1100">{value}</label>
@@ -61,7 +60,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-amber-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-amber-1100 dark:text-amber-900">
@@ -78,7 +77,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-scale-300
-            
+
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
