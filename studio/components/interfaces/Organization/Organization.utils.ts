@@ -11,7 +11,9 @@ export function isInviteExpired(timestamp: string) {
   return true
 }
 
-export const getUserDisplayName = (user: Member) => {
+export const getUserDisplayName = (user?: Member) => {
+  if (!user) return ''
+
   const { username, primary_email, invited_id } = user || {}
   return invited_id !== undefined ? primary_email : username || ''
 }

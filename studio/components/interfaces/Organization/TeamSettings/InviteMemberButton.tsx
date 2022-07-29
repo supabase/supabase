@@ -4,17 +4,19 @@ import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
 
-import { Member, User } from 'types'
-import { useFlag, useOrganizationDetail, useOrganizationRoles, useStore } from 'hooks'
+import { Member, User, Role } from 'types'
+import { useFlag, useOrganizationDetail, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
 interface Props {
-  members: Member[]
   user: User
+  members: Member[]
+  roles: Role[]
+  rolesAddable: Number[]
 }
 
-const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
+const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAddable = [] }) => {
   const { ui } = useStore()
   const router = useRouter()
   const { slug } = router.query
@@ -22,7 +24,6 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
   const enablePermissions = useFlag('enablePermissions')
 
   const [isOpen, setIsOpen] = useState(false)
-  const { roles } = useOrganizationRoles((slug as string) || '')
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
   const initialValues = { email: '', role: '' }
@@ -92,66 +93,86 @@ const InviteMemberModal: FC<Props> = ({ members = [], user }) => {
     <>
       <Button onClick={() => setIsOpen(true)}>Invite</Button>
       <Modal
-        size="small"
+        hideFooter
+        size="medium"
+        layout="vertical"
         className="!overflow-visible"
         visible={isOpen}
         onCancel={() => setIsOpen(false)}
         header="Invite a member to this organization"
-        description="Members you'd like to invite must already be registered on Supabase"
-        layout="vertical"
-        hideFooter
       >
-        <Modal.Content>
-          <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
-            {({ isSubmitting, resetForm }: any) => {
-              // Catches 'roles' when its available and then adds a default value for role select
-              useEffect(() => {
-                if (roles) {
-                  resetForm({
-                    values: { ...initialValues, role: roles[0].id },
-                    initialValues: { ...initialValues, role: roles[0].id },
-                  })
-                }
-              }, [roles])
+        <Form validationSchema={schema} initialValues={initialValues} onSubmit={onInviteMember}>
+          {({ values, isSubmitting, resetForm }: any) => {
+            // Catches 'roles' when its available and then adds a default value for role select
+            useEffect(() => {
+              if (roles) {
+                resetForm({
+                  values: { ...initialValues, role: roles[0].id },
+                  initialValues: { ...initialValues, role: roles[0].id },
+                })
+              }
+            }, [roles])
 
-              return (
-                <div className="w-full py-4">
-                  <div className="space-y-4">
-                    {roles && enablePermissions && (
-                      <Select name="role" label="Member role">
-                        {roles.map((role: any) => (
-                          <Select.Option key={role.id} value={role.id}>
-                            {role.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    )}
+            const selectedRole = roles.find((role) => role.id === Number(values.role))
+            const invalidRoleSelected = enablePermissions
+              ? values.role && !rolesAddable.includes(Number(values.role))
+              : false
 
-                    <Input
-                      autoFocus
-                      id="email"
-                      icon={<IconMail />}
-                      placeholder="Enter email address"
-                      label="Email address"
-                    />
+            return (
+              <>
+                <Modal.Content>
+                  <div className="w-full py-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        {roles && enablePermissions && (
+                          <Select
+                            name="role"
+                            label="Member role"
+                            error={
+                              invalidRoleSelected
+                                ? `You need additional permissions to assign users the role of ${selectedRole?.name}`
+                                : ''
+                            }
+                          >
+                            {roles.map((role: any) => (
+                              <Select.Option key={role.id} value={role.id}>
+                                {role.name}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        )}
+                      </div>
 
+                      <Input
+                        autoFocus
+                        id="email"
+                        icon={<IconMail />}
+                        placeholder="Enter email address"
+                        label="Email address"
+                      />
+                    </div>
+                  </div>
+                </Modal.Content>
+                <Modal.Seperator />
+                <Modal.Content>
+                  <div className="pt-2 pb-3">
                     <Button
                       block
                       size="medium"
                       htmlType="submit"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || invalidRoleSelected}
                       loading={isSubmitting}
                     >
                       Invite new member
                     </Button>
                   </div>
-                </div>
-              )
-            }}
-          </Form>
-        </Modal.Content>
+                </Modal.Content>
+              </>
+            )
+          }}
+        </Form>
       </Modal>
     </>
   )
 }
-export default InviteMemberModal
+export default InviteMemberButton
