@@ -202,8 +202,7 @@ const MembersView = () => {
                                       ].join(' ')}
                                     >
                                       <span className="text-scale-1200 text-xs">
-                                        You need additional permissions to update the role of this
-                                        team member
+                                        You need additional permissions to manage this team member
                                       </span>
                                     </div>
                                   </Tooltip.Content>
