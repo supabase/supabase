@@ -98,9 +98,17 @@ const Subscription: FC<Props> = ({
                 </Button>
               )}
               {!canUpdateSubscription ? (
-                <p className="text-scale-1100 text-xs">
-                  Only the organization owner can amend subscriptions
-                </p>
+                <>
+                  {enablePermissions ? (
+                    <p className="text-scale-1100 text-xs">
+                      You need additional permissions to amend subscriptions
+                    </p>
+                  ) : (
+                    <p className="text-scale-1100 text-xs">
+                      Only the organization owner can amend subscriptions
+                    </p>
+                  )}
+                </>
               ) : projectUpdateDisabled ? (
                 <p className="text-scale-1100 text-right text-xs">
                   Subscription changes are currently disabled
