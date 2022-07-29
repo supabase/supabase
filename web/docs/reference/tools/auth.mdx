@@ -108,6 +108,7 @@ These options control the emails sent from GoTrue.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | <span id="mailer_autoconfirm">`MAILER_AUTOCONFIRM`</span> | `bool` | If you do not require email confirmation, you may set this to `true`. Defaults to `false`. |
+| <span id="mailer_secure_email_change_enabled">`MAILER_SECURE_EMAIL_CHANGE_ENABLED`</span> | `bool` | If `true`, send an email to both the user's current and new email with a confirmation link, otherwise send an email with confirmation link only to new email. Defaults to `true`. |
 | <span id="mailer_otp_exp">`MAILER_OTP_EXP`</span> | `string` | Controls the duration an email link or otp is valid for. Defaults to 24 hrs. |
 | <span id="mailer_urlpaths_invite">`MAILER_URLPATHS_INVITE`</span> | `string` | URL path to use in the user invite email. Defaults to `/`. |
 | <span id="mailer_urlpaths_confirmation">`MAILER_URLPATHS_CONFIRMATION`</span> | `string` | URL path to use in the signup confirmation email. Defaults to `/`. |
