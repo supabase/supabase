@@ -3,24 +3,16 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState, useContext, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { Member } from 'types'
-import {
-  checkPermissions,
-  useStore,
-  useFlag,
-  useOrganizationDetail,
-  useOrganizationRoles,
-} from 'hooks'
+import { Member, Role } from 'types'
+import { useStore, useFlag, useOrganizationDetail } from 'hooks'
+import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
-import OwnerDropdown from './OwnerDropdown'
+import MemberActions from './MemberActions'
 import { PageContext } from 'pages/org/[slug]/settings'
-import { patch } from 'lib/common/fetch'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -29,23 +21,23 @@ interface SelectedMember extends Member {
 
 const MembersView = () => {
   const PageState: any = useContext(PageContext)
+  const {
+    roles,
+    rolesAddable,
+    rolesRemovable,
+  }: { roles: Role[]; rolesAddable: Number[]; rolesRemovable: Number[] } = PageState
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug || ''
 
   const enablePermissions = useFlag('enablePermissions')
-  const { roles } = useOrganizationRoles(slug)
   const { mutateOrgMembers } = useOrganizationDetail(slug)
 
   const [loading, setLoading] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
-  const rolesPermissions = getRolesManagementPermissions(roles)
-  const canEditMemberRoles = checkPermissions(
-    PermissionAction.SQL_INSERT,
-    'postgres.auth.subject_roles'
-  )
+  const hasAccessToMemberActions = enablePermissions ? true : PageState.isOrgOwner
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -102,28 +94,27 @@ const MembersView = () => {
                 const role = (roles || []).find((role) => role.id === memberRoleId)
                 const memberIsUser = x.primary_email == PageState.user.primary_email
                 const memberIsPendingInvite = !!x.invited_id
-                const disableRoleEdit = !canEditMemberRoles || memberIsUser || memberIsPendingInvite
+                const canRemoveRole = rolesRemovable.includes(memberRoleId)
+                const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
 
                 const validateSelectedRoleToChange = (roleId: any) => {
                   if (!role) return
 
                   const selectedRole = (roles || []).find((role) => role.id === roleId)
-                  const rolePermission = rolesPermissions[roleId]
-                  if (!rolePermission || !rolePermission.canChangeTo) {
+                  const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
+
+                  if (!canAddRole) {
                     return ui.setNotification({
                       category: 'error',
-                      message: `You do not have permission to update members to ${
+                      duration: 4000,
+                      message: `You do not have permission to update this team member to ${
                         selectedRole!.name
                       }`,
                     })
                   }
 
                   setUserRoleChangeModalVisible(true)
-                  setSelectedMember({
-                    ...x,
-                    oldRoleId: role.id,
-                    newRoleId: roleId,
-                  })
+                  setSelectedMember({ ...x, oldRoleId: role.id, newRoleId: roleId })
                 }
 
                 return (
@@ -203,7 +194,7 @@ const MembersView = () => {
                                       </span>
                                     </div>
                                   </Tooltip.Content>
-                                ) : !canEditMemberRoles ? (
+                                ) : !canRemoveRole ? (
                                   <Tooltip.Content side="bottom">
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
@@ -213,8 +204,8 @@ const MembersView = () => {
                                       ].join(' ')}
                                     >
                                       <span className="text-scale-1200 text-xs">
-                                        You need additional permissions to update the role of other
-                                        members in this organization
+                                        You need additional permissions to update the role of this
+                                        team member
                                       </span>
                                     </div>
                                   </Tooltip.Content>
@@ -227,8 +218,8 @@ const MembersView = () => {
                         )}
                       </Table.td>
                       <Table.td>
-                        {PageState.isOrgOwner && !memberIsUser && (
-                          <OwnerDropdown members={PageState.members} member={x} roles={roles} />
+                        {hasAccessToMemberActions && !memberIsUser && (
+                          <MemberActions members={PageState.members} member={x} roles={roles} />
                         )}
                       </Table.td>
                     </Table.tr>
@@ -253,22 +244,23 @@ const MembersView = () => {
       </div>
 
       <Modal
-        visible={userRoleChangeModalVisible}
         hideFooter
+        size="medium"
+        visible={userRoleChangeModalVisible}
         onCancel={() => setUserRoleChangeModalVisible(false)}
         header="Change role of member"
-        size="small"
       >
-        <div className="flex flex-col gap-2 my-3">
+        <div className="flex flex-col gap-2 py-4">
           <Modal.Content>
-            <p className="text-sm text-scale-1200 mb-3">
-              By changing the role of this member their permissions will change.
-            </p>
             <p className="text-sm text-scale-1100">
-              You are going to change the role of {selectedMember?.primary_email} from{' '}
+              You are changing the role of{' '}
+              <span className="text-scale-1200">{getUserDisplayName(selectedMember)}</span> from{' '}
               <span className="text-scale-1200">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}
               to{' '}
               <span className="text-scale-1200">{getRoleNameById(selectedMember?.newRoleId)}</span>
+            </p>
+            <p className="text-sm text-scale-1200 mt-3">
+              By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>
           <Modal.Seperator />

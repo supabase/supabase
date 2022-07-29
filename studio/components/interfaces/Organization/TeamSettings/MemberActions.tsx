@@ -1,9 +1,11 @@
 import { FC, useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Dropdown, IconTrash, IconMoreHorizontal } from '@supabase/ui'
 
 import { Member, Role } from 'types'
-import { useStore, useOrganizationDetail, useFlag } from 'hooks'
+import { useStore, useOrganizationDetail, useFlag, checkPermissions } from 'hooks'
 import { delete_, post, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -18,8 +20,9 @@ interface Props {
   roles: Role[]
 }
 
-const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
+const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const PageState: any = useContext(PageContext)
+  const { rolesRemovable } = PageState
   const { slug, name: orgName } = PageState.organization
 
   const { ui } = useStore()
@@ -28,6 +31,20 @@ const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
 
   const [loading, setLoading] = useState(false)
   const [ownerTransferIsVisible, setOwnerTransferIsVisible] = useState(false)
+
+  const isPendingInviteAcceptance = member.invited_id
+
+  const canRemoveMember = enablePermissions
+    ? rolesRemovable.includes((member?.role_ids ?? [-1])[0])
+    : true
+  const canResendInvite = checkPermissions(
+    PermissionAction.SQL_INSERT,
+    'postgres.auth.user_invites'
+  )
+  const canRevokeInvite = checkPermissions(
+    PermissionAction.SQL_DELETE,
+    'postgres.auth.user_invites'
+  )
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -144,6 +161,31 @@ const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
     }
   }
 
+  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
+    return (
+      <div className="flex items-center justify-end">
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button as="span" type="text" icon={<IconMoreHorizontal />} />
+          </Tooltip.Trigger>
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                'border-scale-200 border ', //border
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to manage this team member
+              </span>
+            </div>
+          </Tooltip.Content>
+        </Tooltip.Root>
+      </div>
+    )
+  }
+
   return (
     <div className="flex items-center justify-end">
       <Dropdown
@@ -151,7 +193,7 @@ const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
         align="end"
         overlay={
           <>
-            {!enablePermissions && !member.invited_at && (
+            {!enablePermissions && !isPendingInviteAcceptance && (
               <>
                 <Dropdown.Item onClick={() => setOwnerTransferIsVisible(!ownerTransferIsVisible)}>
                   <div className="flex flex-col">
@@ -162,25 +204,31 @@ const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
                 <Dropdown.Seperator />
               </>
             )}
-            {member.invited_at ? (
+            {isPendingInviteAcceptance ? (
               <>
-                <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
-                  <div className="flex flex-col">
-                    <p>Cancel invitation</p>
-                    <p className="block opacity-50">Revoke this invitation.</p>
-                  </div>
-                </Dropdown.Item>
-                <Dropdown.Seperator />
-                <Dropdown.Item onClick={() => handleResendInvite(member)}>
-                  <div className="flex flex-col">
-                    <p>Resend invitation</p>
-                    <p className="block opacity-50">Invites expire after 24hrs.</p>
-                  </div>
-                </Dropdown.Item>
+                {canResendInvite && (
+                  <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
+                    <div className="flex flex-col">
+                      <p>Cancel invitation</p>
+                      <p className="block opacity-50">Revoke this invitation.</p>
+                    </div>
+                  </Dropdown.Item>
+                )}
+                {canRevokeInvite && (
+                  <>
+                    <Dropdown.Seperator />
+                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                      <div className="flex flex-col">
+                        <p>Resend invitation</p>
+                        <p className="block opacity-50">Invites expire after 24hrs.</p>
+                      </div>
+                    </Dropdown.Item>
+                  </>
+                )}
               </>
             ) : (
-              <Dropdown.Item icon={<IconTrash size="tiny" />} onClick={handleMemberDelete}>
-                Remove member
+              <Dropdown.Item icon={<IconTrash size={16} />} onClick={handleMemberDelete}>
+                <p>Remove member</p>
               </Dropdown.Item>
             )}
           </>
@@ -217,4 +265,4 @@ const OwnerDropdown: FC<Props> = ({ members, member, roles }) => {
   )
 }
 
-export default observer(OwnerDropdown)
+export default observer(MemberActions)

@@ -12,6 +12,7 @@ import {
   BillingSettings,
   InvoicesSettings,
 } from 'components/interfaces/Organization'
+import { getRolesManagementPermissions } from 'components/interfaces/Organization/TeamSettings/TeamSettings.utils'
 
 export const PageContext = createContext(null)
 
@@ -26,10 +27,13 @@ const OrgSettingsLayout = withAuth(
     // [Refactor] Eventually move away from useLocalObservable
     const PageState: any = useLocalObservable(() => ({
       user: {} as User,
-      organization: {} as Organization[],
+      organization: {} as Organization,
       projects: [] as Project[],
       members: [] as Member[],
       roles: [] as Role[],
+
+      rolesAddable: [] as Number[],
+      rolesRemovable: [] as Number[],
 
       membersFilterString: '',
       get isOrgOwner() {
@@ -54,11 +58,15 @@ const OrgSettingsLayout = withAuth(
         })
         return temp.sort((a: any, b: any) => a.username.localeCompare(b.username))
       },
-      initData(organization: Organization[], user: User, projects: Project[], roles: Role[]) {
+      initData(organization: Organization, user: User, projects: Project[], roles: Role[]) {
         this.user = user
         this.projects = projects
         this.organization = organization
         this.roles = roles
+
+        const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
+        this.rolesAddable = rolesAddable
+        this.rolesRemovable = rolesRemovable
       },
       onOrgUpdated(updatedOrg: any) {
         app.onOrgUpdated(updatedOrg)
