@@ -13,6 +13,7 @@ import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
 import { PageContext } from 'pages/org/[slug]/settings'
+import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface SelectedMember extends Member {
   oldRoleId: number
@@ -21,11 +22,8 @@ interface SelectedMember extends Member {
 
 const MembersView = () => {
   const PageState: any = useContext(PageContext)
-  const {
-    roles,
-    rolesAddable,
-    rolesRemovable,
-  }: { roles: Role[]; rolesAddable: Number[]; rolesRemovable: Number[] } = PageState
+  const { roles }: { roles: Role[] } = PageState
+  const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug || ''

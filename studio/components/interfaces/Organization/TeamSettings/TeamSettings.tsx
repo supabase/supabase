@@ -7,13 +7,15 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import InviteMemberModal from './InviteMemberButton'
 import MembersView from './MembersView'
+import { getRolesManagementPermissions } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 import { PageContext } from 'pages/org/[slug]/settings'
 
 const TeamSettings = observer(() => {
   const PageState: any = useContext(PageContext)
-  const { user, members, roles, rolesAddable } = PageState
+  const { user, members, roles } = PageState
+  const { rolesAddable } = getRolesManagementPermissions(roles)
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug ?? ''
