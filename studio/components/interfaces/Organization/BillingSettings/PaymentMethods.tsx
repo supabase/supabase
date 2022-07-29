@@ -182,7 +182,7 @@ const PaymentMethods: FC<Props> = ({
                             {isDefault ? (
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger>
-                                  <Button disabled type="outline" icon={<IconX />} />
+                                  <Button disabled as="span" type="outline" icon={<IconX />} />
                                 </Tooltip.Trigger>
                                 <Tooltip.Content side="bottom">
                                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -203,11 +203,13 @@ const PaymentMethods: FC<Props> = ({
                                 size="tiny"
                                 overlay={[
                                   <Dropdown.Item
+                                    key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
                                     Make default
                                   </Dropdown.Item>,
                                   <Dropdown.Item
+                                    key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
                                     Delete

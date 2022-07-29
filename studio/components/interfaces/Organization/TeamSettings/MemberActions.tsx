@@ -12,7 +12,7 @@ import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
 import { PageContext } from 'pages/org/[slug]/settings'
-import { getUserDisplayName } from '../Organization.utils'
+import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
@@ -33,6 +33,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const [loading, setLoading] = useState(false)
   const [ownerTransferIsVisible, setOwnerTransferIsVisible] = useState(false)
 
+  const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
   const canRemoveMember = enablePermissions
@@ -129,13 +130,12 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
         category: 'error',
         message: `Failed to resend invitation: ${response.error.message}`,
       })
-      setLoading(false)
     } else {
       const updatedMembers = [...members]
       mutateOrgMembers(updatedMembers)
       ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-      setLoading(false)
     }
+    setLoading(false)
   }
 
   async function handleRevokeInvitation(member: Member) {
@@ -154,12 +154,12 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
         category: 'error',
         message: `Failed to revoke invitation: ${response.error.message}`,
       })
-      setLoading(false)
     } else {
       const updatedMembers = [...members]
       mutateOrgMembers(updatedMembers)
       ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
     }
+    setLoading(false)
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -215,7 +215,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
                     </div>
                   </Dropdown.Item>
                 )}
-                {canRevokeInvite && (
+                {canRevokeInvite && isExpired && (
                   <>
                     <Dropdown.Seperator />
                     <Dropdown.Item onClick={() => handleResendInvite(member)}>
