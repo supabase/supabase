@@ -306,8 +306,8 @@ const LogTable = ({
                       >
                         <>
                           <div className="flex flex-col gap-1">
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center"></div>
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-400 w-32 h-4 rounded px-2 flex items-center">
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
+                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
                               <div className="absolute right-1 -bottom-4">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
