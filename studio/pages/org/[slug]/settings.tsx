@@ -12,7 +12,6 @@ import {
   BillingSettings,
   InvoicesSettings,
 } from 'components/interfaces/Organization'
-import { getRolesManagementPermissions } from 'components/interfaces/Organization/TeamSettings/TeamSettings.utils'
 
 export const PageContext = createContext(null)
 
@@ -31,9 +30,6 @@ const OrgSettingsLayout = withAuth(
       projects: [] as Project[],
       members: [] as Member[],
       roles: [] as Role[],
-
-      rolesAddable: [] as Number[],
-      rolesRemovable: [] as Number[],
 
       membersFilterString: '',
       get isOrgOwner() {
@@ -63,10 +59,6 @@ const OrgSettingsLayout = withAuth(
         this.projects = projects
         this.organization = organization
         this.roles = roles
-
-        const { rolesAddable, rolesRemovable } = getRolesManagementPermissions(roles)
-        this.rolesAddable = rolesAddable
-        this.rolesRemovable = rolesRemovable
       },
       onOrgUpdated(updatedOrg: any) {
         app.onOrgUpdated(updatedOrg)
@@ -90,7 +82,6 @@ const OrgSettingsLayout = withAuth(
       const user = ui.profile
       const organization = ui.selectedOrganization
       const projects = app.projects.list((x: Project) => x.organization_id == organization?.id)
-
       PageState.initData(organization, user, projects, roles)
     }, [ui.selectedOrganization, ui.profile, roles])
 

@@ -13,6 +13,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 
 import { PageContext } from 'pages/org/[slug]/settings'
 import { getUserDisplayName } from '../Organization.utils'
+import { getRolesManagementPermissions } from './TeamSettings.utils'
 
 interface Props {
   members: Member[]
@@ -22,8 +23,8 @@ interface Props {
 
 const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const PageState: any = useContext(PageContext)
-  const { rolesRemovable } = PageState
   const { slug, name: orgName } = PageState.organization
+  const { rolesRemovable } = getRolesManagementPermissions(roles)
 
   const { ui } = useStore()
   const enablePermissions = useFlag('enablePermissions')
