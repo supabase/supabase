@@ -120,7 +120,9 @@ const PaymentMethods: FC<Props> = ({
                 <div className="flex justify-between w-full">
                   {!canUpdatePaymentMethods ? (
                     <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this organization's payment methods
+                      {enablePermissions
+                        ? "You need additional permissions to manage this organization's payment methods"
+                        : 'Only organization owners can update payment methods'}
                     </p>
                   ) : (
                     <div />
