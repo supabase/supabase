@@ -15,13 +15,13 @@ const OrganizationDeletePanel = observer(() => {
     >
       <Panel.Content>
         <Alert
-          variant="danger"
           withIcon
+          variant="danger"
           // @ts-ignore
           title={
-            <h5 className="text-red-900">
+            <span className="text-red-900">
               Deleting this organization will also remove its projects
-            </h5>
+            </span>
           }
         >
           <p className="text-red-900">
