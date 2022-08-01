@@ -18,7 +18,8 @@ export const REGIONS = {
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
 }
 
-export const REGIONS_DEFAULT = REGIONS.EAST_US
+export const REGIONS_DEFAULT =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
   FREE: 'Free',

@@ -1,8 +1,10 @@
 import { FC, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Alert, Button, IconPauseCircle } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Project } from 'types'
-import { useStore, useSubscriptionStats } from 'hooks'
+import { checkPermissions, useStore, useSubscriptionStats } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS, DEFAULT_FREE_PROJECTS_LIMIT } from 'lib/constants'
 import { DeleteProjectButton } from 'components/interfaces/Settings/General'
@@ -20,6 +22,21 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const hasExceedActiveFreeProjectsLimit = totalActiveFreeProjects >= freeProjectsLimit
+
+  const canResumeProject = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_jobs.projects.initialize_or_resume'
+  )
+
+  const onSelectRestore = () => {
+    if (!canResumeProject) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to restore this project',
+      })
+    }
+    setShowConfirmRestore(true)
+  }
 
   const onConfirmRestore = async () => {
     await post(`${API_URL}/projects/${project.ref}/restore`, {})
@@ -51,15 +68,34 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
               <p className="text-center">This project is paused.</p>
 
               <div className="flex items-center justify-center gap-4">
-                <Button
-                  size="tiny"
-                  type="primary"
-                  disabled={hasExceedActiveFreeProjectsLimit}
-                  onClick={() => setShowConfirmRestore(true)}
-                >
-                  Restore project
-                </Button>
-                <DeleteProjectButton project={project} type="default" />
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Button
+                      size="tiny"
+                      type="primary"
+                      disabled={hasExceedActiveFreeProjectsLimit || !canResumeProject}
+                      onClick={onSelectRestore}
+                    >
+                      Restore project
+                    </Button>
+                  </Tooltip.Trigger>
+                  {!canResumeProject && (
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                          'border-scale-200 border ', //border
+                        ].join(' ')}
+                      >
+                        <span className="text-scale-1200 text-xs">
+                          You need additional permissions to resume this project
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  )}
+                </Tooltip.Root>
+                <DeleteProjectButton type="default" />
               </div>
 
               {!hasExceedActiveFreeProjectsLimit && (

@@ -88,7 +88,7 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
               ...(showHooksRoute
                 ? [
                     {
-                      name: 'Function Hooks',
+                      name: 'Database Webhooks',
                       key: 'hooks',
                       url: `/project/${ref}/database/hooks`,
                       items: [],
