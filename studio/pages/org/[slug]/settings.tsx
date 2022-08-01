@@ -39,7 +39,7 @@ const OrgSettingsLayout = withAuth(
           if (x.invited_at) {
             return x.primary_email.includes(this.membersFilterString)
           }
-          if (x.gotrue_id) {
+          if (x.id || x.gotrue_id) {
             return (
               x.username.includes(this.membersFilterString) ||
               x.primary_email.includes(this.membersFilterString)
