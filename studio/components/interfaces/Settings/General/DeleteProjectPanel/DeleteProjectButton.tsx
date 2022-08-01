@@ -1,24 +1,28 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { delete_ } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { Project } from 'types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
-  project: Project
   type?: 'danger' | 'default'
 }
 
-const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
+const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
   const router = useRouter()
-  const { ui, app } = useStore()
+  const { app, ui } = useStore()
+
+  const project = ui.selectedProject
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const canDeleteProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
 
   const toggle = () => {
     if (loading) return
@@ -26,6 +30,8 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
   }
 
   async function handleDeleteProject() {
+    if (project === undefined) return
+
     setLoading(true)
     try {
       const response = await delete_(`${API_URL}/projects/${project.ref}`)
@@ -44,11 +50,30 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
 
   return (
     <>
-      <div className="flex items-center">
-        <Button onClick={toggle} type={type}>
-          Delete project
-        </Button>
-      </div>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <div className="flex items-center">
+            <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
+              Delete project
+            </Button>
+          </div>
+        </Tooltip.Trigger>
+        {!canDeleteProject && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                'border-scale-200 border ', //border
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to delete this project
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <TextConfirmModal
         visible={isOpen}
         loading={loading}
@@ -56,7 +81,7 @@ const DeleteProjectButton: FC<Props> = ({ project, type = 'danger' }) => {
         confirmPlaceholder="Type the project name in here"
         alert="This action cannot be undone."
         text={`This will permanently delete the ${project?.name} project and all of its data.`}
-        confirmString={project?.name}
+        confirmString={project?.name || ''}
         confirmLabel="I understand, delete this project"
         onConfirm={handleDeleteProject}
         onCancel={toggle}

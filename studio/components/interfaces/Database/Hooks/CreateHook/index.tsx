@@ -157,8 +157,8 @@ class CreateHookStore implements ICreateHookStore {
 
   get title() {
     return this.formState.id
-      ? `Edit '${this.formState.originalName}' function hook`
-      : 'Add a new function hook'
+      ? `Edit '${this.formState.originalName}' database webhook`
+      : 'Add a new database webhook'
   }
 
   get isEditing() {
