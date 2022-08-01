@@ -1,3 +1,5 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 export interface Organization {
   id: number
   slug: string
@@ -42,20 +44,35 @@ export interface User {
   username: string
   first_name: string
   last_name: string
+  gotrue_id: string
   is_alpha_user: boolean
   free_project_limit: number
 }
 
 export interface Member {
-  id: number
-  is_owner: boolean
-  profile: {
-    id: number
-    primary_email: string
-    username: string
-  }
+  id: number // To be deprecated after full ABAC roll out
+
+  primary_email: string
+  username: string
+  gotrue_id?: string
+  role_ids?: number[]
+
   invited_id?: number
   invited_at?: string
+
+  is_owner?: boolean // To be deprecated after full ABAC roll out
+}
+
+export interface Role {
+  id: number
+  name: string
+}
+
+export interface Permission {
+  actions: PermissionAction[]
+  condition: string | null
+  organization_id: number
+  resources: string[]
 }
 
 export interface ResponseError {

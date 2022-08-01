@@ -7,11 +7,12 @@ import { Typography } from '@supabase/ui'
 import { AutoField, LongTextField } from 'uniforms-bootstrap4'
 
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useProjectAuthConfig, useStore } from 'hooks'
+import { useProjectAuthConfig, useStore, checkPermissions } from 'hooks'
 import { pluckJsonSchemaFields } from 'lib/helpers'
 import { patch } from 'lib/common/fetch'
 import { authConfig } from 'stores/jsonSchema'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const Templates: FC<any> = ({ project }) => {
   const router = useRouter()
@@ -20,6 +21,11 @@ const Templates: FC<any> = ({ project }) => {
     // @ts-ignore
     semver.coerce(toJS(project?.kpsVersion) || 'kps-v0.0.1'),
     semver.coerce('kps-v2.5.3')
+  )
+
+  const canUpdateTemplates = checkPermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.custom_config_gotrue'
   )
 
   const { config, error, mutateAuthConfig } = useProjectAuthConfig(project.ref)
