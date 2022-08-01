@@ -75,7 +75,7 @@ const General: FC<Props> = ({}) => {
             >
               <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
-                  <Input id="name" size="small" label="Project name" disabled={false} />
+                  <Input id="name" size="small" label="Project name" disabled={!canUpdateProject} />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>
