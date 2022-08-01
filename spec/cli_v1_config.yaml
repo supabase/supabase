@@ -1,0 +1,228 @@
+# The spec is divided into 2 main sections:
+#   info: general information about the tool
+#   functions: public functions which the user can access
+
+configspec: '001'
+
+# This section outlines the general information for the tool.
+info:
+  id: 'cli' # {string} A unique ID for this tool.
+  version: 'next' # {string} The current version number of the tool.
+  title: 'CLI' # {string} A readable name.
+  source: 'https://github.com/supabase/cli' # {string} Where developers can find the source code.
+  bugs: 'https://github.com/supabase/cli/issues' # {string} Where developers can file bugs.
+  spec: 'https://github.com/supabase/supabase/blob/master/web/spec/cli_config_001.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  description: |
+    A `config.toml` file is generated after running `supabase init`.
+
+    This file is located in the `supabase` folder under `supabase/config.toml`.
+
+# This section is an array of public functions which a user might need to execute.
+parameters:
+  - id: 'project_id' # {string} A unique identifier for this param.
+    title: 'project_id' # {string} Any a name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    # default: '5432'
+    description: |
+      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
+
+  - id: 'api.port'
+    title: 'api.port'
+    tags: ['api']
+    required: true
+    default: '54321'
+    description: |
+      Port to use for the API URL.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'api.extra_search_path'
+    title: 'api.extra_search_path'
+    tags: ['api']
+    required: true
+    default: '["extensions"]'
+    description: |
+      Extra schemas to add to the `search_path` of every request.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'api.max_rows'
+    title: 'api.max_rows'
+    tags: ['api']
+    required: true
+    default: '1000'
+    description: |
+      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+    links:
+      - name: 'PostgREST configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.port'
+    title: 'db.port'
+    tags: ['database']
+    required: true
+    default: '54322'
+    description: |
+      Port to use for the local database URL.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.major_version'
+    title: 'db.major_version'
+    tags: ['database']
+    required: true
+    default: '14'
+    description: |
+      The database major version to use. This has to be the same as your remote database's. Run `SHOW server_version;` on the remote database to check.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'studio.port'
+    title: 'studio.port'
+    tags: ['dashboard']
+    required: true
+    default: '54323'
+    description: |
+      Port to use for Supabase Studio.
+    links: []
+
+  - id: 'inbucket.port'
+    title: 'inbucket.port'
+    tags: ['local']
+    required: true
+    default: '54324'
+    description: |
+      Port to use for the email testing server web interface.
+
+      Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
+    links:
+      - name: 'Inbucket documentation'
+        link: 'https://www.inbucket.org'
+
+  - id: 'auth.site_url'
+    title: 'auth.site_url'
+    tags: ['auth']
+    required: true
+    default: '"http://localhost:3000"'
+    description: |
+      The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.additional_redirect_urls'
+    title: 'auth.additional_redirect_urls'
+    tags: ['auth']
+    required: true
+    default: '["https://localhost:3000"]'
+    description: |
+      A list of _exact_ URLs that auth providers are permitted to redirect to post authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.jwt_expiry'
+    title: 'auth.jwt_expiry'
+    tags: ['auth']
+    required: true
+    default: '3600'
+    description: |
+      How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.enable_signup'
+    title: 'auth.enable_signup'
+    tags: ['auth']
+    required: true
+    default: 'true'
+    description: |
+      Allow/disallow new user signups to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.email.enable_signup'
+    title: 'auth.email.enable_signup'
+    tags: ['auth']
+    required: true
+    default: 'true'
+    description: |
+      Allow/disallow new user signups via email to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.email.double_confirm_changes'
+    title: 'auth.email.double_confirm_changes'
+    tags: ['auth']
+    required: true
+    default: 'true'
+    description: |
+      If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.email.enable_confirmations'
+    title: 'auth.email.enable_confirmations'
+    tags: ['auth']
+    required: true
+    default: 'true'
+    description: |
+      If enabled, users need to confirm their email address before signing in.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.external.<provider>.enabled'
+    title: 'auth.external.<provider>.enabled'
+    tags: ['auth']
+    required: true
+    default: 'true'
+    description: |
+      Use an external OAuth provider. The full list of providers are:
+
+      - `apple`
+      - `azure`
+      - `bitbucket`
+      - `discord`
+      - `facebook`
+      - `github`
+      - `gitlab`
+      - `google`
+      - `twitch`
+      - `twitter`
+      - `slack`
+      - `spotify`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.external.<provider>.client_id'
+    title: 'auth.external.<provider>.client_id'
+    tags: ['auth']
+    required: true
+    default: '""'
+    description: |
+      Client ID for the external OAuth provider.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+
+  - id: 'auth.external.<provider>.secret'
+    title: 'auth.external.<provider>.secret'
+    tags: ['auth']
+    required: true
+    default: '""'
+    description: |
+      Client secret for the external OAuth provider.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/tools/reference-auth'
