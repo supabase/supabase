@@ -1,4 +1,4 @@
-import template from '../templates/ConfigTemplate'
+import template from './templates/ConfigTemplate'
 import type { ConfigSpec } from '../types/ConfigSpec'
 
 const yaml = require('js-yaml')
@@ -24,19 +24,7 @@ const layout: { cli: Section[]; gotrue: [] } = {
   gotrue: [],
 }
 
-const main = (fileNames: string[], options: any) => {
-  try {
-    const outputDir = options.o || options.output || ''
-    fileNames.forEach((inputFileName) => {
-      gen(inputFileName, outputDir)
-    })
-    return
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-async function gen(inputFileName: string, outputDir: string) {
+export default async function gen(inputFileName: string, outputDir: string) {
   const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
   // console.log('spec', spec)
 
@@ -50,10 +38,6 @@ async function gen(inputFileName: string, outputDir: string) {
       break
   }
 }
-
-// Run everything
-const argv = require('minimist')(process.argv.slice(2))
-main(argv['_'], argv)
 
 /**
  * Versioned Generator
