@@ -23,12 +23,9 @@ Supabase is modular. While it may seem like a single tool, it is actually a suit
 - Developers can disable tools which are not required.
 - Each tool is focused on a single task to minimize complexity.
 
-
 This is a similar approach to any Enterprise-grade system with an additional focus on modularity: while some companies might cut-corners, Supabase makes modularity a priority.
 
-
 ## Architecture
-
 
 - `Database`
   - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
@@ -46,13 +43,12 @@ This is a similar approach to any Enterprise-grade system with an additional foc
 - `File Storage`
   - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 
-
 ## Open source
 
-Each part of the Supabase ecosystem is open source. Wherever possible, we support existing tools rather than developing from scratch. 
+Each part of the Supabase ecosystem is open source. Wherever possible, we support existing tools rather than developing from scratch.
 
-We choose tools which are [OSI Compliant](https://opensource.org/licenses), with a strong bias towards MIT, Apache 2.0, and PostgreSQL licenses. 
-Everything we open source is licensed with one of these 3 licenses: 
+We choose tools which are [OSI Compliant](https://opensource.org/licenses), with a strong bias towards MIT, Apache 2.0, and PostgreSQL licenses.
+Everything we open source is licensed with one of these 3 licenses:
 
 - MIT for client libraries
 - Apache 2.0 for API servers
@@ -60,7 +56,7 @@ Everything we open source is licensed with one of these 3 licenses:
 
 ## Client Libraries
 
-Supabase provides client libraries for building your products. Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single system. 
+Supabase provides client libraries for building your products. Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single system.
 
 For example, our `supabase-js` library is a wrapper around five smaller libraries:
 
@@ -70,10 +66,9 @@ For example, our `supabase-js` library is a wrapper around five smaller librarie
 - `realtime-js` (Websockets)
 - `functions-js` (Edge Functions)
 
-## Community 
+## Community
 
-Supabase officially supports the Javascript libraries, and all other libraries are community-maintained. This is one way that we try to support and foster an open source ecosystem. 
-
+Supabase officially supports the Javascript libraries, and all other libraries are community-maintained. This is one way that we try to support and foster an open source ecosystem.
 
 <table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap' }}>
   <tr>

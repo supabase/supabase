@@ -1,7 +1,3 @@
 {
-  "goTrueSidebar": [
-    "intro",
-    "usage",
-    "release-notes"
-  ]
+  "goTrueSidebar": ["intro", "usage", "release-notes"]
 }

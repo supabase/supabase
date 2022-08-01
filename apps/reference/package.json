@@ -10,7 +10,8 @@
     "build": "docusaurus build",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
-    "serve": "docusaurus serve"
+    "serve": "docusaurus serve",
+    "prettier": "prettier --write \"./**/*.{ts,tsx,md,js,jsx,json}\""
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-rc.1",
