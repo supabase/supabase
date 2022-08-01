@@ -58,6 +58,7 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
 
       // lazy fetches
       this.fetchSubscriptionTier(project)
+      //this.fetchUsageStatus(projectRef)
     }
   }
 
@@ -94,4 +95,13 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
       }
     }
   }
+
+  // Maybe we don't want to do this here...
+  // async fetchUsageStatus(projectRef: string) {
+  //   const url = `${this.url}/${projectRef}/usage-status`
+  //   const headers = constructHeaders(this.headers)
+  //   const response = await get(url, { headers })
+
+  //   return response
+  // }
 }
