@@ -33,20 +33,20 @@ const OrgSettingsLayout = withAuth(
       membersFilterString: '',
 
       get filteredMembers() {
-        if (!this.membersFilterString) return this.members
-
-        const temp = this.members.filter((x: any) => {
-          if (x.invited_at) {
-            return x.primary_email.includes(this.membersFilterString)
-          }
-          if (x.id || x.gotrue_id) {
-            return (
-              x.username.includes(this.membersFilterString) ||
-              x.primary_email.includes(this.membersFilterString)
-            )
-          }
-        })
-        return temp.sort((a: any, b: any) => a.username.localeCompare(b.username))
+        const temp = !this.membersFilterString
+          ? this.members
+          : this.members.filter((x: any) => {
+              if (x.invited_at) {
+                return x.primary_email.includes(this.membersFilterString)
+              }
+              if (x.id || x.gotrue_id) {
+                return (
+                  x.username.includes(this.membersFilterString) ||
+                  x.primary_email.includes(this.membersFilterString)
+                )
+              }
+            })
+        return temp.slice().sort((a: any, b: any) => a.username.localeCompare(b.username))
       },
       initData(organization: Organization, user: User, projects: Project[], roles: Role[]) {
         this.user = user
