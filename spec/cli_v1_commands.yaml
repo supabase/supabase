@@ -1,0 +1,98 @@
+# The spec divided into 3 main sections:
+#   info: general information about the library
+#   functions: public functions which the user can access
+#   types: a list of custom types
+
+clispec: '001'
+
+# This section outlines the general information for the library.
+info:
+  id: cli
+  version: 'next'
+  title: 'CLI'
+  language: 'sh'
+  source: 'https://github.com/supabase/cli'
+  bugs: 'https://github.com/supabase/cli/issues'
+  spec: 'https://github.com/supabase/supabase.tools/cli_spec/lib.yaml'
+  description: |
+    Supabase CLI.
+  options: | # Global options
+    ```sh
+    -v    --verbose               verbose output
+    ```
+
+commands:
+  - id: 'supabase-functions'
+    title: 'supabase functions'
+    summary: 'Manage your Edge Functions'
+    source: 'https://github.com/supabase/cli'
+    description: |
+      Manage your Edge Functions.
+    tags: []
+    links: []
+    usage: |
+      ```sh
+      supabase functions [command] [flags]
+      ```
+    subcommands:
+      - 'supabase-functions-new'
+      - 'supabase-functions-deploy'
+      - 'supabase-functions-delete'
+    options: |
+      ```
+      -h, --help   help for functions
+      ```
+
+  - id: 'supabase-functions-new'
+    title: 'supabase functions new'
+    summary: 'Create an Edge Functions'
+    source: 'https://github.com/supabase/cli'
+    description: |
+      Create an Edge Functions.
+    tags: []
+    links: []
+    usage: |
+      ```sh
+      supabase functions new <Function name>
+      ```
+    subcommands: []
+    options: |
+      ```
+      -h, --help   help for functions
+      ```
+
+  - id: 'supabase-functions-deploy'
+    title: 'supabase functions deploy'
+    summary: 'Deploy an Edge Functions'
+    source: 'https://github.com/supabase/cli'
+    description: |
+      Deploy an Edge Functions.
+    tags: []
+    links: []
+    usage: |
+      ```sh
+      supabase functions deploy <Function name>
+      ````
+    subcommands: []
+    options: |
+      ```
+      -h, --help   help for functions
+      ```
+
+  - id: 'supabase-functions-delete'
+    title: 'supabase functions delete'
+    summary: 'Delete an Edge Functions'
+    source: 'https://github.com/supabase/cli'
+    description: |
+      Delete an Edge Functions.
+    tags: []
+    links: []
+    usage: |
+      ```sh
+      supabase functions delete <Function name>
+      ```
+    subcommands: []
+    options: |
+      ```
+      -h, --help   help for functions
+      ```
