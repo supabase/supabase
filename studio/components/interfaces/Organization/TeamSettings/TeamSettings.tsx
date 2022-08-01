@@ -19,12 +19,12 @@ const TeamSettings = observer(() => {
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug ?? ''
-  const isOrgOwner = ui.selectedOrganization?.is_owner
+  const isOwner = ui.selectedOrganization?.is_owner
 
   const enablePermissions = useFlag('enablePermissions')
   const [isLeaving, setIsLeaving] = useState(false)
 
-  const canAddMembers = enablePermissions ? rolesAddable.length > 0 : isOrgOwner
+  const canAddMembers = enablePermissions ? rolesAddable.length > 0 : isOwner
 
   function onFilterMemberChange(e: any) {
     PageState.membersFilterString = e.target.value
@@ -79,7 +79,7 @@ const TeamSettings = observer(() => {
                 />
               </div>
             )}
-            {!isOrgOwner && (
+            {!isOwner && (
               <div>
                 <Button type="default" onClick={() => leaveTeam()} loading={isLeaving}>
                   Leave team

@@ -27,6 +27,7 @@ const MembersView = () => {
 
   const { ui } = useStore()
   const slug = ui.selectedOrganization?.slug || ''
+  const isOwner = ui.selectedOrganization?.is_owner
 
   const enablePermissions = useFlag('enablePermissions')
   const { mutateOrgMembers } = useOrganizationDetail(slug)
@@ -35,7 +36,7 @@ const MembersView = () => {
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
-  const hasAccessToMemberActions = enablePermissions ? true : PageState.isOrgOwner
+  const hasAccessToMemberActions = enablePermissions ? true : isOwner
 
   const getRoleNameById = (id: number | undefined) => {
     if (!roles) return id
@@ -152,6 +153,7 @@ const MembersView = () => {
                       </Table.td>
 
                       <Table.td>
+                        {!role && !enablePermissions && <p>{x.is_owner ? 'Owner' : 'Developer'}</p>}
                         {role && (
                           <>
                             {!enablePermissions ? (

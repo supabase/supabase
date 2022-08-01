@@ -30,17 +30,11 @@ const OrgSettingsLayout = withAuth(
       projects: [] as Project[],
       members: [] as Member[],
       roles: [] as Role[],
-
       membersFilterString: '',
-      get isOrgOwner() {
-        const userMember = this.members.find(
-          (member: Member) => member.gotrue_id === this.user.gotrue_id
-        )
-        const [memberRoleId] = userMember?.role_ids ?? []
-        const memberRole = (this.roles || []).find((role) => role.id === memberRoleId)
-        return memberRole?.name === 'Owner'
-      },
+
       get filteredMembers() {
+        if (!this.membersFilterString) return this.members
+
         const temp = this.members.filter((x: any) => {
           if (x.invited_at) {
             return x.primary_email.includes(this.membersFilterString)

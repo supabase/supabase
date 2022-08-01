@@ -60,7 +60,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
       owner_id: user.id,
-      role_id: roleId,
+      ...(enablePermissions ? { role_id: roleId } : {}),
     })
 
     if (response.error) {

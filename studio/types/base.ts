@@ -50,8 +50,7 @@ export interface User {
 }
 
 export interface Member {
-  // [Joshen TODO] This is deprecated with the BE update i think
-  id: number
+  id: number // To be deprecated after full ABAC roll out
 
   primary_email: string
   username: string
@@ -60,6 +59,8 @@ export interface Member {
 
   invited_id?: number
   invited_at?: string
+
+  is_owner?: boolean // To be deprecated after full ABAC roll out
 }
 
 export interface Role {
