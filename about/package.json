@@ -7,8 +7,8 @@
     "build": "docusaurus build"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.63",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.63",
+    "@docusaurus/core": "^2.0.0",
+    "@docusaurus/preset-classic": "^2.0.0",
     "@kiwicopple/prism-react-renderer": "github:kiwicopple/prism-react-renderer",
     "mermaid": "^8.13.8",
     "react": "^16.8.4",
