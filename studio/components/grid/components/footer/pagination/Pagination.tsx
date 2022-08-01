@@ -28,10 +28,6 @@ const Pagination: FC<PaginationProps> = () => {
   const maxPages = Math.ceil(state.totalRows / state.rowsPerPage)
   const totalPages = state.totalRows > 0 ? maxPages : 1
 
-  useEffect(() => {
-    if (state.page != page) setPage(state.page)
-  }, [state.page, page])
-
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
 
@@ -93,7 +89,7 @@ const Pagination: FC<PaginationProps> = () => {
 
   function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    const pageNum = Number(value)
+    const pageNum = Number(value) > maxPages ? maxPages : Number(value)
     setPage(pageNum)
     updatePageDebounced(pageNum, dispatch)
   }
@@ -120,7 +116,6 @@ const Pagination: FC<PaginationProps> = () => {
             <InputNumber
               value={page}
               onChange={onPageChange}
-              className="sb-grid-pagination-input"
               size="tiny"
               style={{
                 width: '3rem',
