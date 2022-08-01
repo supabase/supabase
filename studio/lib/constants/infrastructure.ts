@@ -143,3 +143,9 @@ export const DEFAULT_FREE_PROJECTS_LIMIT = 2
 export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
+
+export const USAGE_STATUS = {
+  fine: 'fine',
+  approaching: 'approaching',
+  over: 'over',
+}
