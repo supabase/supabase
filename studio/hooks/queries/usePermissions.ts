@@ -50,6 +50,6 @@ export function checkPermissions(action: string, resource: string, data?: object
     )
     .some(
       ({ condition }: { condition: jsonLogic.RulesLogic }) =>
-        condition === null || jsonLogic.apply(condition, data)
+        condition === null || jsonLogic.apply(condition, { resource_name: resource, ...data })
     )
 }
