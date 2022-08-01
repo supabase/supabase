@@ -1,11 +1,11 @@
 const navbar = [
   {
-    href: '/docs/guides',
+    href: 'https://supabase.com/docs/guides',
     label: 'Guides',
     position: 'left',
   },
   {
-    href: '/docs/guides',
+    href: 'https://supabase.com/docs/guides',
     label: 'Reference',
     position: 'left',
   },
