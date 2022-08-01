@@ -62,7 +62,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
       onAddressUpdated(updatedCustomer.address)
     } catch (error: any) {
       ui.setNotification({
-        category: 'success',
+        category: 'error',
         message: `Failed to update billing address: ${error.message}`,
       })
     } finally {
