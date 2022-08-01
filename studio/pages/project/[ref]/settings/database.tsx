@@ -208,7 +208,6 @@ const ResetDbPassword: FC<any> = () => {
       numbers: true,
       uppercase: true,
     })
-    console.log('generateStrongPassword', password)
     setPassword(password)
     delayedCheckPasswordStrength(password)
   }

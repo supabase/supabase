@@ -4,7 +4,6 @@ interface AuthConfigForm extends AuthConfig {
   ENABLE_SMTP: boolean
 }
 
-// [Joshen TODO] Type properly and write tests
 export const isSmtpEnabled = (config?: Partial<AuthConfig>): boolean => {
   return !!(
     config?.SMTP_ADMIN_EMAIL &&
