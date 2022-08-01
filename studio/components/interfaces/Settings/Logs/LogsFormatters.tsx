@@ -17,8 +17,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
 
   const split = value.toString().split('')[0]
 
-  // console.log(split)
-
   switch (split) {
     // 2XX || 1XX responses
     case '1':
@@ -186,7 +184,6 @@ export function jsonSyntaxHighlight(input: Object) {
   let json: string = JSON.stringify(input, null, 2)
   json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-  // console.log('json', json)
   const newJson = json.replace(
     /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
 
