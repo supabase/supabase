@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { Alert, Button, Typography } from '@supabase/ui'
-
 import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -10,12 +9,20 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import Link from 'next/link'
+import { API_URL } from 'lib/constants'
+import useSWR from 'swr'
+import { get } from 'lib/common/fetch'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
+  const projectRef = project?.ref
 
   const projectIsOverLimits = true
+
+  const { data } = useSWR(`${API_URL}/projects/${projectRef}/usage-status`, get)
+
+  console.log(data)
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -29,17 +36,19 @@ const Home: NextPageWithLayout = () => {
       </div>
       {projectIsOverLimits && (
         <div className="relative mx-6">
-          <Alert withIcon variant="warning" title="Your project is over limits">
-            This project is currently over one or more limits of the Free plan. Please visit Billing{' '}
-            {'&'} Usage to learn more.
-            <p className="mt-4">
-              <Link passHref href={`/project/${project?.ref}/settings/billing`}>
-                <Button as="a" type="default">
-                  Billing {'&'} Usage
-                </Button>
-              </Link>
-            </p>
-          </Alert>
+          {data?.database === `fine` && (
+            <Alert withIcon variant="warning" title="Your project is over limits">
+              This project is currently over one or more limits of the Free plan. Please visit
+              Billing {'&'} Usage to learn more.
+              <p className="mt-4">
+                <Link passHref href={`/project/${project?.ref}/settings/billing`}>
+                  <Button as="a" type="default">
+                    Billing {'&'} Usage
+                  </Button>
+                </Link>
+              </p>
+            </Alert>
+          )}
         </div>
       )}
 
