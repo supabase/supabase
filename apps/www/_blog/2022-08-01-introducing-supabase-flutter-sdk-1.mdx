@@ -1,0 +1,119 @@
+---
+title: 'Introducing Supabase Flutter SDK 1.0'
+description: Supabase Flutter SDK is getting a major update launching version 1.0. 
+author: tyler_shukert
+image: flutter-1/supabase-flutter-1.jpg
+thumb: flutter-1/supabase-flutter-1.jpg
+tags:
+  - flutter
+  - mobile
+date: '2022-08-01'
+toc_depth: 3
+---
+
+Today, we are announcing the upcoming release of the first stable release version of [supabase-flutter](https://pub.dev/packages/supabase_flutter). Flutter has quickly become one of the most popular frameworks for developers that want to build cross-platform mobile apps. We can attest to that growth, our Flutter SDK is one of the most popular ones and each day we see more and more Flutter devs choosing Supabase to handle the backend.
+
+For this release, our main focus was developer experience, so you will see several improvements in that area alongside new features and enhancements.
+
+Before we dive into the actual updates, I would like to thank all the community contributors who have helped the library to be where it is today. 
+
+## Better developer experience
+
+One of the core themes of the supabase-flutter 1.0 is better user experience. Until now, there were some disputable implementations in various places throughout the API, so we wanted to provide a more developer friendly intuitive interface. 
+
+### Automatically handling auth state persistence 
+
+Until now when using supabase-flutter, you had to include a class that extends `SupabaseAuthState` or `SupabaseAuthRequiredState` in order to persist auth state. With supabase-flutter 1.0, there is no longer a need to include these classes in your code. All you need to do to persist the auth state is to just initialize Supabase and everything else will be automatically taken care of. `SupabaseAuthState` and `SupabaseAuthRequiredState` have been removed from the code base. 
+
+```dart
+// Before
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+...
+
+class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
+  ...
+}
+
+// After
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+```
+
+### Automatically handling deep links
+
+Deep link handling had similar issues where you also had to include `SupabaseAuthState` or `SupabaseAuthRequiredState`. With the 1.0 update, you no longer need to use these classes either, and deep links will be automatically handled for you. You can listen to `onAuthStateChange` to handle when a deep link is received to redirect users to a new screen. 
+
+```dart
+// Before
+void onReceivedAuthDeeplink(Uri uri) {
+  Supabase.instance.log('onReceivedAuthDeeplink uri: $uri');
+}
+
+// After
+await Supabase.instance.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+```
+
+### Throwing errors instead of returning them
+
+When supabase-dart and supabase-flutter were created, we wanted to mirror the Javascript library as much as possible, but we soon realized that some syntax does not fit well when they are written in Dart. Throwing vs returning error is a good example of that. Since Dart does not have object destruction, the code becomes a bit tedious when errors are returned. That is why with supabase-flutter 1.0, we are going to throw errors instead of returning it. This is consistent across all features from auth, postgrest and storage. 
+
+```dart
+// Before
+final response = await Supabase.instance.from('messages').select().execute();
+final data = response.data;
+final error = response.error;
+
+// After
+try {
+  final data = await Supabase.instance.from('messages').select();
+} catch(error) {
+  // Handle error here
+}
+```
+
+### No more `.execute()` to get the data
+
+Besides throwing vs returning errors, we want this SDK to be as close as possible to the Javascript SDK to provide consistent developer experience no matter what programming language you are using. Prior to the 1.0 update, whenever you called the postgrest endpoints, you had to call `.execute()` at the end of each query. `.execute()` is now deprecated, and no longer needed in order to query data from your Supabase database. This update, along with many many other improvements across the whole library, has been done by Bruno D'Luka, and I would love to give him a special shout out here!
+
+```dart
+// Before
+final response = await Supabase.instance.from('messages').select().execute();
+final data = response.data;
+
+// After
+final data = await Supabase.instance.from('messages').select();
+```
+
+## Desktop support for deeplinks
+
+Ever since supabase-flutter was born, it supported only iOS, Android and Web for deep linking. This was a limitation of the deep link library that we were using, but with the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/app_links), which will enable us to support MacOS and Windows applications as well! Linux support is being worked on as well. 
+
+![Supabase Flutter desktop support](/images/blog/flutter-1/supported-platforms-table.png)
+
+
+## Multiplayer support
+
+[Multiplayer](https://supabase.com/blog/2022/04/01/supabase-realtime-with-multiplayer-features) is the next generation Supabase realtime engine that was announced at the previous launch week as coming out soon. We want our Flutter developers to experience this new multiplayer feature as well, so are working hard at bringing it to our Flutter SDK. It is not yet included in the developer preview of Supabase Flutter 1.0, but will be part of it when stable launch has been released. 
+
+## Supabase Auth UI for Supabase
+
+Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without having to build it yourself. You can just load the library and display a nice looking auth ui. The library will take your theme settings automatically to match the look and feel of your application. You can easily enable/ disable certain auth features with the configuration as well. I would like to thank [Fatuma](https://twitter.com/XquisiteDreamer) for single handedly working on bringing us an easier authentication experience. 
+
+## Final thoughts
+
+The updates that I got to introduce here are just the tip of the iceberg, and there have been many bug fixes or other features constantly being added to the Supabase Flutter SDK. This could not have been possible with the help from the open source community. Here, I would also like to give a shout out to two other developers who have been a major part of the journey of this SDK, and they are [Vinzent](https://twitter.com/Vinzent03_) and [Daniel Mossaband](https://github.com/DanMossa). They have been a huge part of the Supabase Flutter SDK not just for the 1.0 release, but throughout the lifetime of the library. 
+For those of you who want to try out the new SDK, you can get the developer preview version from [supabase-flutter](https://pub.dev/packages/supabase_flutter) pub.dev page. 
+
+## Flutter Resources
+
+- [supabase-flutter 1.0 developer preview](https://pub.dev/packages/supabase_flutter)
+- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/2022/06/30/flutter-tutorial-building-a-chat-app)
+- [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)
