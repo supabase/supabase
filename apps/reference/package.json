@@ -35,11 +35,7 @@
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.0.0-rc.1",
-    "ejs": "^3.1.8",
-    "fs": "^0.0.1-security",
-    "js-yaml": "^4.1.0",
-    "ts-node": "^10.9.1"
+    "@docusaurus/module-type-aliases": "2.0.0-rc.1"
   },
   "prettier": {
     "semi": false,
