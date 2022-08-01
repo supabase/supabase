@@ -171,7 +171,7 @@ const TriggersList: FC<any> = observer(
           <div className="flex h-full w-full items-center justify-center">
             <ProductEmptyState
               title="Database Webhooks"
-              ctaButtonLabel="Create Database Webhook"
+              ctaButtonLabel="Create Webhook"
               onClickCta={() => createHook()}
             >
               <AlphaPreview />
