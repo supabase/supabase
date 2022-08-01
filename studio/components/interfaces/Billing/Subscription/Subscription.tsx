@@ -1,17 +1,21 @@
-import { FC } from 'react'
 import dayjs from 'dayjs'
+import { FC } from 'react'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
-import { Loading, Button } from '@supabase/ui'
+import { Button, Loading } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { checkPermissions, useStore, useFlag } from 'hooks'
+import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
-import { useStore, useFlag } from 'hooks'
-import CostBreakdownRow from './CostBreakdownRow'
-import { StripeSubscription } from './Subscription.types'
-import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
+
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { chargeableProducts } from '../PAYGUsage/PAYGUsage.constants'
 import { PaygStats, ProductFeature } from '../PAYGUsage/PAYGUsage.types'
+import { deriveFeatureCost, deriveProductCost } from '../PAYGUsage/PAYGUsage.utils'
+import CostBreakdownRow from './CostBreakdownRow'
+import { StripeSubscription } from './Subscription.types'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   project: any
@@ -32,10 +36,20 @@ const Subscription: FC<Props> = ({
   currentPeriodStart,
   currentPeriodEnd,
 }) => {
-  const router = useRouter()
   const { ui } = useStore()
+  const router = useRouter()
   const isOrgOwner = ui.selectedOrganization?.is_owner
+
+  const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+
+  const canReadSubscription = checkPermissions(
+    PermissionAction.SQL_SELECT,
+    'postgres.public.subscriptions'
+  )
+  const canUpdateSubscription = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+    : isOrgOwner
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -66,7 +80,7 @@ const Subscription: FC<Props> = ({
             <div className="flex flex-col items-end space-y-2">
               {isEnterprise ? (
                 <Button
-                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  disabled={!canUpdateSubscription || projectUpdateDisabled}
                   onClick={() =>
                     router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
                   }
@@ -76,17 +90,25 @@ const Subscription: FC<Props> = ({
                 </Button>
               ) : (
                 <Button
-                  disabled={!isOrgOwner || projectUpdateDisabled}
+                  disabled={!canUpdateSubscription || projectUpdateDisabled}
                   onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
                   type="primary"
                 >
                   Change subscription
                 </Button>
               )}
-              {!isOrgOwner ? (
-                <p className="text-scale-1100 text-xs">
-                  Only the organization owner can amend subscriptions
-                </p>
+              {!canUpdateSubscription ? (
+                <>
+                  {enablePermissions ? (
+                    <p className="text-scale-1100 text-xs">
+                      You need additional permissions to amend subscriptions
+                    </p>
+                  ) : (
+                    <p className="text-scale-1100 text-xs">
+                      Only the organization owner can amend subscriptions
+                    </p>
+                  )}
+                </>
               ) : projectUpdateDisabled ? (
                 <p className="text-scale-1100 text-right text-xs">
                   Subscription changes are currently disabled
@@ -116,8 +138,12 @@ const Subscription: FC<Props> = ({
             </p>
           </div>
 
-          {/* Cost Breakdown */}
-          {!loading && subscription && (
+          {!canReadSubscription ? (
+            <div className="px-6 pb-4">
+              <NoPermission resourceText="view this project's subscription" />
+            </div>
+          ) : !loading && subscription ? (
+            // Cost breakdown
             <>
               <div className="border-panel-border-light dark:border-panel-border-dark relative flex items-center border-t px-6 py-3">
                 <div className="w-[40%]">
@@ -180,6 +206,8 @@ const Subscription: FC<Props> = ({
                 </div>
               </div>
             </>
+          ) : (
+            <></>
           )}
         </div>
       </div>

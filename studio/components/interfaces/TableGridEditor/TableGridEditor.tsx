@@ -1,15 +1,16 @@
-import { FC, useRef } from 'react'
-import { useRouter } from 'next/router'
+import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { isUndefined, find } from 'lodash'
-import { SupabaseGrid, SupabaseGridRef, parseSupaTable, Dictionary } from 'components/grid'
-import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
+import { useRouter } from 'next/router'
+import { FC, useRef } from 'react'
 
-import { useStore } from 'hooks'
-import NotFoundState from './NotFoundState'
-import GridHeaderActions from './GridHeaderActions'
-import SidePanelEditor from './SidePanelEditor'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
+import { checkPermissions, useStore } from 'hooks'
+import GridHeaderActions from './GridHeaderActions'
+import NotFoundState from './NotFoundState'
+import SidePanelEditor from './SidePanelEditor'
 
 interface Props {
   /** Theme for the editor */
@@ -63,6 +64,11 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
+  const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
+  const canInsert = checkPermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
+  const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
+  // const canEdit = canAdminWrite && canInsert && canUpdate
+
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)
   const isViewSelected = Object.keys(selectedTable).length === 2

@@ -8,11 +8,13 @@ import {
   IconChevronLeft,
   IconChevronRight,
 } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
+import NoPermission from 'components/ui/NoPermission'
 
 const PAGE_LIMIT = 10
 
@@ -35,7 +37,11 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
+  const canReadInvoices = checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public.invoices')
+
   useEffect(() => {
+    if (!canReadInvoices) return
+
     let cancel = false
     const page = 1
 
@@ -89,6 +95,10 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
         message: 'Unable to fetch the selected invoice',
       })
     }
+  }
+
+  if (!canReadInvoices) {
+    return <NoPermission resourceText="view invoices" />
   }
 
   return (
