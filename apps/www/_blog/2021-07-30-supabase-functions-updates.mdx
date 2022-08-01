@@ -60,13 +60,15 @@ This is especially true for our Enterprise customers, but also Jamstack develope
 
 To meet these goals, we're releasing Supabase Functions in stages:
 
-- _Stage 1:_ Give developers the ability to trigger external HTTP functions - today, using Function Hooks.
+- _Stage 1:_ Give developers the ability to trigger external HTTP functions - today, using Database Webhooks.
 - _Stage 2:_ Give developers the ability to trigger their own Serverless functions on AWS and GCP - Q4 2021.
 - _Stage 3:_ Release our own Serverless Functions (Supabase Functions) - Q4 for Early Preview customers.
 
 ![Supabase Functions timeline](/images/blog/functions-updates/functions-timeline.png)
 
-## Function Hooks (Alpha)
+## Database Webhooks (Alpha)
+
+(Note: Database Webhooks were previously called "Function Hooks")
 
 Today we're releasing Functions Hooks in `ALPHA`. The `ALPHA` tag means that it is NOT stable, but it's available for testing and feedback. The API will change, so do not use it for anything critical. You have been warned.
 
@@ -76,7 +78,7 @@ Postgres already has the concept of [Triggers](https://www.postgresql.org/docs/c
 
 ### Hook Events
 
-Function Hooks allow you to "listen" to any change in your tables to trigger an asynchronous Function. You can hook into a few different events:`INSERT`, `UPDATE`, and `DELETE`. All events are fired **after** a database row is changed. Keen eyes will be able to spot the similarity to Postgres triggers, and that's because Function Hooks are just a convenience wrapper around triggers.
+Database Webhooks allow you to "listen" to any change in your tables to trigger an asynchronous Function. You can hook into a few different events:`INSERT`, `UPDATE`, and `DELETE`. All events are fired **after** a database row is changed. Keen eyes will be able to spot the similarity to Postgres triggers, and that's because Database Webhooks are just a convenience wrapper around triggers.
 
 ![Hook Events](/images/blog/functions-updates/hook-events.png)
 
@@ -88,7 +90,7 @@ Supabase will support several different targets.
 - AWS Lambda/Google Cloud Run: Provide Supabase with a restricted IAM role to trigger Serverless functions natively.
 - Supabase Functions: We'll develop an end-to-end experience.
 
-![Supabase Function Hooks](/images/blog/functions-updates/supabase-function-hooks.png)
+![Supabase Database Webhooks](/images/blog/functions-updates/supabase-function-hooks.png)
 
 ### Hook Payload
 
@@ -120,14 +122,14 @@ type DeletePayload = {
 
 ## Hooks technical design: `pg_net v0.1`
 
-As with most of the Supabase platform, we leverage PostgreSQL's native functionality to implement Function Hooks.
+As with most of the Supabase platform, we leverage PostgreSQL's native functionality to implement Database Webhooks (previously called "Function Hooks").
 
 To build hooks, we've released a new PostgreSQL Extension, [pg_net](https://github.com/supabase/pg_net/), an asynchronous networking extension with an emphasis on scalability/throughput. In its initial (unstable) release we expose:
 
 - asynchronous HTTP `GET` requests.
 - asynchronous HTTP `POST` requests with a JSON payload.
 
-The extension is (currently) capable of >300 requests per second and is the networking layer underpinning Function Hooks. For a complete view of capabilities, check out [the docs](https://supabase.github.io/pg_net/api/).
+The extension is (currently) capable of >300 requests per second and is the networking layer underpinning Database Webhooks. For a complete view of capabilities, check out [the docs](https://supabase.github.io/pg_net/api/).
 
 ### **Usage**
 
@@ -244,7 +246,7 @@ This is only the beginning! First we'll thoroughly test it and make a stable rel
 
 ## Get started today
 
-Function Hooks is enabled today on all [new projects](https://app.supabase.com). Find it under Database > Alpha Preview > Function Hooks.
+Database Webhooks is enabled today on all [new projects](https://app.supabase.com). Find it under Database > Alpha Preview > Database Webhooks.
 
 ![Enable hooks](/images/blog/functions-updates/enable-hooks.png)
 

@@ -8,7 +8,7 @@ import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { passwordStrength } from 'lib/helpers'
+import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
@@ -60,6 +60,7 @@ const Wizard: NextPageWithLayout = () => {
   const isOrganizationOwner = ui.selectedOrganization?.is_owner
   const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+  const availableRegions = getAvailableRegions()
 
   const isAdmin = enablePermissions
     ? checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.projects')
@@ -189,6 +190,13 @@ const Wizard: NextPageWithLayout = () => {
     delayedCheckPasswordStrength(password)
   }
 
+  // [Fran] Enforce APSE1 region on staging
+  function getAvailableRegions() {
+    return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? pluckObjectFields(REGIONS, ['SOUTHEAST_ASIA'])
+      : REGIONS
+  }
+
   return (
     <Panel
       hideHeaderStyling
@@ -303,8 +311,8 @@ const Wizard: NextPageWithLayout = () => {
                     onChange={(value: string) => onDbRegionChange(value)}
                     descriptionText="Select a region close to you for the best performance."
                   >
-                    {Object.keys(REGIONS).map((option: string, i) => {
-                      const label = Object.values(REGIONS)[i]
+                    {Object.keys(availableRegions).map((option: string, i) => {
+                      const label = Object.values(availableRegions)[i] as string
                       return (
                         <Listbox.Option
                           key={option}
@@ -313,7 +321,7 @@ const Wizard: NextPageWithLayout = () => {
                           addOnBefore={({ active, selected }: any) => (
                             <img
                               className="w-5 rounded-sm"
-                              src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                              src={`/img/regions/${Object.keys(availableRegions)[i]}.svg`}
                             />
                           )}
                         >
