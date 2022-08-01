@@ -219,10 +219,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               <div className="bg-scale-300 border-t py-3">
                 <Modal.Content>
                   <div className="flex items-center justify-end gap-2">
-                    <Button size="tiny" type="default">
+                    <Button
+                      size="tiny"
+                      type="default"
+                      onClick={() => setSaveModalOpen(!saveModalOpen)}
+                    >
                       Cancel
                     </Button>
-                    <Button size="tiny" loading={isSubmitting}>
+                    <Button size="tiny" loading={isSubmitting} htmlType="submit">
                       Save
                     </Button>
                   </div>
