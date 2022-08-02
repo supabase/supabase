@@ -7,8 +7,8 @@ const ResourcesExceededErrorRenderer: React.FC<ErrorRendererProps> = ({ error, i
       <p>This query requires too much memory to be executed.</p>
       <p>
         {isCustomQuery
-          ? 'Avoid selecting entire objects and instead select specific keys using dot notation'
-          : 'Avoid querying across a large datetime range'}
+          ? 'Avoid selecting entire objects and instead select specific keys using dot notation.'
+          : 'Avoid querying across a large datetime range.'}
       </p>
       {!isCustomQuery && <p>Please contact support if this error persists.</p>}
     </div>
