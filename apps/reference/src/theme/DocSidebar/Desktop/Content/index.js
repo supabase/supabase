@@ -8,6 +8,7 @@ const subNavRoutes = [
   '/api',
   '/cli',
   '/gotrue',
+  '/storage',
   '/supabase-js',
   '/supabase-dart',
 ]
