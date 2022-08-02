@@ -1,6 +1,7 @@
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import { render, waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import dayjs from 'dayjs'
 
 test('can display log data', async () => {
   render(
@@ -49,6 +50,18 @@ test('dedupes log lines with exact id', async () => {
   await screen.findByText(/some-uuid/)
 })
 
+test('can display standard preview table columns', async () => {
+  const fakeMicroTimestamp = dayjs().unix() * 1000
+  render(
+    <LogTable
+      queryType="auth"
+      data={[{ id: '12345', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
+    />
+  )
+  await waitFor(() => screen.getByText(/some event message/))
+  await expect(screen.findByText(/12345/)).rejects.toThrow()
+  await expect(screen.findByText(fakeMicroTimestamp)).rejects.toThrow()
+})
 test('can display custom columns and headers based on data input', async () => {
   render(<LogTable data={[{ some_header: 'some_data', kinda: 123456 }]} />)
   await waitFor(() => screen.getByText(/some_header/))
