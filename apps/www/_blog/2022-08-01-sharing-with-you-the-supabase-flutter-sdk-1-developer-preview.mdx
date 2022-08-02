@@ -98,7 +98,9 @@ final data = await Supabase.instance.from('messages').select();
 
 ## Desktop support for deeplinks
 
-Ever since supabase-flutter was born, it supported only iOS, Android and Web for deep linking. This was a limitation of the deep link library that we were using, but with the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/app_links), which will enable us to support MacOS and Windows applications as well! Linux support is being worked on as well. 
+Ever since `supabase-flutter` was born, it supported only iOS, Android and Web for deep linking. This was a limitation of the deep link library that we were using. 
+
+With the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/app_links), which will enable us to support MacOS and Windows applications as well! Linux support is being worked on - follow the repo to keep updated. 
 
 ![Supabase Flutter desktop support](/images/blog/flutter-1/supported-platforms-table.png)
 
