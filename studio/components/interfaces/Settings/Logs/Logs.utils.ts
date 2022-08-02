@@ -16,12 +16,7 @@ export const isUnixMicro = (unix: string | number): boolean => {
 }
 
 export const isDefaultLogPreviewFormat = (log: LogData) =>
-  log &&
-  log.timestamp &&
-  log.metadata &&
-  log.event_message &&
-  log.id &&
-  Object.keys(log).length === 4
+  log && log.timestamp && log.event_message && log.id
 
 /**
  * Recursively retrieve all nested object key paths.

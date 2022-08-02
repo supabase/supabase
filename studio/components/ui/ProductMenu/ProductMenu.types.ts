@@ -13,4 +13,5 @@ export interface ProductMenuGroupItem {
   items: any[]
   icon?: ReactNode
   isExternal?: boolean
+  disabled?: boolean
 }

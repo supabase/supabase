@@ -39,10 +39,7 @@ export class RootStore implements IRootStore {
   constructor() {
     this.app = new AppStore(this)
     this.ui = new UiStore(this)
-    this.meta = new MetaStore(this, {
-      projectRef: '',
-      connectionString: '',
-    })
+    this.meta = new MetaStore(this, { projectRef: '', connectionString: '' })
 
     // @ts-ignore
     this.content = new ProjectContentStore(this, { projectRef: '' })

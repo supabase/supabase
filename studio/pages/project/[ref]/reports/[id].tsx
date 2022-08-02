@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import RGL, { WidthProvider } from 'react-grid-layout'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
@@ -6,19 +6,20 @@ import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
 import dayjs from 'dayjs'
 import {
-  Dropdown,
-  Button,
-  IconSave,
   Badge,
-  IconSettings,
+  Button,
+  Dropdown,
   IconArrowRight,
-  IconHome,
   IconChevronRight,
+  IconHome,
   IconPlus,
+  IconSave,
+  IconSettings,
 } from '@supabase/ui'
 
+import { checkPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import Loading from 'components/ui/Loading'
@@ -26,6 +27,7 @@ import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { NextPageWithLayout } from 'types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -64,6 +66,11 @@ const Reports = () => {
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
 
+  const canSaveReport = checkPermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.user_content',
+    { resource: { type: 'report' } }
+  )
   const contentStore = useProjectContentStore(ref)
 
   /*

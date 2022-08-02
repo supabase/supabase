@@ -473,7 +473,7 @@
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs;
+  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {

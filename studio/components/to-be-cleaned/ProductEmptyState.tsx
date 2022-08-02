@@ -8,6 +8,7 @@ interface Props {
   infoButtonLabel?: string
   infoButtonUrl?: string
   onClickCta?: () => void
+  disabled?: boolean
 }
 
 const ProductEmptyState: FC<Props> = ({
@@ -17,6 +18,7 @@ const ProductEmptyState: FC<Props> = ({
   infoButtonLabel = '',
   infoButtonUrl = '',
   onClickCta = () => {},
+  disabled = false,
 }) => (
   <div className="flex items-center justify-center w-full h-full">
     <div className="flex space-x-4 p-6 rounded border border-panel-border-light dark:border-panel-border-dark bg-panel-body-light dark:bg-panel-body-dark shadow-md">
@@ -26,7 +28,7 @@ const ProductEmptyState: FC<Props> = ({
           <Typography.Title level={5}>{title}</Typography.Title>
           <div className="flex flex-col space-y-2">{children}</div>
           <div className="flex items-center space-x-2">
-            <Button type="primary" onClick={onClickCta}>
+            <Button type="primary" onClick={onClickCta} disabled={disabled}>
               {ctaButtonLabel}
             </Button>
             {infoButtonUrl && infoButtonLabel ? (

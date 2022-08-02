@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { checkPermissions, useStore } from 'hooks'
+import { AuthProvidersForm } from 'components/interfaces'
+import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
+import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
-import { AuthProvidersForm } from 'components/interfaces'
-import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
-import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ui, authConfig } = useStore()
@@ -15,6 +16,11 @@ const PageLayout: NextPageWithLayout = () => {
   useEffect(() => {
     authConfig.load()
   }, [ui.selectedProjectRef])
+
+  const canUpdate = checkPermissions(
+    PermissionAction.SQL_UPDATE,
+    'postgres.public.custom_config_gotrue'
+  )
 
   if (authConfig) {
     return (

@@ -1,4 +1,4 @@
-import { Button, IconClock, Typography } from '@supabase/ui'
+import { Button, IconClock } from '@supabase/ui'
 import Link from 'next/link'
 import { FC } from 'react'
 
@@ -22,7 +22,7 @@ const UpgradeToPro: FC<Props> = ({ primaryText, projectRef, secondaryText }) => 
       </div>
       <div className="flex w-full items-center justify-between">
         <div className="space-y-1">
-          <p>{primaryText}</p>
+          <p className="text-sm">{primaryText}</p>
           <div>
             <p className="text-scale-1100 text-sm">{secondaryText}</p>
           </div>
