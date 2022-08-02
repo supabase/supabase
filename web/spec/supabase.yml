@@ -282,7 +282,7 @@ pages:
           Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signUp({
             phone: '+13334445555',
             password: 'some-password',
           })
