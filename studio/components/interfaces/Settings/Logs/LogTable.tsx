@@ -21,7 +21,7 @@ interface Props {
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: LogQueryError
+  error?: LogQueryError | null
   showDownload?: boolean
   // TODO: move all common params to a context to avoid prop drilling
   queryType?: QueryType
