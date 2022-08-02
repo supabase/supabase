@@ -23,7 +23,9 @@ Until now, there were some disputable implementations in the Flutter SDK. We've 
 
 ### Automatically handling auth state persistence 
 
-Until now when using supabase-flutter, you had to include a class that extends `SupabaseAuthState` or `SupabaseAuthRequiredState` in order to persist auth state. With supabase-flutter 1.0, there is no longer a need to include these classes in your code. All you need to do to persist the auth state is to just initialize Supabase and everything else will be automatically taken care of. `SupabaseAuthState` and `SupabaseAuthRequiredState` have been removed from the code base. 
+Previously, `supabase-flutter` required a class that extends `SupabaseAuthState` or `SupabaseAuthRequiredState` to persist auth state. With `supabase-flutter` 1.0, you no longer need to include these classes. 
+
+All you need to persist the auth state is initialize Supabase and everything else will be automatically taken care of. `SupabaseAuthState` and `SupabaseAuthRequiredState` have been removed from the code base. 
 
 ```dart
 // Before
