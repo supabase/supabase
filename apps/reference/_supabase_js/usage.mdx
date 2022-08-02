@@ -999,8 +999,8 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  headers: { 
-    "my-custom-header": 'my-custom-header-value' 
+  headers: {
+    "my-custom-header": 'my-custom-header-value'
   },
   body: JSON.stringify({ foo: 'bar' })
 })
@@ -1171,7 +1171,7 @@ ac.abort()
 ### Notes
 
 - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
+This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
 If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
 
 
@@ -1258,7 +1258,7 @@ const { data, error } = await supabase
 const { data, error } = await supabase
   .from('users')
   .update(`
-    address: { 
+    address: {
       street: 'Melrose Place',
       postcode: 90210
     }
@@ -1279,7 +1279,7 @@ const { data, error } = await supabase
 
 ### Notes
 
-- Primary keys should be included in the data payload in order for an update to work correctly. 
+- Primary keys should be included in the data payload in order for an update to work correctly.
 - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
 
 
@@ -1328,11 +1328,11 @@ const { data, error } = await supabase
 ```js
 const { data, error, count } = await supabase
   .from('users')
-  .upsert({ 
-      id: 3, message: 'foo', 
-      username: 'supabot' 
-  }, { 
-    count: 'exact' 
+  .upsert({
+      id: 3, message: 'foo',
+      username: 'supabot'
+  }, {
+    count: 'exact'
   })
 ```
 
@@ -1652,7 +1652,7 @@ const subscriptions = supabase.getSubscriptions()
 ### Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `select` 
+  - `buckets` permissions: `select`
   - `objects` permissions: none
 
 
@@ -1666,6 +1666,2232 @@ const subscriptions = supabase.getSubscriptions()
 const { data, error } = await supabase
   .storage
   .listBuckets()
+```
+
+
+
+
+
+
+## Get a single bucket
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select`
+  - `objects` permissions: none
+
+
+### Examples
+
+
+
+#### Get bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .getBucket('avatars')
+```
+
+
+
+
+
+
+## Create a new bucket
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `insert`
+  - `objects` permissions: none
+
+
+### Examples
+
+
+
+#### Create bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .createBucket('avatars', { public: false })
+```
+
+
+
+
+
+
+## Empty a bucket
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select`
+  - `objects` permissions: `select` and `delete`
+
+
+### Examples
+
+
+
+#### Empty bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .emptyBucket('avatars')
+```
+
+
+
+
+
+
+## updateBucket()
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `update`
+  - `objects` permissions: none
+
+
+### Examples
+
+
+
+#### Update bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .updateBucket('avatars', { public: false })
+```
+
+
+
+
+
+
+## deleteBucket()
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select` and `delete`
+  - `objects` permissions: none
+
+
+### Examples
+
+
+
+#### Delete bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .deleteBucket('avatars')
+```
+
+
+
+
+
+
+## Upload a file
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `insert`
+- For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
+
+
+### Examples
+
+
+
+#### Upload file
+
+```js
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .upload('public/avatar1.png', avatarFile, {
+    cacheControl: '3600',
+    upsert: false
+  })
+```
+
+
+
+
+#### Upload file using `ArrayBuffer` from base64 file data
+
+```js
+import { decode } from 'base64-arraybuffer'
+
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .upload('public/avatar1.png', decode('base64FileData'), {
+    contentType: 'image/png'
+  })
+```
+
+
+
+
+
+
+## Update a file
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `update` and `select`
+- For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
+
+
+### Examples
+
+
+
+#### Update file
+
+```js
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .update('public/avatar1.png', avatarFile, {
+    cacheControl: '3600',
+    upsert: false
+  })
+```
+
+
+
+
+#### Update file using `ArrayBuffer` from base64 file data
+
+```js
+import {decode} from 'base64-arraybuffer'
+
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .update('public/avatar1.png', decode('base64FileData'), {
+    contentType: 'image/png'
+  })
+```
+
+
+
+
+
+
+## Move a file
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `update` and `select`
+
+
+### Examples
+
+
+
+#### Move file
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .move('public/avatar1.png', 'private/avatar2.png')
+```
+
+
+
+
+
+
+## Copy a file
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `update` and `select`
+
+
+### Examples
+
+
+
+#### Copy file
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .copy('public/avatar1.png', 'private/avatar2.png')
+```
+
+
+
+
+
+
+## Create a signed URL
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `select`
+
+
+### Examples
+
+
+
+#### Create Signed URL
+
+```js
+const { signedURL, error } = await supabase
+  .storage
+  .from('avatars')
+  .createSignedUrl('folder/avatar1.png', 60)
+```
+
+
+
+
+
+
+## Sign multiple URLs
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `select`
+
+
+### Examples
+
+
+
+#### Create Signed URLs
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
+```
+
+
+
+
+
+
+## Get public URL
+
+
+
+
+
+### Notes
+
+- The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: none
+
+
+### Examples
+
+
+
+#### Returns the URL for an asset in a public bucket
+
+```js
+const { publicURL, error } = supabase
+  .storage
+  .from('public-bucket')
+  .getPublicUrl('folder/avatar1.png')
+```
+
+
+
+
+
+
+## Download a file
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `select`
+
+
+### Examples
+
+
+
+#### Download file
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .download('folder/avatar1.png')
+```
+
+
+
+
+
+
+## from.remove()
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `delete` and `select`
+
+
+### Examples
+
+
+
+#### Delete file
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .remove(['folder/avatar1.png'])
+```
+
+
+
+
+
+
+## List files
+
+
+
+
+
+### Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `select`
+
+
+### Examples
+
+
+
+#### List files in a bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .list('folder', {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' },
+  })
+```
+
+
+
+
+#### Search files in a bucket
+
+```js
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .list('folder', {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' },
+    search: 'jon'
+  })
+```
+
+
+
+
+
+
+## Limit rows returned
+
+
+
+
+
+### Notes
+
+Modifiers can be used on `select()` queries.
+
+If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+```
+
+
+
+
+#### With embedded resources
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, cities(name)')
+  .eq('name', 'United States')
+  .limit(1, { foreignTable: 'cities' })
+```
+
+
+
+
+
+
+## Order results
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name', 'country_id')
+  .order('id', { ascending: false })
+```
+
+
+
+
+#### With embedded resources
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, cities(name)')
+  .eq('name', 'United States')
+  .order('name', {foreignTable: 'cities'})
+```
+
+
+
+
+
+
+## Select a range of data
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .range(0,3)
+```
+
+
+
+
+
+
+## Get a single row of data
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .single()
+```
+
+
+
+
+
+
+## Return a single row if it exists
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'Singapore')
+  .maybeSingle()
+```
+
+
+
+
+
+
+## Apply multiple filters with OR conditional
+
+
+
+
+
+### Notes
+
+- `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+  ```js
+  .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
+  .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
+  .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+```
+
+
+
+
+#### Use `or` with `and`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+```
+
+
+
+
+#### Use `or` on foreign tables
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('id, cities(*)')
+  .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+```
+
+
+
+
+
+
+## Apply a "not" filter
+
+
+
+
+
+### Notes
+
+- `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+  ```js
+    .not('name','eq','Paris')
+    .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+    .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+    .not('id','in','(6,7)')  // Use Postgres list () for in filter.
+    .not('id','in',`(${arr})`)  // You can insert a javascript array.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .not('name', 'eq', 'Paris')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .not('name', 'eq', 'Paris')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .not('name', 'eq', 'Paris')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .not('name', 'eq', 'Paris')
+```
+
+
+
+
+
+
+## Match on several criteria
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .match({name: 'Beijing', country_id: 156})
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .match({name: 'Beijing', country_id: 156})
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .match({name: 'Beijing', country_id: 156})
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .match({name: 'Beijing', country_id: 156})
+```
+
+
+
+
+
+
+## Filter by exact equality
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'The shire')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .eq('name', 'San Francisco')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .eq('name', 'Mordor')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .eq('name', 'San Francisco')
+```
+
+
+
+
+
+
+## Filter by not equal
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .neq('name', 'The shire')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .neq('name', 'San Francisco')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .neq('name', 'Mordor')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .neq('name', 'Lagos')
+```
+
+
+
+
+
+
+## Filter by greater than
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gt('country_id', 250)
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .gt('country_id', 250)
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .gt('country_id', 250)
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .gt('country_id', 250)
+```
+
+
+
+
+
+
+## Filter by greater than or equal
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('country_id', 250)
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .gte('country_id', 250)
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .gte('country_id', 250)
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .gte('country_id', 250)
+```
+
+
+
+
+
+
+## Filter by less than
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lt('country_id', 250)
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .lt('country_id', 250)
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .lt('country_id', 250)
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .lt('country_id', 250)
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lte('country_id', 250)
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .lte('country_id', 250)
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .lte('country_id', 250)
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .lte('country_id', 250)
+```
+
+
+
+
+
+
+## Filter by string equality
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .like('name', '%la%')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .like('name', '%la%')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .like('name', '%la%')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .like('name', '%la%')
+```
+
+
+
+
+
+
+## Filter by string equality (case insensitive)
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .ilike('name', '%la%')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .ilike('name', '%la%')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .ilike('name', '%la%')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .ilike('name', '%la%')
+```
+
+
+
+
+
+
+## Filter by null values
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .is('name', null)
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .is('name', null)
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .is('name', null)
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .is('name', null)
+```
+
+
+
+
+
+
+## Filter if in array
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+
+
+
+
+
+## Filter if TBD
+
+
+
+
+
+### Notes
+
+- `.contains()` can work on array columns or range columns.
+  It is very useful for finding rows where a tag array contains all the values in the filter array.
+
+  ```js
+  .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .contains('main_exports', ['oil'])
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .contains('main_exports', ['oil'])
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .contains('main_exports', ['oil'])
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .contains('main_exports', ['oil'])
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+- `.containedBy()` can work on array columns or range columns.
+
+  ```js
+  .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeGt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeGt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeGt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeGt('population_range_millions', '[150, 250]')
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeGte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeGte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeGte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeGte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+- `.overlaps()` can work on array columns or range columns.
+
+  ```js
+  .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+
+
+
+#### With `update()`
+
+```js
+let countries = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+
+
+### Examples
+
+
+
+#### Text search
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    config: 'english'
+  })
+```
+
+
+
+
+#### Basic normalization
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    type: 'plain',
+    config: 'english'
+  })
+```
+
+
+
+
+#### Full normalization
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    type: 'phrase',
+    config: 'english'
+  })
+```
+
+
+
+
+#### Websearch
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat or cat'`, {
+    type: 'websearch',
+    config: 'english'
+  })
+```
+
+
+
+
+
+
+## Filter by TBD
+
+
+
+
+
+### Notes
+
+- `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+  ```js
+    .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+    .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+    .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
+    .filter('id','in',`(${arr})`)  // You can insert a javascript array.
+  ```
+
+
+### Examples
+
+
+
+#### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+
+
+
+#### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+
+
+
+#### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+
+
+
+#### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+
+
+
+#### Filter embedded resources
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, countries ( name )')
+  .filter('countries.name', 'in', '("France","Japan")')
 ```
 
 
