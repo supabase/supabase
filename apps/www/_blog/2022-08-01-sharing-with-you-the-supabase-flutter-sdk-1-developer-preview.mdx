@@ -67,7 +67,9 @@ await Supabase.instance.initialize(
 
 ### Throwing errors instead of returning them
 
-When supabase-dart and supabase-flutter were created, we wanted to mirror the Javascript library as much as possible, but we soon realized that some syntax does not fit well when they are written in Dart. Throwing vs returning error is a good example of that. Since Dart does not have object destruction, the code becomes a bit tedious when errors are returned. That is why with supabase-flutter 1.0, we are going to throw errors instead of returning it. This is consistent across all features from auth, postgrest and storage. 
+When `supabase-dart` and `supabase-flutter` were created, we wanted to mirror the JavaScript library as much as possible. We soon realized that some syntax does not fit well when written in Dart. Throwing vs returning error is a good example of that. Since Dart does not have object destruction, the code becomes a bit tedious when errors are returned. 
+
+With `supabase-flutter` 1.0, we are throwing errors instead of returning them. This is consistent across all features from `auth`, `postgrest`, and `storage`. 
 
 ```dart
 // Before
