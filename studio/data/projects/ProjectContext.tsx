@@ -48,12 +48,13 @@ export const ProjectContextProvider = ({
   useEffect(() => {
     if (projectApiData === undefined) {
       setSupabaseClient(null)
+      return
     }
 
     const {
       app_config: { endpoint: serviceEndpoint },
       serviceApiKey,
-    } = (projectApiData?.projectApi as any).autoApiService
+    } = (projectApiData.projectApi as any).autoApiService
 
     const supabaseClient = createClient(`https://${serviceEndpoint}`, serviceApiKey, {
       auth: {
