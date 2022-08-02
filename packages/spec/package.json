@@ -15,7 +15,7 @@
     "storage:gen": "npm run storage:gen:api",
     "storage:gen:api": "ts-node ./index.ts gen --type api --input ../../spec/storage_v0_openapi.json --output  ../../apps/reference/_storage/usage.mdx",
     "supabase-js:gen": "npm run supabase-js:gen:sdk",
-    "supabase-js:gen:sdk": "ts-node ./index.ts gen --type sdk --input ../../spec/supabase_js_sdk.yaml --output  ../../apps/reference/_supabase_js/usage.mdx",
+    "supabase-js:gen:sdk": "ts-node ./index.ts gen --type sdk --input ../../spec/supabase_js_v1_sdk.yaml --output  ../../apps/reference/_supabase_js/usage.mdx",
     "supabase-dart:gen": "npm run supabase-dart:gen:sdk",
     "supabase-dart:gen:sdk": "ts-node ./index.ts gen --type sdk --input ../../spec/supabase_dart_sdk.yaml --output  ../../apps/reference/_supabase_dart/usage.mdx "
   },
