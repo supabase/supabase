@@ -12,6 +12,9 @@ import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRende
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
+import { LogQueryError } from '.'
+import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -19,7 +22,7 @@ interface Props {
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: any
+  error?: LogQueryError
   showDownload?: boolean
   projectRef: string
 }
@@ -224,6 +227,34 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const renderErrorAlert = () => {
+    if (!error) return null
+    const childProps = {
+      isCustomQuery: queryType ? false : true,
+      error: error!,
+    }
+    let Renderer = DefaultErrorRenderer
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+    ) {
+      Renderer = ResourcesExceededErrorRenderer
+    }
+
+    return (
+      <div className="flex justify-center px-5">
+        <Alert
+          variant="danger"
+          title="Sorry! An error occured when fetching data."
+          withIcon
+          className="w-1/2"
+        >
+          <Renderer {...childProps} />
+        </Alert>
+      </div>
+    )
+  }
+
   return (
     <>
       <section
@@ -335,27 +366,7 @@ const LogTable = ({
                         </>
                       </div>
                     )}
-                    {error && (
-                      <div className="flex justify-center px-5">
-                        <Alert
-                          variant="danger"
-                          title="Sorry! An error occured when fetching data."
-                          withIcon
-                          className="w-1/2"
-                        >
-                          <Input.TextArea
-                            size="tiny"
-                            value={
-                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
-                            }
-                            borderless
-                            className="font-mono w-full mt-4"
-                            copy
-                            rows={12}
-                          />
-                        </Alert>
-                      </div>
-                    )}
+                    {error && renderErrorAlert()}
                   </div>
                 </>
               ) : null

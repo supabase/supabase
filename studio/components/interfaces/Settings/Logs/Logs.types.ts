@@ -51,9 +51,19 @@ export interface CountData {
 type LFResponse<T> = {
   result: T[]
   error?: {
+    code: number
+    errors: {
+      domain: string
+      message: string
+      reason: string | 'resourcesExceeded'
+    }[]
     message: string
+    status: string
   }
 }
+type ApiError = string
+
+export type LogQueryError = Omit<LFResponse<unknown>, "result"> | ApiError
 
 export type Count = LFResponse<CountData>
 
