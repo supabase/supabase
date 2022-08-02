@@ -1,0 +1,28 @@
+# The spec is divided into 2 main sections:
+#   info: general information about the tool
+#   functions: public functions which the user can access
+
+configspec: '001'
+
+# This section outlines the general information for the tool.
+info:
+  id: 'gotrue' # {string} A unique ID for this tool.
+  version: 'next' # {string} The current version number of the tool.
+  title: 'GoTrue' # {string} A readable name.
+  source: 'https://github.com/supabase/gotrue' # {string} Where developers can find the source code.
+  bugs: 'https://github.com/supabase/gotrue/issues' # {string} Where developers can file bugs.
+  spec: 'https://github.com/supabase/supabase/blob/master/web/spec/cli_config_001.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  description: |
+    A `config.toml` file is generated after running `supabase init`.
+
+    This file is located in the `supabase` folder under `supabase/config.toml`.
+
+# This section is an array of public functions which a user might need to execute.
+parameters:
+  - id: 'project_id' # {string} A unique identifier for this param.
+    title: 'project_id' # {string} Any a name.
+    tags: ['general'] # {string[]} These tags are useful for grouping parameters
+    required: true
+    # default: '5432'
+    description: |
+      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.

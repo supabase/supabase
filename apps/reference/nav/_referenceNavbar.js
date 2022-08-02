@@ -1,0 +1,111 @@
+const navbar = [
+  {
+    href: 'https://supabase.com/docs/guides',
+    label: 'Guides',
+    position: 'left',
+  },
+  {
+    href: 'https://supabase.com/docs/guides',
+    label: 'Reference',
+    position: 'left',
+  },
+
+  { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
+  {
+    href: 'https://github.com/supabase/supabase',
+    className: 'navbar-item-github',
+    position: 'right',
+  },
+  {
+    href: 'https://discord.supabase.com',
+    className: 'navbar-item-discord',
+    position: 'right',
+  },
+  {
+    href: 'https://twitter.com/supabase',
+    className: 'navbar-item-twitter',
+    position: 'right',
+  },
+
+  /**
+   * OFFICIAL REFERENCE
+   */
+
+  // API
+  {
+    to: 'api',
+    position: 'left',
+    label: 'API',
+    supabaseCustomNavBarRegex: '(^/api$|api/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_api',
+    supabaseCustomNavBarRegex: '(^/api$|api/)',
+  },
+
+  // CLI
+  {
+    to: 'cli',
+    position: 'left',
+    label: 'CLI',
+    supabaseCustomNavBarRegex: '(^/cli$|cli/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_cli',
+    supabaseCustomNavBarRegex: '(^/cli$|cli/)',
+  },
+
+  // supabase-js
+  {
+    to: 'supabase-js',
+    position: 'left',
+    label: 'JavaScript SDK',
+    supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_supabase_js',
+    supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
+  },
+
+  /**
+   * TOOLS
+   */
+
+  // GoTrue
+  {
+    to: 'gotrue',
+    position: 'left',
+    label: 'GoTrue Auth Server',
+    supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_gotrue',
+    supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
+  },
+
+  /**
+   * COMMUNITY
+   */
+  {
+    to: 'supabase-dart',
+    position: 'left',
+    label: 'Supabase Dart SDK',
+    supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_supabase_dart',
+    supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
+  },
+]
+
+module.exports = { navbar }
