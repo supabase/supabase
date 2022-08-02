@@ -57,7 +57,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <h1 className="text-2xl text-scale-1200">Functions</h1>
+                <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
               </div>
               <WarningBanner title={WARNING_MESSAGE.title} />
             </div>
@@ -107,7 +107,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
               cursor-pointer 
               hover:text-scale-1100"
                   >
-                    Functions
+                    Edge Functions
                   </h1>
                 </Link>
 
