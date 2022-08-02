@@ -11,7 +11,12 @@
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
-    "prettier": "prettier --write \"./**/*.{ts,tsx,md,js,jsx,json}\""
+    "prettier": "prettier --write \"./**/*.{ts,tsx,md,js,jsx,json}\"",
+    "cli:version": "docusaurus docs:version:_cli",
+    "gotrue:version": "docusaurus docs:version:_gotrue",
+    "storage:version": "docusaurus docs:version:_storage",
+    "supabase-js:version": "docusaurus docs:version:_supabase-js",
+    "supabase-dart:version": "docusaurus docs:version:_supabase_dart"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-rc.1",

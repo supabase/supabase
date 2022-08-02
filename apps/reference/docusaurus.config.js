@@ -61,6 +61,16 @@ const config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: '_storage',
+        path: '_storage',
+        routeBasePath: 'storage',
+        sidebarPath: require.resolve('./nav/storage_sidebars.js'),
+        breadcrumbs: false,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: '_supabase_dart',
         path: '_supabase_dart',
         routeBasePath: 'supabase-dart',

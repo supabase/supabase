@@ -41,7 +41,10 @@ const sidebars = {
       type: 'category',
       label: 'Tools',
       collapsed: false,
-      items: [{ type: 'link', label: 'GoTrue Auth Server', href: '/gotrue' }],
+      items: [
+        { type: 'link', label: 'Auth Server', href: '/gotrue' },
+        { type: 'link', label: 'Storage Server', href: '/storage' },
+      ],
     },
     // {
     //   type: 'category',
