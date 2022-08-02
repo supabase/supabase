@@ -5,6 +5,8 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "api:gen": "npm run api:gen:paths",
+    "api:gen:paths": "ts-node ./index.ts gen --type api --input ../../spec/api_v0_openapi.json --output  ../../apps/reference/_api/usage.mdx",
     "cli:gen": "npm run cli:gen:commands && npm run cli:gen:config",
     "cli:gen:commands": "ts-node ./index.ts gen --type command --input ../../spec/cli_v1_commands.yaml --output  ../../apps/reference/_cli/usage.mdx ",
     "cli:gen:config": "ts-node ./index.ts gen --type config --input ../../spec/cli_v1_config.yaml --output  ../../apps/reference/_cli/config.mdx",
@@ -15,10 +17,12 @@
     "supabase-dart:gen": "npm run supabase-dart:gen:sdk",
     "supabase-dart:gen:sdk": "ts-node ./index.ts gen --type sdk --input ../../spec/supabase_dart_sdk.yaml --output  ../../apps/reference/_supabase_dart/usage.mdx "
   },
-  "dependencies": {},
   "devDependencies": {
+    "@types/lodash": "^4.14.182",
     "ejs": "^3.1.8",
     "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21",
+    "openapi-types": "^12.0.0",
     "ts-node": "^10.9.1"
   },
   "prettier": {
