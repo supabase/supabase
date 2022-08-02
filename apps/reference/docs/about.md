@@ -9,11 +9,6 @@ sidebar_position: 2
 
 This section of the docs provides technical descriptions of the products and how to use them.
 
-There are two main sections:
-
-- Supabase Reference Docs - describes to use the tools with integrated integrated libraries.
-- Tools Reference Docs - describes to use the tools with modular libraries.
-
 ## Modularity
 
 Supabase is modular. While it may seem like a single tool, it is actually a suite of tools that are composed on top of a PostgreSQL database. This offers several advantages:
