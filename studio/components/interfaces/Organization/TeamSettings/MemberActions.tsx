@@ -41,11 +41,11 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
     : true
   const canResendInvite = checkPermissions(
     PermissionAction.SQL_INSERT,
-    'postgres.auth.user_invites'
+    'postgres.public.user_invites'
   )
   const canRevokeInvite = checkPermissions(
     PermissionAction.SQL_DELETE,
-    'postgres.auth.user_invites'
+    'postgres.public.user_invites'
   )
 
   const handleMemberDelete = async () => {
@@ -195,7 +195,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
             )}
             {isPendingInviteAcceptance ? (
               <>
-                {canResendInvite && (
+                {canRevokeInvite && (
                   <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
@@ -203,7 +203,7 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
                     </div>
                   </Dropdown.Item>
                 )}
-                {canRevokeInvite && isExpired && (
+                {canResendInvite && isExpired && (
                   <>
                     <Dropdown.Seperator />
                     <Dropdown.Item onClick={() => handleResendInvite(member)}>
