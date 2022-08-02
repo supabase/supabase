@@ -22,7 +22,7 @@ interface Props {
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: LogQueryError
+  error?: LogQueryError | null
   showDownload?: boolean
   projectRef: string
 }
