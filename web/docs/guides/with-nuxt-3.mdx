@@ -188,7 +188,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 <template>
     <form class="row flex flex-center" @submit.prevent="handleLogin">
         <div class="col-6 form-widget">
-            <h1 class="header">Supabase + Vue 3</h1>
+            <h1 class="header">Supabase + Nuxt 3</h1>
             <p class="description">Sign in via magic link with your email below</p>
             <div>
                 <input class="inputField" type="email" placeholder="Your email" v-model="email" />
@@ -242,7 +242,7 @@ Let's create a new component for that called `Account.vue`.
             <input id="email" type="text" :value="user.email" disabled />
         </div>
         <div>
-            <label for="username">Name</label>
+            <label for="username">Username</label>
             <input id="username" type="text" v-model="username" />
         </div>
         <div>
@@ -332,6 +332,30 @@ Now that we have all the components in place, let's update `app.vue`:
     <NuxtPage />
   </div>
 </template>
+```
+
+We now need to create an index page called `pages/index.vue`:
+
+```html title="pages/index.vue"
+<template>
+    <div class="container" style="padding: 50px 0 100px 0">
+        <Account v-if="user" />
+        <Auth v-else />
+    </div>
+</template>
+
+<script setup>
+
+const supabase = useSupabaseClient()
+
+const user = useUser();
+
+user.value = useSupabaseUser()
+supabase.auth.onAuthStateChange((_, session) => {
+    user.value = session?.user
+})
+
+</script>
 ```
 
 Once that's done, run this in a terminal window:
