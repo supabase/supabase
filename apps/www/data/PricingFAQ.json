@@ -1,6 +1,6 @@
 [
   {
-    "question": "Can I cap my usage so my bill doesn't run over.",
+    "question": "Can I cap my usage so my bill doesn't run over?",
     "answer": "Yes. Spend caps are on by default on the pro tier. You can turn spend caps off for usage beyond the tier limits to pay as you grow."
   },
   {
@@ -20,7 +20,7 @@
     "answer": "Our pricing is in Beta. You can read more about our decisions in our blog on pricing [here](/blog/2021/03/29/pricing). Pricing may change in the future, however as a team of developers we are committed to pricing being as developer friendly as possible."
   },
   {
-    "question": "What happens if I cancel my subscription",
+    "question": "What happens if I cancel my subscription?",
     "answer": "The organization is allocated credits for unused time during the billing month. Those credits can be used for other projects."
   },
   {
