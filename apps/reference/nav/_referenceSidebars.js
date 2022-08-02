@@ -40,21 +40,21 @@ const sidebars = {
     {
       type: 'category',
       label: 'Tools',
-      collapsed: true,
+      collapsed: false,
       items: [{ type: 'link', label: 'GoTrue Auth Server', href: '/gotrue' }],
     },
-    {
-      type: 'category',
-      label: 'Postgres Extensions',
-      link: { type: 'doc', id: 'postgres/extensions/intro' },
-      collapsed: true,
-      items: [
-        'postgres/extensions/http',
-        'postgres/extensions/pgtap',
-        'postgres/extensions/plv8',
-        'postgres/extensions/uuid-ossp',
-      ],
-    },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres Extensions',
+    //   link: { type: 'doc', id: 'postgres/extensions/intro' },
+    //   collapsed: true,
+    //   items: [
+    //     'postgres/extensions/http',
+    //     'postgres/extensions/pgtap',
+    //     'postgres/extensions/plv8',
+    //     'postgres/extensions/uuid-ossp',
+    //   ],
+    // },
   ],
 }
 
