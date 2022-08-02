@@ -36,7 +36,7 @@ const DefaultPreviewSelectionRenderer = ({ log }: any) => {
       </div>
 
       <DetailedRow
-        label="Timestamp"
+        label="ISO Timestamp"
         value={isUnixMicro(log.timestamp) ? unixMicroToIsoTimestamp(log.timestamp) : log.timestamp}
       />
       <div className="flex flex-col gap-3">

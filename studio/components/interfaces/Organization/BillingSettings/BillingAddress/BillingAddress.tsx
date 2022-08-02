@@ -2,12 +2,14 @@ import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
 import { Form, Input, Button, Select } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
 import Panel from 'components/ui/Panel'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   loading: boolean
@@ -19,6 +21,12 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
   const { ui } = useStore()
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
+
+  const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
+  const canUpdateBillingAddress = checkPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.customer'
+  )
 
   const [isDirty, setIsDirty] = useState(false)
   const initialValues = {
@@ -54,7 +62,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
       onAddressUpdated(updatedCustomer.address)
     } catch (error: any) {
       ui.setNotification({
-        category: 'success',
+        category: 'error',
         message: `Failed to update billing address: ${error.message}`,
       })
     } finally {
@@ -76,6 +84,8 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
             <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
             <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
           </div>
+        ) : !canReadBillingAddress ? (
+          <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <Form
             validateOnBlur
@@ -87,10 +97,26 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
               return (
                 <>
                   <Panel.Content className="w-3/5 space-y-2">
-                    <Input id="line1" name="line1" placeholder="Address line 1" />
-                    <Input id="line2" name="line2" placeholder="Address line 2" />
+                    <Input
+                      id="line1"
+                      name="line1"
+                      placeholder="Address line 1"
+                      disabled={!canUpdateBillingAddress}
+                    />
+                    <Input
+                      id="line2"
+                      name="line2"
+                      placeholder="Address line 2"
+                      disabled={!canUpdateBillingAddress}
+                    />
                     <div className="flex items-center space-x-2">
-                      <Select className="w-full" id="country" name="country" placeholder="Country">
+                      <Select
+                        className="w-full"
+                        id="country"
+                        name="country"
+                        placeholder="Country"
+                        disabled={!canUpdateBillingAddress}
+                      >
                         <Select.Option key="empty" value="">
                           ---
                         </Select.Option>
@@ -105,20 +131,41 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                         id="postal_code"
                         name="postal_code"
                         placeholder="Postal code"
+                        disabled={!canUpdateBillingAddress}
                       />
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Input className="w-full" id="city" name="city" placeholder="City" />
-                      <Input className="w-full" id="state" name="state" placeholder="State" />
+                      <Input
+                        className="w-full"
+                        id="city"
+                        name="city"
+                        placeholder="City"
+                        disabled={!canUpdateBillingAddress}
+                      />
+                      <Input
+                        className="w-full"
+                        id="state"
+                        name="state"
+                        placeholder="State"
+                        disabled={!canUpdateBillingAddress}
+                      />
                     </div>
                   </Panel.Content>
                   <div className="border-t border-scale-400" />
-                  <Panel.Content>
+                  <Panel.Content className="flex justify-between">
+                    {!canUpdateBillingAddress ? (
+                      <p className="text-sm text-scale-1000">
+                        You need additional permissions to update this organization's billing
+                        address
+                      </p>
+                    ) : (
+                      <div />
+                    )}
                     <div className="flex items-center space-x-4">
                       <Button
                         type="default"
                         htmlType="reset"
-                        disabled={!isDirty || isSubmitting}
+                        disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
                         onClick={() => {
                           handleReset()
                           setIsDirty(false)
@@ -130,7 +177,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                         type="primary"
                         htmlType="submit"
                         loading={isSubmitting}
-                        disabled={!isDirty || isSubmitting}
+                        disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
                       >
                         Save changes
                       </Button>

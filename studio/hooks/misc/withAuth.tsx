@@ -1,7 +1,8 @@
-import { useProfile, useStore } from 'hooks'
 import { ComponentType, useEffect } from 'react'
 import { NextRouter, useRouter } from 'next/router'
+
 import { IS_PLATFORM } from 'lib/constants'
+import { useProfile, useStore, usePermissions } from 'hooks'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -26,6 +27,7 @@ export function withAuth<T>(
     const returning =
       app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
     const { profile, isLoading } = useProfile(returning)
+    const { permissions, isLoading: isPermissionLoading } = usePermissions(returning)
 
     const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
     const isRedirecting =
@@ -33,7 +35,7 @@ export function withAuth<T>(
       checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // this should run before redirecting
+      // This should run before redirecting
       if (!isLoading) {
         if (!profile) {
           ui.setProfile(undefined)
@@ -49,11 +51,15 @@ export function withAuth<T>(
         }
       }
 
-      // this should run after setting store data
+      if (!isPermissionLoading) {
+        ui.setPermissions(permissions)
+      }
+
+      // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isRedirecting, profile])
+    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
 
     useEffect(() => {
       if (!isLoading && router.isReady) {

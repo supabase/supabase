@@ -39,7 +39,6 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
       </div>
       <div className="h-px w-full bg-panel-border-interior-light dark:bg-panel-border-interior-dark"></div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding} space-y-2`}>
-        {console.log(log)}
         <DetailedRow label="Severity" value={<SeverityFormatter value={metadata.level} />} />
         <DetailedRow label="Deployment version" value={metadata.version} />
         <DetailedRow label="Timestamp" value={timestamp.format('DD MMM, YYYY HH:mm')} />

@@ -260,7 +260,7 @@ const CreateProject = observer(() => {
       const query = new URLSearchParams(_store.queryParams).toString()
       router.push(`/vercel/complete?${query}`)
     } catch (error) {
-      console.log('error', error)
+      console.error('Error', error)
       setLoading(false)
     }
   }
