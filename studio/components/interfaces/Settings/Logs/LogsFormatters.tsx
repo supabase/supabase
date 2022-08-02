@@ -5,6 +5,8 @@
  */
 
 import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import dayjs from 'dayjs'
+import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 
 export const ResponseCodeFormatter = ({ value }: any) => {
   if (!value) {
@@ -25,8 +27,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
         <div className="flex items-center h-full">
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300 dark:bg-scale-600
-            
+            bg-scale-500 dark:bg-scale-400 border
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -41,7 +42,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-red-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-red-1100">{value}</label>
@@ -57,7 +58,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-amber-400
-            
+
             "
           >
             <label className="block font-mono text-sm text-amber-1100 dark:text-amber-900">
@@ -74,7 +75,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           <div
             className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
             bg-scale-300
-            
+
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -162,6 +163,24 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       )
       break
   }
+}
+
+/**
+ * Formats a timestamp into a local timestamp display
+ *
+ * Accepts either unix microsecond or iso timestamp.
+ * For LogTable column rendering
+ */
+export const TimestampLocalFormatter = ({
+  value,
+  className,
+}: {
+  className?: string
+  value: string | number
+}) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  const formattedTimestamp = dayjs(timestamp).format('DD MMM, HH:mm:ss')
+  return <span className={`text-xs ${className}`}>{formattedTimestamp}</span>
 }
 
 /*

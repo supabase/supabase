@@ -12,6 +12,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "dev:reference": "turbo run dev --filter=reference --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "docker:dev": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
