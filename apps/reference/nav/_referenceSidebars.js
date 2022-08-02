@@ -27,19 +27,18 @@ const sidebars = {
         },
         { type: 'link', label: 'Supabase CLI', href: '/cli' },
         { type: 'link', label: 'Supabase API', href: '/api' },
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Community',
-      collapsed: false,
-      items: [
         { type: 'link', label: 'Supabase Dart Client', href: '/supabase-dart' },
       ],
     },
+    // {
+    //   type: 'category',
+    //   label: 'Community',
+    //   collapsed: false,
+    //   items: [],
+    // },
     {
       type: 'category',
-      label: 'Tools',
+      label: 'Self hosted',
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/gotrue' },
