@@ -48,7 +48,9 @@ await Supabase.initialize(
 
 ### Automatically handling deep links
 
-Deep link handling had similar issues where you also had to include `SupabaseAuthState` or `SupabaseAuthRequiredState`. With the 1.0 update, you no longer need to use these classes either, and deep links will be automatically handled for you. You can listen to `onAuthStateChange` to handle when a deep link is received to redirect users to a new screen. 
+Deep link handling had similar issues previously, requiring you to implement `SupabaseAuthState` or `SupabaseAuthRequiredState` classes. 
+
+With the 1.0 update, you no longer need to use these classes, and deep links will be automatically handled. You can listen to `onAuthStateChange` to handle when a deep link is received to redirect users to a new screen. 
 
 ```dart
 // Before
