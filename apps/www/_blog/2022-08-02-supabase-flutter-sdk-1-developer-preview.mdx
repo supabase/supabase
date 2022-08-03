@@ -115,11 +115,35 @@ With the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/a
 
 We want our Flutter developers to experience this new multiplayer feature as well, so are working hard at bringing it to our Flutter SDK. It is not yet included in the developer preview of Supabase Flutter 1.0, but will be part of it when stable launch has been released. 
 
-## Supabase Auth UI for Supabase
+## Supabase Auth UI for Flutter
 
-Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application. You can easily enable/disable certain Auth features with the configuration.
+![Supabase Auth UI for Flutter](/images/blog/flutter-1supabase-flutter-auth-ui.png)
+
+Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application.
+
+You can get started with it on [pub.dev](https://pub.dev/packages/supabase_auth_ui).
 
 I would like to thank [Fatuma](https://twitter.com/XquisiteDreamer) for single-handedly working on bringing us an easier authentication experience. 
+
+```dart
+// Email and password signin form
+SupaEmailAuth(
+  authAction: AuthAction.signIn,
+  redirectUrl: '/home',
+),
+
+// Magic Link signin form
+SupaMagicAuth(),
+
+// Social Login Buttons
+SupaSocialsAuth(
+  socialProviders: [
+  SocialProviders.apple,
+  SocialProviders.google,
+  ],
+  colored: true,
+),
+```
 
 ## Final thoughts
 
