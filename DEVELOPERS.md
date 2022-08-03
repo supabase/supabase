@@ -181,7 +181,7 @@ Then edit and visit any of the following sites:
 
 - `/apps/www`: http://localhost:3000
   - The main website.
-- `/apps/refernce`: http://localhost:3010
+- `/apps/reference`: http://localhost:3010
   - Reference Documentation.
 - `/apps/temp-docs`: http://localhost:3001
   - We are migrating the docs to a Next.js application.
