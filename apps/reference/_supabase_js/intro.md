@@ -1,9 +1,9 @@
 ---
 slug: /
 sidebar_position: 1
-sidebar_label: Introduction
+sidebar_label: Supabase JavaScript Library
 ---
 
-# Supabase JavaScript Client
+# Supabase JavaScript Library
 
 Some docs
