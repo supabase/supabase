@@ -2,12 +2,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconCode, Loading, Badge } from '@supabase/ui'
+import { IconCode, Loading } from '@supabase/ui'
 
 import { useStore, withAuth } from 'hooks'
 import FunctionsNav from './FunctionsNav'
 import BaseLayout from 'components/layouts'
-import WarningBanner from 'components/ui/WarningBanner'
 
 const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
@@ -120,21 +119,10 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
             {item && <FunctionsNav item={item} />}
           </div>
           <div
-            className="
-            h-full flex flex-col flex-grow
-
-            w-full mx-auto
-
-            transition-all
-
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+            className={[
+              'h-full flex flex-col flex-grow w-full mx-auto transition-all',
+              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+            ].join(' ')}
           >
             {children}
           </div>
