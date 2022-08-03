@@ -123,15 +123,11 @@ const config = {
       footer: {
         links: [
           {
-            title: 'Tools',
+            title: 'Reference',
             items: [
               {
                 label: 'Supabase CLI',
                 to: '/cli',
-              },
-              {
-                label: 'GoTrue',
-                to: '/gotrue',
               },
             ],
           },
