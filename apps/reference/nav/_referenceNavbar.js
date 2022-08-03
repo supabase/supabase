@@ -38,12 +38,12 @@ const navbar = [
     label: 'API',
     supabaseCustomNavBarRegex: '(^/api$|api/)',
   },
-  {
-    type: 'docsVersionDropdown',
-    position: 'left',
-    docsPluginId: '_api',
-    supabaseCustomNavBarRegex: '(^/api$|api/)',
-  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_api',
+  //   supabaseCustomNavBarRegex: '(^/api$|api/)',
+  // },
 
   // CLI
   {
@@ -52,12 +52,12 @@ const navbar = [
     label: 'CLI',
     supabaseCustomNavBarRegex: '(^/cli$|cli/)',
   },
-  {
-    type: 'docsVersionDropdown',
-    position: 'left',
-    docsPluginId: '_cli',
-    supabaseCustomNavBarRegex: '(^/cli$|cli/)',
-  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_cli',
+  //   supabaseCustomNavBarRegex: '(^/cli$|cli/)',
+  // },
 
   // supabase-js
   {
