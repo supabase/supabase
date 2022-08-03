@@ -1,4 +1,5 @@
 import fs from 'fs'
+import _ from 'lodash'
 
 export const slugify = (text: string) => {
   return text
@@ -22,3 +23,14 @@ export const writeToDisk = (fileName: string, content: any) => {
     })
   })
 }
+
+/**
+ * Convert Object to Array of values
+ */
+export const toArrayWithKey = (obj: object, keyAs: string) =>
+  _.values(
+    _.mapValues(obj, (value: any, key: string) => {
+      value[keyAs] = key
+      return value
+    })
+  )

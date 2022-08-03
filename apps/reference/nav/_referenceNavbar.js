@@ -91,6 +91,20 @@ const navbar = [
     supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
   },
 
+  // Storage
+  {
+    to: 'storage',
+    position: 'left',
+    label: 'GoTrue Auth Server',
+    supabaseCustomNavBarRegex: '(^/storage$|storage/)',
+  },
+  {
+    type: 'docsVersionDropdown',
+    position: 'left',
+    docsPluginId: '_storage',
+    supabaseCustomNavBarRegex: '(^/storage$|storage/)',
+  },
+
   /**
    * COMMUNITY
    */
