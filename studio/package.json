@@ -21,7 +21,7 @@
     "@radix-ui/react-tooltip": "^0.1.6",
     "@scaleleap/pg-format": "^1.0.0",
     "@sentry/browser": "^6.15.0",
-    "@sentry/nextjs": "^6.15.0",
+    "@sentry/nextjs": "^6.16.1",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.25.0",
     "@supabase/postgres-meta": "^0.26.1",
