@@ -1,14 +1,13 @@
-import BaseLayout from 'components/layouts'
-import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
-import { IconAlertCircle, IconCode, IconSlash, Loading, Tabs } from '@supabase/ui'
-import { Tab } from '@headlessui/react'
-import FunctionsNav from './FunctionsNav'
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { IconCode, Loading, Badge } from '@supabase/ui'
+
+import { useStore, withAuth } from 'hooks'
+import FunctionsNav from './FunctionsNav'
+import BaseLayout from 'components/layouts'
 import WarningBanner from 'components/ui/WarningBanner'
-import { WARNING_MESSAGE } from './Functions.constants'
 
 const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
@@ -51,15 +50,18 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
-            flex items-center justify-center
-          "
+                  className={[
+                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
+                    'text-brand-900 flex items-center justify-center',
+                  ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <h1 className="text-2xl text-scale-1200">Functions</h1>
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-2xl text-scale-1200">Functions</h1>
+                  <Badge color="green">Beta</Badge>
+                </div>
               </div>
-              <WarningBanner title={WARNING_MESSAGE.title} />
             </div>
 
             {children}
