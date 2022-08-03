@@ -175,7 +175,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
             const payload: UserContent = {
               name: values.name,
-              description: values.description,
+              description: values?.description ?? '',
               type: 'log_sql',
               content: {
                 content_id: editorId,
@@ -185,6 +185,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               },
               visibility: 'user',
             }
+
+            console.log('Payload', payload)
 
             try {
               const { data: query, error } = await content.create(payload)
