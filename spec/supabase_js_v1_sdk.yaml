@@ -715,8 +715,8 @@ functions:
     name: 'select()'
     description: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
-      - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
+      - `select()` can be combined with [Modifiers](https://supabase.com/docs/reference/javascript/using-modifiers)
+      - `select()` can be combined with [Filters](https://supabase.com/docs/reference/javascript/using-filters)
       - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     examples:
       - id: example-data-select
@@ -911,7 +911,7 @@ functions:
     summary: 'Update data in database'
     name: 'update()'
     description: |
-      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+      - `update()` should always be combined with [Filters](https://supabase.com/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
     examples:
       - id: example-data-update-basic
         summary: Updating your data
@@ -998,9 +998,9 @@ functions:
     summary: 'Delete data from database'
     name: 'delete()'
     description: |
-      - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - `delete()` should always be combined with [filters](https://supabase.com/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
-        [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+        [RLS](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
@@ -1058,7 +1058,7 @@ functions:
         description: |
           Postgres functions that return tables can also be combined with
           [Modifiers](/docs/reference/javascript/using-modifiers) and
-          [Filters](/docs/reference/javascript/using-filters).
+          [Filters](https://supabase.com/docs/reference/javascript/using-filters).
         code: |
           ```js
           const { data, error } = await supabase
@@ -1081,7 +1081,7 @@ functions:
     summary: 'Subscribe to database changes'
     name: 'on().subscribe()'
     description: |
-      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](https://supabase.com/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
       - id: example-data-realtime-basic
@@ -1462,7 +1462,7 @@ functions:
     summary: 'Get public URL'
     name: 'from.getPublicUrl()'
     description: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](https://supabase.com/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
