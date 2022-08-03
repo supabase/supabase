@@ -175,7 +175,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
             const payload: UserContent = {
               name: values.name,
-              description: values?.description ?? '',
+              description: values.description || '',
               type: 'log_sql',
               content: {
                 content_id: editorId,
