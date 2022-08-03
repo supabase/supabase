@@ -21,11 +21,11 @@ const General: FC<Props> = ({}) => {
   const project = ui.selectedProject
 
   const formId = 'project-general-settings'
-  const initialValues = { name: project?.name ?? '' }
+  const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
   const canUpdateProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
-    const response = await post(`${API_URL}/projects/${project?.ref}/update`, values)
+    const response = await post(`${API_URL}/projects/${project?.ref}/update`, { name: values.name })
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -76,6 +76,7 @@ const General: FC<Props> = ({}) => {
               <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
                   <Input id="name" size="small" label="Project name" disabled={!canUpdateProject} />
+                  <Input copy disabled id="ref" size="small" label="Reference ID" />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>
