@@ -24,7 +24,7 @@ type PaginationProps = {}
 const Pagination: FC<PaginationProps> = () => {
   const state = useTrackedState()
   const dispatch = useDispatch()
-  const [page, setPage] = useState(state.page)
+  const [page, setPage] = useState<number | null>(state.page)
   const maxPages = Math.ceil(state.totalRows / state.rowsPerPage)
   const totalPages = state.totalRows > 0 ? maxPages : 1
 
@@ -90,8 +90,10 @@ const Pagination: FC<PaginationProps> = () => {
   function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
     const pageNum = Number(value) > maxPages ? maxPages : Number(value)
-    setPage(pageNum)
-    updatePageDebounced(pageNum, dispatch)
+    setPage(pageNum || null)
+    if (pageNum) {
+      updatePageDebounced(pageNum, dispatch)
+    }
   }
 
   function onRowsPerPageChange(value: string | number) {
@@ -114,6 +116,8 @@ const Pagination: FC<PaginationProps> = () => {
           <p className="text-scale-1100 text-sm">Page</p>
           <div className="sb-grid-pagination-input-container">
             <InputNumber
+              // [Fran] we'll have to upgrade the UI component types to accept the null value when users delete the input content
+              // @ts-ignore
               value={page}
               onChange={onPageChange}
               size="tiny"
