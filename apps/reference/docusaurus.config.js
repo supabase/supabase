@@ -53,8 +53,18 @@ const config = {
       {
         id: '_gotrue',
         path: '_gotrue',
-        routeBasePath: 'gotrue',
+        routeBasePath: 'auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
+        breadcrumbs: false,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: '_storage',
+        path: '_storage',
+        routeBasePath: 'storage',
+        sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
       },
     ],
@@ -105,23 +115,19 @@ const config = {
         // title: 'Supabase Tools',
         logo: {
           alt: 'Supabase Tools',
-          src: 'img/supabase-tools-light.svg',
-          srcDark: 'img/supabase-tools-dark.svg',
+          src: 'img/supabase-logo-wordmark--light.svg',
+          srcDark: 'img/supabase-logo-wordmark--dark.svg',
         },
         items: mainNavbar.navbar,
       },
       footer: {
         links: [
           {
-            title: 'Tools',
+            title: 'Reference',
             items: [
               {
                 label: 'Supabase CLI',
                 to: '/cli',
-              },
-              {
-                label: 'GoTrue',
-                to: '/gotrue',
               },
             ],
           },
