@@ -215,6 +215,7 @@ module.exports = {
         'guides/integrations/auth0',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
+        'guides/integrations/directus',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
