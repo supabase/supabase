@@ -5,9 +5,10 @@ const navbar = [
     position: 'left',
   },
   {
-    href: 'https://supabase.com/docs/guides',
+    href: '/',
     label: 'Reference',
     position: 'left',
+    // activeLinkRegex: '',
   },
 
   { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
