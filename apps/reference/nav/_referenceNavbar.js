@@ -63,7 +63,7 @@ const navbar = [
   {
     to: 'supabase-js',
     position: 'left',
-    label: 'JavaScript SDK',
+    label: 'JavaScript Library',
     supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
   },
   {
@@ -111,7 +111,7 @@ const navbar = [
   {
     to: 'supabase-dart',
     position: 'left',
-    label: 'Supabase Dart SDK',
+    label: 'Dart Library',
     supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
   },
   // {
