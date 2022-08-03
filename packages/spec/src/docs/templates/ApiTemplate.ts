@@ -15,7 +15,7 @@ title: Usage
 <% paths.forEach(function(path){ %>
 <% path.operations.forEach(function(operation){ %>
 
-### <%- operation.summary %>
+## <%- operation.summary %> {#<%- operation.operationId %>}
 
 \`\`\`
 <%- path.path %>
