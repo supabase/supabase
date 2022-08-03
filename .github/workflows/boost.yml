@@ -27,4 +27,4 @@ jobs:
         with:
           action: scan
           api_token: ${{ secrets.BOOST_API_KEY }}
-          scanner_version: 3.0.0.rc33
+          scanner_version: 3.0.0.rc33 # Run ID 1
