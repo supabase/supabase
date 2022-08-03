@@ -115,8 +115,8 @@ const config = {
         // title: 'Supabase Tools',
         logo: {
           alt: 'Supabase Tools',
-          src: 'img/supabase-tools-light.svg',
-          srcDark: 'img/supabase-tools-dark.svg',
+          src: 'img/supabase-logo-wordmark--light.svg',
+          srcDark: 'img/supabase-logo-wordmark--dark.svg',
         },
         items: mainNavbar.navbar,
       },
