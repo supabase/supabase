@@ -37,8 +37,8 @@ const Index = ({}: Props) => {
       <Layout>
         <Container>
           <SectionContainer className="">
-            <div className="text-center space-y-2">
-            <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
+            <div className="space-y-2 text-center">
+              <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
                 Support
               </h1>
               <h1 className="h1">Get Support</h1>
@@ -60,12 +60,13 @@ const Index = ({}: Props) => {
                   <div className="mb-4">
                     <h5 className="text-scale-1200 text-lg font-medium">GitHub Issues</h5>
                     <p className="my-2 block">
-                      <p  className='text-scale-1100'>
+                      <p className="text-scale-1100">
                         Have a general issue or bug that you've found? We'd love to hear about it in
                         our GitHub issues. This can be feature requests too!
                       </p>
-                      <p className="mt-2 text-scale-1100">
-                        <span className="font-bold text-brand-900">Use this for:</span> Bugs and other issues
+                      <p className="text-scale-1100 mt-2">
+                        <span className="text-brand-900 font-bold">Use this for:</span> Bugs and
+                        other issues
                       </p>
                     </p>
                   </div>
@@ -107,12 +108,13 @@ const Index = ({}: Props) => {
                       GitHub Discussions/Discord
                     </h5>
                     <p className="my-2 block">
-                      <p className='text-scale-1100'>
+                      <p className="text-scale-1100">
                         For help and questions about best practices, join our GitHub discussions or
                         join us on Discord. Browse and ask questions.
                       </p>
-                      <p className="mt-2 text-scale-1100">
-                        <span className="font-bold text-brand-900">Use this for:</span> General questions
+                      <p className="text-scale-1100 mt-2">
+                        <span className="text-brand-900 font-bold">Use this for:</span> General
+                        questions
                       </p>
                     </p>
                   </div>
@@ -121,8 +123,8 @@ const Index = ({}: Props) => {
                 <div>
                   <div
                     className="
-                    dark:bg-scale-400 flex 
-                    flex-row justify-space-evenly gap-2 rounded rounded-t-none border-b
+                    dark:bg-scale-400 justify-space-evenly 
+                    flex flex-row gap-2 rounded rounded-t-none border-b
                     border-r border-l
                     border-gray-100 bg-white p-5
                     pt-10 dark:border-gray-600"
@@ -137,10 +139,7 @@ const Index = ({}: Props) => {
                         </Button>
                       </a>
                     </Link>
-                    <Link
-                      href="https://discord.supabase.com/"
-                      as="https://discord.supabase.com/"
-                    >
+                    <Link href="https://discord.supabase.com/" as="https://discord.supabase.com/">
                       <a target="_blank">
                         <Button
                           size="medium"
@@ -180,13 +179,13 @@ const Index = ({}: Props) => {
                   <div className="mb-4">
                     <h5 className="text-scale-1200 text-lg font-medium">Email Support</h5>
                     <p className="my-2 block">
-                      <p className='text-scale-1100'>
+                      <p className="text-scale-1100">
                         We offer email based support. If you need SLAs, guaranteed response times,
                         or have an issue, please contact us here.
                       </p>
-                      <p className="mt-2 text-scale-1100">
-                        <span className="font-bold text-brand-900">Use this for:</span> Issues or questions
-                        specific to you
+                      <p className="text-scale-1100 mt-2">
+                        <span className="text-brand-900 font-bold">Use this for:</span> Issues or
+                        questions specific to you
                       </p>
                     </p>
                   </div>
