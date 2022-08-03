@@ -53,7 +53,7 @@ const config = {
       {
         id: '_gotrue',
         path: '_gotrue',
-        routeBasePath: 'gotrue',
+        routeBasePath: 'auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
       },
