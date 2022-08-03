@@ -57,9 +57,9 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                   <h1 className="text-2xl text-scale-1200">Functions</h1>
-                  <Badge color="green">Beta</Badge>
+                  <p className="text-scale-1000 mt-1">Beta</p>
                 </div>
               </div>
             </div>
@@ -70,48 +70,29 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
       ) : (
         <div className="h-full flex flex-col flex-grow py-6">
           <div
-            className="
-            w-full mx-auto
-
-            transition-all
-            flex flex-col
-
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+            className={[
+              'w-full mx-auto transition-all flex flex-col',
+              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+            ].join(' ')}
           >
-            <div
-              className="flex 
-            flex-col 
-            gap-y-4
-            xl:flex-row 
-            item-center 
-            justify-between"
-            >
+            <div className="flex flex-col gap-y-4 xl:flex-row item-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
-            flex items-center justify-center
-          "
+                  className={[
+                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
+                    'text-brand-900 flex items-center justify-center',
+                  ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <Link href={`/project/${ref}/functions`}>
-                  <h1
-                    className="
-              transition-colors 
-              text-2xl text-scale-1200 
-              cursor-pointer 
-              hover:text-scale-1100"
-                  >
-                    Functions
-                  </h1>
-                </Link>
+                <div className="flex items-center space-x-4">
+                  <Link href={`/project/${ref}/functions`}>
+                    <h1 className="transition-colors text-2xl text-scale-1200 cursor-pointer hover:text-scale-1100">
+                      Functions
+                    </h1>
+                  </Link>
+                  <p className="text-scale-1000 mt-1">Beta</p>
+                </div>
 
                 {name && (
                   <>
@@ -133,9 +114,6 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                     <h5 className="text-2xl text-scale-1200">{name}</h5>
                   </>
                 )}
-              </div>
-              <div>
-                <WarningBanner title={WARNING_MESSAGE.title} />
               </div>
             </div>
             {item && <FunctionsNav item={item} />}
