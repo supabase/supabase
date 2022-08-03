@@ -120,7 +120,7 @@ export const generateUpdateColumnPayload = (
   if (!isEqual(originalColumn.format, type)) {
     payload.type = type
   }
-  if (!isEqual(originalColumn.default_value, defaultValue)) {
+  if (!isEqual(unescapeLiteral(originalColumn.default_value as string), defaultValue)) {
     payload.defaultValue = defaultValue
     payload.defaultValueFormat =
       isNull(defaultValue) || isSQLExpression(defaultValue)

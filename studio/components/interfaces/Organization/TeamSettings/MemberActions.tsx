@@ -54,9 +54,12 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
       message: `This is permanent! Are you sure you want to remove ${member.primary_email}`,
       onAsyncConfirm: async () => {
         setLoading(true)
-        const response = await delete_(
-          `${API_URL}/organizations/${slug}/members/${member.gotrue_id}`
-        )
+
+        const response = enablePermissions
+          ? await delete_(`${API_URL}/organizations/${slug}/members/${member.gotrue_id}`)
+          : await delete_(`${API_URL}/organizations/${slug}/members/remove`, {
+              member_id: member.id,
+            })
 
         if (response.error) {
           ui.setNotification({
@@ -65,7 +68,10 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
           })
           setLoading(false)
         } else {
-          const updatedMembers = members.filter((m) => m.gotrue_id !== member.gotrue_id)
+          const updatedMembers = enablePermissions
+            ? members.filter((m) => m.gotrue_id !== member.gotrue_id)
+            : members.filter((m) => m.id !== member.id)
+
           mutateOrgMembers(updatedMembers)
           ui.setNotification({
             category: 'success',
