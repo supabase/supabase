@@ -186,8 +186,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               visibility: 'user',
             }
 
-            console.log('Payload', payload)
-
             try {
               const { data: query, error } = await content.create(payload)
               if (error) throw error
