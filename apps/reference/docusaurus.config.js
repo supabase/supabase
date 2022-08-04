@@ -11,7 +11,8 @@ const config = {
   tagline: 'Documentation for the Supabase Ecosystem',
   url: 'https://supabase.tools',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
+  // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
