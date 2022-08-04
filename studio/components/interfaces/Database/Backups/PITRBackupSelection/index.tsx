@@ -268,7 +268,9 @@ const PITRBackupSelection: FC<Props> = () => {
             </div>
             <Popover.Seperator />
             <div className="flex items-center justify-end px-4">
-              <Button type="default">Restore</Button>
+              <Button type="default" htmlType="submit">
+                Restore
+              </Button>
             </div>
           </div>
         </div>
