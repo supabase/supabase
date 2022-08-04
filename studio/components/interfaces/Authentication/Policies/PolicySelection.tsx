@@ -1,17 +1,19 @@
 import { FC } from 'react'
-import { IconEdit, IconGrid, Modal } from '@supabase/ui'
+import { Button, IconEdit, IconGrid, Modal } from '@supabase/ui'
 import CardButton from 'components/ui/CardButton'
 
 interface Props {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
+  onCancel: () => void
 }
 
 const PolicySelection: FC<Props> = ({
   description = '',
   onViewTemplates = () => {},
   onViewEditor = () => {},
+  onCancel = () => {},
 }) => {
   return (
     <Modal.Content>
@@ -29,7 +31,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   bg-scale-1200 text-scale-100 flex h-8
                   w-8
-                  items-center justify-center rounded  
+                  items-center justify-center rounded
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -47,7 +49,7 @@ const PolicySelection: FC<Props> = ({
                   className="
                   bg-scale-1200 text-scale-100 flex h-8
                   w-8
-                  items-center justify-center rounded  
+                  items-center justify-center rounded
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />
@@ -68,6 +70,11 @@ const PolicySelection: FC<Props> = ({
           </a>
           .
         </p>
+        <div className="pt-4">
+          <Button type="default" htmlType="reset" onClick={() => onCancel()}>
+            Cancel
+          </Button>
+        </div>
       </div>
     </Modal.Content>
   )

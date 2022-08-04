@@ -190,6 +190,7 @@ const PolicyEditorModal: FC<Props> = ({
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
+            onCancel={onSelectCancel}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
