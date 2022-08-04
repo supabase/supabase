@@ -1,0 +1,74 @@
+---
+id: single
+title: "single()"
+slug: single
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Retrieves only one row from the result. Result must be one row (e.g. using
+`limit`), otherwise this will result in an error.
+
+<Tabs
+  defaultValue="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .single()
+```
+
+
+</TabItem>
+
+</Tabs>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Examples
+
+### With `select()`
+
+
+
+<Tabs
+  defaultValue="js"
+  groupId="reference/supabase-js"
+  values={[{ label: 'JavaScript', value: 'js' }]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .single()
+```
+
+
+</TabItem>
+
+</Tabs>
