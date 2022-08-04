@@ -54,12 +54,12 @@ module.exports = {
         'guides/local-development',
         'guides/examples',
       ],
-      collapsed: false,
+      collapsed: true,
     },
     {
       type: 'category',
       label: 'Quickstarts',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/with-angular',
         'guides/with-expo',
@@ -80,7 +80,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Database',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/database',
         'guides/database/connecting-to-postgres',
@@ -118,19 +118,19 @@ module.exports = {
     {
       type: 'category',
       label: 'APIs',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/api', 'guides/api/generating-types'],
     },
     {
       type: 'category',
       label: 'Functions',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/functions'],
     },
     {
       type: 'category',
       label: 'Auth',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/auth',
         {
@@ -185,13 +185,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Storage',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/storage'],
     },
     {
       type: 'category',
       label: 'Platform',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/platform/logs',
         'guides/platform/metrics',
@@ -203,13 +203,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Self Hosting',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/hosting/overview', 'guides/hosting/docker'],
     },
     {
       type: 'category',
       label: 'Integrations',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
@@ -228,7 +228,7 @@ module.exports = {
     {
       type: 'category',
       label: 'See Also',
-      collapsed: false,
+      collapsed: true,
       items: [
         'faq',
         'handbook/contributing',
