@@ -1,14 +1,12 @@
-import BaseLayout from 'components/layouts'
-import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
-import { IconAlertCircle, IconCode, IconSlash, Loading, Tabs } from '@supabase/ui'
-import { Tab } from '@headlessui/react'
-import FunctionsNav from './FunctionsNav'
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
-import WarningBanner from 'components/ui/WarningBanner'
-import { WARNING_MESSAGE } from './Functions.constants'
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { IconCode, Loading } from '@supabase/ui'
+
+import { useStore, withAuth } from 'hooks'
+import FunctionsNav from './FunctionsNav'
+import BaseLayout from 'components/layouts'
 
 const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const { functions, ui } = useStore()
@@ -51,15 +49,18 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
-            flex items-center justify-center
-          "
+                  className={[
+                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
+                    'text-brand-900 flex items-center justify-center',
+                  ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <h1 className="text-2xl text-scale-1200">Functions</h1>
+                <div className="flex items-center space-x-4">
+                  <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
+                  <p className="text-scale-1000 mt-1">Beta</p>
+                </div>
               </div>
-              <WarningBanner title={WARNING_MESSAGE.title} />
             </div>
 
             {children}
@@ -68,48 +69,30 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
       ) : (
         <div className="h-full flex flex-col flex-grow py-6">
           <div
-            className="
-            w-full mx-auto
-
-            transition-all
-            flex flex-col
-
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+            className={[
+              'w-full mx-auto transition-all flex flex-col',
+              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+            ].join(' ')}
           >
-            <div
-              className="flex 
-            flex-col 
-            gap-y-4
-            xl:flex-row 
-            item-center 
-            justify-between"
-            >
+            <div className="flex flex-col gap-y-4 xl:flex-row item-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className="w-6 h-6 bg-brand-300 border border-brand-600 rounded text-brand-900
-            flex items-center justify-center
-          "
+                  className={[
+                    'w-6 h-6 bg-brand-300 border border-brand-600 rounded',
+                    'text-brand-900 flex items-center justify-center',
+                  ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
                 </div>
-                <Link href={`/project/${ref}/functions`}>
-                  <h1
-                    className="
-              transition-colors 
-              text-2xl text-scale-1200 
-              cursor-pointer 
-              hover:text-scale-1100"
-                  >
-                    Functions
-                  </h1>
-                </Link>
+
+                <div className="flex items-center space-x-4">
+                  <Link href={`/project/${ref}/functions`}>
+                    <h1 className="transition-colors text-2xl text-scale-1200 cursor-pointer hover:text-scale-1100">
+                      Edge Functions
+                    </h1>
+                  </Link>
+                  <p className="text-scale-1000 mt-1">Beta</p>
+                </div>
 
                 {name && (
                   <>
@@ -132,29 +115,14 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
                   </>
                 )}
               </div>
-              <div>
-                <WarningBanner title={WARNING_MESSAGE.title} />
-              </div>
             </div>
             {item && <FunctionsNav item={item} />}
           </div>
           <div
-            // weird repetative styling
-            className="
-            h-full flex flex-col flex-grow
-
-            w-full mx-auto
-
-            transition-all
-
-            px-5
-            lg:px-16
-            xl:px-24
-            1xl:px-28
-            2xl:px-32
-
-            gap-4
-        "
+            className={[
+              'h-full flex flex-col flex-grow w-full mx-auto transition-all',
+              'px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 gap-4',
+            ].join(' ')}
           >
             {children}
           </div>

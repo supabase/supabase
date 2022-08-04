@@ -72,7 +72,7 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       ? [
           {
             key: 'functions',
-            label: 'Functions',
+            label: 'Edge Functions',
             icon: <IconCode size={18} strokeWidth={2} />,
             link: isProjectBuilding ? buildingUrl : `/project/${ref}/functions`,
           },
