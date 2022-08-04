@@ -11,11 +11,12 @@ date: '2022-08-02'
 toc_depth: 3
 ---
 
-Today, we are releasing of Developer Preview version of v1.0 of [Supabase Flutter SDK](https://pub.dev/packages/supabase_flutter). Flutter has quickly become one of the most popular frameworks for developers to build cross-platform mobile apps. We can attest to that growth, our Flutter SDK is one of the most popular libraries and each day we see more Flutter devs choosing Supabase.
+Today, we are releasing of Developer Preview version of v1.0 of [Supabase Flutter SDK](https://pub.dev/packages/supabase_flutter/versions/1.0.0-dev.1). Flutter has quickly become one of the most popular frameworks for developers to build cross-platform mobile apps. We can attest to that growth, our Flutter SDK is one of the most popular libraries and each day we see more Flutter devs choosing Supabase.
 
 For this release, our main focus is developer experiences. We would love for you to try the SDK and provide your feedback so that we can continue to improve! 
 
 Before we dive into the actual updates, I would like to thank all the community contributors who have helped the library to be where it is today. 
+
 
 ## Better developer experience
 
@@ -115,16 +116,45 @@ With the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/a
 
 We want our Flutter developers to experience this new multiplayer feature as well, so are working hard at bringing it to our Flutter SDK. It is not yet included in the developer preview of Supabase Flutter 1.0, but will be part of it when stable launch has been released. 
 
-## Supabase Auth UI for Supabase
+## Supabase Auth UI for Flutter
 
-Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application. You can easily enable/disable certain Auth features with the configuration.
+![Supabase Auth UI for Flutter](/images/blog/flutter-1/supabase-flutter-auth-ui.png)
+
+Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application.
+
+You can get started with it on [pub.dev](https://pub.dev/packages/supabase_auth_ui).
 
 I would like to thank [Fatuma](https://twitter.com/XquisiteDreamer) for single-handedly working on bringing us an easier authentication experience. 
+
+```dart
+// Email and password signin form
+SupaEmailAuth(
+  authAction: AuthAction.signIn,
+  redirectUrl: '/home',
+),
+
+// Magic Link signin form
+SupaMagicAuth(),
+
+// Social Login Buttons
+SupaSocialsAuth(
+  socialProviders: [
+  SocialProviders.apple,
+  SocialProviders.google,
+  ],
+  colored: true,
+),
+```
 
 ## Final thoughts
 
 These updates are just the tip of the iceberg for 1.0. There are been many bug fixes and features constantly being added to the Supabase Flutter SDK. This could not have been possible with the help from the open source community. Here, I would also like to give a shout out to two other developers who have been a major part of the journey of this SDK: [Vinzent](https://twitter.com/Vinzent03_) and [Daniel Mossaband](https://github.com/DanMossa). They have been a huge part of the Supabase Flutter SDK - not just for the 1.0 release, but throughout the lifetime of the library. 
-For those of you who want to try out the new SDK, you can get the developer preview version from [supabase-flutter](https://pub.dev/packages/supabase_flutter) pub.dev page. 
+For those of you who want to try out the new SDK, you can get the developer preview version from [supabase-flutter](https://pub.dev/packages/supabase_flutter/versions/1.0.0-dev.1) pub.dev page or can simply copy and paste the following into your pubspec.yaml file. 
+
+```yaml
+supabase_flutter: ^1.0.0-dev.1
+```
+
 If you have any feedbacks, please let us know in the issues of the [supabase-flutter](https://github.com/supabase-community/supabase-flutter/issues) repository. 
 
 ## Flutter Resources
