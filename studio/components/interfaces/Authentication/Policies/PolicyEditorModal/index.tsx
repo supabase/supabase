@@ -200,18 +200,21 @@ const PolicyEditorModal: FC<Props> = ({
             onUpdatePolicyFormFields={onUpdatePolicyFormFields}
             onViewTemplates={onViewTemplates}
             onReviewPolicy={validatePolicyFormFields}
+            onCancel={onSelectCancel}
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
           <PolicyTemplates
             templates={getGeneralPolicyTemplates(schema, table)}
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
+            onCancel={onSelectCancel}
           />
         ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
           <PolicyReview
             policy={policyStatementForReview}
             onSelectBack={onViewEditor}
             onSelectSave={onReviewSave}
+            onCancel={onSelectCancel}
           />
         ) : (
           <div />

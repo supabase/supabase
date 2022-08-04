@@ -18,6 +18,7 @@ interface Props {
   onUpdatePolicyFormFields: (value: any) => void
   onViewTemplates: () => void
   onReviewPolicy: () => void
+  onCancel: () => void
 }
 
 const PolicyEditor: FC<Props> = ({
@@ -27,6 +28,7 @@ const PolicyEditor: FC<Props> = ({
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
+  onCancel = () => {},
 }) => {
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
@@ -81,6 +83,7 @@ const PolicyEditor: FC<Props> = ({
         showTemplates={isNewPolicy}
         onViewTemplates={onViewTemplates}
         onReviewPolicy={onReviewPolicy}
+        onCancel={onCancel}
       />
     </div>
   )

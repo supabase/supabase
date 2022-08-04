@@ -5,18 +5,30 @@ interface Props {
   showTemplates: boolean
   onViewTemplates: () => void
   onReviewPolicy: () => void
+  onCancel: () => void
 }
 
-const PolicyEditorFooter: FC<Props> = ({ showTemplates, onViewTemplates, onReviewPolicy }) => (
-  <div className="dark:border-dark flex w-full items-center justify-end gap-2 border-t px-6 py-4">
-    {showTemplates && (
-      <Button type="default" onClick={onViewTemplates}>
-        View templates
-      </Button>
-    )}
-    <Button type="primary" onClick={onReviewPolicy}>
-      Review
+const PolicyEditorFooter: FC<Props> = ({
+  showTemplates,
+  onViewTemplates,
+  onReviewPolicy,
+  onCancel,
+}) => (
+  <div className="dark:border-dark flex items-center justify-between border-t px-6 py-4 mt-4">
+    <Button type="default" onClick={onCancel}>
+      Cancel
     </Button>
+
+    <div className="flex items-center gap-2">
+      {showTemplates && (
+        <Button type="default" onClick={onViewTemplates}>
+          View templates
+        </Button>
+      )}
+      <Button type="primary" onClick={onReviewPolicy}>
+        Review
+      </Button>
+    </div>
   </div>
 )
 

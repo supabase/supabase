@@ -8,12 +8,14 @@ interface Props {
   policy: PolicyForReview
   onSelectBack: () => void
   onSelectSave: () => void
+  onCancel: () => void
 }
 
 const PolicyReview: FC<Props> = ({
   policy = {},
   onSelectBack = () => {},
   onSelectSave = () => {},
+  onCancel = () => {},
 }) => {
   const [isSaving, setIsSaving] = useState(false)
   const onSavePolicy = () => {
@@ -52,13 +54,24 @@ const PolicyReview: FC<Props> = ({
           </div>
         </div>
       </Modal.Content>
-      <div className="dark:border-dark flex w-full items-center justify-end gap-2 border-t px-6 py-4">
-        <Button type="default" onClick={onSelectBack}>
-          Back to edit
+      <div className="dark:border-dark flex items-center justify-between border-t px-6 py-4">
+        <Button type="default" onClick={onCancel}>
+          Cancel
         </Button>
-        <Button type="primary" disabled={isEmpty(policy)} onClick={onSavePolicy} loading={isSaving}>
-          Save policy
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button type="default" onClick={onSelectBack}>
+            Back to edit
+          </Button>
+          <Button
+            type="primary"
+            disabled={isEmpty(policy)}
+            onClick={onSavePolicy}
+            loading={isSaving}
+          >
+            Save policy
+          </Button>
+        </div>
       </div>
     </>
   )
