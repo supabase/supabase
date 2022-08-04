@@ -15,7 +15,7 @@
   - [Installing packages](#installing-packages)
   - [Development](#development)
 - [Common Tasks](#common-tasks)
-  - [Adding redirects](#adding-redirects)
+  - [Adding Redirects](#adding-redirects)
 - [Finally](#finally)
 - [Community Channels](#community-channels)
 
@@ -181,6 +181,8 @@ Then edit and visit any of the following sites:
 
 - `/apps/www`: http://localhost:3000
   - The main website.
+- `/apps/reference`: http://localhost:3010
+  - Reference Documentation.
 - `/apps/temp-docs`: http://localhost:3001
   - We are migrating the docs to a Next.js application.
 - `/apps/temp-community-forum`: http://localhost:3002
@@ -194,6 +196,7 @@ The monorepo has a set of shared components under `/packages`:
 
 - `/packages/common`: Common React code, shared between all sites.
 - `/packages/config`: All shared config
+- `/packages/spec`: Generates documentation using spec files.
 - `/packages/tsconfig`: Shared Typescript settings
 
 ### Installing packages

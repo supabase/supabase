@@ -25,7 +25,7 @@ const BillingUpdate: NextPageWithLayout = () => {
 
   const subscriptionStats = useSubscriptionStats()
   const freeProjectsLimit = ui?.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
-  const freeProjectsOwned = subscriptionStats.total_free_projects ?? 0
+  const freeProjectsOwned = subscriptionStats.total_active_free_projects ?? 0
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false)
   const [showConfirmDowngrade, setShowConfirmDowngrade] = useState(false)

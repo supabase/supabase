@@ -79,17 +79,31 @@ const navbar = [
 
   // GoTrue
   {
-    to: 'gotrue',
+    to: 'auth',
     position: 'left',
-    label: 'GoTrue Auth Server',
-    supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
+    label: 'Auth Server',
+    supabaseCustomNavBarRegex: '(^/auth$|auth/)',
   },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_gotrue',
+  //   supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
+  // },
+
+  // Storage
   {
-    type: 'docsVersionDropdown',
+    to: 'storage',
     position: 'left',
-    docsPluginId: '_gotrue',
-    supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
+    label: 'Storage Server',
+    supabaseCustomNavBarRegex: '(^/storage$|storage/)',
   },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_storage',
+  //   supabaseCustomNavBarRegex: '(^/storage$|storage/)',
+  // },
 
   /**
    * COMMUNITY
@@ -100,12 +114,12 @@ const navbar = [
     label: 'Supabase Dart SDK',
     supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
   },
-  {
-    type: 'docsVersionDropdown',
-    position: 'left',
-    docsPluginId: '_supabase_dart',
-    supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
-  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_supabase_dart',
+  //   supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
+  // },
 ]
 
 module.exports = { navbar }
