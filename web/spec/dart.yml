@@ -368,7 +368,7 @@ pages:
   invoke():
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
+      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
