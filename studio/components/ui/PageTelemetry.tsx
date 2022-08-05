@@ -30,7 +30,8 @@ const PageTelemetry: FC = ({ children }) => {
      * Send page telemetry on first page load
      * if there asPath is defined, then this isn't needed
      */
-    if (router.route === '/' && !router.asPath) {
+    console.log(router)
+    if (router.route === '/' && router.asPath === '/') {
       handlePageTelemetry(profile)
     }
     /**
