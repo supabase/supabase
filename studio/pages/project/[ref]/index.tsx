@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Typography } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useStore, useProjectUsageStatus } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
@@ -9,10 +9,14 @@ import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
+import { OveragesBanner } from '../../../components/interfaces/Home'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
+
   const project = ui.selectedProject
+  const projectTier = ui.selectedProject?.subscription_tier
+  const { usageStatus } = useProjectUsageStatus(project?.ref)
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -24,6 +28,11 @@ const Home: NextPageWithLayout = () => {
       <div className="mx-6 flex items-center space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
       </div>
+
+      {/* [Joshen TODO] pass projectTier into tier and just keep one */}
+      {projectTier !== undefined && <OveragesBanner tier={'tier_free'} usageStatus={usageStatus} />}
+      {projectTier !== undefined && <OveragesBanner tier={'tier_pro'} usageStatus={usageStatus} />}
+      {projectTier !== undefined && <OveragesBanner tier={'tier_payg'} usageStatus={usageStatus} />}
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 
