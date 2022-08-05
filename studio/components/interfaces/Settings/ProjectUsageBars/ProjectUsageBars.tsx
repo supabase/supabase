@@ -11,10 +11,9 @@ import { UsageStats, ApiUsageStats } from './ProjectUsageBars.types'
 
 interface Props {
   projectRef?: string
-  subscription_id?: string
 }
 
-const ProjectUsage: FC<Props> = ({ projectRef, subscription_id }) => {
+const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { data: stats, error: usageError } = useSWR(`${API_URL}/projects/${projectRef}/usage`, get)
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
@@ -112,11 +111,7 @@ interface ProjectUsageMinimalProps extends Props {
   filter: string
 }
 
-export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({
-  projectRef,
-  subscription_id,
-  filter,
-}) => {
+export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter }) => {
   const { data: apiStats, error: usageError } = useSWR<ApiUsageStats>(
     `${API_URL}/projects/${projectRef}/usage`,
     get
