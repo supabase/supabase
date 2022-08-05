@@ -32,7 +32,6 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
         />
       ),
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/editor`,
-      // disabled: !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public'),
     },
     {
       key: 'auth',
@@ -85,20 +84,12 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
-  const canReadStats = checkPermissions(
-    PermissionAction.SQL_SELECT,
-    'postgres.public.stats_daily_projects',
-    {
-      resource: { type: 'report' },
-    }
-  )
-  const canReadReport = checkPermissions(
-    PermissionAction.SQL_SELECT,
-    'postgres.public.user_content',
-    {
-      resource: { type: 'report' },
-    }
-  )
+  const canReadStats = checkPermissions(PermissionAction.READ, 'stats_daily_projects', {
+    resource: { type: 'report' },
+  })
+  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
+    resource: { type: 'report' },
+  })
 
   return [
     ...(IS_PLATFORM
@@ -134,7 +125,6 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
             label: 'Settings',
             icon: <IconSettings size={18} strokeWidth={2} />,
             link: `/project/${ref}/settings/general`,
-            // disabled: !checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public.projects'),
           },
         ]
       : []),

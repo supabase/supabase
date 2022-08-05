@@ -31,17 +31,14 @@ const GeneralSettings = observer(() => {
   const enablePermissions = useFlag('enablePermissions')
 
   const canUpdateOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.organizations')
+    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
     : ui.selectedOrganization?.is_owner
 
   const canDeleteOrganization = enablePermissions
-    ? checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.organizations')
+    ? checkPermissions(PermissionAction.UPDATE, 'organizations')
     : ui.selectedOrganization?.is_owner
 
-  const canReadBillingEmail = checkPermissions(
-    PermissionAction.SQL_SELECT,
-    'postgres.public.organizations'
-  )
+  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
