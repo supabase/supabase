@@ -23,10 +23,7 @@ const Templates: FC<any> = ({ project }) => {
     semver.coerce('kps-v2.5.3')
   )
 
-  const canUpdateTemplates = checkPermissions(
-    PermissionAction.SQL_UPDATE,
-    'postgres.public.custom_config_gotrue'
-  )
+  const canUpdateTemplates = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { config, error, mutateAuthConfig } = useProjectAuthConfig(project.ref)
   if (error) {

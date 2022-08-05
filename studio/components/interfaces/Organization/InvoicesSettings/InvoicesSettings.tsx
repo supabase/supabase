@@ -37,7 +37,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   const { stripe_customer_id } = organization
   const offset = (page - 1) * PAGE_LIMIT
 
-  const canReadInvoices = checkPermissions(PermissionAction.SQL_SELECT, 'postgres.public.invoices')
+  const canReadInvoices = checkPermissions(PermissionAction.READ, 'invoices')
 
   useEffect(() => {
     if (!canReadInvoices) return
