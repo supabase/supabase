@@ -60,10 +60,6 @@ const TableEditorMenu: FC<Props> = ({
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-  const canCreateTables = checkPermissions(
-    PermissionAction.TENANT_SQL_CREATE_TABLE,
-    'postgres.public.*'
-  )
 
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views

@@ -43,10 +43,7 @@ const Subscription: FC<Props> = ({
   const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canReadSubscription = checkPermissions(
-    PermissionAction.SQL_SELECT,
-    'postgres.public.subscriptions'
-  )
+  const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
   const canUpdateSubscription = enablePermissions
     ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
     : isOrgOwner

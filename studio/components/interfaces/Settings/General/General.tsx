@@ -22,7 +22,7 @@ const General: FC<Props> = ({}) => {
 
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+  const canUpdateProject = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const response = await post(`${API_URL}/projects/${project?.ref}/update`, { name: values.name })

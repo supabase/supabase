@@ -22,7 +22,7 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const canDeleteProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+  const canDeleteProject = checkPermissions(PermissionAction.UPDATE, 'projects')
 
   const toggle = () => {
     if (loading) return
