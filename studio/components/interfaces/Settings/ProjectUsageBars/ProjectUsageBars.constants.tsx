@@ -1,3 +1,4 @@
+import { IconArchive, IconDatabase } from '@supabase/ui'
 import SparkBar from 'components/ui/SparkBar'
 import { UsageStats } from './ProjectUsageBars.types'
 
@@ -8,7 +9,7 @@ const MB = 1000000
 export const usageLimits = {
   database: {
     title: 'Database',
-    icon_src: '/img/database.svg',
+    icon: <IconDatabase className="dark:text-scale-100" size={16} strokeWidth={2} />,
     features: [
       {
         title: 'API requests',
@@ -74,7 +75,7 @@ export const usageLimits = {
   },
   storage: {
     title: 'File storage',
-    icon_src: '/img/archive.svg',
+    icon: <IconArchive className="dark:text-scale-100" size={16} strokeWidth={2} />,
     features: [
       {
         title: 'Storage space',

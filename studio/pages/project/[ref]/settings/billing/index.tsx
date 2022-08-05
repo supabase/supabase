@@ -44,6 +44,7 @@ interface SettingsProps {
 
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
+  const projectTier = ui.selectedProject?.subscription_tier
 
   const [dateRange, setDateRange] = useState<any>()
 
@@ -73,8 +74,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
-      {/* [Joshen TODO] After API is ready */}
-      <OveragesBanner tier={'tier_free'} />
+      {projectTier !== undefined && <OveragesBanner tier={projectTier} />}
       <Subscription
         loading={loading}
         project={project}
