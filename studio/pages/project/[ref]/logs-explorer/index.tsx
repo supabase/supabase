@@ -23,6 +23,7 @@ import { NextPageWithLayout, UserContent } from 'types'
 import toast from 'react-hot-toast'
 import dayjs from 'dayjs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { useProjectSubscription } from 'hooks'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -31,7 +32,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState<boolean>(false)
+
   const { content } = useStore()
+  const { subscription } = useProjectSubscription(ref as string)
+  const tier = subscription?.tier
 
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
@@ -106,6 +111,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
+    if (tier?.key === 'FREE') {
+      setShowUpgradePrompt(!showUpgradePrompt)
+      return
+    }
+
     setParams((prev) => ({
       ...prev,
       iso_timestamp_start: from || '',
@@ -135,7 +145,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isLoading={isLoading}
             warnings={warnings}
           />
-
           <div className="h-48 min-h-[7rem]">
             <ShimmerLine active={isLoading} />
             <CodeEditor
@@ -154,7 +163,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">
-            <UpgradePrompt projectRef={ref as string} from={params.iso_timestamp_start || ''} />
+            <UpgradePrompt
+              projectRef={ref as string}
+              from={params.iso_timestamp_start || ''}
+              showUpgradePrompt={showUpgradePrompt}
+              setShowUpgradePrompt={setShowUpgradePrompt}
+            />
           </div>
         </div>
       </div>
