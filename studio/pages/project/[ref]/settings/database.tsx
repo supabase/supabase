@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import useSWR from 'swr'
+import { NextPageWithLayout } from 'types'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -16,11 +17,10 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
-import { NextPageWithLayout } from 'types'
+import { ProjectUsageMinimal } from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()

@@ -9,14 +9,13 @@ import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
-import { OveragesBanner } from '../../../components/interfaces/Home'
+import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
 
   const project = ui.selectedProject
   const projectTier = ui.selectedProject?.subscription_tier
-  const { usageStatus } = useProjectUsageStatus(project?.ref)
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -29,10 +28,12 @@ const Home: NextPageWithLayout = () => {
         <h1 className="text-3xl">{projectName}</h1>
       </div>
 
-      {/* [Joshen TODO] pass projectTier into tier and just keep one */}
-      {projectTier !== undefined && <OveragesBanner tier={'tier_free'} usageStatus={usageStatus} />}
-      {projectTier !== undefined && <OveragesBanner tier={'tier_pro'} usageStatus={usageStatus} />}
-      {projectTier !== undefined && <OveragesBanner tier={'tier_payg'} usageStatus={usageStatus} />}
+      {/* [Joshen TODO] After API is ready pass projectTier into tier and just keep one */}
+      <div className="mx-6 space-y-2">
+        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_free'} />}
+        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_pro'} />}
+        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_payg'} />}
+      </div>
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 
@@ -62,6 +63,12 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+Home.getLayout = (page) => (
+  <ProjectLayoutWithAuth>
+    <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+      {page}
+    </main>
+  </ProjectLayoutWithAuth>
+)
 
 export default observer(Home)
