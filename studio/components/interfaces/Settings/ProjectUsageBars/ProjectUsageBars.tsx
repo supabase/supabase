@@ -30,6 +30,13 @@ const ProjectUsage: FC<Props> = ({ projectRef, subscription_id }) => {
 
   // [Joshen TODO] After API is ready need to update to include dbEgress, storageEgress
   // And also to highlight in this chart which components are "approaching" and "over"
+  const mockUsage: any = {
+    dbSize: { value: 10773283, limit: 524288000 },
+    dbEgress: { value: 400000000, limit: 524288000 },
+    storageSize: { value: 624288000, limit: 524288000 },
+    storageEgress: { value: 0, limit: 524288000 },
+  }
+  // We can try to do up some simple UI logic now while waiting for API
 
   const tier =
     subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PRO ? 'pro' : 'free'
@@ -47,8 +54,8 @@ const ProjectUsage: FC<Props> = ({ projectRef, subscription_id }) => {
                 <tr className="overflow-hidden rounded">
                   <th className="w-1/4 px-6 py-3 text-left">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded bg-white">
-                        <img width={'16'} src={product.icon_src} />
+                      <div className="flex h-8 w-8 items-center justify-center rounded bg-scale-500 dark:bg-white">
+                        {product.icon}
                       </div>
                       <Typography.Title level={5} className="mb-0">
                         {product.title}

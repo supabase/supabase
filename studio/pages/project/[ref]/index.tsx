@@ -28,11 +28,8 @@ const Home: NextPageWithLayout = () => {
         <h1 className="text-3xl">{projectName}</h1>
       </div>
 
-      {/* [Joshen TODO] After API is ready pass projectTier into tier and just keep one */}
       <div className="mx-6 space-y-2">
-        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_free'} />}
-        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_pro'} />}
-        {projectTier !== undefined && <OveragesBanner minimal tier={'tier_payg'} />}
+        {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />}
       </div>
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
