@@ -1,5 +1,5 @@
 import template from './templates/ApiTemplate'
-import { toArrayWithKey } from './helpers'
+import { slugify, toArrayWithKey } from './helpers'
 import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 const fs = require('fs')
 const ejs = require('ejs')
@@ -51,10 +51,19 @@ async function gen_v3(spec: OpenAPIV3.Document, dest: string) {
 
 // OPENAPI-SPEC-VERSION: 2.0
 async function gen_v2(spec: OpenAPIV2.Document, dest: string) {
-  const paths = Object.entries(spec.paths).map(([key, path], i) => {
+  const paths = Object.entries(spec.paths).map(([key, path]) => {
     return {
       path: key,
-      operations: toArrayWithKey(path!, 'operation'),
+      operations: toArrayWithKey(path!, 'operation').map((o) => {
+        const operation = o as OpenAPIV2.OperationObject & {
+          path: string
+        }
+        return {
+          ...operation,
+          operationId: slugify(operation.summary!),
+          responses: toArrayWithKey(operation.responses!, 'responseCode'),
+        }
+      }),
     }
   })
 

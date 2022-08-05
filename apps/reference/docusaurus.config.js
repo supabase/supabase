@@ -11,7 +11,8 @@ const config = {
   tagline: 'Documentation for the Supabase Ecosystem',
   url: 'https://supabase.tools',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
+  // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
@@ -123,11 +124,48 @@ const config = {
       footer: {
         links: [
           {
-            title: 'Reference',
+            title: 'Company',
             items: [
               {
-                label: 'Supabase CLI',
-                to: '/cli',
+                label: 'Blog',
+                to: 'https://supabase.com/blog',
+              },
+              {
+                label: 'Open source',
+                to: '/oss',
+              },
+              {
+                label: 'Humans.txt',
+                to: 'https://supabase.com/humans.txt',
+              },
+              {
+                label: 'Lawyers.txt',
+                to: 'https://supabase.com/lawyers.txt',
+              },
+            ],
+          },
+          {
+            title: 'Resources',
+            items: [
+              {
+                label: 'Brand Assets',
+                to: 'https://supabase.com/brand-assets',
+              },
+              {
+                label: 'Docs',
+                to: 'https://supabase.com/docs',
+              },
+              {
+                label: 'Pricing',
+                to: 'https://supabase.com/pricing',
+              },
+              {
+                label: 'Support',
+                to: '/support',
+              },
+              {
+                label: 'System Status',
+                to: 'https://status.supabase.com/',
               },
             ],
           },
@@ -135,42 +173,38 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/supabase',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discord.supabase.com',
+                label: 'GitHub',
+                href: 'https://github.com/supabase/supabase',
               },
               {
                 label: 'Twitter',
                 href: 'https://twitter.com/supabase',
               },
+              {
+                label: 'DevTo',
+                href: 'https://dev.to/supabase',
+              },
+              {
+                label: 'RSS',
+                href: 'https://supabase.com/rss.xml',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.supabase.com',
+              },
             ],
           },
           {
-            title: 'More',
+            title: 'Beta',
             items: [
               {
-                label: 'Supabase Website',
-                href: 'https://supabase.com',
-              },
-              {
-                label: 'Supabase Docs',
-                href: 'https://supabase.com/docs',
-              },
-              {
-                label: 'Supabase GitHub',
-                href: 'https://github.com/supabase/supabase',
-              },
-              {
-                label: 'Supabase Community GitHub',
-                href: 'https://github.com/supabase-community/supabase',
+                label: 'Join our beta',
+                href: 'https://app.supabase.com',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Supabase, Inc.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Supabase.`,
       },
       prism: {
         additionalLanguages: ['dart'],
