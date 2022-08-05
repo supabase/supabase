@@ -29,12 +29,6 @@ const examples = [
   },
 ]
 
-:::caution
-
-Edge Functions are Experimental until 1 August 2022. There will be breaking changes. Do not use them in Production.
-
-:::
-
 Edge Functions are server-side Typescript functions, distributed globally at the edge - close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties, like Stripe.
 
 Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
@@ -292,8 +286,6 @@ We recommend developing “fat functions”. This means that you should develop 
 We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
 
 ## Limitations
-
-Edge Functions are Experimental. They aren't going away, but there will be breaking changes.
 
 - Deno Deploy limitations
   - Deno does not support outgoing connections to ports `25`, `465`, and `587`.
