@@ -4,14 +4,20 @@ import { observer } from 'mobx-react-lite'
 import { Typography, Loading, IconArrowRight } from '@supabase/ui'
 
 import { Project, NextPageWithLayout } from 'types'
-import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
+import {
+  useProjectPaygStatistics,
+  useProjectSubscription,
+  useStore,
+  useProjectUsageStatus,
+} from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
-import ProjectUsage from 'components/ui/Usage'
 import LoadingUI from 'components/ui/Loading'
-import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
+import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
+import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -39,6 +45,8 @@ interface SettingsProps {
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
 
+  const [dateRange, setDateRange] = useState<any>()
+
   const {
     subscription,
     isLoading: loading,
@@ -49,8 +57,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     ui.selectedProject?.ref,
     subscription?.tier?.supabase_prod_id
   )
-
-  const [dateRange, setDateRange] = useState<any>()
 
   useEffect(() => {
     if (error) {
@@ -67,6 +73,8 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
+      {/* [Joshen TODO] After API is ready */}
+      <OveragesBanner tier={'tier_free'} />
       <Subscription
         loading={loading}
         project={project}

@@ -81,3 +81,5 @@ export const GOTRUE_ERRORS = {
 
 export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
+
+export const USAGE_APPROACHING_THRESHOLD = 0.75
