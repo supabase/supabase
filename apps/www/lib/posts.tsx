@@ -106,19 +106,30 @@ export const getAllPostSlugs = (directory: Directories) => {
   return files
 }
 
-// Get Post based on Slug
 export const getPostdata = async (slug: string, directory: string) => {
-  //Finding directory named "blog" from the current working directory of Node.
+  /**
+   * All files are mdx files
+   */
+  const fileType = 'mdx'
+  slug = slug + '.' + fileType
+
+  /**
+   * Return full directory
+   */
   const postDirectory = path.join(process.cwd(), directory)
+  const folderfiles = fs.readdirSync(postDirectory)
 
-  console.log('postDirectory', postDirectory)
+  /**
+   * Check if the file exists in the directory
+   * This should return 1 result
+   *
+   * this is so slugs like 'blog-post.mdx' will work
+   * even if the mdx file is date namednamed like '2022-01-01-blog-post.mdx'
+   */
+  const found = folderfiles.filter((x) => x.includes(slug))[0]
 
-  const fullPath = path.join(postDirectory, `${slug}.mdx`)
-
-  console.log('fullPath', fullPath)
-
+  const fullPath = path.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')
-
   return postContent
 }
 
