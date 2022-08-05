@@ -19,7 +19,12 @@ export default [
     key: 'level',
     headerRenderer: () => <HeaderFormmater value={'Level'} />,
     name: 'level',
-    formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
+    formatter: (data: any) => {
+      if (data.row.event_type === 'uncaughtException') {
+        return <SeverityFormatter value={data.row.event_type} uppercase={false} />
+      }
+      return <SeverityFormatter value={data.row.level} />
+    },
     width: 24,
     resizable: true,
   },
