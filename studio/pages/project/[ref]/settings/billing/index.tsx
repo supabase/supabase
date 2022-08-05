@@ -118,7 +118,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>

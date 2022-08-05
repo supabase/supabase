@@ -133,11 +133,7 @@ const Usage: FC<any> = ({ project }) => {
             }
           >
             <Panel.Content>
-              <ProjectUsageMinimal
-                projectRef={ref}
-                subscription_id={project.subscription_id}
-                filter={'Database'}
-              />
+              <ProjectUsageMinimal projectRef={ref} filter={'Database'} />
             </Panel.Content>
           </Panel>
         </section>
