@@ -9,12 +9,17 @@ import { useProjectSubscription } from 'hooks'
 interface Props {
   projectRef: string
   from: string
+  showUpgradePrompt: boolean
+  setShowUpgradePrompt: (showUpgradePrompt: boolean) => void
 }
 
-const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
-  const [showHelperModal, setShowHelperModal] = useState(false)
+const UpgradePrompt: React.FC<Props> = ({
+  projectRef,
+  from,
+  showUpgradePrompt,
+  setShowUpgradePrompt,
+}) => {
   const { subscription, isLoading, isError } = useProjectSubscription(projectRef)
-
   if (isLoading) return <IconLoader size={16} className="animate-spin" />
   if (isError) console.error('Error fetching project subscription')
 
@@ -27,33 +32,13 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
 
   return (
     <>
-      <div
-        className={`flex flex-row items-center gap-3 px-2 py-1 text-xs transition-all ${
-          isExceedingLimit
-            ? 'text-yellow-1100  rounded border border-yellow-700 bg-yellow-200 font-semibold'
-            : ''
-        }`}
-      >
-        <span className="text-scale-1100">{`${queryLimit.text} retention`}</span>
-        <IconHelpCircle
-          size={16}
-          strokeWidth={1.5}
-          className="text-scale-1100 hover:text-scale-1200 cursor-pointer transition"
-          onClick={() => setShowHelperModal(true)}
-        />
-        {queryLimit.promptUpgrade && (
-          <Link href={`/project/${projectRef}/settings/billing`}>
-            <Button size="tiny">Upgrade</Button>
-          </Link>
-        )}
-      </div>
-
       <Modal
         hideFooter
-        visible={showHelperModal}
+        visible={showUpgradePrompt}
+        closable
         size="medium"
         header="Log retention"
-        onCancel={() => setShowHelperModal(false)}
+        onCancel={() => setShowUpgradePrompt(false)}
       >
         <div className="space-y-4 py-4">
           <Modal.Content>
@@ -87,10 +72,14 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
           </Modal.Content>
           <Modal.Seperator />
           <Modal.Content>
-            <div className="flex items-center gap-2">
-              <Button block type="primary" onClick={() => setShowHelperModal(false)}>
-                Understood
+            <div className="flex justify-between">
+              <Button type="default" onClick={() => setShowUpgradePrompt(false)}>
+                Close
               </Button>
+
+              <Link href={`/project/${projectRef}/settings/billing`}>
+                <Button size="tiny">Upgrade</Button>
+              </Link>
             </div>
           </Modal.Content>
         </div>
