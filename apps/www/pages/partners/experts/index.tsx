@@ -62,7 +62,7 @@ function ExpertPartnersPage(props: Props) {
             <h1 className="h1">{meta_title}</h1>
             <h2 className="text-scale-900 text-xl">{meta_description}</h2>
           </div>
-          <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-32">
+          <div className="grid space-y-12 md:gap-8 lg:grid-cols-12 lg:gap-16 lg:space-y-0 xl:gap-16">
             <div className="lg:col-span-4 xl:col-span-3">
               {/* Horizontal link menu */}
               <div className="space-y-6">
