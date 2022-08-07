@@ -14,7 +14,7 @@ tags:
 date: '2021-04-02'
 ---
 
-This week we [launched Supabase Storage](/blog/2021/03/30/supabase-storage), which leaves one other huge piece of the
+This week we [launched Supabase Storage](/blog/supabase-storage), which leaves one other huge piece of the
 stack that everyone is asking for: Functions.
 
 ## TLDR
@@ -41,10 +41,10 @@ this yourself, probably using a cron-job.
 ## A better solution?
 
 We searched for some open source tools which we think are solving this problem well. We looked at
-[NodeRed](/blog/2021/03/30/supabase-storage#designing-the-storage-middleware), [n8n](https://n8n.io/),
+[NodeRed](/blog/supabase-storage#designing-the-storage-middleware), [n8n](https://n8n.io/),
 [Airflow](http://airflow.apache.org/blog/airflow-two-point-oh-is-here/), and about 10 other tools. They are amazing tools on their
 own, but for the Supabase Stack they ultimately had the
-[same shortcomings](/blog/2021/03/30/supabase-storage#integration-with-the-supabase-ecosystem) that we found
+[same shortcomings](/blog/supabase-storage#integration-with-the-supabase-ecosystem) that we found
 with Storage providers - most of them lacked deep Postgres integration.
 
 We went back to the drawing board and asked, "if we could wave a wand and get the perfect solution, what would it look like?".
