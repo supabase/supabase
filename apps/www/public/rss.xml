@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 01 Aug 2022 03:03:00</lastBuildDate>
+      <lastBuildDate>Tue, 02 Aug 2022 03:03:00</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-beta-update-july-2022</guid>
+  <title>Supabase Beta July 2022</title>
+  <link>https://supabase.com/blog/supabase-beta-update-july-2022</link>
+  <description>Launch Week Golden Tickets, Flutter SDK 1.0 Developer Preview and more...</description>
+  <pubDate>Tue, 02 Aug 2022 03:03:00</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview</guid>
   <title>Supabase Flutter SDK 1.0 Developer Preview</title>
   <link>https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview</link>

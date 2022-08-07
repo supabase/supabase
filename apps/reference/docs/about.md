@@ -9,11 +9,6 @@ sidebar_position: 2
 
 This section of the docs provides technical descriptions of the products and how to use them.
 
-There are two main sections:
-
-- Supabase Reference Docs - describes to use the tools with integrated integrated libraries.
-- Tools Reference Docs - describes to use the tools with modular libraries.
-
 ## Modularity
 
 Supabase is modular. While it may seem like a single tool, it is actually a suite of tools that are composed on top of a PostgreSQL database. This offers several advantages:
@@ -33,7 +28,7 @@ This is a similar approach to any Enterprise-grade system with an additional foc
   - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - `Auth`
   - Authentication: [GoTrue](https://github.com/supabase/gotrue) is an SWT based API for managing users and issuing SWT tokens.
-  - Authorization: using [PostgreSQL Row Level Security](/docs/guides/auth/row-level-security).
+  - Authorization: using [PostgreSQL Row Level Security](https://supabase.com/docs/guides/auth/row-level-security).
 - `APIs`
   - Websockets: [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
   - REST: [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
