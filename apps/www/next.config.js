@@ -897,7 +897,7 @@ module.exports = withMDX({
         permanent: true,
         source: '/blog/2021/04/02/supabase-dot-com',
         destination: '/blog/supabase-dot-com',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2021/04/02/supabase-pgbouncer',
@@ -1192,17 +1192,17 @@ module.exports = withMDX({
         permanent: true,
         source: '/blog/2022/06/07/beta-update-may-2022',
         destination: '/blog/beta-update-may-2022',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/06/15/loading-data-supabase-python',
         destination: '/blog/loading-data-supabase-python',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/06/28/partial-postgresql-data-dumps-with-rls',
         destination: '/blog/partial-postgresql-data-dumps-with-rls',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/06/29/visualizing-supabase-data-using-metabase',
@@ -1212,24 +1212,22 @@ module.exports = withMDX({
         permanent: true,
         source: '/blog/2022/06/30/flutter-tutorial-building-a-chat-app',
         destination: '/blog/flutter-tutorial-building-a-chat-app',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/07/05/beta-update-june-2022',
         destination: '/blog/beta-update-june-2022',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/07/13/supabase-auth-helpers-with-sveltekit-support',
         destination: '/blog/supabase-auth-helpers-with-sveltekit-support',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/07/18/seen-by-in-postgresql',
         destination: '/blog/seen-by-in-postgresql',
       },
-      
-      
     ]
   },
 })
