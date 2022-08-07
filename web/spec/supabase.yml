@@ -282,7 +282,7 @@ pages:
           Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signUp({
             phone: '+13334445555',
             password: 'some-password',
           })
@@ -792,16 +792,6 @@ pages:
     title: 'invoke()'
     description: |
       Invokes a Supabase Function.
-
-      :::caution
-
-      Edge Functions are Experimental until 1 August 2022. There will breaking changes. Do not use them in Production.
-
-      :::
-
-      We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
-      There will be breaking changes with no notice.
-
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
