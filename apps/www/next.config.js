@@ -1227,7 +1227,7 @@ module.exports = withMDX({
         permanent: true,
         source: '/blog/2022/07/18/seen-by-in-postgresql',
         destination: '/blog/seen-by-in-postgresql',
-      },      
+      },
       {
         permanent: true,
         source: '/blog/2022/08/02/supabase-flutter-sdk-1-developer-preview',
@@ -1235,7 +1235,7 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: /blog/2022/08/03/supabase-beta-update-july-2022',
+        source: '/blog/2022/08/03/supabase-beta-update-july-2022',
         destination: '/blog/supabase-beta-update-july-2022',
       },
     ]
