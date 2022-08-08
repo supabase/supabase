@@ -54,7 +54,6 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
-  showDownload,
   error,
   projectRef,
 }: Props) => {
@@ -224,50 +223,72 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const LogsExplorerTableHeader = () => (
+    <div className="w-full bg-scale-100 dark:bg-scale-300 rounded-tl rounded-tr border-t border-l border-r flex items-center justify-between px-5 py-2">
+      <div className="flex items-center gap-2">
+        {data && data.length ? (
+          <>
+            <span className="text-sm text-scale-1200">Query results</span>
+            <span className="text-sm text-scale-1100">{data && data.length}</span>
+          </>
+        ) : (
+          <span className="text-xs text-scale-1200">Results will be shown below</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {onHistogramToggle && (
+          <Button
+            type="default"
+            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            onClick={onHistogramToggle}
+          >
+            Histogram
+          </Button>
+        )}
+        <CSVButton data={data}>Download</CSVButton>
+      </div>
+    </div>
+  )
+
+  const NoRowsAlert = () => (
+    <div className="transition-all duration-500 delay-200 flex flex-col items-center gap-6 text-center mt-16 opacity-100 scale-100 justify-center">
+      <>
+        <div className="flex flex-col gap-1">
+          <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
+          <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
+            <div className="absolute right-1 -bottom-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1 px-5">
+          <h3 className="text-lg text-scale-1200">No results</h3>
+          <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
+        </div>
+      </>
+    </div>
+  )
+
   return (
     <>
       <section
         className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
-        {!queryType && (
-          <div>
-            <div
-              className="
-            w-full bg-scale-100 dark:bg-scale-300 
-            rounded-tl rounded-tr
-            border-t
-            border-l
-            border-r
-            flex items-center justify-between
-            px-5 py-2
-      "
-            >
-              <div className="flex items-center gap-2">
-                {data && data.length ? (
-                  <>
-                    <span className="text-sm text-scale-1200">Query results</span>
-                    <span className="text-sm text-scale-1100">{data && data.length}</span>
-                  </>
-                ) : (
-                  <span className="text-xs text-scale-1200">Results will be shown below</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {onHistogramToggle && (
-                  <Button
-                    type="default"
-                    icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-                    onClick={onHistogramToggle}
-                  >
-                    Histogram
-                  </Button>
-                )}
-                {showDownload && <CSVButton data={data}>Download</CSVButton>}
-              </div>
-            </div>
-          </div>
-        )}
+        {!queryType && <LogsExplorerTableHeader />}
         <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
@@ -285,56 +306,7 @@ const LogTable = ({
               !isLoading ? (
                 <>
                   <div className="py-4 w-full h-full flex-col space-y-12">
-                    {!error && (
-                      <div
-                        className={`transition-all
-                      duration-500
-                      delay-200
-                      
-                      flex
-                      flex-col
-                      items-center
-                  
-                      gap-6
-                      text-center
-                      mt-16
-                      opacity-100 
-                      scale-100
-                      
-                      justify-center
-                    `}
-                      >
-                        <>
-                          <div className="flex flex-col gap-1">
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
-                              <div className="absolute right-1 -bottom-4">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-6 w-6"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col gap-1 px-5">
-                            <h3 className="text-lg text-scale-1200">No results</h3>
-                            <p className="text-sm text-scale-900">
-                              Try another search, or adjusting the filters
-                            </p>
-                          </div>
-                        </>
-                      </div>
-                    )}
+                    {!error && <NoRowsAlert />}
                     {error && (
                       <div className="flex justify-center px-5">
                         <Alert
@@ -361,18 +333,9 @@ const LogTable = ({
               ) : null
             }
             columns={columns as any}
-            rowClass={(r) => {
-              const row = r as LogData
-
-              let classes = []
-              classes.push(
-                `${
-                  row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
-                }`
-              )
-
-              return classes.join(' ')
-            }}
+            rowClass={(r: LogData) =>
+              r.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
+            }
             rows={logDataRows}
             rowKeyGetter={(r) => {
               if (!hasId) return Object.keys(r)[0]
