@@ -89,6 +89,16 @@ const config = {
         breadcrumbs: false,
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: '_auth_helpers',
+        path: '_auth_helpers',
+        routeBasePath: 'auth-helpers',
+        sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
+        breadcrumbs: false,
+      },
+    ],
   ],
 
   presets: [
