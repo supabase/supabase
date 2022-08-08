@@ -17,7 +17,6 @@ import Avatar from '~/components/Avatar'
 import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import blogStyles from './[slug].module.css'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -61,7 +60,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-  const filePath = `${params.year}-${params.month}-${params.day}-${params.slug}`
+  const filePath = `${params.slug}`
   const postContent = await getPostdata(filePath, '_blog')
   const { data, content } = matter(postContent)
 
@@ -157,7 +156,7 @@ function BlogPostPage(props: any) {
       <div>
         <p className="text-scale-1200">On this page</p>
         <div>
-          <div className={[blogStyles['toc'], 'prose prose-toc'].join(' ')}>
+          <div className={['prose prose-toc'].join(' ')}>
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
@@ -274,9 +273,7 @@ function BlogPostPage(props: any) {
                       />
                     </div>
                   )}
-                  <article className={[blogStyles['article'], 'prose prose-docs'].join(' ')}>
-                    {content}
-                  </article>
+                  <article className={['prose prose-docs'].join(' ')}>{content}</article>
                   <div className="py-16">
                     <div className="text-scale-900 dark:text-scale-1000 text-sm">
                       Share this article
