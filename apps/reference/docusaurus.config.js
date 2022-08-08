@@ -11,7 +11,7 @@ const config = {
   tagline: 'Documentation for the Supabase Ecosystem',
   url: 'https://supabase.tools',
   baseUrl: '/',
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
