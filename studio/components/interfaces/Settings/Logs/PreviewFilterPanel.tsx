@@ -33,6 +33,9 @@ interface Props {
   csvData?: unknown[]
   onFiltersChange: (filters: Filters) => void
   filters: Filters
+  tier: string | undefined
+  showUpgradePrompt: boolean
+  setShowUpgradePrompt: (showUpgradePrompt: boolean) => void
 }
 
 /**
@@ -54,6 +57,9 @@ const PreviewFilterPanel: FC<Props> = ({
   onFiltersChange,
   filters,
   table,
+  tier,
+  showUpgradePrompt,
+  setShowUpgradePrompt,
 }) => {
   const [search, setSearch] = useState('')
 
@@ -97,9 +103,19 @@ const PreviewFilterPanel: FC<Props> = ({
       Refresh
     </Button>
   )
-  const handleSearch = (partial: Partial<Parameters<LogSearchCallback>[0]>) =>
-    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
+  const handleSearch = (partial: Partial<Parameters<LogSearchCallback>[0]>) => {
+    // We want to show the upgrade prompt to Free plan users who go beyond the 1 day retention range
+    if (tier === 'FREE') {
+      // [Terry] The date range picker always returns a partial.from and a partial.to
+      // If we just use the last x hours dropdown, we only get a partial.to
+      if (partial.to) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+        return
+      }
+    }
 
+    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
+  }
   return (
     <div
       className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-5 pt-4' : '')}

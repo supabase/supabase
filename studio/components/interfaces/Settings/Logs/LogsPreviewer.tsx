@@ -20,6 +20,7 @@ import { LOGS_TABLES } from './Logs.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import UpgradePrompt from './UpgradePrompt'
+import { useProjectSubscription } from 'hooks'
 
 /**
  * Acts as a container component for the entire log display
@@ -46,8 +47,11 @@ export const LogsPreviewer: React.FC<Props> = ({
   tableName,
 }) => {
   const router = useRouter()
-  const { s, ite, its } = router.query
+  const { s, ite, its, ref } = router.query
   const [showChart, setShowChart] = useState(true)
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState<boolean>(false)
+  const { subscription } = useProjectSubscription(ref as string)
+  const tier = subscription?.tier
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -131,6 +135,9 @@ export const LogsPreviewer: React.FC<Props> = ({
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
+        tier={tier?.key}
+        showUpgradePrompt={showUpgradePrompt}
+        setShowUpgradePrompt={setShowUpgradePrompt}
       />
       <div
         className={
@@ -169,7 +176,12 @@ export const LogsPreviewer: React.FC<Props> = ({
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
-            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''} />
+            <UpgradePrompt
+              projectRef={projectRef}
+              from={params.iso_timestamp_start || ''}
+              showUpgradePrompt={showUpgradePrompt}
+              setShowUpgradePrompt={setShowUpgradePrompt}
+            />
           </div>
         )}
         {error && (
