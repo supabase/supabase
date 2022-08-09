@@ -42,12 +42,12 @@ const HelpPopover: FC<Props> = () => {
                 </Button>
               </Link>
               <Link href="https://supabase.com/docs/">
-                <Button type="secondary" size="tiny" icon={<IconBookOpen />}>
+                <Button type="text" size="tiny" icon={<IconBookOpen />}>
                   Docs
                 </Button>
               </Link>
               <Link href="https://status.supabase.com/">
-                <Button type="secondary" size="tiny" icon={<IconActivity />}>
+                <Button type="text" size="tiny" icon={<IconActivity />}>
                   Supabase Status
                 </Button>
               </Link>
