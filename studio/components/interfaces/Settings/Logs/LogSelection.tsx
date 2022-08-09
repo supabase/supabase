@@ -13,19 +13,31 @@ import FunctionInvocationSelectionRender, {
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { isDefaultLogPreviewFormat, LogsTableName } from '.'
+import { isDefaultLogPreviewFormat, LogsEndpointParams, LogsTableName } from '.'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import Connecting from 'components/ui/Loading/Loading'
 
-interface Props {
+export interface LogSelectionProps {
   log: LogData | null
   onClose: () => void
   queryType?: QueryType
   projectRef: string
+  params: Partial<LogsEndpointParams>
 }
 
-const LogSelection: FC<Props> = ({ projectRef, log: partialLog, onClose, queryType }) => {
-  const [{ logData: fullLog, isLoading }] = useSingleLog(projectRef, queryType, partialLog?.id)
+const LogSelection: FC<LogSelectionProps> = ({
+  projectRef,
+  log: partialLog,
+  onClose,
+  queryType,
+  params = {},
+}) => {
+  const [{ logData: fullLog, isLoading }] = useSingleLog(
+    projectRef,
+    queryType,
+    params,
+    partialLog?.id
+  )
   const Formatter = () => {
     switch (queryType) {
       case 'api':
