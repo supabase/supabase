@@ -136,13 +136,14 @@ export const getPostdata = async (slug: string, directory: string) => {
 export const getAllCategories = (directory: Directories) => {
   const posts = getSortedPosts(directory)
   let categories: any = []
-
+  if (posts){
   posts.map((post: any) => {
     // add tags into categories array
     post.tags.map((tag: string) => {
       if (!categories.includes(tag)) return categories.push(tag)
     })
   })
+}
 
   return categories
 }
