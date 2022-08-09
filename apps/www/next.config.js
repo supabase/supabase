@@ -1061,7 +1061,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2021/11/29/community-day',
-        destination: '/blog/community-day',
+        destination: '/blog/community-day-3',
       },
       {
         permanent: true,
@@ -1136,7 +1136,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2022/03/28/community-day',
-        destination: '/blog/community-day',
+        destination: '/blog/community-day-4',
       },
       {
         permanent: true,
