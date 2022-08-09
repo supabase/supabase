@@ -162,6 +162,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
+            params={params}
           />
         </LoadingOpacity>
         {!error && (
