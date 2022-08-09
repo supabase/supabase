@@ -15,6 +15,7 @@ module.exports = withMDX({
       'supabase.com',
       'obuldanrptloktxcffvn.supabase.co',
       'avatars.githubusercontent.com',
+      'colab.research.google.com',
     ],
   },
   async headers() {
