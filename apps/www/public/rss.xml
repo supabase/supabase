@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 02 Aug 2022 03:03:00</lastBuildDate>
+      <lastBuildDate>Mon, 08 Aug 2022 03:03:00</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</guid>
+  <title>Slack Consolidate: a slackbot built with Python and Supabase</title>
+  <link>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</link>
+  <description>Different approaches for tracking visitor counts with PostgreSQL.</description>
+  <pubDate>Mon, 08 Aug 2022 03:03:00</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-beta-update-july-2022</guid>
   <title>Supabase Beta July 2022</title>
   <link>https://supabase.com/blog/supabase-beta-update-july-2022</link>
