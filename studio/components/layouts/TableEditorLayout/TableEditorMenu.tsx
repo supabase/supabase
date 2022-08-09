@@ -229,6 +229,7 @@ const TableEditorMenu: FC<Props> = ({
                   key={table.name}
                   url={`/project/${projectRef}/editor/${table.id}`}
                   name={table.name}
+                  hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
                     isActive && (
