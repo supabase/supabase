@@ -21,7 +21,7 @@ Before we dive in, let’s look at some prerequisites you'll need:
 
 - [Supabase Client](https://pypi.org/project/supabase/)
   - The SDK only supports Python > 3.7. You can download a supported Python version from [here](https://www.python.org/downloads/).
-    `pip install **supabase**`
+    `pip install supabase`
 - [Python dotenv](https://pypi.org/project/python-dotenv/) to handle API keys without exposing them in the code
   - This is optional, but it will avoid issues of package dependencies and version conflicts.
     **`pip install python-dotenv`**
@@ -161,9 +161,9 @@ Slack links have the following format:
   https://<span className="text-scale-1200">ORGANIZATION</span>.slack.com/archives/
   <span className="text-scale-1200">channel_id</span>/p<span className="text-scale-1200">message_id</span>
 </span>
-
+<br/>
 <span style={{ color: 'maroon' }}>Organization: subdomain used in Slack</span>
-
+<br/>
 <span style={{ color: 'DarkGreen' }}>Channel ID</span>: It is the string that you'll need to enter
 in slack channels as the channel id e.g C0000ABC02DE
 
@@ -405,17 +405,20 @@ if __name__ == '__main__':
 
 Of course, we aren't doing proper Python example if we don't make a test notebook available:
 
-<a href="https://colab.research.google.com/github/mansueli/SlackConsolidate/blob/main/SlackConsolidate_bot.ipynb">
-  <img
-    className="ignore-on-export"
-    src="https://colab.research.google.com/assets/colab-badge.svg"
-    alt="Open in colab"
-    width="256"
-  />
-</a>
+![Open in Colab](/images/blog/2022-august/colab-badge.svg)](https://colab.research.google.com/assets/colab-badge.svg)
 
 ## Conclusion
 
 Using Supabase and Slack SDK, it is very easy to create a bot that consolidates data according to the rules set. It just takes some steps to get started with the Python SDK and you can even run a demo directly in [Google Colab](https://colab.research.google.com/drive/1-sM23eQPE1Me4vl10KKoa9xzLYIgkgyQ?usp=sharing).
 
 If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.supabase.com/).
+
+## More Python and Supabase resources
+
+- [Python data loading with Supabase](https://supabase.com/blog/loading-data-supabase-python)
+- [Visualizing Supabase Data using Metabase](https://supabase.com/blog/visualizing-supabase-data-using-metabase)
+- [Supabase-py (Database) on Replit](https://replit.com/@Supabase/Supabase-py-Database?v=1)
+
+
+
+
