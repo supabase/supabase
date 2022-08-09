@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 
-import Container from 'components/Container'
 import Layout from '~/components/Layouts/Default'
 
 import SectionHeader from 'components/UI/SectionHeader'
@@ -12,20 +11,11 @@ import PressData from 'data/Press'
 import CommunityData from 'data/Community'
 import CompaniesData from 'data/Companies'
 import InvestorData from 'data/Investors'
-import TeamData from 'data/Team'
 
 import Image from 'next/image'
 import Link from 'next/link'
 
-import {
-  Button,
-  Card,
-  IconChevronRight,
-  IconGitHub,
-  IconLinkedin,
-  IconTwitter,
-  Space,
-} from '@supabase/ui'
+import { Button, Card, Space } from '@supabase/ui'
 import { NextSeo } from 'next-seo'
 
 type Props = {}
