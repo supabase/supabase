@@ -123,7 +123,7 @@ const Index = ({}: Props) => {
                   <div
                     className="
                     dark:bg-scale-400 justify-space-evenly
-                    flex flex-row gap-0.5 rounded rounded-t-none border-b
+                    flex flex-row gap-2 rounded rounded-t-none border-b
                     border-r border-l
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
