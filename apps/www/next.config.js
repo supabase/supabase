@@ -981,7 +981,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2021/07/30/1-the-supabase-hackathon',
-        destination: '/blog/1-the-supabase-hackathon',
+        destination: '/blog/the-supabase-hackathon',
       },
       {
         permanent: true,
