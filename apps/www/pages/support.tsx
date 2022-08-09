@@ -111,7 +111,7 @@ const Index = ({}: Props) => {
                         For help and questions about best practices, join our GitHub discussions or
                         join us on Discord. Browse and ask questions.
                       </p>
-                      <p className="text-scale-1100 mt-2">
+                      <p className="text-scale-1100 mt-2 text-sm">
                         <span className="text-brand-900 text-sm font-bold">Use this for:</span>{' '}
                         General questions
                       </p>
@@ -182,7 +182,7 @@ const Index = ({}: Props) => {
                         We offer email based support. If you need SLAs, guaranteed response times,
                         or have an issue, please contact us here.
                       </p>
-                      <p className="text-scale-1100 mt-2">
+                      <p className="text-scale-1100 mt-2 text-sm">
                         <span className="text-brand-900 text-sm font-bold">Use this for:</span>{' '}
                         Issues or questions specific to you
                       </p>
