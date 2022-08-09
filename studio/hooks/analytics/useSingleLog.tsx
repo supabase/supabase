@@ -22,11 +22,12 @@ interface Handlers {
 function useSingleLog(
   project: string,
   queryType?: QueryType,
+  paramsToMerge?: Partial<LogsEndpointParams>,
   id?: string | null
 ): [Data, Handlers] {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
-  const params: LogsEndpointParams = { project, sql }
+  const params: LogsEndpointParams = { ...paramsToMerge, project, sql }
   const endpointUrl = `${API_URL}/projects/${project}/analytics/endpoints/logs.all?${genQueryParams(
     params as any
   )}`
