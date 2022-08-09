@@ -1,0 +1,133 @@
+---
+title: 'Launch Week 5 Hackathon'
+description: Build to win $1500 - Friday 12th to Monday 21st August 2022
+author: ant_wilson
+image: lw5-hackathon/thumb.png
+thumb: lw5-hackathon/thumb.png
+tags:
+  - launch-week
+date: '2022-08-08'
+toc_depth: 3
+---
+
+# The Supabase Open Source Hackathon
+
+Now is the perfect time to start your new Open Source project!
+
+[Launch Week](https://supabase.com/launch-week) is about to start and we're running a hackathon in parallel for the entire duration.
+
+There's $1500 and gold Supabase caps to be won!
+
+[Supabase-js v2.0](https://github.com/supabase/supabase-js/releases) and [Flutter SDK v1.0](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview) will both be announced during Launch Week, they are both available already and using them in your project will gain extra credit!
+
+## Key Facts
+
+- You have 10 days to build a new **Open Source** project using Supabase.
+  - Starting 8:00am PT Friday 13th August 2022.
+- Build whatever you want - a project, app, tool, library, anything
+- Enter as an individual, or as a team of up to 5 people
+- Submission deadline is 11:59pm Sunday night PT 21st August 2022
+- There are 5 prize categories.
+  - Best overall project will win $1500 in GitHub sponsorships!
+  - Most technically challenging, most fun, best flutter project, and most visually pleasing will all win a Gold Supabase Cap!
+
+![Gold cap](/images/blog/lw5-hackathon/spool.png)
+
+## Details
+
+### Schedule
+
+- The Hackathon begins **NOW**! (8:00am PT Friday 13th August 2022)
+- Work on your project any time for the next 10 days
+- Submission deadline (11:59pm PT Sunday 21st August 2021)
+- Winners Announced (10pm PT Monday 22nd August 2022)
+
+### Prizes
+
+There are 5 chances to win, there will be prizes for:
+
+- Best Overall Project ($1500 in GitHub Sponsorship & Gold Cap)
+- Most Visually Pleasing (Gold Cap)
+- Most Technically Impressive (Gold Cap)
+- Most Fun/Interesting (Gold Cap)
+- Best Flutter Project (Gold Cap)
+
+There will be a winner and a runner-up prize for each category. Every team member gets a cap.
+
+![Gold cap](/images/blog/lw5-hackathon/cap.png)
+
+### Submission
+
+You should submit your project using [this form](https://forms.gle/erYrSFKSErKVBFFC8).
+
+You will be asked to send a link to a GitHub (or similar) repo, in the README you should include:
+
+- link to hosted demo (if applicable)
+- list of team members GitHub handles (and Twitter if they have one)
+- any demo videos, instructions, or memes
+- a brief description of how you used Supabase:
+  - to store data?
+  - realtime?
+  - auth?
+  - storage?
+- any other info you want the judges to know (motivations/ideas/process)
+- optional team photo
+
+### Judges
+
+The Supabase Founders will be judging, we will be looking for:
+
+- creativity/inventiveness
+- functions correctly/smoothly
+- visually pleasing
+- technically impressive
+- use of Supabase features
+  - deep usage of a single feature or
+  - broad usage are both ok
+- FUN! 😃
+
+### Rules
+
+- Team size 1-5 (all team members on winning teams will receive a prize)
+- You cannot be in multiple teams
+- One submission per team
+- All design elements, code, etc. for your project must be created **during** the event
+- All entries must be Open Source (link to source code required in entry)
+- Must use Supabase in some capacity
+- Can be any language or framework
+- You must submit before the deadline (no late entries)
+
+### Community
+
+The Supabase Team will be taking part in the Hackathon and you'll find us live building in our discord all week. Please join us by building in public:
+
+- Text channel: hackathon
+- Audio channel: hackathon
+
+If you need help or advice when building, find other people to join your team, or if you just want to chill and watch people build, come and join us!
+
+[Join our Discord](https://discord.supabase.com)
+
+![Discord Hangout](/images/blog/hackathon/community.png)
+
+### Guides
+
+Here's a collection of resources that will help you get started building with Supabase:
+
+- [Examples and Resources](/docs/guides/examples)
+- [Supabase Crash Course](https://www.youtube.com/watch?v=7uKQBl9uZ00) [video]
+- [Flutter Quickstart Guide](/docs/guides/with-flutter)
+- [Nextjs Quickstart Guide](/docs/guides/with-nextjs)
+- [Using Supabase inside Replit](/blog/using-supabase-replit)
+- [Full Stack Development with Next.js and Supabase – The Complete Guide](https://www.freecodecamp.org/news/the-complete-guide-to-full-stack-development-with-supabas/)
+- [Auth Deep Dive - Learn everything there is to know about Supabase Auth](/docs/learn/auth-deep-dive/auth-deep-dive-jwts) [videos]
+- [Send SMS notifications using Twilio](https://www.twilio.com/blog/send-sms-notifications-supabase-users-node-js-twilio-messaging)
+- [How to Integrate Supabase in Your Ionic App](https://www.youtube.com/watch?v=pl9XfIWutKE) [video]
+- [Building a Slack clone with authentication and realtime data syncing using Supabase](https://www.youtube.com/watch?v=LUMxJ4w-MUU) [video]
+- [Creating Protected Routes In NextJS With Supabase](https://aboutmonica.com/blog/creating-protected-routes-in-next-js-with-supabase)
+
+### Additional Info
+
+- Any intellectual property developed during the hackathon will belong to the team that developed it. We expect that each team will have an agreement between themselves regarding the IP, but this is not required
+- By making a submission you grant Supabase permission to use screenshots, code-snippets and/or links to your project or content of your README on our Twitter, blog, website, email updates, and in the Supabase discord server. Supabase does not make any claims over your IP.
+- $1500 prize will be paid by making a GitHub sponsorship to the winning repo, $500/month for 3 months. The goal here is to create a sustainable project that will be continue to be maintained for the duration of the sponsorship period (and hopefully beyond :) )
