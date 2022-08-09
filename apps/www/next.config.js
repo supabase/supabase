@@ -1121,7 +1121,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2022/03/08/audit',
-        destination: '/blog/audit',
+        destination: '/blog/postgres-audit',
       },
       {
         permanent: true,
