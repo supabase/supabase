@@ -930,8 +930,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/supabase-beta-june-2021',
-        destination: '/blog/2021/07/02/supabase-beta-june-2021',
+        source: '/blog/2021/07/02/supabase-beta-june-2021',
+        destination: '/blog/supabase-beta-june-2021',
       },
       {
         permanent: true,
@@ -981,7 +981,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2021/07/30/1-the-supabase-hackathon',
-        destination: '/blog/the-supabase-hackathon',
+        destination: '/blog/1-the-supabase-hackathon',
       },
       {
         permanent: true,
@@ -1121,7 +1121,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2022/03/08/audit',
-        destination: '/blog/postgres-audit',
+        destination: '/blog/audit',
       },
       {
         permanent: true,
