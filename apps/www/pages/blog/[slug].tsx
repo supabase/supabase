@@ -18,6 +18,7 @@ import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
+const ignoreClass = 'ignore-on-export'
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
 const components = {
@@ -25,22 +26,29 @@ const components = {
   Quote,
   Avatar,
   code: (props: any) => {
-    return <CodeBlock {...props} />
+    if (props.className !== ignoreClass) {
+      return <CodeBlock {...props} />
+    } else {
+      return <code {...props} />
+    }
   },
   ImageGrid,
   img: (props: any) => {
-    return (
-      <div
-        className="
+    if (props.className !== ignoreClass) {
+      return (
+        <div
+          className="
           next-image--dynamic-fill 
           to-scale-400  
           from-scale-500 rounded-md
           border bg-gradient-to-r
         "
-      >
-        <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
-      </div>
-    )
+        >
+          <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
+        </div>
+      )
+    }
+    return <img {...props} />
   },
 }
 
