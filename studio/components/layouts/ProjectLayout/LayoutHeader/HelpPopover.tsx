@@ -35,11 +35,11 @@ const HelpPopover: FC<Props> = () => {
               For issues with your project hosted on supabase.com, or other inquiries about our
               hosted services.
             </p>
-            <div className="space-x-2">
+            <div className="space-x-1">
               <Link href={supportUrl}>
                 <a>
                   <Button type="default" icon={<IconMail />}>
-                    Contact support team
+                    Contact Support
                   </Button>
                 </a>
               </Link>
@@ -53,7 +53,7 @@ const HelpPopover: FC<Props> = () => {
               <Link href="https://status.supabase.com/">
                 <a>
                   <Button type="secondary" size="tiny" icon={<IconActivity />}>
-                    Status
+                    Supabase Status
                   </Button>
                 </a>
               </Link>
