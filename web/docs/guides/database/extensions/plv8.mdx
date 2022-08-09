@@ -18,47 +18,41 @@ It can be used for database functions, triggers, queries and more.
 
 ## Usage
 
-
-### Enabling
-
+### Enable the extension
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page.
-2. Click on "Extensions" in the sidebar.
-3. Search for "plv8".
-4. Click the toggle.
-```
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "plv8" and enable the extension.
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
-```sql 
-
+```sql
 -- Example: enable the "plv8" extension 
 create extension plv8;
 
 -- Example: disable the "plv8" extension 
 drop extension if exists plv8;
-
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
-To disable an extension you can call `drop extension`.
+To disable an extension, call `drop extension`.
 
 Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
 </TabItem>
 </Tabs>
 
-### Creating `plv8` functions
+### Create `plv8` functions
 
 Functions written in `plv8` are written just like any other PostgreSQL functions, only
 with the `language` identifier set to `plv8`.
@@ -74,28 +68,24 @@ $$ language plv8;
 
 You can call `plv8` functions like any other Postgres function: 
 
-
-
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JavaScript', value: 'JS'},
-]}>
-<TabItem value="SQL">
+  defaultValue="sql"
+  values={[
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+  ]}>
 
+<TabItem value="sql">
 
 ```sql
 select function_name();
 ```
 
 </TabItem>
-<TabItem value="JS">
+<TabItem value="javascript">
 
-```js 
-
+```js
 const { data, error } = supabase.rpc('function_name')
-
 ```
 
 </TabItem>
@@ -103,7 +93,7 @@ const { data, error } = supabase.rpc('function_name')
 
 ## Examples
 
-### Scalar Functions
+### Scalar functions
 
 A [scalar function](https://plv8.github.io/#scalar-function-calls) is anything that takes in some user input and returns a single result.
 
@@ -134,7 +124,7 @@ returns smallint as $$
 $$ language plv8;
 ```
 
-### Set-returning Functions
+### Set-returning functions
 
 A [set-returning function](https://plv8.github.io/#set-returning-function-calls) is anything that returns a full set of results - for example, rows in a table.
 
@@ -150,8 +140,7 @@ returns setof messages as $$
 $$ language plv8;
 ```
 
-
 ## Resources 
 
-- Official [`plv8` documentation](https://plv8.github.io/).
-- [plv8 GitHub Repository](https://github.com/plv8/plv8).
+- Official [`plv8` documentation](https://plv8.github.io/)
+- [plv8 GitHub Repository](https://github.com/plv8/plv8)
