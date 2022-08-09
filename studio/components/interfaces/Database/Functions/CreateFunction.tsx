@@ -1,4 +1,4 @@
-import { FC, useEffect, useContext, createContext, FormEvent } from 'react'
+import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import {
@@ -12,6 +12,7 @@ import {
   Radio,
   IconPlus,
   Toggle,
+  Modal,
 } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
@@ -20,6 +21,7 @@ import { useStore } from 'hooks'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 class CreateFunctionFormState {
   id: number | undefined
@@ -145,6 +147,7 @@ class CreateFunctionStore implements ICreateFunctionStore {
   meta = null
   schemas = []
   advancedVisible = false
+  isDirty = false
 
   constructor() {
     makeAutoObservable(this)
@@ -172,7 +175,12 @@ class CreateFunctionStore implements ICreateFunctionStore {
     this.loading = value
   }
 
+  setIsDirty = (value: boolean) => {
+    this.isDirty = value
+  }
+
   onFormChange = ({ key, value }: { key: string; value: any }) => {
+    this.isDirty = true
     if (has(this.formState, key)) {
       const temp = (this.formState as any)[key] as any
       ;(this.formState as any)[key] = { ...temp, value, error: undefined }
@@ -296,6 +304,8 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
   const _localState = useLocalObservable(() => new CreateFunctionStore())
   _localState.meta = meta as any
 
+  const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
+
   useEffect(() => {
     const fetchSchemas = async () => {
       await (_localState!.meta as any).schemas.load()
@@ -308,6 +318,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
 
   useEffect(() => {
     _localState.formState.reset(func)
+    _localState.setIsDirty(false)
   }, [visible, func])
 
   async function handleSubmit() {
@@ -348,12 +359,16 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
     }
   }
 
+  function isClosingSidePanel() {
+    _localState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
+  }
+
   return (
     <>
       <SidePanel
         size="large"
         visible={visible}
-        onCancel={() => setVisible(!visible)}
+        onCancel={isClosingSidePanel}
         header={_localState.title}
         className="hooks-sidepanel transform transition-all duration-300 ease-in-out mr-0"
         loading={_localState.loading}
@@ -436,6 +451,24 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
             )}
           </div>
         </CreateFunctionContext.Provider>
+        <ConfirmationModal
+          visible={isClosingPanel}
+          header="Confirm to close"
+          buttonLabel="Confirm"
+          onSelectCancel={() => setIsClosingPanel(false)}
+          onSelectConfirm={() => {
+            setIsClosingPanel(false)
+            setVisible(!visible)
+          }}
+          children={
+            <Modal.Content>
+              <p className="text-scale-1100 py-4 text-sm">
+                There are unsaved changes. Are you sure you want to close the panel? Your changes
+                will be lost.
+              </p>
+            </Modal.Content>
+          }
+        />
       </SidePanel>
     </>
   )

@@ -1,3 +1,4 @@
+import ApiGenerator from './api'
 import CliGenerator from './cli'
 import ConfigGenerator from './config'
 import SdkGenerator from './sdk'
@@ -12,6 +13,10 @@ export default async function DocGenerator({
   type: 'cli' | 'config' | 'sdk' | 'api'
 }) {
   switch (type) {
+    case 'api':
+      await ApiGenerator(input, output)
+      break
+
     case 'cli':
       await CliGenerator(input, output)
       break

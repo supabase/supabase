@@ -7,7 +7,8 @@ const subNavRoutes = [
   // Add any routes which should have a subnav
   '/api',
   '/cli',
-  '/gotrue',
+  '/auth',
+  '/storage',
   '/supabase-js',
   '/supabase-dart',
 ]

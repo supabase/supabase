@@ -18,7 +18,7 @@ const Landing = () => {
           provider: 'github',
         },
         {
-          redirectTo: process.env.NEXT_PUBLIC_SITE_URL,
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?auth=true`,
         }
       )
       if (error) throw error

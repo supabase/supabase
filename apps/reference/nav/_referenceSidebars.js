@@ -20,41 +20,47 @@ const sidebars = {
       link: { type: 'doc', id: 'about' },
       collapsed: false,
       items: [
-        {
-          type: 'link',
-          label: 'Supabase JavaScript Client',
-          href: '/supabase-js',
-        },
         { type: 'link', label: 'Supabase CLI', href: '/cli' },
         { type: 'link', label: 'Supabase API', href: '/api' },
+        {
+          type: 'link',
+          label: 'Supabase JavaScript Library',
+          href: '/supabase-js',
+        },
+        {
+          type: 'link',
+          label: 'Supabase Dart Library',
+          href: '/supabase-dart',
+        },
       ],
     },
+    // {
+    //   type: 'category',
+    //   label: 'Community',
+    //   collapsed: false,
+    //   items: [],
+    // },
     {
       type: 'category',
-      label: 'Community',
+      label: 'Self hosted',
       collapsed: false,
       items: [
-        { type: 'link', label: 'Supabase Dart Client', href: '/supabase-dart' },
+        { type: 'link', label: 'Auth Server', href: '/auth' },
+        { type: 'link', label: 'Storage Server', href: '/storage' },
       ],
     },
-    {
-      type: 'category',
-      label: 'Tools',
-      collapsed: true,
-      items: [{ type: 'link', label: 'GoTrue Auth Server', href: '/gotrue' }],
-    },
-    {
-      type: 'category',
-      label: 'Postgres Extensions',
-      link: { type: 'doc', id: 'postgres/extensions/intro' },
-      collapsed: true,
-      items: [
-        'postgres/extensions/http',
-        'postgres/extensions/pgtap',
-        'postgres/extensions/plv8',
-        'postgres/extensions/uuid-ossp',
-      ],
-    },
+    // {
+    //   type: 'category',
+    //   label: 'Postgres Extensions',
+    //   link: { type: 'doc', id: 'postgres/extensions/intro' },
+    //   collapsed: true,
+    //   items: [
+    //     'postgres/extensions/http',
+    //     'postgres/extensions/pgtap',
+    //     'postgres/extensions/plv8',
+    //     'postgres/extensions/uuid-ossp',
+    //   ],
+    // },
   ],
 }
 
