@@ -81,6 +81,7 @@ const Column: FC<Props> = ({
           <Input
             value={column.name}
             size="small"
+            placeholder="column name"
             title={column.name}
             disabled={hasImportContent}
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
