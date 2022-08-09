@@ -76,26 +76,29 @@ const Column: FC<Props> = ({
           </Typography>
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[20%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
+            placeholder="column name"
+            title={column.name}
             disabled={hasImportContent}
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
-            actions={
-              <Button
-                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
-                onClick={() => onEditRelation(column)}
-              >
-                <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
-              </Button>
-            }
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
         </div>
+      </div>
+      <div className="w-[5%]  pl-0.5">
+        <Button
+          type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
+          onClick={() => onEditRelation(column)}
+          className="px-1 py-2"
+        >
+          <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
+        </Button>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
