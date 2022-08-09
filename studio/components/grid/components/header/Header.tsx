@@ -30,7 +30,7 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
   const { selectedRows } = state
 
   return (
-    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5">
+    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5 py-1.5">
       {selectedRows.size > 0 ? (
         <RowHeader sorts={sorts} filters={filters} />
       ) : (
