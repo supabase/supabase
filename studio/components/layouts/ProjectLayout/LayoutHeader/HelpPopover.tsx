@@ -37,17 +37,17 @@ const HelpPopover: FC<Props> = () => {
             </p>
             <div className="space-x-1">
               <Link href={supportUrl}>
-                <Button type="default" icon={<IconMail />}>
+                <Button type="default" icon={<IconMail />} as="a">
                   Contact Support
                 </Button>
               </Link>
               <Link href="https://supabase.com/docs/">
-                <Button type="text" size="tiny" icon={<IconBookOpen />}>
+                <Button type="text" size="tiny" icon={<IconBookOpen />} as="a">
                   Docs
                 </Button>
               </Link>
               <Link href="https://status.supabase.com/">
-                <Button type="text" size="tiny" icon={<IconActivity />}>
+                <Button type="text" size="tiny" icon={<IconActivity />} as="a">
                   Supabase Status
                 </Button>
               </Link>
