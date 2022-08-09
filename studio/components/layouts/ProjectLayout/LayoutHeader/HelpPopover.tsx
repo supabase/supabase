@@ -36,17 +36,17 @@ const HelpPopover: FC<Props> = () => {
               hosted services.
             </p>
             <div className="space-x-1">
-              <Link href={supportUrl}>
+              <Link passHref href={supportUrl}>
                 <Button type="default" icon={<IconMail />} as="a">
                   Contact Support
                 </Button>
               </Link>
-              <Link href="https://supabase.com/docs/">
+              <Link passHref href="https://supabase.com/docs/">
                 <Button type="text" size="tiny" icon={<IconBookOpen />} as="a">
                   Docs
                 </Button>
               </Link>
-              <Link href="https://status.supabase.com/">
+              <Link passHref href="https://status.supabase.com/">
                 <Button type="text" size="tiny" icon={<IconActivity />} as="a">
                   Supabase Status
                 </Button>
