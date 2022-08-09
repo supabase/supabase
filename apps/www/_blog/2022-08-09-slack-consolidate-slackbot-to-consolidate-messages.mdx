@@ -5,9 +5,9 @@ author: rodrigo_mansueli
 image: /images/blog/2022-august/slackbot.jpg
 thumb: /images/blog/2022-august/slackbot.jpg
 tags:
-  - slack 
-  - python 
-  - api 
+  - slack
+  - python
+  - api
   - automation
 author_image_url: https://github.com/mansueli.png
 authorURL: https://github.com/mansueli
@@ -15,25 +15,25 @@ date: '2022-08-09'
 toc_depth: 3
 ---
 
-Supabase is a platform-as-a-service built on top of PostgreSQL and [many other amazing open-source tools](https://supabase.com/docs/architecture). It’s a fantastic option to create data-intensive apps and tooling. Taking advantage of the community-made [Python SDK](https://github.com/supabase-community/supabase-py) and [Slack's Python SDK](https://slack.dev/python-slack-sdk/), you can automate tasks and build apps for several use cases. 
+Supabase is a platform-as-a-service built on top of PostgreSQL and [many other amazing open-source tools](https://supabase.com/docs/architecture). It’s a fantastic option to create data-intensive apps and tooling. Taking advantage of the community-made [Python SDK](https://github.com/supabase-community/supabase-py) and [Slack's Python SDK](https://slack.dev/python-slack-sdk/), you can automate tasks and build apps for several use cases.
 
 ## Prerequisites
 
 Before we dive in, let’s look at some prerequisites you'll need:
 
 - [Supabase Client](https://pypi.org/project/supabase/)
-    - The SDK only supports Python > 3.7. You can download a supported Python version from [here](https://www.python.org/downloads/).
+  - The SDK only supports Python > 3.7. You can download a supported Python version from [here](https://www.python.org/downloads/).
     `pip install **supabase**`
 - [Python dotenv](https://pypi.org/project/python-dotenv/) to handle API keys without exposing them in the code
-    - This is optional, but it will avoid issues of package dependencies and version conflicts. 
+  - This is optional, but it will avoid issues of package dependencies and version conflicts.
     **`pip install python-dotenv`**
 - [Slack SDK](https://pypi.org/project/slack-sdk/) for Python
-    - This is needed to create the Slack bot
+  - This is needed to create the Slack bot
     **`pip install slack-sdk`**
 
 ### Creating the App in Slack
 
-Now, it is time to create the bot in Slack and get the API Keys (after granting the required scopes) 
+Now, it is time to create the bot in Slack and get the API Keys (after granting the required scopes)
 
 [https://api.slack.com/apps](https://api.slack.com/apps)
 
@@ -65,23 +65,23 @@ always_online: false
 oauth_config:
 scopes:
 user:
-- channels:history
-- channels:read
-- channels:write
-- chat:write
-- links:read
-- users:read
-- groups:history
-- groups:read
-- mpim:history
-- im:history
+  - channels:history
+  - channels:read
+  - channels:write
+  - chat:write
+  - links:read
+  - users:read
+  - groups:history
+  - groups:read
+  - mpim:history
+  - im:history
 bot:
-- channels:history
-- channels:read
-- links:read
-- chat:write.public
-- chat:write
-- channels:join
+  - channels:history
+  - channels:read
+  - links:read
+  - chat:write.public
+  - chat:write
+  - channels:join
 settings:
 org_deploy_enabled: false
 socket_mode_enabled: false
@@ -122,9 +122,9 @@ Now, we are done with Slack for now. Let's create some buffer tables in Supabase
 
 ## Creating Tables in Supabase
 
-Create an account [here](https://app.supabase.com/) (if you don't have one yet). 
+Create an account [here](https://app.supabase.com/) (if you don't have one yet).
 
-We will be using Supabase's [database](https://supabase.com/docs/guides/database) and the Python [client Libraries](https://supabase.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc. 
+We will be using Supabase's [database](https://supabase.com/docs/guides/database) and the Python [client Libraries](https://supabase.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
 
 Go to the SQL Editor and run this:
 
@@ -159,11 +159,15 @@ After right-clicking a message in Slack, you can see the option to select the li
 
 Slack links have the following format:
 
-https://<span style="color:maroon">ORGANIZATION</span>.slack.com/archives/<span style="color:DarkGreen">channel_id</span>/p<span style="color:GreenYellow">message_id</span>
+<span>
+  https://<span className="text-scale-1200">ORGANIZATION</span>.slack.com/archives/
+  <span className="text-scale-1200">channel_id</span>/p<span className="text-scale-1200">message_id</span>
+</span>
 
-<span style="color:maroon">Organization: subdomain used in Slack</span>
+<span style={{ color: 'maroon' }}>Organization: subdomain used in Slack</span>
 
-<span style="color:DarkGreen">Channel ID</span>:  It is the string that you'll need to enter in slack channels as the channel id e.g C0000ABC02DE
+<span style={{ color: 'DarkGreen' }}>Channel ID</span>: It is the string that you'll need to enter
+in slack channels as the channel id e.g C0000ABC02DE
 
 The name of the channel is not needed. But it is recommended to set, it so you can filter and find this information later on if needed. You can ignore everything else when setting the table for `slack_channels`
 
@@ -203,17 +207,17 @@ VALUES ('support-enterprise','C0000ABC02DC','Enterprise Support msgs', 'all_them
 
 Notes:
 
-`p_level` is an optional message that will be included in with the message e.g **VIP customer.** 
+`p_level` is an optional message that will be included in with the message e.g **VIP customer.**
 
 `private` is an integer field that should be set to 1 if the channel has a 🔒padlock before the name (not a public channel).
 
-`channel_id` is the source channel ID and `dest_channel_id` is the ID of the channel where the bot will post the message. 
+`channel_id` is the source channel ID and `dest_channel_id` is the ID of the channel where the bot will post the message.
 
 ## Setting up the environment File:
 
 You need to get the supabase URL and API keys from here:
 
-[https://app.supabase.com/project/_/settings/api](https://app.supabase.com/project/_/settings/api)
+[https://app.supabase.com/project/\_/settings/api](https://app.supabase.com/project/_/settings/api)
 
 ![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/2022-august/10_copy_supabase_apis.png)
 
@@ -241,7 +245,7 @@ SLACK_ORG=slack_sub_domain
 
 ## Now, we can run the bot:
 
-It works in a similar fashion to Arduino / PIC processors of an infinity loop looking for new data and performing tasks. 
+It works in a similar fashion to Arduino / PIC processors of an infinity loop looking for new data and performing tasks.
 
 ```python
 import time
@@ -261,11 +265,11 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 SLACK_ORG = config['SLACK_ORG']
 SLACK_ORG_LINK = f"https://{SLACK_ORG}.slack.com/archives/"
 ############
-# Config: 
+# Config:
 ############
 # 1.4 seconds should be the minimum to avoid passing Slack API limits.
 # https://api.slack.com/docs/rate-limits#tier_t3
-POOLING_DELAY = 1.4  
+POOLING_DELAY = 1.4
 # Check if new channels were added each hour.
 SCAN_CHANNELS_DELAY = 3600.0
 BUFFER_SIZE = 20
@@ -295,7 +299,7 @@ def setup():
     """_summary_
         Fetches the list of channels from Supabase and returns them in a dict()
     Returns:
-        dict: Dictionary with SlackChannel objects. 
+        dict: Dictionary with SlackChannel objects.
     """
     channels = dict()
     data = supabase.from_("slack_channels").select("channel_id, channel, p_level, dest_channel, dest_channel_id, private").execute().data
@@ -329,7 +333,7 @@ def post(src_channel, link, message):
             aux_text = ("Message on <#"+src_channel.id+
                 ">."+src_channel.p_level+" \n"+message+" \n"+link)
         result = bot_client.chat_postMessage(
-                channel= src_channel.dest_channel_id, 
+                channel= src_channel.dest_channel_id,
                 text=aux_text
                 )
         logger.info(result)
@@ -350,9 +354,9 @@ def ts_to_strtime(ts):
 
 def loop_through_channels(channels):
     """_summary_
-        Loop through the channels and post messages on postgres if they aren't cached. 
+        Loop through the channels and post messages on postgres if they aren't cached.
     Args:
-        channels (dict): dict() with SlackChannel objects 
+        channels (dict): dict() with SlackChannel objects
     """
     for channel_id in channels:
         channel = channels[channel_id]
@@ -384,8 +388,8 @@ def loop_through_channels(channels):
 
 def main():
     """_summary_
-        Main loop to infinitely keep pooling data from channels and posting on Slack. 
-        It also checks for new channels every hour. 
+        Main loop to infinitely keep pooling data from channels and posting on Slack.
+        It also checks for new channels every hour.
     """
     channels = setup()
     start = time.time()
@@ -407,6 +411,6 @@ Of course, we aren't doing proper Python example if we don't make a test noteboo
 
 ## Conclusion
 
-Using Supabase and Slack SDK, it is very easy to create a bot that consolidates data according to the rules set. It just takes some steps to get started with the Python SDK and you can even run a demo directly in [Google Colab](https://colab.research.google.com/drive/1-sM23eQPE1Me4vl10KKoa9xzLYIgkgyQ?usp=sharing). 
+Using Supabase and Slack SDK, it is very easy to create a bot that consolidates data according to the rules set. It just takes some steps to get started with the Python SDK and you can even run a demo directly in [Google Colab](https://colab.research.google.com/drive/1-sM23eQPE1Me4vl10KKoa9xzLYIgkgyQ?usp=sharing).
 
 If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.supabase.com/).
