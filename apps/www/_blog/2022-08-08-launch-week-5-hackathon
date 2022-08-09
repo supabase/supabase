@@ -20,6 +20,16 @@ There's $1500 and gold Supabase caps to be won!
 
 [Supabase-js v2.0](https://github.com/supabase/supabase-js/releases) and [Flutter SDK v1.0](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview) will both be announced during Launch Week, they are both available already and using them in your project will gain extra credit!
 
+<iframe
+  className="video-with-border w-full"
+  width="640"
+  height="385"
+  src="https://www.youtube-nocookie.com/embed/rI3Ik7GyYEw"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
 ## Key Facts
 
 - You have 10 days to build a new **Open Source** project using Supabase.
