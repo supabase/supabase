@@ -150,7 +150,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <div className="relative flex flex-grow flex-col">
           <LoadingOpacity active={isLoading}>
             <div className="flex h-full flex-grow">
-              <LogTable data={logData} error={error} projectRef={ref as string} />
+              <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">
