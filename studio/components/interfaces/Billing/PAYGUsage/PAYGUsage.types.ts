@@ -13,6 +13,6 @@ export interface ProductFeature {
   freeQuota?: number
 }
 
-export type PaygStats = { [key: string]: { sum: number; max: number } }
+export type PaygStats = { [key: string]: { sum: number; max: number; avg: number } }
 
 export type PricingModel = 'sum' | 'max' | 'avg'
