@@ -8,6 +8,8 @@
   [class*='docItemCol_'] {
     max-width: initial;
     min-width: 0;
+    width: 100%;
+    flex-direction: column;
 
     @media (min-width: 997px) {
       max-width: initial !important;
@@ -15,6 +17,20 @@
   }
 
   [class*='docItemContainer_'] {
+    margin: 0 auto;
+  }
+
+  [class*='docItemContainer_'] {
+    margin: 0 auto;
+    width: 100%;
+    max-width: var(--doc-item-container-width);
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .theme-doc-version-banner {
+    margin: 0 auto;
+    width: 100%;
     max-width: var(--doc-item-container-width);
     flex-grow: 1;
     min-width: 0;
