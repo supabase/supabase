@@ -5,12 +5,12 @@ import Link from '@docusaurus/Link'
 
 const subNavRoutes = [
   // Add any routes which should have a subnav
-  '/api',
-  '/cli',
-  '/auth',
-  '/storage',
-  '/supabase-js',
-  '/supabase-dart',
+  '/reference/api',
+  '/reference/cli',
+  '/reference/auth',
+  '/reference/storage',
+  '/reference/javascript',
+  '/reference/dart',
 ]
 
 const requiresSubNav = (pathname, routes) => {
