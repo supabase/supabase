@@ -20,7 +20,7 @@ import Panel from 'components/ui/Panel'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
-import { ProjectUsageMinimal } from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
+import ProjectUsageMinimal from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageMinimal'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
@@ -128,7 +128,7 @@ const Usage: FC<any> = ({ project }) => {
           <Panel
             title={
               <Typography.Title key="panel-title" level={5} className="mb-0">
-                Database storage
+                Database usage
               </Typography.Title>
             }
           >

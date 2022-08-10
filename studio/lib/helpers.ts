@@ -139,7 +139,7 @@ export const propsAreEqual = (prevProps: any, nextProps: any) => {
 export const formatBytes = (bytes: any, decimals = 2) => {
   if (bytes === 0 || bytes === undefined) return '0 bytes'
 
-  const k = 1000
+  const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 

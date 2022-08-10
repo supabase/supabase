@@ -1,20 +1,20 @@
 import { compact } from 'lodash'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 
-export const getResourcesApproachingLimits = (usage: any) => {
+export const getResourcesApproachingLimits = (usages: any) => {
   return compact(
-    Object.keys(usage).map((resourceName) => {
-      const resource = usage[resourceName]
-      if (resource.value / resource.limit >= USAGE_APPROACHING_THRESHOLD) return resourceName
+    Object.keys(usages).map((resourceName) => {
+      const resource = usages[resourceName]
+      if (resource.usage / resource.limit >= USAGE_APPROACHING_THRESHOLD) return resourceName
     })
   )
 }
 
-export const getResourcesExceededLimits = (usage: any) => {
+export const getResourcesExceededLimits = (usages: any) => {
   return compact(
-    Object.keys(usage).map((resourceName) => {
-      const resource = usage[resourceName]
-      if (resource.value / resource.limit >= 1) return resourceName
+    Object.keys(usages).map((resourceName) => {
+      const resource = usages[resourceName]
+      if (resource.usage / resource.limit >= 1) return resourceName
     })
   )
 }
