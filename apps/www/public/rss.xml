@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</guid>
   <title>Slack Consolidate: a slackbot built with Python and Supabase</title>
   <link>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</link>
-  <description>Different approaches for tracking visitor counts with PostgreSQL.</description>
+  <description>A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python</description>
   <pubDate>Mon, 08 Aug 2022 03:03:00</pubDate>
 </item>
 <item>

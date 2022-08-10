@@ -34,12 +34,18 @@ const sidebars = {
         },
       ],
     },
-    // {
-    //   type: 'category',
-    //   label: 'Community',
-    //   collapsed: false,
-    //   items: [],
-    // },
+    {
+      type: 'category',
+      label: 'Community',
+      collapsed: false,
+      items: [
+        {
+          type: 'link',
+          label: 'Supabase Auth Helpers',
+          href: '/auth-helpers',
+        },
+      ],
+    },
     {
       type: 'category',
       label: 'Self hosted',
