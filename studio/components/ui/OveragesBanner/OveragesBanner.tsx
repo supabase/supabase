@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Alert, Button } from '@supabase/ui'
 
-import { useStore, useProjectUsageStatus } from 'hooks'
+import { useStore, useProjectUsage } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { getResourcesApproachingLimits, getResourcesExceededLimits } from './OveragesBanner.utils'
 
@@ -17,11 +17,11 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
 
   // [Joshen TODO] After API is ready, to do up proper logic here
   // const { usageStatus } = useProjectUsageStatus(ui.selectedProject?.ref)
-  const usage: any = {
-    dbSize: { value: 10773283, limit: 524288000 },
-    dbEgress: { value: 400000000, limit: 524288000 },
-    storageSize: { value: 624288000, limit: 524288000 },
-    storageEgress: { value: 0, limit: 524288000 },
+  const usage = {
+    dbSize: { usage: 10773283, limit: 524288000 },
+    dbEgress: { usage: 400000000, limit: 524288000 },
+    storageSize: { usage: 624288000, limit: 524288000 },
+    storageEgress: { usage: 0, limit: 524288000 },
   }
 
   const resourcesApproachingLimits = getResourcesApproachingLimits(usage)
@@ -47,40 +47,13 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
       : ''
 
   const minimalDescription =
-    tier === PRICING_TIER_PRODUCT_IDS.FREE ? (
-      <>
-        You can check your project's usage details or upgrade to the pro tier{' '}
-        <Link href={`/project/${ref}/settings/billing`}>
-          <a>
-            <span className="cursor-pointer underline">here</span>
-          </a>
-        </Link>{' '}
-        to support the growth of your project.
-      </>
-    ) : tier === PRICING_TIER_PRODUCT_IDS.PRO ? (
-      <>
-        You can check your project's usage details or consider disabling spend cap{' '}
-        <Link href={`/project/${ref}/settings/billing`}>
-          <a>
-            <span className="cursor-pointer underline">here</span>
-          </a>
-        </Link>{' '}
-        to support the growth of your project.
-      </>
-    ) : tier === PRICING_TIER_PRODUCT_IDS.PAYG ? (
-      <>
-        As you have disabled spend cap, additional resources will be charged on a per-usage basis.
-        You can check your project's usage details{' '}
-        <Link href={`/project/${ref}/settings/billing`}>
-          <a>
-            <span className="cursor-pointer underline">here</span>
-          </a>
-        </Link>{' '}
-        for more information.
-      </>
-    ) : (
-      ''
-    )
+    tier === PRICING_TIER_PRODUCT_IDS.FREE
+      ? "You can check your project's usage details or upgrade to the pro tier to support the growth of your project."
+      : tier === PRICING_TIER_PRODUCT_IDS.PRO
+      ? "You can check your project's usage details or consider disabling spend cap to support the growth of your project."
+      : tier === PRICING_TIER_PRODUCT_IDS.PAYG
+      ? "As you have disabled spend cap, additional resources will be charged on a per-usage basis. You can check your project's usage details for more information."
+      : ''
 
   const description =
     tier === PRICING_TIER_PRODUCT_IDS.FREE
@@ -114,7 +87,11 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         actions={
           minimal ? (
             <div className="h-full flex items-center">
-              <Button type="default">Explore usage details</Button>
+              <Link href={`/project/${ref}/settings/billing`}>
+                <a>
+                  <Button type="default">Explore usage details</Button>
+                </a>
+              </Link>
             </div>
           ) : (
             <></>

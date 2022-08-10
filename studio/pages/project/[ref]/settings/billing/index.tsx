@@ -4,12 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Typography, Loading, IconArrowRight } from '@supabase/ui'
 
 import { Project, NextPageWithLayout } from 'types'
-import {
-  useProjectPaygStatistics,
-  useProjectSubscription,
-  useStore,
-  useProjectUsageStatus,
-} from 'hooks'
+import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'

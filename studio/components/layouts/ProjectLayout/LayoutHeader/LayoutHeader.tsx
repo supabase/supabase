@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { IS_PLATFORM } from 'lib/constants'
-import { useStore, useProjectUsageStatus } from 'hooks'
+import { useStore, useProjectUsage } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
@@ -23,10 +23,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   // [Joshen TODO] After API is ready, to do up proper logic here
   const usage: any = {
-    dbSize: { value: 10773283, limit: 524288000 },
-    dbEgress: { value: 400000000, limit: 524288000 },
-    storageSize: { value: 624288000, limit: 524288000 },
-    storageEgress: { value: 0, limit: 524288000 },
+    dbSize: { usage: 10773283, limit: 524288000 },
+    dbEgress: { usage: 400000000, limit: 524288000 },
+    storageSize: { usage: 624288000, limit: 524288000 },
+    storageEgress: { usage: 0, limit: 524288000 },
   }
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const isOverUsageLimits = resourcesExceededLimits.length > 0

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Typography } from '@supabase/ui'
 
-import { useStore, useProjectUsageStatus } from 'hooks'
+import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayoutWithAuth } from 'components/layouts'
@@ -28,13 +28,15 @@ const Home: NextPageWithLayout = () => {
         <h1 className="text-3xl">{projectName}</h1>
       </div>
 
-      <div className="mx-6 space-y-2">
+      <div className="mx-6">
         {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />}
       </div>
 
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 
-      {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+      <div className="mx-6">
+        {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+      </div>
 
       <div className="space-y-8">
         <div className="mx-6">
