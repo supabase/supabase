@@ -10,7 +10,7 @@ const PortalRootWithNoSSR = dynamic(
 
 const PortalToast = () => (
   // @ts-ignore
-  <PortalRootWithNoSSR className="portal--toast">
+  <PortalRootWithNoSSR className="portal--toast" id="toast">
     <Toaster
       position="top-right"
       toastOptions={{

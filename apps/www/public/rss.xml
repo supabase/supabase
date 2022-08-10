@@ -7,12 +7,18 @@
       <language>en</language>
       <lastBuildDate>Tue, 09 Aug 2022 06:06:00</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
-      <item>
+<item>
   <guid>https://supabase.com/blog/launch-week-5-hackathon</guid>
   <title>Launch Week 5 Hackathon</title>
   <link>https://supabase.com/blog/launch-week-5-hackathon</link>
   <description>Build to win $1500 - Friday 12th to Monday 21st August 2022</description>
   <pubDate>Tue, 09 Aug 2022 06:06:00</pubDate>
+<item>
+  <guid>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</guid>
+  <title>Slack Consolidate: a slackbot built with Python and Supabase</title>
+  <link>https://supabase.com/blog/slack-consolidate-slackbot-to-consolidate-messages</link>
+  <description>A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python</description>
+  <pubDate>Mon, 08 Aug 2022 03:03:00</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-beta-update-july-2022</guid>

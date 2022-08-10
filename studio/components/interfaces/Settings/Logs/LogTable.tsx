@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
-import LogSelection from './LogSelection'
+import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
@@ -15,13 +15,15 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 
 interface Props {
   data?: Array<LogData | Object>
-  queryType?: QueryType
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
   error?: any
   showDownload?: boolean
+  // TODO: move all common params to a context to avoid prop drilling
+  queryType?: QueryType
   projectRef: string
+  params: LogSelectionProps['params']
 }
 type LogMap = { [id: string]: LogData }
 
@@ -57,6 +59,7 @@ const LogTable = ({
   showDownload,
   error,
   projectRef,
+  params,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -396,6 +399,7 @@ const LogTable = ({
                 onClose={() => setFocusedLog(null)}
                 log={focusedLog}
                 queryType={queryType}
+                params={params}
               />
             </div>
           ) : null}

@@ -64,9 +64,10 @@ const TableGridEditor: FC<Props> = ({
   }
 
   const tableId = selectedTable?.id
-  const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
-  const canInsert = checkPermissions(PermissionAction.TENANT_SQL_INSERT, String(tableId))
-  const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
+  // [Joshen] When we get to this, double check again what are the actions
+  // const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
+  // const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
+  // const canInsert = checkPermissions(PermissionAction.CREATE, String(tableId))
   // const canEdit = canAdminWrite && canInsert && canUpdate
 
   // @ts-ignore

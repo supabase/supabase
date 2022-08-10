@@ -121,6 +121,19 @@ const navbar = [
   //   docsPluginId: '_supabase_dart',
   //   supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
   // },
+
+  {
+    to: 'auth-helpers',
+    position: 'left',
+    label: 'Auth Helpers',
+    supabaseCustomNavBarRegex: '(^/auth-helpers$|auth-helpers/)',
+  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_auth_helpers',
+  //   supabaseCustomNavBarRegex: '(^/auth-helpers$|auth-helpers/)',
+  // },
 ]
 
 module.exports = { navbar }
