@@ -20,6 +20,7 @@ npm install @supabase/auth-helpers-svelte
 ```
 
 Using [yarn](https://yarnpkg.com/):
+
 ```sh
 yarn add @supabase/auth-helpers-sveltekit
 
@@ -49,14 +50,14 @@ We will start off by creating a `db.ts` file inside of our `src/lib` directory. 
 
 ```ts
 // src/lib/db.ts
-import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit';
+import { createSupabaseClient } from '@supabase/auth-helpers-sveltekit'
 
 const { supabaseClient } = createSupabaseClient(
   import.meta.env.VITE_SUPABASE_URL as string,
   import.meta.env.VITE_SUPABASE_ANON_KEY as string
-);
+)
 
-export { supabaseClient };
+export { supabaseClient }
 ```
 
 Edit your `__layout.svelte` file and add import the `SupaAuthHelper` component, the `supabaseClient` we just instantiated and the `session` store.
@@ -64,15 +65,15 @@ Edit your `__layout.svelte` file and add import the `SupaAuthHelper` component, 
 ```html
 // src/routes/__layout.svelte
 <script>
-import { session } from '$app/stores';
-import { supabaseClient } from '$lib/db';
-import { SupaAuthHelper } from '@supabase/auth-helpers-svelte';	
+  import { session } from '$app/stores'
+  import { supabaseClient } from '$lib/db'
+  import { SupaAuthHelper } from '@supabase/auth-helpers-svelte'
 </script>
 
 <SupaAuthHelper {supabaseClient} {session}>
   <slot />
 </SupaAuthHelper>
-````
+```
 
 ### Hooks setup
 
@@ -80,18 +81,18 @@ Our `hooks.ts` file is where the heavy lifting of this library happens, we need 
 
 ```ts
 // src/hooks.ts
-import { handleAuth } from '@supabase/auth-helpers-sveltekit';
-import type { GetSession, Handle } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
+import { handleAuth } from '@supabase/auth-helpers-sveltekit'
+import type { GetSession, Handle } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks'
 
-export const handle: Handle = sequence(...handleAuth());
+export const handle: Handle = sequence(...handleAuth())
 
 export const getSession: GetSession = async (event) => {
-  const { user, accessToken, error } = event.locals;
-  return { 
-    user, 
-    accessToken, 
-    error
+  const { user, accessToken, error } = event.locals
+  return {
+    user,
+    accessToken,
+    error,
   }
 }
 ```
@@ -103,6 +104,7 @@ These will create the handlers under the hood that perform different parts of th
 - `/api/auth/logout`: You can logout the user.
 
 ### Typings
+
 In order to get the most out of TypeScript and its intellisense, you should import our types into the `app.d.ts` type definition file that comes with your SvelteKit project.
 
 ```ts
@@ -111,19 +113,15 @@ In order to get the most out of TypeScript and its intellisense, you should impo
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare namespace App {
-  interface UserSession {
-    user: import('@supabase/supabase-js').User;
-    accessToken?: string;
-  }
-  
-  interface Locals extends UserSession {
-    error: import('@supabase/supabase-js').ApiError;
-  }
+  interface UserSession {
+    user: import('@supabase/supabase-js').User
+    accessToken?: string
+  }
+  interface Locals extends UserSession {
+    error: import('@supabase/supabase-js').ApiError
+  }
 
-  interface Session extends UserSession {}
-  
-  // interface Platform {}
-  // interface Stuff {}
+  interface Session extends UserSession {} // interface Platform {} // interface Stuff {}
 }
 ```
 
@@ -144,9 +142,11 @@ In your `src/hooks.ts` file the logout handler is already setup and you can conf
 > By default the redirect path after logging out will be `/`.
 
 ```ts
-export const handle = sequence(...handleAuth({ 
-  logout: { returnTo: '/auth/signin' }
-}));
+export const handle = sequence(
+  ...handleAuth({
+    logout: { returnTo: '/auth/signin' },
+  })
+)
 ```
 
 ### Basic Setup
@@ -156,14 +156,14 @@ You can now determine if a user is authenticated on the client-side by checking 
 ```html
 // example
 <script>
-import { session } from '$app/stores';
+  import { session } from '$app/stores'
 </script>
 
 {#if !$session.user}
-  <h1>I am not logged in</h1>
+<h1>I am not logged in</h1>
 {:else}
-  <h1>Welcome {$session.user.email}</h1>
-  <p>I am logged in!</p>
+<h1>Welcome {$session.user.email}</h1>
+<p>I am logged in!</p>
 {/if}
 ```
 
@@ -216,8 +216,8 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 ```html
 <!-- src/routes/profile.svelte -->
 <script>
-export let user;
-export let data;
+  export let user
+  export let data
 </script>
 
 <div>Protected content for {user.email}</div>
@@ -227,38 +227,41 @@ export let data;
 
 ```ts
 // src/routes/profile.ts
-import { supabaseServerClient, withApiAuth } from "@supabase/auth-helpers-sveltekit";
-import type { RequestHandler } from "./__types/profile";
+import {
+  supabaseServerClient,
+  withApiAuth,
+} from '@supabase/auth-helpers-sveltekit'
+import type { RequestHandler } from './__types/profile'
 
 interface TestTable {
-  id: string;
-  created_at: string;
+  id: string
+  created_at: string
 }
 
 interface GetOutput {
-  user: User;
-  data: TestTable[];
+  user: User
+  data: TestTable[]
 }
 
 export const GET: RequestHandler<GetOutput> = async ({ locals }) =>
   withApiAuth(
     {
-      redirectTo: "/",
-      user: locals.user
+      redirectTo: '/',
+      user: locals.user,
     },
     async () => {
       const { data } = await supabaseServerClient(session.accessToken)
-      	.from<TestTable>("test")
-	.select("*");
+        .from<TestTable>('test')
+        .select('*')
 
       return {
         body: {
           user: locals.user,
-          data
-        }
-      };
+          data,
+        },
+      }
     }
-  );
+  )
 ```
 
 ## Protecting API routes
@@ -268,28 +271,33 @@ Wrap an API Route to check that the user has a valid session. If they're not log
 
 ```ts
 // src/routes/api/protected-route.ts
-import { supabaseServerClient, withApiAuth } from "@supabase/auth-helpers-sveltekit";
-import type { RequestHandler } from "./__types/protected-route";
+import {
+  supabaseServerClient,
+  withApiAuth,
+} from '@supabase/auth-helpers-sveltekit'
+import type { RequestHandler } from './__types/protected-route'
 
 interface TestTable {
-  id: string;
-  created_at: string;
+  id: string
+  created_at: string
 }
 
 interface GetOutput {
-  data: TestTable[];
+  data: TestTable[]
 }
 
 export const GET: RequestHandler<GetOutput> = async ({ locals, request }) =>
   withApiAuth({ user: locals.user }, async () => {
     // Run queries with RLS on the server
-    const { data } = await supabaseServerClient(request).from("test").select("*");
+    const { data } = await supabaseServerClient(request)
+      .from('test')
+      .select('*')
 
     return {
       status: 200,
-      body: { data }
-    };
-  });
+      body: { data },
+    }
+  })
 ```
 
 If you visit `/api/protected-route` without a valid session cookie, you will get a 303 response.

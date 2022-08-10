@@ -20,6 +20,7 @@ npm install @supabase/auth-helpers-react
 ```
 
 Using [yarn](https://yarnpkg.com/):
+
 ```sh
 yarn add @supabase/auth-helpers-nextjs
 
@@ -54,9 +55,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 The path to your dynamic API route file would be `/pages/api/auth/[...supabase].js`. Populate that file as follows:
 
 ```js
-import { handleAuth } from '@supabase/auth-helpers-nextjs';
+import { handleAuth } from '@supabase/auth-helpers-nextjs'
 
-export default handleAuth({ logout: { returnTo: '/' } });
+export default handleAuth({ logout: { returnTo: '/' } })
 ```
 
 Executing `handleAuth()` creates the following route handlers under the hood that perform different parts of the authentication flow:
@@ -71,16 +72,16 @@ Wrap your `pages/_app.js` component with the `UserProvider` component:
 
 ```jsx
 // pages/_app.js
-import React from 'react';
-import { UserProvider } from '@supabase/auth-helpers-react';
-import { supabaseClient } from '@supabase/auth-helpers-nextjs';
+import React from 'react'
+import { UserProvider } from '@supabase/auth-helpers-react'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default function App({ Component, pageProps }) {
   return (
     <UserProvider supabaseClient={supabaseClient}>
       <Component {...pageProps} />
     </UserProvider>
-  );
+  )
 }
 ```
 
@@ -91,23 +92,23 @@ You can now determine if a user is authenticated by checking that the `user` obj
 For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security) to work properly when fetching data client-side, you need to make sure to import the `{ supabaseClient }` from `# @supabase/auth-helpers-nextjs` and only run your query once the user is defined client-side in the `useUser()` hook:
 
 ```js
-import { Auth } from '@supabase/ui';
-import { useUser } from '@supabase/auth-helpers-react';
-import { supabaseClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect, useState } from 'react';
+import { Auth } from '@supabase/ui'
+import { useUser } from '@supabase/auth-helpers-react'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
 
 const LoginPage = () => {
-  const { user, error } = useUser();
-  const [data, setData] = useState();
+  const { user, error } = useUser()
+  const [data, setData] = useState()
 
   useEffect(() => {
     async function loadData() {
-      const { data } = await supabaseClient.from('test').select('*');
-      setData(data);
+      const { data } = await supabaseClient.from('test').select('*')
+      setData(data)
     }
     // Only run query once user is logged in.
-    if (user) loadData();
-  }, [user]);
+    if (user) loadData()
+  }, [user])
 
   if (!user)
     return (
@@ -120,7 +121,7 @@ const LoginPage = () => {
           socialButtonSize="xlarge"
         />
       </>
-    );
+    )
 
   return (
     <>
@@ -130,10 +131,10 @@ const LoginPage = () => {
       <p>client-side data fetching with RLS</p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
 ```
 
 ### Server-side rendering (SSR) - withPageAuth
@@ -142,13 +143,13 @@ If you wrap your `getServerSideProps` with `withPageAuth` your props object will
 
 ```js
 // pages/profile.js
-import { withPageAuth } from '@supabase/auth-helpers-nextjs';
+import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }) {
-  return <div>Hello {user.name}</div>;
+  return <div>Hello {user.name}</div>
 }
 
-export const getServerSideProps = withPageAuth({ redirectTo: '/login' });
+export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
 ```
 
 If there is no authenticated user, they will be redirect to your home page, unless you specify the `redirectTo` option.
@@ -158,20 +159,20 @@ user props. You can also access the user session data by calling `getUser` insid
 
 ```js
 // pages/protected-page.js
-import { withPageAuth, getUser } from '@supabase/auth-helpers-nextjs';
+import { withPageAuth, getUser } from '@supabase/auth-helpers-nextjs'
 
 export default function ProtectedPage({ user, customProp }) {
-  return <div>Protected content</div>;
+  return <div>Protected content</div>
 }
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/foo',
   async getServerSideProps(ctx) {
     // Access the user object
-    const { user, accessToken } = await getUser(ctx);
-    return { props: { email: user?.email } };
-  }
-});
+    const { user, accessToken } = await getUser(ctx)
+    return { props: { email: user?.email } }
+  },
+})
 ```
 
 ### Server-side data fetching with RLS
@@ -182,15 +183,15 @@ For [row level security](https://supabase.com/docs/learn/auth-deep-dive/auth-row
 import {
   User,
   withPageAuth,
-  supabaseServerClient
-} from '@supabase/auth-helpers-nextjs';
+  supabaseServerClient,
+} from '@supabase/auth-helpers-nextjs'
 
 export default function ProtectedPage({
   user,
-  data
+  data,
 }: {
   user: User,
-  data: any
+  data: any,
 }) {
   return (
     <>
@@ -198,17 +199,17 @@ export default function ProtectedPage({
       <pre>{JSON.stringify(data, null, 2)}</pre>
       <pre>{JSON.stringify(user, null, 2)}</pre>
     </>
-  );
+  )
 }
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/',
   async getServerSideProps(ctx) {
     // Run queries with RLS on the server
-    const { data } = await supabaseServerClient(ctx).from('test').select('*');
-    return { props: { data } };
-  }
-});
+    const { data } = await supabaseServerClient(ctx).from('test').select('*')
+    return { props: { data } }
+  },
+})
 ```
 
 ### Server-side data fetching to OAuth APIs using `provider_token`
@@ -216,7 +217,7 @@ export const getServerSideProps = withPageAuth({
 When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted as an HTTPOnly cookie upon logging in to enabled usage on the server side. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user. In the following example, we fetch the user's full profile from the third-party API during SSR using their id and auth token:
 
 ```js
-import { User, withPageAuth, getUser } from '@supabase/auth-helpers-nextjs';
+import { User, withPageAuth, getUser } from '@supabase/auth-helpers-nextjs'
 
 interface Profile {
   /* ... */
@@ -224,33 +225,33 @@ interface Profile {
 
 export default function ProtectedPage({
   user,
-  data
+  data,
 }: {
   user: User,
-  profile: Profile
+  profile: Profile,
 }) {
-  return <div>Protected content</div>;
+  return <div>Protected content</div>
 }
 
 export const getServerSideProps = withPageAuth({
   redirectTo: '/',
   async getServerSideProps(ctx) {
     // Retrieve provider_token from cookies
-    const provider_token = ctx.req.cookies['sb-provider-token'];
+    const provider_token = ctx.req.cookies['sb-provider-token']
     // Get logged in user's third-party id from metadata
-    const { user } = await getUser(ctx);
-    const userId = user?.user_metadata.provider_id;
+    const { user } = await getUser(ctx)
+    const userId = user?.user_metadata.provider_id
     const profile: Profile = await (
       await fetch(`https://api.example.com/users/${userId}`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${provider_token}`
-        }
+          Authorization: `Bearer ${provider_token}`,
+        },
       })
-    ).json();
-    return { props: { profile } };
-  }
-});
+    ).json()
+    return { props: { profile } }
+  },
+})
 ```
 
 ## Protecting API routes
@@ -262,16 +263,16 @@ Wrap an API Route to check that the user has a valid session. If they're not log
 // pages/api/protected-route.js
 import {
   withApiAuth,
-  supabaseServerClient
-} from '@supabase/auth-helpers-nextjs';
+  supabaseServerClient,
+} from '@supabase/auth-helpers-nextjs'
 
 export default withApiAuth(async function ProtectedRoute(req, res) {
   // Run queries with RLS on the server
   const { data } = await supabaseServerClient({ req, res })
     .from('test')
-    .select('*');
-  res.json(data);
-});
+    .select('*')
+  res.json(data)
+})
 ```
 
 If you visit `/api/protected-route` without a valid session cookie, you will get a 401 response.
@@ -282,25 +283,24 @@ As an alternative to protecting individual pages using `getServerSideProps` with
 
 ```ts
 // pages/protected/_middleware.ts
-import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/middleware';
+import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/middleware'
 
-export const middleware = withMiddlewareAuth({ redirectTo: '/login' });
+export const middleware = withMiddlewareAuth({ redirectTo: '/login' })
 ```
 
 It is also possible to add finer granularity based on the user logged in. I.e. you can specify a promise to determine if a specific user has permission or not.
 
-
 ```ts
 // pages/protected/_middleware.ts
-import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/dist/middleware';
+import { withMiddlewareAuth } from '@supabase/auth-helpers-nextjs/dist/middleware'
 
-export const middleware = withMiddlewareAuth({ 
+export const middleware = withMiddlewareAuth({
   redirectTo: '/login',
   authGuard: {
     isPermitted: async (user) => user.email?.endsWith('@example.com') ?? false,
-    redirectTo: '/insufficient-permissions'
-  }
-});
+    redirectTo: '/insufficient-permissions',
+  },
+})
 ```
 
 ## Migrating from @supabase/supabase-auth-helpers to @supabase/auth-helpers
