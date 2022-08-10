@@ -104,10 +104,7 @@ function Blog(props: any) {
                 <div className="col-span-12 lg:col-span-12">
                   <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
                     {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId}>
-                        {/* <p>{categoryId}</p> */}
-                        <></>
-                      </Tabs.Panel>
+                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId} />
                     ))}
                   </Tabs>
                 </div>
