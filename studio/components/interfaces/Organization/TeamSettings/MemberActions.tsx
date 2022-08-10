@@ -39,14 +39,8 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const canRemoveMember = enablePermissions
     ? rolesRemovable.includes((member?.role_ids ?? [-1])[0])
     : true
-  const canResendInvite = checkPermissions(
-    PermissionAction.SQL_INSERT,
-    'postgres.public.user_invites'
-  )
-  const canRevokeInvite = checkPermissions(
-    PermissionAction.SQL_DELETE,
-    'postgres.public.user_invites'
-  )
+  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites')
+  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites')
 
   const handleMemberDelete = async () => {
     confirmAlert({

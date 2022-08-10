@@ -63,7 +63,7 @@ const Wizard: NextPageWithLayout = () => {
   const availableRegions = getAvailableRegions()
 
   const isAdmin = enablePermissions
-    ? checkPermissions(PermissionAction.SQL_INSERT, 'postgres.public.projects')
+    ? checkPermissions(PermissionAction.CREATE, 'projects')
     : isOrganizationOwner
 
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized

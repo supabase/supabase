@@ -19,10 +19,7 @@ const DeleteOrganizationButton = observer(() => {
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
-  const canDeleteOrganization = checkPermissions(
-    PermissionAction.SQL_UPDATE,
-    'postgres.public.organizations'
-  )
+  const canDeleteOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
 
   const onValidate = (values: any) => {
     const errors: any = {}

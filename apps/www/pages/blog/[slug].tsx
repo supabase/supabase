@@ -18,6 +18,7 @@ import ImageGrid from '~/components/ImageGrid'
 import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 
+const ignoreClass = 'ignore-on-export'
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
 const components = {
@@ -25,22 +26,29 @@ const components = {
   Quote,
   Avatar,
   code: (props: any) => {
-    return <CodeBlock {...props} />
+    if (props.className !== ignoreClass) {
+      return <CodeBlock {...props} />
+    } else {
+      return <code {...props} />
+    }
   },
   ImageGrid,
   img: (props: any) => {
-    return (
-      <div
-        className="
+    if (props.className !== ignoreClass) {
+      return (
+        <div
+          className="
           next-image--dynamic-fill 
           to-scale-400  
           from-scale-500 rounded-md
           border bg-gradient-to-r
         "
-      >
-        <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
-      </div>
-    )
+        >
+          <Image {...props} className="next-image--dynamic-fill rounded-md border" layout="fill" />
+        </div>
+      )
+    }
+    return <img {...props} />
   },
 }
 
@@ -92,7 +100,7 @@ export async function getStaticProps({ params }: any) {
       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
-        slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
+        slug: `${params.slug}`,
         content: mdxSource,
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
@@ -173,6 +181,7 @@ function BlogPostPage(props: any) {
           description: props.blog.description,
           url: `https://supabase.com/blog/${props.blog.slug}`,
           type: 'article',
+
           article: {
             //
             // to do: add expiration and modified dates
@@ -191,6 +200,7 @@ function BlogPostPage(props: any) {
               url: `https://supabase.com${basePath}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
+              alt: `${props.blog.title} thumbnail`,
             },
           ],
         }}
