@@ -244,6 +244,15 @@
   --ifm-card-background-color: var(--custom-background-color-highlight);
 }
 
+.markdown a {
+  color: var(--custom-content-color);
+  text-decoration-color: var(--custom-primary-darker);
+  --ifm-link-decoration: underline;
+}
+.markdown a:hover {
+  color: var(--custom-primary);
+}
+
 .custom--navbar__link--hidden .navbar__item,
 .navbar-sidebar__item.menu
   > .menu__list
