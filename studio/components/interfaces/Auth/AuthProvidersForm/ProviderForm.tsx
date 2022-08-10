@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from '@supabase/ui'
 
@@ -15,28 +15,22 @@ const ProviderForm: FC<Props> = ({ provider }) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
 
-  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
-  const INITIAL_VALUES: { [x: string]: string } = {}
-
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
 
-  useEffect(() => {
-    /**
-     * Construct values for INITIAL_VALUES
-     * Return empty string `""` rather than `null`
-     * as it breaks form. null is not a valid value.
-     */
+  const generateInitialValues = () => {
+    const initialValues: { [x: string]: string } = {}
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
-
-      INITIAL_VALUES[key] = isDoubleNegative
-        ? !authConfig.config[key]
-        : authConfig.config[key] ?? ''
+      initialValues[key] = isDoubleNegative ? !authConfig.config[key] : authConfig.config[key] ?? ''
     })
-  }, [provider])
+    return initialValues
+  }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+  const INITIAL_VALUES = generateInitialValues()
+
+  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     try {
       const payload = { ...values }
 
@@ -48,7 +42,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
       })
 
       await authConfig.update(payload)
-
+      resetForm({ values: payload, initialValues: payload })
       setSubmitting(false)
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
