@@ -8,6 +8,7 @@
 /* You can override the default Infima variables here. */
 
 @use './main';
+@use './components/methodLists';
 // @use './components/admonition';
 // @use './components/back-to-top-button';
 // @use './components/code';
@@ -23,7 +24,7 @@
 // @use './components/table';
 // @use './components/tabs';
 // @use './components/theme-toggle';
-// @use './components/toc';
+@use './components/toc';
 
 :root {
   --ifm-background-color: var(--token-primary-bg-c);
@@ -178,3 +179,63 @@
 // .cordova-ee-card p {
 //   margin: 1rem 0 0;
 // }
+
+/* PRISM */
+
+.prism-code {
+  background-color: none;
+  word-break: break-word;
+  font-size: 0.8rem;
+  outline: none !important;
+}
+.prism-code div,
+.prism-code div:focus,
+.prism-code div:active {
+  outline: none !important;
+}
+.token.keyword.module,
+.token.property-access,
+.token.function {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.plain,
+.token.parameter,
+.token.punctuation,
+.token.operator,
+.token.console.class-name,
+.token.doc-comment.parameter,
+.token.doc-comment.optional-parameter,
+.token.doc-comment.parameter.punctuation,
+.token.doc-comment.optional-parameter.punctuation {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.keyword,
+.token.doc-comment.keyword {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.string {
+  font-style: normal !important;
+  color: #24b47e !important;
+}
+.token.console {
+  font-style: normal !important;
+  color: #49c1ad !important;
+}
+.token.constant {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.comment {
+  font-style: normal !important;
+  color: #666 !important;
+}
+.token.number {
+  color: #b5cea8 !important;
+}
+.token.boolean,
+.token.doc-comment.class-name {
+  @apply text-green-500;
+}
