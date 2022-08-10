@@ -1,0 +1,180 @@
+:root {
+  --ifm-code-padding-vertical: 0rem;
+  --ifm-code-padding-horizontal: 0.25rem;
+  --ifm-code-font-size: 0.813rem;
+
+  --code-block-line-height: 1.5;
+
+  //inline code
+  --ifm-code-background: var(--c-indigo-10);
+}
+
+html[data-theme='light'] {
+  --code-block-bg-c: var(--c-indigo-10);
+}
+
+html[data-theme='dark'] {
+  --code-block-bg-c: var(--token-secondary-bg-c);
+}
+
+:not(pre) > code {
+  position: relative;
+  margin-block-start: -0.125rem;
+  background-color: inherit;
+  vertical-align: baseline;
+
+  background-color: var(--code-block-bg-c);
+  padding-block-start: 0.25rem;
+  padding-block-end: 0.25rem;
+
+  // alternative solution for highlighting background with it's own drawbacks
+  // &::before {
+  //   content: '';
+  //   position: absolute;
+
+  //   z-index: -1;
+  //   left: 0;
+  //   right: 0;
+  //   top: -0.25rem;
+  //   bottom: -0.25rem;
+
+  //   background-color: var(--ifm-code-background);
+  //   border-radius: var(--ifm-code-border-radius);
+  // }
+}
+code {
+  border: none;
+
+  // padding: 0.375rem 0.25rem 0.25rem;
+}
+
+// Overrides
+#__docusaurus {
+  [class*='codeBlockContainer_'] {
+    box-shadow: none;
+  }
+}
+
+/**
+ * prism.js Dark theme for JavaScript, CSS and HTML
+ * Based on the slides of the talk “/Reg(exp){2}lained/”
+ * @author Lea Verou
+ */
+
+code[class*='language-'],
+pre[class*='language-'] {
+  background: var(--code-block-bg-c);
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: var(--code-block-line-height);
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*='language-'] {
+  padding: 1em;
+  margin: 0 0;
+  overflow: auto;
+  /* border: .3em solid hsl(30, 20%, 40%); */
+  border-radius: 0.5em;
+  /* box-shadow: 1px 1px .5em black inset; */
+}
+
+/* Inline code */
+:not(pre) > code[class*='language-'] {
+  padding: 0.15em 0.2em 0.05em;
+  border-radius: 0.3em;
+  border: 0.13em solid hsl(30, 20%, 40%);
+  box-shadow: 1px 1px 0.3em -0.1em black inset;
+  white-space: normal;
+}
+
+/* Tomorrow Comment */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #8c9296;
+}
+
+.token.punctuation {
+  opacity: 0.7;
+}
+
+.namespace {
+  opacity: 0.7;
+}
+
+.token.tag {
+  color: #91c5ff;
+}
+
+.token.tag.punctuation,
+.token.tag.class-name,
+.token.tag.punctuation + .token.tag:not(.attr-value):not([class*='language-']) {
+  color: #2b90ff;
+}
+
+.token.property,
+.token.attr-name,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #8454ff;
+}
+
+.token.selector,
+.token.char,
+.token.function,
+.token.builtin,
+.token.inserted {
+  color: #ff6810;
+}
+
+.token.operator,
+.token.string,
+.token.entity,
+.token.url,
+.token.attr-value,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  color: #42b983;
+}
+
+.token.atrule {
+  color: #ffbb01;
+}
+
+.token.regex,
+.token.keyword,
+.token.important {
+  color: #f55073;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.deleted {
+  color: red;
+}

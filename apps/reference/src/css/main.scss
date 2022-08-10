@@ -162,8 +162,20 @@
   /* Sidebar */
   --ifm-sidebar-border-color: var(--custom-border-color);
   --ifm-menu-color-active: var(--custom-primary);
-  --doc-sidebar-width: 250px;
   --ifm-menu-link-padding-horizontal: 0rem;
+  --doc-sidebar-width: 24rem;
+  --dropdown-icon-width: 0.625rem;
+  --dropdown-icon-height: 0.375rem;
+  --dropdown-icon-gap: 0.688rem;
+  --ifm-menu-link-padding-vertical: 0.5rem;
+  --sidebar-spacing-horizontal: 1.5rem;
+
+  /* Doc item */
+  --doc-item-container-width: 42rem;
+
+  /* Doc Page */
+
+  --doc-page-vertical-spacing: 2rem;
 
   /* Panel */
   --ifm-panel-border-color: var(--custom-border-color);
@@ -306,24 +318,6 @@
 
 pre {
   background-color: var(--custom-background-color-diff);
-}
-
-#custom--main-menu-button {
-  display: flex;
-  padding: 1rem 0 0.5rem 0.5rem;
-  font-size: 0.9rem;
-  color: var(--custom-content-color-light);
-}
-#custom--main-menu-button svg {
-  padding: 2px;
-  margin-right: 10px;
-  color: var(--custom-content-color-light);
-}
-#custom--main-menu-button:hover,
-#custom--main-menu-button:hover svg {
-  transition: all;
-  transition-duration: 0.5s;
-  color: var(--custom-content-color-emphasis);
 }
 
 @media screen and (max-width: 580px) {
