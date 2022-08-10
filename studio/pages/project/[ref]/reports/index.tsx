@@ -22,11 +22,9 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const canCreateReport = checkPermissions(
-    PermissionAction.SQL_INSERT,
-    'postgres.public.user_content',
-    { resource: { type: 'report' } }
-  )
+  // const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  //   resource: { type: 'report' },
+  // })
   const contentStore = useProjectContentStore(ref)
 
   useEffect(() => {
