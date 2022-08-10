@@ -1,0 +1,83 @@
+html[data-theme='light'] {
+  --sidebar-category-c: var(--c-gray-100);
+  --sidebar-border-c: var(--c-gray-0);
+
+  --ifm-menu-color-background-active: var(--c-blue-0);
+  --ifm-menu-color: var(--c-indigo-80);
+}
+
+html[data-theme='dark'] {
+  --sidebar-category-c: var(--c-gray-0);
+  --sidebar-border-c: var(--c-gray-90);
+
+  --ifm-menu-color: var(--c-gray-20);
+}
+
+:root {
+  --doc-sidebar-width: 32rem;
+
+  --dropdown-icon-width: 0.625rem;
+  --dropdown-icon-height: 0.375rem;
+  --dropdown-icon-gap: 0.688rem;
+
+  --ifm-menu-link-padding-vertical: 0.5rem;
+  --ifm-menu-color-active: var(--ifm-link-color);
+
+  --sidebar-spacing-horizontal: 1.5rem;
+}
+
+.theme-doc-sidebar-menu-custom-container {
+  padding: 32px;
+
+  .custom--main-menu-button {
+    display: flex;
+    padding: 1rem 0 0.5rem 0.5rem;
+    font-size: 0.9rem;
+    color: var(--custom-content-color-light);
+  }
+  .custom--main-menu-button svg {
+    padding: 2px;
+    margin-right: 10px;
+    color: var(--custom-content-color-light);
+  }
+  .custom--main-menu-button:hover,
+  .custom--main-menu-button:hover svg {
+    transition: all;
+    transition-duration: 0.5s;
+    color: var(--custom-content-color-emphasis);
+  }
+
+  .menu__link--sublist-caret {
+    &::after {
+      background: var(--ifm-menu-link-sublist-icon) center /
+        var(--dropdown-icon-width) var(--dropdown-icon-height);
+      background-repeat: no-repeat;
+
+      min-width: auto;
+
+      width: var(--dropdown-icon-width);
+      height: var(--dropdown-icon-height);
+
+      // margin-inline-end: var(--dropdown-icon-gap);
+      // margin-block-end: 0;
+    }
+  }
+
+  .menu__caret {
+    &::before {
+      background: var(--ifm-menu-link-sublist-icon) center /
+        var(--dropdown-icon-width) var(--dropdown-icon-height);
+      background-repeat: no-repeat;
+
+      min-width: auto;
+
+      width: var(--dropdown-icon-width);
+      height: var(--dropdown-icon-height);
+
+      // margin-right: var(--dropdown-icon-width);
+
+      // margin-inline-end: var(--dropdown-icon-gap);
+      // margin-block-end: 0;
+    }
+  }
+}

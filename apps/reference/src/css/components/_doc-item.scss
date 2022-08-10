@@ -1,0 +1,55 @@
+:root {
+  --doc-item-container-width: 42rem;
+}
+
+//overrides
+#__docusaurus {
+  //#region ------------ DocItem -------------
+  [class*='docItemCol_'] {
+    max-width: initial;
+    min-width: 0;
+
+    @media (min-width: 997px) {
+      max-width: initial !important;
+    }
+  }
+
+  [class*='docItemContainer_'] {
+    max-width: var(--doc-item-container-width);
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  [class*='docMainContainer_'] {
+    // .end {
+    //   @media (max-width: 996px) {
+    //     display: none;
+    //   }
+    // }
+
+    > .container {
+      > .row {
+        > .col {
+          display: flex;
+          justify-content: center;
+
+          min-width: 0;
+        }
+      }
+    }
+
+    .spacer {
+      flex-basis: 5rem;
+
+      @media (max-width: 996px) {
+        display: none;
+      }
+    }
+  }
+
+  [class*='docItemCol_'] {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+  }
+  //#endregion
+}

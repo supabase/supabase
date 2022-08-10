@@ -1,0 +1,99 @@
+html[data-theme='light'] {
+  --toc-separator-c: var(--c-indigo-20);
+  --ifm-toc-link-color: var(--c-indigo-80);
+}
+
+html[data-theme='dark'] {
+  --toc-separator-c: var(--c-carbon-90);
+  --ifm-toc-link-color: var(--c-carbon-0);
+}
+
+:root {
+}
+
+//overrides
+#__docusaurus {
+  [class^='tableOfContents_'] {
+    position: static;
+    top: initial;
+    overflow: hidden;
+
+    max-height: initial;
+
+    padding-block-end: 1.25rem;
+
+    border-block-end: 1px solid var(--toc-separator-c);
+
+    line-height: 1.4;
+  }
+
+  --ifm-toc-border-color: transparent;
+
+  .toc-wrapper {
+    overflow: auto;
+    position: sticky;
+    top: calc(var(--ifm-navbar-height) + 16px);
+    max-height: calc(100vh - var(--ifm-navbar-height) - 16px);
+
+    margin-block-start: 5rem;
+
+    padding-inline-end: 2rem;
+    padding-inline-start: 2rem;
+    padding-block-end: 2rem;
+
+    h2 {
+      font-size: 0.625rem;
+      line-height: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--c-indigo-60);
+    }
+
+    .table-of-contents {
+      padding: 0;
+      margin-inline-start: calc(-1 * var(--ifm-toc-padding-horizontal));
+      margin-inline-end: calc(-1 * var(--ifm-toc-padding-horizontal));
+
+      width: 16rem;
+
+      > li:first-of-type {
+        margin-block-start: 0;
+      }
+
+      > li:last-of-type {
+        margin-block-end: 0;
+      }
+    }
+
+    .theme-edit-this-page {
+      --edit-this-page-c: var(--ifm-heading-color);
+
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+  }
+
+  .internal-ad {
+    cursor: pointer;
+
+    max-width: 148px;
+    display: block;
+    margin: 48px 0 0;
+
+    p {
+      font-size: 13px;
+      line-height: 19px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+
+      color: var(--ifm-font-color-base);
+      transition: 0.2s color;
+    }
+  }
+
+  [class^='tocCollapsible_'] {
+    @media (max-width: 996px) {
+      display: none;
+    }
+  }
+}

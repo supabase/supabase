@@ -21,9 +21,9 @@ export default function ContentWrapper(props) {
   const { pathname } = useLocation()
 
   return (
-    <>
+    <div className="theme-doc-sidebar-menu-custom-container">
       {pathname && requiresSubNav(pathname, subNavRoutes) && (
-        <Link to="/" id="custom--main-menu-button">
+        <Link to="/" className="custom--main-menu-button">
           <svg
             width="24"
             height="24"
@@ -40,6 +40,6 @@ export default function ContentWrapper(props) {
         </Link>
       )}
       <Content {...props} />
-    </>
+    </div>
   )
 }
