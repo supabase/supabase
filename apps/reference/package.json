@@ -7,7 +7,7 @@
     "start": "npm run docusaurus",
     "docusaurus": "docusaurus start --port 3010",
     "swizzle": "docusaurus swizzle",
-    "build": "docusaurus build --out-dir build/docs",
+    "build": "docusaurus build",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
