@@ -5,12 +5,12 @@ import Link from '@docusaurus/Link'
 
 const subNavRoutes = [
   // Add any routes which should have a subnav
-  '/api',
-  '/cli',
-  '/auth',
-  '/storage',
-  '/supabase-js',
-  '/supabase-dart',
+  '/docs/reference/api',
+  '/docs/reference/cli',
+  '/docs/reference/auth',
+  '/docs/reference/storage',
+  '/docs/reference/javascript',
+  '/docs/reference/dart',
 ]
 
 const requiresSubNav = (pathname, routes) => {
@@ -23,7 +23,7 @@ export default function ContentWrapper(props) {
   return (
     <div className="theme-doc-sidebar-menu-custom-container">
       {pathname && requiresSubNav(pathname, subNavRoutes) && (
-        <Link to="/" className="custom--main-menu-button">
+        <Link to="/docs/reference" className="custom--main-menu-button">
           <svg
             width="24"
             height="24"
