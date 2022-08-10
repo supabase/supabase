@@ -20,17 +20,17 @@ const sidebars = {
       link: { type: 'doc', id: 'about' },
       collapsed: false,
       items: [
-        { type: 'link', label: 'Supabase CLI', href: '/cli' },
-        { type: 'link', label: 'Supabase API', href: '/api' },
+        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
+        { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
-          href: '/supabase-js',
+          href: '/reference/javascript',
         },
         {
           type: 'link',
           label: 'Supabase Dart Library',
-          href: '/supabase-dart',
+          href: '/reference/dart',
         },
       ],
     },
@@ -42,7 +42,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Supabase Auth Helpers',
-          href: '/auth-helpers',
+          href: '/reference/auth-helpers',
         },
       ],
     },
@@ -51,8 +51,8 @@ const sidebars = {
       label: 'Self hosted',
       collapsed: false,
       items: [
-        { type: 'link', label: 'Auth Server', href: '/auth' },
-        { type: 'link', label: 'Storage Server', href: '/storage' },
+        { type: 'link', label: 'Auth Server', href: '/reference/auth' },
+        { type: 'link', label: 'Storage Server', href: '/reference/storage' },
       ],
     },
     // {

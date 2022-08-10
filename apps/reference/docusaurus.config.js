@@ -34,7 +34,7 @@ const config = {
       {
         id: '_api',
         path: '_api',
-        routeBasePath: 'api',
+        routeBasePath: '/reference/api',
         sidebarPath: require.resolve('./nav/api_sidebars.js'),
         breadcrumbs: false,
       },
@@ -44,7 +44,7 @@ const config = {
       {
         id: '_cli',
         path: '_cli',
-        routeBasePath: 'cli',
+        routeBasePath: '/reference/cli',
         sidebarPath: require.resolve('./nav/cli_sidebars.js'),
         breadcrumbs: false,
       },
@@ -54,7 +54,7 @@ const config = {
       {
         id: '_gotrue',
         path: '_gotrue',
-        routeBasePath: 'auth',
+        routeBasePath: '/reference/auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
       },
@@ -64,7 +64,7 @@ const config = {
       {
         id: '_storage',
         path: '_storage',
-        routeBasePath: 'storage',
+        routeBasePath: '/reference/storage',
         sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
       },
@@ -74,7 +74,7 @@ const config = {
       {
         id: '_supabase_dart',
         path: '_supabase_dart',
-        routeBasePath: 'supabase-dart',
+        routeBasePath: '/reference/dart',
         sidebarPath: require.resolve('./nav/supabase_dart_sidebars.js'),
         breadcrumbs: false,
       },
@@ -84,7 +84,7 @@ const config = {
       {
         id: '_supabase_js',
         path: '_supabase_js',
-        routeBasePath: 'supabase-js',
+        routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
       },
@@ -94,7 +94,7 @@ const config = {
       {
         id: '_auth_helpers',
         path: '_auth_helpers',
-        routeBasePath: 'auth-helpers',
+        routeBasePath: '/reference/auth-helpers',
         sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
         breadcrumbs: false,
       },
