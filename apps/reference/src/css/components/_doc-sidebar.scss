@@ -32,6 +32,32 @@ html[data-theme='dark'] {
     font-size: 0.9rem;
     color: var(--custom-content-color-light);
   }
+
+  .custom--main-menu-header-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .custom--main-menu-header {
+    display: flex;
+    font-size: var(--custom-font-size-md);
+    font-weight: 700;
+    color: var(--ifm-menu-color);
+    margin-bottom: 0;
+  }
+
+  .custom--main-menu-header__icon {
+    width: 32px;
+    height: 32px;
+    display: block;
+    border-radius: 8px;
+    background-color: var(--ifm-menu-color-background-active);
+    border: 1px solid var(--ifm-menu-color-active);
+  }
+
   .custom--main-menu-button svg {
     padding: 2px;
     margin-right: 10px;

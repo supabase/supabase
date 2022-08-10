@@ -55,6 +55,7 @@
   --custom-font-code: 'office code pro', Menlo, monospace;
   --custom-font-size-base: 1rem;
   --custom-font-size-sm: 0.9rem;
+  --custom-font-size-xs: 0.8rem;
   --custom-border-radius: 3px;
   --custom-border-radius-md: 6px;
   --custom-primary-darkest: #10633e;
@@ -171,7 +172,7 @@
   --sidebar-spacing-horizontal: 1.5rem;
 
   /* Doc item */
-  --doc-item-container-width: 42rem;
+  --doc-item-container-width: 50rem;
 
   /* Doc Page */
 
@@ -409,64 +410,4 @@ html[data-theme='dark'] .navbar-item-discord:before {
     no-repeat;
   background-repeat: no-repeat;
   background-position: center;
-}
-
-/* PRISM */
-
-.prism-code {
-  background-color: none;
-  word-break: break-word;
-  font-size: 0.8rem;
-  outline: none !important;
-}
-.prism-code div,
-.prism-code div:focus,
-.prism-code div:active {
-  outline: none !important;
-}
-.token.keyword.module,
-.token.property-access,
-.token.function {
-  font-style: normal !important;
-  color: #ccc !important;
-}
-.token.plain,
-.token.parameter,
-.token.punctuation,
-.token.operator,
-.token.console.class-name,
-.token.doc-comment.parameter,
-.token.doc-comment.optional-parameter,
-.token.doc-comment.parameter.punctuation,
-.token.doc-comment.optional-parameter.punctuation {
-  font-style: normal !important;
-  color: #ccc !important;
-}
-.token.keyword,
-.token.doc-comment.keyword {
-  font-style: normal !important;
-  color: #569cd6 !important;
-}
-.token.string {
-  font-style: normal !important;
-  color: #24b47e !important;
-}
-.token.console {
-  font-style: normal !important;
-  color: #49c1ad !important;
-}
-.token.constant {
-  font-style: normal !important;
-  color: #569cd6 !important;
-}
-.token.comment {
-  font-style: normal !important;
-  color: #666 !important;
-}
-.token.number {
-  color: #b5cea8 !important;
-}
-.token.boolean,
-.token.doc-comment.class-name {
-  @apply text-green-500;
 }

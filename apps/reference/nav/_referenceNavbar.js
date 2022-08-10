@@ -63,13 +63,13 @@ const navbar = [
   // },
 
   // supabase-js
-  {
-    to: 'reference/javascript',
-    position: 'left',
-    label: 'JavaScript Library',
-    supabaseCustomNavBarRegex:
-      '(^/docs/reference/javascript$|docs/reference/javascript/)',
-  },
+  // {
+  //   to: 'reference/javascript',
+  //   position: 'left',
+  //   label: 'JavaScript Library',
+  //   supabaseCustomNavBarRegex:
+  //     '(^/docs/reference/javascript$|docs/reference/javascript/)',
+  // },
   {
     type: 'docsVersionDropdown',
     position: 'left',
