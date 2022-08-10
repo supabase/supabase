@@ -7,14 +7,14 @@ const mainNavbar = require('./nav/_referenceNavbar')
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Supabase Tools',
-  tagline: 'Documentation for the Supabase Ecosystem',
-  url: 'https://supabase.tools',
-  baseUrl: '/',
+  title: 'Supabase',
+  tagline: 'The open source Firebase alternative.',
+  url: 'https://supabase.com',
+  baseUrl: '/docs/',
   onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: '/favicon.ico',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -123,11 +123,11 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        // title: 'Supabase Tools',
+        // title: 'Supabase Docs',
         logo: {
-          alt: 'Supabase Tools',
-          src: 'img/supabase-logo-wordmark--light.svg',
-          srcDark: 'img/supabase-logo-wordmark--dark.svg',
+          alt: 'Supabase Docs',
+          src: '/img/supabase-logo-wordmark--light.svg',
+          srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
         items: mainNavbar.navbar,
       },
