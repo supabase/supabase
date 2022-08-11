@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Downloads a file.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .storage
@@ -24,10 +17,6 @@ const { data, error } = await supabase
   .download('folder/avatar1.png')
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -78,21 +67,9 @@ The file path to be downloaded, including the path and file name. For example `f
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .storage
   .from('avatars')
   .download('folder/avatar1.png')
 ```
-
-
-</TabItem>
-
-</Tabs>

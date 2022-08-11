@@ -11,23 +11,12 @@ import TabItem from '@theme/TabItem';
 Invokes a Supabase Function.
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
   body: JSON.stringify({ foo: 'bar' })
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -101,35 +90,16 @@ object with the following properties
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
   body: JSON.stringify({ foo: 'bar' })
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Specifying response type.
 
 By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
@@ -138,22 +108,10 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Parsing custom headers.
 
 You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
@@ -163,8 +121,3 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
   body: JSON.stringify({ foo: 'bar' })
 })
 ```
-
-
-</TabItem>
-
-</Tabs>

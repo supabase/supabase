@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Subscribe to realtime changes in your database.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('*')
@@ -26,10 +19,6 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -100,13 +89,6 @@ A callback that will handle the payload that is sent whenever your database chan
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('*')
@@ -116,21 +98,9 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Listening to a specific table
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -141,21 +111,9 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Listening to inserts
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -165,11 +123,6 @@ const mySubscription = supabase
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to updates
 
@@ -181,13 +134,6 @@ alter table "your_table" replica identity full;
 ```
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
@@ -196,11 +142,6 @@ const mySubscription = supabase
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to deletes
 
@@ -212,13 +153,6 @@ alter table "your_table" replica identity full;
 ```
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
@@ -228,21 +162,9 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Listening to multiple events
 
 You can chain listeners if you want to listen to multiple events for each table.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -252,21 +174,9 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Listening to row level changes
 
 You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -274,8 +184,3 @@ const mySubscription = supabase
   .on('UPDATE', handleRecordUpdated)
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>

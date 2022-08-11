@@ -10,23 +10,12 @@ import TabItem from '@theme/TabItem';
 
 Removes all objects inside a single bucket.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .storage
   .emptyBucket('avatars')
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -77,20 +66,8 @@ The unique identifier of the bucket you would like to empty.
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .storage
   .emptyBucket('avatars')
 ```
-
-
-</TabItem>
-
-</Tabs>

@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Limits the result to rows within the specified range, inclusive.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -24,10 +17,6 @@ const { data, error } = await supabase
   .range(0,3)
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -142,21 +131,9 @@ The foreign table to use (for foreign columns).
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
   .select('name, country_id')
   .range(0,3)
 ```
-
-
-</TabItem>
-
-</Tabs>
