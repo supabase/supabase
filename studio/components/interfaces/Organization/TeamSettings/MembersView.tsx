@@ -87,7 +87,7 @@ const MembersView = () => {
               <Table.th key="header-status"></Table.th>,
               <Table.th key="header-role" className="flex items-center space-x-2">
                 <span>Role</span>
-                <RolesHelperModal />
+                {enablePermissions && <RolesHelperModal />}
               </Table.th>,
               <Table.th key="header-action"></Table.th>,
             ]}
