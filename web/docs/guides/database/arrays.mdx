@@ -23,14 +23,11 @@ Create a test table with a text array (an array of strings):
 
 <TabItem value="dashboard">
 
-1. Go to the Table Editor
-2. Create a New Table
-3. Create a new table named `arraytest` and save the table
-    - New Column
-        - Name the new column `textarray`
-        - Make it type `text`
-        - Check the box labelled `Define as array`
-        - Save the new column
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Click **New Table** and create a table with the name `arraytest`.
+1. Click **Save**.
+1. Click **New Column** and create a column with the name `textarray`, type `text`, and select **Define as array**.
+1. Click **Save**.
 
 </TabItem>
 
@@ -56,12 +53,10 @@ CREATE TABLE arraytest (id integer NOT NULL, textarray text ARRAY);
 
 <TabItem value="dashboard">
 
-- Table Editor
-- Select `arraytest`
-- Insert Row
-    - In the `textarray` field input, paste:
-    - `["Harry", "Larry", "Moe"]`
-    - Save the new row
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Select the `arraytest` table.
+1. Click **Insert row** and add `["Harry", "Larry", "Moe"]`.
+1. Click **Save.**
 
 </TabItem>
 
@@ -98,10 +93,10 @@ const { data, error } = await supabase
 
 <TabItem value="dashboard">
 
-- Table Editor
-- Select `arraytest`
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Select the `arraytest` table.
 
-Your first array data!
+You should see:
 
 | id  | textarray               |
 | --- | ----------------------- |
@@ -114,7 +109,7 @@ Your first array data!
 SELECT * FROM arraytest;
 ```
 
-Your first array data!
+You should see:
 
 | id  | textarray               |
 | --- | ----------------------- |
@@ -125,7 +120,7 @@ Your first array data!
 
 ## Query array data
 
-To query an array, PostgreSQL uses 1-based arrays, so be careful, since you're probably used to 0-based arrays in JavaScript.
+PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
 
 <Tabs
   groupId="dashboard-or-sql"
