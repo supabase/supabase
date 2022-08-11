@@ -108,15 +108,15 @@ This model has been surprisingly successful and we hope that more companies will
 
 ### Elixir Type support
 
-Elixir is a functional programming language that enables huge horizontal scalability, we use it at Supabase for our Realtime
-engine and our logging infrastructure. Recently [announced by Jose at ElixirConf EU](https://twitter.com/josevalim/status/1535008937640181760?s=20&t=BLqeO2YpdhYfCZxgsmlNug),
-the Elixir team is investigating a type system. Supabase uses Elixir extensively, and we're sponsoring this research and development.
+Elixir is a functional programming language that enables huge horizontal scalability. We use it at Supabase for our Realtime
+engine and our logging infrastructure. Recently [announced by José](https://twitter.com/josevalim/status/1535008937640181760?s=20&t=BLqeO2YpdhYfCZxgsmlNug) at ElixirConf EU,
+the Elixir team is investigating a type system. Supabase is sponsoring this research and development.
 
 ### Deno
 
-Functions was one of the most demanded features of Supabase, and we explored a huge number of options before settling on Deno. Deno checked all the boxes -
-the most important of which was their approach to open source. Both Supabase and Netlify now support Deno Edge Functions,
-and we hope that our backing will help convince others to consider adopting the Deno runtime.
+[Functions](https://supabase.com/edge-functions) was one of the most demanded features of Supabase, and we explored a huge number of options before settling on Deno.
+Deno checked all the boxes - most important for us was their approach to open source. Both Supabase and Netlify now support Deno Edge Functions,
+and we hope that our backing will help convince others to adopt the Deno runtime too.
 
 ### Database encryption
 
@@ -137,15 +137,15 @@ In our Series A post, we outlined our plans for Supabase [in three phases](https
 
 We're now moving into Phase 3, with the same goals that we outlined in 2021:
 
-- **Branching:**
+- **Branching:** <br />
   Developers should be able to "fork" a database at any point. This is particularly important for Jamstack developers who run deployments for every Git branch.
-- **Scalable storage:**
+- **Scalable storage:** <br />
   Storage should grow and shrink without the user needing to provision more space themselves.
-- **Distributed:**
+- **Distributed:** <br />
   An entire fleet of databases, distributed around the world, should feel like a single database (and even better if all nodes can accept read/write workloads).
-- **Ephemeral compute:**
+- **Ephemeral compute:** <br />
   Developers don't want to be charged for a database which isn't doing anything. Likewise - if they are running huge computation then the database should scale up seamlessly, and scale down to zero when it's unused.
-- **Snapshots and time-travel:**
+- **Snapshots and time-travel:** <br />
   Developers should be able to roll back to any point in time, or take a copy of their database with just a click of a button.
 
 We have a lot of work ahead of us, but we're excited to announce one of the ways that we're supporting the community is through our investment into OrioleDb.
@@ -155,7 +155,7 @@ of [“wicked” problems](https://www.socallinuxexpo.org/sites/default/files/pr
 
 While it _currently_ requires some modifications to the Postgres core (about 1000 lines), the goal is to upstream the requisite core code so
 that _anyone_ can build a Storage extension like OrioleDb. Giving developers low-level access to the underlying storage capabilities of
-Postgres will unlock a slew of new capabilities in Postgres. We like that Oriole is approaching the improvements to Postgres through an extension rather than a fork.
+Postgres will unlock a slew of new capabilities in Postgres.
 You can read more about OrioleDb's plans for Snapshots and Branching [in their wiki](https://github.com/orioledb/orioledb/wiki/Database-branching).
 
 Supabase has invested $500K into Oriole to support their efforts, and we've hired a developer at Supabase to work full-time on OrioleDb, with more to come.
