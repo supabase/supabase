@@ -36,11 +36,16 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
+  const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = enablePermissions
     ? rolesRemovable.includes((member?.role_ids ?? [-1])[0])
     : true
-  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites')
-  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites')
+  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
+    resource: { role_id: roleId },
+  })
+  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites', {
+    resource: { role_id: roleId },
+  })
 
   const handleMemberDelete = async () => {
     confirmAlert({
