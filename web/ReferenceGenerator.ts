@@ -69,7 +69,7 @@ async function gen(inputFileName, outputDir) {
 
       // Create page
       const content = Page({
-        slug,
+        slug: (docSpec.info.slugPrefix || '') + slug,
         id: slug,
         specFileName: inputFileName,
         title: pageSpec.title || pageSpec.pageName,
@@ -169,7 +169,12 @@ function generateExamples(id: string, specExamples: any, allLanguages: any) {
     let allTabs = example.hideCodeBlock
       ? ''
       : Tabs(id, allLanguages, generateTabs(allLanguages, example))
-    return Example({ name: example.name, description: example.description, tabs: allTabs, note: example.note })
+    return Example({
+      name: example.name,
+      description: example.description,
+      tabs: allTabs,
+      note: example.note,
+    })
   })
 }
 

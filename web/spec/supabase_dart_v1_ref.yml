@@ -8,6 +8,7 @@ info:
     Supabase Dart.
 
   definition: spec/tsdoc_v1/combined.json
+  slugPrefix: '/'
   libraries:
     - name: 'Dart'
       id: 'dart'
