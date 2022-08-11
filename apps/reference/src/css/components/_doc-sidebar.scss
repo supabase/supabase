@@ -36,26 +36,34 @@ html[data-theme='dark'] {
   .custom--main-menu-header-container {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     padding: 1rem 0 0.5rem 1rem;
     margin-bottom: 1rem;
-  }
 
-  .custom--main-menu-header {
-    display: flex;
-    font-size: var(--custom-font-size-md);
-    font-weight: 700;
-    color: var(--ifm-menu-color);
-    margin-bottom: 0;
-  }
+    .custom--main-menu-header {
+      display: flex;
+      font-size: var(--custom-font-size-md);
+      font-weight: 700;
+      color: var(--ifm-menu-color);
+      margin-bottom: 0;
+    }
 
-  .custom--main-menu-header__icon {
-    width: 32px;
-    height: 32px;
-    display: block;
-    border-radius: 8px;
-    background-color: var(--ifm-menu-color-background-active);
-    border: 1px solid var(--ifm-menu-color-active);
+    .custom--main-menu-header__icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      background-color: var(--custom-background-color-diff);
+      border: 1px solid var(--custom-background-color-highlight);
+
+      img {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 4px;
+      }
+    }
   }
 
   .custom--main-menu-button svg {
