@@ -10,23 +10,12 @@ import TabItem from '@theme/TabItem';
 
 Performs an UPSERT into the table.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('messages')
   .upsert({ id: 3, message: 'foo', username: 'supabot' })
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -185,34 +174,15 @@ Count algorithm to use to count rows in a table.
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('messages')
   .upsert({ id: 3, message: 'foo', username: 'supabot' })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Bulk Upsert your data
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -223,11 +193,6 @@ const { data, error } = await supabase
   ])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Upserting into tables with constraints
 
 Running the following will cause supabase to upsert data into the `users` table. 
@@ -235,34 +200,15 @@ If the username 'supabot' already exists, the `onConflict` argument tells supaba
 based on the column passed into `onConflict`.
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('users')
   .upsert({ username: 'supabot' }, { onConflict: 'username' })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Return the exact number of rows
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error, count } = await supabase
@@ -274,8 +220,3 @@ const { data, error, count } = await supabase
     count: 'exact' 
   })
 ```
-
-
-</TabItem>
-
-</Tabs>

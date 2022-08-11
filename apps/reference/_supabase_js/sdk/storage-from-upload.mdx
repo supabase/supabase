@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Uploads a file to an existing bucket.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase
@@ -28,10 +21,6 @@ const { data, error } = await supabase
   })
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -128,13 +117,6 @@ HTTP headers.
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase
@@ -146,21 +128,9 @@ const { data, error } = await supabase
   })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Upload file using `ArrayBuffer` from base64 file data
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { decode } from 'base64-arraybuffer'
@@ -172,8 +142,3 @@ const { data, error } = await supabase
     contentType: 'image/png'
   })
 ```
-
-
-</TabItem>
-
-</Tabs>

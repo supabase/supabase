@@ -12,13 +12,6 @@ Retrieves at most one row from the result. Result must be at most one row
 (e.g. using `eq` on a UNIQUE column), otherwise this will result in an
 error.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -27,10 +20,6 @@ const { data, error } = await supabase
   .maybeSingle()
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 
 
@@ -54,13 +43,6 @@ const { data, error } = await supabase
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -68,8 +50,3 @@ const { data, error } = await supabase
   .eq('name', 'Singapore')
   .maybeSingle()
 ```
-
-
-</TabItem>
-
-</Tabs>

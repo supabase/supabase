@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Performs an INSERT into the table.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -25,10 +18,6 @@ const { data, error } = await supabase
   ])
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -100,13 +89,6 @@ If you are using Row Level Security and you are encountering problems, try setti
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -115,23 +97,11 @@ const { data, error } = await supabase
   ])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Bulk create
 
 When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
 rolled back.
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -142,11 +112,6 @@ const { data, error } = await supabase
   ])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Upsert
 
 For upsert, if set to true, primary key columns would need to be included 
@@ -155,13 +120,6 @@ used must be natural, not surrogate. There are however,
 [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
 for surrogate primary keys.
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -174,8 +132,3 @@ const { data, error } = await supabase
     ],
     { upsert: true })
 ```
-
-
-</TabItem>
-
-</Tabs>

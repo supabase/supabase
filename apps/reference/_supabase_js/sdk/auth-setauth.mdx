@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Overrides the JWT on the current client. The JWT will then be sent in all subsequent network requests.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 function apiFunction(req, res) {
   // Assuming the access token was sent as a header "X-Supabase-Auth"
@@ -31,10 +24,6 @@ function apiFunction(req, res) {
 }
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -82,13 +71,6 @@ a jwt access token
 
 This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 function apiFunction(req, res) {
   // Assuming the access token was sent as a header "X-Supabase-Auth"
@@ -103,21 +85,9 @@ function apiFunction(req, res) {
 }
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With Express.
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 
@@ -153,8 +123,3 @@ async function apiFunction(req, res) {
   const { data } = await supabase.from('your_table').select()
 }
 ```
-
-
-</TabItem>
-
-</Tabs>

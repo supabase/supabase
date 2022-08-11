@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Finds all rows whose columns match the specified `query` object.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -24,10 +17,6 @@ const { data, error } = await supabase
   .match({name: 'Beijing', country_id: 156})
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -76,13 +65,6 @@ The object to filter with, with column names as keys mapped
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -90,21 +72,9 @@ const { data, error } = await supabase
   .match({name: 'Beijing', country_id: 156})
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -113,21 +83,9 @@ const { data, error } = await supabase
   .match({name: 'Beijing', country_id: 156})
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -136,21 +94,9 @@ const { data, error } = await supabase
   .match({name: 'Beijing', country_id: 156})
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -158,8 +104,3 @@ const { data, error } = await supabase
   .rpc('echo_all_cities')
   .match({name: 'Beijing', country_id: 156})
 ```
-
-
-</TabItem>
-
-</Tabs>

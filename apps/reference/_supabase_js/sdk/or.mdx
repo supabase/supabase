@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Finds all rows satisfying at least one of the filters.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -24,10 +17,6 @@ const { data, error } = await supabase
   .or('id.eq.20,id.eq.30')
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -128,13 +117,6 @@ The foreign table to use (if `column` is a foreign column).
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -142,21 +124,9 @@ const { data, error } = await supabase
   .or('id.eq.20,id.eq.30')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Use `or` with `and`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -165,21 +135,9 @@ const { data, error } = await supabase
   .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Use `or` on foreign tables
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -187,8 +145,3 @@ const { data, error } = await supabase
   .select('id, cities(*)')
   .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
 ```
-
-
-</TabItem>
-
-</Tabs>

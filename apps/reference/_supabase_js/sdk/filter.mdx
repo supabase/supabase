@@ -10,13 +10,6 @@ import TabItem from '@theme/TabItem';
 
 Finds all rows whose `column` satisfies the filter.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -24,10 +17,6 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -124,13 +113,6 @@ The value to filter with.
 
 
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -138,21 +120,9 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -161,21 +131,9 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -184,21 +142,9 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -207,21 +153,9 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Filter embedded resources
 
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -229,8 +163,3 @@ const { data, error } = await supabase
   .select('name, countries ( name )')
   .filter('countries.name', 'in', '("France","Japan")')
 ```
-
-
-</TabItem>
-
-</Tabs>

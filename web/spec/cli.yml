@@ -28,7 +28,6 @@ info:
 
     Report issues to our [issue tracker](https://github.com/supabase/cli/issues).
 
-  definition: spec/combined.json
   libraries:
     - name: 'sh'
       id: 'sh'
