@@ -62,7 +62,12 @@ const RefHeader = (props) => {
   console.log('found path', found)
   return (
     <div className="custom--main-menu-header-container">
-      <div className="custom--main-menu-header__icon"></div>
+      <div className="custom--main-menu-header__icon">
+        <img
+          src="/docs/img/icons/languages/javascript-icon.svg"
+          alt="supabase-logo"
+        />
+      </div>
       <h4 className="custom--main-menu-header">{headerNames[found].name}</h4>
     </div>
   )
