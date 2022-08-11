@@ -12,6 +12,7 @@ import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
+import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { PageContext } from 'pages/org/[slug]/settings'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -84,7 +85,10 @@ const MembersView = () => {
             head={[
               <Table.th key="header-user">User</Table.th>,
               <Table.th key="header-status"></Table.th>,
-              <Table.th key="header-role">Role</Table.th>,
+              <Table.th key="header-role" className="flex items-center space-x-2">
+                <span>Role</span>
+                <RolesHelperModal />
+              </Table.th>,
               <Table.th key="header-action"></Table.th>,
             ]}
             body={[
