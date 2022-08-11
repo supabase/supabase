@@ -27,9 +27,9 @@ const RedirectDomains = () => {
     setSubmitting(true)
     try {
       const payload = URI_ALLOW_LIST_ARRAY
-      await payload.push(values.domain)
+      payload.push(values.domain)
       // convert payload to comma seperated string and update
-      authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+      await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
       setSubmitting(false)
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })

@@ -66,11 +66,9 @@ const Reports = () => {
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
 
-  const canSaveReport = checkPermissions(
-    PermissionAction.SQL_UPDATE,
-    'postgres.public.user_content',
-    { resource: { type: 'report' } }
-  )
+  // const canSaveReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
+  //   resource: { type: 'report' },
+  // })
   const contentStore = useProjectContentStore(ref)
 
   /*
