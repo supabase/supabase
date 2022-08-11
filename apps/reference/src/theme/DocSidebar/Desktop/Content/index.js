@@ -17,31 +17,31 @@ const subNavRoutes = [
 const headerNames = {
   api: {
     name: 'API',
-    icon: null,
+    icon: 'javascript-icon',
   },
   cli: {
     name: 'CLI',
-    icon: null,
+    icon: 'cli-icon',
   },
   auth: {
     name: 'Auth',
-    icon: null,
+    icon: 'javascript-icon',
   },
   storage: {
     name: 'Storage',
-    icon: null,
+    icon: 'javascript-icon',
   },
   javascript: {
     name: 'supabase-js',
-    icon: null,
+    icon: 'javascript-icon',
   },
   dart: {
     name: 'Dart',
-    icon: null,
+    icon: 'dart-icon',
   },
   'auth-helpers': {
     name: 'Auth Helpers',
-    icon: null,
+    // icon: 'javascript-icon',
   },
 }
 
@@ -62,12 +62,14 @@ const RefHeader = (props) => {
   console.log('found path', found)
   return (
     <div className="custom--main-menu-header-container">
-      <div className="custom--main-menu-header__icon">
-        <img
-          src="/docs/img/icons/languages/javascript-icon.svg"
-          alt="supabase-logo"
-        />
-      </div>
+      {headerNames[found].icon && (
+        <div className="custom--main-menu-header__icon">
+          <img
+            src={`/docs/img/icons/${headerNames[found].icon}.svg`}
+            alt="supabase-logo"
+          />
+        </div>
+      )}
       <h4 className="custom--main-menu-header">{headerNames[found].name}</h4>
     </div>
   )
@@ -76,31 +78,31 @@ const RefHeader = (props) => {
 export default function ContentWrapper(props) {
   const { pathname } = useLocation()
 
-  // console.log('pathname', pathname)
-
   return (
-    <div className="theme-doc-sidebar-menu-custom-container">
-      {pathname && requiresSubNav(pathname, subNavRoutes) && (
-        <>
-          <Link to="/docs/reference" className="custom--main-menu-button">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20.3284 11.0001V13.0001L7.50011 13.0001L10.7426 16.2426L9.32842 17.6568L3.67157 12L9.32842 6.34314L10.7426 7.75735L7.49988 11.0001L20.3284 11.0001Z"
-                fill="currentColor"
-              />
-            </svg>
-            <span>All Reference Docs</span>
-          </Link>
-          <RefHeader pathname={pathname} />
-        </>
-      )}
-      <Content {...props} />
-    </div>
+    <>
+      <div className="theme-doc-sidebar-menu-custom-container">
+        {pathname && requiresSubNav(pathname, subNavRoutes) && (
+          <>
+            <Link to="/docs/reference" className="custom--main-menu-button">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20.3284 11.0001V13.0001L7.50011 13.0001L10.7426 16.2426L9.32842 17.6568L3.67157 12L9.32842 6.34314L10.7426 7.75735L7.49988 11.0001L20.3284 11.0001Z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>All Reference Docs</span>
+            </Link>
+            <RefHeader pathname={pathname} />
+          </>
+        )}
+        <Content {...props} />
+      </div>
+    </>
   )
 }
