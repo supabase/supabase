@@ -90,3 +90,37 @@ test('error message handling', async () => {
   await screen.findByText(/string/)
   await screen.findByText(/my_error/)
 })
+
+test('custom error message: Resources exceeded during query execution', async () => {
+  const errorFromLogflare = {
+    error: {
+      code: 400,
+      errors: [
+        {
+          domain: 'global',
+          message:
+            'Resources exceeded during query execution: The query could not be executed in the allotted memory. Peak usage: 122% of limit.\nTop memory consumer(s):\n  ORDER BY operations: 99%\n  other/unattributed: 1%\n',
+          reason: 'resourcesExceeded',
+        },
+      ],
+      message:
+        'Resources exceeded during query execution: The query could not be executed in the allotted memory. Peak usage: 122% of limit.\nTop memory consumer(s):\n  ORDER BY operations: 99%\n  other/unattributed: 1%\n',
+      status: 'INVALID_ARGUMENT',
+    },
+  }
+
+  // logs explorer, custom query
+  const { rerender } = render(<LogTable error={errorFromLogflare} />)
+
+  // prompt user to reduce selected tables
+  await screen.findByText(/This query requires too much memory to be executed/)
+  await screen.findByText(
+    /Avoid selecting entire objects and instead select specific keys using dot notation/
+  )
+
+  // previewer, prompt to reduce time range
+  rerender(<LogTable queryType="api" error={errorFromLogflare} />)
+  await screen.findByText(/This query requires too much memory to be executed/)
+  await screen.findByText(/Avoid querying across a large datetime range/)
+  await screen.findByText(/Please contact support if this error persists/)
+})

@@ -21,6 +21,7 @@
     "@supabase/ui": "v0.37.0-alpha.50",
     "classnames": "^2.3.1",
     "date-fns": "2.10.0",
+    "dayjs": "^1.11.4",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
     "markdown-toc": "^1.2.0",
