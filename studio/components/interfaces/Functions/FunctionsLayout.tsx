@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconCode, Loading } from '@supabase/ui'
+import { IconCode } from '@supabase/ui'
 
 import { useStore, withAuth } from 'hooks'
 import FunctionsNav from './FunctionsNav'
@@ -20,14 +20,6 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
     }
   }, [ui.selectedProjectRef])
 
-  if (!functions.isLoaded) {
-    return (
-      <BaseLayout>
-        <Loading active={true}>{''}</Loading>
-      </BaseLayout>
-    )
-  }
-
   const item = id ? functions.byId(id) : null
   const name = item?.name || ''
 
@@ -35,7 +27,7 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const centered = !hasFunctions
 
   return (
-    <BaseLayout>
+    <BaseLayout isLoading={!functions.isLoaded}>
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">

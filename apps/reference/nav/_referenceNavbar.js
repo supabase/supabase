@@ -5,9 +5,10 @@ const navbar = [
     position: 'left',
   },
   {
-    href: 'https://supabase.com/docs/guides',
+    href: '/',
     label: 'Reference',
     position: 'left',
+    // activeLinkRegex: '',
   },
 
   { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
@@ -38,12 +39,12 @@ const navbar = [
     label: 'API',
     supabaseCustomNavBarRegex: '(^/api$|api/)',
   },
-  {
-    type: 'docsVersionDropdown',
-    position: 'left',
-    docsPluginId: '_api',
-    supabaseCustomNavBarRegex: '(^/api$|api/)',
-  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_api',
+  //   supabaseCustomNavBarRegex: '(^/api$|api/)',
+  // },
 
   // CLI
   {
@@ -52,18 +53,18 @@ const navbar = [
     label: 'CLI',
     supabaseCustomNavBarRegex: '(^/cli$|cli/)',
   },
-  {
-    type: 'docsVersionDropdown',
-    position: 'left',
-    docsPluginId: '_cli',
-    supabaseCustomNavBarRegex: '(^/cli$|cli/)',
-  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_cli',
+  //   supabaseCustomNavBarRegex: '(^/cli$|cli/)',
+  // },
 
   // supabase-js
   {
     to: 'supabase-js',
     position: 'left',
-    label: 'JavaScript SDK',
+    label: 'JavaScript Library',
     supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
   },
   {
@@ -111,7 +112,7 @@ const navbar = [
   {
     to: 'supabase-dart',
     position: 'left',
-    label: 'Supabase Dart SDK',
+    label: 'Dart Library',
     supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
   },
   // {
@@ -119,6 +120,19 @@ const navbar = [
   //   position: 'left',
   //   docsPluginId: '_supabase_dart',
   //   supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
+  // },
+
+  {
+    to: 'auth-helpers',
+    position: 'left',
+    label: 'Auth Helpers',
+    supabaseCustomNavBarRegex: '(^/auth-helpers$|auth-helpers/)',
+  },
+  // {
+  //   type: 'docsVersionDropdown',
+  //   position: 'left',
+  //   docsPluginId: '_auth_helpers',
+  //   supabaseCustomNavBarRegex: '(^/auth-helpers$|auth-helpers/)',
   // },
 ]
 

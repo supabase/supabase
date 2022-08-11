@@ -17,7 +17,7 @@ Have you ever wanted to restore your database's state to a particular moment in 
 
 ## Introduction
 
-[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/2017/08/18/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/2020/07/17/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
+[WAL-G](https://github.com/wal-g/wal-g) is an [open-source continuous archiving tool](https://www.citusdata.com/blog/introducing-wal-g-faster-restores-for-postgres/) used to easily set up and recover from [physical backups](/blog/postgresql-physical-logical-backups) in Postgres. It mainly handles the storage and retrieval of physical backups and WAL archives to and from a chosen cloud storage provider. In this post, we will walk you through on how to effortlessly set up WAL-G for your database as well as guide you on what to do if and when disaster strikes.
 
 ## Prerequisites
 
@@ -188,11 +188,10 @@ Once Postgres finishes starting up and completes recovery mode, all data or data
 
 ## More Postgres resources
 
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/2022/07/18/seen-by-in-postgresql)
-- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/2022/06/28/partial-postgresql-data-dumps-with-rls)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/2022/03/08/audit)
-- [Postgres Views](https://supabase.com/blog/2020/11/18/postgresql-views)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/2021/02/27/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/2020/07/09/postgresql-templates)
-- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/2021/12/01/realtime-row-level-security-in-postgresql)
-
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

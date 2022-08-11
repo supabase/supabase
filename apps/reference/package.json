@@ -15,7 +15,7 @@
     "cli:version": "docusaurus docs:version:_cli",
     "gotrue:version": "docusaurus docs:version:_gotrue",
     "storage:version": "docusaurus docs:version:_storage",
-    "supabase-js:version": "docusaurus docs:version:_supabase-js",
+    "supabase-js:version": "docusaurus docs:version:_supabase_js",
     "supabase-dart:version": "docusaurus docs:version:_supabase_dart"
   },
   "dependencies": {

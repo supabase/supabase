@@ -368,17 +368,7 @@ pages:
   invoke():
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
-
-      :::caution
-
-      Supabase Functions are in Experimental release until 1 August 2022. There will breaking changes. Do not use them in Production.
-
-      :::
-
-      We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
-      There will be breaking changes with no notice.
-
+      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.

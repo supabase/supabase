@@ -122,12 +122,19 @@ test.each([
       expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
       expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
     })
+    // reset mock so that we can check for selection call
+    get.mockClear()
 
     for (const text of tableTexts) {
       await screen.findByText(text)
     }
     const row = await screen.findByText(tableTexts[0])
     fireEvent.click(row)
+
+    await waitFor(() => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_start'))
+      expect(get).not.toHaveBeenCalledWith(expect.stringContaining('iso_timestamp_end'))
+    })
 
     for (const text of selectionTexts) {
       await screen.findAllByText(text)
