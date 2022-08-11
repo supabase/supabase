@@ -11,7 +11,7 @@ const config = {
   tagline: 'Documentation for the Supabase Ecosystem',
   url: 'https://supabase.tools',
   baseUrl: '/',
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -86,6 +86,16 @@ const config = {
         path: '_supabase_js',
         routeBasePath: 'supabase-js',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
+        breadcrumbs: false,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: '_auth_helpers',
+        path: '_auth_helpers',
+        routeBasePath: 'auth-helpers',
+        sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
         breadcrumbs: false,
       },
     ],
