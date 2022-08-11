@@ -7,7 +7,7 @@ info:
 
     Supabase Dart.
 
-  definition: spec/combined.json
+  definition: spec/tsdoc_v1/combined.json
   libraries:
     - name: 'Dart'
       id: 'dart'
