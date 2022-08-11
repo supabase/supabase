@@ -3,8 +3,7 @@
     {
       "type": "category",
       "label": "Getting Started",
-      "link": { "type": "doc", "id": "intro" },
-      "items": ["installing", "initializing", "generating-types"],
+      "items": ["intro", "installing", "initializing", "generating-types"],
       "collapsed": false
     },
     {
