@@ -83,6 +83,8 @@ export async function getStaticProps({ params }: any) {
 
   const relatedPosts = getSortedPosts('_blog', 5, mdxSource.scope.tags)
 
+  // [Joshen] Really stumped here, blog.tsx calls the exact same method and the same args
+  // in getStaticProps but the URLs returned there do not include the date stamp unlike here
   const allPosts = getSortedPosts('_blog')
 
   const currentIndex = allPosts
@@ -129,8 +131,12 @@ function BlogPostPage(props: any) {
 
   const NextCard = (props: any) => {
     const { post, label, className } = props
+
+    // [Joshen] I don't necessarily think this is the right fix though
+    const formattedUrl = post.url.split('/').pop()
+
     return (
-      <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+      <Link href={`/blog/${formattedUrl}`} as={`/blog/${formattedUrl}`}>
         <div className={className}>
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">

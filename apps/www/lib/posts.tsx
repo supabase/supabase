@@ -13,7 +13,7 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
-  console.log(postDirectory)
+  console.log('getSortedPosts directory:', postDirectory)
 
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
