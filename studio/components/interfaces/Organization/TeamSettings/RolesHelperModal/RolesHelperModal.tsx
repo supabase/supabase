@@ -32,14 +32,14 @@ const RolesHelperModal: FC<Props> = ({}) => {
           <Modal.Content>
             <div className="bg-scale-400 border border-scale-500 rounded">
               <div className="flex items-center border-b border-scale-600">
-                <div className="text-sm w-[49%] pl-4">Permissions</div>
-                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600">
+                <div className="text-sm w-[49%] pl-4 font-bold">Permissions</div>
+                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600 font-bold">
                   Owner
                 </div>
-                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600">
+                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600 font-bold">
                   Adminstrator
                 </div>
-                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600">
+                <div className="text-sm w-[17%] h-8 flex items-center justify-center border-l border-scale-600 font-bold">
                   Developer
                 </div>
               </div>
