@@ -15,7 +15,7 @@ const config = {
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
-  // themes: ['docusaurus-theme-search-typesense'],
+  // themes: ['docusaurus-theme-search-typesense'], // This is currently causing build errors "ReactContextError" - Docusaurus server-side rendering could not render static page with path
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
