@@ -1,17 +1,11 @@
 import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconChevronDown, IconHelpCircle, Modal } from '@supabase/ui'
+import { IconCheck, IconHelpCircle, Modal } from '@supabase/ui'
 import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 
 interface Props {}
 
 const RolesHelperModal: FC<Props> = ({}) => {
   const [showModal, setShowModal] = useState(false)
-
-  // Left off here:
-  // "Permissions, Owner, Admin and Developer header to be sticky"
-  // Everything else scrollably y axis, fix the height, see if can get it out by tonight
-  // Also fix Modal component - the X icon is missing if closable
-
   return (
     <>
       <IconHelpCircle
