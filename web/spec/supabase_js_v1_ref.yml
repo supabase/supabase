@@ -7,7 +7,7 @@ info:
 
     Supabase JavaScript.
 
-  definition: spec/combined.json
+  definition: spec/tsdoc_v1/combined.json
   libraries:
     - name: 'JavaScript'
       id: 'js'
@@ -1266,7 +1266,7 @@ pages:
           ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: | 
+        notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
