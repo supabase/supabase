@@ -97,7 +97,7 @@ const MembersView = () => {
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
 
                 const validateSelectedRoleToChange = (roleId: any) => {
-                  if (!role) return
+                  if (!role || role.id === roleId) return
 
                   const selectedRole = (roles || []).find((role) => role.id === roleId)
                   const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
@@ -167,14 +167,14 @@ const MembersView = () => {
                                     value={role.id}
                                     onChange={validateSelectedRoleToChange}
                                   >
-                                    {roles.map((role: any) => (
+                                    {roles.map((r: any) => (
                                       <Listbox.Option
-                                        key={role.id}
-                                        value={role.id}
-                                        label={role.name}
+                                        key={r.id}
+                                        value={r.id}
+                                        label={r.name}
                                         disabled={disableRoleEdit}
                                       >
-                                        {role.name}
+                                        {r.name}
                                       </Listbox.Option>
                                     ))}
                                   </Listbox>
