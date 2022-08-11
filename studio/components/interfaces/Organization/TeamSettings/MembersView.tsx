@@ -194,7 +194,7 @@ const MembersView = () => {
                                       </span>
                                     </div>
                                   </Tooltip.Content>
-                                ) : !canRemoveRole ? (
+                                ) : !memberIsUser && !canRemoveRole ? (
                                   <Tooltip.Content side="bottom">
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
