@@ -62,10 +62,10 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
       // rewrite to keep existing ticket urls working
-      {
-        source: '/launch-week/tickets/:path',
-        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
-      },
+      // {
+      //   source: '/launch-week/tickets/:path',
+      //   destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
+      // },
       // rewrite to move ticket website to another path
       {
         source: '/launch-week-register',
