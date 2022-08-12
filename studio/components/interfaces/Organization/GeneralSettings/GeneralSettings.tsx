@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Form, Input } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -74,8 +74,17 @@ const GeneralSettings = observer(() => {
   return (
     <div className="container my-4 max-w-4xl space-y-8">
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
-        {({ isSubmitting, handleReset, values, initialValues }: any) => {
+        {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+
+          useEffect(() => {
+            const values = {
+              name: PageState.organization.name,
+              billing_email: PageState.organization?.billing_email ?? '',
+            }
+            resetForm({ values, initialValues: values })
+          }, [PageState.organization.slug])
+
           return (
             <FormPanel
               footer={
