@@ -28,6 +28,10 @@ body,
   -webkit-font-smoothing: antialiased;
   @apply bg-bg-primary-light dark:bg-bg-primary-dark;
   @apply text-scale-1200;
+
+  // [Joshen] pointer-events: none gets styled to the body whenever a modal opens
+  // Is this an intended radix behaviour? This is however, affecting Stripe's 3D popup
+  pointer-events: auto !important;
 }
 
 * {
