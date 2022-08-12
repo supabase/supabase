@@ -478,5 +478,5 @@ html[data-theme='dark'] .navbar-item-discord:before {
 }
 
 .theme-doc-markdown h3 {
-  scroll-margin-top: 80px
+  scroll-margin-top: 80px;
 }
