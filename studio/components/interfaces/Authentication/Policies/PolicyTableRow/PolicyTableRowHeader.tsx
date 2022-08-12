@@ -19,7 +19,7 @@ const PolicyTableRowHeader: FC<Props> = ({
   const { ref } = router.query
 
   return (
-    <div className="flex w-full items-center justify-between">
+    <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex space-x-4 text-left">
         <Link href={`/project/${ref}/editor/${table.id}`}>
           <a>
