@@ -36,7 +36,7 @@ export default function LaunchHero() {
           <div className="flex flex-col gap-3">
             <h3 className="text-scale-1200 text-lg">Prizes</h3>
             <p className="text-scale-1100 text-sm">
-              There are 5 categories to win. There will be winner prize and a runner-up prize in
+              There are 5 categories to win. There will be a prize for the winner and a runner-up prize in
               each category.
             </p>
           </div>
