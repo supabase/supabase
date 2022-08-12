@@ -9,11 +9,16 @@ const FILENAME_SUBSTRING = 11
 
 type Directories = '_blog' | '_case-studies' | '_alternatives'
 
-export const getSortedPosts = (directory: Directories, limit?: number, tags?: any) => {
+export const getSortedPosts = (
+  directory: Directories,
+  limit?: number,
+  tags?: any,
+  runner?: any
+) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
-  console.log(postDirectory)
+  console.log('runner', runner, postDirectory)
 
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
@@ -37,11 +42,13 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
     // construct url to link to blog posts
     // based on datestamp in file name
     let url = ''
+    let contentPath = ''
     if (directory === '_blog') {
-      const dates = getDatesFromFileName(filename)
-      url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
+      url = `/${slug.substring(FILENAME_SUBSTRING)}`
+      contentPath = `/${directory.replace('_', '')}/${slug.substring(FILENAME_SUBSTRING)}`
     } else {
       url = `/${directory.replace('_', '')}/${slug}`
+      contentPath = `/${directory.replace('_', '')}/${slug}`
     }
 
     const frontmatter = {
@@ -49,6 +56,7 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
       date: formattedDate,
       readingTime,
       url: url,
+      path: contentPath,
     }
     return {
       slug,
@@ -78,6 +86,7 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
 
 // Get Slugs
 export const getAllPostSlugs = (directory: Directories) => {
+  console.log('getAllPostSlugs ran !')
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
