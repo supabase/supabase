@@ -1,16 +1,18 @@
 const buildNavbar = ({ baseUrl }) => {
+  // We need to remove the starting/trailing slash from the baseUrl
+  const trimmedBaseUrl = baseUrl.slice(1, -1)
   return [
     {
       to: '/',
       label: 'Guides',
-      activeBaseRegex: `.*.docs/$|^/${baseUrl}/architecture|(^/${baseUrl}/guides/(database|auth|storage|api|examples!))|(^/${baseUrl}/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/${baseUrl}/faq|^/${baseUrl}/going-into-prod|^/${baseUrl}/handbook|^/${baseUrl}/company)`,
+      activeBaseRegex: `.*.docs/$|^/${trimmedBaseUrl}/architecture|(^/${trimmedBaseUrl}/guides/(database|auth|storage|api|examples!))|(^/${trimmedBaseUrl}/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/${trimmedBaseUrl}/faq|^/${trimmedBaseUrl}/going-into-prod|^/${trimmedBaseUrl}/handbook|^/${trimmedBaseUrl}/company)`,
       position: 'left',
     },
     {
       to: '/reference',
       label: 'Reference',
       position: 'left',
-      activeBaseRegex: `^/${baseUrl}/reference$|^/${baseUrl}/reference/$`, // exactly match "/${baseUrl}/reference/" only
+      activeBaseRegex: `^/${trimmedBaseUrl}/reference$|^/${trimmedBaseUrl}/reference/$`, // exactly match "/${trimmedBaseUrl}/reference/" only
     },
     { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
     {
@@ -36,7 +38,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/api',
       position: 'left',
       label: 'API',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/api$|${baseUrl}/reference/api/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/api$|${trimmedBaseUrl}/reference/api/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
@@ -49,7 +51,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/cli',
       position: 'left',
       label: 'CLI',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/cli$|${baseUrl}/reference/cli/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/cli$|${trimmedBaseUrl}/reference/cli/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
@@ -62,13 +64,13 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/javascript',
       position: 'left',
       label: 'JavaScript Library',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/javascript$|${baseUrl}/reference/javascript/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
     },
     {
       type: 'docsVersionDropdown',
       position: 'left',
       docsPluginId: '_supabase_js',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/javascript$|${baseUrl}/reference/javascript/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
     },
     /**
      * TOOLS
@@ -78,7 +80,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/auth',
       position: 'left',
       label: 'Auth Server',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/auth$|${baseUrl}/reference/auth/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth$|${trimmedBaseUrl}/reference/auth/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
@@ -91,7 +93,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/storage',
       position: 'left',
       label: 'Storage Server',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/storage$|${baseUrl}/reference/storage/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/storage$|${trimmedBaseUrl}/reference/storage/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
@@ -106,7 +108,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/supabase-dart',
       position: 'left',
       label: 'Dart Library',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/dart$|${baseUrl}/reference/dart/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/dart$|${trimmedBaseUrl}/reference/dart/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
@@ -118,7 +120,7 @@ const buildNavbar = ({ baseUrl }) => {
       to: 'reference/auth-helpers',
       position: 'left',
       label: 'Auth Helpers',
-      supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/auth-helpers$|${baseUrl}/reference/auth-helpers/)`,
+      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth-helpers$|${trimmedBaseUrl}/reference/auth-helpers/)`,
     },
     // {
     //   type: 'docsVersionDropdown',
