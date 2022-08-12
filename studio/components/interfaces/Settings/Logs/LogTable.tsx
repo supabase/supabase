@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
-import LogSelection from './LogSelection'
+import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
@@ -12,16 +12,21 @@ import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRende
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
 import CSVButton from 'components/ui/CSVButton'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
+import { LogQueryError } from '.'
+import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
-  queryType?: QueryType
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: any
+  error?: LogQueryError | null
   showDownload?: boolean
+  // TODO: move all common params to a context to avoid prop drilling
+  queryType?: QueryType
   projectRef: string
+  params: LogSelectionProps['params']
 }
 type LogMap = { [id: string]: LogData }
 
@@ -57,6 +62,7 @@ const LogTable = ({
   showDownload,
   error,
   projectRef,
+  params,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -224,6 +230,34 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const renderErrorAlert = () => {
+    if (!error) return null
+    const childProps = {
+      isCustomQuery: queryType ? false : true,
+      error: error!,
+    }
+    let Renderer = DefaultErrorRenderer
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+    ) {
+      Renderer = ResourcesExceededErrorRenderer
+    }
+
+    return (
+      <div className="flex justify-center px-5">
+        <Alert
+          variant="danger"
+          title="Sorry! An error occured when fetching data."
+          withIcon
+          className="w-1/2"
+        >
+          <Renderer {...childProps} />
+        </Alert>
+      </div>
+    )
+  }
+
   return (
     <>
       <section
@@ -335,27 +369,7 @@ const LogTable = ({
                         </>
                       </div>
                     )}
-                    {error && (
-                      <div className="flex justify-center px-5">
-                        <Alert
-                          variant="danger"
-                          title="Sorry! An error occured when fetching data."
-                          withIcon
-                          className="w-1/2"
-                        >
-                          <Input.TextArea
-                            size="tiny"
-                            value={
-                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
-                            }
-                            borderless
-                            className="font-mono w-full mt-4"
-                            copy
-                            rows={12}
-                          />
-                        </Alert>
-                      </div>
-                    )}
+                    {error && renderErrorAlert()}
                   </div>
                 </>
               ) : null
@@ -396,6 +410,7 @@ const LogTable = ({
                 onClose={() => setFocusedLog(null)}
                 log={focusedLog}
                 queryType={queryType}
+                params={params}
               />
             </div>
           ) : null}

@@ -14,47 +14,41 @@ Supabase has pre-installed some of the most useful open source extensions.
 
 ### Enable and disable extensions
 
-
-
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page
-2. Click on "Extensions" in the sidebar 
-3. Find the extension you would like to enable/disable 
-4. Click the toggle.
-```
+<TabItem value="dashboard">
 
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click **Extensions** in the sidebar.
+3. Enable or disable an extension.
 
 <video width="99%" muted playsInline controls={true}>
 <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
-
-
 </TabItem>
-<TabItem value="SQL">
 
-```sql 
+<TabItem value="sql">
 
+```sql
 -- Example: enable the "pgtap" extension and ensure it is installed
 create extension pgtap with schema extensions;
 
 -- Example: disable the "pgtap" extension 
 drop extension pgtap;
-
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
-To disable an extension you can call `drop extension`.
+To disable an extension call `drop extension`.
 
-Enabling few extensions by the SQL code `create extension <extension-name> with schema extensions` may lead to permission issues (e.g. `dblink`, `http`, `pg_cron`).
+:::caution
+Enabling some extensions with `create extension <extension-name> with schema extensions` may lead to permission issues (e.g., `dblink`, `http`, `pg_cron`).
+:::
 
 </TabItem>
 
@@ -63,6 +57,6 @@ Enabling few extensions by the SQL code `create extension <extension-name> with 
 
 ### Full list of extensions
 
-Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly into the database through our SQL editor.
+Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly in the database through our SQL editor.
 
 <ExtensionsComponent />

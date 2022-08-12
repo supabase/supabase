@@ -6,6 +6,7 @@ module.exports = withMDX({
 
   trailingSlash: false,
   images: {
+    dangerouslyAllowSVG: true,
     domains: [
       'avatars.githubusercontent.com',
       'github.com',
@@ -15,6 +16,8 @@ module.exports = withMDX({
       'supabase.com',
       'obuldanrptloktxcffvn.supabase.co',
       'avatars.githubusercontent.com',
+      'colab.research.google.com',
+      'api.producthunt.com',
     ],
   },
   async headers() {
@@ -58,17 +61,29 @@ module.exports = withMDX({
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
+      // rewrite to keep existing ticket urls working
       {
         source: '/launch-week/tickets/:path',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
       },
+      // rewrite to move ticket website to another path
       {
         source: '/launch-week/register',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
       },
       {
-        source: '/launch-week/register/:path*',
-        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
+        source: '/launch-week/register/:path',
+        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path`,
+      },
+      {
+        // redirect /docs/
+        // trailing slash caused by docusaurus issue with multizone
+        source: '/new-docs/',
+        destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
+      },
+      {
+        source: '/new-docs/:path*',
+        destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}/:path*`,
       },
       // misc rewrites
       {
@@ -934,8 +949,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/supabase-beta-june-2021',
-        destination: '/blog/2021/07/02/supabase-beta-june-2021',
+        source: '/blog/2021/07/02/supabase-beta-june-2021',
+        destination: '/blog/supabase-beta-june-2021',
       },
       {
         permanent: true,
@@ -1065,7 +1080,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2021/11/29/community-day',
-        destination: '/blog/community-day',
+        destination: '/blog/community-day-3',
       },
       {
         permanent: true,
@@ -1140,7 +1155,7 @@ module.exports = withMDX({
       {
         permanent: true,
         source: '/blog/2022/03/28/community-day',
-        destination: '/blog/community-day',
+        destination: '/blog/community-day-4',
       },
       {
         permanent: true,

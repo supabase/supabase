@@ -160,5 +160,13 @@
     "position": "DevRel & DX",
     "author_url": "https://github.com/silentworks",
     "author_image_url": "https://github.com/silentworks.png"
+  },
+  {
+    "author_id": "rodrigo_mansueli",
+    "author": "Rodrigo Mansueli Nunes",
+    "username": "mansueli",
+    "position": "Support Engineer",
+    "author_url": "https://github.com/mansueli",
+    "author_image_url": "https://github.com/mansueli.png"
   }
 ]

@@ -1,0 +1,70 @@
+---
+id: installing-and-updating
+---
+
+# Installing and Updating
+
+## macOS
+
+### Installing
+
+Available via [Homebrew](https://brew.sh). To install:
+
+```sh
+brew install supabase/tap/supabase
+```
+
+### Upgrading
+
+To upgrade:
+
+```sh
+brew upgrade supabase
+```
+
+## Windows
+
+### Installing
+
+Available via [Scoop](https://scoop.sh). To install:
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
+
+### Upgrading
+
+To upgrade:
+
+```powershell
+scoop update supabase
+```
+
+## Linux
+
+### Homebrew
+
+Available via [Homebrew](https://brew.sh) and Linux packages.
+
+To install:
+
+```sh
+brew install supabase/tap/supabase
+```
+
+To upgrade:
+
+```sh
+brew upgrade supabase
+```
+
+### Linux packages
+
+Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
+To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager
+and run one of the following:
+
+- `sudo apk add --allow-untrusted <...>.apk`
+- `sudo dpkg -i <...>.deb`
+- `sudo rpm -i <...>.rpm`

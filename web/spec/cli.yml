@@ -3,6 +3,7 @@ openref: 0.1
 info:
   id: reference/cli
   title: About
+  slugPrefix: ''
   description: |
     The Supabase CLI can be found in our [CLI](https://github.com/supabase/cli) repository.
 
@@ -26,8 +27,7 @@ info:
     ## Support
 
     Report issues to our [issue tracker](https://github.com/supabase/cli/issues).
-    
-  definition: spec/combined.json
+
   libraries:
     - name: 'sh'
       id: 'sh'
@@ -466,7 +466,7 @@ pages:
       Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
       To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager 
       and run one of the following:
-      
+
       - `sudo apk add --allow-untrusted <...>.apk`
       - `sudo dpkg -i <...>.deb`
       - `sudo rpm -i <...>.rpm`
@@ -474,7 +474,7 @@ pages:
   Config Reference:
     description: |
       A `config.toml` file is generated after running `supabase init`. 
-      
+
       This file is located in the `supabase` folder under `supabase/config.toml`.
 
       ## General
@@ -592,7 +592,7 @@ pages:
       `required | default: false`
 
       Use an external OAuth provider. The full list of providers are: 
-      
+
       - `apple`
       - `azure`
       - `bitbucket`
