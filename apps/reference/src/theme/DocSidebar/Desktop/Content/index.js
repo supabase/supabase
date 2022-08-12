@@ -17,7 +17,7 @@ const subNavRoutes = [
 const headerNames = {
   api: {
     name: 'API',
-    icon: 'javascript-icon',
+    icon: 'api-icon',
   },
   cli: {
     name: 'CLI',
