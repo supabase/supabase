@@ -16,43 +16,36 @@ Let's cover some basic concepts:
 - Unit tests: allow you to test small parts of a system (like a database table!).
 - TAP: stands for [Test Anything Protocol](http://testanything.org/). It is an framework which aims to simplify the error reporting during testing. 
 
-
-
 ## Usage
 
-
-### Enabling
+### Enable the extension
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page.
-2. Click on "Extensions" in the sidebar.
-3. Search for "pgtap".
-4. Click the toggle.
-```
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pgtap" and enable the extension.
 
 <video width="99%" muted playsInline controls={true}>
 <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
-```sql 
-
+```sql
 -- Enable the "pgtap" extension 
 create extension pgtap with schema extensions;
 
 -- Disable the "pgtap" extension 
 drop extension if exists pgtap;
-
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
@@ -130,4 +123,4 @@ API:
 
 ## Resources 
 
-- Official [`pgTAP` documentation](https://pgtap.org/).
+- Official [`pgTAP` documentation](https://pgtap.org/)
