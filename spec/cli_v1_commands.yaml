@@ -7,7 +7,8 @@ info:
   source: https://github.com/supabase/cli
   bugs: https://github.com/supabase/cli/issues
   spec: https://github.com/supabase/supabase.tools/cli_spec/lib.yaml
-  description: 'Supabase CLI '
+  description: |
+    Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
   options: |-
     ```sh
           --debug   output debug logs to stderr
@@ -16,7 +17,7 @@ info:
 commands:
 - id: supabase-stop
   title: supabase stop
-  summary: Stop the Supabase local development setup
+  summary: Stop all local Supabase containers
   tags: []
   links: []
   usage: |-
@@ -30,7 +31,7 @@ commands:
     ```
 - id: supabase-status
   title: supabase status
-  summary: Show status of the Supabase local development setup
+  summary: Show status of local Supabase containers
   tags: []
   links: []
   usage: |-
@@ -44,7 +45,7 @@ commands:
     ```
 - id: supabase-start
   title: supabase start
-  summary: Start the Supabase local development setup
+  summary: Start containers for Supabase local development
   tags: []
   links: []
   usage: |-
@@ -71,7 +72,8 @@ commands:
     ```
 - id: supabase-secrets-unset
   title: supabase secrets unset
-  summary: Unset a secret(s) from the linked Supabase project
+  summary: Unset a secret(s) on Supabase
+  description: Unset a secret(s) from the linked Supabase project.
   tags: []
   links: []
   usage: |-
@@ -85,7 +87,8 @@ commands:
     ```
 - id: supabase-secrets-set
   title: supabase secrets set
-  summary: Set a secret(s) to the linked Supabase project
+  summary: Set a secret(s) on Supabase
+  description: Set a secret(s) to the linked Supabase project.
   tags: []
   links: []
   usage: |-
@@ -100,7 +103,8 @@ commands:
     ```
 - id: supabase-secrets-list
   title: supabase secrets list
-  summary: List all secrets in the linked project
+  summary: List all secrets on Supabase
+  description: List all secrets in the linked project.
   tags: []
   links: []
   usage: |-
@@ -126,7 +130,8 @@ commands:
     ```
 - id: supabase-projects-list
   title: supabase projects list
-  summary: List all projects
+  summary: List all Supabase projects
+  description: List all Supabase projects the logged-in user can access.
   tags: []
   links: []
   usage: |-
@@ -140,20 +145,21 @@ commands:
     ```
 - id: supabase-projects-create
   title: supabase projects create
-  summary: Create a new project
+  summary: Create a project on Supabase
   tags: []
   links: []
   usage: |-
     ```sh
-    supabase projects create [flags]
+    supabase projects create <project name> [flags]
     ```
   subcommands: []
   options: |-
     ```sh
           --db-password string   Database password of the project.
       -h, --help                 help for create
+      -i, --interactive          Enables interactive mode.
           --org-id string        Organization ID to create the project in.
-          --plan string          Select a plan that suits your needs. Can be "free" or "pro". (default "free")
+          --plan string          Select a plan that suits your needs. (default "free")
           --region string        Select a region close to you for the best performance.
     ```
 - id: supabase-orgs
@@ -169,7 +175,8 @@ commands:
     ```
 - id: supabase-orgs-list
   title: supabase orgs list
-  summary: List all organizations the logged-in user belongs
+  summary: List all organizations
+  description: List all organizations the logged-in user belongs.
   tags: []
   links: []
   usage: |-
@@ -187,6 +194,7 @@ commands:
   tags: []
   links: []
   subcommands:
+  - supabase-migration-list
   - supabase-migration-new
   options: |-
     ```sh
@@ -205,6 +213,21 @@ commands:
   options: |-
     ```sh
       -h, --help   help for new
+    ```
+- id: supabase-migration-list
+  title: supabase migration list
+  summary: List local and remote migrations
+  tags: []
+  links: []
+  usage: |-
+    ```sh
+    supabase migration list [flags]
+    ```
+  subcommands: []
+  options: |-
+    ```sh
+      -h, --help              help for list
+      -p, --password string   Password to your remote Postgres database.
     ```
 - id: supabase-login
   title: supabase login
@@ -233,11 +256,12 @@ commands:
   options: |-
     ```sh
       -h, --help                 help for link
+      -p, --password string      Password to your remote Postgres database.
           --project-ref string   Project ref of the Supabase project.
     ```
 - id: supabase-init
   title: supabase init
-  summary: Initialize a project to use Supabase CLI
+  summary: Initialize a local project
   tags: []
   links: []
   usage: |-
@@ -273,7 +297,8 @@ commands:
     ```
 - id: supabase-gen-types-typescript
   title: supabase gen types typescript
-  summary: |
+  summary: Generate types for TypeScript
+  description: |
     Generate types for TypeScript. Must specify either --local or --db-url
   tags: []
   links: []
@@ -334,7 +359,8 @@ commands:
     ```
 - id: supabase-functions-deploy
   title: supabase functions deploy
-  summary: Deploy a Function to the linked Supabase project
+  summary: Deploy a Function to Supabase
+  description: Deploy a Function to the linked Supabase project.
   tags: []
   links: []
   usage: |-
@@ -350,7 +376,8 @@ commands:
     ```
 - id: supabase-functions-delete
   title: supabase functions delete
-  summary: |
+  summary: Delete a Function from Supabase
+  description: |
     Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
   tags: []
   links: []
@@ -395,35 +422,20 @@ commands:
     ```
 - id: supabase-db-remote
   title: supabase db remote
-  summary: Manage remote database connections
+  summary: Manage remote databases
   tags: []
   links: []
   subcommands:
   - supabase-db-remote-changes
   - supabase-db-remote-commit
-  - supabase-db-remote-set
   options: |-
     ```sh
-      -h, --help   help for remote
-    ```
-- id: supabase-db-remote-set
-  title: supabase db remote set
-  summary: Set the remote database to push migrations to
-  tags: []
-  links: []
-  usage: |-
-    ```sh
-    supabase db remote set <remote database url> [flags]
-    ```
-  subcommands: []
-  options: |-
-    ```sh
-      -h, --help   help for set
+      -h, --help              help for remote
+      -p, --password string   Password to your remote Postgres database.
     ```
 - id: supabase-db-remote-commit
   title: supabase db remote commit
-  summary: |
-    Commit changes on the remote database since the last pushed migration
+  summary: Commit remote changes as a new migration
   tags: []
   links: []
   usage: |-
@@ -437,8 +449,8 @@ commands:
     ```
 - id: supabase-db-remote-changes
   title: supabase db remote changes
-  summary: |
-    Print changes on the remote database since the last pushed migration
+  summary: Show changes on the remote database
+  description: Show changes on the remote database since last migration.
   tags: []
   links: []
   usage: |-
@@ -462,8 +474,9 @@ commands:
   subcommands: []
   options: |-
     ```sh
-          --dry-run   Print the migrations that would be applied, but don't actually apply them.
-      -h, --help      help for push
+          --dry-run           Print the migrations that would be applied, but don't actually apply them.
+      -h, --help              help for push
+      -p, --password string   Password to your remote Postgres database.
     ```
 - id: supabase-db-diff
   title: supabase db diff
@@ -484,8 +497,9 @@ commands:
     ```
 - id: supabase-db-branch
   title: supabase db branch
-  summary: |
-    Manage branches. Each branch is associated with a separate database.
+  summary: Manage database branches
+  description: |
+    Manage database branches. Each branch is associated with a separate database.
   tags: []
   links: []
   subcommands:

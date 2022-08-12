@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const supabaseClient = require('./sidebar_spec_supabase')
+const supabaseClient = require('./sidebar_spec_supabase_js_v1_ref')
 const supabaseCli = require('./sidebar_spec_cli')
 const dart = require('./sidebar_spec_dart')
 
@@ -197,7 +197,7 @@ module.exports = {
         'guides/platform/metrics',
         'going-into-prod',
         'guides/platform/performance',
-        'guides/platform/permissions'
+        'guides/platform/permissions',
       ],
     },
     {
