@@ -10,6 +10,11 @@ import {
   IconFilm,
   IconFile,
   IconAlertCircle,
+  IconDownload,
+  IconTrash,
+  IconCopy,
+  IconEdit,
+  IconMove,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import { useContextMenu } from 'react-contexify'
@@ -145,13 +150,34 @@ const FileExplorerRow = ({
       : [
           ...(!item.isCorrupted
             ? [
-                { name: 'Copy URL', onClick: () => onCopyFileURL(itemWithColumnIndex) },
-                { name: 'Rename', onClick: () => onSelectItemRename(itemWithColumnIndex) },
-                { name: 'Move', onClick: () => onSelectItemMove(itemWithColumnIndex) },
-                { name: 'Download', onClick: () => onDownloadFile(itemWithColumnIndex) },
+                {
+                  name: 'Copy URL',
+                  icon: <IconCopy size="tiny" />,
+                  onClick: () => onCopyFileURL(itemWithColumnIndex),
+                },
+                {
+                  name: 'Rename',
+                  icon: <IconEdit size="tiny" />,
+                  onClick: () => onSelectItemRename(itemWithColumnIndex),
+                },
+                {
+                  name: 'Move',
+                  icon: <IconMove size="tiny" />,
+                  onClick: () => onSelectItemMove(itemWithColumnIndex),
+                },
+                {
+                  name: 'Download',
+                  icon: <IconDownload size="tiny" />,
+                  onClick: () => onDownloadFile(itemWithColumnIndex),
+                },
+                { name: 'Separator' },
               ]
             : []),
-          { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
+          {
+            name: 'Delete',
+            icon: <IconTrash size="tiny" />,
+            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+          },
         ]
 
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'
@@ -266,11 +292,21 @@ const FileExplorerRow = ({
               side="bottom"
               align="end"
               overlay={[
-                rowOptions.map((option) => (
-                  <Dropdown.Item key={option.name} onClick={option.onClick}>
-                    {option.name}
-                  </Dropdown.Item>
-                )),
+                rowOptions.map((option) => {
+                  if (option.name === 'Separator') {
+                    return <Dropdown.Seperator key="row-separator" />
+                  } else {
+                    return (
+                      <Dropdown.Item
+                        key={option.name}
+                        icon={option.icon || <></>}
+                        onClick={option.onClick}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    )
+                  }
+                }),
               ]}
             >
               <div className="storage-row-menu opacity-0">
