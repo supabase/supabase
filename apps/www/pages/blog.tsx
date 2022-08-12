@@ -38,27 +38,25 @@ function Blog(props: any) {
 
   const router = useRouter()
 
-  // useEffect(() => {
-  //   // contruct an array of blog posts
-  //   // not inluding the first blog post
-  //   const shiftedBlogs = [...props.blogs]
-  //   shiftedBlogs.shift()
+  useEffect(() => {
+    // contruct an array of blog posts
+    // not inluding the first blog post
+    const shiftedBlogs = [...props.blogs]
+    shiftedBlogs.shift()
 
-  //   setBlogs(
-  //     category === 'all'
-  //       ? shiftedBlogs
-  //       : props.blogs.filter((post: any) => {
-  //           const found = post.tags.includes(category)
-  //           return found
-  //         })
-  //   )
-  // }, [category])
+    setBlogs(
+      category === 'all'
+        ? shiftedBlogs
+        : props.blogs.filter((post: any) => {
+            const found = post.tags.includes(category)
+            return found
+          })
+    )
+  }, [category])
 
-  // useEffect(() => {
-  //   return props.categories.unshift('all')
-  // }, [])
-
-  // console.log('state blogs', blogs[0])
+  useEffect(() => {
+    return props.categories.unshift('all')
+  }, [])
 
   // append 'all' category
   // const categories = props.categories.push('all')
