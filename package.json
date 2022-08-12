@@ -62,8 +62,6 @@
     "auth"
   ],
   "dependencies": {
-    "@mdx-js/react": "^2.1.1",
-    "mini-svg-data-uri": "^1.4.4",
-    "string-hash": "^1.1.3"
+    "@mdx-js/react": "^2.1.1"
   }
 }
