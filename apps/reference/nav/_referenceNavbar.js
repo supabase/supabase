@@ -1,14 +1,16 @@
 const navbar = [
   {
-    href: 'https://supabase.com/docs/guides',
+    to: '/',
     label: 'Guides',
+    activeBaseRegex:
+      '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
     position: 'left',
   },
   {
-    href: '/',
+    to: '/reference',
     label: 'Reference',
     position: 'left',
-    // activeLinkRegex: '',
+    activeBaseRegex: '^/docs/reference$|^/docs/reference/$', // exactly match "/docs/reference/" only
   },
 
   { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
@@ -34,10 +36,10 @@ const navbar = [
 
   // API
   {
-    to: 'api',
+    to: 'reference/api',
     position: 'left',
     label: 'API',
-    supabaseCustomNavBarRegex: '(^/api$|api/)',
+    supabaseCustomNavBarRegex: '(^/docs/reference/api$|docs/reference/api/)',
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -48,10 +50,10 @@ const navbar = [
 
   // CLI
   {
-    to: 'cli',
+    to: 'reference/cli',
     position: 'left',
     label: 'CLI',
-    supabaseCustomNavBarRegex: '(^/cli$|cli/)',
+    supabaseCustomNavBarRegex: '(^/docs/reference/cli$|docs/reference/cli/)',
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -62,16 +64,18 @@ const navbar = [
 
   // supabase-js
   {
-    to: 'supabase-js',
+    to: 'reference/javascript',
     position: 'left',
     label: 'JavaScript Library',
-    supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
+    supabaseCustomNavBarRegex:
+      '(^/docs/reference/javascript$|docs/reference/javascript/)',
   },
   {
     type: 'docsVersionDropdown',
     position: 'left',
     docsPluginId: '_supabase_js',
-    supabaseCustomNavBarRegex: '(^/supabase-js$|supabase-js/)',
+    supabaseCustomNavBarRegex:
+      '(^/docs/reference/javascript$|docs/reference/javascript/)',
   },
 
   /**
@@ -80,10 +84,10 @@ const navbar = [
 
   // GoTrue
   {
-    to: 'auth',
+    to: 'reference/auth',
     position: 'left',
     label: 'Auth Server',
-    supabaseCustomNavBarRegex: '(^/auth$|auth/)',
+    supabaseCustomNavBarRegex: '(^/docs/reference/auth$|docs/reference/auth/)',
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -94,10 +98,11 @@ const navbar = [
 
   // Storage
   {
-    to: 'storage',
+    to: 'reference/storage',
     position: 'left',
     label: 'Storage Server',
-    supabaseCustomNavBarRegex: '(^/storage$|storage/)',
+    supabaseCustomNavBarRegex:
+      '(^/docs/reference/storage$|docs/reference/storage/)',
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -110,10 +115,10 @@ const navbar = [
    * COMMUNITY
    */
   {
-    to: 'supabase-dart',
+    to: 'reference/supabase-dart',
     position: 'left',
     label: 'Dart Library',
-    supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
+    supabaseCustomNavBarRegex: '(^/docs/reference/dart$|docs/reference/dart/)',
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -123,10 +128,11 @@ const navbar = [
   // },
 
   {
-    to: 'auth-helpers',
+    to: 'reference/auth-helpers',
     position: 'left',
     label: 'Auth Helpers',
-    supabaseCustomNavBarRegex: '(^/auth-helpers$|auth-helpers/)',
+    supabaseCustomNavBarRegex:
+      '(^/docs/reference/auth-helpers$|docs/reference/auth-helpers/)',
   },
   // {
   //   type: 'docsVersionDropdown',

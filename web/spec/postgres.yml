@@ -11,6 +11,7 @@ info:
     to the Ingres database developed at the University of California, Berkeley.
 
   definition: spec/combined.json
+  slugPrefix: ''
   libraries:
     - name: 'SQL'
       id: 'sql'
@@ -29,7 +30,7 @@ info:
       # - name: 'Columns'
       #   items:
       #     - Creating columns
-          # - Column types
+      # - Column types
 
 pages:
   Schemas:
@@ -67,7 +68,7 @@ pages:
   Tables:
     description: |
       Tables are similar to excel spreadsheets. They contain columns & rows of data. There are a few key differences from a spreadsheet however:
-      
+
       - Every column is a strict type of data. When you set up a column, you must define what "data type" it is.
       - Tables can be joined together through relationships. For example you can have a "users" table, which is joined to a "teams" table.
 
@@ -148,7 +149,7 @@ pages:
   #         alter table new_table
   #         add new_column text;
   #         ```
-          
+
   Database Users:
     description: |
       Users and Roles are almost interchangeable.
