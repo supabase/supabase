@@ -129,8 +129,9 @@ function BlogPostPage(props: any) {
 
   const NextCard = (props: any) => {
     const { post, label, className } = props
+
     return (
-      <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+      <Link href={`${post.path}`} as={`${post.path}`}>
         <div className={className}>
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
@@ -348,7 +349,7 @@ function BlogPostPage(props: any) {
                       </div>
                       <div className="space-y-3">
                         {props.relatedPosts.map((post: any) => (
-                          <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+                          <Link href={`${post.path}`} as={`${post.path}`}>
                             <div>
                               <p className="cursor-pointer">
                                 <div className="flex gap-2">
@@ -405,7 +406,7 @@ function BlogPostPage(props: any) {
                     </h5>
                     <Space direction="vertical">
                       {props.relatedPosts.map((post: any) => (
-                        <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+                        <Link href={`${post.path}`} as={`${post.path}`}>
                           <div>
                             <p className="cursor-pointer">
                               <Space>
