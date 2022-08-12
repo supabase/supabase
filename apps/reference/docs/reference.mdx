@@ -6,6 +6,7 @@ hide_table_of_contents: true
 ---
 
 import Link from '@docusaurus/Link'
+import ButtonCard from '@site/src/components/ButtonCard'
 
 The Supabase Reference Docs provide technical descriptions of the products and how to use them.
 
@@ -13,45 +14,37 @@ The Supabase Reference Docs provide technical descriptions of the products and h
   <div class="row is-multiline">
     {/* Database */}
     <div class="col col--6">
-      <Link
+      <ButtonCard
+        icon={"/docs/img/icons/javascript-icon.svg"}
         class="card"
         to="/docs/reference/javascript"
         style={{ height: '100%' }}
-      >
-        <div class="card__body">
-          <h4>JavaScript</h4>
-          <p>JavaScript and TypeScript documentation.</p>
-        </div>
-      </Link>
+        title="JavaScript"
+        description="JavaScript and TypeScript documentation."
+      > 
+        
+      </ButtonCard>
     </div>
     {/* Auth */}
     <div class="col col--6">
-      <Link class="card" to="/docs/reference/dart" style={{ height: '100%' }}>
-        <div class="card__body">
-          <h4>Dart</h4>
-          <p>Dart and Flutter documentation.</p>
-        </div>
-      </Link>
+      <ButtonCard icon={"/docs/img/icons/dart-icon.svg"} class="card" to="/docs/reference/dart" style={{ height: '100%' }} title="Dart" description="Dart and Flutter documentation.">
+        
+      </ButtonCard>
     </div>
     {/* Examples - coming soon */}
     <div class="col col--6">
-      <Link class="card" to="/docs/reference/cli" style={{ height: '100%' }}>
-        <div class="card__body">
-          <h4>Supabase CLI</h4>
-          <p>Manage your Supabase projects.</p>
-        </div>
-      </Link>
+      <ButtonCard icon={"/docs/img/icons/cli-icon.svg"} class="card" to="/docs/reference/cli" style={{ height: '100%' }} title="Supabase CLI" description="Manage your Supabase projects.">
+        
+      </ButtonCard>
     </div>
     {/* CLI */}
     <div class="col col--6">
-      <Link class="card" to="/docs/reference/api" style={{ height: '100%' }}>
-        <div class="card__body">
-          <h4>Supabase API</h4>
-          <p>Manage your Supabase projects.</p>
-        </div>
-      </Link>
+      <ButtonCard icon={"/docs/img/icons/api-icon.svg"} class="card" to="/docs/reference/api" style={{ height: '100%' }} title="Supabase API" description="Manage your Supabase projects.">
+        
+      </ButtonCard>
     </div>
     {/*  */}
+
   </div>
 </div>
 

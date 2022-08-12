@@ -7,8 +7,11 @@
 
 /* You can override the default Infima variables here. */
 
+@use './fonts';
 @use './main';
 @use './components/methodLists';
+@use './components/menu';
+@use './components/button-card';
 // @use './components/admonition';
 // @use './components/back-to-top-button';
 // @use './components/code';
@@ -16,7 +19,7 @@
 @use './components/doc-page';
 @use './components/doc-sidebar';
 // @use './components/edit-this-page';
-// @use './components/markdown';
+@use './components/markdown';
 // @use './components/navbar';
 // @use './components/navbar-sidebar';
 // @use './components/pagination';
@@ -85,14 +88,13 @@
 //   --ifm-menu-link-sublist-icon-filter: invert(100%);
 // }
 
-// html {
-//   -moz-osx-font-smoothing: grayscale;
-//   -webkit-font-smoothing: antialiased;
-//   text-rendering: optimizeLegibility;
-//   font-smoothing: antialiased;
-
-//   scroll-padding-top: calc(var(--ifm-navbar-height) + 16px);
-// }
+html {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-smoothing: antialiased;
+  scroll-padding-top: calc(var(--ifm-navbar-height) + 16px);
+}
 
 // *,
 // *::before,
