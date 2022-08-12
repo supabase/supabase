@@ -1,6 +1,12 @@
 import React from 'react'
 
-export default function GithubCard({ title, description, href, stars, handle }) {
+export default function GithubCard({
+  title,
+  description,
+  href,
+  stars,
+  handle,
+}) {
   return (
     <a className={'card'} href={href} style={{ height: '100%' }}>
       <div className="card__body">

@@ -45,7 +45,7 @@ export default function Section({ title, id, style, children }) {
 
   return (
     <section className="section-lg">
-      <div className="container Section">
+      <div className="Section container">
         <h2
           className={`${stylePropOptions[style]} Section-Title`}
           ref={sectionRef}

@@ -137,7 +137,10 @@ The second key, `service role key`, should only ever be used on one of your own 
 The `user access token` is the JWT issued when you call for example:
 
 ```js
-supabase.auth.signIn({ email: 'lao.gimmie@gov.sg', password: 'They_Live_1988!' })
+supabase.auth.signIn({
+  email: 'lao.gimmie@gov.sg',
+  password: 'They_Live_1988!',
+})
 ```
 
 This token should be passed in addition to the `apikey` header as an `Authorization Bearer` header like:

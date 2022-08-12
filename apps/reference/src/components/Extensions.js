@@ -17,13 +17,18 @@ export default function Extensions() {
         {extensions
           .filter((x) => x.name.indexOf(filter) >= 0)
           .map((extension) => (
-            <div className={'col col--6'} key={extension.name} style={styles.column}>
+            <div
+              className={'col col--6'}
+              key={extension.name}
+              style={styles.column}
+            >
               <div style={styles.card}>
                 <h3>
                   <code style={styles.title}>{extension.name}</code>
                 </h3>
                 <p style={styles.description}>
-                  {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                  {extension.comment.charAt(0).toUpperCase() +
+                    extension.comment.slice(1)}
                 </p>
               </div>
             </div>
