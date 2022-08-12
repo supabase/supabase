@@ -1,4 +1,5 @@
 import { Button } from '@supabase/ui'
+import Link from 'next/link'
 
 export function ScheduleInfo() {
   return (
@@ -21,7 +22,9 @@ export function ScheduleInfo() {
           </p>
         </div>
         <div className="px-10">
-          <Button type="default">Get a ticket</Button>
+          <Link href="/launch-week-register">
+            <Button type="default">Get a ticket</Button>
+          </Link>
         </div>
         <img src="/images/launchweek/gold-ticket.svg" className="w-full" />
       </div>
