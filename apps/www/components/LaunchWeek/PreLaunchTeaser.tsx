@@ -7,6 +7,7 @@ import Link from 'next/link'
 export function PreLaunchTeaser() {
   const authorArray = ['paul_copplestone', 'ant_wilson']
   const author = []
+
   for (let i = 0; i < authorArray.length; i++) {
     author.push(
       // @ts-ignore
