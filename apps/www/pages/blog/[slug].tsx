@@ -100,7 +100,7 @@ export async function getStaticProps({ params }: any) {
       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
       relatedPosts,
       blog: {
-        slug: `${params.year}/${params.month}/${params.day}/${params.slug}`,
+        slug: `${params.slug}`,
         content: mdxSource,
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
@@ -181,6 +181,7 @@ function BlogPostPage(props: any) {
           description: props.blog.description,
           url: `https://supabase.com/blog/${props.blog.slug}`,
           type: 'article',
+
           article: {
             //
             // to do: add expiration and modified dates
@@ -199,6 +200,7 @@ function BlogPostPage(props: any) {
               url: `https://supabase.com${basePath}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
+              alt: `${props.blog.title} thumbnail`,
             },
           ],
         }}

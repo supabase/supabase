@@ -6,6 +6,7 @@ module.exports = withMDX({
 
   trailingSlash: false,
   images: {
+    dangerouslyAllowSVG: true,
     domains: [
       'avatars.githubusercontent.com',
       'github.com',
@@ -16,6 +17,7 @@ module.exports = withMDX({
       'obuldanrptloktxcffvn.supabase.co',
       'avatars.githubusercontent.com',
       'colab.research.google.com',
+      'api.producthunt.com',
     ],
   },
   async headers() {
