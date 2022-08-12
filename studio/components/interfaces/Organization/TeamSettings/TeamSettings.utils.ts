@@ -15,12 +15,12 @@ export const getRolesManagementPermissions = (
     const selectedRole = roles.find((r) => r.name === role)
     if (!selectedRole) return
 
-    const canAdd = checkPermissions(PermissionAction.SQL_INSERT, 'postgres.auth.subject_roles', {
+    const canAdd = checkPermissions(PermissionAction.CREATE, 'auth.subject_roles', {
       resource: { role_id: selectedRole!.id },
     })
     if (canAdd) rolesAddable.push(selectedRole.id)
 
-    const canRemove = checkPermissions(PermissionAction.SQL_DELETE, 'postgres.auth.subject_roles', {
+    const canRemove = checkPermissions(PermissionAction.DELETE, 'auth.subject_roles', {
       resource: { role_id: selectedRole!.id },
     })
     if (canRemove) rolesRemovable.push(selectedRole.id)

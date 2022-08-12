@@ -244,6 +244,23 @@
   --ifm-card-background-color: var(--custom-background-color-highlight);
 }
 
+.markdown p a,
+.markdown p a code,
+.markdown li a code,
+.markdown li a {
+  transition: box-shadow 0.1s ease-in-out;
+  padding-bottom: 2px;
+  color: var(--custom-content-color);
+  box-shadow: var(--custom-primary) 0px -3px 0px -1px inset;
+}
+.markdown p a:hover,
+.markdown a:hover code,
+.markdown li a:hover {
+  box-shadow: inset 0 -30px 0 -1px var(--custom-primary);
+  /* text-shadow: 0px 0px 3px var(--custom-primary-darkest); */
+  color: var(--custom-background-color);
+}
+
 .custom--navbar__link--hidden .navbar__item,
 .navbar-sidebar__item.menu
   > .menu__list
@@ -401,4 +418,68 @@ html[data-theme='dark'] .navbar-item-discord:before {
     no-repeat;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+/* PRISM */
+
+.prism-code {
+  background-color: none;
+  word-break: break-word;
+  font-size: 0.8rem;
+  outline: none !important;
+}
+.prism-code div,
+.prism-code div:focus,
+.prism-code div:active {
+  outline: none !important;
+}
+.token.keyword.module,
+.token.property-access,
+.token.function {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.plain,
+.token.parameter,
+.token.punctuation,
+.token.operator,
+.token.console.class-name,
+.token.doc-comment.parameter,
+.token.doc-comment.optional-parameter,
+.token.doc-comment.parameter.punctuation,
+.token.doc-comment.optional-parameter.punctuation {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.keyword,
+.token.doc-comment.keyword {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.string {
+  font-style: normal !important;
+  color: #24b47e !important;
+}
+.token.console {
+  font-style: normal !important;
+  color: #49c1ad !important;
+}
+.token.constant {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.comment {
+  font-style: normal !important;
+  color: #666 !important;
+}
+.token.number {
+  color: #b5cea8 !important;
+}
+.token.boolean,
+.token.doc-comment.class-name {
+  @apply text-green-500;
+}
+
+.theme-doc-markdown h3 {
+  scroll-margin-top: 80px;
 }

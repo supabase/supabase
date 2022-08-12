@@ -13,11 +13,6 @@ const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const { meta } = useStore()
   const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
 
-  const canCreateTables = checkPermissions(
-    PermissionAction.TENANT_SQL_CREATE_TABLE,
-    'postgres.public'
-  )
-
   const renderNoTablesCTA = () => {
     return (
       <div className="flex flex-col items-center justify-center space-y-4">

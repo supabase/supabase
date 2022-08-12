@@ -61,8 +61,7 @@ In order to query any value that is an array, we would need to `UNNEST()` that f
 
 :::caution
 
-Large projects may run into a `400 ORDER BY` memory limit error when querying with many unnested rows across large date ranges. If experiencing this error, consider reducing the number of unnested joins, or by reducing the queried date range.
-
+Large projects may run into a `Resources Exceeded` memory limit error when selecting large objects with many nested keys. To avoid this error, select individual keys separately or reduce the queried date range.
 :::
 
 ### Functions

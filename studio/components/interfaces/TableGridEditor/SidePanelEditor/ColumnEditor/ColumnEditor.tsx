@@ -152,6 +152,12 @@ const ColumnEditor: FC<Props> = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <SidePanel.Content>
         <div className="space-y-10 py-6">
