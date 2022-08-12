@@ -16,6 +16,14 @@ import LaunchHero from './LaunchHero'
 
 const days = _days as WeekDayProps[]
 
+// to do
+
+// remove arrow
+// update the copy on the 'fireside chat'
+//
+// add full stops
+// check spelling on schedule.
+
 type Article = {
   title: string
   url: string
@@ -146,16 +154,13 @@ export default function launchweek() {
                       <NewspaperIcon strokeWidth={1} />
                     </div>
                     <div>
-                      <h3 className="text-scale-1200 text-base">
-                        You can still win a lucky gold ticket
-                      </h3>
+                      <h3 className="text-scale-1200 text-base">Supabase Series B</h3>
                       <p className="text-scale-1100 text-sm">
-                        A few of the lucky attendees for Launch Week will get a limited edition
-                        Supabase goodie bag.
+                        Supabase raised $80M in May, bringing our total funding to $116M
                       </p>
                     </div>
                     <div>
-                      <Button className="text-white">Get a ticket</Button>
+                      <Button type="default">Read more</Button>
                     </div>
                   </div>
                 </div>
@@ -178,11 +183,9 @@ export default function launchweek() {
                   The first launch will be on Monday 08:00 PT | 11:00 ET Week.
                 </p>
               </div>
-              <div className="dark:bg-scale-300 flex flex-col gap-0 overflow-hidden rounded-md border border bg-white shadow-sm md:max-w-md">
-                <div className="flex flex-col gap-3 p-6 px-10">
-                  <h3 className="text-scale-1200 text-base">
-                    You can still win a lucky gold ticket
-                  </h3>
+              <div className="dark:bg-scale-300 flex flex-col gap-0 overflow-hidden rounded-md border border bg-white shadow-sm md:max-w-lg">
+                <div className="flex flex-col gap-3 p-10">
+                  <h3 className="text-scale-1200 text-lg">You can still win a lucky gold ticket</h3>
                   <p className="text-scale-1100 text-sm">
                     A few of the lucky attendees for Launch Week will get a limited edition Supabase
                     goodie bag.
