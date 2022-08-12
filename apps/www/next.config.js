@@ -62,17 +62,17 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
       {
-        source: '/docs1',
+        source: '/new-docs',
         destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
       },
       {
         // redirect /docs/
         // trailing slash caused by docusaurus issue with multizone
-        source: '/docs1/',
+        source: '/new-docs/',
         destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
       },
       {
-        source: '/docs1/:path*',
+        source: '/new-docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}/:path*`,
       },
       {
