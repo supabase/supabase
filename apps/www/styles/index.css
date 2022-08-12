@@ -249,3 +249,38 @@ table {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+
+/**
+launch week
+*/
+
+.launch-week-timeline-border--approaching {
+  border-image: linear-gradient(to bottom, var(--colors-brand9), var(--colors-purple7)) 1 100%;
+}
+
+.launch-week-gradientBg {
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg--light.jpg');
+  background-color: var(--colors-scale2);
+  width: 100%;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  height: 100%;
+  background-position: bottom;
+  background-position-y: -820px;
+  background-size: 1929px 1170px;
+  background-repeat: no-repeat;
+  position: absolute;
+  z-index: 0;
+}
+
+.dark .launch-week-gradientBg {
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
+  background-color: #1c1c1c;
+}
+
+@media screen and (min-width: 1032px) {
+  .launch-week-gradientBg {
+    background-position-y: -780px;
+  }
+}
