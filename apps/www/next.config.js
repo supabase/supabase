@@ -72,8 +72,8 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
       },
       {
-        source: '/launch-week-register/:path',
-        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path`,
+        source: '/launch-week-register/:path*',
+        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
       },
       {
         source: '/new-docs',
