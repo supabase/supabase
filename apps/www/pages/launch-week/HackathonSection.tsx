@@ -5,7 +5,7 @@ import Controller from './launch-controller.json'
 
 export default function LaunchHero() {
   return (
-    <div className="flex flex-col gap-16 lg:grid lg:grid-cols-12">
+    <div className="flex flex-col gap-16 lg:grid lg:grid-cols-12" id="launch-week--hackathon">
       <div className="col-span-12 flex flex-col gap-12 lg:col-span-6">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3">
