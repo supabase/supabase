@@ -60,8 +60,5 @@
     "functions",
     "database",
     "auth"
-  ],
-  "dependencies": {
-    "@mdx-js/react": "^2.1.1"
-  }
+  ]
 }
