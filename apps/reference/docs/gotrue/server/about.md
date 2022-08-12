@@ -256,7 +256,8 @@ Default Content (if template is unavailable):
 <h2>You have been invited</h2>
 
 <p>
-  You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:
+  You have been invited to create a user on {{ .SiteURL }}. Follow this link to
+  accept the invite:
 </p>
 <p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>
 ```
@@ -313,7 +314,10 @@ Default Content (if template is unavailable):
 ```html
 <h2>Confirm Change of Email</h2>
 
-<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
+<p>
+  Follow this link to confirm the update of your email from {{ .Email }} to {{
+  .NewEmail }}:
+</p>
 <p><a href="{{ .ConfirmationURL }}">Change Email</a></p>
 ```
 
@@ -634,7 +638,6 @@ Returns:
   "updated_at": "2016-05-15T19:53:12.368652374-07:00"
 }
 ```
-
 
 ### **PUT /admin/users/{user_id}**
 

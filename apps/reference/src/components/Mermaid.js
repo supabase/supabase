@@ -30,7 +30,10 @@ export default function Mermaid({ graph, classNames, caption }) {
   return (
     <div className={`Mermaid ${classNames || ''}`}>
       {caption && <figcaption>{caption}</figcaption>}
-      <div className="graph" dangerouslySetInnerHTML={{ __html: rendered }}></div>
+      <div
+        className="graph"
+        dangerouslySetInnerHTML={{ __html: rendered }}
+      ></div>
     </div>
   )
 }

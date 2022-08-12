@@ -34,7 +34,9 @@ export default function CustomCodeBlock({
           <div className={'code-with-header repsonse-header'}>
             <a
               className="code-header has-hover-pointer"
-              style={showResponse ? styles.responseShown : styles.responseHidden}
+              style={
+                showResponse ? styles.responseShown : styles.responseHidden
+              }
               onClick={() => toggleResponse(!showResponse)}
             >
               {showResponse ? 'Hide' : 'Show'} Response

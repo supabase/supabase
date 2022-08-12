@@ -45,7 +45,10 @@ export default function Sponsors() {
               <div className="row is-multiline" style={{ paddingLeft: 15 }}>
                 {t.transactions.map((x, index) => (
                   <div className="col col--4" key={index}>
-                    <a className="avatar" href={`https://github.com/${x.sponsor}`}>
+                    <a
+                      className="avatar"
+                      href={`https://github.com/${x.sponsor}`}
+                    >
                       <img
                         className="avatar__photo avatar__photo--sm"
                         src={`https://github.com/${x.sponsor}.png`}

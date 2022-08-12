@@ -1,6 +1,11 @@
 import React from 'react'
 
-export default function HowCard({ title, description, featureTitle, features }) {
+export default function HowCard({
+  title,
+  description,
+  featureTitle,
+  features,
+}) {
   return (
     <div className={'HowCard'}>
       <div className={'card'} style={styles.card}>
