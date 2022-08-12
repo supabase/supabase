@@ -11,7 +11,7 @@ const RolesHelperModal: FC<Props> = ({}) => {
       <IconHelpCircle
         size={16}
         strokeWidth={1.5}
-        className="cursor-pointer"
+        className="cursor-pointer hover:text-scale-1200 transition"
         onClick={() => setShowModal(!showModal)}
       />
       <Modal
