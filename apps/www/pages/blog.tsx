@@ -16,7 +16,7 @@ import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_blog')
+  const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
@@ -24,6 +24,7 @@ export async function getStaticProps() {
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
 
+  console.log('posts in props', allPostsData[0])
   return {
     props: {
       blogs: allPostsData,
@@ -38,25 +39,27 @@ function Blog(props: any) {
 
   const router = useRouter()
 
-  useEffect(() => {
-    // contruct an array of blog posts
-    // not inluding the first blog post
-    const shiftedBlogs = [...props.blogs]
-    shiftedBlogs.shift()
+  // useEffect(() => {
+  //   // contruct an array of blog posts
+  //   // not inluding the first blog post
+  //   const shiftedBlogs = [...props.blogs]
+  //   shiftedBlogs.shift()
 
-    setBlogs(
-      category === 'all'
-        ? shiftedBlogs
-        : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
-            return found
-          })
-    )
-  }, [category])
+  //   setBlogs(
+  //     category === 'all'
+  //       ? shiftedBlogs
+  //       : props.blogs.filter((post: any) => {
+  //           const found = post.tags.includes(category)
+  //           return found
+  //         })
+  //   )
+  // }, [category])
 
-  useEffect(() => {
-    return props.categories.unshift('all')
-  }, [])
+  // useEffect(() => {
+  //   return props.categories.unshift('all')
+  // }, [])
+
+  // console.log('state blogs', blogs[0])
 
   // append 'all' category
   // const categories = props.categories.push('all')
@@ -145,7 +148,7 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
-      <Link href={`/blog/${blog.url}`}>
+      <Link href={`${blog.path}`}>
         <a className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           <div className="relative h-96 w-full overflow-auto rounded-lg border">
             <Image
