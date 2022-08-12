@@ -26,7 +26,20 @@ export default async function gen(inputFileName: string, outputDir: string) {
  * Versioned Generator
  */
 async function gen_v001(spec: CliSpec, dest: string) {
-  const commands = spec.commands
+  let commandMap = new Map(spec.commands.map((item) => [item.id, item]))
+
+  const commands = spec.commands.map((x) => {
+    const isChild = x.subcommands.length < 1
+    const heading = isChild
+      ? `### ${x.summary} {#${x.id}}`
+      : `## ${x.summary} {#${x.id}}`
+
+    return {
+      ...x,
+      heading,
+      subcommandList: x.subcommands.map((c) => commandMap.get(c)),
+    }
+  })
 
   const content = ejs.render(template, {
     info: spec.info,
