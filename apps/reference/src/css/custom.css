@@ -245,6 +245,8 @@
 }
 
 .markdown p a,
+.markdown p a code,
+.markdown li a code,
 .markdown li a {
   transition: box-shadow 0.1s ease-in-out;
   padding-bottom: 2px;
@@ -252,6 +254,7 @@
   box-shadow: var(--custom-primary) 0px -3px 0px -1px inset;
 }
 .markdown p a:hover,
+.markdown a:hover code,
 .markdown li a:hover {
   box-shadow: inset 0 -30px 0 -1px var(--custom-primary);
   /* text-shadow: 0px 0px 3px var(--custom-primary-darkest); */
