@@ -37,40 +37,34 @@ You can use the `http` extension to make these network requests from Postgres.
 ## Usage
 
 
-### Enabling
+### Enable the extension
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page.
-2. Click on "Extensions" in the sidebar.
-3. Search for "http".
-4. Click the toggle.
-```
+<TabItem value="dashboard">
 
-
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "http" and enable the extension.
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
-```sql 
-
+```sql
 -- Example: enable the "http" extension 
 create extension http with schema extensions;
 
 -- Example: disable the "http" extension 
 drop extension if exists http;
-
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
-To disable an extension you can call `drop extension`.
+To disable an extension, call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
 
@@ -125,4 +119,4 @@ from
 
 ## Resources 
 
-- Official [`http` GitHub Repository](https://github.com/pramsey/pgsql-http).
+- Official [`http` GitHub Repository](https://github.com/pramsey/pgsql-http)
