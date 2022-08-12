@@ -22,8 +22,6 @@ const BlogListItem = ({ post }: Props) => {
     }
   }
 
-  // console.log('blog list item', post.url)
-
   return (
     <div>
       <a href={`${post.path}`}>

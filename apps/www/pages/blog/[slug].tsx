@@ -130,8 +130,6 @@ function BlogPostPage(props: any) {
   const NextCard = (props: any) => {
     const { post, label, className } = props
 
-    // console.log('nextcard', post.path)
-
     return (
       <Link href={`${post.path}`} as={`${post.path}`}>
         <div className={className}>
