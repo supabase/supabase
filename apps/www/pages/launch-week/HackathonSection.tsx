@@ -9,12 +9,12 @@ export default function LaunchHero() {
       <div className="col-span-12 flex flex-col gap-12 lg:col-span-6">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-3">
-            <h3 className="text-scale-1200 text-3xl tracking-tight">Launch Week Hackathon</h3>
+            <h3 className="text-scale-1200 text-4xl tracking-tight">Launch Week Hackathon</h3>
             <div>
               <Badge>In progress</Badge>
             </div>
             <h4 className="text-scale-1100 text-xl">
-              Submissions close Sunday 21st Aug 11:59 (PT)
+              Submissions close Sunday 21st Aug 11:59 (PT).
             </h4>
           </div>
 
@@ -47,7 +47,10 @@ export default function LaunchHero() {
               <a className="text-brand-900" href="https://madewithsupabase.com">
                 madewithsupabase.com
               </a>
-              . All submissions must be open source and publically available.
+              .
+            </p>
+            <p className="text-scale-1100 text-sm">
+              All submissions must be open source and publically available.
             </p>
           </div>
         </div>

@@ -5,7 +5,7 @@ export default function LaunchHero() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4 lg:gap-8">
-        <h1 className="text-scale-1200 text-3xl font-semibold tracking-tight md:text-5xl lg:text-8xl">
+        <h1 className="text-scale-1200 text-4xl font-semibold tracking-tight md:text-5xl lg:text-8xl">
           {Controller.hero_header}
         </h1>
         <h2 className="text-scale-1100 text-sm lg:text-xl">
