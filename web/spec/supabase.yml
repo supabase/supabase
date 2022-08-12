@@ -1266,7 +1266,7 @@ pages:
           ```
       - name: Listening to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: | 
+        notes: |
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
@@ -1695,7 +1695,15 @@ pages:
             .eq('name', 'United States')
             .order('name', {foreignTable: 'cities'})
           ```
-
+      - name: Ordering multiple columns
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name', 'country_id')
+            .order('country_id', { ascending: false })
+            .order('name', { ascending: false })
+          ```
   range():
     $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.range'
     examples:
