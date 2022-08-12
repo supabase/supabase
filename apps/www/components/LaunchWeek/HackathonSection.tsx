@@ -14,7 +14,7 @@ export default function LaunchHero() {
               <Badge>In progress</Badge>
             </div>
             <h4 className="text-scale-1100 text-xl">
-              Submissions close Sunday 21st Aug 11:59 (PT).
+              Submissions close Sunday 21st Aug 23:59 (PT).
             </h4>
           </div>
 
