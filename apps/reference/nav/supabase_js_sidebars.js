@@ -20,7 +20,12 @@ const sidebars = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['intro', 'migration-guide', 'release-notes'],
+      items: [
+        'intro',
+        'migration-guide',
+        'release-notes',
+        'typescript-support',
+      ],
       collapsed: false,
     },
     {
