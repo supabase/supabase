@@ -18,7 +18,6 @@ const days = _days as WeekDayProps[]
 
 // to do
 
-// remove arrow
 // update the copy on the 'fireside chat'
 //
 // add full stops
@@ -123,13 +122,11 @@ export default function launchweek() {
                 "
                 >
                   <div className="flex flex-col gap-4">
-                    <div className="text-scale-1100 -ml-[6px] hidden w-6 lg:block">
-                      <ArrowSmLeftIcon strokeWidth={1} />
-                    </div>
                     <div className="flex gap-3">
                       {author.map((author: any) => {
                         return (
                           <Image
+                            key={author.author_id + ' profile image'}
                             src={author.author_image_url}
                             className="dark:border-dark rounded-lg border"
                             width="54px"
@@ -139,17 +136,15 @@ export default function launchweek() {
                       })}
                     </div>
                     <div className="flex flex-col gap-3">
-                      <h4 className="text-scale-1200 text-base">
-                        In the meantime, find out why Supabase is Open Source
-                      </h4>
+                      <h4 className="text-scale-1200 text-base">Founders Fireside Chat</h4>
                       <p className="text-scale-1100 text-sm">
-                        Our two co-founders, Copple and Ant, discuss the future of Supabase, and
-                        what it means for Open Source development.
+                        Our two co-founders, Copple and Ant, discuss open source development and the
+                        future of Supabase.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     <div className="text-scale-1100 w-8">
                       <NewspaperIcon strokeWidth={1} />
                     </div>
@@ -200,7 +195,14 @@ export default function launchweek() {
           )}
           <div>
             {days.map((item: WeekDayProps, i) => {
-              return <LaunchSection {...item} index={i} shippingHasStarted={shippingHasStarted} />
+              return (
+                <LaunchSection
+                  key={'launchweek-item ' + item.title}
+                  {...item}
+                  index={i}
+                  // shippingHasStarted={shippingHasStarted}
+                />
+              )
             })}
           </div>
         </SectionContainer>

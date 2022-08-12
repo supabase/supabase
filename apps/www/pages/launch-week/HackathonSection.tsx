@@ -1,47 +1,59 @@
 import { TruckIcon } from '@heroicons/react/outline'
 import { Button, Badge } from '@supabase/ui'
+import Link from 'next/link'
 import Controller from './launch-controller.json'
 
 export default function LaunchHero() {
   return (
-    <div className="flex grid grid-cols-12 flex-col gap-16">
-      <div className="col-span-6 flex flex-col gap-12">
-        <div className="flex flex-col gap-3">
-          <div>
-            <Badge>In progress</Badge>
+    <div className="flex flex-col gap-16 lg:grid lg:grid-cols-12">
+      <div className="col-span-12 flex flex-col gap-12 lg:col-span-6">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-3">
+            <h3 className="text-scale-1200 text-3xl tracking-tight">Launch Week Hackathon</h3>
+            <div>
+              <Badge>In progress</Badge>
+            </div>
+            <h4 className="text-scale-1100 text-xl">
+              Submissions close Sunday 21st Aug 11:59 (PT)
+            </h4>
           </div>
-          <h3 className="text-scale-1200 tracking-tight lg:text-5xl">Hackathon updates</h3>
-          <h4 className="text-scale-1100 text-xl">Submissions close Sunday 21st Aug 11:59 (PT)</h4>
-        </div>
 
-        <div className="flex gap-3">
-          <Button type="primary" size="small" className="text-white">
-            Submit project
-          </Button>
-          <Button type="default" size="small">
-            Hackathon info
-          </Button>
+          <div className="flex gap-3">
+            <Link href="https://www.madewithsupabase.com/launch-week-5">
+              <Button type="primary" size="small" className="text-white">
+                Submit your project
+              </Button>
+            </Link>
+            <Link href="/blog/launch-week-5-hackathon">
+              <Button type="default" size="small">
+                Learn more
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-16">
-          <div>
+          <div className="flex flex-col gap-3">
             <h3 className="text-scale-1200 text-lg">Prizes</h3>
             <p className="text-scale-1100 text-sm">
               There are 5 categories to win. There will be winner prize and a runner-up prize in
               each category.
             </p>
           </div>
-          <div>
+          <div className="flex flex-col gap-3">
             <h3 className="text-scale-1200 text-lg">Submission</h3>
             <p className="text-scale-1100 text-sm">
-              Submit your project through <a>madewithsupabase.com</a>. All submissions must be open
-              source and publically available.
+              Submit your project through{' '}
+              <a className="text-brand-900" href="https://madewithsupabase.com">
+                madewithsupabase.com
+              </a>
+              . All submissions must be open source and publically available.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="col-span-6">
+      <div className="col-span-12 lg:col-span-5 lg:col-start-8">
         <div className="relative">
           <img
             className="z-10 w-full rounded-xl border"
