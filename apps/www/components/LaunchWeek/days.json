@@ -1,0 +1,32 @@
+[
+  {
+    "shipped": false,
+    "date": "15th Aug 2022",
+    "d": 1,
+    "dd": "Monday"
+  },
+  {
+    "shipped": false,
+    "date": "16th Aug 2022",
+    "d": 2,
+    "dd": "Tuesday"
+  },
+  {
+    "shipped": false,
+    "date": "17th Aug 2022",
+    "d": 3,
+    "dd": "Wednesday"
+  },
+  {
+    "shipped": false,
+    "date": "18th Aug 2022",
+    "d": 4,
+    "dd": "Thursday"
+  },
+  {
+    "shipped": false,
+    "date": "19th Aug 2022",
+    "d": 5,
+    "dd": "Friday"
+  }
+]
