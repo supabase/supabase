@@ -24,7 +24,6 @@ export async function getStaticProps() {
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/rss.xml', rss)
 
-  console.log('posts in props', allPostsData[0])
   return {
     props: {
       blogs: allPostsData,
