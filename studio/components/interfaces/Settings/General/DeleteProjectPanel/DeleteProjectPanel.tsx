@@ -23,7 +23,7 @@ const DeleteProjectPanel: FC<Props> = ({}) => {
             withIcon
             title="Deleting this project will also remove your database."
           >
-            <div className="flex flex-col">
+            <div>
               <p className="mb-4 block">
                 Make sure you have made a backup if you want to keep your data.
               </p>
