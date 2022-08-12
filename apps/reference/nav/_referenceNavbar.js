@@ -1,16 +1,19 @@
+const config = require('../docusaurus.config.js')
+
+const baseUrl = config.baseUrl
+
 const navbar = [
   {
     to: '/',
     label: 'Guides',
-    activeBaseRegex:
-      '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
+    activeBaseRegex: `.*.docs/$|^/${baseUrl}/architecture|(^/${baseUrl}/guides/(database|auth|storage|api|examples!))|(^/${baseUrl}/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/${baseUrl}/faq|^/${baseUrl}/going-into-prod|^/${baseUrl}/handbook|^/${baseUrl}/company)`,
     position: 'left',
   },
   {
     to: '/reference',
     label: 'Reference',
     position: 'left',
-    activeBaseRegex: '^/docs/reference$|^/docs/reference/$', // exactly match "/docs/reference/" only
+    activeBaseRegex: `^/${baseUrl}/reference$|^/${baseUrl}/reference/$`, // exactly match "/${baseUrl}/reference/" only
   },
 
   { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
@@ -39,7 +42,7 @@ const navbar = [
     to: 'reference/api',
     position: 'left',
     label: 'API',
-    supabaseCustomNavBarRegex: '(^/docs/reference/api$|docs/reference/api/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/api$|${baseUrl}/reference/api/)`,
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -53,7 +56,7 @@ const navbar = [
     to: 'reference/cli',
     position: 'left',
     label: 'CLI',
-    supabaseCustomNavBarRegex: '(^/docs/reference/cli$|docs/reference/cli/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/cli$|${baseUrl}/reference/cli/)`,
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -67,15 +70,13 @@ const navbar = [
     to: 'reference/javascript',
     position: 'left',
     label: 'JavaScript Library',
-    supabaseCustomNavBarRegex:
-      '(^/docs/reference/javascript$|docs/reference/javascript/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/javascript$|${baseUrl}/reference/javascript/)`,
   },
   {
     type: 'docsVersionDropdown',
     position: 'left',
     docsPluginId: '_supabase_js',
-    supabaseCustomNavBarRegex:
-      '(^/docs/reference/javascript$|docs/reference/javascript/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/javascript$|${baseUrl}/reference/javascript/)`,
   },
 
   /**
@@ -87,7 +88,7 @@ const navbar = [
     to: 'reference/auth',
     position: 'left',
     label: 'Auth Server',
-    supabaseCustomNavBarRegex: '(^/docs/reference/auth$|docs/reference/auth/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/auth$|${baseUrl}/reference/auth/)`,
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -101,8 +102,7 @@ const navbar = [
     to: 'reference/storage',
     position: 'left',
     label: 'Storage Server',
-    supabaseCustomNavBarRegex:
-      '(^/docs/reference/storage$|docs/reference/storage/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/storage$|${baseUrl}/reference/storage/)`,
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -118,7 +118,7 @@ const navbar = [
     to: 'reference/supabase-dart',
     position: 'left',
     label: 'Dart Library',
-    supabaseCustomNavBarRegex: '(^/docs/reference/dart$|docs/reference/dart/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/dart$|${baseUrl}/reference/dart/)`,
   },
   // {
   //   type: 'docsVersionDropdown',
@@ -131,8 +131,7 @@ const navbar = [
     to: 'reference/auth-helpers',
     position: 'left',
     label: 'Auth Helpers',
-    supabaseCustomNavBarRegex:
-      '(^/docs/reference/auth-helpers$|docs/reference/auth-helpers/)',
+    supabaseCustomNavBarRegex: `(^/${baseUrl}/reference/auth-helpers$|${baseUrl}/reference/auth-helpers/)`,
   },
   // {
   //   type: 'docsVersionDropdown',

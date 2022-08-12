@@ -10,7 +10,7 @@ const config = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
-  baseUrl: '/docs/',
+  baseUrl: '/new-docs/',
   onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
