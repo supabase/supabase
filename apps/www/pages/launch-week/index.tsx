@@ -1,7 +1,7 @@
 import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import _days from './days_new_format.json'
+import _days from './days.json'
 import HackathonSection from './HackathonSection'
 import LaunchHero from './LaunchHero'
 import { LaunchSection } from './LaunchSection'
