@@ -5,12 +5,14 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
+const baseUrl = '/new-docs/'
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
-  baseUrl: '/new-docs/',
+  baseUrl: baseUrl,
   onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -137,7 +139,7 @@ const config = {
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
-        items: mainNavbar.navbar,
+        items: mainNavbar.buildNavbar({ baseUrl }),
       },
       footer: {
         links: [
