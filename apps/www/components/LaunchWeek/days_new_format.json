@@ -1,0 +1,217 @@
+[
+  {
+    "title": "CLI and Rest API",
+    "shipped": false,
+    "date": "15th Aug 2022",
+    "description": "To kick off launch week, as it is now tradition, we’re showcasing some of the communities and contributors that make up the Supabase community.",
+    "d": 1,
+    "dd": "Monday",
+    "articles": [
+      {
+        "title": "Introducing Rest API",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "CLI Docs",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "Rest API Docs",
+            "url": "Something",
+            "description": "Learn how to use the new Rest API"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "supabase-js v2",
+    "shipped": false,
+    "date": "16th Aug 2022",
+    "description": "To kick off launch week, as it is now tradition, we’re showcasing some of the communities and contributors that make up the Supabase community.",
+    "d": 2,
+    "dd": "Tuesday",
+    "articles": [
+      {
+        "title": "Introducing Supabase.js v2",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "Supabase.js v2 Docs",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "Migration guide",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Security",
+    "shipped": false,
+    "date": "17th Aug 2022",
+    "description": "To kick off launch week, as it is now tradition, we’re showcasing some of the communities and contributors that make up the Supabase community.",
+    "d": 3,
+    "dd": "Wednesday",
+    "announcements": [
+      {
+        "title": "Supabase is now SOC2 compliant",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "type": "soc2"
+      }
+    ],
+    "articles": [
+      {
+        "title": "Improving security at Supabase",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "New Security landing page",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "DPA Agreement",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "Dashboard Organization permissions",
+            "url": "Something",
+            "description": "Learn how to install the CLI"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Realtime",
+    "shipped": false,
+    "date": "18th Aug 2022",
+    "description": "To kick off launch week, as it is now tradition, we’re showcasing some of the communities and contributors that make up the Supabase community.",
+    "d": 4,
+    "dd": "Thursday",
+    "articles": [
+      {
+        "title": "Improving security at Supabase",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "Realtime Docs",
+            "url": "Something",
+            "description": "Learn how to use the new Realtime"
+          },
+          {
+            "title": "Migrating to new Realtime",
+            "url": "Something",
+            "description": "Learn how to use the new Rest API"
+          },
+          {
+            "title": "New Realtime landing page",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Community and One more thing...",
+    "shipped": false,
+    "date": "19th Aug 2022",
+    "description": "To kick off launch week, as it is now tradition, we’re showcasing some of the communities and contributors that make up the Supabase community.",
+    "d": 5,
+    "dd": "Friday",
+    "articles": [
+      {
+        "title": "Community spotlight",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "postgrest  v10: native types, EXPLAIN",
+            "url": "Something",
+            "description": "Learn how to use the new Realtime"
+          },
+          {
+            "title": "postgres core contributions",
+            "url": "Something",
+            "description": "Learn how to use the new Realtime"
+          },
+          {
+            "title": "Replit templates",
+            "url": "Something",
+            "description": "Learn how to use the new Realtime"
+          }
+        ]
+      },
+      {
+        "title": "Product updates",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "Egghead course",
+            "url": "Something",
+            "description": "Learn how to use the new Realtime"
+          },
+          {
+            "title": "Flutter v1",
+            "url": "Something",
+            "description": "Learn how to use the new Rest API"
+          },
+          {
+            "title": "pg_graphql: 0.4.0",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "pg_jsonschema: 0.1.0",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Auth Helpers",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Auth UI",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Auth hCaptcha",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Supabase Vault",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Permissions 1 + three way schema + column encryption",
+            "url": "Something",
+            "description": "New landing page for realtime"
+          },
+          {
+            "title": "Auth | MFA",
+            "url": "Something",
+            "description": "Soft launch of MFA, you can sign up for early access"
+          }
+        ]
+      }
+    ]
+  }
+]
