@@ -254,17 +254,12 @@ table {
 launch week
 */
 
-.launch-week-timeline-border--approaching { 
-  border-image: 
-  linear-gradient(
-    to bottom, 
-    var(--colors-brand9), 
-    var(--colors-purple7)
-  ) 1 100%;
+.launch-week-timeline-border--approaching {
+  border-image: linear-gradient(to bottom, var(--colors-brand9), var(--colors-purple7)) 1 100%;
 }
 
 .launch-week-gradientBg {
-  background-image: url("/images/launchweek/supabase-launch-week-5-bg--light.jpg");
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg--light.jpg');
   background-color: var(--colors-scale2);
   width: 100%;
   left: 0;
@@ -280,8 +275,8 @@ launch week
 }
 
 .dark .launch-week-gradientBg {
-  background-image: url("/images/launchweek/supabase-launch-week-5-bg.jpg");
-  background-color: #1C1C1C;
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
+  background-color: #1c1c1c;
 }
 
 @media screen and (min-width: 1032px) {
