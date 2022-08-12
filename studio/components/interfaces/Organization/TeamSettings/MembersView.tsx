@@ -12,6 +12,7 @@ import { isInviteExpired, getUserDisplayName } from '../Organization.utils'
 
 import Table from 'components/to-be-cleaned/Table'
 import MemberActions from './MemberActions'
+import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { PageContext } from 'pages/org/[slug]/settings'
 import { getRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -84,7 +85,10 @@ const MembersView = () => {
             head={[
               <Table.th key="header-user">User</Table.th>,
               <Table.th key="header-status"></Table.th>,
-              <Table.th key="header-role">Role</Table.th>,
+              <Table.th key="header-role" className="flex items-center space-x-2">
+                <span>Role</span>
+                {enablePermissions && <RolesHelperModal />}
+              </Table.th>,
               <Table.th key="header-action"></Table.th>,
             ]}
             body={[
@@ -97,7 +101,7 @@ const MembersView = () => {
                 const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
 
                 const validateSelectedRoleToChange = (roleId: any) => {
-                  if (!role) return
+                  if (!role || role.id === roleId) return
 
                   const selectedRole = (roles || []).find((role) => role.id === roleId)
                   const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
@@ -167,14 +171,14 @@ const MembersView = () => {
                                     value={role.id}
                                     onChange={validateSelectedRoleToChange}
                                   >
-                                    {roles.map((role: any) => (
+                                    {roles.map((r: any) => (
                                       <Listbox.Option
-                                        key={role.id}
-                                        value={role.id}
-                                        label={role.name}
+                                        key={r.id}
+                                        value={r.id}
+                                        label={r.name}
                                         disabled={disableRoleEdit}
                                       >
-                                        {role.name}
+                                        {r.name}
                                       </Listbox.Option>
                                     ))}
                                   </Listbox>
@@ -194,7 +198,7 @@ const MembersView = () => {
                                       </span>
                                     </div>
                                   </Tooltip.Content>
-                                ) : !canRemoveRole ? (
+                                ) : !memberIsUser && !canRemoveRole ? (
                                   <Tooltip.Content side="bottom">
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
