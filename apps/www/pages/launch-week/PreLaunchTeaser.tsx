@@ -29,7 +29,7 @@ export function PreLaunchTeaser() {
           <iframe
             className="absolute top-0 w-full rounded-xl"
             height="100%"
-            src="https://www.youtube-nocookie.com/embed/k03mZzoAhkg"
+            src="https://www.youtube-nocookie.com/embed/4t_63HT3rZY"
             style={{ top: 0, left: 0 }}
             frameBorder="0"
             allow="autoplay; modestbranding; encrypted-media"
