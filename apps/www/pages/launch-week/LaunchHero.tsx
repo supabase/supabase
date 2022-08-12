@@ -17,7 +17,7 @@ export default function LaunchHero() {
           View the schedule
         </Button>
         <Button type="default" size="small">
-          Hackathon info
+          Join the Hackathon
         </Button>
       </div>
     </div>
