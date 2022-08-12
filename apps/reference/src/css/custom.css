@@ -476,3 +476,7 @@ html[data-theme='dark'] .navbar-item-discord:before {
 .token.doc-comment.class-name {
   @apply text-green-500;
 }
+
+.theme-doc-markdown h3 {
+  scroll-margin-top: 80px;
+}
