@@ -151,7 +151,7 @@ export default function launchweek() {
                     <div>
                       <h3 className="text-scale-1200 text-base">Supabase Series B</h3>
                       <p className="text-scale-1100 text-sm">
-                        Supabase raised $80M in May, bringing our total funding to $116M
+                        Supabase raised $80M in May, bringing our total funding to $116M.
                       </p>
                     </div>
                     <div>
@@ -169,13 +169,13 @@ export default function launchweek() {
           {!shippingHasStarted && (
             <div className="flex flex-col gap-16">
               <div className="text-scale-1200 flex flex-col gap-4 text-lg">
-                <h3 className="text-scale-1200 text-3xl">Week Schedule</h3>
+                <h3 className="text-scale-1200 text-4xl">Week Schedule</h3>
                 <p className="md:max-w-lg">
                   Each day of the week we will announce a new item, every day, from Monday to
                   Friday.
                 </p>
                 <p className="text-scale-1100 text-base md:max-w-lg">
-                  The first launch will be on Monday 08:00 PT | 11:00 ET Week.
+                  The first launch will be on Monday 08:00 PT | 11:00 ET.
                 </p>
               </div>
               <div className="dark:bg-scale-300 flex flex-col gap-0 overflow-hidden rounded-md border border bg-white shadow-sm md:max-w-lg">
@@ -267,11 +267,11 @@ export const LaunchSection = (props: WeekDayProps) => {
         )}
         {/* END timeline line */}
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 pl-4 lg:pl-0">
           {/* START timeline dot */}
           <div
             className={[
-              'absolute mt-[4px] -ml-[37.5px] h-3 w-3 rounded-full border',
+              'absolute mt-[4px] -ml-[21px] h-3 w-3 rounded-full border lg:-ml-[37.5px]',
               props.shipped ? 'border-brand-900 bg-brand-400' : 'border-purple-900 bg-purple-300',
             ].join(' ')}
           ></div>
@@ -292,7 +292,7 @@ export const LaunchSection = (props: WeekDayProps) => {
               <Badge color="purple">Not shipped yet</Badge>
             )}
           </div>
-          <h4 className="text-scale-1200 text-4xl">
+          <h4 className="text-scale-1200 text-2xl md:text-3xl lg:text-4xl">
             {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
           </h4>
 
