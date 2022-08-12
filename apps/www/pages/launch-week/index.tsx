@@ -1,13 +1,13 @@
 import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import _days from './days.json'
-import HackathonSection from './HackathonSection'
-import LaunchHero from './LaunchHero'
-import { LaunchSection } from './LaunchSection'
-import PreLaunchTeaser from './PreLaunchTeaser'
-import ScheduleInfo from './ScheduleInfo'
-import { WeekDayProps } from './types'
+import _days from '~/components/LaunchWeek/days.json'
+import HackathonSection from '~/components/LaunchWeek/HackathonSection'
+import LaunchHero from '~/components/LaunchWeek/LaunchHero'
+import { LaunchSection } from '~/components/LaunchWeek/LaunchSection'
+import PreLaunchTeaser from '~/components/LaunchWeek/PreLaunchTeaser'
+import ScheduleInfo from '~/components/LaunchWeek/ScheduleInfo'
+import { WeekDayProps } from '~/components/LaunchWeek/types'
 
 const days = _days as WeekDayProps[]
 
