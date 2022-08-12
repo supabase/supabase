@@ -3,14 +3,15 @@ import Content from '@theme-original/DocSidebar/Desktop/Content'
 import { useLocation } from '@docusaurus/router'
 import Link from '@docusaurus/Link'
 
+const baseUrl = `new-docs`
 const subNavRoutes = [
   // Add any routes which should have a subnav
-  '/api',
-  '/cli',
-  '/auth',
-  '/storage',
-  '/supabase-js',
-  '/supabase-dart',
+  `/${baseUrl}/reference/api`,
+  `/${baseUrl}/reference/cli`,
+  `/${baseUrl}/reference/auth`,
+  `/${baseUrl}/reference/storage`,
+  `/${baseUrl}/reference/javascript`,
+  `/${baseUrl}/reference/dart`,
 ]
 
 const requiresSubNav = (pathname, routes) => {
@@ -23,7 +24,7 @@ export default function ContentWrapper(props) {
   return (
     <>
       {pathname && requiresSubNav(pathname, subNavRoutes) && (
-        <Link to="/" id="custom--main-menu-button">
+        <Link to={`/${baseUrl}/reference`} id="custom--main-menu-button">
           <svg
             width="24"
             height="24"
