@@ -76,11 +76,11 @@ module.exports = withMDX({
         destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}/:path*`,
       },
       {
-        source: '/launch-week',
+        source: '/launch-week-register',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
       },
       {
-        source: '/launch-week/:path*',
+        source: '/launch-week-register/:path*',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
       },
       // misc rewrites
