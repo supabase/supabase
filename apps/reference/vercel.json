@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/docs1"
+      "destination": "/new-docs"
     }
   ]
 }
