@@ -14,7 +14,6 @@ const PolicyRow: FC<Props> = ({
   onSelectEditPolicy = () => {},
   onSelectDeletePolicy = () => {},
 }) => {
-  console.log('Policy', policy)
   return (
     <Panel.Content
       className={[
