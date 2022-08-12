@@ -179,7 +179,7 @@ const TableEditorMenu: FC<Props> = ({
         {/* Table search input */}
         <div className="mb-2 block px-3">
           <Input
-            className="border-none"
+            className={`border-none transition ease-in-out ${searchText == '' ? '' : 'custom-input-width'}`}
             icon={
               <div className="text-scale-900">
                 <IconSearch size={12} strokeWidth={1.5} />
