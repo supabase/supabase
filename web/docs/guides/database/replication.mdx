@@ -8,126 +8,48 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-Replication is technique for copying the data from one database to another. This is useful for:
+Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
 
-- Spreading out the "load". For example, if your database has a lot of reads, you might want to split it between two databases.
+- Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
 - Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
-- In Supabase's case, we use the built-in replication functionality to provide a real-time API.
 
+Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://app.supabase.com) or with SQL.
 
+## Manage publications in the Dashboard
 
-## Publications
-
-Publications are a way of choosing which changes should be sent to other systems (usually another Postgres database).
-
-
-### Managing Publications 
-
-Supabase provides an interface for managing your publications, or you can use SQL.
-
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Database" section.
-2. Click on "Replication" in the sidebar.
-3. Control which database events are sent by toggling the Insert/Update/Delete toggles.
-4. Control which tables broadcast changes by clicking into the "Source" and toggling the tables.
-```
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Replication** in the sidebar.
+3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
+4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-realtime.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
-<TabItem value="SQL">
+## Create a publication
 
-```sql
-alter publication supabase_realtime add table products;
-```
-
-</TabItem>
-</Tabs>
-
-### Create a Publication
-
-This publication will contain all changes to all tables.
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+This publication contains changes to all tables.
 
 ```sql
 create publication publication_name 
 for all tables;
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Create a Publication which listens to individual tables
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Create a publication to listen to individual tables
 
 ```sql
 create publication publication_name 
 for table table_one, table_two;
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Add tables to an existing publication
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Add tables to an existing publication
 
 ```sql
 alter publication publication_name 
 add table table_name;
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Listen to `insert`
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Listen to `insert`
 
 ```sql
 create publication publication_name 
@@ -135,21 +57,7 @@ for all tables
 with (publish = 'insert');
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Listen to `update`
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Listen to `update`
 
 ```sql
 create publication publication_name 
@@ -157,21 +65,7 @@ for all tables
 with (publish = 'update');
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Listen to `delete`
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Listen to `delete`
 
 ```sql
 create publication publication_name 
@@ -179,42 +73,15 @@ for all tables
 with (publish = 'delete');
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Remove a Publication
-
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+## Remove a publication
 
 ```sql
 drop publication if exists publication_name;
 ```
 
+## Recreate a publication
 
-</TabItem>
-
-</Tabs>
-
-### Recreate a Publication
-
-If you are planning to re-create a publication, it's best to do it in a transaction to ensure the operation succeeds.
-
-
-<Tabs
-  defaultValue="sql"
-  groupId="reference/postgres"
-  values={[{ label: 'SQL', value: 'sql' }]}>
-
-<TabItem value="sql">
+If you're recreating a publication, it's best to do it in a transaction to ensure the operation succeeds.
 
 ```sql
 begin; 
@@ -225,8 +92,3 @@ begin;
   create publication publication_name;  
 commit;
 ```
-
-
-</TabItem>
-
-</Tabs>

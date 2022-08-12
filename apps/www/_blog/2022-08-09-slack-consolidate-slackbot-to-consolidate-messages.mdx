@@ -2,8 +2,8 @@
 title: 'Slack Consolidate: a slackbot built with Python and Supabase'
 description: A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python
 author: rodrigo_mansueli
-image: slackbot-consilidate/slackbot-thumb.jpg
-thumb: slackbot-consilidate/slackbot-thumb.jpg
+image: slackbot-consolidate/slackbot-thumb.jpg
+thumb: slackbot-consolidate/slackbot-thumb.jpg
 tags:
   - slack
   - python
@@ -35,19 +35,19 @@ Now, it is time to create the bot in Slack and get the API Keys (after granting 
 
 [https://api.slack.com/apps](https://api.slack.com/apps)
 
-![Green arrow pointing to the ‘Create New App’ button.](/images/blog/slackbot-consilidate/00_create_new_app.png)
+![Green arrow pointing to the ‘Create New App’ button.](/images/blog/slackbot-consolidate/00_create_new_app.png)
 
 Green arrow pointing to the ‘Create New App’ button.
 
 Then, select to create an app from a manifest (this will already set the required permissions) for the app:
 
-![Green arrow pointing to the option ‘From an app manifest’ inside the “Create an app” menu.](/images/blog/slackbot-consilidate/01_create_an_slack_app.png)
+![Green arrow pointing to the option ‘From an app manifest’ inside the “Create an app” menu.](/images/blog/slackbot-consolidate/01_create_an_slack_app.png)
 
 Green arrow pointing to the option ‘From an app manifest’ inside the “Create an app” menu.
 
 Select the Slack workspace to deploy:
 
-![The picture shows a dropdown UI with Supabase selected as the workspace.](/images/blog/slackbot-consilidate/02_pick_workspace.png)
+![The picture shows a dropdown UI with Supabase selected as the workspace.](/images/blog/slackbot-consolidate/02_pick_workspace.png)
 
 The picture shows a dropdown UI with Supabase selected as the workspace.
 
@@ -88,13 +88,13 @@ token_rotation_enabled: false
 
 Enter the manifest above when asked:
 
-![The picture shows the place where you have to paste the manifest file included in the repo.](/images/blog/slackbot-consilidate/03_enter_manifest.png)
+![The picture shows the place where you have to paste the manifest file included in the repo.](/images/blog/slackbot-consolidate/03_enter_manifest.png)
 
 The picture shows the place where you have to paste the manifest file included in the repo.
 
 Then, confirm to create the bot:
 
-![You can see a summary screen to confirm the creation of the bot and the scopes assigned.](/images/blog/slackbot-consilidate/04_confirm_window.png)
+![You can see a summary screen to confirm the creation of the bot and the scopes assigned.](/images/blog/slackbot-consolidate/04_confirm_window.png)
 
 You can see a summary screen to confirm the creation of the bot and the scopes assigned.
 
@@ -102,7 +102,7 @@ You can see a summary screen to confirm the creation of the bot and the scopes a
 
 Install the app on the workspace:
 
-![The picture shows the button to Install the App to the Slack Workspace.](/images/blog/slackbot-consilidate/05_install_workspace.png)
+![The picture shows the button to Install the App to the Slack Workspace.](/images/blog/slackbot-consolidate/05_install_workspace.png)
 
 The picture shows the button to Install the App to the Slack Workspace.
 
@@ -112,7 +112,7 @@ The command to invite the bot is below:
 
 `/invite @SlackConsolidate`
 
-![The picture shows the command /invite @Slackbot in the channel #team-support.](/images/blog/slackbot-consilidate/06_invite_bot_to_channel.png)
+![The picture shows the command /invite @Slackbot in the channel #team-support.](/images/blog/slackbot-consolidate/06_invite_bot_to_channel.png)
 
 The picture shows the command /invite @Slackbot in the channel #team-support.
 
@@ -151,7 +151,7 @@ CREATE TABLE slack_watcher (
 
 You may want to call [conversations.list](https://api.slack.com/methods/conversations.list) to dump all the channels and channel IDs into a CSV file, then use it to populate the table `slack_channels`. You can also manually get the data, but copying the links to messages in the channels:
 
-![After right-clicking a message in Slack, you can see the option to select the link.](/images/blog/slackbot-consilidate/07_copy_msg_link.png)
+![After right-clicking a message in Slack, you can see the option to select the link.](/images/blog/slackbot-consolidate/07_copy_msg_link.png)
 
 After right-clicking a message in Slack, you can see the option to select the link.
 
@@ -175,13 +175,13 @@ The name of the channel is not needed. But it is recommended to set, it so you c
 
 Using Supabase UI (easier):
 
-![The green arrow points to insert row button inside Supabase.](/images/blog/slackbot-consilidate/08_insert_row.png)
+![The green arrow points to insert row button inside Supabase.](/images/blog/slackbot-consolidate/08_insert_row.png)
 
 The green arrow points to insert row button inside Supabase.
 
 Then, enter the information as needed:
 
-![The picture shows the UI in Supabase to insert a new row to the database table.](/images/blog/slackbot-consilidate/09_insert_row_b.png)
+![The picture shows the UI in Supabase to insert a new row to the database table.](/images/blog/slackbot-consolidate/09_insert_row_b.png)
 
 The picture shows the UI in Supabase to insert a new row to the database table.
 
@@ -217,7 +217,7 @@ You need to get the supabase URL and API keys from here:
 
 [https://app.supabase.com/project/\_/settings/api](https://app.supabase.com/project/_/settings/api)
 
-![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/slackbot-consilidate/10_copy_supabase_apis.png)
+![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/slackbot-consolidate/10_copy_supabase_apis.png)
 
 The picture illustrates where to get the URL and the service key to setup the environment variables.
 
@@ -225,7 +225,7 @@ Slack environment variables:
 
 Then, copy the bot and person API Tokens for the bot:
 
-![The picture has arrows pointing to the tokens that will be used as environment variables from Slack.](/images/blog/slackbot-consilidate/11_copy_slack_apis.png)
+![The picture has arrows pointing to the tokens that will be used as environment variables from Slack.](/images/blog/slackbot-consolidate/11_copy_slack_apis.png)
 
 The picture has arrows pointing to the tokens that will be used as environment variables from Slack.
 
@@ -405,7 +405,7 @@ if __name__ == '__main__':
 
 Of course, we aren't doing proper Python example if we don't make a test notebook available:
 
-[![Open in Colab](/images/blog/2022-august/colab-badge.svg)](https://colab.research.google.com/github/mansueli/SlackConsolidate/blob/main/SlackConsolidate_bot.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mansueli/SlackConsolidate/blob/main/SlackConsolidate_bot.ipynb)
 
 ## Conclusion
 
