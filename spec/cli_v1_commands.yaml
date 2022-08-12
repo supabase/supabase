@@ -430,7 +430,8 @@ commands:
   - supabase-db-remote-commit
   options: |-
     ```sh
-      -h, --help   help for remote
+      -h, --help              help for remote
+      -p, --password string   Password to your remote Postgres database.
     ```
 - id: supabase-db-remote-commit
   title: supabase db remote commit
@@ -444,8 +445,7 @@ commands:
   subcommands: []
   options: |-
     ```sh
-      -h, --help              help for commit
-      -p, --password string   Password to your remote Postgres database.
+      -h, --help   help for commit
     ```
 - id: supabase-db-remote-changes
   title: supabase db remote changes
