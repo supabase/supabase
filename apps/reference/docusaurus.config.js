@@ -91,13 +91,13 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
-        lastVersion: 'current',
-        versions: {
-          current: {
-            label: 'v2',
-            // path: 'v2',
-          },
-        },
+        // lastVersion: 'current',
+        // versions: {
+        //   current: {
+        //     label: 'v2',
+        //     // path: 'v2',
+        //   },
+        // },
       },
     ],
     [
