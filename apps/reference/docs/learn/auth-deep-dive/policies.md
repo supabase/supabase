@@ -80,7 +80,7 @@ For the curious, try heading to the SQL editor and querying:
 select * from auth.users;
 ```
 
-If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](/docs/reference/javascript/auth-session) method to see if there is a valid session:
+If supabase-js is loaded on your site (in this case http://localhost:3000) then it will automatically pluck the access_token out of the URL and initiate a session. You can check the [session()](../../reference/javascript/auth-session) method to see if there is a valid session:
 
 ```jsx
 console.log(supabase.auth.session())
@@ -161,9 +161,9 @@ You can get as creative as you like with these policies.
 
 ### Next steps
 
-- Watch [Part One: JWTs](/docs/learn/auth-deep-dive/auth-deep-dive-jwts)
-- Watch [Part Two: Row Level Security](/docs/learn/auth-deep-dive/auth-row-level-security)
-<!-- - Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies) -->
-- Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
-- Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
+- Watch [Part One: JWTs](../../learn/auth-deep-dive/auth-deep-dive-jwts)
+- Watch [Part Two: Row Level Security](../../learn/auth-deep-dive/auth-row-level-security)
+<!-- - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies) -->
+- Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
+- Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
 - Sign up for Supabase: [app.supabase.com](https://app.supabase.com)

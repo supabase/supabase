@@ -8,7 +8,7 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
-These functions live inside your database, and they can be [used with the API](/docs/reference/javascript/rpc).
+These functions live inside your database, and they can be [used with the API](../../reference/javascript/rpc).
 
 ## Quick demo
 
@@ -25,7 +25,7 @@ These functions live inside your database, and they can be [used with the API](/
 ## Getting started
 
 Supabase provides several options for creating database functions. You can use the Dashboard or create them directly using SQL.
-We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database
+We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
 and run the SQL queries yourself.
 
 1. Go to the "SQL editor" section.
@@ -49,7 +49,7 @@ $$; --6
 
 <details>
 <summary>Show/Hide Details</summary>
-  
+
 At it's most basic a function has the following parts:
 
 1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. You can use either `create` when creating a new function or `replace` when replacing an existing function. Or you can use `create or replace` together to handle either.
@@ -86,7 +86,7 @@ select hello_world();
 const { data, error } = await supabase.rpc('hello_world')
 ```
 
-Reference: [rpc()](/docs/reference/javascript/rpc)
+Reference: [rpc()](../../reference/javascript/rpc)
 
 </TabItem>
 <TabItem value="Dart">
@@ -97,7 +97,7 @@ final res = await supabase
   .execute();
 ```
 
-Reference: [rpc()](/docs/reference/dart/rpc)
+Reference: [rpc()](../../reference/dart/rpc)
 
 </TabItem>
 
@@ -105,7 +105,7 @@ Reference: [rpc()](/docs/reference/dart/rpc)
 
 ## Returning data sets
 
-Database Functions can also return data sets from [Tables](/docs/guides/database/tables) or Views.
+Database Functions can also return data sets from [Tables](../../guides/database/tables) or Views.
 
 For example, if we had a database with some Star Wars data inside:
 
@@ -279,10 +279,10 @@ final res = await supabase
 
 ### Database Functions vs Edge Functions
 
-For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
-and can be called remotely using the [REST and GraphQL API](/docs/guides/database/api).
+For data-intensive operations we recommend using [Database Functions](../../guides/database/functions), which are executed within your database
+and can be called remotely using the [REST and GraphQL API](../../guides/database/api).
 
-For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in Typescript.
+For use-cases which require low-latency we recommend [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
 
 ### Security `definer` vs `invoker`
 
@@ -305,7 +305,7 @@ This limits the potential damage if you allow access to schemas which the user e
 
 ## Resources
 
-- Official Client libraries: [JavaScript](/docs/reference/javascript/rpc) and [Dart](/docs/reference/dart/rpc)
+- Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Dart](../../reference/dart/rpc)
 - Community client libraries: [github.com/supabase-community](https://github.com/supabase-community)
 - PostgreSQL Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
 - PostgreSQL Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
