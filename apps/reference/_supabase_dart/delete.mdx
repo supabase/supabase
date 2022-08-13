@@ -1,15 +1,14 @@
 ---
 id: delete
-title: "Delete data: delete()"
+title: 'Delete data: delete()'
 slug: delete
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs a DELETE on the table.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,34 +24,18 @@ final res = await supabase
   .match({ 'id': 666 })
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Delete records
-
-
 
 <Tabs
   defaultValue="dart"
@@ -68,7 +51,6 @@ final res = await supabase
   .match({ 'id': 666 })
   .execute();
 ```
-
 
 </TabItem>
 

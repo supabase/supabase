@@ -1,12 +1,12 @@
 ---
 id: removesubscription
-title: "removeSubscription()"
+title: 'removeSubscription()'
 slug: removesubscription
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Closes and removes a subscription and returns the number of open subscriptions.
 
@@ -21,13 +21,11 @@ Closes and removes a subscription and returns the number of open subscriptions.
 supabase.removeSubscription(mySubscription)
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -53,25 +51,13 @@ The subscription you want to close and remove.
 
 </ul>
 
-
 ## Notes
 
 - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Remove a subscription
-
-
 
 <Tabs
   defaultValue="js"
@@ -83,7 +69,6 @@ The subscription you want to close and remove.
 ```js
 supabase.removeSubscription(mySubscription)
 ```
-
 
 </TabItem>
 

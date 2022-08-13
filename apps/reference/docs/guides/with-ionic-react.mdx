@@ -1,12 +1,12 @@
 ---
 id: with-ionic-react
-title: "Quickstart: Ionic React"
+title: 'Quickstart: Ionic React'
 description: Learn how to use Supabase in your Ionic React App.
 sidebar_label: Ionic React
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Intro
 
@@ -47,7 +47,6 @@ and then creating a "schema" inside the database.
 1. Enter your project details.
 1. Wait for the new database to launch.
 
-
 ### Set up the database schema
 
 Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
@@ -66,7 +65,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -123,7 +127,6 @@ create policy "Anyone can upload an avatar."
 </TabItem>
 </Tabs>
 
-
 ### Get the API Keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
@@ -134,7 +137,12 @@ We just need to get the URL and `anon` key from the API settings.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -416,30 +424,30 @@ export function AccountPage() {
 Now that we have all the components in place, let's update `App.tsx`:
 
 ```jsx title="src/App.tsx"
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { supabase } from './supabaseClient';
+import { Redirect, Route } from 'react-router-dom'
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
+import { IonReactRouter } from '@ionic/react-router'
+import { supabase } from './supabaseClient'
 
-import '@ionic/react/css/ionic.bundle.css';
+import '@ionic/react/css/ionic.bundle.css'
 
 /* Theme variables */
-import './theme/variables.css';
-import { LoginPage } from './pages/Login';
-import { AccountPage } from './pages/Account';
-import { useEffect, useState } from 'react';
-import { Session } from '@supabase/supabase-js';
+import './theme/variables.css'
+import { LoginPage } from './pages/Login'
+import { AccountPage } from './pages/Account'
+import { useEffect, useState } from 'react'
+import { Session } from '@supabase/supabase-js'
 
-setupIonicReact();
+setupIonicReact()
 
 const App: React.FC = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = (useState < Session) | (null > null)
   useEffect(() => {
-    setSession(supabase.auth.session());
+    setSession(supabase.auth.session())
     supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, [session]);
+      setSession(session)
+    })
+  }, [session])
   return (
     <IonApp>
       <IonReactRouter>
@@ -448,7 +456,7 @@ const App: React.FC = () => {
             exact
             path="/"
             render={() => {
-              return session ? <Redirect to="/account" /> : <LoginPage />;
+              return session ? <Redirect to="/account" /> : <LoginPage />
             }}
           />
           <Route exact path="/account">
@@ -457,10 +465,10 @@ const App: React.FC = () => {
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
-  );
-};
+  )
+}
 
-export default App;
+export default App
 ```
 
 Once that's done, run this in a terminal window:
@@ -492,24 +500,24 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 With those packages installed we can update our `index.tsx` to include an additional bootstapping call for the Ionic PWA Elements.
 
 ```ts title="src/index.tsx"
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import * as serviceWorkerRegistration from './serviceWorkerRegistration'
+import reportWebVitals from './reportWebVitals'
 
-import {defineCustomElements} from '@ionic/pwa-elements/loader';
-defineCustomElements(window);
+import { defineCustomElements } from '@ionic/pwa-elements/loader'
+defineCustomElements(window)
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
   document.getElementById('root')
-);
+)
 
-serviceWorkerRegistration.unregister();
-reportWebVitals();
+serviceWorkerRegistration.unregister()
+reportWebVitals()
 ```
 
 Then create an **AvatarComponent**.

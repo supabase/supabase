@@ -1,15 +1,14 @@
 ---
 id: storage-createbucket
-title: "createBucket()"
+title: 'createBucket()'
 slug: storage-createbucket
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Creates a new Storage bucket
-
 
 <Tabs
   defaultValue="dart"
@@ -23,36 +22,20 @@ final res = await supabase
   .storage
   .createBucket('avatars');
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `insert` 
+  - `buckets` permissions: `insert`
   - `objects` permissions: none
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Create bucket
-
-
 
 <Tabs
   defaultValue="dart"
@@ -66,7 +49,6 @@ final res = await supabase
   .storage
   .createBucket('avatars');
 ```
-
 
 </TabItem>
 

@@ -1,18 +1,17 @@
 ---
 id: is_
-title: ".is_()"
+title: '.is_()'
 slug: is_
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
 `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
 
-
 <Tabs
   defaultValue="dart"
   groupId="reference/dart"
@@ -27,33 +26,14 @@ final res = await supabase
   .is_('name', null)
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -69,15 +49,12 @@ final res = await supabase
   .is_('name', null)
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -94,14 +71,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -118,14 +92,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -141,7 +112,6 @@ final res = await supabase
   .is_('name', null)
   .execute();
 ```
-
 
 </TabItem>
 

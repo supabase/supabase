@@ -1,12 +1,12 @@
 ---
 id: invoke
-title: "invoke()"
+title: 'invoke()'
 slug: invoke
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Invokes a Supabase Function. See the [guide](/docs/guides/api) for details on writing Functions.
 
@@ -19,7 +19,6 @@ Supabase Functions are in Experimental release until 1 August 2022. There will b
 We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
 There will be breaking changes with no notice.
 
-
 <Tabs
   defaultValue="dart"
   groupId="reference/dart"
@@ -33,34 +32,18 @@ final data = res.data;
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - Requires an Authorization header.
 - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic invocation.
-
-
 
 <Tabs
   defaultValue="dart"
@@ -74,7 +57,6 @@ final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'})
 final data = res.data;
 final error = res.error;
 ```
-
 
 </TabItem>
 
@@ -83,7 +65,6 @@ final error = res.error;
 ### Specifying response type.
 
 By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
-
 
 <Tabs
   defaultValue="dart"
@@ -102,7 +83,6 @@ final data = res.data;
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -110,7 +90,6 @@ final error = res.error;
 ### Parsing custom headers.
 
 Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
-
 
 <Tabs
   defaultValue="dart"
@@ -128,7 +107,6 @@ final res = await supabaseClient.functions.invoke(
   },
 );
 ```
-
 
 </TabItem>
 

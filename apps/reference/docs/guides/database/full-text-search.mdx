@@ -1,20 +1,17 @@
 ---
 id: full-text-search
-title: "Full Text Search"
+title: 'Full Text Search'
 description: How to use full text search in PostgreSQL.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Postgres has built-in functions to handle `Full Text Search` queries. This is like a "search engine" within Postgres.
-
 
 ## Preparation
 
 For this guide we'll use the following example data:
-
 
 <Tabs
 defaultValue="Data"
@@ -33,8 +30,8 @@ create table books (
   description text
 );
 
-insert into books (title, author, description) 
-values 
+insert into books (title, author, description)
+values
   ('The Poky Little Puppy','Janette Sebring Lowrey','Puppy is slower than other, bigger animals.'),
   ('The Tale of Peter Rabbit','Beatrix Potter','Rabbit eats some vegetables.'),
   ('Tootle','Gertrude Crampton','Little toy train has big dreams.'),
@@ -45,13 +42,13 @@ values
 </TabItem>
 <TabItem value="Data">
 
-| id    | title | author | description |
-| ----  | ---- | ---- | ----------- |
-|    1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
-|    2 | The Tale of Peter Rabbit  | Beatrix Potter | Rabbit eats some vegetables. |
-|    3 | Tootle | Gertrude Crampton | Little toy train has big dreams. |
-|    4 | Green Eggs and Ham | Dr. Seuss | Sam has changing food preferences and eats unusually colored food. |
-|    5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues.  |
+| id  | title                               | author                 | description                                                        |
+| --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
+| 1   | The Poky Little Puppy               | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.                        |
+| 2   | The Tale of Peter Rabbit            | Beatrix Potter         | Rabbit eats some vegetables.                                       |
+| 3   | Tootle                              | Gertrude Crampton      | Little toy train has big dreams.                                   |
+| 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
+| 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
 
 </TabItem>
 
@@ -69,7 +66,7 @@ Converts your data into searchable "tokens". `to_tsvector()` stands for "to text
 select to_tsvector('green eggs and ham')
 
 -- Returns 'egg':2 'green':1 'ham':4
-``` 
+```
 
 Collectively these tokens are called a "document" which Postgres can use for comparisons.
 
@@ -77,9 +74,8 @@ Collectively these tokens are called a "document" which Postgres can use for com
 
 Converts a query string into "tokens" to match. `to_tsquery()` stands for "to text search query".
 
-This conversion step is important because we will want to "fuzzy match" on keywords. 
+This conversion step is important because we will want to "fuzzy match" on keywords.
 For example if a user searches for "eggs", and a column has the value "egg", we probably still want to return a match.
-
 
 ### Match: `@@`
 
@@ -97,8 +93,8 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select * 
-from books 
+select *
+from books
 where title = 'Harry';
 ```
 
@@ -127,8 +123,7 @@ final result = await client
 </TabItem>
 </Tabs>
 
-
-The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the 
+The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the
 example above:
 
 <Tabs
@@ -141,8 +136,8 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select * 
-from books 
+select *
+from books
 where to_tsvector(title) @@ to_tsquery('Harry');
 ```
 
@@ -187,12 +182,12 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  * 
-from 
+select
+  *
+from
   books
-where 
-  to_tsvector(description) 
+where
+  to_tsvector(description)
   @@ to_tsquery('big');
 ```
 
@@ -220,10 +215,10 @@ final result = await client
 </TabItem>
 <TabItem value="Data">
 
-| id | title                               | author            | description                                     |
-| -- | ----------------------------------- | ----------------- | ----------------------------------------------- |
-| 3  | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                     |
-| 5  | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
+| id  | title                               | author            | description                                     |
+| --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
+| 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
+| 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
 
 </TabItem>
 </Tabs>
@@ -241,11 +236,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  * 
-from 
+select
+  *
+from
   books
-where 
+where
   to_tsvector(description || ' ' || title) -- concat columns, but be sure to include a space to separate them!
   @@ to_tsquery('little');
 ```
@@ -253,17 +248,17 @@ where
 </TabItem>
 <TabItem value="Data">
 
-| id | title                 | author                 | description                                 |
-| -- | --------------------- | ---------------------- | ------------------------------------------- |
-| 1  | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
-| 3  | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
+| id  | title                 | author                 | description                                 |
+| --- | --------------------- | ---------------------- | ------------------------------------------- |
+| 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
+| 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
 </TabItem>
 </Tabs>
 
 ### Match all search words
 
-To find all `books` where `description` contains BOTH of the words `little` and `big`, we can  use the `&` symbol:
+To find all `books` where `description` contains BOTH of the words `little` and `big`, we can use the `&` symbol:
 
 <Tabs
 defaultValue="SQL"
@@ -276,11 +271,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  * 
-from 
+select
+  *
+from
   books
-where 
+where
   to_tsvector(description)
   @@ to_tsquery('little & big'); -- use & for AND in the search query
 ```
@@ -309,9 +304,9 @@ final result = await client
 </TabItem>
 <TabItem value="Data">
 
-| id | title  | author            | description                      |
-| -- | ------ | ----------------- | -------------------------------- |
-| 3  | Tootle | Gertrude Crampton | Little toy train has big dreams. |
+| id  | title  | author            | description                      |
+| --- | ------ | ----------------- | -------------------------------- |
+| 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
 
 </TabItem>
 </Tabs>
@@ -331,12 +326,12 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  * 
-from 
+select
+  *
+from
   books
-where 
-  to_tsvector(description) 
+where
+  to_tsvector(description)
   @@ to_tsquery('little | big'); -- use | for OR in the search query
 ```
 
@@ -364,10 +359,10 @@ final result = await client
 </TabItem>
 <TabItem value="Data">
 
-| id | title                 | author                 | description                                 |
-| -- | --------------------- | ---------------------- | ------------------------------------------- |
-| 1  | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
-| 3  | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
+| id  | title                 | author                 | description                                 |
+| --- | --------------------- | ---------------------- | ------------------------------------------- |
+| 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
+| 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
 </TabItem>
 </Tabs>
@@ -376,15 +371,15 @@ Notice how searching for `big` includes results with the word `bigger` (or `bigg
 
 ## Creating Indexes
 
-Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they 
+Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they
 don't need to be created at the time we execute the query. This will make our queries much faster.
 
 ### Searchable columns
 
-Let's create a new column `fts` inside the `books` table to store the searchable index of the `title` and `description` columns. 
+Let's create a new column `fts` inside the `books` table to store the searchable index of the `title` and `description` columns.
 
-We can use a special feature of Postgres called 
-[Generated Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) 
+We can use a special feature of Postgres called
+[Generated Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html)
 to ensure that the index is updated any time the values in the `title` and `description` columns change.
 
 <Tabs
@@ -396,27 +391,27 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-alter table 
-  books 
-add column 
+alter table
+  books
+add column
   fts tsvector generated always as (to_tsvector('english', description || ' ' || title)) stored;
-  
+
 create index books_fts on books using gin (fts); -- generate the index
 
-select id, fts 
+select id, fts
 from books;
 ```
 
 </TabItem>
 <TabItem value="Data">
 
-| id | fts                                                                                                             |
-| -- | --------------------------------------------------------------------------------------------------------------- |
-| 1  | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
-| 2  | 'eat':2 'peter':8 'rabbit':1,9 'tale':6 'veget':4                                                               |
-| 3  | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
-| 4  | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
-| 5  | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
+| id  | fts                                                                                                             |
+| --- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
+| 2   | 'eat':2 'peter':8 'rabbit':1,9 'tale':6 'veget':4                                                               |
+| 3   | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
+| 4   | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
+| 5   | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
 
 </TabItem>
 </Tabs>
@@ -436,11 +431,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
-  * 
-from 
+select
+  *
+from
   books
-where 
+where
   fts @@ to_tsquery('little & big');
 ```
 
@@ -468,9 +463,9 @@ final result = await client
 </TabItem>
 <TabItem value="Data">
 
-| id | title  | author            | description                      | fts                                                     |
-| -- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
-| 3  | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
+| id  | title  | author            | description                      | fts                                                     |
+| --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
+| 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
 
 </TabItem>
 </Tabs>
@@ -485,7 +480,6 @@ to learn about additional query operators you can use to do more advanced `full 
 The proximity symbol is useful for searching for terms that are a certain "distance" apart.
 For example, to find the phrase `big dreams`, where the a match for "big" is followed immediately by a match for "dreams":
 
-
 <Tabs
 defaultValue="SQL"
 values={[
@@ -496,11 +490,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
+select
   *
-from 
+from
   books
-where 
+where
   to_tsvector(description) @@ to_tsquery('big <-> dreams');
 ```
 
@@ -528,7 +522,6 @@ final result = await client
 </TabItem>
 </Tabs>
 
-
 We can also use the `<->` to find words within a certain distance of eachother. For example to find `year` and `school` within 2 words of each other:
 
 <Tabs
@@ -541,11 +534,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
+select
   *
-from 
+from
   books
-where 
+where
   to_tsvector(description) @@ to_tsquery('year <2> school');
 ```
 
@@ -573,7 +566,6 @@ final result = await client
 </TabItem>
 </Tabs>
 
-
 ### Negation: `!`
 
 The negation symbol can be used to find phrases which _don't_ contain a search term.
@@ -589,11 +581,11 @@ values={[
 <TabItem value="SQL">
 
 ```sql
-select 
+select
   *
-from 
+from
   books
-where 
+where
   to_tsvector(description) @@ to_tsquery('big & !little');
 ```
 
@@ -621,10 +613,6 @@ final result = await client
 </TabItem>
 </Tabs>
 
-
 ## Resources
 
-* [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
-
-
-
+- [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)

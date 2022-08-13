@@ -1,12 +1,12 @@
 ---
 id: auth-api-listusers
-title: "listUsers()"
+title: 'listUsers()'
 slug: auth-api-listusers
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Get a list of users.
 
@@ -23,34 +23,18 @@ This function should only be called on a server. Never expose your `service_role
 const { data: user, error } = await supabase.auth.api.listUsers()
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Get a full list of users.
-
-
 
 <Tabs
   defaultValue="js"
@@ -62,7 +46,6 @@ const { data: user, error } = await supabase.auth.api.listUsers()
 ```js
 const { data: user, error } = await supabase.auth.api.listUsers()
 ```
-
 
 </TabItem>
 

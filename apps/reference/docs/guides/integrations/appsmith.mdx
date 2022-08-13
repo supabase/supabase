@@ -23,7 +23,7 @@ Let’s get started!
 
 ![create-table-supabase-02](/img/guides/integrations/appsmith/create-table-supabase-02.png)
 
-The database is now set up. 
+The database is now set up.
 
 ## Step 2: Connect the database to Appsmith
 
@@ -37,7 +37,7 @@ The database is now set up.
 
 ![create-datasource-appsmith-04](/img/guides/integrations/appsmith/create-datasource-appsmith-04.png)
 
-- Fill out the form to connect to your Supabase instance.  Click **Test** to test connection and then **Save** to save the datasource
+- Fill out the form to connect to your Supabase instance. Click **Test** to test connection and then **Save** to save the datasource
 
 ![connect-supabase-datasource-05](/img/guides/integrations/appsmith/connect-supabase-datasource-05.png)
 
@@ -69,7 +69,7 @@ The database is now set up.
 ```jsx
 INSERT INTO PUBLIC."tickets"("id","createdAt","user","updatedAt","description",
 "status","priority","category","assignedTo")
-VALUES('{{appsmith.store.ticket.id}}','{{moment().format('yyyy-mm-ddHH:MM:ss')}}','{{c_user.text}}', 
+VALUES('{{appsmith.store.ticket.id}}','{{moment().format('yyyy-mm-ddHH:MM:ss')}}','{{c_user.text}}',
 '{{moment().format('yyyy-mm-ddHH:MM:ss')}}','{{c_description.text}}','{{c_status.selectedOptionValue}}',
 '{{c_property.selectedOptionValue}}',
 '{{c_category.selectedOptionValue}}','{{c_assignee.selectedOptionValue}}');
@@ -78,7 +78,7 @@ VALUES('{{appsmith.store.ticket.id}}','{{moment().format('yyyy-mm-ddHH:MM:ss')}}
 - Click the **Confirm** button on the modal and under **Events**, set the **onClick** property to execute the create_new_ticket query.
 - Create a second query named **get_tickets** that will list all the tickets.
 
- ****
+  ***
 
 ```jsx
 SELECT * FROM public."tickets";
@@ -87,19 +87,33 @@ SELECT * FROM public."tickets";
 - Drag and drop a table widget under the **Assigned To Me** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
-{{get_tickets.data.filter(t => t.assignedTo === 'confidence@appsmith.com' && t.status !== 'closed')}}
+{
+  {
+    get_tickets.data.filter(
+      (t) => t.assignedTo === 'confidence@appsmith.com' && t.status !== 'closed'
+    )
+  }
+}
 ```
 
 - Drag and drop a table widget under the **Resolved** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
-{{get_tickets.data.filter(t => t.status === 'open')}}
+{
+  {
+    get_tickets.data.filter((t) => t.status === 'open')
+  }
+}
 ```
 
 - Drag and drop a table widget under the **Closed** tab. Open the property pane and add the following snippet under **Table Data** to bind the query results.
 
 ```jsx
-{{get_tickets.data.filter(t => t.status === 'closed')}}
+{
+  {
+    get_tickets.data.filter((t) => t.status === 'closed')
+  }
+}
 ```
 
 ## Step 5: Creating Charts in Appsmith
@@ -146,6 +160,7 @@ SELECT * FROM public."tickets";
 ```
 
 ## Resources
+
 - [Appsmith](https://www.appsmith.com/) official website.
 - [Appsmith GitHub](https://github.com/appsmithorg).
 - [Appsmith](https://docs.appsmith.com/) documentation.

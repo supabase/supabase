@@ -1,12 +1,12 @@
 ---
 id: storage-from-remove
-title: "from.remove()"
+title: 'from.remove()'
 slug: storage-from-remove
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Deletes files within the same bucket
 
@@ -18,19 +18,16 @@ Deletes files within the same bucket
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .remove(['folder/avatar1.png'])
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -56,27 +53,15 @@ An array of files to be deleted, including the path and file name. For example [
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `delete` and `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Delete file
-
-
 
 <Tabs
   defaultValue="js"
@@ -86,12 +71,10 @@ An array of files to be deleted, including the path and file name. For example [
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .remove(['folder/avatar1.png'])
 ```
-
 
 </TabItem>
 

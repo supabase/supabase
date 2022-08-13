@@ -1,18 +1,17 @@
 ---
 id: uuid-ossp
-title: "uuid-ossp: Unique Identifiers"
+title: 'uuid-ossp: Unique Identifiers'
 description: A UUID generator for PostgreSQL.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 The `uuid-ossp` extension can be used to generate a `UUID`.
 
-
 ## Overview
 
-A `UUID` is a "Universally Unique Identifer" and it is, for practical purposes, unique. 
+A `UUID` is a "Universally Unique Identifer" and it is, for practical purposes, unique.
 This makes them particularly well suited as Primary Keys. It is occasionally referred to as a `GUID`, which stands for "Globally Unique Identifer".
 
 ## Usage
@@ -39,14 +38,14 @@ Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 <TabItem value="sql">
 
 ```sql
--- Example: enable the "uuid-ossp" extension 
+-- Example: enable the "uuid-ossp" extension
 create extension "uuid-ossp" with schema extensions;
 
--- Example: disable the "uuid-ossp" extension 
+-- Example: disable the "uuid-ossp" extension
 drop extension if exists "uuid-ossp";
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension, call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
@@ -58,7 +57,7 @@ Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 
 </Tabs>
 
-### The `uuid` type 
+### The `uuid` type
 
 Once the extension is enabled, you now have access to a `uuid` type.
 
@@ -66,7 +65,7 @@ Once the extension is enabled, you now have access to a `uuid` type.
 
 Creates a UUID value based on the combination of computer’s MAC address, current timestamp, and a random value.
 
-### `uuid_generate_v4()` 
+### `uuid_generate_v4()`
 
 Creates UUID values based solely on random numbers.
 
@@ -92,7 +91,6 @@ create table contacts (
 );
 ```
 
-
-## Resources 
+## Resources
 
 - [The Basics Of PostgreSQL `UUID` Data Type](https://www.postgresqltutorial.com/postgresql-uuid/)

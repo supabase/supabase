@@ -1,39 +1,18 @@
 ---
 id: textsearch
-title: ".textSearch()"
+title: '.textSearch()'
 slug: textsearch
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Text search
-
-
 
 <Tabs
   defaultValue="dart"
@@ -46,12 +25,11 @@ Finds all rows whose tsvector value on the stated `column` matches to_tsquery(qu
 final res = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', "'fat' & 'cat'", 
-    config: 'english' 
+  .textSearch('catchphrase', "'fat' & 'cat'",
+    config: 'english'
   )
   .execute();
 ```
-
 
 </TabItem>
 
@@ -72,13 +50,12 @@ Uses PostgreSQL's `plainto_tsquery` function.
 final res = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', "'fat' & 'cat'",  
+  .textSearch('catchphrase', "'fat' & 'cat'",
     type: TextSearchType.plain,
-    config: 'english' 
+    config: 'english'
   )
   .execute();
 ```
-
 
 </TabItem>
 
@@ -99,13 +76,12 @@ Uses PostgreSQL's `phraseto_tsquery` function.
 final res = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', "'fat' & 'cat'",  
+  .textSearch('catchphrase', "'fat' & 'cat'",
     type: TextSearchType.phrase,
-    config: 'english' 
+    config: 'english'
   )
   .execute();
 ```
-
 
 </TabItem>
 
@@ -113,15 +89,14 @@ final res = await supabase
 
 ### Full normalization
 
-Uses PostgreSQL's `websearch_to_tsquery` function. 
-This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+Uses PostgreSQL's `websearch_to_tsquery` function.
+This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
 with advanced operators.
 
 - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
 - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
 - `OR`: the word “or” will be converted to the | operator.
 - `-`: a dash will be converted to the ! operator.
-
 
 <Tabs
   defaultValue="dart"
@@ -134,13 +109,12 @@ with advanced operators.
 final res = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', "'fat or cat'",  
+  .textSearch('catchphrase', "'fat or cat'",
     type: TextSearchType.websearch,
     config: 'english'
   )
   .execute();
 ```
-
 
 </TabItem>
 

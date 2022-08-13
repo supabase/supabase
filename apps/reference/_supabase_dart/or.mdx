@@ -1,15 +1,14 @@
 ---
 id: or
-title: ".or()"
+title: '.or()'
 slug: or
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows satisfying at least one of the filters.
-
 
 <Tabs
   defaultValue="dart"
@@ -26,14 +25,9 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -45,20 +39,9 @@ final res = await supabase
   .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -75,14 +58,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Use `or` with `and`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -98,7 +78,6 @@ final res = await supabase
   .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
   .execute();
 ```
-
 
 </TabItem>
 

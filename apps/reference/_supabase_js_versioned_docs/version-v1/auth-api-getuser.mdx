@@ -1,12 +1,12 @@
 ---
 id: auth-api-getuser
-title: "getUser()"
+title: 'getUser()'
 slug: auth-api-getuser
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Gets the current user details.
 
@@ -22,18 +22,14 @@ and therefore, acts like getting the currently authenticated user
 <TabItem value="js">
 
 ```js
-const { user, error } = await supabase.auth.api.getUser(
-  'ACCESS_TOKEN_JWT',
-)
+const { user, error } = await supabase.auth.api.getUser('ACCESS_TOKEN_JWT')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -59,27 +55,15 @@ A valid, logged-in JWT. Typically, the access_token for the currentSession
 
 </ul>
 
-
 ## Notes
 
 - Fetches the user object from the database instead of local storage.
 - Note that user() fetches the user object from local storage which might not be the most updated.
 - Requires the user's access_token.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Fetch the user object using the access_token jwt.
-
-
 
 <Tabs
   defaultValue="js"
@@ -89,11 +73,8 @@ A valid, logged-in JWT. Typically, the access_token for the currentSession
 <TabItem value="js">
 
 ```js
-const { user, error } = await supabase.auth.api.getUser(
-  'ACCESS_TOKEN_JWT',
-)
+const { user, error } = await supabase.auth.api.getUser('ACCESS_TOKEN_JWT')
 ```
-
 
 </TabItem>
 

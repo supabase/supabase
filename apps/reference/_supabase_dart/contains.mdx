@@ -1,14 +1,12 @@
 ---
 id: contains
-title: ".contains()"
+title: '.contains()'
 slug: contains
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 <Tabs
   defaultValue="dart"
@@ -24,33 +22,14 @@ final res = await supabase
   .contains('main_exports', ['oil'])
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -66,15 +45,12 @@ final res = await supabase
   .contains('main_exports', ['oil'])
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -91,14 +67,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -115,14 +88,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -138,7 +108,6 @@ final res = await supabase
   .contains('main_exports', ['oil'])
   .execute();
 ```
-
 
 </TabItem>
 
