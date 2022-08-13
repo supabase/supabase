@@ -5,8 +5,9 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
-    "api:gen": "npm run api:gen:api",
-    "api:gen:api": "ts-node ./index.ts gen --type api --input ../../spec/api_v0_openapi.json --output  ../../apps/reference/_api/usage.mdx",
+    "api:gen": "npm run api:deparse && npm run api:gen:api",
+    "api:deparse": "swagger-cli bundle --dereference --outfile ../../spec/api_v0_openapi/deparsed.json ../../spec/api_v0_openapi.json",
+    "api:gen:api": "ts-node ./index.ts gen --type api --url https://api.supabase.com --input ../../spec/api_v0_openapi/deparsed.json --output  ../../apps/reference/_api/usage.mdx",
     "cli:gen": "npm run cli:gen:commands && npm run cli:gen:config",
     "cli:gen:commands": "ts-node ./index.ts gen --type cli --input ../../spec/cli_v1_commands.yaml --output  ../../apps/reference/_cli/usage.mdx ",
     "cli:gen:config": "ts-node ./index.ts gen --type config --input ../../spec/cli_v1_config.yaml --output  ../../apps/reference/_cli/config.mdx",
@@ -20,6 +21,7 @@
     "supabase-dart:gen:sdk": "ts-node ./index.ts gen --type sdk --input ../../spec/supabase_dart_sdk.yaml --output  ../../apps/reference/_supabase_dart/usage.mdx "
   },
   "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
     "@types/lodash": "^4.14.182",
     "ejs": "^3.1.8",
     "js-yaml": "^4.1.0",
