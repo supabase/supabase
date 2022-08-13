@@ -5,12 +5,13 @@ description: Auto-generating and Realtime APIs.
 sidebar_label: Overview
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
 ## Overview
 
-Supabase generates three types of API directly from your database schema. 
+Supabase generates three types of API directly from your database schema.
 
 - REST - interact with your database through a restful interface.
 - Realtime - listen to database changes.
@@ -18,26 +19,25 @@ Supabase generates three types of API directly from your database schema.
 
 The APIs are:
 
-- **Instant and auto-generated.** <br />As you update your database the changes are immediately accessible through your API. 
-- **Self documenting.** <br />Supabase generates documentation in the Dashboard which updates as you make database changes. 
-- **Secure.** <br />The API is configured to work with PostgreSQL's Row Level Security, provisioned behind an API gateway with key-auth enabled. 
+- **Instant and auto-generated.** <br />As you update your database the changes are immediately accessible through your API.
+- **Self documenting.** <br />Supabase generates documentation in the Dashboard which updates as you make database changes.
+- **Secure.** <br />The API is configured to work with PostgreSQL's Row Level Security, provisioned behind an API gateway with key-auth enabled.
 - **Fast.** <br />Our benchmarks for basic reads are more than 300% faster than Firebase. The API is a very thin layer on top of Postgres, which does most of the heavy lifting.
 - **Scalable.** <br />The API can serve thousands of simultaneous requests, and works well for Serverless workloads.
 
-
 ### REST API {#rest-api-overview}
 
-Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres. 
+Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
 It provides everything you need from a CRUD API:
 
 - Basic CRUD operations
-- Deeply nested joins, allowing you to fetch data from multiple tables in a single fetch 
+- Deeply nested joins, allowing you to fetch data from multiple tables in a single fetch
 - Works with Postgres Views
-- Works with Postgres Functions 
+- Works with Postgres Functions
 - Works with the Postgres security model - including Row Level Security, Roles, and Grants.
 
 <iframe
-  className="w-full video-with-border"
+  className="video-with-border w-full"
   width="640"
   height="480"
   src="https://www.youtube-nocookie.com/embed/rPAJJFdtPw0"
@@ -50,27 +50,27 @@ It provides everything you need from a CRUD API:
 
 :::note
 
-GraphQL is in Beta, and may have breaking changes. It is only available on self-hosted setups and Supabase projects created after 28th March 2022. 
+GraphQL is in Beta, and may have breaking changes. It is only available on self-hosted setups and Supabase projects created after 28th March 2022.
 
 :::
 
-GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/2021/12/03/pg-graphql), an open source PostgreSQL extension for GraphQL. 
+GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/2021/12/03/pg-graphql), an open source PostgreSQL extension for GraphQL.
 
 ### Realtime API {#realtime-api-overview}
 
-Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets. 
+Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
 
 ## Getting started
 
-All APIs are auto-created from Database tables. After you have added tables or functions to your database, you can use the APIs provided. 
+All APIs are auto-created from Database tables. After you have added tables or functions to your database, you can use the APIs provided.
 
 ### Creating API Routes
 
-API routes are automatically created when you create Postgres Tables, Views, or Functions. 
+API routes are automatically created when you create Postgres Tables, Views, or Functions.
 
-Let's create our first 
-API route by creating a table called `todos` to store tasks. 
+Let's create our first
+API route by creating a table called `todos` to store tasks.
 This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <Tabs
@@ -90,7 +90,12 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
 1. Click **Save**.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
+  <source
+    src={useBaseUrl('/videos/api/api-create-table-sm.mp4')}
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -117,10 +122,15 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src={useBaseUrl('/videos/api/api-url-and-key.mp4')}
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
-The REST API and the GraphQL API are both accessible through this URL: 
+The REST API and the GraphQL API are both accessible through this URL:
 
 - REST: `https://<project_ref>.supabase.co/rest/v1`
 - GraphQL: `https://<project_ref>.supabase.co/graphql/v1`
@@ -134,12 +144,11 @@ You are provided with two keys:
 - an `anon` key, which is safe to be used in a browser context.
 - a `service_role` key, which should only be used on a server. This key can bypass Row Level Security. NEVER use this key in a browser.
 
-
 ### Accessing the docs in the Dashboard
 
 #### REST API {#rest-api-dashboard-docs}
 
-Supabase generates documentation in the [Dashboard](https://app.supabase.com) which updates as you make database changes. 
+Supabase generates documentation in the [Dashboard](https://app.supabase.com) which updates as you make database changes.
 Let's view the documentation for a `countries` table which we created in our database.
 
 1. Go to the [API](https://app.supabase.com/project/_/api) page in the Dashboard.
@@ -147,10 +156,15 @@ Let's view the documentation for a `countries` table which we created in our dat
 3. Switch between the JavaScript and the cURL docs using the tabs.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-docs.mp4" type="video/mp4" muted playsInline />
+  <source
+    src={useBaseUrl('/videos/api/api-docs.mp4')}
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
-#### GraphQL 
+#### GraphQL
 
 The GraphQL Endpoint that we provide (`https://<project_ref>.supabase.co/graphql/v1`) is compatible with any GraphiQL implementation that can pass an `apikey` header.
 Some suggested applications:
@@ -162,14 +176,12 @@ Some suggested applications:
 
 ## Using the API
 
-
-### REST API 
+### REST API
 
 You can interact with your API directly via HTTP requests, or you can use the client libraries which we provide.
 
-Let's see how to make a request to the `todos` table which we created in the first step, 
+Let's see how to make a request to the `todos` table which we created in the first step,
 using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
-
 
 <Tabs
   groupId="language"
@@ -187,9 +199,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Make a request
-const { data: todos, error } = await supabase
-  .from('todos')
-  .select('*')
+const { data: todos, error } = await supabase.from('todos').select('*')
 ```
 
 </TabItem>
@@ -212,17 +222,16 @@ JS Reference: [select()](../reference/javascript/select),
 [delete()](../reference/javascript/delete),
 [rpc()](../reference/javascript/rpc) (call Postgres functions).
 
+### GraphQL API
 
-### GraphQL API 
-
-:::note 
+:::note
 
 To rebuild your GraphQL schema from the SQL schema, call `select graphql.rebuild_schema();`.
 Be sure to rebuild the GraphQL schema after altering the SQL schema.
 
 :::
 
-You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/). 
+You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/).
 
 <Tabs
   groupId="language"
@@ -247,7 +256,7 @@ const headers = {
 // See: https://formidable.com/open-source/urql/docs/basics/react-preact/#setting-up-the-client
 const client = createClient({
   url: '<SUPABASE_URL>/graphql/v1',
-  fetchOptions: function createFetchOptions() { 
+  fetchOptions: function createFetchOptions() {
     return { headers }
   },
 })
@@ -289,7 +298,6 @@ curl --request POST '<SUPABASE_URL>/graphql/v1' \
 </TabItem>
 </Tabs>
 
-
 ### Realtime API
 
 By default Realtime is disabled on your database. Let's turn on Realtime for the `todos` table.
@@ -310,7 +318,12 @@ By default Realtime is disabled on your database. Let's turn on Realtime for the
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-realtime.mp4" type="video/mp4" muted playsInline />
+  <source
+    src={useBaseUrl('/videos/api/api-realtime.mp4')}
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -342,18 +355,16 @@ const { data: todos, error } = await supabase
   .subscribe()
 ```
 
-Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes. 
+Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
 The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
 called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
 
 ## API Security
 
+### Securing your Routes
 
-### Securing your Routes 
-
-
-Your API is designed to work with Postgres Row Level Security (RLS). If you use Supabase [Auth](/docs/guides/auth), you can restrict data based on the logged-in user.
-To control access to your data, you can use [Policies](/docs/guides/auth#policies).
+Your API is designed to work with Postgres Row Level Security (RLS). If you use Supabase [Auth](/guides/auth), you can restrict data based on the logged-in user.
+To control access to your data, you can use [Policies](/guides/auth#policies).
 When you create a table in Postgres, Row Level Security is disabled by default. To enable RLS:
 
 <Tabs
@@ -380,7 +391,7 @@ alter table todos enable row level security;
 </TabItem>
 </Tabs>
 
-### The `service_role` key 
+### The `service_role` key
 
 Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key can is designed to bypass Row Level Security - so it should only be used on a private server.
 
@@ -389,14 +400,16 @@ If they detect any keys with service_role privileges being pushed to GitHub, the
 
 ### Safeguards towards accidental deletes and updates
 
-For all projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API. 
+For all projects, by default, the Postgres extension [safeupdate](https://github.com/eradman/pg-safeupdate) is enabled for all queries coming from the API.
 This ensures that any `delete()` or `update()` would fail if there are no accompanying filters provided.
 To confirm that safeupdate is enabled for queries going through the API of your project, the following query could be run:
+
 ```sql
 select usename,useconfig from pg_shadow where usename = 'authenticator' ;
 ```
 
 The expected value for `useconfig` should be:
+
 ```
 ["session_preload_libraries=supautils, safeupdate"]
 ```
