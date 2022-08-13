@@ -7,14 +7,16 @@ export default async function DocGenerator({
   input,
   output,
   type,
+  url,
 }: {
   input: string
   output: string
   type: 'cli' | 'config' | 'sdk' | 'api'
+  url?: string
 }) {
   switch (type) {
     case 'api':
-      await ApiGenerator(input, output)
+      await ApiGenerator(input, output, url || '')
       break
 
     case 'cli':
