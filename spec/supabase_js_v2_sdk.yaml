@@ -1586,7 +1586,7 @@ functions:
           ```js
           const { data, error } = await supabase
             .from('cities')
-            .select('name', 'country_id')
+            .select('name, country_id')
             .order('id', { ascending: false })
           ```
       - id: example-data-order-embedded
