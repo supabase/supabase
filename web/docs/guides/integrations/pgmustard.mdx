@@ -6,11 +6,11 @@ description: 'Troubleshoot slow queries on Supabase with pgMustard, a visualizat
 
 This guide explains how to troubleshoot slow queries on Supabase using `explain` and pgMustard.
 
-[pgMustard](https://pgmustard.com/) is a visualization tool for [`explain analyze`](https://www.postgresql.org/docs/current/using-explain.html#USING-EXPLAIN-ANALYZE) that also gives performance tips.
+[pgMustard](https://pgmustard.com/) is a visualization tool for [`explain (analyze, buffers)`](https://www.postgresql.org/docs/current/using-explain.html#USING-EXPLAIN-ANALYZE) that also gives performance tips.
 
 ## Step 1: Get the query plan from Supabase
 
-Use `explain analyze` to get a query plan from Postgres. This will run the query behind the scenes, so be careful with data modification queries.
+Use `explain (analyze, buffers)` to get a query plan from Postgres. This will run the query behind the scenes, so be careful with data modification queries.
 
 pgMustard requires plans to be in json format, and the buffers, verbose, and settings parameters allow it to give better tips.
 
