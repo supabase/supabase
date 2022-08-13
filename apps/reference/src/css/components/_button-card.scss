@@ -1,0 +1,31 @@
+:root {
+  --custom-button-card-padding: 1.5rem;
+}
+
+.button-card__container {
+  padding: var(--custom-button-card-padding);
+  border: 1px solid var(--custom-border-color);
+  background-color: var(--custom-background-color-diff);
+  border-radius: 0.5rem;
+
+  margin-bottom: var(--ifm-spacing-horizontal) !important;
+
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+    var(--tw-shadow, 0 0 #0000);
+
+  img {
+    margin-bottom: 0.5rem;
+  }
+
+  h3 {
+    color: var(--custom-content-color-emphasis);
+    font-size: var(--custom-font-size-lg);
+    margin-bottom: 0rem;
+  }
+
+  p {
+    color: var(--custom-content-color-light);
+    font-size: var(--custom-font-size-sm);
+    margin-bottom: 0;
+  }
+}
