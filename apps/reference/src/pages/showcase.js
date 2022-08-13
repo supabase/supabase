@@ -51,9 +51,15 @@ function ShowcaseSection({ showcase }) {
 
 function ShowcaseCard({ projectOrCompany, isOpenSource, publicRepo }) {
   const spacedFooter =
-    projectOrCompany.web_site && publicRepo && isOpenSource ? 'ShowcaseCard-Footer-Spaced' : null
+    projectOrCompany.web_site && publicRepo && isOpenSource
+      ? 'ShowcaseCard-Footer-Spaced'
+      : null
   const button = (label, href) => (
-    <a className="button button--secondary ShowcaseCard-Footer-Item" target="_blank" href={href}>
+    <a
+      className="button button--secondary ShowcaseCard-Footer-Item"
+      target="_blank"
+      href={href}
+    >
       {label}
     </a>
   )
@@ -62,18 +68,25 @@ function ShowcaseCard({ projectOrCompany, isOpenSource, publicRepo }) {
     <div className="card card__body ShowcaseCard">
       <div className="ShowcaseCard-Content">
         <div className="ShowcaseCard-ImgContainer">
-          <img className="ShowcaseCard-Img" src={`/img/showcase-logo/${projectOrCompany.image}`} />
+          <img
+            className="ShowcaseCard-Img"
+            src={`/img/showcase-logo/${projectOrCompany.image}`}
+          />
         </div>
 
         <div className="ShowcaseCard-Text">
           <h3 className="">{projectOrCompany.name}</h3>
-          <span className="ShowcaseCard-Tag">{isOpenSource ? '#OpenSource' : null}</span>
+          <span className="ShowcaseCard-Tag">
+            {isOpenSource ? '#OpenSource' : null}
+          </span>
           <p>{projectOrCompany.description}</p>
         </div>
       </div>
 
       <div className={`${spacedFooter} ShowcaseCard-Footer`}>
-        {projectOrCompany.web_site ? button('Web site', projectOrCompany.web_site) : null}
+        {projectOrCompany.web_site
+          ? button('Web site', projectOrCompany.web_site)
+          : null}
         {publicRepo && isOpenSource ? button('View repo', publicRepo) : null}
       </div>
     </div>

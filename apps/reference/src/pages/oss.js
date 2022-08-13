@@ -45,8 +45,8 @@ export default function Oss() {
             <div className="col">
               <h2 className="with-underline">Open source</h2>
               <p className="">
-                Supabase is an open source company, supporting existing open source tools and
-                communities wherever possible.
+                Supabase is an open source company, supporting existing open
+                source tools and communities wherever possible.
               </p>
             </div>
           </div>
@@ -70,7 +70,9 @@ export default function Oss() {
             {maintainerPills.map((x) => (
               <li
                 key={x}
-                className={`pills__item ${activePill == x ? 'pills__item--active' : ''}`}
+                className={`pills__item ${
+                  activePill == x ? 'pills__item--active' : ''
+                }`}
                 onClick={() => setActivePill(x)}
               >
                 {x}
@@ -84,15 +86,24 @@ export default function Oss() {
               .sort((a, b) => a.handle.localeCompare(b.handle))
               .map((x, idx) => (
                 <div className={'col col--4'} key={idx}>
-                  <a className="card" href={`https://github.com/${x.handle}`} target="_blank">
+                  <a
+                    className="card"
+                    href={`https://github.com/${x.handle}`}
+                    target="_blank"
+                  >
                     <div className="card__body">
                       <div className="avatar">
                         <div className="avatar__photo-link avatar__photo avatar__photo--lg">
-                          <img alt={x.handle} src={`https://github.com/${x.handle}.png`} />
+                          <img
+                            alt={x.handle}
+                            src={`https://github.com/${x.handle}.png`}
+                          />
                         </div>
                         <div className="avatar__intro">
                           <h4 className="avatar__name">@{x.handle}</h4>
-                          <small className="avatar__subtitle">{x.description}</small>
+                          <small className="avatar__subtitle">
+                            {x.description}
+                          </small>
                         </div>
                       </div>
                     </div>
