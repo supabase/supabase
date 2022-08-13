@@ -63,7 +63,7 @@ const RefHeader = (props) => {
       {headerNames[found].icon && (
         <div className="custom--main-menu-header__icon">
           <img
-            src={`/docs/img/icons/${headerNames[found].icon}.svg`}
+            src={`/${baseUrl}/img/icons/${headerNames[found].icon}.svg`}
             alt="supabase-logo"
           />
         </div>
