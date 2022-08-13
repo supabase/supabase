@@ -1,48 +1,27 @@
 ---
 id: initializing
-title: "Initializing"
+title: 'Initializing'
 slug: initializing
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Dart
+
 You can initialize a new Supabase client using the `SupabaseClient()` method.
 
 The Supabase client is your entrypoint to the rest of the Supabase functionality
 and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
-
 ## Flutter
 
 For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Dart SupabaseClient()
-
-
 
 <Tabs
   defaultValue="dart"
@@ -55,14 +34,11 @@ For `supabase_flutter`, you will be using the static `initialize()` method on `S
 final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Flutter initialize()
-
-
 
 <Tabs
   defaultValue="dart"
@@ -77,7 +53,6 @@ Future<void> main() async {
   runApp(MyApp());
 }
 ```
-
 
 </TabItem>
 

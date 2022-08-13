@@ -1,12 +1,12 @@
 ---
 id: auth-api-updateuserbyid
-title: "updateUserById()"
+title: 'updateUserById()'
 slug: /auth-api-updateuserbyid
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Updates the user data.
 
@@ -17,9 +17,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -37,12 +35,11 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -68,26 +65,14 @@ This function should only be called on a server. Never expose your `service_role
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Updates a user's email.
-
-
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -98,8 +83,6 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 
 ### Updates a user's password.
 
-
-
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
@@ -108,8 +91,6 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 ```
 
 ### Updates a user's metadata.
-
-
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -120,8 +101,6 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 
 ### Updates a user's app_metadata.
 
-
-
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
@@ -131,8 +110,6 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 
 ### Confirms a user's email address.
 
-
-
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
@@ -141,8 +118,6 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 ```
 
 ### Confirms a user's phone number.
-
-
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(

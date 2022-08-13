@@ -1,12 +1,12 @@
 ---
 id: order
-title: "order()"
+title: 'order()'
 slug: /order
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Orders the result with the specified `column`.
 
@@ -17,9 +17,7 @@ const { data, error } = await supabase
   .order('id', { ascending: false })
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -43,7 +41,6 @@ The column to order on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -58,7 +55,7 @@ The column to order on.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -85,7 +82,6 @@ If `true`, `null`s appear first.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -105,7 +101,6 @@ The foreign table to use (if `column` is a foreign column).
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -133,24 +128,9 @@ If `true`, the result will be in ascending order.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -161,12 +141,10 @@ const { data, error } = await supabase
 
 ### With embedded resources
 
-
-
 ```js
 const { data, error } = await supabase
   .from('countries')
   .select('name, cities(name)')
   .eq('name', 'United States')
-  .order('name', {foreignTable: 'cities'})
+  .order('name', { foreignTable: 'cities' })
 ```

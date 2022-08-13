@@ -9,16 +9,16 @@ import JwtGenerator from '@site/src/components/JwtGenerator'
 
 There are several ways to use Supabase:
 
-- [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure. 
+- [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure.
 - [Docker](/docs/guides/hosting/docker): deploy to your own infrastructure.
 - Kubernetes: coming soon.
 
 ## Architecture
 
-Supabase is a combination of open source tools, each specifically chosen for Enterprise-readiness. 
+Supabase is a combination of open source tools, each specifically chosen for Enterprise-readiness.
 
-If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. 
-If the tool doesn't exist, we build and open source it ourselves. 
+If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool.
+If the tool doesn't exist, we build and open source it ourselves.
 
 ![Supabase Architecture](/img/supabase-architecture.png)
 
@@ -29,10 +29,6 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-
-
-
-
 
 ## Configuration
 
@@ -52,11 +48,10 @@ The "middleware" is everything except Postgres, and it should work with any Post
 
 ### Database Extensions
 
-Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the 
+Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
 [schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
 
-
-We recommend installing all extensions into an `extensions` schema. This will keep your API clean, 
+We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
 
 ```sql
@@ -70,20 +65,18 @@ create extension if not exists pgjwt with schema extensions;
 
 For UUID functions, required for PostgreSQL <13.
 
-
 ##### `pgcrypto` and `pgjwt`
-
 
 For working with JWT and Auth functions.
 
 ### Database Roles
 
-Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the 
+Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
 [schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
 
 ##### `postgres`
 
-The default PostgreSQL role. This has admin privileges.  
+The default PostgreSQL role. This has admin privileges.
 
 ##### `anon`
 
@@ -91,7 +84,7 @@ For "anonymous access". This is the role which the API (PostgREST) will use when
 
 ##### `authenticator`
 
-A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then 
+A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then
 "change into" another role determined by the JWT verification.
 
 ##### `authenticated`
@@ -116,22 +109,22 @@ For running commands via the Supabase UI.
 
 ##### `supabase_admin`
 
-Supabase Administrative role for maintaining your database. 
+Supabase Administrative role for maintaining your database.
 
-## API Keys 
+## API Keys
 
-The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role, 
+The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role,
 and Supabase is designed to work with 2 roles: an `ANON_KEY` for unauthenticated access and a `SERVICE_KEY` for elevated access.
 
 Use this tool to generate keys:
 
 <JwtGenerator />
 
-## Managing your secrets 
+## Managing your secrets
 
 Many components inside Supabase use secure secrets and passwords. These are listed in the self-hosting
-[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a 
-secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks. 
+[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a
+secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks.
 
 Some suggested systems include:
 
@@ -148,7 +141,7 @@ Supabase is evolving fast, and we'll continue to improve the migration strategy 
 
 We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
 
-## Deployment options 
+## Deployment options
 
 While Supabase officially supports Docker, we have several other deployment strategies managed by the community:
 

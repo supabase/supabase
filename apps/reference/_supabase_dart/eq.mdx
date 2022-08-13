@@ -1,15 +1,14 @@
 ---
 id: eq
-title: ".eq()"
+title: '.eq()'
 slug: eq
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose value on the stated `column` exactly matches the specified `value`.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,33 +24,14 @@ final res = await supabase
   .eq('name', 'The shire')
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -67,15 +47,12 @@ final res = await supabase
   .eq('name', 'The shire')
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -92,14 +69,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -116,14 +90,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -139,7 +110,6 @@ final res = await supabase
   .eq('name', 'San Francisco')
   .execute();
 ```
-
 
 </TabItem>
 

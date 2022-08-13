@@ -1,14 +1,12 @@
 ---
 id: containedby
-title: ".containedBy()"
+title: '.containedBy()'
 slug: /containedby
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ```js
 const { data, error } = await supabase
@@ -16,11 +14,6 @@ const { data, error } = await supabase
   .select('name, id, main_exports')
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
-
-
-
-
-
 
 ## Notes
 
@@ -33,20 +26,9 @@ const { data, error } = await supabase
   .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -57,8 +39,6 @@ const { data, error } = await supabase
 
 ### With `update()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('countries')
@@ -68,8 +48,6 @@ const { data, error } = await supabase
 
 ### With `delete()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('countries')
@@ -78,8 +56,6 @@ const { data, error } = await supabase
 ```
 
 ### With `rpc()`
-
-
 
 ```js
 // Only valid if the Postgres function returns a table type.

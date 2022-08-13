@@ -137,18 +137,27 @@ const { data, error } = await supabase.from('books').insert([
   {
     title: 'The Tale of Peter Rabbit',
     author: 'Beatrix Potter',
-    metadata: { description: 'Rabbit eats some vegetables.', price: 4.49, ages: [2, 5] },
+    metadata: {
+      description: 'Rabbit eats some vegetables.',
+      price: 4.49,
+      ages: [2, 5],
+    },
   },
   {
     title: 'Tootle',
     author: 'Gertrude Crampton',
-    metadata: { description: 'Little toy train has big dreams.', price: 3.99, ages: [2, 5] },
+    metadata: {
+      description: 'Little toy train has big dreams.',
+      price: 3.99,
+      ages: [2, 5],
+    },
   },
   {
     title: 'Green Eggs and Ham',
     author: 'Dr. Seuss',
     metadata: {
-      description: 'Sam has changing food preferences and eats unusually colored food.',
+      description:
+        'Sam has changing food preferences and eats unusually colored food.',
       price: 7.49,
       ages: [4, 8],
     },

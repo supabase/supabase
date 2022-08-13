@@ -79,13 +79,13 @@ Initialize the Supabase client by passing it the environment variables.
 This can be saved to a common file, for example as `lib/supabaseClient.js`
 
 ```jsx
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
-export default supabase;
+export const supabase = createClient(supabaseUrl, supabaseKey)
+export default supabase
 ```
 
 ## Step 4: Set up Clerk Provider
@@ -103,17 +103,17 @@ After the package is installed, wrap your application with the `<ClerkProvider /
 In a Next.js application, this is typically done in `pages/_app.js`:
 
 ```jsx
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider } from '@clerk/nextjs'
 
 function MyApp({ Component, pageProps }) {
   return (
     <ClerkProvider>
       <Component {...pageProps} />
     </ClerkProvider>
-  );
+  )
 }
 
-export default MyApp;
+export default MyApp
 ```
 
 ## Step 5: Set auth token with Supabase
@@ -125,29 +125,29 @@ In order to access the custom JWT, you can use the `getToken` function returned 
 Call `supabase.auth.setAuth(token)` to override the JWT on the current client. The JWT will then be sent to Supabase with all subsequent network requests.
 
 ```jsx
-import { useAuth } from '@clerk/nextjs';
-import supabase from '../lib/supabaseClient';
+import { useAuth } from '@clerk/nextjs'
+import supabase from '../lib/supabaseClient'
 
 export default function Home() {
-  const { getToken } = useAuth();
+  const { getToken } = useAuth()
 
   const fetchData = async () => {
     // TODO #1: Replace with your JWT template name
-    const token = await getToken({ template: 'supabase' });
+    const token = await getToken({ template: 'supabase' })
 
-    supabase.auth.setAuth(token);
+    supabase.auth.setAuth(token)
 
     // TODO #2: Replace with your database table name
-    const { data, error } = await supabase.from('your_table').select();
+    const { data, error } = await supabase.from('your_table').select()
 
     // TODO #3: Handle the response
-  };
+  }
 
   return (
     <button type="button" onClick={fetchData}>
       Fetch data
     </button>
-  );
+  )
 }
 ```
 

@@ -1,12 +1,12 @@
 ---
 id: like
-title: ".like()"
+title: '.like()'
 slug: /like
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose value in the stated `column` matches the supplied
 `pattern` (case sensitive).
@@ -18,9 +18,7 @@ const { data, error } = await supabase
   .like('name', '%la%')
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -44,7 +42,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -67,24 +64,9 @@ The pattern to filter with.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -95,8 +77,6 @@ const { data, error } = await supabase
 
 ### With `update()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -106,8 +86,6 @@ const { data, error } = await supabase
 
 ### With `delete()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -116,8 +94,6 @@ const { data, error } = await supabase
 ```
 
 ### With `rpc()`
-
-
 
 ```js
 // Only valid if the Postgres function returns a table type.

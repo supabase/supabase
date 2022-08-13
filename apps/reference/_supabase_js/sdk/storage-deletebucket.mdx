@@ -1,25 +1,21 @@
 ---
 id: storage-deletebucket
-title: "deleteBucket()"
+title: 'deleteBucket()'
 slug: /storage-deletebucket
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
 You must first `empty()` the bucket.
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .deleteBucket('avatars')
+const { data, error } = await supabase.storage.deleteBucket('avatars')
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -45,30 +41,16 @@ The unique identifier of the bucket you would like to delete.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
   - `buckets` permissions: `select` and `delete`
   - `objects` permissions: none
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Delete bucket
 
-
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .deleteBucket('avatars')
+const { data, error } = await supabase.storage.deleteBucket('avatars')
 ```

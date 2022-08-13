@@ -1,15 +1,14 @@
 ---
 id: range
-title: "range()"
+title: 'range()'
 slug: range
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Limits the result to rows within the specified range, inclusive.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,33 +24,14 @@ final res = await supabase
   .range(0,3)
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -67,7 +47,6 @@ final res = await supabase
   .range(0,3)
   .execute();
 ```
-
 
 </TabItem>
 
