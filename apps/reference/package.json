@@ -12,7 +12,7 @@
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
-    "prettier": "prettier --write \"./**/*.{ts,tsx,md,js,jsx,css,json}\"",
+    "prettier": "prettier --write \"./**/*.{ts,tsx,md,mdx,js,jsx,css,json}\"",
     "cli:version": "docusaurus docs:version:_cli",
     "gotrue:version": "docusaurus docs:version:_gotrue",
     "storage:version": "docusaurus docs:version:_storage",
