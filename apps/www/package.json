@@ -1,6 +1,6 @@
 {
   "name": "www",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Supabase main website",
   "private": true,
   "scripts": {
