@@ -219,7 +219,7 @@ export default function Auth() {
 
   return (
     <div className="row flex flex-center">
-      <div className="col-6 form-widget">
+      <div className="col-6 auth-widget">
         <h1 className="header">Supabase + Next.js</h1>
         <p className="description">Sign in via magic link with your email below</p>
         <div>
@@ -324,7 +324,7 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="form-widget">
+    <div className="account">
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session.user.email} disabled />
@@ -522,7 +522,7 @@ import Avatar from './Avatar'
 // ...
 
 return (
-  <div className="form-widget">
+  <div className="account">
     {/* Add to the body */}
     <Avatar
       url={avatar_url}
