@@ -1,3 +1,11 @@
+# NextJS - supabase-auth - starter example
+To use the  OAuth provider, create new credentials `CLIENT_ID` and `CLIENT_SECRET` from various providers like [Google](https://console.cloud.google.com/apis/credentials) or [Github]() under a new project and paste them on the Supabase project settings directory under the chosen provider.
+
+## For `Google` Provider 
+copy the url and paste it as the `allowed_uri` in [Google console](https://console.cloud.google.com/apis/credentials) to avoid mismatch
+ [!Image](/examples/nextjs-with-supabase-auth/public/google_supabase.png) [!Image for Google console](/examples/nextjs-with-supabase-auth/public/supabasegoogle%20console.png)
+
+
 # Example: Supabase authentication client- and server-side (API routes), and SSR with auth cookie.
 
 This example shows how to use Supabase auth both on the client and server in both [API routes](https://nextjs.org/docs/api-routes/introduction) and when using [server side rendering (SSR)](https://nextjs.org/docs/basic-features/pages#server-side-rendering). This example uses helper functions that can be viewed at [supabase auth helpers repository](https://github.com/supabase-community/supabase-auth-helpers).
