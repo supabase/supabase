@@ -5,7 +5,7 @@ slug: /
 sidebar_label: Supabase JavaScript Library
 ---
 
-This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`. 
+This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
 You can use the `supabase-js` library to:
 

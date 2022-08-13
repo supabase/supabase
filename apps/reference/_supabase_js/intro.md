@@ -15,7 +15,7 @@ Refer to the `v1` docs for a stable release.
 
 :::
 
-This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`. 
+This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
 You can use the `supabase-js` library to:
 
