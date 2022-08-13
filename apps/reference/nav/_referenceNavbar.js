@@ -34,12 +34,12 @@ const buildNavbar = ({ baseUrl }) => {
      * OFFICIAL REFERENCE
      */
     // API
-    {
-      to: 'reference/api',
-      position: 'left',
-      label: 'API',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/api$|${trimmedBaseUrl}/reference/api/)`,
-    },
+    // {
+    //   to: 'reference/api',
+    //   position: 'left',
+    //   label: 'API',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/api$|${trimmedBaseUrl}/reference/api/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
@@ -47,12 +47,12 @@ const buildNavbar = ({ baseUrl }) => {
     //   supabaseCustomNavBarRegex: '(^/api$|api/)',
     // },
     // CLI
-    {
-      to: 'reference/cli',
-      position: 'left',
-      label: 'CLI',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/cli$|${trimmedBaseUrl}/reference/cli/)`,
-    },
+    // {
+    //   to: 'reference/cli',
+    //   position: 'left',
+    //   label: 'CLI',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/cli$|${trimmedBaseUrl}/reference/cli/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
@@ -60,12 +60,12 @@ const buildNavbar = ({ baseUrl }) => {
     //   supabaseCustomNavBarRegex: '(^/cli$|cli/)',
     // },
     // supabase-js
-    {
-      to: 'reference/javascript',
-      position: 'left',
-      label: 'JavaScript Library',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
-    },
+    // {
+    //   to: 'reference/javascript',
+    //   position: 'left',
+    //   label: 'JavaScript Library',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/javascript$|${trimmedBaseUrl}/reference/javascript/)`,
+    // },
     {
       type: 'docsVersionDropdown',
       position: 'left',
@@ -76,12 +76,12 @@ const buildNavbar = ({ baseUrl }) => {
      * TOOLS
      */
     // GoTrue
-    {
-      to: 'reference/auth',
-      position: 'left',
-      label: 'Auth Server',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth$|${trimmedBaseUrl}/reference/auth/)`,
-    },
+    // {
+    //   to: 'reference/auth',
+    //   position: 'left',
+    //   label: 'Auth Server',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth$|${trimmedBaseUrl}/reference/auth/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
@@ -89,12 +89,12 @@ const buildNavbar = ({ baseUrl }) => {
     //   supabaseCustomNavBarRegex: '(^/gotrue$|gotrue/)',
     // },
     // Storage
-    {
-      to: 'reference/storage',
-      position: 'left',
-      label: 'Storage Server',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/storage$|${trimmedBaseUrl}/reference/storage/)`,
-    },
+    // {
+    //   to: 'reference/storage',
+    //   position: 'left',
+    //   label: 'Storage Server',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/storage$|${trimmedBaseUrl}/reference/storage/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
@@ -104,24 +104,24 @@ const buildNavbar = ({ baseUrl }) => {
     /**
      * COMMUNITY
      */
-    {
-      to: 'reference/supabase-dart',
-      position: 'left',
-      label: 'Dart Library',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/dart$|${trimmedBaseUrl}/reference/dart/)`,
-    },
+    // {
+    //   to: 'reference/supabase-dart',
+    //   position: 'left',
+    //   label: 'Dart Library',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/dart$|${trimmedBaseUrl}/reference/dart/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
     //   docsPluginId: '_supabase_dart',
     //   supabaseCustomNavBarRegex: '(^/supabase-dart$|supabase-dart/)',
     // },
-    {
-      to: 'reference/auth-helpers',
-      position: 'left',
-      label: 'Auth Helpers',
-      supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth-helpers$|${trimmedBaseUrl}/reference/auth-helpers/)`,
-    },
+    // {
+    //   to: 'reference/auth-helpers',
+    //   position: 'left',
+    //   label: 'Auth Helpers',
+    //   supabaseCustomNavBarRegex: `(^/${trimmedBaseUrl}/reference/auth-helpers$|${trimmedBaseUrl}/reference/auth-helpers/)`,
+    // },
     // {
     //   type: 'docsVersionDropdown',
     //   position: 'left',
