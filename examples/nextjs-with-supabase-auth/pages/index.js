@@ -1,5 +1,6 @@
-import { useUser, Auth } from '@supabase/supabase-auth-helpers/react'
-import { supabaseClient } from '@supabase/supabase-auth-helpers/nextjs'
+import { Auth } from '@supabase/ui'
+import { useUser } from '@supabase/auth-helpers-react'
+import { supabaseClient } from '@supabase/auth-helpers-nextjs'
 import { useEffect, useState } from 'react'
 
 const LoginPage = () => {

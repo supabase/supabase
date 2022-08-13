@@ -1,13 +1,13 @@
 // pages/profile.js
-import { withAuthRequired } from '@supabase/supabase-auth-helpers/nextjs'
+import { withPageAuth } from '@supabase/auth-helpers-nextjs'
 
 export default function Profile({ user }) {
   return (
     <>
-      <div>Hello {user.email}</div>
+     <div>Hello {user.user_metadata.full_name}</div>
       <pre>{JSON.stringify(user, null, 2)}</pre>
     </>
   )
 }
 
-export const getServerSideProps = withAuthRequired()
+export const getServerSideProps = withPageAuth({ redirectTo: '/login' })
