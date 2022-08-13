@@ -5,17 +5,19 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
+const baseUrl = '/new-docs/'
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
-  baseUrl: '/docs/',
+  baseUrl: baseUrl,
   onBrokenLinks: 'ignore', // TODO: remove this when going into prod
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
-  // themes: ['docusaurus-theme-search-typesense'], // This is currently causing build errors "ReactContextError" - Docusaurus server-side rendering could not render static page with path
+  themes: ['docusaurus-theme-search-typesense'],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -138,7 +140,7 @@ const config = {
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
-        items: mainNavbar.navbar,
+        items: mainNavbar.buildNavbar({ baseUrl }),
       },
       footer: {
         links: [
@@ -232,26 +234,26 @@ const config = {
         darkTheme: darkCodeTheme,
       },
 
-      // typesense: {
-      //   typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+      typesense: {
+        typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
 
-      //   typesenseServerConfig: {
-      //     nodes: [
-      //       {
-      //         host: 'doc-search.supabase.com',
-      //         port: 443,
-      //         protocol: 'https',
-      //       },
-      //     ],
-      //     apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
-      //   },
+        typesenseServerConfig: {
+          nodes: [
+            {
+              host: 'doc-search.supabase.com',
+              port: 443,
+              protocol: 'https',
+            },
+          ],
+          apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
+        },
 
-      //   // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
-      //   typesenseSearchParameters: {},
+        // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+        typesenseSearchParameters: {},
 
-      //   // Optional
-      //   contextualSearch: true,
-      // },
+        // Optional
+        contextualSearch: true,
+      },
     }),
 }
 

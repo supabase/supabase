@@ -3,15 +3,15 @@ import Content from '@theme-original/DocSidebar/Desktop/Content'
 import { useLocation } from '@docusaurus/router'
 import Link from '@docusaurus/Link'
 
+const baseUrl = `new-docs`
 const subNavRoutes = [
   // Add any routes which should have a subnav
-  '/docs/reference/api',
-  '/docs/reference/cli',
-  '/docs/reference/auth-helpers',
-  '/docs/reference/auth',
-  '/docs/reference/storage',
-  '/docs/reference/javascript',
-  '/docs/reference/dart',
+  `/${baseUrl}/reference/api`,
+  `/${baseUrl}/reference/cli`,
+  `/${baseUrl}/reference/auth`,
+  `/${baseUrl}/reference/storage`,
+  `/${baseUrl}/reference/javascript`,
+  `/${baseUrl}/reference/dart`,
 ]
 
 const headerNames = {
@@ -48,7 +48,6 @@ const headerNames = {
 const requiresSubNav = (pathname, routes) => {
   // if (pathname.includes('reference/auth-helpers')) return false
   const found = routes.find((route) => pathname.indexOf(route) == 0)
-  console.log('found sub nav', found)
   return found
 }
 
@@ -58,8 +57,7 @@ const RefHeader = (props) => {
   const found = paths.find((p) => {
     return split === p
   })
-  // return <p>hello world</p>
-  console.log('found path', found)
+
   return (
     <div className="custom--main-menu-header-container">
       {headerNames[found].icon && (
@@ -83,7 +81,7 @@ export default function ContentWrapper(props) {
       <div className="theme-doc-sidebar-menu-custom-container">
         {pathname && requiresSubNav(pathname, subNavRoutes) && (
           <>
-            <Link to="/docs/reference" className="custom--main-menu-button">
+            <Link to={`/${baseUrl}/reference`} id="custom--main-menu-button">
               <svg
                 width="24"
                 height="24"
