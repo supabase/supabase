@@ -1,25 +1,22 @@
 ---
 id: invoke
-title: "invoke()"
+title: 'invoke()'
 slug: /invoke
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Invokes a Supabase Function.
 
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -42,7 +39,6 @@ the name of the function to invoke
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -69,30 +65,18 @@ object with the following properties
 
 </ul>
 
-
 ## Notes
 
 - Requires an Authorization header.
 - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic invocation.
 
-
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
 
@@ -100,11 +84,10 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 
 By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
 
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
   responseType: 'text',
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
 
@@ -112,12 +95,11 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 
 You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
 
-
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  headers: { 
-    "my-custom-header": 'my-custom-header-value' 
+  headers: {
+    'my-custom-header': 'my-custom-header-value',
   },
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```

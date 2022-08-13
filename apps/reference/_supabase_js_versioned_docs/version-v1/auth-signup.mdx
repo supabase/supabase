@@ -1,12 +1,12 @@
 ---
 id: auth-signup
-title: "signUp()"
+title: 'signUp()'
 slug: auth-signup
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Creates a new user.
 
@@ -24,13 +24,11 @@ const { user, session, error } = await supabase.auth.signUp({
 })
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -48,12 +46,11 @@ const { user, session, error } = await supabase.auth.signUp({
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -69,7 +66,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -90,12 +87,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -111,12 +107,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -132,7 +127,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -144,7 +139,6 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
@@ -152,24 +146,13 @@ No description provided.
 - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
 - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
 - If signUp() is called for an existing confirmed user:
-    - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
-    - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
+  - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
+  - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
 - To check if a user already exists, refer to getUser().
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Sign up.
-
-
 
 <Tabs
   defaultValue="js"
@@ -185,14 +168,11 @@ const { user, session, error } = await supabase.auth.signUp({
 })
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Sign up with additional user meta data.
-
-
 
 <Tabs
   defaultValue="js"
@@ -208,14 +188,13 @@ const { user, session, error } = await supabase.auth.signUp(
     password: 'example-password',
   },
   {
-    data: { 
-      first_name: 'John', 
+    data: {
+      first_name: 'John',
       age: 27,
-    }
+    },
   }
 )
 ```
-
 
 </TabItem>
 
@@ -228,7 +207,6 @@ You can sign up with OAuth providers using the [`signIn()`](/docs/reference/java
 ### Sign up with Phone.
 
 Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
-
 
 <Tabs
   defaultValue="js"
@@ -249,7 +227,6 @@ let { session, error } = await supabase.auth.verifyOTP({
   token: '123456',
 })
 ```
-
 
 </TabItem>
 

@@ -1,12 +1,12 @@
 ---
 id: auth-setauth
-title: "setAuth()"
+title: 'setAuth()'
 slug: auth-setauth
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Overrides the JWT on the current client. The JWT will then be sent in all subsequent network requests.
 
@@ -20,9 +20,9 @@ Overrides the JWT on the current client. The JWT will then be sent in all subseq
 ```js
 function apiFunction(req, res) {
   // Assuming the access token was sent as a header "X-Supabase-Auth"
-  const { access_token } = req.get('X-Supabase-Auth') 
+  const { access_token } = req.get('X-Supabase-Auth')
 
-  // You can now use it within a Supabase Client 
+  // You can now use it within a Supabase Client
   const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
   const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -31,13 +31,11 @@ function apiFunction(req, res) {
 }
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -63,19 +61,6 @@ a jwt access token
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic example.
@@ -92,9 +77,9 @@ This is most useful on server-side functions where you cannot log the user in, b
 ```js
 function apiFunction(req, res) {
   // Assuming the access token was sent as a header "X-Supabase-Auth"
-  const { access_token } = req.get('X-Supabase-Auth') 
+  const { access_token } = req.get('X-Supabase-Auth')
 
-  // You can now use it within a Supabase Client 
+  // You can now use it within a Supabase Client
   const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
   const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -103,14 +88,11 @@ function apiFunction(req, res) {
 }
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With Express.
-
-
 
 <Tabs
   defaultValue="js"
@@ -120,40 +102,41 @@ function apiFunction(req, res) {
 <TabItem value="js">
 
 ```js
-
 /**
-* Make a request from the client to your server function
-*/
+ * Make a request from the client to your server function
+ */
 async function makeApiRequest() {
   const token = newClient.session()?.access_token
 
   await fetch('https://example.com/withAuth', {
-     method: 'GET',
-     withCredentials: true,
-     credentials: 'include',
-     headers: {
+    method: 'GET',
+    withCredentials: true,
+    credentials: 'include',
+    headers: {
       'Content-Type': 'application/json',
-      'Authorization': bearer, // Your own auth
+      Authorization: bearer, // Your own auth
       'X-Supabase-Auth': token, // Set the Supabase user
-     }
+    },
   })
 }
 
 /**
-* Use the Auth token in your server-side function.
-*/
+ * Use the Auth token in your server-side function.
+ */
 async function apiFunction(req, res) {
-  const { access_token } = req.get('X-Supabase-Auth') 
+  const { access_token } = req.get('X-Supabase-Auth')
 
-  // You can now use it within a Supabase Client 
-  const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
+  // You can now use it within a Supabase Client
+  const supabase = createClient(
+    'https://xyzcompany.supabase.co',
+    'public-anon-key'
+  )
   const { user, error } = supabase.auth.setAuth(access_token)
 
   // This client will now send requests as this user
   const { data } = await supabase.from('your_table').select()
 }
 ```
-
 
 </TabItem>
 

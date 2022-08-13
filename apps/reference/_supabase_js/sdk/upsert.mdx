@@ -1,12 +1,12 @@
 ---
 id: upsert
-title: "Upsert data: upsert()"
+title: 'Upsert data: upsert()'
 slug: /upsert
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs an UPSERT into the table.
 
@@ -16,9 +16,7 @@ const { data, error } = await supabase
   .upsert({ id: 3, message: 'foo', username: 'supabot' })
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -42,7 +40,6 @@ The values to insert.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -57,7 +54,7 @@ The values to insert.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -84,7 +81,6 @@ By default the new record is returned. Set this to 'minimal' if you don't need t
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -105,7 +101,6 @@ By specifying the `on_conflict` query parameter, you can make UPSERT work on a c
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -125,7 +120,6 @@ Specifies if duplicate rows should be ignored and not inserted.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -153,26 +147,14 @@ Count algorithm to use to count rows in a table.
 
 </ul>
 
-
 ## Notes
 
-- Primary keys should be included in the data payload in order for an update to work correctly. 
-- Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
-
-
-
-
-
-
-
-
-
+- Primary keys should be included in the data payload in order for an update to work correctly.
+- Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
 
 ## Examples
 
 ### Upsert your data
-
-
 
 ```js
 const { data, error } = await supabase
@@ -182,23 +164,18 @@ const { data, error } = await supabase
 
 ### Bulk Upsert your data
 
-
-
 ```js
-const { data, error } = await supabase
-  .from('messages')
-  .upsert([
+const { data, error } = await supabase.from('messages').upsert([
   { id: 3, message: 'foo', username: 'supabot' },
-  { id: 4, message: 'bar', username: 'supabot' }
-  ])
+  { id: 4, message: 'bar', username: 'supabot' },
+])
 ```
 
 ### Upserting into tables with constraints
 
-Running the following will cause supabase to upsert data into the `users` table. 
-If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row 
+Running the following will cause supabase to upsert data into the `users` table.
+If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
 based on the column passed into `onConflict`.
-
 
 ```js
 const { data, error } = await supabase
@@ -208,15 +185,15 @@ const { data, error } = await supabase
 
 ### Return the exact number of rows
 
-
-
 ```js
-const { data, error, count } = await supabase
-  .from('users')
-  .upsert({ 
-      id: 3, message: 'foo', 
-      username: 'supabot' 
-  }, { 
-    count: 'exact' 
-  })
+const { data, error, count } = await supabase.from('users').upsert(
+  {
+    id: 3,
+    message: 'foo',
+    username: 'supabot',
+  },
+  {
+    count: 'exact',
+  }
+)
 ```

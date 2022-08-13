@@ -1,12 +1,12 @@
 ---
 id: auth-api-deleteuser
-title: "deleteUser()"
+title: 'deleteUser()'
 slug: auth-api-deleteuser
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Delete a user. Requires a `service_role` key.
 
@@ -25,13 +25,11 @@ const { data: user, error } = await supabase.auth.api.deleteUser(
 )
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -57,26 +55,14 @@ The user uid you want to remove.
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Remove a user completely.
-
-
 
 <Tabs
   defaultValue="js"
@@ -90,7 +76,6 @@ const { data: user, error } = await supabase.auth.api.deleteUser(
   '715ed5db-f090-4b8c-a067-640ecee36aa0'
 )
 ```
-
 
 </TabItem>
 

@@ -1,15 +1,14 @@
 ---
 id: storage-from-createsignedurl
-title: "from.createSignedUrl()"
+title: 'from.createSignedUrl()'
 slug: storage-from-createsignedurl
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
-
 
 <Tabs
   defaultValue="dart"
@@ -26,36 +25,20 @@ final res = await supabase
 
 final signedURL = res.data;
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Create Signed URL
-
-
 
 <Tabs
   defaultValue="dart"
@@ -72,7 +55,6 @@ final res = await supabase
 
 final signedURL = res.data;
 ```
-
 
 </TabItem>
 

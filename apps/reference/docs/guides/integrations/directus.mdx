@@ -1,7 +1,7 @@
 ---
 id: directus
 title: 'Directus'
-description: "In this guide, we will show you how to create a Supabase project, install the Directus platform locally and configure the two to connect."
+description: 'In this guide, we will show you how to create a Supabase project, install the Directus platform locally and configure the two to connect.'
 ---
 
 In this guide, we will demonstrate how to create a new Supabase project, install a fresh instance of the Directus platform, then configure the two to work together seamlessly. If you're unfamiliar with either of these systems, don’t worry! We’ll start off with an overview of each platform and explain how they complement each other, noting any overlap in capabilities.
@@ -24,13 +24,13 @@ When these two systems are brought together, you get a scalable datastore, limit
 
 The two platforms share an overlap of capabilities that deepens their integration and offers developers the freedom of choice across a broader spectrum of connectivity. Key areas of intersection include:
 
-The ability to generate *powerful* APIs dynamically to connect data
+The ability to generate _powerful_ APIs dynamically to connect data
 User management and fine-grained access control
 Digital asset storage and management.
 
 More importantly, Directus and Supabase share a common vision for your data, making them quite symbiotic. Both solutions are completely open-source, with self-hosted and cloud deployment options available. They are unopinionated in their approach, with vendor-agnostic data storage, and they both focus on providing a polished developer experience along with comprehensive documentation.
 
-By linking the Supabase database with your Directus Project, *you get a superset of data tools.* You'll benefit from Supabase's Postgres database and its *dev-centric* admin app with the raw power to run SQL queries, ***as well as*** the Directus no-code app, which enables intuitive permissions-based data access for the whole team.
+By linking the Supabase database with your Directus Project, _you get a superset of data tools._ You'll benefit from Supabase's Postgres database and its _dev-centric_ admin app with the raw power to run SQL queries, **_as well as_** the Directus no-code app, which enables intuitive permissions-based data access for the whole team.
 
 Let’s dive into how we actually set up and link these two platforms to create a modern data stack powerhouse.
 
@@ -102,6 +102,7 @@ The configuration can be found in <file-path>/example-project/.env
 cd example-project
 npx directus start
 ```
+
 **Please note:** To prevent public accessibility when using the supabase-js library,turn on row level security (RLS) on all these tables inside of the Supabase Dashboard. By default when RLS is turned on these tables cannot be read from or written to with the supabase-js library.
 
 That’s it! Your project is now up and running locally. You can access the Directus Studio in the browser via the URL displayed, and log in with the Directus admin credentials you entered above:
@@ -119,10 +120,12 @@ From here, the sky's the limit on what you can build. You’ll probably want to 
 Below are some additional resources to dive in and start exploring these two platforms:
 
 **Directus**
+
 - See the [Directus guides](https://directus.io/guides/).
 - Join the Directus community on [Discord](https://directus.chat/).
 - Check out the source code on the official [Directus GitHub Repo](https://github.com/directus/directus).
 
 **Supabase**
+
 - Explore the [Supabase documentation](https://supabase.com/docs)
 - Join the Supabase community on [Discord](https://discord.supabase.com/)

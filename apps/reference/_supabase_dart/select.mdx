@@ -1,15 +1,14 @@
 ---
 id: select
-title: "Fetch data: select()"
+title: 'Fetch data: select()'
 slug: select
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs vertical filtering with SELECT.
-
 
 <Tabs
   defaultValue="dart"
@@ -28,14 +27,9 @@ final data = res.data;
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -44,20 +38,9 @@ final error = res.error;
 - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
 - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Getting your data
-
-
 
 <Tabs
   defaultValue="dart"
@@ -75,7 +58,6 @@ final res = await supabase
 final data = res.data;
 final error = res.error;
 ```
-
 
 </TabItem>
 
@@ -98,7 +80,6 @@ final res = await supabase
   .select('name')
   .execute();
 ```
-
 
 </TabItem>
 
@@ -127,20 +108,18 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Query the same foreign table multiple times
 
-Sometimes you will need to query the same foreign table twice. 
-In this case, you can use the name of the joined column to identify 
-which join you intend to use. For convenience, you can also give an 
-alias for each column. For example, if we had a shop of products, 
-and we wanted to get the supplier and the purchaser at the same time 
+Sometimes you will need to query the same foreign table twice.
+In this case, you can use the name of the joined column to identify
+which join you intend to use. For convenience, you can also give an
+alias for each column. For example, if we had a shop of products,
+and we wanted to get the supplier and the purchaser at the same time
 (both in the users) table:
-
 
 <Tabs
   defaultValue="dart"
@@ -160,16 +139,14 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Filtering with inner joins
 
-If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
 to select all rows in a `message` table which belong to a user with the `username` "Jane":
-
 
 <Tabs
   defaultValue="dart"
@@ -186,7 +163,6 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -195,7 +171,6 @@ final res = await supabase
 
 You can get the number of rows by using the count option.
 Allowed values for count option are [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
-
 
 <Tabs
   defaultValue="dart"
@@ -213,19 +188,17 @@ final res = await supabase
 final count = res.count;
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Querying JSON data
 
-If you have data inside of a JSONB column, you can apply select 
-and query filters to the data values. Postgres offers a 
-[number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-for querying JSON data. Also see 
+If you have data inside of a JSONB column, you can apply select
+and query filters to the data values. Postgres offers a
+[number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+for querying JSON data. Also see
 [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
-
 
 <Tabs
   defaultValue="dart"
@@ -245,7 +218,6 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -253,7 +225,6 @@ final res = await supabase
 ### Return data as CSV
 
 By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
-
 
 <Tabs
   defaultValue="dart"
@@ -269,7 +240,6 @@ final res = await supabase
   .csv()
   .execute();
 ```
-
 
 </TabItem>
 

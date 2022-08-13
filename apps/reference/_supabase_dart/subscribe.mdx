@@ -1,15 +1,14 @@
 ---
 id: subscribe
-title: "on().subscribe()"
+title: 'on().subscribe()'
 slug: subscribe
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Subscribe to realtime changes in your database.
-
 
 <Tabs
   defaultValue="dart"
@@ -27,34 +26,18 @@ final mySubscription = supabase
   .subscribe();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
 - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Listen to all database changes
-
-
 
 <Tabs
   defaultValue="dart"
@@ -71,7 +54,6 @@ final mySubscription = supabase
   })
   .subscribe();
 ```
-
 
 </TabItem>
 
@@ -79,8 +61,6 @@ final mySubscription = supabase
 
 ### Listening to a specific table
 
-
-
 <Tabs
   defaultValue="dart"
   groupId="reference/dart"
@@ -97,14 +77,11 @@ final mySubscription = supabase
   .subscribe();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Listening to inserts
-
-
 
 <Tabs
   defaultValue="dart"
@@ -122,20 +99,18 @@ final mySubscription = supabase
   .subscribe();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Listening to updates
 
-By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
-enable full replication for the table you are listening too: 
+By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+enable full replication for the table you are listening too:
 
 ```sql
 alter table "your_table" replica identity full;
 ```
-
 
 <Tabs
   defaultValue="dart"
@@ -153,20 +128,18 @@ final mySubscription = supabase
   .subscribe();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Listening to deletes
 
-By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
-enable full replication for the table you are listening too: 
+By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+enable full replication for the table you are listening too:
 
 ```sql
 alter table "your_table" replica identity full;
 ```
-
 
 <Tabs
   defaultValue="dart"
@@ -183,7 +156,6 @@ final mySubscription = supabase
   })
   .subscribe();
 ```
-
 
 </TabItem>
 
@@ -208,7 +180,6 @@ final mySubscription = supabase
   .subscribe();
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -230,7 +201,6 @@ final mySubscription = supabase
   .on(SupabaseEventTypes.update, handleRecordUpdated)
   .subscribe();
 ```
-
 
 </TabItem>
 

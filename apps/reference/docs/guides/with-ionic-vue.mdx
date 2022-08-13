@@ -1,12 +1,12 @@
 ---
 id: with-ionic-vue
-title: "Quickstart: Ionic Vue"
+title: 'Quickstart: Ionic Vue'
 description: Learn how to use Supabase in your Ionic Vue App.
 sidebar_label: Ionic Vue
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Intro
 
@@ -47,7 +47,6 @@ and then creating a "schema" inside the database.
 1. Enter your project details.
 1. Wait for the new database to launch.
 
-
 ### Set up the database schema
 
 Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
@@ -66,7 +65,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -123,7 +127,6 @@ create policy "Anyone can upload an avatar."
 </TabItem>
 </Tabs>
 
-
 ### Get the API Keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
@@ -134,7 +137,12 @@ We just need to get the URL and `anon` key from the API settings.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -214,31 +222,12 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
       </ion-list>
       <p>{{email}}</p>
     </ion-content>
-
   </ion-page>
 </template>
 
 <script lang="ts">
-import { supabase } from '../supabase';
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  toastController,
-  loadingController,
-} from '@ionic/vue';
-import { defineComponent, ref } from 'vue';
-
-export default defineComponent({
-  name: 'LoginPage',
-  components: {
+  import { supabase } from '../supabase'
+  import {
     IonContent,
     IonHeader,
     IonPage,
@@ -249,37 +238,49 @@ export default defineComponent({
     IonLabel,
     IonInput,
     IonButton,
-  },
-  setup() {
-    const email = ref('');
-    const handleLogin = async () => {
+    toastController,
+    loadingController,
+  } from '@ionic/vue'
+  import { defineComponent, ref } from 'vue'
 
-      const loader = await loadingController.create({});
-      const toast = await toastController.create({ duration: 5000 });
+  export default defineComponent({
+    name: 'LoginPage',
+    components: {
+      IonContent,
+      IonHeader,
+      IonPage,
+      IonTitle,
+      IonToolbar,
+      IonList,
+      IonItem,
+      IonLabel,
+      IonInput,
+      IonButton,
+    },
+    setup() {
+      const email = ref('')
+      const handleLogin = async () => {
+        const loader = await loadingController.create({})
+        const toast = await toastController.create({ duration: 5000 })
 
-      try {
-        await loader.present();
-        const { error } = await supabase.auth.signIn({ email: email.value });
+        try {
+          await loader.present()
+          const { error } = await supabase.auth.signIn({ email: email.value })
 
-        if (error) throw error;
+          if (error) throw error
 
-        toast.message = 'Check your email for the login link!';
-        await toast.present();
-
-      } catch (error: any) {
-
-        toast.message = error.error_description || error.message;
-        await toast.present();
-
-      } finally {
-
-        await loader.dismiss();
-
+          toast.message = 'Check your email for the login link!'
+          await toast.present()
+        } catch (error: any) {
+          toast.message = error.error_description || error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
       }
-    };
-    return { handleLogin, email };
-  },
-});
+      return { handleLogin, email }
+    },
+  })
 </script>
 ```
 
@@ -337,118 +338,118 @@ Let's create a new component for that called `Account.vue`.
 </template>
 
 <script lang="ts">
-import { store } from '@/store';
-import { supabase } from '@/supabase';
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  toastController,
-  loadingController,
-  IonInput,
-  IonItem,
-  IonButton,
-  IonLabel,
-} from '@ionic/vue';
-import { User } from '@supabase/supabase-js';
-import { defineComponent, onMounted, ref } from 'vue';
-export default defineComponent({
-  name: 'AccountPage',
-  components: {
+  import { store } from '@/store'
+  import { supabase } from '@/supabase'
+  import {
     IonContent,
     IonHeader,
     IonPage,
     IonTitle,
     IonToolbar,
+    toastController,
+    loadingController,
     IonInput,
     IonItem,
     IonButton,
     IonLabel,
-  },
-  setup() {
-    const session = ref(supabase.auth.session());
-    const profile = ref({
-      username: '',
-      website: '',
-      avatar_url: '',
-    });
-    const user = store.user as User;
-    async function getProfile() {
-      const loader = await loadingController.create({});
-      const toast = await toastController.create({ duration: 5000 });
-      await loader.present();
-      try {
-        let { data, error, status } = await supabase
-          .from('profiles')
-          .select(`username, website, avatar_url`)
-          .eq('id', user.id)
-          .single();
+  } from '@ionic/vue'
+  import { User } from '@supabase/supabase-js'
+  import { defineComponent, onMounted, ref } from 'vue'
+  export default defineComponent({
+    name: 'AccountPage',
+    components: {
+      IonContent,
+      IonHeader,
+      IonPage,
+      IonTitle,
+      IonToolbar,
+      IonInput,
+      IonItem,
+      IonButton,
+      IonLabel,
+    },
+    setup() {
+      const session = ref(supabase.auth.session())
+      const profile = ref({
+        username: '',
+        website: '',
+        avatar_url: '',
+      })
+      const user = store.user as User
+      async function getProfile() {
+        const loader = await loadingController.create({})
+        const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
+        try {
+          let { data, error, status } = await supabase
+            .from('profiles')
+            .select(`username, website, avatar_url`)
+            .eq('id', user.id)
+            .single()
 
-        if (error && status !== 406) throw error;
+          if (error && status !== 406) throw error
 
-        if (data) {
-          console.log(data)
-          profile.value = {
-            username: data.username,
-            website: data.website,
-            avatar_url: data.avatar_url,
-          };
+          if (data) {
+            console.log(data)
+            profile.value = {
+              username: data.username,
+              website: data.website,
+              avatar_url: data.avatar_url,
+            }
+          }
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
         }
-      } catch (error: any) {
-        toast.message = error.message;
-        await toast.present();
-      } finally {
-        await loader.dismiss();
       }
-    }
 
-    const updateProfile = async () => {
-      const loader = await loadingController.create({});
-      const toast = await toastController.create({ duration: 5000 });
-      try {
-        await loader.present();
-        const updates = {
-          id: user.id,
-          ...profile.value,
-          updated_at: new Date(),
-        };
-        //
-        let { error } = await supabase.from('profiles').upsert(updates, {
-          returning: 'minimal', // Don't return the value after inserting
-        });
-        //
-        if (error) throw error;
-      } catch (error: any) {
-        toast.message = error.message;
-        await toast.present();
-      } finally {
-        await loader.dismiss();
+      const updateProfile = async () => {
+        const loader = await loadingController.create({})
+        const toast = await toastController.create({ duration: 5000 })
+        try {
+          await loader.present()
+          const updates = {
+            id: user.id,
+            ...profile.value,
+            updated_at: new Date(),
+          }
+          //
+          let { error } = await supabase.from('profiles').upsert(updates, {
+            returning: 'minimal', // Don't return the value after inserting
+          })
+          //
+          if (error) throw error
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
       }
-    };
 
-    async function signOut() {
-      const loader = await loadingController.create({});
-      const toast = await toastController.create({ duration: 5000 });
-      await loader.present();
-      try {
-        let { error } = await supabase.auth.signOut();
-        if (error) throw error;
-      } catch (error: any) {
-        toast.message = error.message;
-        await toast.present();
-      } finally {
-        await loader.dismiss();
+      async function signOut() {
+        const loader = await loadingController.create({})
+        const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
+        try {
+          let { error } = await supabase.auth.signOut()
+          if (error) throw error
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
       }
-    }
 
-    onMounted(() => {
-      getProfile();
-    });
-    return { signOut, profile, session, updateProfile };
-  },
-});
+      onMounted(() => {
+        getProfile()
+      })
+      return { signOut, profile, session, updateProfile }
+    },
+  })
 </script>
 ```
 
@@ -457,31 +458,30 @@ export default defineComponent({
 Now that we have all the components in place, let's update `App.vue` and our routes:
 
 ```ts title="src/router.index.ts"
-import { createRouter, createWebHistory } from '@ionic/vue-router';
-import { RouteRecordRaw } from 'vue-router';
-import LoginPage from '../views/Login.vue';
-import AccountPage from '../views/Account.vue';
+import { createRouter, createWebHistory } from '@ionic/vue-router'
+import { RouteRecordRaw } from 'vue-router'
+import LoginPage from '../views/Login.vue'
+import AccountPage from '../views/Account.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Login',
-    component: LoginPage
+    component: LoginPage,
   },
   {
     path: '/account',
     name: 'Account',
-    component: AccountPage
-  }
+    component: AccountPage,
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
 })
 
 export default router
 ```
-
 
 ```html title="src/App.vue"
 <template>
@@ -491,29 +491,29 @@ export default router
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue';
-import { defineComponent } from 'vue';
+  import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue'
+  import { defineComponent } from 'vue'
 
-import { store } from './store';
-import { supabase } from './supabase';
+  import { store } from './store'
+  import { supabase } from './supabase'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    IonApp,
-    IonRouterOutlet
-  },
-  setup(){
-    const router = useIonRouter();
-    store.user = supabase.auth.user() ?? {};
-    supabase.auth.onAuthStateChange((_, session) => {
-      store.user = session?.user ?? {}
-      if(session?.user) {
-        router.replace('/account');
-      }
-    })
-  }
-});
+  export default defineComponent({
+    name: 'App',
+    components: {
+      IonApp,
+      IonRouterOutlet,
+    },
+    setup() {
+      const router = useIonRouter()
+      store.user = supabase.auth.user() ?? {}
+      supabase.auth.onAuthStateChange((_, session) => {
+        store.user = session?.user ?? {}
+        if (session?.user) {
+          router.replace('/account')
+        }
+      })
+    },
+  })
 </script>
 ```
 
@@ -548,24 +548,22 @@ With those packages installed we can update our `main.ts` to include an addition
 ```ts title="src/main.tsx"
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router';
+import router from './router'
 
-import { IonicVue } from '@ionic/vue';
+import { IonicVue } from '@ionic/vue'
 /* Core CSS required for Ionic components to work properly */
-import '@ionic/vue/css/ionic.bundle.css';
+import '@ionic/vue/css/ionic.bundle.css'
 
 /* Theme variables */
-import './theme/variables.css';
+import './theme/variables.css'
 
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
-defineCustomElements(window);
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+import { defineCustomElements } from '@ionic/pwa-elements/loader'
+defineCustomElements(window)
+const app = createApp(App).use(IonicVue).use(router)
 
 router.isReady().then(() => {
-  app.mount('#app');
-});
+  app.mount('#app')
+})
 ```
 
 Then create an **AvatarComponent**.
@@ -581,104 +579,105 @@ Then create an **AvatarComponent**.
 </template>
 
 <script lang="ts">
-import { ref, toRefs, watch, defineComponent } from 'vue';
-import { supabase } from '../supabase';
-import { Camera, CameraResultType } from '@capacitor/camera';
-import { IonIcon } from '@ionic/vue';
-import { person } from 'ionicons/icons';
-export default defineComponent({
-  name: 'AppAvatar',
-  props: { path: String },
-  emits: ['upload', 'update:path'],
-  components: { IonIcon },
-  setup(prop, { emit }) {
-    const { path } = toRefs(prop);
-    const avatarUrl = ref('');
+  import { ref, toRefs, watch, defineComponent } from 'vue'
+  import { supabase } from '../supabase'
+  import { Camera, CameraResultType } from '@capacitor/camera'
+  import { IonIcon } from '@ionic/vue'
+  import { person } from 'ionicons/icons'
+  export default defineComponent({
+    name: 'AppAvatar',
+    props: { path: String },
+    emits: ['upload', 'update:path'],
+    components: { IonIcon },
+    setup(prop, { emit }) {
+      const { path } = toRefs(prop)
+      const avatarUrl = ref('')
 
-    const downloadImage = async () => {
-      try {
-        const { data, error } = await supabase.storage
-          .from('avatars')
-          .download(path.value);
-        if (error) throw error;
-        avatarUrl.value = URL.createObjectURL(data!);
-      } catch (error: any) {
-        console.error('Error downloading image: ', error.message);
-      }
-    };
-
-    const uploadAvatar = async () => {
-      try {
-        const photo = await Camera.getPhoto({
-          resultType: CameraResultType.DataUrl,
-        });
-        if (photo.dataUrl) {
-          const file = await fetch(photo.dataUrl)
-            .then((res) => res.blob())
-            .then(
-              (blob) =>
-                new File([blob], 'my-file', { type: `image/${photo.format}` })
-            );
-
-          const fileName = `${Math.random()}-${new Date().getTime()}.${
-            photo.format
-          }`;
-          let { error: uploadError } = await supabase.storage
+      const downloadImage = async () => {
+        try {
+          const { data, error } = await supabase.storage
             .from('avatars')
-            .upload(fileName, file);
-          if (uploadError) {
-            throw uploadError;
-          }
-          emit('update:path', fileName);
-          emit('upload');
+            .download(path.value)
+          if (error) throw error
+          avatarUrl.value = URL.createObjectURL(data!)
+        } catch (error: any) {
+          console.error('Error downloading image: ', error.message)
         }
-      } catch (error) {
-        console.log(error);
       }
-    };
 
-    watch(path, () => {
-      if (path.value) downloadImage();
-    });
+      const uploadAvatar = async () => {
+        try {
+          const photo = await Camera.getPhoto({
+            resultType: CameraResultType.DataUrl,
+          })
+          if (photo.dataUrl) {
+            const file = await fetch(photo.dataUrl)
+              .then((res) => res.blob())
+              .then(
+                (blob) =>
+                  new File([blob], 'my-file', { type: `image/${photo.format}` })
+              )
 
-    return { avatarUrl, uploadAvatar, person };
-  },
-});
+            const fileName = `${Math.random()}-${new Date().getTime()}.${
+              photo.format
+            }`
+            let { error: uploadError } = await supabase.storage
+              .from('avatars')
+              .upload(fileName, file)
+            if (uploadError) {
+              throw uploadError
+            }
+            emit('update:path', fileName)
+            emit('upload')
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      watch(path, () => {
+        if (path.value) downloadImage()
+      })
+
+      return { avatarUrl, uploadAvatar, person }
+    },
+  })
 </script>
 <style>
-.avatar {
-  display: block;
-  margin: auto;
-  min-height: 150px;
-}
-.avatar .avatar_wrapper {
-  margin: 16px auto 16px;
-  border-radius: 50%;
-  overflow: hidden;
-  height: 150px;
-  aspect-ratio: 1;
-  background: var(--ion-color-step-50);
-  border: thick solid var(--ion-color-step-200);
-}
-.avatar .avatar_wrapper:hover {
-  cursor: pointer;
-}
-.avatar .avatar_wrapper ion-icon.no-avatar {
-  width: 100%;
-  height: 115%;
-}
-.avatar img {
-  display: block;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
+  .avatar {
+    display: block;
+    margin: auto;
+    min-height: 150px;
+  }
+  .avatar .avatar_wrapper {
+    margin: 16px auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    height: 150px;
+    aspect-ratio: 1;
+    background: var(--ion-color-step-50);
+    border: thick solid var(--ion-color-step-200);
+  }
+  .avatar .avatar_wrapper:hover {
+    cursor: pointer;
+  }
+  .avatar .avatar_wrapper ion-icon.no-avatar {
+    width: 100%;
+    height: 115%;
+  }
+  .avatar img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 ```
 
 ### Add the new widget
 
 And then we can add the widget to the Account page:
+
 ```html title="src/views/Account.vue"
 <template>
   <ion-page>

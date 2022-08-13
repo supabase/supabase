@@ -1,15 +1,14 @@
 ---
 id: auth-signinwithprovider
-title: "auth.signInWithProvider()"
+title: 'auth.signInWithProvider()'
 slug: auth-signinwithprovider
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Signs the user in using third party OAuth providers.
-
 
 <Tabs
   defaultValue="dart"
@@ -24,34 +23,18 @@ final res = await supabase.auth.signInWithProvider(Provider.github);
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - `auth.signInWithProvider()` is only available on `supabase_flutter`
 - It will open the browser to the relevant login page.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Sign in with provider.
-
-
 
 <Tabs
   defaultValue="dart"
@@ -65,7 +48,6 @@ final res = await supabase.auth.signInWithProvider(Provider.github);
 
 final error = res.error;
 ```
-
 
 </TabItem>
 
@@ -75,7 +57,6 @@ final error = res.error;
 
 Specify the redirect link to bring back the user via deeplink.
 Note that `redirectTo` should be null for Flutter Web.
-
 
 <Tabs
   defaultValue="dart"
@@ -96,7 +77,6 @@ final res = await supabase.auth.signInWithProvider(
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -105,7 +85,6 @@ final error = res.error;
 
 If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
 You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
-
 
 <Tabs
   defaultValue="dart"
@@ -122,7 +101,6 @@ const { user, session, error } = await supabase.auth.signIn({
 })
 const oAuthToken = session.provider_token // use to access provider API
 ```
-
 
 </TabItem>
 
