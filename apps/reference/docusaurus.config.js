@@ -17,7 +17,7 @@ const config = {
   // onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
-  themes: ['docusaurus-theme-search-typesense'],
+  // themes: ['docusaurus-theme-search-typesense'],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -91,13 +91,13 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
-        lastVersion: 'current',
-        versions: {
-          current: {
-            label: 'v2',
-            // path: 'v2',
-          },
-        },
+        // lastVersion: 'current',
+        // versions: {
+        //   current: {
+        //     label: 'v2',
+        //     // path: 'v2',
+        //   },
+        // },
       },
     ],
     [
@@ -239,26 +239,26 @@ const config = {
         darkTheme: darkCodeTheme,
       },
 
-      typesense: {
-        typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+      // typesense: {
+      //   typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
 
-        typesenseServerConfig: {
-          nodes: [
-            {
-              host: 'doc-search.supabase.com',
-              port: 443,
-              protocol: 'https',
-            },
-          ],
-          apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
-        },
+      //   typesenseServerConfig: {
+      //     nodes: [
+      //       {
+      //         host: 'doc-search.supabase.com',
+      //         port: 443,
+      //         protocol: 'https',
+      //       },
+      //     ],
+      //     apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
+      //   },
 
-        // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
-        typesenseSearchParameters: {},
+      //   // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+      //   typesenseSearchParameters: {},
 
-        // Optional
-        contextualSearch: true,
-      },
+      //   // Optional
+      //   contextualSearch: true,
+      // },
     }),
 }
 

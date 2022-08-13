@@ -22,9 +22,11 @@ const sidebars = {
       label: 'Getting Started',
       items: [
         'intro',
-        'migration-guide',
-        'release-notes',
+        'installing',
+        'initializing',
         'typescript-support',
+        'release-notes',
+        'migration-guide',
       ],
       collapsed: false,
     },
