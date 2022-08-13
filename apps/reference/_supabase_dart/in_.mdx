@@ -1,18 +1,17 @@
 ---
 id: in_
-title: ".in_()"
+title: '.in_()'
 slug: in_
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose value on the stated `column` is found on the specified `values`.
 
 `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
 
-
 <Tabs
   defaultValue="dart"
   groupId="reference/dart"
@@ -27,33 +26,14 @@ final res = await supabase
   .in_('name', ['Rio de Janeiro', 'San Francisco'])
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -69,15 +49,12 @@ final res = await supabase
   .in_('name', ['Rio de Janeiro', 'San Francisco'])
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -94,14 +71,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -118,14 +92,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -141,7 +112,6 @@ final res = await supabase
   .in_('name', ['Rio de Janeiro', 'San Francisco'])
   .execute();
 ```
-
 
 </TabItem>
 

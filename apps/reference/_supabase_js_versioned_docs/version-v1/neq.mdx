@@ -1,12 +1,12 @@
 ---
 id: neq
-title: ".neq()"
+title: '.neq()'
 slug: neq
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose value on the stated `column` doesn't match the
 specified `value`.
@@ -25,13 +25,11 @@ const { data, error } = await supabase
   .neq('name', 'The shire')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -55,7 +53,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -78,24 +75,9 @@ The value to filter with.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -111,14 +93,11 @@ const { data, error } = await supabase
   .neq('name', 'The shire')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -134,14 +113,11 @@ const { data, error } = await supabase
   .neq('name', 'San Francisco')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -157,14 +133,11 @@ const { data, error } = await supabase
   .neq('name', 'Mordor')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -179,7 +152,6 @@ const { data, error } = await supabase
   .rpc('echo_all_cities')
   .neq('name', 'Lagos')
 ```
-
 
 </TabItem>
 

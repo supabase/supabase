@@ -1,12 +1,12 @@
 ---
 id: limit
-title: "limit()"
+title: 'limit()'
 slug: /limit
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Limits the result with the specified `count`.
 
@@ -17,9 +17,7 @@ const { data, error } = await supabase
   .limit(1)
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -43,7 +41,6 @@ The maximum no. of rows to limit to.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -58,7 +55,7 @@ The maximum no. of rows to limit to.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -91,24 +88,9 @@ The foreign table to use (for foreign columns).
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -118,8 +100,6 @@ const { data, error } = await supabase
 ```
 
 ### With embedded resources
-
-
 
 ```js
 const { data, error } = await supabase

@@ -1,15 +1,14 @@
 ---
 id: storage-from-upload
-title: "from.upload()"
+title: 'from.upload()'
 slug: storage-from-upload
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Uploads a file to an existing bucket.
-
 
 <Tabs
   defaultValue="dart"
@@ -29,13 +28,11 @@ final res = await supabase
   ));
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -59,7 +56,6 @@ The relative file path. Should be of the format `folder/subfolder/filename.png`.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -79,7 +75,6 @@ The body of the file to be stored in the bucket.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -106,27 +101,15 @@ HTTP headers.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `insert`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Upload file
-
-
 
 <Tabs
   defaultValue="dart"
@@ -145,7 +128,6 @@ final res = await supabase
     upsert: false
   ));
 ```
-
 
 </TabItem>
 

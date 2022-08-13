@@ -1,15 +1,14 @@
 ---
 id: not
-title: ".not()"
+title: '.not()'
 slug: not
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows which doesn't satisfy the filter.
-
 
 <Tabs
   defaultValue="dart"
@@ -26,14 +25,9 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -47,20 +41,9 @@ final res = await supabase
   .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -77,14 +60,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -101,14 +81,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -125,14 +102,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -148,7 +122,6 @@ final res = await supabase
   .not('name', 'eq', 'Paris')
   .execute();
 ```
-
 
 </TabItem>
 

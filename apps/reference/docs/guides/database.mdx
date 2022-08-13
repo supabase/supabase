@@ -40,7 +40,12 @@ Dig into the relationships within your data.
 You can duplicate your tables, just like you would inside a spreadsheet.
 
 <video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/duplicate-tables.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ### The SQL Editor
@@ -66,7 +71,12 @@ To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
 
 <video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/toggle-extensions.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 [Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
@@ -145,15 +155,27 @@ const NEW_PROJECT_URL = 'https://yyy.supabase.co'
 const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
-  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    schema: 'storage',
-  })
-  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
-  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
+  const oldSupabaseRestClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY,
+    {
+      schema: 'storage',
+    }
+  )
+  const oldSupabaseClient = createClient(
+    OLD_PROJECT_URL,
+    OLD_PROJECT_SERVICE_KEY
+  )
+  const newSupabaseClient = createClient(
+    NEW_PROJECT_URL,
+    NEW_PROJECT_SERVICE_KEY
+  )
 
   // make sure you update max_rows in postgrest settings if you have a lot of objects
   // or paginate here
-  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
+  const { data: oldObjects, error } = await oldSupabaseRestClient
+    .from('objects')
+    .select()
   if (error) {
     console.log('error getting objects from old bucket')
     throw error
@@ -162,9 +184,10 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
   for (const objectData of oldObjects) {
     console.log(`moving ${objectData.id}`)
     try {
-      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .download(objectData.name)
+      const { data, error: downloadObjectError } =
+        await oldSupabaseClient.storage
+          .from(objectData.bucket_id)
+          .download(objectData.name)
       if (downloadObjectError) {
         throw downloadObjectError
       }

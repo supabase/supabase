@@ -1,12 +1,12 @@
 ---
 id: storage-from-createsignedurl
-title: "from.createSignedUrl()"
+title: 'from.createSignedUrl()'
 slug: storage-from-createsignedurl
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Create signed URL to download file without requiring permissions. This URL can be valid for a set number of seconds.
 
@@ -18,19 +18,16 @@ Create signed URL to download file without requiring permissions. This URL can b
 <TabItem value="js">
 
 ```js
-const { signedURL, error } = await supabase
-  .storage
+const { signedURL, error } = await supabase.storage
   .from('avatars')
   .createSignedUrl('folder/avatar1.png', 60)
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +51,6 @@ The file path to be downloaded, including the current file name. For example `fo
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -77,27 +73,15 @@ The number of seconds until the signed URL expires. For example, `60` for a URL 
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Create Signed URL
-
-
 
 <Tabs
   defaultValue="js"
@@ -107,12 +91,10 @@ The number of seconds until the signed URL expires. For example, `60` for a URL 
 <TabItem value="js">
 
 ```js
-const { signedURL, error } = await supabase
-  .storage
+const { signedURL, error } = await supabase.storage
   .from('avatars')
   .createSignedUrl('folder/avatar1.png', 60)
 ```
-
 
 </TabItem>
 

@@ -73,7 +73,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -141,7 +146,12 @@ We just need to get the URL and `anon` key from the API settings.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -215,10 +225,12 @@ export default function Auth() {
   }
 
   return (
-    <div className="row flex flex-center">
+    <div className="row flex-center flex">
       <div className="col-6 form-widget" aria-live="polite">
         <h1 className="header">Supabase + React</h1>
-        <p className="description">Sign in via magic link with your email below</p>
+        <p className="description">
+          Sign in via magic link with your email below
+        </p>
         {loading ? (
           'Sending magic link...'
         ) : (
@@ -345,13 +357,17 @@ const Account = ({ session }) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button className="button primary block" disabled={loading}>
               Update profile
             </button>
           </div>
         </form>
       )}
-      <button type="button" className="button block" onClick={() => supabase.auth.signOut()}>
+      <button
+        type="button"
+        className="button block"
+        onClick={() => supabase.auth.signOut()}
+      >
         Sign Out
       </button>
     </div>
@@ -385,7 +401,11 @@ export default function App() {
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!session ? <Auth /> : <Account key={session.user.id} session={session} />}
+      {!session ? (
+        <Auth />
+      ) : (
+        <Account key={session.user.id} session={session} />
+      )}
     </div>
   )
 }
@@ -428,7 +448,9 @@ export default function Avatar({ url, size, onUpload }) {
 
   const downloadImage = async (path) => {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path)
       if (error) {
         throw error
       }
@@ -452,7 +474,9 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -474,7 +498,9 @@ export default function Avatar({ url, size, onUpload }) {
         className="avatar image"
         style={{ height: size, width: size }}
       />
-      {uploading ? "Uploading..." : (
+      {uploading ? (
+        'Uploading...'
+      ) : (
         <>
           <label className="button primary block" htmlFor="single">
             Upload an avatar

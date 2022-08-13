@@ -1,12 +1,12 @@
 ---
 id: single
-title: "single()"
+title: 'single()'
 slug: single
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves only one row from the result. Result must be one row (e.g. using
 `limit`), otherwise this will result in an error.
@@ -26,32 +26,13 @@ const { data, error } = await supabase
   .single()
 ```
 
-
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -67,7 +48,6 @@ const { data, error } = await supabase
   .limit(1)
   .single()
 ```
-
 
 </TabItem>
 

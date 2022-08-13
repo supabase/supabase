@@ -1,15 +1,14 @@
 ---
 id: limit
-title: "limit()"
+title: 'limit()'
 slug: limit
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Limits the result with the specified count.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,33 +24,14 @@ final res = await supabase
   .limit(1)
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -67,15 +47,12 @@ final res = await supabase
   .limit(1)
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With embedded resources
-
-
 
 <Tabs
   defaultValue="dart"
@@ -92,7 +69,6 @@ final res = await supabase
   .limit(1,  foreignTable: 'cities' )
   .execute();
 ```
-
 
 </TabItem>
 

@@ -120,7 +120,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -194,7 +199,12 @@ We just need to get the URL as well as the `anon`, `service_role` and `JWT_SECRE
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -293,7 +303,10 @@ import { createClient } from '@supabase/supabase-js'
 
 // ...
 
-const supabaseClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const supabaseClient = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
 
 const App = () => (
   <FatalErrorBoundary page={FatalErrorPage}>
@@ -402,10 +415,12 @@ const Auth = () => {
   }
 
   return (
-    <div className="row flex flex-center">
+    <div className="row flex-center flex">
       <div className="col-6 form-widget">
         <h1 className="header">Supabase + RedwoodJS</h1>
-        <p className="description">Sign in via magic link with your email below</p>
+        <p className="description">
+          Sign in via magic link with your email below
+        </p>
         <div>
           <input
             className="inputField"
@@ -524,7 +539,7 @@ const Account = () => {
   }
 
   return (
-    <div className="row flex flex-center">
+    <div className="row flex-center flex">
       <div className="col-6 form-widget">
         <h1 className="header">Supabase + RedwoodJS</h1>
         <p className="description">Your profile</p>
@@ -554,7 +569,7 @@ const Account = () => {
 
           <div>
             <button
-              className="button block primary"
+              className="button primary block"
               onClick={() => updateProfile({ username, website, avatar_url })}
               disabled={loading}
             >
@@ -655,7 +670,9 @@ const Avatar = ({ url, size, onUpload }) => {
 
   async function downloadImage(path) {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path)
       if (error) {
         throw error
       }
@@ -679,7 +696,9 @@ const Avatar = ({ url, size, onUpload }) => {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -703,7 +722,10 @@ const Avatar = ({ url, size, onUpload }) => {
           style={{ height: size, width: size }}
         />
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
+        <div
+          className="avatar no-image"
+          style={{ height: size, width: size }}
+        />
       )}
       <div style={{ width: size }}>
         <label className="button primary block" htmlFor="single">

@@ -25,18 +25,17 @@ At a high level,
 ## Step 1: Set up your Backend on Supabase
 
 - On the [Supabase dashboard](https://app.supabase.com/), click `New project` and set the name of the project.
-By default, Supabase will already be set up for user signups with email, with users being stored in a `users` table.
+  By default, Supabase will already be set up for user signups with email, with users being stored in a `users` table.
 
 ![create-project-supabase](/img/guides/integrations/plasmic/create-project-supabase-01.png)
 
 - Navigate to the `Table Editor` on the left side navigation bar. Here we can create a `New table` to store our Pokemon entries. Make sure you are in the `schema public` view. Create a new table called `entries`, with 6 columns:
-    - `id`: is a unique ID for the entry. This column should be generated automatically as the primary column.
-    - `user_id`: Create a relation to the `user` table by clicking on the link icon next to the column name. Here, you can select the `id` column of the `user` table.
-    - `name`, `description`, `imageUrl`: This will store the name, description, and imageUrl for each Pokemon.
-    - `inserted_at` : This will be an automatically populated column, set to when the row was first inserted.
+  - `id`: is a unique ID for the entry. This column should be generated automatically as the primary column.
+  - `user_id`: Create a relation to the `user` table by clicking on the link icon next to the column name. Here, you can select the `id` column of the `user` table.
+  - `name`, `description`, `imageUrl`: This will store the name, description, and imageUrl for each Pokemon.
+  - `inserted_at` : This will be an automatically populated column, set to when the row was first inserted.
 
 > Note: In this tutorial we’ve turned off “[Row Level Security (RLS)](https://supabase.com/docs/guides/auth/row-level-security)”. In practice, you will want to create policies that restrict who gets to create, edit, and delete posts. By turning this off, any user can modify the database without restrictions.
-> 
 
 ![create-table-supabase](/img/guides/integrations/plasmic/create-table-supabase-02.png)
 
@@ -46,10 +45,9 @@ For your convenience, feel free to import the following CSV into Supabase to pre
 
 ## Step 2: Set up your codebase
 
-We have a working code example for you [here](https://github.com/plasmicapp/plasmic/tree/master/examples/supabase-demo). This starter comes with all of the code components you need to get started querying Supabase through Plasmic Studio. 
+We have a working code example for you [here](https://github.com/plasmicapp/plasmic/tree/master/examples/supabase-demo). This starter comes with all of the code components you need to get started querying Supabase through Plasmic Studio.
 
 > Code components are React components defined in your code base that we import into Plasmic Studio for use. Your project will be configured to look for these at `http://localhost:3000/plasmic-host` You can use these components in your design, as well as style them. Check out `supabase-demo/plasmic-init.ts` to see how they are registered with Plasmic.
-> 
 
 First, clone the repo to your development machine and install the dependencies.
 
@@ -79,7 +77,7 @@ If you pre-populated the database in Step 1. you should see the following homepa
 
 Now let’s try to make some additions! The code base is currently configured to a read-only copy of the Plasmic project. Let’s make an editable copy first.
 
-Open the default starter Plasmic project here:   
+Open the default starter Plasmic project here:  
 [https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6](https://studio.plasmic.app/projects/66RKaSPCwKxYjCfXWHCxn6)
 
 ![clone-project-plasmic](/img/guides/integrations/plasmic/clone-project-plasmic-04.png)
@@ -95,7 +93,7 @@ The API token can be found by clicking the `Code` button in the top bar.
 
 ![api-token-plasmic](/img/guides/integrations/plasmic/api-token-plasmic-05.png)
 
-Now go back to `.env.local` and update the corresponding project ID and token fields. 
+Now go back to `.env.local` and update the corresponding project ID and token fields.
 
 ### Step 4b: Configure your Plasmic project app host
 
@@ -104,25 +102,34 @@ To tell Plasmic to look for your code components on your dev server, you’ll ne
 > Note: At this point, you’ll need to keep your dev server running at `http://localhost:3000`for the project to load.
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/docs/videos/guides/integrations/plasmic/configure-app-host-plasmic-05.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/guides/integrations/plasmic/configure-app-host-plasmic-05.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 After restarting the dev server and Plasmic Studio, you should now be able to make edits across Plasmic Studio and your codebase.
 
 ## Step 5: Create a new page for our Pokedex gallery
 
-Let’s make a visual gallery for our Pokemon by using the code components from the code base. 
+Let’s make a visual gallery for our Pokemon by using the code components from the code base.
 
 Create a new page called `Gallery`, and set a path for this page (`/gallery`).
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/docs/videos/guides/integrations/plasmic/create-gallery-page-plasmic-06.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/guides/integrations/plasmic/create-gallery-page-plasmic-06.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 Insert a `SupabaseGrid` by searching the AddDrawer (by clicking the blue + button)
 
 > For source see `components/CodeComponents/DatabaseComponents.tsx`
-> 
 
 ![add-supabasegrid-plasmic](/img/guides/integrations/plasmic/add-supabasegrid-plasmic-07.png)
 
@@ -145,7 +152,12 @@ Now customize the repeated content by inserting instances of `SupabaseField`. Se
 For your convenience, the following video shows you how to create the page end-to-end.
 
 <video width="99%" autoPlay="autoplay" muted playsInline controls={true}>
-  <source src="/docs/videos/guides/integrations/plasmic/end-to-end-plasmic-10.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/guides/integrations/plasmic/end-to-end-plasmic-10.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Step 6: Check your dev server
@@ -253,28 +265,38 @@ Note that this code component is defined in your codebase. Feel free to augment 
 // supabase-demo/components/CodeComponents/DisplayCollections.tsx
 
 export function SupabaseGridCollection(props: SupabaseGridCollectionProps) {
-  const supabaseQuery = React.useContext(SupabaseQueryContext);
-  const { children, columns, columnGap, rowGap, count, className, loading, testLoading } = props;
+  const supabaseQuery = React.useContext(SupabaseQueryContext)
+  const {
+    children,
+    columns,
+    columnGap,
+    rowGap,
+    count,
+    className,
+    loading,
+    testLoading,
+  } = props
 
-  const result = supabaseQuery;
+  const result = supabaseQuery
   if (!result || testLoading) {
-    return loading;
+    return loading
   }
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: `repeat(${columns}, 1fr)`,
-      columnGap: `${columnGap}px`,
-      rowGap: `${rowGap}px`,
-    }}
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        columnGap: `${columnGap}px`,
+        rowGap: `${rowGap}px`,
+      }}
       className={className}
     >
-      {result.slice(0, count).map((row: any, i: any) => 
+      {result.slice(0, count).map((row: any, i: any) => (
         <RowContext.Provider value={row} key={row.id}>
           <div key={row.id}>{repeatedElement(i === 0, children)}</div>
         </RowContext.Provider>
-      )}
+      ))}
     </div>
   )
 }
@@ -287,12 +309,18 @@ export function SupabaseGridCollection(props: SupabaseGridCollectionProps) {
 ```tsx
 // supabase-demo/components/CodeComponents/DisplayCollections.tsx
 
-export function SupabaseTextField({ name, className }: { name?: string; className?: string }) {
-  const contexts = useAllContexts();
+export function SupabaseTextField({
+  name,
+  className,
+}: {
+  name?: string
+  className?: string
+}) {
+  const contexts = useAllContexts()
   if (!name) {
     return <p>You need to set the name prop</p>
   }
-  return <div className={className}>{getPropValue(name, contexts)}</div>;
+  return <div className={className}>{getPropValue(name, contexts)}</div>
 }
 ```
 

@@ -1,12 +1,12 @@
 ---
 id: rpc
-title: "Postgres functions: rpc()"
+title: 'Postgres functions: rpc()'
 slug: rpc
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 You can call Postgres functions as a "Remote Procedure Call".
 
@@ -19,7 +19,6 @@ create or replace function hello_world() returns text as $$
 $$ language sql;
 ```
 
-
 <Tabs
   defaultValue="js"
   groupId="reference/supabase-js"
@@ -28,17 +27,14 @@ $$ language sql;
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .rpc('hello_world')
+const { data, error } = await supabase.rpc('hello_world')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -62,7 +58,6 @@ The function name to call.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -83,7 +78,6 @@ The parameters to pass to the function call.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -98,7 +92,7 @@ The parameters to pass to the function call.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -124,7 +118,6 @@ When set to true, no data will be returned.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -152,19 +145,6 @@ Count algorithm to use to count rows in a table.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Call a Postgres function
@@ -179,18 +159,14 @@ This is an example of invoking a Postgres function with no parameters.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .rpc('hello_world')
+const { data, error } = await supabase.rpc('hello_world')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With Parameters
-
-
 
 <Tabs
   defaultValue="js"
@@ -200,10 +176,8 @@ const { data, error } = await supabase
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .rpc('echo_city', { name: 'The Shire' })
+const { data, error } = await supabase.rpc('echo_city', { name: 'The Shire' })
 ```
-
 
 </TabItem>
 
@@ -221,10 +195,10 @@ You can process large payloads at once using [array parameters](https://postgres
 <TabItem value="js">
 
 ```js
-const { data, error } = await postgrest
-  .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
+const { data, error } = await postgrest.rpc('echo_cities', {
+  names: ['The Shire', 'Mordor'],
+})
 ```
-
 
 </TabItem>
 
@@ -233,9 +207,8 @@ const { data, error } = await postgrest
 ### With filters
 
 Postgres functions that return tables can also be combined with
-[Modifiers](/docs/reference/javascript/using-modifiers) and 
+[Modifiers](/docs/reference/javascript/using-modifiers) and
 [Filters](/docs/reference/javascript/using-filters).
-
 
 <Tabs
   defaultValue="js"
@@ -251,7 +224,6 @@ const { data, error } = await supabase
   .eq('name', 'The Shire')
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -261,7 +233,6 @@ const { data, error } = await supabase
 You can specify a count option to get the row count along with your data.
 Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
 
-
 <Tabs
   defaultValue="js"
   groupId="reference/supabase-js"
@@ -270,10 +241,12 @@ Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
 <TabItem value="js">
 
 ```js
-const { data, error, count } = await supabase
-  .rpc('hello_world', {}, { count: 'exact' })
+const { data, error, count } = await supabase.rpc(
+  'hello_world',
+  {},
+  { count: 'exact' }
+)
 ```
-
 
 </TabItem>
 

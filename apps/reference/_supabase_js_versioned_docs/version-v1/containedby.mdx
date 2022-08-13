@@ -1,14 +1,12 @@
 ---
 id: containedby
-title: ".containedBy()"
+title: '.containedBy()'
 slug: containedby
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 <Tabs
   defaultValue="js"
@@ -24,14 +22,9 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -44,20 +37,9 @@ const { data, error } = await supabase
   .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -73,14 +55,11 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -96,14 +75,11 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -119,14 +95,11 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -141,7 +114,6 @@ const { data, error } = await supabase
   .rpc('echo_all_countries')
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
-
 
 </TabItem>
 

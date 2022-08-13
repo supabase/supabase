@@ -1,12 +1,12 @@
 ---
 id: is
-title: ".is()"
+title: '.is()'
 slug: /is
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 A check for exact equality (null, true, false), finds all rows whose
 value on the stated `column` exactly match the specified `value`.
@@ -18,9 +18,7 @@ const { data, error } = await supabase
   .is('name', null)
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -44,7 +42,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -67,24 +64,9 @@ The value to filter with.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -95,8 +77,6 @@ const { data, error } = await supabase
 
 ### With `update()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -106,22 +86,13 @@ const { data, error } = await supabase
 
 ### With `delete()`
 
-
-
 ```js
-const { data, error } = await supabase
-  .from('cities')
-  .delete()
-  .is('name', null)
+const { data, error } = await supabase.from('cities').delete().is('name', null)
 ```
 
 ### With `rpc()`
 
-
-
 ```js
 // Only valid if the Postgres function returns a table type.
-const { data, error } = await supabase
-  .rpc('echo_all_cities')
-  .is('name', null)
+const { data, error } = await supabase.rpc('echo_all_cities').is('name', null)
 ```

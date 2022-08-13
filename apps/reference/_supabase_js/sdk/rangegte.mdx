@@ -1,14 +1,12 @@
 ---
 id: rangegte
-title: ".rangeGte()"
+title: '.rangeGte()'
 slug: /rangegte
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ```js
 const { data, error } = await supabase
@@ -17,28 +15,9 @@ const { data, error } = await supabase
   .rangeGte('population_range_millions', '[150, 250]')
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```js
 const { data, error } = await supabase
@@ -49,8 +28,6 @@ const { data, error } = await supabase
 
 ### With `update()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('countries')
@@ -60,8 +37,6 @@ const { data, error } = await supabase
 
 ### With `delete()`
 
-
-
 ```js
 const { data, error } = await supabase
   .from('countries')
@@ -70,8 +45,6 @@ const { data, error } = await supabase
 ```
 
 ### With `rpc()`
-
-
 
 ```js
 // Only valid if the Postgres function returns a table type.

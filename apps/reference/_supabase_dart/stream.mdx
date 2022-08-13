@@ -1,15 +1,14 @@
 ---
 id: stream
-title: "stream()"
+title: 'stream()'
 slug: stream
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Notifies of data at the queried table.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,34 +24,18 @@ supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
 - `stream()` will emit the initial data as well as any further change on the database as `Stream` of `List<Map<String, dynamic>>` by combining Postgrest and Realtime.
 - Takes a list of primary key columns as its argument.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Listening to a specific table
-
-
 
 <Tabs
   defaultValue="dart"
@@ -67,7 +50,6 @@ supabase
   .stream(['id'])
   .execute();
 ```
-
 
 </TabItem>
 
@@ -77,7 +59,6 @@ supabase
 
 You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
 This syntax is the as how you can filter data in Realtime
-
 
 <Tabs
   defaultValue="dart"
@@ -93,14 +74,11 @@ supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `order()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -117,14 +95,11 @@ supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `limit()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -141,7 +116,6 @@ supabase
   .limit(10)
   .execute();
 ```
-
 
 </TabItem>
 

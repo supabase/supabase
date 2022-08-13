@@ -1,15 +1,14 @@
 ---
 id: filter
-title: ".filter()"
+title: '.filter()'
 slug: filter
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose `column` satisfies the filter.
-
 
 <Tabs
   defaultValue="dart"
@@ -26,14 +25,9 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -45,20 +39,9 @@ final res = await supabase
     .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -75,14 +58,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -99,14 +79,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -123,14 +100,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -146,14 +120,11 @@ final res = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Filter embedded resources
-
-
 
 <Tabs
   defaultValue="dart"
@@ -169,7 +140,6 @@ final res = await supabase
   .filter('countries.name', 'in', '("France","Japan")')
   .execute();
 ```
-
 
 </TabItem>
 
