@@ -44,7 +44,12 @@ and run the SQL queries yourself.
 <TabItem value="dashboard">
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-create-table-sm.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
@@ -394,7 +399,7 @@ create view transcripts as
     from grades
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
-    
+
 alter view transcripts owner to authenticated;
 ```
 

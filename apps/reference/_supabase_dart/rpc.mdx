@@ -1,18 +1,17 @@
 ---
 id: rpc
-title: "Stored Procedures: rpc()"
+title: 'Stored Procedures: rpc()'
 slug: rpc
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 You can call stored procedures as a "Remote Procedure Call".
 
 That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
 It's especially useful when the logic rarely changes - like password resets and updates.
-
 
 <Tabs
   defaultValue="dart"
@@ -27,26 +26,9 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
@@ -67,14 +49,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With Parameters
-
-
 
 <Tabs
   defaultValue="dart"
@@ -89,7 +68,6 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
@@ -98,7 +76,6 @@ final res = await supabase
 
 You can specify a count option to get the row count along with your data.
 Allowed values for count option are `exact`, `planned` and `estimated`.
-
 
 <Tabs
   defaultValue="dart"
@@ -112,7 +89,6 @@ final res = await supabase
   .rpc('hello_world')
   .execute(count: CountOption.exact);
 ```
-
 
 </TabItem>
 

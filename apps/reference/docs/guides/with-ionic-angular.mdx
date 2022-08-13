@@ -1,12 +1,12 @@
 ---
 id: with-ionic-angular
-title: "Quickstart: Ionic Angular"
+title: 'Quickstart: Ionic Angular'
 description: Learn how to use Supabase in your Ionic Angular App.
 sidebar_label: Ionic Angular
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Intro
 
@@ -47,7 +47,6 @@ and then creating a "schema" inside the database.
 1. Enter your project details.
 1. Wait for the new database to launch.
 
-
 ### Set up the database schema
 
 Now we are going to set up the database schema. We can use the "User Management Starter" quickstart in the SQL Editor,
@@ -66,7 +65,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -123,7 +127,6 @@ create policy "Anyone can upload an avatar."
 </TabItem>
 </Tabs>
 
-
 ### Get the API Keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
@@ -134,7 +137,12 @@ We just need to get the URL and `anon` key from the API settings.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-    <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -162,53 +170,55 @@ And finally we want to save the environment variables in the `environment.ts` fi
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-
 ```ts title="environment.ts"
 export const environment = {
   production: false,
-  supabaseUrl: "YOUR_SUPABASE_URL",
-  supabaseKey: "YOUR_SUPABASE_KEY"
-};
+  supabaseUrl: 'YOUR_SUPABASE_URL',
+  supabaseKey: 'YOUR_SUPABASE_KEY',
+}
 ```
 
 Now that we have the API credentials in place, let's create a **SupabaseService** with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
 ```ts title="src/app/supabase.service.ts"
-import { Injectable } from '@angular/core';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { Injectable } from '@angular/core'
+import { LoadingController, ToastController } from '@ionic/angular'
 import {
   AuthChangeEvent,
   createClient,
   Session,
   SupabaseClient,
-} from '@supabase/supabase-js';
-import { environment } from '../environments/environment';
+} from '@supabase/supabase-js'
+import { environment } from '../environments/environment'
 
 export interface Profile {
-  username: string;
-  website: string;
-  avatar_url: string;
+  username: string
+  website: string
+  avatar_url: string
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient
 
-  constructor(private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
+  constructor(
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
+  ) {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseKey
-    );
+    )
   }
 
   get user() {
-    return this.supabase.auth.user();
+    return this.supabase.auth.user()
   }
 
   get session() {
-    return this.supabase.auth.session();
+    return this.supabase.auth.session()
   }
 
   get profile() {
@@ -216,21 +226,21 @@ export class SupabaseService {
       .from('profiles')
       .select(`username, website, avatar_url`)
       .eq('id', this.user?.id)
-      .single();
+      .single()
   }
 
   authChanges(
     callback: (event: AuthChangeEvent, session: Session | null) => void
   ) {
-    return this.supabase.auth.onAuthStateChange(callback);
+    return this.supabase.auth.onAuthStateChange(callback)
   }
 
   signIn(email: string) {
-    return this.supabase.auth.signIn({ email });
+    return this.supabase.auth.signIn({ email })
   }
 
   signOut() {
-    return this.supabase.auth.signOut();
+    return this.supabase.auth.signOut()
   }
 
   updateProfile(profile: Profile) {
@@ -238,28 +248,28 @@ export class SupabaseService {
       ...profile,
       id: this.user?.id,
       updated_at: new Date(),
-    };
+    }
 
     return this.supabase.from('profiles').upsert(update, {
       returning: 'minimal', // Don't return the value after inserting
-    });
+    })
   }
 
   downLoadImage(path: string) {
-    return this.supabase.storage.from('avatars').download(path);
+    return this.supabase.storage.from('avatars').download(path)
   }
 
   uploadAvatar(filePath: string, file: File) {
-    return this.supabase.storage.from('avatars').upload(filePath, file);
+    return this.supabase.storage.from('avatars').upload(filePath, file)
   }
 
   async createNotice(message: string) {
-    const toast = await this.toastCtrl.create({ message, duration: 5000 });
-    await toast.present();
+    const toast = await this.toastCtrl.create({ message, duration: 5000 })
+    await toast.present()
   }
 
   createLoader() {
-    return this.loadingCtrl.create();
+    return this.loadingCtrl.create()
   }
 }
 ```
@@ -272,8 +282,8 @@ Create an **LoginPage** with `ionic g page login` Ionic CLI command.
 > This guide will show the template inline, but the example app will have templateUrls
 
 ```ts title="src/app/login/login.page.ts"
-import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from '../supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-login',
@@ -289,43 +299,41 @@ import { SupabaseService } from '../supabase.service';
         <h1>Supabase + Ionic Angular</h1>
         <p>Sign in via magic link with your email below</p>
       </div>
-        <ion-list inset="true">
-          <form (ngSubmit)="handleLogin($event)">
-            <ion-item>
-              <ion-label position="stacked">Email</ion-label>
-              <ion-input
-                [(ngModel)]="email"
-                name="email"
-                autocomplete
-                type="email"
-              ></ion-input>
-            </ion-item>
-            <div class="ion-text-center">
-              <ion-button type="submit" fill="clear">Login</ion-button>
-            </div>
-          </form>
-        </ion-list>
+      <ion-list inset="true">
+        <form (ngSubmit)="handleLogin($event)">
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input
+              [(ngModel)]="email"
+              name="email"
+              autocomplete
+              type="email"
+            ></ion-input>
+          </ion-item>
+          <div class="ion-text-center">
+            <ion-button type="submit" fill="clear">Login</ion-button>
+          </div>
+        </form>
+      </ion-list>
     </ion-content>
   `,
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  email = '';
-  constructor(
-    private readonly supabase: SupabaseService,
-  ) {}
+  email = ''
+  constructor(private readonly supabase: SupabaseService) {}
 
   ngOnInit() {}
   async handleLogin(event: any) {
-    event.preventDefault();
-    const loader = await this.supabase.createLoader();
-    await loader.present();
+    event.preventDefault()
+    const loader = await this.supabase.createLoader()
+    await loader.present()
     try {
-      await this.supabase.signIn(this.email);
-      await loader.dismiss();
-      await this.supabase.createNotice('Check your email for the login link!');
+      await this.supabase.signIn(this.email)
+      await loader.dismiss()
+      await this.supabase.createNotice('Check your email for the login link!')
     } catch (error) {
-      await loader.dismiss();
+      await loader.dismiss()
       await this.supabase.createNotice(error.error_description || error.message)
     }
   }
@@ -338,9 +346,9 @@ After a user is signed in we can allow them to edit their profile details and ma
 Create an **AccountComponent** with `ionic g page account` Ionic CLI command.
 
 ```ts title="src/app/account.component.ts"
-import { Component, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
-import { Profile, SupabaseService } from '../supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
+import { Profile, SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-account',
@@ -394,62 +402,60 @@ export class AccountPage implements OnInit {
     username: '',
     avatar_url: '',
     website: '',
-  };
+  }
 
-  session = this.supabase.session;
+  session = this.supabase.session
 
   constructor(
     private readonly supabase: SupabaseService,
     private router: Router
   ) {}
   ngOnInit() {
-    this.getProfile();
+    this.getProfile()
   }
 
   async getProfile() {
     try {
-      let { data: profile, error, status } = await this.supabase.profile;
+      let { data: profile, error, status } = await this.supabase.profile
       if (error && status !== 406) {
-        throw error;
+        throw error
       }
       if (profile) {
-        this.profile = profile;
+        this.profile = profile
       }
     } catch (error) {
-      alert(error.message);
+      alert(error.message)
     }
   }
 
   async updateProfile(avatar_url: string = '') {
-    const loader = await this.supabase.createLoader();
-    await loader.present();
+    const loader = await this.supabase.createLoader()
+    await loader.present()
     try {
-      await this.supabase.updateProfile({ ...this.profile, avatar_url });
-      await loader.dismiss();
-      await this.supabase.createNotice('Profile updated!');
+      await this.supabase.updateProfile({ ...this.profile, avatar_url })
+      await loader.dismiss()
+      await this.supabase.createNotice('Profile updated!')
     } catch (error) {
-      await this.supabase.createNotice(error.message);
+      await this.supabase.createNotice(error.message)
     }
   }
 
   async signOut() {
-    console.log('testing?');
-    await this.supabase.signOut();
-    this.router.navigate(['/'], { replaceUrl: true });
+    console.log('testing?')
+    await this.supabase.signOut()
+    this.router.navigate(['/'], { replaceUrl: true })
   }
 }
 ```
-
-
 
 ### Launch!
 
 Now that we have all the components in place, let's update **AppComponent**:
 
 ```ts title="src/app/app.component.ts"
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { SupabaseService } from './supabase.service';
+import { Component } from '@angular/core'
+import { Router } from '@angular/router'
+import { SupabaseService } from './supabase.service'
 
 @Component({
   selector: 'app-root',
@@ -463,11 +469,11 @@ import { SupabaseService } from './supabase.service';
 export class AppComponent {
   constructor(private supabase: SupabaseService, private router: Router) {
     this.supabase.authChanges((_, session) => {
-      console.log(session);
+      console.log(session)
       if (session?.user) {
-        this.router.navigate(['/account']);
+        this.router.navigate(['/account'])
       }
-    });
+    })
   }
 }
 ```
@@ -475,24 +481,26 @@ export class AppComponent {
 Then update the **AppRoutingModule**
 
 ```ts title="src/app/app.ts"
-import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { NgModule } from '@angular/core'
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
 const routes: Routes = [
   {
     path: '/',
-    loadChildren: () => import('./login/login.module').then((m) => m.LoginPageModule)
+    loadChildren: () =>
+      import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
     path: 'account',
-    loadChildren: () => import('./account/account.module').then((m) => m.AccountPageModule)
+    loadChildren: () =>
+      import('./account/account.module').then((m) => m.AccountPageModule),
   },
-];
+]
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-      preloadingStrategy: PreloadAllModules
+      preloadingStrategy: PreloadAllModules,
     }),
   ],
   exports: [RouterModule],
@@ -507,7 +515,6 @@ ionic serve
 ```
 
 And the browser will auomatically open to show the app.
-
 
 ![Supabase Angular](/img/ionic-demos/ionic-angular.png)
 
@@ -532,22 +539,22 @@ Ionic PWA elements is a companion package that will polyfill certain browser API
 With those packages installed we can update our `main.ts` to include an additional bootstapping call for the Ionic PWA Elements.
 
 ```ts title="src/main.ts"
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { enableProdMode } from '@angular/core'
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 
-import { AppModule } from './app/app.module';
-import { environment } from './environments/environment';
+import { AppModule } from './app/app.module'
+import { environment } from './environments/environment'
 
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { defineCustomElements } from '@ionic/pwa-elements/loader'
 defineCustomElements(window)
 
 if (environment.production) {
-  enableProdMode();
+  enableProdMode()
 }
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.log(err));
+platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  .catch((err) => console.log(err))
 ```
-
 
 Then create an **AvatarComponent** with this Ionic CLI command:
 
@@ -556,10 +563,10 @@ Then create an **AvatarComponent** with this Ionic CLI command:
 ```
 
 ```ts title="src/app/avatar.component.ts"
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { SupabaseService } from '../supabase.service';
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
+import { SupabaseService } from '../supabase.service'
+import { Camera, CameraResultType } from '@capacitor/camera'
 @Component({
   selector: 'app-avatar',
   template: `
@@ -570,7 +577,8 @@ import { Camera, CameraResultType } from '@capacitor/camera';
       </ng-template>
     </div>
   `,
-  style: [`
+  style: [
+    `
     :host {
        display: block;
        margin: auto;
@@ -598,20 +606,21 @@ import { Camera, CameraResultType } from '@capacitor/camera';
        width: 100%;
        height: 100%;
     }
-  `],
+  `,
+  ],
 })
 export class AvatarComponent implements OnInit {
-  _avatarUrl: SafeResourceUrl | undefined;
-  uploading = false;
+  _avatarUrl: SafeResourceUrl | undefined
+  uploading = false
 
   @Input()
   set avatarUrl(url: string | undefined) {
     if (url) {
-      this.downloadImage(url);
+      this.downloadImage(url)
     }
   }
 
-  @Output() upload = new EventEmitter<string>();
+  @Output() upload = new EventEmitter<string>()
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -622,41 +631,45 @@ export class AvatarComponent implements OnInit {
 
   async downloadImage(path: string) {
     try {
-      const { data } = await this.supabase.downLoadImage(path);
+      const { data } = await this.supabase.downLoadImage(path)
       this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(
         URL.createObjectURL(data)
-      );
+      )
     } catch (error) {
-      console.error('Error downloading image: ', error.message);
+      console.error('Error downloading image: ', error.message)
     }
   }
 
   async uploadAvatar() {
-    const loader = await this.supabase.createLoader();
+    const loader = await this.supabase.createLoader()
     try {
       const photo = await Camera.getPhoto({
         resultType: CameraResultType.DataUrl,
-      });
+      })
 
       const file = await fetch(photo.dataUrl)
         .then((res) => res.blob())
-        .then( (blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }));
+        .then(
+          (blob) =>
+            new File([blob], 'my-file', { type: `image/${photo.format}` })
+        )
 
-      const fileName = `${Math.random()}-${new Date().getTime()}.${ photo.format }`;
+      const fileName = `${Math.random()}-${new Date().getTime()}.${
+        photo.format
+      }`
 
-      await loader.present();
-      await this.supabase.uploadAvatar(fileName, file);
+      await loader.present()
+      await this.supabase.uploadAvatar(fileName, file)
 
-      this.upload.emit(fileName);
+      this.upload.emit(fileName)
     } catch (error) {
-      this.supabase.createNotice(error.message);
+      this.supabase.createNotice(error.message)
     } finally {
-      loader.dismiss();
+      loader.dismiss()
     }
   }
 }
 ```
-
 
 ### Add the new widget
 

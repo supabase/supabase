@@ -1,12 +1,12 @@
 ---
 id: maybesingle
-title: "maybeSingle()"
+title: 'maybeSingle()'
 slug: maybesingle
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves at most one row from the result. Result must be at most one row
 (e.g. using `eq` on a UNIQUE column), otherwise this will result in an
@@ -27,32 +27,13 @@ const { data, error } = await supabase
   .maybeSingle()
 ```
 
-
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -68,7 +49,6 @@ const { data, error } = await supabase
   .eq('name', 'Singapore')
   .maybeSingle()
 ```
-
 
 </TabItem>
 

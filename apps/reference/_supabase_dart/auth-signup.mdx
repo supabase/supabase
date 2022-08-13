@@ -1,15 +1,14 @@
 ---
 id: auth-signup
-title: "auth.signUp()"
+title: 'auth.signUp()'
 slug: auth-signup
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Creates a new user.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,14 +24,9 @@ final user = res.data?.user;
 final error = res.error;
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -41,20 +35,9 @@ final error = res.error;
 - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
 - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Sign up.
-
-
 
 <Tabs
   defaultValue="dart"
@@ -69,7 +52,6 @@ final res = await supabase.auth.signUp('example@email.com',　'example-password'
 final user = res.data?.user;
 final error = res.error;
 ```
-
 
 </TabItem>
 

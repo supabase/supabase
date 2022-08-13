@@ -1,15 +1,14 @@
 ---
 id: storage-from-list
-title: "from.list()"
+title: 'from.list()'
 slug: storage-from-list
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Lists all the files within a bucket.
-
 
 <Tabs
   defaultValue="dart"
@@ -24,36 +23,20 @@ final res = await supabase
   .from('avatars')
   .list();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### List files in a bucket
-
-
 
 <Tabs
   defaultValue="dart"
@@ -68,7 +51,6 @@ final res = await supabase
   .from('avatars')
   .list();
 ```
-
 
 </TabItem>
 

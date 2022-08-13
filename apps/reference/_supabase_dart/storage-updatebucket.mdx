@@ -1,15 +1,14 @@
 ---
 id: storage-updatebucket
-title: "updateBucket()"
+title: 'updateBucket()'
 slug: storage-updatebucket
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Updates a new Storage bucket
-
 
 <Tabs
   defaultValue="dart"
@@ -24,14 +23,9 @@ final res = await supabase
   .updateBucket('avatars', { public: false });
 ```
 
-
 </TabItem>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -39,20 +33,9 @@ final res = await supabase
   - `buckets` permissions: `update`
   - `objects` permissions: none
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Update bucket
-
-
 
 <Tabs
   defaultValue="dart"
@@ -66,7 +49,6 @@ final res = await supabase
   .storage
   .updateBucket('avatars', { public: false });
 ```
-
 
 </TabItem>
 

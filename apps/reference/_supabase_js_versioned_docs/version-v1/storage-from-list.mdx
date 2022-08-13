@@ -1,12 +1,12 @@
 ---
 id: storage-from-list
-title: "from.list()"
+title: 'from.list()'
 slug: storage-from-list
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Lists all the files within a bucket.
 
@@ -18,23 +18,18 @@ Lists all the files within a bucket.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .list('folder', {
-    limit: 100,
-    offset: 0,
-    sortBy: { column: 'name', order: 'asc' },
-  })
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+})
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -58,7 +53,6 @@ The folder path.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -78,7 +72,6 @@ Search options, including `limit`, `offset`, `sortBy`, and `search`.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -102,27 +95,15 @@ Fetch parameters, currently only supports `signal`, which is an AbortController'
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### List files in a bucket
-
-
 
 <Tabs
   defaultValue="js"
@@ -132,16 +113,12 @@ Fetch parameters, currently only supports `signal`, which is an AbortController'
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .list('folder', {
-    limit: 100,
-    offset: 0,
-    sortBy: { column: 'name', order: 'asc' },
-  })
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+})
 ```
-
 
 </TabItem>
 
@@ -149,8 +126,6 @@ const { data, error } = await supabase
 
 ### Search files in a bucket
 
-
-
 <Tabs
   defaultValue="js"
   groupId="reference/supabase-js"
@@ -159,17 +134,13 @@ const { data, error } = await supabase
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .from('avatars')
-  .list('folder', {
-    limit: 100,
-    offset: 0,
-    sortBy: { column: 'name', order: 'asc' },
-    search: 'jon'
-  })
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+  search: 'jon',
+})
 ```
-
 
 </TabItem>
 

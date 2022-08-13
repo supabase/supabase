@@ -1,15 +1,14 @@
 ---
 id: auth-update
-title: "auth.update()"
+title: 'auth.update()'
 slug: auth-update
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Updates user data, if there is a logged in user.
-
 
 <Tabs
   defaultValue="dart"
@@ -25,35 +24,19 @@ final res = await supabase.auth.update(
 
 final error = res.error;
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
-It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
 Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Update a user's metadata.
-
-
 
 <Tabs
   defaultValue="dart"
@@ -69,7 +52,6 @@ final res = await supabase.auth.update(
 
 final error = res.error;
 ```
-
 
 </TabItem>
 

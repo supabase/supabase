@@ -1,12 +1,11 @@
 ---
 id: replication
-title: "Replication"
+title: 'Replication'
 slug: replication
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
 
@@ -23,7 +22,12 @@ Replication is done through _publications_, a method of choosing which changes t
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/api/api-realtime.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-realtime.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Create a publication
@@ -31,28 +35,28 @@ Replication is done through _publications_, a method of choosing which changes t
 This publication contains changes to all tables.
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables;
 ```
 
 ## Create a publication to listen to individual tables
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for table table_one, table_two;
 ```
 
 ## Add tables to an existing publication
 
 ```sql
-alter publication publication_name 
+alter publication publication_name
 add table table_name;
 ```
 
 ## Listen to `insert`
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'insert');
 ```
@@ -60,7 +64,7 @@ with (publish = 'insert');
 ## Listen to `update`
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'update');
 ```
@@ -68,7 +72,7 @@ with (publish = 'update');
 ## Listen to `delete`
 
 ```sql
-create publication publication_name 
+create publication publication_name
 for all tables
 with (publish = 'delete');
 ```
@@ -84,11 +88,11 @@ drop publication if exists publication_name;
 If you're recreating a publication, it's best to do it in a transaction to ensure the operation succeeds.
 
 ```sql
-begin; 
+begin;
   -- remove the realtime publication
-  drop publication if exists publication_name; 
+  drop publication if exists publication_name;
 
   -- re-create the publication but don't enable it for any tables
-  create publication publication_name;  
+  create publication publication_name;
 commit;
 ```
