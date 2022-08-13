@@ -30,7 +30,7 @@ When creating a table, it's best practice to add columns at the same time.
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
 Supabase provides several options for creating tables. You can use the Dashboard or create them directly using SQL.
-We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/database/connecting/connecting-to-postgres) to your database
+We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
 and run the SQL queries yourself.
 
 <Tabs
@@ -172,7 +172,7 @@ create table movies (
 
 ## Loading data
 
-There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](/docs/guides/api).
+There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](../../guides/api).
 Use the "Bulk Loading" instructions if you are loading large data sets.
 
 ### Basic data loading
@@ -242,7 +242,7 @@ For example, if you wanted to load a CSV file into your movies table:
 "Return of the Jedi", "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
 ```
 
-You would [connect](/docs/guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the COPY command:
+You would [connect](../../guides/database/connecting-to-postgres#direct-connections) to your database directly and load the file with the COPY command:
 
 ```bash
 psql -h DATABASE_URL -p 5432 postgres -U postgres \

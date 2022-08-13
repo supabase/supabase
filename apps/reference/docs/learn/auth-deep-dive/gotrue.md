@@ -56,7 +56,7 @@ const { user, session, error } = await supabase.auth.signIn({
 
 If you want to request a feature, or contribute to the project directly, just head to https://github.com/supabase/gotrue and open some issues/PRs, we're always open to help.
 
-In the next guide we'll be looking at how to setup external OAuth providers: Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
+In the next guide we'll be looking at how to setup external OAuth providers: Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
 
 ### Resources
 
@@ -64,9 +64,9 @@ In the next guide we'll be looking at how to setup external OAuth providers: Wat
 
 ### Next steps
 
-- Watch [Part One: JWTs](/docs/learn/auth-deep-dive/auth-deep-dive-jwts)
-- Watch [Part Two: Row Level Security](/docs/learn/auth-deep-dive/auth-row-level-security)
-- Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
-<!-- - Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue) -->
-- Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
+- Watch [Part One: JWTs](../../learn/auth-deep-dive/auth-deep-dive-jwts)
+- Watch [Part Two: Row Level Security](../../learn/auth-deep-dive/auth-row-level-security)
+- Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
+<!-- - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue) -->
+- Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
 - Sign up for Supabase: [app.supabase.com](https://app.supabase.com)
