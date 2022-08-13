@@ -43,7 +43,6 @@ async function gen_v3(
   dest: string,
   { apiUrl }: { apiUrl: string }
 ) {
-  console.log('apiUrl', apiUrl)
   const paths = Object.entries(spec.paths).map(([key, path], i) => {
     const fullPath = `${apiUrl}${key}`
     return {
