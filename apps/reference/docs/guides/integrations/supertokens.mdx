@@ -261,8 +261,8 @@ import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import ThirdPartyEmailPassword, {
-    ThirdPartyEmailPasswordAuth,
-} from "supertokens-auth-react/recipe/thirdpartyemailpassword";
+  ThirdPartyEmailPasswordAuth,
+} from 'supertokens-auth-react/recipe/thirdpartyemailpassword'
 import dynamic from 'next/dynamic'
 import { useSessionContext } from 'supertokens-auth-react/recipe/session'
 import { getSupabase } from '../utils/supabase'
@@ -283,7 +283,7 @@ function ProtectedPage() {
   const { accessTokenPayload, userId } = useSessionContext()
 
   if (sessionContext.loading === true) {
-        return null;
+    return null
   }
 
   const [userEmail, setEmail] = useState('')
@@ -294,7 +294,10 @@ function ProtectedPage() {
       const supabase = getSupabase(accessTokenPayload.supabase_token)
 
       // retrieve the user's name from the users table whose email matches the email in the JWT
-      const { data } = await supabase.from('users').select('email').eq('user_id', userId)
+      const { data } = await supabase
+        .from('users')
+        .select('email')
+        .eq('user_id', userId)
 
       if (data.length > 0) {
         setEmail(data[0].email)

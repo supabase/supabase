@@ -1,22 +1,20 @@
 ---
 id: auth-update
-title: "update()"
+title: 'update()'
 slug: /auth-update
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Updates user data, if there is a logged in user.
 
 ```js
-const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+const { user, error } = await supabase.auth.update({ email: 'new@email.com' })
 ```
 
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -34,7 +32,7 @@ const { user, error } = await supabase.auth.update({email: 'new@email.com'})
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -42,24 +40,13 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
 To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
 
-
-User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
 Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
@@ -68,23 +55,19 @@ Use the `update()` method if you have data which rarely changes or is specific o
 Sends a "Confirm Email Change" email to the new email address.
 
 ```js
-const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+const { user, error } = await supabase.auth.update({ email: 'new@email.com' })
 ```
 
 ### Update password for authenticated user.
 
-
-
 ```js
-const { user, error } = await supabase.auth.update({password: 'new password'})
+const { user, error } = await supabase.auth.update({ password: 'new password' })
 ```
 
 ### Update a user's metadata.
 
-
-
 ```js
-const { user, error } = await supabase.auth.update({ 
-  data: { hello: 'world' } 
+const { user, error } = await supabase.auth.update({
+  data: { hello: 'world' },
 })
 ```

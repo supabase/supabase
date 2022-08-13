@@ -5,12 +5,11 @@ description: Using Postgres extensions.
 ---
 
 import ExtensionsComponent from '@site/src/components/Extensions'
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Extensions are exactly as they sound - they "extend" the database with functionality which isn't part of the Postgres core.
 Supabase has pre-installed some of the most useful open source extensions.
-
 
 ### Enable and disable extensions
 
@@ -28,7 +27,12 @@ Supabase has pre-installed some of the most useful open source extensions.
 3. Enable or disable an extension.
 
 <video width="99%" muted playsInline controls={true}>
-<source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/toggle-extensions.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -39,11 +43,11 @@ Supabase has pre-installed some of the most useful open source extensions.
 -- Example: enable the "pgtap" extension and ensure it is installed
 create extension pgtap with schema extensions;
 
--- Example: disable the "pgtap" extension 
+-- Example: disable the "pgtap" extension
 drop extension pgtap;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension call `drop extension`.
 
 :::caution
@@ -53,7 +57,6 @@ Enabling some extensions with `create extension <extension-name> with schema ext
 </TabItem>
 
 </Tabs>
-
 
 ### Full list of extensions
 

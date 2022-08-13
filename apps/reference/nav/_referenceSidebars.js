@@ -224,6 +224,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Community',
+      // link: { type: 'doc', id: 'about' },
       collapsed: false,
       items: [
         {

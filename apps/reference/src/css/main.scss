@@ -1,37 +1,3 @@
-/*
-  Font import
-*/
-
-@font-face {
-  font-family: 'custom-font';
-  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
-    url(/fonts/custom/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
-    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-/* mono font */
-
-@font-face {
-  font-family: 'office code pro';
-  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.eot');
-  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.woff2') format('woff2'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.woff') format('woff'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype'),
-    url('/fonts/office-code-pro/OfficeCodePro-Regular.otf') format('otf');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 /**
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
@@ -53,8 +19,10 @@
     'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
     'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   --custom-font-code: 'office code pro', Menlo, monospace;
+  --custom-font-size-lg: 1.1rem;
   --custom-font-size-base: 1rem;
   --custom-font-size-sm: 0.9rem;
+  --custom-font-size-xs: 0.8rem;
   --custom-border-radius: 3px;
   --custom-border-radius-md: 6px;
   --custom-primary-darkest: #10633e;
@@ -148,6 +116,7 @@
 
   /* Navbar */
   --ifm-navbar-background-color: var(--custom-background-color);
+  --ifm-navbar-link-hover-color: var(--custom-primary);
 
   /* Footer */
   --ifm-footer-background-color: var(--custom-background-color);
@@ -160,10 +129,14 @@
   --ifm-hero-text-color: var(--custom-content-color);
 
   /* Sidebar */
-  --ifm-sidebar-border-color: var(--custom-border-color);
-  --ifm-menu-color-active: var(--custom-primary);
-  --doc-sidebar-width: 250px;
-  --ifm-menu-link-padding-horizontal: 0rem;
+
+  // --sidebar-spacing-horizontal: 2rem;
+
+  /* Doc item */
+  --doc-item-container-width: 55rem;
+
+  /* Doc Page */
+  --doc-page-vertical-spacing: 2rem;
 
   /* Panel */
   --ifm-panel-border-color: var(--custom-border-color);
@@ -292,55 +265,12 @@
   border-bottom: 1px solid var(--custom-border-color);
 }
 
-.menu {
-  font-weight: var(--ifm-font-weight-regular);
-}
-.menu__link {
-  font-size: var(--custom-font-size-sm);
-  color: var(--custom-content-color-light);
-  padding-left: 10px;
-  padding-right: 10px;
-}
-.menu__link.menu__link--sublist {
-  font-weight: var(--ifm-font-weight-bold);
-  text-transform: uppercase;
-  font-size: smaller;
-  color: var(--custom-content-color-emphasis);
-}
-.menu__link.menu__link--active:not(.menu__link--sublist) {
-  /* background-color: transparent; */
-  color: var(--custom-content-color-emphasis);
-}
-.menu__link:hover:not(.menu__link--active),
-.menu__caret:hover {
-  background-color: transparent;
-  color: var(--custom-content-color-emphasis);
-}
-
 .pagination-nav__link {
   border-color: var(--custom-border-color);
 }
 
 pre {
   background-color: var(--custom-background-color-diff);
-}
-
-#custom--main-menu-button {
-  display: flex;
-  padding: 1rem 0 0.5rem 0.5rem;
-  font-size: 0.9rem;
-  color: var(--custom-content-color-light);
-}
-#custom--main-menu-button svg {
-  padding: 2px;
-  margin-right: 10px;
-  color: var(--custom-content-color-light);
-}
-#custom--main-menu-button:hover,
-#custom--main-menu-button:hover svg {
-  transition: all;
-  transition-duration: 0.5s;
-  color: var(--custom-content-color-emphasis);
 }
 
 @media screen and (max-width: 580px) {
@@ -419,6 +349,7 @@ html[data-theme='dark'] .navbar-item-discord:before {
   background-repeat: no-repeat;
   background-position: center;
 }
+
 
 /* PRISM */
 

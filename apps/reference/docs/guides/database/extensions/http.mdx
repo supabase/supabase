@@ -1,18 +1,18 @@
 ---
 id: http
-title: "http: RESTful Client"
+title: 'http: RESTful Client'
 description: An HTTP Client for PostgreSQL Functions.
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 The `http` extension allows you to call RESTful endpoints within Postgres.
 
 ## Quick demo
 
 <iframe
-  className="w-full video-with-border"
+  className="video-with-border w-full"
   width="640"
   height="385"
   src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
@@ -36,7 +36,6 @@ You can use the `http` extension to make these network requests from Postgres.
 
 ## Usage
 
-
 ### Enable the extension
 
 <Tabs
@@ -56,14 +55,14 @@ You can use the `http` extension to make these network requests from Postgres.
 <TabItem value="sql">
 
 ```sql
--- Example: enable the "http" extension 
+-- Example: enable the "http" extension
 create extension http with schema extensions;
 
--- Example: disable the "http" extension 
+-- Example: disable the "http" extension
 drop extension if exists http;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
 To disable an extension, call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
@@ -80,11 +79,11 @@ While the main usage is simply `http('http_request')`, there are 5 wrapper funct
 - `http_post()`
 - `http_put()`
 - `http_delete()`
-- `http_head()` 
+- `http_head()`
 
-### Returned values 
+### Returned values
 
-A successful call to a web URL from the `http` extension returns a record with the following fields: 
+A successful call to a web URL from the `http` extension returns a record with the following fields:
 
 - `status`: integer
 - `content_type`: character varying
@@ -96,19 +95,18 @@ A successful call to a web URL from the `http` extension returns a record with t
 ### Simple `GET` example
 
 ```sql
-select 
+select
   "status", "content"::jsonb
-from 
+from
   http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
-
 
 ### Simple `POST` example
 
 ```sql
-select 
+select
   "status", "content"::jsonb
-from 
+from
   http_post(
     'https://jsonplaceholder.typicode.com/posts',
     '{ "title": "foo", "body": "bar", "userId": 1 }',
@@ -116,7 +114,6 @@ from
   );
 ```
 
-
-## Resources 
+## Resources
 
 - Official [`http` GitHub Repository](https://github.com/pramsey/pgsql-http)

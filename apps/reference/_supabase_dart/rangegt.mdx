@@ -1,14 +1,12 @@
 ---
 id: rangegt
-title: ".rangeGt()"
+title: '.rangeGt()'
 slug: rangegt
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 <Tabs
   defaultValue="dart"
@@ -24,33 +22,14 @@ final res = await supabase
   .rangeGt('population_range_millions', '[150, 250]')
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -66,15 +45,12 @@ final res = await supabase
   .rangeGt('population_range_millions', '[150, 250]')
   .execute();
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -91,14 +67,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -115,14 +88,11 @@ final res = await supabase
   .execute();
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="dart"
@@ -138,7 +108,6 @@ final res = await supabase
   .rangeGt('population_range_millions', '[150, 250]')
   .execute();
 ```
-
 
 </TabItem>
 

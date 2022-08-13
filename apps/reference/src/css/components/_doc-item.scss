@@ -1,0 +1,60 @@
+:root {
+  // --doc-item-container-width: 42rem;
+}
+
+//overrides
+#__docusaurus {
+  [class*='docItemCol_'] {
+    // flex-direction: column;
+  }
+
+  [class*='docItemContainer_'] {
+    // margin: 0 auto;
+  }
+
+  [class*='docItemContainer_'] {
+    max-width: var(--doc-item-container-width);
+    margin: 0 auto;
+    // width: 100%;
+  }
+
+  .theme-doc-version-banner {
+    max-width: var(--doc-item-container-width);
+    margin: 0 auto;
+    // width: 100%;
+    margin-bottom: 2rem !important;
+  }
+
+  [class*='docMainContainer_'] {
+    // .end {
+    //   @media (max-width: 996px) {
+    //     display: none;
+    //   }
+    // }
+
+    // > .container {
+    //   > .row {
+    //     > .col {
+    //       display: flex;
+    //       justify-content: center;
+
+    //       min-width: 0;
+    //     }
+    //   }
+    // }
+
+    // .spacer {
+    //   flex-basis: 5rem;
+
+    //   @media (max-width: 996px) {
+    //     display: none;
+    //   }
+    // }
+  }
+
+  // [class*='docItemCol_'] {
+  //   margin-inline-start: auto;
+  //   margin-inline-end: auto;
+  // }
+  //#endregion
+}

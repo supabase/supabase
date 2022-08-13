@@ -6,12 +6,12 @@ description: Getting the best results out of your Supabase project
 
 The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the tier your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
 
-## Optimizing the number of connections 
+## Optimizing the number of connections
 
 By default, the number of connections allowed to Postgres and PgBouncer is configured based on the resources available to the database.
 
 | Compute Add-on | Postgresql connections | PGBouncer connections |
-|----------------|------------------------|-----------------------|
+| -------------- | ---------------------- | --------------------- |
 | None           | 60                     | 200                   |
 | Small          | 90                     | 200                   |
 | Medium         | 120                    | 200                   |
@@ -55,6 +55,7 @@ Configuring the number of PgBouncer connections is not supported at this time.
 Every Supabase project has [the pg_stat_statements extension](https://www.postgresql.org/docs/14/pgstatstatements.html) enabled by default. This extension records query execution performance details and is the best way to find queries that take the most time to execute. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
 
 Obtaining information from pg_stat_statements:
+
 ```sql
 select mean_exec_time + stddev_exec_time, * from pg_stat_statements order by 1 desc;
 ```
@@ -74,5 +75,4 @@ Using the query plan analyzer to optimize your queries is a large topic, with a 
 - [Postgres Wiki.](https://wiki.postgresql.org/wiki/Using_EXPLAIN)
 - [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
 
-
-You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](/docs/guides/platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.
+You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](../platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.

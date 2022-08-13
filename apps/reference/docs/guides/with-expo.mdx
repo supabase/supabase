@@ -50,7 +50,12 @@ or you can just copy/paste the SQL from below and run it yourself.
 3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/sql-user-management-starter.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 </TabItem>
@@ -118,7 +123,12 @@ We just need to get the URL and `anon` key from the API settings.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
-  <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
 </video>
 
 ## Building the App
@@ -229,10 +239,18 @@ export default function Auth() {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+        <Button
+          title="Sign in"
+          disabled={loading}
+          onPress={() => signInWithEmail()}
+        />
       </View>
       <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
+        <Button
+          title="Sign up"
+          disabled={loading}
+          onPress={() => signUpWithEmail()}
+        />
       </View>
     </View>
   )
@@ -405,7 +423,7 @@ import { View } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>(null)
+  const [session, setSession] = (useState < Session) | (null > null)
 
   useEffect(() => {
     setSession(supabase.auth.session())
@@ -417,7 +435,11 @@ export default function App() {
 
   return (
     <View>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
+      {session && session.user ? (
+        <Account key={session.user.id} session={session} />
+      ) : (
+        <Auth />
+      )}
     </View>
   )
 }
@@ -457,7 +479,9 @@ export default function Avatar({ url, size, onUpload }) {
 
   async function downloadImage(path) {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(path)
       if (error) {
         throw error
       }
@@ -481,7 +505,9 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      let { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
 
       if (uploadError) {
         throw uploadError

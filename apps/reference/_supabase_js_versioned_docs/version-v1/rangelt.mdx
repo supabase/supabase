@@ -1,14 +1,12 @@
 ---
 id: rangelt
-title: ".rangeLt()"
+title: '.rangeLt()'
 slug: rangelt
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 <Tabs
   defaultValue="js"
@@ -23,33 +21,14 @@ const { data, error } = await supabase
   .select('name, id, population_range_millions')
   .rangeLt('population_range_millions', '[150, 250]')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -64,15 +43,12 @@ const { data, error } = await supabase
   .select('name, id, population_range_millions')
   .rangeLt('population_range_millions', '[150, 250]')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -88,14 +64,11 @@ const { data, error } = await supabase
   .rangeLt('population_range_millions', '[150, 250]')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -111,14 +84,11 @@ const { data, error } = await supabase
   .rangeLt('population_range_millions', '[150, 250]')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -133,7 +103,6 @@ const { data, error } = await supabase
   .rpc('echo_all_countries')
   .rangeLt('population_range_millions', '[150, 250]')
 ```
-
 
 </TabItem>
 

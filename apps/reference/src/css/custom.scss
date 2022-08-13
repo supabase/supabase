@@ -1,0 +1,316 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+
+@use './fonts';
+@use './main';
+@use './components/methodLists';
+@use './components/menu';
+@use './components/button-card';
+// @use './components/admonition';
+// @use './components/back-to-top-button';
+// @use './components/code';
+@use './components/doc-item';
+@use './components/doc-page';
+@use './components/doc-sidebar';
+// @use './components/edit-this-page';
+@use './components/markdown';
+// @use './components/navbar';
+// @use './components/navbar-sidebar';
+// @use './components/pagination';
+// @use './components/search';
+// @use './components/table';
+// @use './components/tabs';
+// @use './components/theme-toggle';
+@use './components/toc';
+
+:root {
+  --ifm-background-color: var(--token-primary-bg-c);
+
+  --ifm-navbar-link-hover-color: initial;
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-navbar-item-padding-vertical: 0;
+
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, Inter, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI emoji';
+  --ifm-font-family-monospace: 'SFMono-Regular', 'Roboto Mono', Consolas,
+    'Liberation Mono', Menlo, Courier, monospace;
+
+  --ifm-menu-link-sublist-icon: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgdmlld0JveD0iMCAwIDEwIDYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik04Ljk5OTg4IDVMNC45OTk4OCAxTDAuOTk5ODc4IDUiIHN0cm9rZT0iIzAzMDYwQiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K');
+
+  //#region ----------- Z Indices ------------
+  --z-sidebar: 2000;
+  --z-backdrop: 1100;
+  //#endregion
+}
+
+// html[data-theme='light'] {
+//   --token-primary-bg-c: #fff;
+//   --token-secondary-bg-c: #fff;
+
+//   --ifm-link-color: var(--c-blue-90);
+//   //rgb value is c-blue-90
+//   --ifm-link-hover-color: rgba(27, 109, 255, 0.8);
+
+//   --ifm-background-surface-color: var(--token-primary-bg-c);
+
+//   --ifm-navbar-background-color: var(--token-primary-bg-c);
+//   --ifm-navbar-shadow: 0 1px 0 0 var(--c-gray-0);
+
+//   --ifm-heading-color: var(--c-carbon-100);
+//   --ifm-code-background: var(--c-indigo-10);
+//   --ifm-font-color-base: var(--c-carbon-90);
+// }
+
+// html[data-theme='dark'] {
+//   --token-primary-bg-c: #03060b;
+//   --token-secondary-bg-c: #13171c;
+
+//   --ifm-link-color: var(--c-blue-70);
+//   //rgb value is c-blue-70
+//   --ifm-link-hover-color: rgba(77, 141, 255, 0.8);
+
+//   --ifm-background-surface-color: var(--token-primary-bg-c);
+
+//   --ifm-navbar-background-color: var(--token-primary-bg-c);
+//   --ifm-navbar-shadow: 0 1px 0 0 var(--c-gray-90);
+
+//   --ifm-heading-color: #fff;
+//   --ifm-font-color-base: var(--c-carbon-10);
+//   --ifm-background-color: var(--token-primary-bg-c);
+//   --ifm-dropdown-background-color: var(--token-secondary-bg-c);
+
+//   --ifm-menu-link-sublist-icon-filter: invert(100%);
+// }
+
+html {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-smoothing: antialiased;
+  scroll-padding-top: calc(var(--ifm-navbar-height) + 16px);
+}
+
+// *,
+// *::before,
+// *::after {
+//   box-sizing: border-box;
+// }
+
+// a {
+//   text-decoration: none;
+
+//   &:hover {
+//     text-decoration: none;
+//   }
+// }
+
+// body {
+//   margin: 0;
+// }
+
+// .theme-doc-version-banner {
+//   display: none;
+// }
+
+// .theme-doc-version-badge {
+//   display: none;
+// }
+
+// ion-grid {
+//   margin: 1em 0;
+// }
+
+// figure {
+//   margin: 0;
+// }
+
+// figure > * {
+//   display: block;
+//   margin: 0 auto;
+// }
+
+// figure.device {
+//   max-width: 400px;
+//   margin: 0 auto;
+// }
+
+// figcaption {
+//   text-align: center;
+// }
+
+// img {
+//   display: block;
+//   max-width: 100%;
+// }
+
+// iframe {
+//   background-color: rgba(0, 0, 0, 0.02);
+//   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1);
+// }
+
+// .git-link svg {
+//   height: 1em;
+//   width: 1em;
+//   vertical-align: -0.1em;
+// }
+// .git-link path {
+//   fill: currentColor;
+// }
+
+// .cordova-ee-card {
+//   max-width: 100%;
+// }
+
+// .cordova-ee-img {
+//   width: 50px;
+//   float: left;
+//   margin-right: 20px;
+// }
+
+// .native-ee-detail {
+//   float: right;
+//   cursor: pointer;
+// }
+
+// .cordova-ee-card p {
+//   margin: 1rem 0 0;
+// }
+
+/* PRISM */
+
+.prism-code {
+  background-color: none;
+  word-break: break-word;
+  font-size: 0.8rem;
+  outline: none !important;
+}
+.prism-code div,
+.prism-code div:focus,
+.prism-code div:active {
+  outline: none !important;
+}
+.token.keyword.module,
+.token.property-access,
+.token.function {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.plain,
+.token.parameter,
+.token.punctuation,
+.token.operator,
+.token.console.class-name,
+.token.doc-comment.parameter,
+.token.doc-comment.optional-parameter,
+.token.doc-comment.parameter.punctuation,
+.token.doc-comment.optional-parameter.punctuation {
+  font-style: normal !important;
+  color: #ccc !important;
+}
+.token.keyword,
+.token.doc-comment.keyword {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.string {
+  font-style: normal !important;
+  color: #24b47e !important;
+}
+.token.console {
+  font-style: normal !important;
+  color: #49c1ad !important;
+}
+.token.constant {
+  font-style: normal !important;
+  color: #569cd6 !important;
+}
+.token.comment {
+  font-style: normal !important;
+  color: #666 !important;
+}
+.token.number {
+  color: #b5cea8 !important;
+}
+.token.boolean,
+.token.doc-comment.class-name {
+  @apply text-green-500;
+}
+
+
+.method-list-group {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.method-list-group li {
+  border-top: 1px solid var(--custom-border-color);
+  padding-top: 12px;
+}
+
+.method-list-group li:last-child {
+  border-bottom: 1px solid var(--custom-border-color);
+}
+
+h4.method-list-item-label {
+  display: flex;
+}
+
+h4.method-list-item-label .method-list-item-label-name {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  margin-right: 4px;
+  padding: var(--ifm-code-padding-vertical) 0;
+}
+
+h4.method-list-item-label .method-list-item-label-badge {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  padding: 0 5px;
+  font-weight: 300;
+  padding: var(--ifm-code-padding-vertical) var(--ifm-code-padding-horizontal);
+}
+
+h4.method-list-item-label .method-list-item-validation {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  padding: 0 5px;
+  font-weight: 300;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.method-list-group .method-list-group {
+  border: 1px solid var(--custom-border-color);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+
+.method-list-group .method-list-group li {
+  padding: 12px;
+  border-bottom: none;
+}
+
+.method-list-title {
+  margin: 0;
+  padding: 6px 12px;
+}
+
+.method-list-group .method-list-group li div,
+.method-list-group .method-list-group li h4,
+.method-list-group .method-list-group li p {
+  padding: 0;
+  margin: 0;
+}
+
+.method-list-group .method-list-group li h4 {
+  margin-bottom: 4px;
+}

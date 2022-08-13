@@ -32,6 +32,7 @@ const config = {
   },
 
   plugins: [
+    'docusaurus-plugin-sass',
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -90,13 +91,13 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
-        lastVersion: 'current',
-        versions: {
-          current: {
-            label: 'v2',
-            // path: 'v2',
-          },
-        },
+        // lastVersion: 'current',
+        // versions: {
+        //   current: {
+        //     label: 'v2',
+        //     // path: 'v2',
+        //   },
+        // },
       },
     ],
     [
@@ -123,7 +124,7 @@ const config = {
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/css/custom.scss'),
         },
       }),
     ],

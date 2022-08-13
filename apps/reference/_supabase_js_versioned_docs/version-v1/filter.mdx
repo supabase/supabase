@@ -1,12 +1,12 @@
 ---
 id: filter
-title: ".filter()"
+title: '.filter()'
 slug: filter
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose `column` satisfies the filter.
 
@@ -24,13 +24,11 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +52,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -74,7 +71,6 @@ The operator to filter with.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -98,7 +94,6 @@ The value to filter with.
 
 </ul>
 
-
 ## Notes
 
 - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
@@ -109,20 +104,9 @@ The value to filter with.
     .filter('id','in',`(${arr})`)  // You can insert a javascript array.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -138,14 +122,11 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `update()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -161,14 +142,11 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `delete()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -184,14 +162,11 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### With `rpc()`
-
-
 
 <Tabs
   defaultValue="js"
@@ -207,14 +182,11 @@ const { data, error } = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
 
-
 </TabItem>
 
 </Tabs>
 
 ### Filter embedded resources
-
-
 
 <Tabs
   defaultValue="js"
@@ -229,7 +201,6 @@ const { data, error } = await supabase
   .select('name, countries ( name )')
   .filter('countries.name', 'in', '("France","Japan")')
 ```
-
 
 </TabItem>
 

@@ -1,12 +1,12 @@
 ---
 id: auth-signout
-title: "signOut()"
+title: 'signOut()'
 slug: auth-signout
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Inside a browser context, `signOut()` will remove the logged in user from the browser session
 and log them out - removing all items from localstorage and then trigger a "SIGNED_OUT" event.
@@ -24,32 +24,13 @@ For server-side management, you can revoke all refresh tokens for a user by pass
 const { error } = await supabase.auth.signOut()
 ```
 
-
 </TabItem>
 
 </Tabs>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Sign out
-
-
 
 <Tabs
   defaultValue="js"
@@ -61,7 +42,6 @@ const { error } = await supabase.auth.signOut()
 ```js
 const { error } = await supabase.auth.signOut()
 ```
-
 
 </TabItem>
 

@@ -1,15 +1,14 @@
 ---
 id: storage-from-update
-title: "from.update()"
+title: 'from.update()'
 slug: storage-from-update
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Replaces an existing file at the specified path with a new one.
-
 
 <Tabs
   defaultValue="dart"
@@ -28,36 +27,20 @@ final res = await supabase
     upsert: false
   ));
 ```
-
 
 </TabItem>
 
 </Tabs>
 
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `update` and `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Update file
-
-
 
 <Tabs
   defaultValue="dart"
@@ -76,7 +59,6 @@ final res = await supabase
     upsert: false
   ));
 ```
-
 
 </TabItem>
 

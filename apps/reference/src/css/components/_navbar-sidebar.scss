@@ -1,0 +1,66 @@
+//overrides
+#__docusaurus {
+  .navbar-sidebar {
+    z-index: var(--z-sidebar);
+
+    &__item {
+      padding: 1rem var(--ifm-navbar-padding-horizontal);
+
+      .menu__list {
+        .separator {
+          display: none;
+        }
+        .icon-link {
+          display: none;
+        }
+      }
+    }
+
+    &__brand {
+      .navbar__brand {
+        display: flex;
+      }
+
+      .navbar__logo {
+        display: block;
+        height: auto;
+
+        img {
+          display: block;
+          height: auto;
+        }
+      }
+    }
+
+    .cta {
+      display: none;
+    }
+
+    [class*='toggle_'] {
+      display: none;
+    }
+
+    &__back {
+      padding-inline-start: 0;
+      padding-inline-end: 0;
+
+      margin: 0;
+
+      background-color: var(--token-primary-bg-c);
+    }
+
+    &__close {
+      padding: 0.5rem;
+      margin-inline-end: -0.5rem;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__backdrop {
+      z-index: var(--z-sidebar);
+    }
+  }
+}

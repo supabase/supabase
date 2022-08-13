@@ -6,14 +6,18 @@ const ejs = require('ejs')
 const Helpers = require('./Helpers')
 const { writeToDisk } = Helpers
 
-export default async function gen(inputFileName: string, outputDir: string) {
+export default async function gen(
+  inputFileName: string,
+  outputDir: string,
+  apiUrl: string
+) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')
   const spec = JSON.parse(specRaw)
   // console.log('spec', spec)
 
   switch (spec.openapi || spec.swagger) {
     case '3.0.0':
-      await gen_v3(spec, outputDir)
+      await gen_v3(spec, outputDir, { apiUrl })
       break
 
     case '2.0':
@@ -31,11 +35,29 @@ export default async function gen(inputFileName: string, outputDir: string) {
  */
 
 // OPENAPI-SPEC-VERSION: 3.0.0
-async function gen_v3(spec: OpenAPIV3.Document, dest: string) {
+type v3OperationWithPath = OpenAPIV3.OperationObject & {
+  path: string
+}
+async function gen_v3(
+  spec: OpenAPIV3.Document,
+  dest: string,
+  { apiUrl }: { apiUrl: string }
+) {
   const paths = Object.entries(spec.paths).map(([key, path], i) => {
+    const fullPath = `${apiUrl}${key}`
     return {
       path: key,
-      operations: toArrayWithKey(path!, 'operation'),
+      fullPath,
+      operationList: toArrayWithKey(path!, 'operation').map((o) => {
+        const operation = o as v3OperationWithPath
+        return {
+          ...operation,
+          operationId: slugify(operation.summary!),
+
+          responseList:
+            toArrayWithKey(operation.responses!, 'responseCode') || [],
+        }
+      }),
     }
   })
 
@@ -54,14 +76,14 @@ async function gen_v2(spec: OpenAPIV2.Document, dest: string) {
   const paths = Object.entries(spec.paths).map(([key, path]) => {
     return {
       path: key,
-      operations: toArrayWithKey(path!, 'operation').map((o) => {
+      operationList: toArrayWithKey(path!, 'operation').map((o) => {
         const operation = o as OpenAPIV2.OperationObject & {
           path: string
         }
         return {
           ...operation,
           operationId: slugify(operation.summary!),
-          responses: toArrayWithKey(operation.responses!, 'responseCode'),
+          responseList: toArrayWithKey(operation.responses!, 'responseCode'),
         }
       }),
     }
@@ -77,15 +99,9 @@ async function gen_v2(spec: OpenAPIV2.Document, dest: string) {
   console.log('Saved: ', dest)
 }
 
-// const pathsToArrays = (pathObject: {
-//   path: string
-//   get?: object
-//   post?: object
-//   patch?: object
-//   delete?: object
-// }) => {
+// function addResponseCode(response: v3ResponseWithCode, spec: OpenAPIV3.Document) {
+//   const jsonResponse = response.
 //   return {
-//     path: pathObject.path,
-
+//     ...response
 //   }
 // }

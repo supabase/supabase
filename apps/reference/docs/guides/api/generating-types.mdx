@@ -1,6 +1,6 @@
 ---
 id: generating-types
-title: "Generating Types"
+title: 'Generating Types'
 description: How to generate types for your API and Supabase libraries.
 ---
 
@@ -31,9 +31,9 @@ Important notes:
 After you have generated your types, you can use them in your TypeScript projects:
 
 ```ts
-import { NextApiRequest, NextApiResponse } from "next"
-import { createClient } from "@supabase/supabase-js"
-import { definitions } from "../../types/supabase"
+import { NextApiRequest, NextApiResponse } from 'next'
+import { createClient } from '@supabase/supabase-js'
+import { definitions } from '../../types/supabase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -42,11 +42,11 @@ const supabase = createClient(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const allOnlineUsers = await supabase
-    .from<definitions["users"]>("users")
-    .select("*")
-    .eq("status", "ONLINE")
+    .from<definitions['users']>('users')
+    .select('*')
+    .eq('status', 'ONLINE')
   res.status(200).json(allOnlineUsers)
-};
+}
 ```
 
 For more advance type-support, check out [`postgrest-js-tools`](https://github.com/mzalevski/postgrest-js-tools).
@@ -56,6 +56,7 @@ For more advance type-support, check out [`postgrest-js-tools`](https://github.c
 One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.
 
 The following script can be run in your terminal to produce the file `types/database/index.ts`.
+
 ```
 npx openapi-typescript https://your-project.supabase.co/rest/v1/?apikey=your-anon-key --output types/database/index.ts
 ```
@@ -67,7 +68,7 @@ You can add this script to your `package.json` and run it using `npm run update-
 ```
 
 You can use GitHub actions to generate this file automatically. This script will commit the change to your repo every night.
-Create a file `.github/workflows/update-types.yml` and add the following snippet into this file to define the action along with the environment variables. 
+Create a file `.github/workflows/update-types.yml` and add the following snippet into this file to define the action along with the environment variables.
 
 ```yml
 name: Update database types
