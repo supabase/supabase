@@ -1,15 +1,14 @@
 ---
 id: not
-title: ".not()"
+title: '.not()'
 slug: /not
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows which doesn't satisfy the filter.
-
 
 ```dart
 final res = await supabase
@@ -18,11 +17,6 @@ final res = await supabase
   .not('name', 'eq', 'Paris')
   .execute();
 ```
-
-
-
-
-
 
 ## Notes
 
@@ -36,20 +30,9 @@ final res = await supabase
   .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```dart
 final res = await supabase
@@ -61,8 +44,6 @@ final res = await supabase
 
 ### With `update()`
 
-
-
 ```dart
 final res = await supabase
   .from('cities')
@@ -73,8 +54,6 @@ final res = await supabase
 
 ### With `delete()`
 
-
-
 ```dart
 final res = await supabase
   .from('cities')
@@ -84,8 +63,6 @@ final res = await supabase
 ```
 
 ### With `rpc()`
-
-
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.

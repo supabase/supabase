@@ -1,15 +1,14 @@
 ---
 id: storage-from-download
-title: "from.download()"
+title: 'from.download()'
 slug: /storage-from-download
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Downloads a file.
-
 
 ```dart
 final res = await supabase
@@ -18,31 +17,15 @@ final res = await supabase
   .download('avatar1.png');
 ```
 
-
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Download file
-
-
 
 ```dart
 final res = await supabase

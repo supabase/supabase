@@ -1,15 +1,14 @@
 ---
 id: filter
-title: ".filter()"
+title: '.filter()'
 slug: /filter
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose `column` satisfies the filter.
-
 
 ```dart
 final res = await supabase
@@ -18,11 +17,6 @@ final res = await supabase
   .filter('name', 'in', '("Paris","Tokyo")')
   .execute();
 ```
-
-
-
-
-
 
 ## Notes
 
@@ -34,20 +28,9 @@ final res = await supabase
     .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```dart
 final res = await supabase
@@ -59,8 +42,6 @@ final res = await supabase
 
 ### With `update()`
 
-
-
 ```dart
 final res = await supabase
   .from('cities')
@@ -70,8 +51,6 @@ final res = await supabase
 ```
 
 ### With `delete()`
-
-
 
 ```dart
 final res = await supabase
@@ -83,8 +62,6 @@ final res = await supabase
 
 ### With `rpc()`
 
-
-
 ```dart
 // Only valid if the Stored Procedure returns a table type.
 final res = await supabase
@@ -93,8 +70,6 @@ final res = await supabase
 ```
 
 ### Filter embedded resources
-
-
 
 ```dart
 final res = await supabase

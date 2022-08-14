@@ -1,15 +1,14 @@
 ---
 id: insert
-title: "Create data: insert()"
+title: 'Create data: insert()'
 slug: /insert
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs an INSERT into the table.
-
 
 ```dart
 final res = await supabase
@@ -19,31 +18,15 @@ final res = await supabase
   ]).execute();
 ```
 
-
-
-
-
-
 ## Notes
 
 - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
-
-
-
-
-
-
-
-
-
+  This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
+  If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
 
 ## Examples
 
 ### Create a record
-
-
 
 ```dart
 final res = await supabase
@@ -54,8 +37,6 @@ final res = await supabase
 ```
 
 ### Bulk create
-
-
 
 ```dart
 final res = await supabase

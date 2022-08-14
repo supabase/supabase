@@ -1,15 +1,14 @@
 ---
 id: single
-title: "single()"
+title: 'single()'
 slug: /single
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
-
 
 ```dart
 final res = await supabase
@@ -19,28 +18,9 @@ final res = await supabase
   .execute();
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```dart
 final res = await supabase
