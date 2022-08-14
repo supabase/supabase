@@ -25,8 +25,9 @@ You can use the `supabase-js` library to:
 - build login and user management functionality
 - manage large files
 
-## Links
+## Additional Links
 
-- GitHub: [supabase/supabase-js](https://github.com/supabase/supabase-js)
+- Source Code: [github.com/supabase/supabase-js](https://github.com/supabase/supabase-js)
 - TypeDoc: [supabase.github.io/supabase-js](https://supabase.github.io/supabase-js)
 - NPM: [npmjs.com/package/@supabase/supabase-js](https://www.npmjs.com/package/@supabase/supabase-js)
+- [Known bugs and issues](https://github.com/supabase/supabase-js/issues)
