@@ -1,15 +1,14 @@
 ---
 id: storage-from-update
-title: "from.update()"
+title: 'from.update()'
 slug: /storage-from-update
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Replaces an existing file at the specified path with a new one.
-
 
 ```dart
 final avatarFile = File('path/to/file');
@@ -22,31 +21,15 @@ final res = await supabase
   ));
 ```
 
-
-
-
-
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `update` and `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Update file
-
-
 
 ```dart
 final avatarFile = File('path/to/file');

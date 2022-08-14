@@ -1,14 +1,12 @@
 ---
 id: contains
-title: ".contains()"
+title: '.contains()'
 slug: /contains
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_dart_v1_ref.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ```dart
 final res = await supabase
@@ -18,28 +16,9 @@ final res = await supabase
   .execute();
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
 
 ```dart
 final res = await supabase
@@ -51,8 +30,6 @@ final res = await supabase
 
 ### With `update()`
 
-
-
 ```dart
 final res = await supabase
   .from('countries')
@@ -63,8 +40,6 @@ final res = await supabase
 
 ### With `delete()`
 
-
-
 ```dart
 final res = await supabase
   .from('countries')
@@ -74,8 +49,6 @@ final res = await supabase
 ```
 
 ### With `rpc()`
-
-
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
