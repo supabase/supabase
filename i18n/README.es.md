@@ -25,7 +25,7 @@
 
 ## Documentación
 
-Para ver la documentación completa, visita la [Documentación](https://supabase.com/docs).
+Para ver la documentación completa, visita [supabase.com/docs](https://supabase.com/docs).
 
 Para ver como contribuir, visita los [Primeros Pasos](../DEVELOPERS.md)
 
