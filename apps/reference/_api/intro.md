@@ -4,13 +4,13 @@ sidebar_position: 1
 sidebar_label: Supabase API
 ---
 
-# Supabase API (Beta)
+# Supabase API
 
 The Supabase API allows you to manage your projects programmatically.
 
 ## Status
 
-The API is currently in beta. It may have breaking changes.
+The Supabase API is in `beta`. It is usable in it's current state, but it's likely that there will be breaking changes.
 
 ## Authentication
 
@@ -29,3 +29,9 @@ All API requests must be authenticated and made over HTTPS.
 
 The API is currently subject to our fair-use policy. In the future, are likely to introduce rate limits.
 All resources created via the API are subject to the pricing detailed on our [Pricing](https://supabase.com/pricing) pages.
+
+## Additional links
+
+- [OpenAPI Docs](https://api.supabase.com/api/v1)
+- [OpenAPI Spec](https://api.supabase.com/api/v1-json)
+- Reporting bugs and issues: [github.com/supabase/supabase](https://github.com/supabase/supabase)
