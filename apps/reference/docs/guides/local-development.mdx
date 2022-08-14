@@ -7,7 +7,7 @@ description: How to use Supabase on your local development machine.
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Supabase provides a CLI so that you can develop your application locally, with the ability to deploy your application to the Supabase platform.
+Supabase provides a [CLI](https://github.com/supabase/cli) so that you can develop your application locally, with the ability to deploy your application to the Supabase platform.
 
 ## Prerequisites
 
@@ -205,18 +205,15 @@ There are a few commands required to link your project. We are in the process of
 
 :::
 
-Let's associate your project with your remote project using [supabase link](/docs/guides/local-development) and [db remote set](/docs/reference/cli/supabase-db-remote-set)
+Let's associate your project with your remote project using [supabase link](/docs/guides/local-development).
 
 ```bash
 
-supabase link
-# Use "supabase link --project-ref your-project-ref" to link your project in one step.
-
-supabase db remote set 'postgresql://postgres:<your_password>@db.<your_project_ref>.supabase.co:5432/postgres'
-# Use the connection string from your Supabase project here.
+supabase link --project-ref <project-id>
+# You can get <project-id> from your project’s dashboard URL: https://app.supabase.com/project/<project-id>
 
 supabase db remote commit
-# capture any changes that you have made to your database before setting up the CLI
+# Capture any changes that you have made to your database before setting up the CLI
 ```
 
 You'll notice that `supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
