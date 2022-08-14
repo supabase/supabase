@@ -8,14 +8,14 @@
   --ifm-menu-color-active: var(--custom-primary);
   --ifm-menu-color-background-active: var(--custom-background-color-diff);
 
-  --dropdown-icon-width: 0.525rem;
-  --dropdown-icon-height: 0.475rem;
+  --dropdown-icon-width: 1rem;
+  --dropdown-icon-height: 1rem;
   --dropdown-icon-gap: 0.688rem;
   --ifm-menu-link-padding-vertical: 0.5rem;
 
   --custom-sidebar-padding: 1.5rem;
   --custom-sidebar-menu-link-vertical-padding: 1rem;
-  --custom-sidebar-menu-link-padding: 0.5rem 1rem;
+  --custom-sidebar-menu-link-padding: 0.5rem 1.3rem;
 
   --tw-ring-inset: ;
   --tw-ring-offset-width: 0px;
@@ -60,6 +60,13 @@
   a {
     color: var(--custom-content-color-emphasis);
   }
+  .menu__caret {
+    &::before {
+      position: absolute;
+      left: 0;
+    }
+  }
+
   .menu__link--sublist-caret {
     &::after {
       position: absolute;
@@ -101,6 +108,7 @@
 }
 
 .custom--main-menu-button {
+  padding-top: var(--custom-sidebar-menu-link-vertical-padding);
   padding-left: var(--custom-sidebar-padding);
   padding-right: var(--custom-sidebar-padding);
   display: flex;
