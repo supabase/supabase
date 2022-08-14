@@ -14,7 +14,7 @@
     "gen:supabase:v2": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_js/sdk spec/supabase_js_v2_ref.yml",
     "gen:cli": "ts-node ReferenceGenerator.ts -o docs/reference/cli spec/cli.yml",
     "gen:dart": "ts-node ReferenceGenerator.ts -o docs/reference/dart spec/supabase_dart_v1_ref.yml",
-    "gen:dart:new": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_dart spec/supabase_dart_v1_ref.yml",
+    "gen:dart:new": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_dart/generated spec/supabase_dart_v1_ref.yml",
     "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },
   "dependencies": {
