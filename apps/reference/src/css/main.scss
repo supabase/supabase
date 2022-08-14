@@ -218,6 +218,46 @@
   --ifm-card-background-color: var(--custom-background-color-highlight);
 }
 
+[data-theme='light'] .DocSearch {
+  /* --docsearch-primary-color: var(--ifm-color-primary); */
+  /* --docsearch-text-color: var(--ifm-font-color-base); */
+  --docsearch-muted-color: var(--custom-background-color-diff-2);
+  // --docsearch-container-background: rgba(94, 100, 112, 0.7);
+  /* Modal */
+  --docsearch-modal-background: var(--custom-background-color);
+  /* Search box */
+  --docsearch-searchbox-background: var(--ifm-color-secondary);
+  --docsearch-searchbox-focus-background: var(--ifm-color-white);
+  /* Hit */
+  --docsearch-hit-color: var(--ifm-font-color-base);
+  --docsearch-hit-active-color: var(--ifm-color-white);
+  --docsearch-hit-background: var(--ifm-color-white);
+  /* Footer */
+  --docsearch-footer-background: var(--ifm-color-white);
+}
+
+[data-theme='dark'] .DocSearch {
+  --docsearch-text-color: var(--ifm-font-color-base);
+  --docsearch-muted-color: var(--ifm-color-secondary-darkest);
+  // --docsearch-container-background: rgba(47, 55, 69, 0.7);
+  /* Modal */
+  --docsearch-modal-background: var(--custom-background-color);
+  /* Search box */
+  --docsearch-searchbox-background: var(--ifm-background-color);
+  --docsearch-searchbox-focus-background: var(--ifm-color-black);
+  /* Hit */
+  --docsearch-hit-color: var(--ifm-font-color-base);
+  --docsearch-hit-active-color: var(--ifm-color-white);
+  --docsearch-hit-background: var(--custom-background-color-diff-1);
+  /* Footer */
+  --docsearch-footer-background: var(--ifm-background-surface-color);
+  --docsearch-key-gradient: linear-gradient(
+    -26.5deg,
+    var(--ifm-color-emphasis-200) 0%,
+    var(--ifm-color-emphasis-100) 100%
+  );
+}
+
 .markdown p a,
 .markdown p a code,
 .markdown li a code,
@@ -404,4 +444,31 @@ html[data-theme='dark'] .navbar-item-discord:before {
 
 .theme-doc-markdown h3 {
   scroll-margin-top: 80px;
+}
+
+// buttons
+
+.button {
+  font-family: var(--custom-font-base);
+}
+.button.button--primary {
+  color: white;
+  text-shadow: 0px 0px 6px rgba(13, 128, 86, 0.8);
+}
+.button.button--secondary {
+  color: var(--custom-content-color);
+  /* background-color: var(--custom-background-color); */
+}
+.button.button--secondary:hover {
+  background-color: var(--custom-background-color-diff-1);
+}
+:root[data-theme='dark'] .button.button--secondary:hover {
+  background-color: var(--custom-background-color-highlight);
+}
+.button.button--secondary.button--outline {
+  border-color: #333;
+}
+:root[data-theme='dark'] .button.button--secondary {
+  /* background-color: var(--custom-background-color-highlight); */
+  border-color: #fff;
 }
