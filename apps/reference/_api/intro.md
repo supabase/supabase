@@ -4,13 +4,13 @@ sidebar_position: 1
 sidebar_label: Supabase API
 ---
 
-# Supabase API (Beta)
+# Supabase API
 
 The Supabase API allows you to manage your projects programmatically.
 
 ## Status
 
-The API is currently in beta. It may have breaking changes.
+The Supabase API is in `beta`. It is usable in it's current state, but it's likely that there will be breaking changes.
 
 ## Authentication
 
