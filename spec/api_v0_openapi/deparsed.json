@@ -46,6 +46,9 @@
             }
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -144,6 +147,9 @@
             }
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -187,6 +193,9 @@
             "description": "Unexpected error listing organizations"
           }
         },
+        "tags": [
+          "organizations"
+        ],
         "security": [
           {
             "bearer": []
@@ -242,6 +251,9 @@
             "description": "Unexpected error creating an organization"
           }
         },
+        "tags": [
+          "organizations"
+        ],
         "security": [
           {
             "bearer": []
@@ -325,6 +337,9 @@
             "description": "Failed to retrieve project's functions"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -433,6 +448,9 @@
             "description": "Failed to create project's function"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -534,6 +552,9 @@
             "description": "Failed to retrieve function with given slug"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -643,6 +664,9 @@
             "description": "Failed to update function with given slug"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -684,6 +708,9 @@
             "description": "Failed to delete function with given slug"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -739,6 +766,9 @@
             "description": "Failed to retrieve project's secrets"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -796,6 +826,9 @@
             "description": "Failed to create project's secrets"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -847,6 +880,9 @@
             "description": "Failed to delete secrets with given names"
           }
         },
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -861,7 +897,16 @@
     "version": "1.0.0",
     "contact": {}
   },
-  "tags": [],
+  "tags": [
+    {
+      "name": "organizations",
+      "description": "Organization endpoints"
+    },
+    {
+      "name": "projects",
+      "description": "Project endpoints"
+    }
+  ],
   "servers": [],
   "components": {
     "securitySchemes": {

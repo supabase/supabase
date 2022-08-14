@@ -38,32 +38,49 @@ export default async function gen(
 type v3OperationWithPath = OpenAPIV3.OperationObject & {
   path: string
 }
+type enrichedOperation = OpenAPIV3.OperationObject & {
+  path: string
+  fullPath: string
+  operationId: string
+}
 async function gen_v3(
   spec: OpenAPIV3.Document,
   dest: string,
   { apiUrl }: { apiUrl: string }
 ) {
-  const paths = Object.entries(spec.paths).map(([key, path], i) => {
+  const specLayout = spec.tags || []
+  const operations: enrichedOperation[] = []
+  Object.entries(spec.paths).forEach(([key, val]) => {
     const fullPath = `${apiUrl}${key}`
-    return {
-      path: key,
-      fullPath,
-      operationList: toArrayWithKey(path!, 'operation').map((o) => {
-        const operation = o as v3OperationWithPath
-        return {
-          ...operation,
-          operationId: slugify(operation.summary!),
 
-          responseList:
-            toArrayWithKey(operation.responses!, 'responseCode') || [],
-        }
-      }),
+    toArrayWithKey(val!, 'operation').forEach((o) => {
+      const operation = o as v3OperationWithPath
+      const enriched = {
+        ...operation,
+        path: key,
+        fullPath,
+        operationId: slugify(operation.summary!),
+
+        responseList:
+          toArrayWithKey(operation.responses!, 'responseCode') || [],
+      }
+      operations.push(enriched)
+    })
+  })
+
+  const sections = specLayout.map((section) => {
+    return {
+      ...section,
+      operations: operations.filter((operation) =>
+        operation.tags?.includes(section.name)
+      ),
     }
   })
 
   const content = ejs.render(template, {
     info: spec.info,
-    paths,
+    sections,
+    operations,
   })
   // console.log(content)
   // Write to disk
