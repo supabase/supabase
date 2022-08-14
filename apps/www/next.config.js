@@ -1408,6 +1408,11 @@ module.exports = withMDX({
         source: '/docs/reference/tools/reference-auth',
         destination: '/docs/reference/auth',
       },
+      {
+        permanent: true,
+        source: '/docs/guides/local-development',
+        destination: '/docs/guides/cli/local-development',
+      },
     ]
   },
 })
