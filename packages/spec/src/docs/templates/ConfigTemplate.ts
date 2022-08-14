@@ -1,6 +1,7 @@
 const template = `
 ---
 id: config
+slug: /config
 title: Configuration
 toc_max_heading_level: 2
 ---
