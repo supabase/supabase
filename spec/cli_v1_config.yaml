@@ -16,6 +16,25 @@ info:
     A `config.toml` file is generated after running `supabase init`.
 
     This file is located in the `supabase` folder under `supabase/config.toml`.
+  tags:
+    - id: general
+      title: General
+      description: General settings.
+    - id: auth
+      title: Auth Settings
+      description: Auth Settings.
+    - id: api
+      title: API Settings
+      description: Auth Settings.
+    - id: database
+      title: Database Settings
+      description: Database Settings.
+    - id: dashboard
+      title: Dashboard Settings
+      description: Dashboard Settings.
+    - id: local
+      title: Local Development
+      description: Local Development.
 
 # This section is an array of public functions which a user might need to execute.
 parameters:
@@ -113,7 +132,7 @@ parameters:
       The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.additional_redirect_urls'
     title: 'auth.additional_redirect_urls'
@@ -124,7 +143,7 @@ parameters:
       A list of _exact_ URLs that auth providers are permitted to redirect to post authentication.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.jwt_expiry'
     title: 'auth.jwt_expiry'
@@ -135,7 +154,7 @@ parameters:
       How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
@@ -146,7 +165,7 @@ parameters:
       Allow/disallow new user signups to your project.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
@@ -157,7 +176,7 @@ parameters:
       Allow/disallow new user signups via email to your project.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.email.double_confirm_changes'
     title: 'auth.email.double_confirm_changes'
@@ -168,7 +187,7 @@ parameters:
       If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.email.enable_confirmations'
     title: 'auth.email.enable_confirmations'
@@ -179,9 +198,9 @@ parameters:
       If enabled, users need to confirm their email address before signing in.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.external.<provider>.enabled'
+  - id: 'auth.external.provider.enabled'
     title: 'auth.external.<provider>.enabled'
     tags: ['auth']
     required: true
@@ -203,9 +222,9 @@ parameters:
       - `spotify`
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.external.<provider>.client_id'
+  - id: 'auth.external.provider.client_id'
     title: 'auth.external.<provider>.client_id'
     tags: ['auth']
     required: true
@@ -214,9 +233,9 @@ parameters:
       Client ID for the external OAuth provider.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.external.<provider>.secret'
+  - id: 'auth.external.provider.secret'
     title: 'auth.external.<provider>.secret'
     tags: ['auth']
     required: true
@@ -225,4 +244,4 @@ parameters:
       Client secret for the external OAuth provider.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/tools/reference-auth'
+        link: 'https://supabase.com/docs/reference/auth'
