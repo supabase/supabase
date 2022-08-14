@@ -14,9 +14,9 @@ The API is currently in beta. It may have breaking changes.
 
 ## Authentication
 
-All API requests require an `Authorization Bearer token`.
-To generate or manage your API key, visit your [account](https://app.supabase.com/account/tokens) page.
-Your API key carries the same privileges as your user account, so be sure to keep it secret.
+All API requests require a Supabase Personal token to be included in the Authorization header: `Authorization Bearer <supabase_personal_token`.
+To generate or manage your API token, visit your [account](https://app.supabase.com/account/tokens) page.
+Your API tokens carry the same privileges as your user account, so be sure to keep it secret.
 
 ```bash
 $ curl https://api.supabase.com/v1/projects \
