@@ -255,11 +255,6 @@
   color: var(--custom-content-color);
 }
 
-.navbar__logo {
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-
 .navbar {
   box-shadow: none;
   border-bottom: 1px solid var(--custom-border-color);
@@ -349,7 +344,6 @@ html[data-theme='dark'] .navbar-item-discord:before {
   background-repeat: no-repeat;
   background-position: center;
 }
-
 
 /* PRISM */
 
