@@ -21,7 +21,7 @@ export default async function gen(
       break
 
     case '2.0':
-      await gen_v2(spec, outputDir)
+      await gen_v2(spec, outputDir, { apiUrl })
       break
 
     default:
@@ -91,36 +91,49 @@ async function gen_v3(
 }
 
 // OPENAPI-SPEC-VERSION: 2.0
-async function gen_v2(spec: OpenAPIV2.Document, dest: string) {
-  const paths = Object.entries(spec.paths).map(([key, path]) => {
+async function gen_v2(
+  spec: OpenAPIV2.Document,
+  dest: string,
+  { apiUrl }: { apiUrl: string }
+) {
+  const specLayout = spec.tags || []
+  const operations: enrichedOperation[] = []
+  Object.entries(spec.paths).forEach(([key, val]) => {
+    const fullPath = `${apiUrl}${key}`
+
+    toArrayWithKey(val!, 'operation').forEach((o) => {
+      const operation = o as v3OperationWithPath
+      const enriched = {
+        ...operation,
+        path: key,
+        fullPath,
+        operationId: slugify(operation.summary!),
+
+        responseList:
+          toArrayWithKey(operation.responses!, 'responseCode') || [],
+      }
+      operations.push(enriched)
+    })
+  })
+
+  const sections = specLayout.map((section) => {
     return {
-      path: key,
-      operationList: toArrayWithKey(path!, 'operation').map((o) => {
-        const operation = o as OpenAPIV2.OperationObject & {
-          path: string
-        }
-        return {
-          ...operation,
-          operationId: slugify(operation.summary!),
-          responseList: toArrayWithKey(operation.responses!, 'responseCode'),
-        }
-      }),
+      ...section,
+      title: toTitle(section.name),
+      id: slugify(section.name),
+      operations: operations.filter((operation) =>
+        operation.tags?.includes(section.name)
+      ),
     }
   })
 
   const content = ejs.render(template, {
     info: spec.info,
-    paths,
+    sections,
+    operations,
   })
   // console.log(content)
   // Write to disk
   await writeToDisk(dest, content)
   console.log('Saved: ', dest)
 }
-
-// function addResponseCode(response: v3ResponseWithCode, spec: OpenAPIV3.Document) {
-//   const jsonResponse = response.
-//   return {
-//     ...response
-//   }
-// }
