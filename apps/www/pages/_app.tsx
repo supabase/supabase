@@ -9,8 +9,6 @@ import { post } from './../lib/fetchWrapper'
 import { ThemeProvider } from '~/components/Providers'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  // test comment
-
   const router = useRouter()
 
   function telemetry() {
