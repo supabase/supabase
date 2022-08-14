@@ -1,15 +1,24 @@
 REPO_DIR=$(shell pwd)
 
-run: download.api.v1 download.tsdoc.v1 format
+run: download transform format
 
+# Format everything - easier for git to track changes
 format:
 	npx prettier --write .
+
+# Transform docs into working files
+transform:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+
+# Download all the specs
+download: download.api.v1 download.storage.v1 download.tsdoc.v1
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
 	
 download.storage.v1:
-	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v1_openapi.json
+	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v0_openapi.json
 
 download.tsdoc.v1:
 	curl -sS https://supabase.github.io/supabase-js/spec.json > $(REPO_DIR)/enrichments/tsdoc_v1/supabase.json
