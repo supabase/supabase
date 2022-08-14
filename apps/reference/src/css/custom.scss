@@ -12,21 +12,11 @@
 @use './components/methodLists';
 @use './components/menu';
 @use './components/button-card';
-// @use './components/admonition';
-// @use './components/back-to-top-button';
-// @use './components/code';
 @use './components/doc-item';
 @use './components/doc-page';
 @use './components/doc-sidebar';
-// @use './components/edit-this-page';
 @use './components/markdown';
-// @use './components/navbar';
-// @use './components/navbar-sidebar';
-// @use './components/pagination';
-// @use './components/search';
-// @use './components/table';
-// @use './components/tabs';
-// @use './components/theme-toggle';
+@use './components/nav-bar';
 @use './components/toc';
 
 :root {
@@ -241,7 +231,6 @@ html {
 .token.doc-comment.class-name {
   @apply text-green-500;
 }
-
 
 .method-list-group {
   list-style: none;
