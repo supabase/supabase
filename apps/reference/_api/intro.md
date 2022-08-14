@@ -33,4 +33,5 @@ All resources created via the API are subject to the pricing detailed on our [Pr
 ## Additional links
 
 - [OpenAPI Docs](https://api.supabase.com/api/v1)
+- [OpenAPI Spec](https://api.supabase.com/api/v1-json)
 - Reporting bugs and issues: [github.com/supabase/supabase](https://github.com/supabase/supabase)

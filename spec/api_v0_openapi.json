@@ -20,6 +20,7 @@
             }
           }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "post": {
@@ -40,6 +41,7 @@
             }
           }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       }
     },
@@ -63,6 +65,7 @@
           },
           "500": { "description": "Unexpected error listing organizations" }
         },
+        "tags": ["organizations"],
         "security": [{ "bearer": [] }]
       },
       "post": {
@@ -88,6 +91,7 @@
           },
           "500": { "description": "Unexpected error creating an organization" }
         },
+        "tags": ["organizations"],
         "security": [{ "bearer": [] }]
       }
     },
@@ -119,6 +123,7 @@
           },
           "500": { "description": "Failed to retrieve project's functions" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "post": {
@@ -149,6 +154,7 @@
           },
           "500": { "description": "Failed to create project's function" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       }
     },
@@ -190,6 +196,7 @@
           },
           "500": { "description": "Failed to retrieve function with given slug" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "patch": {
@@ -227,6 +234,7 @@
           },
           "500": { "description": "Failed to update function with given slug" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "delete": {
@@ -253,6 +261,7 @@
           "200": { "description": "" },
           "500": { "description": "Failed to delete function with given slug" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       }
     },
@@ -284,6 +293,7 @@
           },
           "500": { "description": "Failed to retrieve project's secrets" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "post": {
@@ -314,6 +324,7 @@
           "201": { "description": "" },
           "500": { "description": "Failed to create project's secrets" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       },
       "delete": {
@@ -342,12 +353,16 @@
           },
           "500": { "description": "Failed to delete secrets with given names" }
         },
+        "tags": ["projects"],
         "security": [{ "bearer": [] }]
       }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
-  "tags": [],
+  "tags": [
+    { "name": "organizations", "description": "Organization endpoints" },
+    { "name": "projects", "description": "Project endpoints" }
+  ],
   "servers": [],
   "components": {
     "securitySchemes": { "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" } },
