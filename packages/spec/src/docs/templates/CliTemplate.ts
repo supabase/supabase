@@ -1,7 +1,7 @@
 const template = `
 ---
 id: usage
-slug /usage
+slug: /usage
 title: Usage
 toc_max_heading_level: 3
 ---
