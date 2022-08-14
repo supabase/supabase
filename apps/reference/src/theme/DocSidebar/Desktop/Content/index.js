@@ -81,7 +81,10 @@ export default function ContentWrapper(props) {
       <div className="theme-doc-sidebar-menu-custom-container">
         {pathname && requiresSubNav(pathname, subNavRoutes) && (
           <>
-            <Link to={`/${baseUrl}/reference`} id="custom--main-menu-button">
+            <Link
+              to={`/${baseUrl}/reference`}
+              className="custom--main-menu-button"
+            >
               <svg
                 width="24"
                 height="24"
