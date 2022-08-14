@@ -11,18 +11,6 @@ type Section = {
   id: string
   title: string
 }
-type Layout = 'cli' | 'gotrue'
-const layout: { cli: Section[]; gotrue: [] } = {
-  cli: [
-    { id: 'general', title: 'General' },
-    { id: 'api', title: 'API' },
-    { id: 'database', title: 'Database' },
-    { id: 'dashboard', title: 'Dashboard' },
-    { id: 'local', title: 'Local Development' },
-    { id: 'auth', title: 'Auth' },
-  ],
-  gotrue: [],
-}
 
 export default async function gen(inputFileName: string, outputDir: string) {
   const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
@@ -43,8 +31,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
  * Versioned Generator
  */
 async function gen_v001(spec: ConfigSpec, dest: string) {
-  const layoutId: Layout = spec.info.id as Layout
-  const specLayout = layout[layoutId]
+  const specLayout = spec.info.tags
   const sections = specLayout.map((section: Section) => {
     const parameters = spec.parameters.filter(
       (parameter) => parameter.tags[0] === section.id

@@ -1,6 +1,12 @@
 import { SpecLink } from './Spec'
 import { Url } from 'url'
 
+export type Tag = {
+  id: string
+  title: string
+  description?: string
+}
+
 export type ConfigInfo = {
   id: string
   version: string
@@ -9,6 +15,7 @@ export type ConfigInfo = {
   bugs: Url
   spec: Url
   description: string
+  tags: Tag[]
 }
 
 export type ConfigParameter = {
