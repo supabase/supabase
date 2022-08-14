@@ -1,5 +1,5 @@
 import template from './templates/ApiTemplate'
-import { slugify, toArrayWithKey } from './helpers'
+import { slugify, toArrayWithKey, toTitle } from './helpers'
 import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 const fs = require('fs')
 const ejs = require('ejs')
@@ -71,6 +71,8 @@ async function gen_v3(
   const sections = specLayout.map((section) => {
     return {
       ...section,
+      title: toTitle(section.name),
+      id: slugify(section.name),
       operations: operations.filter((operation) =>
         operation.tags?.includes(section.name)
       ),

@@ -19,7 +19,7 @@ import TabItem from '@theme/TabItem';
 
 <% sections.forEach(function(section){ %>
 
-## <%- section.name %> {#<%= section.name %>}
+## <%- section.title %> {#<%= section.id %>}
 
 <%- section.description %>
 
