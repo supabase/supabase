@@ -44,6 +44,7 @@ You can get your `<project-id>` from your project’s dashboard URL:
 ```
 https://app.supabase.com/project/<project-id>
 ```
+
 If you’re using an existing Supabase project, you might have made schema changes through the dashboard. You need to pull these changes before making local schema changes from the CLI. You can do this by running:
 
 ```sql
@@ -168,9 +169,7 @@ In this section, we will show how to set up a CI/CD workflow with the CLI on Git
 - Create separate Supabase projects for staging and production
 - Push your Git repository to GitHub and enable GitHub Actions
 
-<aside>
-⚠️ You need a *new* project for staging. A project which has already been modified to reflect the production project’s schema can’t be used because the CLI would reapply these changes.
-</aside>
+> ⚠️ You need a _new_ project for staging. A project which has already been modified to reflect the production project’s schema can’t be used because the CLI would reapply these changes.
 
 ### Configure GitHub Actions
 
