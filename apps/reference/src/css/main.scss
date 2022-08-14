@@ -23,8 +23,8 @@
   --custom-font-size-base: 1rem;
   --custom-font-size-sm: 0.9rem;
   --custom-font-size-xs: 0.8rem;
-  --custom-border-radius: 3px;
-  --custom-border-radius-md: 6px;
+  --custom-border-radius: 6px;
+  --custom-border-radius-md: 12px;
   --custom-primary-darkest: #10633e;
   --custom-primary-darker: #1c8656;
   --custom-primary-dark: #38bc81;
@@ -73,8 +73,9 @@
   --ifm-code-color: var(--custom-content-color);
   --ifm-color-warning: var(--custom-color-orange-600);
   --ifm-color-info-contrast-background: var(--custom-background-color-diff);
-  --prism-background-color: var(--custom-background-color-diff) !important;
   --ifm-pre-background: var(--custom-background-color-diff) !important;
+
+  --prism-background-color: var(#1c1c1c) !important;
 
   /* Primary */
   --ifm-color-primary-darkest: var(--custom-primary-darkest);
@@ -264,10 +265,6 @@
   border-color: var(--custom-border-color);
 }
 
-pre {
-  background-color: var(--custom-background-color-diff);
-}
-
 @media screen and (max-width: 580px) {
   .navbar__items .navbar-item-github {
     display: none !important;
@@ -348,10 +345,10 @@ html[data-theme='dark'] .navbar-item-discord:before {
 /* PRISM */
 
 .prism-code {
-  background-color: none;
   word-break: break-word;
   font-size: 0.8rem;
   outline: none !important;
+  // border-radius: 32px;
 }
 .prism-code div,
 .prism-code div:focus,
