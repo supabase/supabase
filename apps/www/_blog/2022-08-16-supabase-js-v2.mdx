@@ -98,7 +98,7 @@ A lot of developers didn't even realize they could use passwordless magic links.
 
 The `insert()`, `update()`, and `upsert()` functions now require you to explicitly append `select()` if you want the data to be returned.
 
-```tsx
+```ts
 // v2
 const { data } = await supabase.from('messages').insert({ id: 1, message: 'Hello world' }).select() // select is now explicitly required
 
@@ -119,6 +119,40 @@ Previously you could pass a `returning: 'minimal'` option to the `insert()`, `up
 `upsert()` statements. We've now made this the default behaviour.
 
 </details>
+
+## Updated Realtime API
+
+There are a few changes to our Realtime interface:
+
+```ts
+// v2
+supabaseClient
+  .channel('any_string_you_want')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'movies',
+    },
+    (payload) => {
+      console.log(payload)
+    }
+  )
+  .subscribe()
+
+// v1
+supabase
+  .from('movies')
+  .on('INSERT', (payload) => {
+    console.log(payload)
+  })
+  .subscribe()
+```
+
+There is a new `channel()` function which requires a string to denote the name of a channel.
+While this may seem more verbose, it's an important change for our upcoming [multiplayer](https://supabase.com/blog/supabase-realtime-with-multiplayer-features) features.
+You can listen to PostgreSQL database changes on any channel you want by subscribing to the `'postgres_changes'` event.
 
 ## Community
 
