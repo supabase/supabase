@@ -1,7 +1,4 @@
 import dayjs from 'dayjs'
-import matter from 'gray-matter'
-import hydrate from 'next-mdx-remote/hydrate'
-import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
@@ -10,9 +7,7 @@ import CTABanner from '~/components/CTABanner'
 import ImageGrid from '~/components/ImageGrid'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
-import { getPostdata } from '~/lib/posts'
-
-import fs from 'fs'
+import ReactMarkdown from 'react-markdown'
 import { IconCornerDownRight, IconGitCommit, IconPlus, IconPlusCircle } from '@supabase/ui'
 
 // import all components used in blog articles here
@@ -53,41 +48,21 @@ const components = {
   },
 }
 
-export async function getStaticProps({ params }: any) {
-  // plugins for next-mdx-remote
-  const gfm = require('remark-gfm')
-  const slug = require('rehype-slug')
+export async function getStaticProps() {
+  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
+  const data = await response.json()
 
-  const filenames = fs.readdirSync('_changelog')
-  console.log('filenames', filenames)
-
-  const changelogContent: any[] = []
-
-  await Promise.all(
-    filenames.map(async (filepath: string) => {
-      // clean up filepath
-      const filePathModified = filepath.replace('.mdx', '')
-      // get post data from markdown
-      const postContent = await getPostdata(filePathModified, '_changelog')
-      // extract content and frontmatter from post
-      const { data, content } = matter(postContent)
-      // Runs the MDX renderer on the MDX string provided with the components and data provided.
-      const mdxSource: any = await renderToString(content, {
-        components,
-        scope: data,
-        mdxOptions: {
-          remarkPlugins: [gfm],
-          rehypePlugins: [slug],
-        },
-      })
-      // add page to array of changelogs
-      return changelogContent.push({ content: mdxSource, ...data })
-    })
-  )
+  if (!data) {
+    return {
+      props: {
+        notFound: true,
+      },
+    }
+  }
 
   return {
     props: {
-      changelog: changelogContent,
+      changelog: data,
     },
   }
 }
@@ -133,14 +108,12 @@ function ChangelogPage(props: any) {
           </div>
 
           {/* Content */}
-
           <div>
-            {props.changelog.map((x: any) => {
-              // const content = hydrate(x.content, { components })
-              const content = hydrate(x.content, { components })
-
+            {props.changelog.map((changelog: any, i: number) => {
+              const date = changelog.published_at.split('T')
+              console.log(date[0])
               return (
-                <div className="grid border-l pb-10  lg:grid-cols-12">
+                <div key={i} className="grid border-l pb-10  lg:grid-cols-12">
                   <div
                     className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
@@ -150,17 +123,18 @@ function ChangelogPage(props: any) {
                         <IconGitCommit size={14} strokeWidth={1.5} />
                       </div>
                       <div className="flex w-full flex-col gap-1">
-                        {x.title && <h3 className="text-scale-1200 text-2xl">{x.title}</h3>}
+                        {changelog.name && (
+                          <h3 className="text-scale-1200 text-2xl">{changelog.name}</h3>
+                        )}
                         <p className="text-scale-900 text-lg">
-                          {dayjs(x.date).format('MMM D, YYYY')}
+                          {dayjs(date[0]).format('MMM D, YYYY')}
                         </p>
                       </div>
                     </div>
                   </div>
                   <div className="col-span-8 ml-8 lg:ml-0">
-                    <article className={['prose prose-docs max-w-none'].join(' ')}>
-                      {' '}
-                      {content}
+                    <article className="prose prose-docs max-w-none">
+                      <ReactMarkdown>{changelog.body}</ReactMarkdown>
                     </article>
                   </div>
                 </div>
