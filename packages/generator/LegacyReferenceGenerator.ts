@@ -36,7 +36,7 @@ const main = (fileNames: string[], options: any) => {
 }
 
 async function gen(inputFileName: string, outputDir: string) {
-  const docSpec = yaml.safeLoad(fs.readFileSync(inputFileName, 'utf8'))
+  const docSpec = yaml.load(fs.readFileSync(inputFileName, 'utf8'))
   const defRef = docSpec.info.definition
     ? fs.readFileSync(docSpec.info.definition, 'utf8')
     : '{}'
@@ -83,7 +83,7 @@ async function gen(inputFileName: string, outputDir: string) {
       const content = Page({
         slug: (docSpec.info.slugPrefix || '') + slug,
         id: slug,
-        specFileName: inputFileName,
+        specFileName: docSpec.info.specUrl || inputFileName,
         title: pageSpec.title || pageSpec.pageName,
         description,
         parameters: hasTsRef ? generateParameters(tsDefinition) : '',

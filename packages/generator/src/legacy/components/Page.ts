@@ -1,5 +1,3 @@
-const EDIT_BASE_URL = 'https://github.com/supabase/supabase/edit/master/web'
-
 type PageParmas = {
   id: string
   title: string
@@ -32,7 +30,7 @@ const Page = ({
 id: ${id}
 title: "${title}"
 slug: ${slug}
-custom_edit_url: ${EDIT_BASE_URL}/${specFileName}
+custom_edit_url: ${specFileName}
 ---
 
 import Tabs from '@theme/Tabs';
