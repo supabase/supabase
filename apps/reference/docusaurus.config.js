@@ -13,8 +13,7 @@ const config = {
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
   baseUrl: baseUrl,
-  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
-  // onBrokenLinks: 'throw',
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
   // themes: ['docusaurus-theme-search-typesense'],
