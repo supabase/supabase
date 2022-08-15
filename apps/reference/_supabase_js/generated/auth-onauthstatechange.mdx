@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Receive a notification every time an auth event happens.
+
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   console.log(event, session)

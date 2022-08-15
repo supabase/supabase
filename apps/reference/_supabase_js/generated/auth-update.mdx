@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Updates user data, if there is a logged in user.
+
 ```js
 const { user, error } = await supabase.auth.update({ email: 'new@email.com' })
 ```

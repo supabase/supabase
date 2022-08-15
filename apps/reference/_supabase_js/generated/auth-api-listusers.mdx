@@ -8,6 +8,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Get a list of users.
+
+This function should only be called on a server. Never expose your `service_role` key in the browser.
+
 ```js
 const { data: user, error } = await supabase.auth.api.listUsers()
 ```
