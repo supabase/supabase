@@ -42,12 +42,14 @@ const Announcement = () => {
       <div
         onClick={handleLink}
         className="
+          launch-week-gradientBg--anouncement-bar
           to-green-1000
           hover:from-green-1000
           hover:to-green-1100 relative flex
           cursor-pointer flex-row        
           space-x-3 
-          bg-gradient-to-r from-green-900 text-white
+          overflow-hidden bg-gradient-to-r from-green-900
+          text-white
         "
       >
         <div
