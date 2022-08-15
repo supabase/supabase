@@ -79,6 +79,8 @@ pages:
   auth.signInWithPassword():
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
+    notes: |
+      - A user can sign up either via email or phone.
     examples:
       - name: Sign in with email.
         isSpotlight: true
@@ -93,7 +95,7 @@ pages:
         description: Supabase supports Phone Auth.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
             password: 'some-password',
           })
