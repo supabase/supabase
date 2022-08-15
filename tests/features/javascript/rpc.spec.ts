@@ -2,7 +2,7 @@ import { params, suite, test } from '@testdeck/jest'
 import { faker } from '@faker-js/faker'
 import { Severity } from 'allure-js-commons'
 
-import { ApiError, Session, SupabaseClient, User, UserAttributes } from '@supabase/supabase-js'
+import { Session, SupabaseClient, User, UserAttributes } from '@supabase/supabase-js'
 
 import { FEATURE } from '../templates/enums'
 import { description, feature, log, severity, step } from '../../.jest/jest-custom-reporter'
