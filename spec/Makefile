@@ -8,8 +8,8 @@ format:
 
 # Transform docs into working files
 transform:
-	# npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
-	# npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:functions
 	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:gotrue
