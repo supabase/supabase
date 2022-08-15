@@ -10,8 +10,6 @@
 
 import Example from './src/legacy/components/Example'
 import Page from './src/legacy/components/Page'
-import Sidebar from './src/legacy/components/Sidebar'
-import SidebarCategory from './src/legacy/components/SidebarCategory'
 import Tab from './src/legacy/components/Tab'
 import {
   slugify,
@@ -50,15 +48,6 @@ async function gen(inputFileName: string, outputDir: string) {
       pageName: name,
     })
   )
-
-  // // Sidebar
-  // const inputFileNameToSnakeCase = inputFileName
-  //   .replace('/', '_')
-  //   .replace('.yml', '')
-  // const sidebarFileName = `sidebar_${inputFileNameToSnakeCase}.js`
-  // const sidebar = generateSidebar(docSpec)
-  // await writeToDisk(sidebarFileName, sidebar)
-  // console.log('Sidebar created: ', sidebarFileName)
 
   // Index Page
   const indexFilename = outputDir + `/index.mdx`
@@ -142,14 +131,18 @@ function getDescriptionFromDefintion(tsDefinition) {
 }
 
 function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
-  let children = paramDefinition.type?.declaration?.children
+  let param =
+    paramDefinition.type?.type == 'reference' &&
+    paramDefinition.type?.dereferenced?.id
+      ? paramDefinition.type?.dereferenced
+      : paramDefinition
+  let children = param.type?.declaration?.children
+
   const labelParams = {
-    name: paramDefinition.name,
-    isOptional: !!paramDefinition.flags.isOptional,
-    type: extractParamTypeAsString(paramDefinition),
-    description: paramDefinition.comment
-      ? tsDocCommentToMdComment(paramDefinition.comment)
-      : null,
+    name: param.name,
+    isOptional: !!param.flags.isOptional,
+    type: extractParamTypeAsString(param),
+    description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
   }
   let subContent = ''
 
@@ -301,18 +294,6 @@ function extractTsDocNode(nodeToFind: string, definition: any) {
   return currentNode
 }
 
-function generateSidebar(docSpec: any) {
-  let path = docSpec.info.docs.path || ''
-  let categories = docSpec.info.docs.sidebar.map((x) => {
-    const items = x.items.map((item) => {
-      let slug = slugify(item)
-      return `'${path}${slug}'`
-    })
-    return SidebarCategory(x.name, items)
-  })
-  return Sidebar(categories)
-}
-
 function generateDocsIndexPage(docSpec: any, inputFileName: string) {
   return Page({
     slug: (docSpec.info.slugPrefix || '') + slugify(docSpec.info.title),
@@ -322,7 +303,6 @@ function generateDocsIndexPage(docSpec: any, inputFileName: string) {
     description: docSpec.info.description,
   })
 }
-
 // Run everything
 const argv = require('minimist')(process.argv.slice(2))
 main(argv['_'], argv)
