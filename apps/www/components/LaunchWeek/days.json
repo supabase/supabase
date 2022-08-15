@@ -1,6 +1,6 @@
 [
   {
-    "title": "CLI and REST API",
+    "title": "CLI and Admin API",
     "shipped": true,
     "date": "15th Aug 2022",
     "description": "We are moving Supabase CLI v1 out of beta, and releasing Admin API beta.",
@@ -19,9 +19,9 @@
             "description": "Learn how to install the CLI"
           },
           {
-            "title": "Rest API Docs",
+            "title": "Admin API Docs",
             "url": "/docs/reference/api",
-            "description": "Learn how to use the new Rest API"
+            "description": "Learn how to use the new Admin API"
           }
         ]
       }
