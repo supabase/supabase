@@ -8,8 +8,6 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-The event you want to listen to.
-
 ```js
 const mySubscription = supabase
   .from('*')
@@ -26,7 +24,7 @@ const mySubscription = supabase
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      event
+      type
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -37,7 +35,7 @@ const mySubscription = supabase
   </h4>
   <div class="method-list-item-description">
 
-The event
+No description provided.
 
   </div>
   
@@ -48,16 +46,16 @@ The event
     <span className="method-list-item-label-name">
       filter
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
-      <code>Record</code>
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-An object that specifies what you want to listen to from the event.
+No description provided.
 
   </div>
   
@@ -68,16 +66,16 @@ An object that specifies what you want to listen to from the event.
     <span className="method-list-item-label-name">
       callback
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
-      <code>object</code>
+      <code>Function</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-A callback function that is called whenever the event occurs.
+No description provided.
 
   </div>
   

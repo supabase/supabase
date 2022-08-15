@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Updates a new Storage bucket
+
 ```js
 const { data, error } = await supabase.storage.updateBucket('avatars', {
   public: false,
@@ -32,7 +34,7 @@ const { data, error } = await supabase.storage.updateBucket('avatars', {
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+A unique identifier for the bucket you are updating.
 
   </div>
   
