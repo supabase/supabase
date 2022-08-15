@@ -1,4 +1,4 @@
-clispec: '001'
+clispec: "001"
 info:
   id: cli
   version: 1.0.0
@@ -393,7 +393,7 @@ commands:
       ```
   - id: supabase-db
     title: supabase db
-    summary: Manage Postgres databases
+    summary: Manage local Postgres databases
     tags: []
     links: []
     subcommands:
@@ -497,9 +497,9 @@ commands:
       ```
   - id: supabase-db-branch
     title: supabase db branch
-    summary: Manage database branches
+    summary: Manage local database branches
     description: |
-      Manage database branches. Each branch is associated with a separate database.
+      Manage local database branches. Each branch is associated with a separate local database. Forking remote databases is NOT supported.
     tags: []
     links: []
     subcommands:
