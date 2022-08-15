@@ -52,6 +52,10 @@
         "url": "https://status.supabase.com/"
       },
       {
+        "text": "Changelog",
+        "url": "/changelog"
+      },
+      {
         "text": "Terms of service",
         "url": "/docs/company/terms"
       },
