@@ -2,13 +2,13 @@
 id: subscribe
 title: 'on().subscribe()'
 slug: /subscribe
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Subscribe to realtime changes in your database.
+The event you want to listen to.
 
 ```js
 const mySubscription = supabase
@@ -32,12 +32,32 @@ const mySubscription = supabase
       required
     </span>
     <span className="method-list-item-validation">
-      <code>SupabaseEventTypes</code>
+      <code>string</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The database event which you would like to receive updates for, or you can use the special wildcard `*` to listen to all changes.
+The event
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      filter
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>Record</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An object that specifies what you want to listen to from the event.
 
   </div>
   
@@ -48,8 +68,8 @@ The database event which you would like to receive updates for, or you can use t
     <span className="method-list-item-label-name">
       callback
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -57,7 +77,7 @@ The database event which you would like to receive updates for, or you can use t
   </h4>
   <div class="method-list-item-description">
 
-A callback that will handle the payload that is sent whenever your database changes.
+A callback function that is called whenever the event occurs.
 
   </div>
   

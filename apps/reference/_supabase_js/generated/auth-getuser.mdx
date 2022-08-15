@@ -1,7 +1,7 @@
 ---
-id: auth-signout
-title: 'signOut()'
-slug: /auth-signout
+id: auth-getuser
+title: 'getUser()'
+slug: /auth-getuser
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
@@ -9,13 +9,17 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 ```js
-const { error } = await supabase.auth.signOut()
+const user = supabase.auth.user()
 ```
+
+## Notes
+
+This method gets the user object from memory.
 
 ## Examples
 
-### Sign out
+### Get the logged in user
 
 ```js
-const { error } = await supabase.auth.signOut()
+const user = supabase.auth.user()
 ```

@@ -2,7 +2,7 @@
 id: or
 title: '.or()'
 slug: /or
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -44,7 +44,7 @@ The filters to use, separated by commas.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      foreignTable
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -55,7 +55,7 @@ The filters to use, separated by commas.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The foreign table to use (if `column` is a foreign column).
 
   </div>
   
@@ -67,16 +67,16 @@ No description provided.
     <span className="method-list-item-label-name">
       foreignTable
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>undefined</code> | <code>string</code>
+      <code>string</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The foreign table to use (if `column` is a foreign column).
+No description provided.
 
   </div>
   

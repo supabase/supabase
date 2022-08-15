@@ -2,7 +2,7 @@
 id: select
 title: 'Fetch data: select()'
 slug: /select
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -23,11 +23,11 @@ const { data, error } = await supabase.from('cities').select()
     <span className="method-list-item-label-name">
       columns
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>string</code>
+      <code>Query</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -62,18 +62,18 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      head
+      count
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>boolean</code>
+      <code>exact</code> | <code>planned</code> | <code>estimated</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-When set to true, select will void data.
+No description provided.
 
   </div>
   
@@ -82,18 +82,18 @@ When set to true, select will void data.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      count
+      head
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>null</code> | <code>exact</code> | <code>planned</code> | <code>estimated</code>
+      <code>boolean</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+No description provided.
 
   </div>
   

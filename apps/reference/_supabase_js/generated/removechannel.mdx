@@ -1,17 +1,17 @@
 ---
-id: removesubscription
-title: 'removeSubscription()'
-slug: /removesubscription
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+id: removechannel
+title: 'removeChannel()'
+slug: /removechannel
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Closes and removes a subscription and returns the number of open subscriptions.
+Closes and removes a channel and returns the number of open channels.
 
 ```js
-supabase.removeSubscription(mySubscription)
+supabase.removeChannel(mySubscription)
 ```
 
 ## Parameters
@@ -21,7 +21,7 @@ supabase.removeSubscription(mySubscription)
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      subscription
+      channel
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -32,7 +32,7 @@ supabase.removeSubscription(mySubscription)
   </h4>
   <div class="method-list-item-description">
 
-The subscription you want to close and remove.
+The channel you want to close and remove.
 
   </div>
   
@@ -49,5 +49,5 @@ The subscription you want to close and remove.
 ### Remove a subscription
 
 ```js
-supabase.removeSubscription(mySubscription)
+supabase.removeChannel(mySubscription)
 ```

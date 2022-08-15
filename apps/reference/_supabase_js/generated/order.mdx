@@ -2,7 +2,7 @@
 id: order
 title: 'order()'
 slug: /order
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -30,7 +30,7 @@ const { data, error } = await supabase
       required
     </span>
     <span className="method-list-item-validation">
-      <code>object</code>
+      <code>ColumnName</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -44,10 +44,10 @@ The column to order on.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      options
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -65,10 +65,10 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      nullsFirst
+      ascending
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>boolean</code>
@@ -76,7 +76,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-If `true`, `null`s appear first.
+No description provided.
 
   </div>
   
@@ -87,16 +87,16 @@ If `true`, `null`s appear first.
     <span className="method-list-item-label-name">
       foreignTable
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>undefined</code> | <code>string</code>
+      <code>undefined</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The foreign table to use (if `column` is a foreign column).
+No description provided.
 
   </div>
   
@@ -105,10 +105,10 @@ The foreign table to use (if `column` is a foreign column).
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      ascending
+      nullsFirst
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>boolean</code>
@@ -116,7 +116,7 @@ The foreign table to use (if `column` is a foreign column).
   </h4>
   <div class="method-list-item-description">
 
-If `true`, the result will be in ascending order.
+No description provided.
 
   </div>
   

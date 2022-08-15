@@ -316,7 +316,7 @@ function generateSidebar(docSpec: any) {
 
 function generateDocsIndexPage(docSpec: any, inputFileName: string) {
   return Page({
-    slug: slugify(docSpec.info.title),
+    slug: (docSpec.info.slugPrefix || '') + slugify(docSpec.info.title),
     id: 'index',
     title: docSpec.info.title,
     specFileName: inputFileName,

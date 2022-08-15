@@ -2,7 +2,7 @@
 id: rpc
 title: 'Postgres functions: rpc()'
 slug: /rpc
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -36,7 +36,7 @@ const { data, error } = await supabase.rpc('hello_world')
       required
     </span>
     <span className="method-list-item-validation">
-      <code>string</code>
+      <code>FunctionName</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -50,13 +50,13 @@ The function name to call.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      params
+      args
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
-      <code>undefined</code> | <code>object</code>
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -70,7 +70,7 @@ The parameters to pass to the function call.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      options
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -81,7 +81,7 @@ The parameters to pass to the function call.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Named parameters.
 
   </div>
   
@@ -91,18 +91,18 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      head
+      count
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>boolean</code>
+      <code>exact</code> | <code>planned</code> | <code>estimated</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-When set to true, no data will be returned.
+Count algorithm to use to count rows in a table.
 
   </div>
   
@@ -111,18 +111,18 @@ When set to true, no data will be returned.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      count
+      head
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>null</code> | <code>exact</code> | <code>planned</code> | <code>estimated</code>
+      <code>boolean</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+When set to true, no data will be returned.
 
   </div>
   
