@@ -48,15 +48,13 @@ const { data } = await supabase.from('messages').select().match({ id: 1 })
 
 <summary>ℹ️ Differences from v1</summary>
 
-<p>
-  v1 also supported types, but the types were generated from the API rather than the database, so it
-  lost a lot of detailed information. The library also required you to specify the definition in
-  every function call, rather than at the client level.
-</p>
+v1 also supported types, but the types were generated from the API rather than the database, so it
+lost a lot of detailed information. The library also required you to specify the definition in
+every function call, rather than at the client level.
 
-<p>
-  <code>supabase.from<Definitions['Message']>('messages').select('*')</code>
-</p>
+```
+supabase.from<Definitions['Message']>('messages').select('*')
+```
 
 </details>
 
@@ -117,10 +115,8 @@ If you don't append `select()`, the `data` value will be an empty object: `{}`.
 
 <summary>ℹ️ Differences from v1</summary>
 
-<p>
-  Previously you could pass a `returning: 'minimal'` option to the `insert()`, `update()`, and
-  `upsert()` statements. We've now made this the default behaviour.
-</p>
+Previously you could pass a `returning: 'minimal'` option to the `insert()`, `update()`, and
+`upsert()` statements. We've now made this the default behaviour.
 
 </details>
 
