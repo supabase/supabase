@@ -1,7 +1,7 @@
-import { Form, Input, InputNumber, Toggle } from '@supabase/ui'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import {
@@ -18,6 +18,7 @@ const AutoSchemaForm = observer(() => {
   const { isLoaded } = authConfig
 
   const formId = 'auth-config-general-form'
+  const [hidden, setHidden] = useState(true)
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -149,9 +150,16 @@ const AutoSchemaForm = observer(() => {
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <Input
                       id="SECURITY_CAPTCHA_SECRET"
+                      type={hidden ? 'password' : 'text'}
                       size="small"
-                      label="hCaptcha sitekey"
-                      descriptionText="hCaptcha secret (sitekey)"
+                      label="hCaptcha secret"
+                      actions={
+                        <Button
+                          icon={hidden ? <IconEye /> : <IconEyeOff />}
+                          type="default"
+                          onClick={() => setHidden(!hidden)}
+                        />
+                      }
                     />
                   )}
                 </FormSectionContent>
