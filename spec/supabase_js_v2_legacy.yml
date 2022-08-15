@@ -7,7 +7,7 @@ info:
 
     Supabase JavaScript.
 
-  definition: spec/tsdoc_v1/combined.json
+  definition: ../../spec/enrichments/tsdoc_v2/combined.json
   specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v2_legacy.yml
   slugPrefix: '/'
   libraries:

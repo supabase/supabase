@@ -2,20 +2,13 @@
 id: storage-from-list
 title: 'from.list()'
 slug: storage-from-list
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 Lists all the files within a bucket.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase.storage.from('avatars').list('folder', {
@@ -24,10 +17,6 @@ const { data, error } = await supabase.storage.from('avatars').list('folder', {
   sortBy: { column: 'name', order: 'asc' },
 })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -105,13 +94,6 @@ Fetch parameters, currently only supports `signal`, which is an AbortController'
 
 ### List files in a bucket
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase.storage.from('avatars').list('folder', {
   limit: 100,
@@ -120,18 +102,7 @@ const { data, error } = await supabase.storage.from('avatars').list('folder', {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Search files in a bucket
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase.storage.from('avatars').list('folder', {
@@ -141,7 +112,3 @@ const { data, error } = await supabase.storage.from('avatars').list('folder', {
   search: 'jon',
 })
 ```
-
-</TabItem>
-
-</Tabs>

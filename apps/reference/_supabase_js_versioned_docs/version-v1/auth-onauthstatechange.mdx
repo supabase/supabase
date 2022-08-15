@@ -2,7 +2,7 @@
 id: auth-onauthstatechange
 title: 'onAuthStateChange()'
 slug: auth-onauthstatechange
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,22 +10,11 @@ import TabItem from '@theme/TabItem'
 
 Receive a notification every time an auth event happens.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   console.log(event, session)
 })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -57,31 +46,13 @@ No description provided.
 
 ### Listen to auth changes
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   console.log(event, session)
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to sign in
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -89,18 +60,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to sign out
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -108,18 +68,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to token refresh
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -127,18 +76,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to user updates
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -146,18 +84,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to user deleted
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
@@ -165,25 +92,10 @@ supabase.auth.onAuthStateChange((event, session) => {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Listen to password recovery events
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 supabase.auth.onAuthStateChange((event, session) => {
   if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
 })
 ```
-
-</TabItem>
-
-</Tabs>

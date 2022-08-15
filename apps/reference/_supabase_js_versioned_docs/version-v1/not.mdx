@@ -2,7 +2,7 @@
 id: not
 title: '.not()'
 slug: not
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,23 +10,12 @@ import TabItem from '@theme/TabItem'
 
 Finds all rows which doesn't satisfy the filter.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
   .select('name, country_id')
   .not('name', 'eq', 'Paris')
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -110,13 +99,6 @@ The value to filter with.
 
 ### With `select()`
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -124,18 +106,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -144,18 +115,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -164,18 +124,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -183,7 +132,3 @@ const { data, error } = await supabase
   .rpc('echo_all_cities')
   .not('name', 'eq', 'Paris')
 ```
-
-</TabItem>
-
-</Tabs>
