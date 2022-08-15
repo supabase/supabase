@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Creates a new user.
+
 ```js
 const { user, session, error } = await supabase.auth.signUp({
   email: 'example@email.com',
@@ -94,7 +96,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Optional user metadata.
 
   </div>
   
@@ -114,7 +116,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The redirect URL attached to the signup confirmation link. Does not redirect the user if it's a mobile signup.
 
   </div>
   

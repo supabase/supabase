@@ -8,6 +8,12 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Gets the current user details.
+
+This method is called by the GoTrueClient `update` where
+the jwt is set to this.currentSession.access_token
+and therefore, acts like getting the currently authenticated user
+
 ```js
 const { user, error } = await supabase.auth.api.getUser('ACCESS_TOKEN_JWT')
 ```
@@ -30,7 +36,7 @@ const { user, error } = await supabase.auth.api.getUser('ACCESS_TOKEN_JWT')
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+A valid, logged-in JWT. Typically, the access_token for the currentSession
 
   </div>
   

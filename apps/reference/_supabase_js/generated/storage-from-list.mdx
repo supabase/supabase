@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Lists all the files within a bucket.
+
 ```js
 const { data, error } = await supabase.storage.from('avatars').list('folder', {
   limit: 100,
@@ -34,7 +36,7 @@ const { data, error } = await supabase.storage.from('avatars').list('folder', {
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The folder path.
 
   </div>
   
@@ -54,7 +56,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Search options, including `limit`, `offset`, `sortBy`, and `search`.
 
   </div>
   
@@ -74,7 +76,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Fetch parameters, currently only supports `signal`, which is an AbortController's signal
 
   </div>
   
