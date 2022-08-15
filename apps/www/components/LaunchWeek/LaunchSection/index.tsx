@@ -29,7 +29,7 @@ export const LaunchSection = (props: WeekDayProps) => {
             <div className="relative">
               <img
                 className="top-0 left-0 rounded-xl border drop-shadow-lg"
-                src="/images/launchweek/security.jpg"
+                src="/images/launchweek/launchweek-day-placeholder.jpg"
                 alt="Supabase"
               />
             </div>
