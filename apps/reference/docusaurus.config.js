@@ -5,7 +5,7 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
-const baseUrl = '/new-docs/'
+const baseUrl = '/docs/'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
