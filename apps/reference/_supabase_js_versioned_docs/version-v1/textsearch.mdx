@@ -2,7 +2,7 @@
 id: textsearch
 title: '.textSearch()'
 slug: textsearch
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -106,13 +106,6 @@ The text search configuration to use.
 
 ### Text search
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('quotes')
@@ -122,20 +115,9 @@ const { data, error } = await supabase
   })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Basic normalization
 
 Uses PostgreSQL's `plainto_tsquery` function.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -147,20 +129,9 @@ const { data, error } = await supabase
   })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Full normalization
 
 Uses PostgreSQL's `phraseto_tsquery` function.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -171,10 +142,6 @@ const { data, error } = await supabase
     config: 'english',
   })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ### Websearch
 
@@ -187,13 +154,6 @@ with advanced operators.
 - `OR`: the word “or” will be converted to the | operator.
 - `-`: a dash will be converted to the ! operator.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('quotes')
@@ -203,7 +163,3 @@ const { data, error } = await supabase
     config: 'english',
   })
 ```
-
-</TabItem>
-
-</Tabs>
