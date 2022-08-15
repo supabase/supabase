@@ -2,7 +2,7 @@
 id: filter
 title: '.filter()'
 slug: /filter
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -30,7 +30,7 @@ const { data, error } = await supabase
       required
     </span>
     <span className="method-list-item-validation">
-      <code>object</code>
+      <code>ColumnName</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -50,7 +50,7 @@ The column to filter on.
       required
     </span>
     <span className="method-list-item-validation">
-      <code>FilterOperator</code>
+      <code>FilterOperator</code> | <code>not.eq</code> | <code>not.neq</code> | <code>not.gt</code> | <code>not.gte</code> | <code>not.lt</code> | <code>not.lte</code> | <code>not.like</code> | <code>not.ilike</code> | <code>not.is</code> | <code>not.in</code> | <code>not.cs</code> | <code>not.cd</code> | <code>not.sl</code> | <code>not.sr</code> | <code>not.nxl</code> | <code>not.nxr</code> | <code>not.adj</code> | <code>not.ov</code> | <code>not.fts</code> | <code>not.plfts</code> | <code>not.phfts</code> | <code>not.wfts</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -70,7 +70,7 @@ The operator to filter with.
       required
     </span>
     <span className="method-list-item-validation">
-      <code>any</code>
+      <code>unknown</code>
     </span>
   </h4>
   <div class="method-list-item-description">

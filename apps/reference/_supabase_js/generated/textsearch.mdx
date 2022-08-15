@@ -2,14 +2,14 @@
 id: textsearch
 title: '.textSearch()'
 slug: /textsearch
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose tsvector value on the stated `column` matches
-to_tsquery(`query`).
+Finds all rows whose text or tsvector value on the stated `column` matches
+the tsquery in `query`.
 
 ## Parameters
 
@@ -24,7 +24,7 @@ to_tsquery(`query`).
       required
     </span>
     <span className="method-list-item-validation">
-      <code>object</code>
+      <code>ColumnName</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -58,10 +58,10 @@ The Postgres tsquery string to filter with.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      __namedParameters
+      options
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -81,16 +81,36 @@ No description provided.
     <span className="method-list-item-label-name">
       config
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
-      <code>undefined</code> | <code>string</code>
+      <code>string</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The text search configuration to use.
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      type
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>plain</code> | <code>phrase</code> | <code>websearch</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
 
   </div>
   

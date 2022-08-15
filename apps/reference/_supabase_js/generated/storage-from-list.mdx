@@ -2,13 +2,11 @@
 id: storage-from-list
 title: 'from.list()'
 slug: /storage-from-list
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase_js_v2_ref.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
-
-Lists all the files within a bucket.
 
 ```js
 const { data, error } = await supabase.storage.from('avatars').list('folder', {
@@ -31,12 +29,12 @@ const { data, error } = await supabase.storage.from('avatars').list('folder', {
       optional
     </span>
     <span className="method-list-item-validation">
-      <code>undefined</code> | <code>string</code>
+      <code>string</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The folder path.
+No description provided.
 
   </div>
   
@@ -56,7 +54,7 @@ The folder path.
   </h4>
   <div class="method-list-item-description">
 
-Search options, including `limit`, `offset`, `sortBy`, and `search`.
+No description provided.
 
   </div>
   
@@ -76,7 +74,7 @@ Search options, including `limit`, `offset`, `sortBy`, and `search`.
   </h4>
   <div class="method-list-item-description">
 
-Fetch parameters, currently only supports `signal`, which is an AbortController's signal
+No description provided.
 
   </div>
   
