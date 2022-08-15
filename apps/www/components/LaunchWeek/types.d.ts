@@ -31,4 +31,5 @@ export interface WeekDayProps {
   products?: Announcement[]
   index: number
   shippingHasStarted?: boolean
+  youtube_id?: string
 }
