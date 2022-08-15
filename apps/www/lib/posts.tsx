@@ -15,7 +15,6 @@ export const getSortedPosts = (
   tags?: any,
   runner?: any
 ) => {
-
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
