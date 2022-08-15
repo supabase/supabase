@@ -20,8 +20,9 @@
     "supabase-dart:v1:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_dart/generated ../../spec/supabase_dart_v1_legacy.yml",
     "supabase-dart:v1:olddocs": "ts-node ./LegacyReferenceGenerator.ts -o ../../web/docs/reference/dart ../../spec/supabase_dart_v1_legacy.yml",
     "supabase-js:format": "prettier --write ../../apps/reference/_supabase_js/**/*.mdx && prettier --write ../../apps/reference/_supabase_js_versioned_docs/**/*.mdx",
-    "supabase-js:v1": "npm-run-all supabase-js:v1:ref supabase-js:format",
+    "supabase-js:v1": "npm-run-all supabase-js:v1:ref supabase-js:v1:olddocs supabase-js:format",
     "supabase-js:v1:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js_versioned_docs/version-v1 ../../spec/supabase_js_v1_legacy.yml",
+    "supabase-js:v1:olddocs": "ts-node ./LegacyReferenceGenerator.ts -o ../../web/docs/reference/javascript ../../spec/supabase_dart_v1_legacy.yml",
     "supabase-js:v2": "npm-run-all supabase-js:v2:ref supabase-js:format",
     "supabase-js:v2:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js/generated ../../spec/supabase_js_v2_legacy.yml"
   },
