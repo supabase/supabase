@@ -18,7 +18,7 @@ The Supabase CLI also functions as a database migrations tool. In this guide, we
 
 Before you start, here are some prerequisites:
 
-- [Install the Supabase CLI](https://supabase.com/docs/reference/cli/installing-and-updating)
+- [Install the Supabase CLI](/reference/cli/installing-and-updating)
 - Create a Supabase project
 - Initialise a local Git repository
 
@@ -36,7 +36,7 @@ You should see that a new `supabase` directory is created. Then you need to link
 
 ```sql
 supabase login
-supabase link --project-ref <project-id>
+supabase link --project-ref $PROJECT_ID
 ```
 
 You can get your `<project-id>` from your project’s dashboard URL:
@@ -321,7 +321,7 @@ After verifying your staging project has successfully migrated, create another P
 
 The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PROJECT_ID` environment variable.
 
-The full example code for this guide is available on our [demo repository](https://github.com/supabase/cli-example).
+The full example code for this guide is available on our [demo repository](https://github.com/supabase/supabase-action-example).
 
 ## Troubleshooting
 
