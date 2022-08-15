@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Sends a mobile OTP via SMS. Will register the account if it doesn't already exist
+
 ## Parameters
 
 <ul className="method-list-group">
@@ -26,7 +28,7 @@ import TabItem from '@theme/TabItem'
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The user's phone number WITH international prefix
 
   </div>
   
@@ -87,7 +89,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+A boolean flag to indicate whether to automatically create a user on magiclink / otp sign-ins if the user doesn't exist. Defaults to true.
 
   </div>
   

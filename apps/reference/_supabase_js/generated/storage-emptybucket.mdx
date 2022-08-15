@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Removes all objects inside a single bucket.
+
 ```js
 const { data, error } = await supabase.storage.emptyBucket('avatars')
 ```
@@ -30,7 +32,7 @@ const { data, error } = await supabase.storage.emptyBucket('avatars')
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The unique identifier of the bucket you would like to empty.
 
   </div>
   

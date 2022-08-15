@@ -8,6 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
+Uploads a file to an existing bucket.
+
 ```js
 const avatarFile = event.target.files[0]
 const { data, error } = await supabase.storage
@@ -36,7 +38,7 @@ const { data, error } = await supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
 
   </div>
   
@@ -56,7 +58,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The body of the file to be stored in the bucket.
 
   </div>
   
@@ -76,7 +78,10 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+HTTP headers.
+`cacheControl`: string, the `Cache-Control: max-age=<seconds>` seconds value.
+`contentType`: string, the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+`upsert`: boolean, whether to perform an upsert.
 
   </div>
   
