@@ -1,69 +1,30 @@
 ---
 id: auth-api-listusers
-title: "listUsers()"
+title: 'listUsers()'
 slug: auth-api-listusers
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Get a list of users.
 
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.auth.api.listUsers()
 ```
-
-
-</TabItem>
-
-</Tabs>
-
-
-
-
 
 ## Notes
 
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Get a full list of users.
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.auth.api.listUsers()
 ```
-
-
-</TabItem>
-
-</Tabs>

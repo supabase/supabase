@@ -1,36 +1,22 @@
 ---
 id: storage-from-getpublicurl
-title: "from.getPublicUrl()"
+title: 'from.getPublicUrl()'
 slug: storage-from-getpublicurl
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieve URLs for assets in public buckets
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { publicURL, error } = supabase
-  .storage
+const { publicURL, error } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -56,44 +42,19 @@ The file path to be downloaded, including the path and file name. For example `f
 
 </ul>
 
-
 ## Notes
 
 - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: none
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Returns the URL for an asset in a public bucket
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { publicURL, error } = supabase
-  .storage
+const { publicURL, error } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
-
-
-</TabItem>
-
-</Tabs>

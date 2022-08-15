@@ -19,8 +19,8 @@ const sidebars = {
   sidebar: [
     'intro',
     'installing-and-updating',
-    'usage',
-    'config',
+    'generated/usage',
+    'generated/config',
     'release-notes',
     // {
     //   type: "category",

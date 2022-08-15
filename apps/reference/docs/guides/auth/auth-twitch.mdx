@@ -1,0 +1,123 @@
+---
+id: auth-twitch
+title: 'Login with Twitch'
+description: Add Twitch OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Twitch Auth for your project, you need to set up a Twitch Application and add the Application OAuth credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Twitch logins for your application consists of 3 parts:
+
+- Create and configure a Twitch Application [Twitch Developer Console](https://dev.twitch.tv/console)
+- Add your Twitch OAuth Consumer keys to your [Supabase Project](https://app.supabase.com)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Access your Twitch Developer account
+
+- Go to [dev.twitch.tv](https://dev.twitch.tv).
+- Click on `Log in with Twitch` at the top right to log in.
+- If you have not already enabled 2-Factor Authentication for your Twitch Account, you will need to do that at [Twitch Security Settings](https://www.twitch.tv/settings/security) before you can continue.
+
+![Twitch Developer Page](/img/guides/auth-twitch/twitch-developer-page.png)
+
+- Once logged in, go to the [Twitch Developer Console](https://dev.twitch.tv/console).
+
+![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
+
+### Find your callback URL
+
+In the next step you require a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Create a Twitch Application
+
+![Twitch Developer Console](/img/guides/auth-twitch/twitch-console.png)
+
+- Click on `+ Register Your Application` at the top right.
+
+![Register Application](/img/guides/auth-twitch/twitch-register-your-application.png)
+
+- Enter the name of your application.
+- Type or paste your `OAuth Redirect URL` (the callback URL from the previous step.)
+- Select a category for your app.
+- Check the Captcha box and click `Create`.
+
+### Retrieve your Twitch OAuth Client ID and Client Secret
+
+- Click `Manage` at the right of your application entry in the list.
+
+![Twitch Applications List](/img/guides/auth-twitch/twitch-applications-list.png)
+
+- Copy your Client ID.
+- Click `New Secret` to create a new Client Secret.
+- Copy your Client Secret.
+
+![Get Client ID and Secret](/img/guides/auth-twitch/twitch-get-keys.png)
+
+### Add your Twitch credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `External OAuth Providers` turn `Twitch Enabled` to ON
+- Enter your `client_id` and `client_secret` saved in the previous step
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'twitch',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithTwitch() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'twitch',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Twitch Account](https://twitch.tv)
+- [Twitch Developer Console](https://dev.twitch.tv/console)

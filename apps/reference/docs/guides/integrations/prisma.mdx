@@ -1,0 +1,177 @@
+---
+id: prisma
+title: 'Prisma'
+description: 'Connect your Supabase postgres database to your Prisma project.'
+---
+
+This guide explains how to quickly connect the Postgres database provided by Supabase to a Prisma project.
+
+[Prisma](https://prisma.io) is an [open source](https://github.com/prisma/prisma) next-generation ORM. It consists of the following parts:
+
+- **Prisma Client**: Auto-generated and type-safe query builder for Node.js & TypeScript.
+- **Prisma Migrate**: Migration system.
+- **Prisma Studio**: GUI to view and edit data in your database.
+
+## Step 1: Get the connection string from Supabase project settings
+
+Go to the settings page from the sidebar and navigate to the **Database** tab. You’ll find the database’s connection string with a placeholder for the password you provided when you created the project.
+![Getting the connection string](/img/guides/integrations/prisma/zntcsh3ic91gf1gy8j73.png)
+
+## Step 2: Testing the connection
+
+To make sure that everything works correctly, let’s try the connection string in a Prisma project.
+
+If you already have one, all you need to do is set the `DATABASE_URL` to the connection string (including the password) in your `.env` file, and you’re good to go.
+
+In case you don’t have a Prisma project or this is your first time working with Prisma, you’re going to use the repo from the [quickstart](https://www.prisma.io/docs/getting-started/quickstart) guide.
+
+### Cloning the starter project
+
+Navigate into a directory of your choice and run the following command in your terminal if you’re on a Windows machine:
+
+```bash
+curl https://pris.ly/quickstart -L -o quickstart-main.tar.gz && tar -zxvf quickstart-main.tar.gz quickstart-main/typescript/starter && move quickstart-main\typescript\starter starter && rmdir /S /Q quickstart-main && del /Q quickstart-main.tar.gz
+```
+
+And if you’re using Mac OS or Linux, run the following command:
+
+```bash
+curl -L https://pris.ly/quickstart | tar -xz --strip=2 quickstart-main/typescript/starter
+```
+
+You can now navigate into the directory and install the project’s dependencies:
+
+```bash
+cd starter && npm install
+```
+
+### A look at the project’s structure
+
+This project comes with TypeScript configured and has the following structure.
+
+- A `prisma` directory which contains:
+  - A `dev.db` file: This is a SQLite database.
+  - A `schema.prisma` file: Where we define the different database models and relations between them.
+- A `.env` file: Contains the `DATABASE_URL` variable, which Prisma will use.
+- A `script.ts` file: where we will run some queries using Prisma Client.
+  This starter also comes with the following packages installed:
+- [`@prisma/client`](https://www.npmjs.com/package/@prisma/client): An auto-generated and type-safe query builder that’s _tailored_ to your data.
+- [`prisma`](https://www.npmjs.com/package/prisma): Prisma’s command-line interface (CLI). It allows you to initialize new project assets, generate Prisma Client, and analyze existing database structures through introspection to automatically create your application models.
+  > Note: Prisma works with both JavaScript and TypeScript. However, to get the best possible development experience, using TypeScript is highly recommended.
+
+### Configuring the project to use PostgreSQL
+
+Go ahead and delete the `prisma/dev.db` file because we will be switching to PostgreSQL.
+Next, inside the `prisma/.env` file, update the value of the `DATABASE_URL` variable to the connection string you got in **step 3**. The URL might look as follows:
+
+```env
+# prisma/.env
+postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:5432/postgres
+```
+
+Finally, inside your `schema.prisma` file, change the `provider` from “sqlite” to `“postgresql”`.
+This is what your `schema.prisma` file should look like:
+
+```go
+datasource db {
+  provider = “postgresql”
+  url      = env(“DATABASE_URL”)
+}
+generator client {
+  provider = “prisma-client-js”
+}
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+```
+
+To test that everything works correctly, run the following command to create a migration:
+
+```bash
+prisma migrate dev --name init
+```
+
+You can optionally give your migration a name, depending on the changes you made. Since this is the project’s first migration, you’re setting the `--name` flag to “init”.
+If everything works correctly, you should get the following message in your terminal:
+
+```text
+Your database is now in sync with your schema.
+:heavy_check_mark: Generated Prisma Client (2.x.x) to ./node_modules/@prisma/client in 111ms
+```
+
+This will create a `prisma/migrations` folder inside your `prisma` directory and synchronize your Prisma schema with your database schema.
+
+> Note: if you want to skip the process of creating a migration history, you can use the [`db push`](https://www.prisma.io/docs/concepts/components/prisma-migrate/db-push) command instead of `migrate dev`.
+> If you go to your Supabase project, in the table editor, you should see that two tables have been created, a `Post` and a `User` table.
+> ![tables created in the UI](/img/guides/integrations/prisma/7y4qq4wwvfrheti6r09u.png)
+> That’s it! You have now successfully connected a Prisma project to a PostgreSQL database hosted on Supabase and ran your first migration.
+
+## Connection pooling with Supabase
+
+If you’re working in a serverless environment (for example Node.js functions hosted on AWS Lambda, Vercel or Netlify Functions), you need to set up [connection pooling](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#serverless-environments-faas) using a tool like [PgBouncer](https://www.pgbouncer.org/). That’s because every function invocation may result in a [new connection to the database](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#the-serverless-challenge). Supabase [supports connection management using PgBouncer](https://supabase.io/blog/2021/04/02/supabase-pgbouncer#what-is-connection-pooling) and are enabled by default.
+Go to the **Database** page from the sidebar in the Supabase dashboard and navigate to **connection pool** settings
+![Connection pool settings](/img/guides/integrations/prisma/w0oowg8vq435ob5c3gf0.png)
+When running migrations you need to use the non pooled connection URL (like the one we used in **step 4**). However, when deploying your app, you’ll use the pooled connection URL and add the `?pgbouncer=true` flag to the PostgreSQL connection URL. To minimize the number of concurrent connections, setting the `connection_limit` to `1` is also recommended. So the URL might look as follows:
+
+```env
+# prisma/.env
+postgres://postgres:[YOUR-PASSWORD]@db.vdbnhqozmlzdsaejdxwr.supabase.co:6543/postgres?pgbouncer=true&connection_limit=1
+```
+
+Prisma Migrate uses database transactions to check out the current state of the database and the migrations table. However, the Migration Engine is designed to use a single connection to the database, and does not support connection pooling with PgBouncer. If you attempt to run Prisma Migrate commands in any environment that uses PgBouncer for connection pooling, you might see the following error:
+
+```bash
+Error: undefined: Database error
+Error querying the database: db error: ERROR: prepared statement “s0” already exists
+```
+
+This is a known issue and it is being worked on, you can follow the progress on this [GitHub issue](https://github.com/prisma/prisma/issues/6485).
+If you want to learn more about Prisma, check out the [docs](https://www.prisma.io/docs). Also in case you have any questions or run into any issue, feel free to start a discussion in the repo’s [discussions section](https://github.com/prisma/prisma/discussions).
+
+## Troubleshooting
+
+If you run `prisma migrate dev --name init` multiple times, it sometimes asks if you want to recreate the whole schema. If you chose yes, it will delete the public schema and recreates it. The default grants are missing after this. If you run into this problem, add a helper SQL for fixing the grants:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS "auth";
+CREATE SCHEMA IF NOT EXISTS "extensions";
+create extension if not exists "uuid-ossp"      with schema extensions;
+create extension if not exists pgcrypto         with schema extensions;
+create extension if not exists pgjwt            with schema extensions;
+
+grant usage on schema public to postgres, anon, authenticated, service_role;
+grant usage on schema extensions to postgres, anon, authenticated, service_role;
+alter user supabase_admin SET search_path TO public, extensions; -- don't include the "auth" schema
+
+grant all privileges on all tables in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+grant all privileges on all functions in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+grant all privileges on all sequences in schema public to postgres, anon, authenticated, service_role, supabase_admin;
+
+alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+
+alter default privileges for user supabase_admin in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+alter default privileges for user supabase_admin in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges for user supabase_admin in schema public grant all on functions to postgres, anon, authenticated, service_role;
+
+alter role anon set statement_timeout = '3s';
+alter role authenticated set statement_timeout = '8s';
+```
+
+## Resources
+
+- [Prisma](https://prisma.io) official website.
+- [Prisma GitHub](https://github.com/prisma/prisma).
+- [Prisma](https://www.prisma.io/docs/) documentation.

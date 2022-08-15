@@ -1,6 +1,7 @@
 {
   "show": true,
-  "text": "Launch Week 5",
-  "cta": "Get your ticket now",
-  "link": "//launch-week"
+  "text": "Supabase CLI v1 and Admin API Beta",
+  "cta": "Learn more",
+  "link": "/launch-week",
+  "badge": "Day 1"
 }

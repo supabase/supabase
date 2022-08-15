@@ -1,35 +1,20 @@
 ---
 id: storage-emptybucket
-title: "emptyBucket()"
+title: 'emptyBucket()'
 slug: storage-emptybucket
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Removes all objects inside a single bucket.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .emptyBucket('avatars')
+const { data, error } = await supabase.storage.emptyBucket('avatars')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -55,42 +40,16 @@ The unique identifier of the bucket you would like to empty.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `select` 
+  - `buckets` permissions: `select`
   - `objects` permissions: `select` and `delete`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Empty bucket
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .emptyBucket('avatars')
+const { data, error } = await supabase.storage.emptyBucket('avatars')
 ```
-
-
-</TabItem>
-
-</Tabs>

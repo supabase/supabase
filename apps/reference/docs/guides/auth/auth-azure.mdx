@@ -1,0 +1,104 @@
+---
+id: auth-azure
+title: 'Login with Azure'
+description: Add Azure OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Azure Auth for your project, you need to set up an Azure OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Azure OAuth consists of four broad steps:
+
+- Create an application under Azure Active Directory.
+- Obtain a `Application (client) ID` with “Sign In with Azure” capabilities. This will be used as the `client id`.
+- Create a `Secret ID` with “Sign In with Azure” capabilities. The value of the secret will be used as the `client secret`.
+- Whitelist the callback url of your application.
+
+## Steps
+
+### Access your Azure Developer account
+
+- Go to [portal.azure.com](https://portal.azure.com/#home).
+- Login and select "Azure Active Directory" under the list of Azure Services.
+
+### Register an application
+
+- Under Azure Active Directory, select "App registrations" in the side panel.
+- Select "New registration".
+- Choose a name and select your preferred option for the supported account types.
+- Specify the "Redirect URI".
+- The redirect / callback URI should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
+- Click "Register" at the bottom of the form.
+
+![Register an application.](/img/guides/auth-azure/azure-register-app.png)
+
+### Obtain a Client ID
+
+This will serve as the `client_id` when you make API calls to authenticate the user.
+
+- Once your app has been registered, the client id can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled "Application (client) ID".
+
+![Obtain the client id](/img/guides/auth-azure/azure-client-id.png)
+
+### Obtain a Secret ID
+
+This will serve as the `client_secret` when you make API calls to authenticate the user.
+
+- Click on the name of the app registered above.
+- Under "Essentials", click on "Client credentials".
+- Navigate to the "Client secrets" tab and select "New client secret".
+- Enter a description and choose your preferred expiry for the secret.
+- Once the secret is generated, save the `value` (not the secret ID).
+
+![Obtain the client secret](/img/guides/auth-azure/azure-client-secret.png)
+
+## Obtain the Tenant URL
+
+This will allow your users to use your custom Azure login page when logging in.
+
+- Select the Directory (Tenant) ID value.
+- The Azure Tenant URL should look like this: `https://login.microsoftonline.com/<tenant-id>`
+
+![Obtain the tenant url](/img/guides/auth-azure/azure-tenant-url.png)
+
+### Add login code to your client app
+
+The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'azure',
+})
+```
+
+Add a function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithAzure() {
+  const { user, session, error } = await supabase.auth.signIn(
+    {
+      provider: 'azure',
+    },
+    {
+      scopes: 'email',
+    }
+  )
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Azure Developer Account](https://portal.azure.com).
+- [GitHub Discussion](https://github.com/supabase/gotrue/pull/54#issuecomment-757043573).
