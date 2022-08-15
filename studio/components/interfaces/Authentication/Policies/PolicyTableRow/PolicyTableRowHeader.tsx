@@ -1,6 +1,8 @@
 import { FC } from 'react'
+import { useRouter } from 'next/router'
 import { Badge, Button } from '@supabase/ui'
 import { PostgresTable } from '@supabase/postgres-meta'
+import Link from 'next/link'
 
 interface Props {
   table: PostgresTable
@@ -13,12 +15,17 @@ const PolicyTableRowHeader: FC<Props> = ({
   onSelectToggleRLS = () => {},
   onSelectCreatePolicy = () => {},
 }) => {
+  const router = useRouter()
+  const { ref } = router.query
+
   return (
-    <div className="flex w-full items-center justify-between">
+    <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex space-x-4 text-left">
-        <h4 className="m-0 text-lg">
-          <span>{table.name}</span>
-        </h4>
+        <Link href={`/project/${ref}/editor/${table.id}`}>
+          <a>
+            <h4 className="m-0">{table.name}</h4>
+          </a>
+        </Link>
         <Badge color={table.rls_enabled ? 'green' : 'yellow'}>
           {table.rls_enabled ? 'RLS enabled' : 'RLS disabled'}
         </Badge>
