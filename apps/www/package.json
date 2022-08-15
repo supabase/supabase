@@ -1,6 +1,6 @@
 {
   "name": "www",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Supabase main website",
   "private": true,
   "scripts": {
@@ -18,7 +18,7 @@
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^10.0.7",
     "@supabase/supabase-js": "^1.6.0",
-    "@supabase/ui": "v0.37.0-alpha.50",
+    "@supabase/ui": "v0.37.0-alpha.80",
     "classnames": "^2.3.1",
     "date-fns": "2.10.0",
     "dayjs": "^1.11.4",

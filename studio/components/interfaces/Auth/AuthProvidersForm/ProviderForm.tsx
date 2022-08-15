@@ -31,28 +31,30 @@ const ProviderForm: FC<Props> = ({ provider }) => {
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
-    try {
-      const payload = { ...values }
+    const payload = { ...values }
 
-      // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
-      Object.keys(values).map((x: string) => {
-        if (doubleNegativeKeys.includes(x)) {
-          payload[x] = !values[x]
-        }
-      })
+    // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
+    Object.keys(values).map((x: string) => {
+      if (doubleNegativeKeys.includes(x)) {
+        payload[x] = !values[x]
+      }
+    })
 
-      await authConfig.update(payload)
+    const { error } = await authConfig.update(payload)
+
+    if (!error) {
       resetForm({ values: payload, initialValues: payload })
-      setSubmitting(false)
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } catch (error: any) {
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to update settings:  ${error?.message}`,
       })
     }
+
+    setSubmitting(false)
   }
 
   return (

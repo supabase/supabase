@@ -1,0 +1,111 @@
+---
+id: auth-spotify
+title: 'Login with Spotify'
+description: Add Spotify OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Spotify Auth for your project, you need to set up a Spotify OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Spotify logins for your application consists of 3 parts:
+
+- Create and configure a Spotify Project and App on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
+- Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+
+## Steps
+
+### Access your Spotify Developer account
+
+- Log into [Spotify](https://spotify.com)
+- Access the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+
+![Spotify Developer Portal.](/img/guides/auth-spotify/spotify-portal.png)
+
+### Find your callback URL
+
+The next step requires a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Create a Spotify OAuth app
+
+- Log into [Spotify](https://spotify.com).
+- Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+- Click `Create an App`
+- Type your `App name`
+- Type your `App description`
+- Check the box to agree with the `Developer TOS and Branding Guidelines`
+- Click `Create`
+- Save your `Client ID`
+- Save your `Client Secret`
+- Click `Edit Settings`
+
+Under `Redirect URIs`:
+
+- Paste your Supabase Callback URL in the box
+- Click `Add`
+- Click `Save` at the bottom
+
+### Enter your Spotify credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- In the left sidebar, click the `Authentication` icon (near the top).
+- Click `Settings` from the list to go to the `Authentication Settings` page.
+- Enter the final (hosted) URL of your app under `Site URL` (this is important).
+- Under `External OAuth Providers` turn `Spotify Enabled` to ON.
+- Enter your `Client ID` (`client_id`) and `Client Secret` (`client_secret`) saved in the previous step.
+- Click `Save`.
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'spotify',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithSpotify() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'spotify',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)

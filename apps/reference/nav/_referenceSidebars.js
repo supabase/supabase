@@ -1,48 +1,237 @@
-/**
- * Creating a sidebar enables you to:
- - create an ordered group of docs
- - render a sidebar for each doc of that group
- - provide next/previous navigation
-
- The sidebars can be generated from the filesystem, or explicitly defined here.
-
- Create as many sidebars as you want.
- */
-
-// @ts-check
-
-/** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  mainSidebar: [
+  guides: [
+    {
+      type: 'category',
+      label: 'Overview',
+      items: [
+        'about',
+        'architecture',
+        'guides/hosting/platform',
+        'guides/cli/local-development',
+        'guides/cli/cicd-workflow',
+        'guides/examples',
+      ],
+      collapsed: true,
+    },
+    {
+      type: 'category',
+      label: 'Quickstarts',
+      collapsed: true,
+      items: [
+        'guides/with-angular',
+        'guides/with-expo',
+        'guides/with-flutter',
+        'guides/with-ionic-angular',
+        'guides/with-ionic-react',
+        'guides/with-ionic-vue',
+        'guides/with-nextjs',
+        'guides/with-nuxt-3',
+        'guides/with-react',
+        'guides/with-redwoodjs',
+        'guides/with-solidjs',
+        'guides/with-svelte',
+        'guides/with-sveltekit',
+        'guides/with-vue-3',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      collapsed: true,
+      items: [
+        'guides/database',
+        'guides/database/connecting-to-postgres',
+        'guides/database/tables',
+        'guides/database/functions',
+        'guides/database/full-text-search',
+        // 'guides/database/json',
+        // 'guides/database/arrays',
+        // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Extensions',
+          collapsed: true,
+          items: [
+            'guides/database/extensions',
+            // 'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
+            'guides/database/extensions/http',
+            'guides/database/extensions/uuid-ossp',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'APIs',
+      collapsed: true,
+      items: ['guides/api', 'guides/api/generating-types'],
+    },
+    {
+      type: 'category',
+      label: 'Functions',
+      collapsed: true,
+      items: ['guides/functions'],
+    },
+    {
+      type: 'category',
+      label: 'Auth',
+      collapsed: true,
+      items: [
+        'guides/auth',
+        {
+          type: 'category',
+          label: 'Authentication',
+          collapsed: true,
+          items: [
+            'guides/auth/auth-email',
+            'guides/auth/auth-magic-link',
+            'guides/auth/auth-apple',
+            'guides/auth/auth-azure',
+            'guides/auth/auth-bitbucket',
+            'guides/auth/auth-discord',
+            'guides/auth/auth-facebook',
+            'guides/auth/auth-github',
+            'guides/auth/auth-gitlab',
+            'guides/auth/auth-google',
+            'guides/auth/auth-keycloak',
+            'guides/auth/auth-linkedin',
+            'guides/auth/auth-notion',
+            'guides/auth/auth-slack',
+            'guides/auth/auth-spotify',
+            'guides/auth/auth-twitch',
+            'guides/auth/auth-twitter',
+            'guides/auth/auth-workos',
+            'guides/auth/auth-zoom',
+            'guides/auth/auth-twilio',
+            'guides/auth/auth-vonage',
+            'guides/auth/auth-messagebird',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Authorization',
+          collapsed: true,
+          items: [
+            'guides/auth/row-level-security',
+            'guides/auth/managing-user-data',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Deep Dive',
+          collapsed: true,
+          items: [
+            'learn/auth-deep-dive/auth-deep-dive-jwts',
+            'learn/auth-deep-dive/auth-row-level-security',
+            'learn/auth-deep-dive/auth-policies',
+            'learn/auth-deep-dive/auth-gotrue',
+            'learn/auth-deep-dive/auth-google-oauth',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Storage',
+      collapsed: true,
+      items: ['guides/storage'],
+    },
+    {
+      type: 'category',
+      label: 'Platform',
+      collapsed: true,
+      items: [
+        'guides/platform/logs',
+        'guides/platform/metrics',
+        'going-into-prod',
+        'guides/platform/performance',
+        'guides/platform/permissions',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Self Hosting',
+      collapsed: true,
+      items: ['guides/hosting/overview', 'guides/hosting/docker'],
+    },
+    {
+      type: 'category',
+      label: 'Integrations',
+      collapsed: true,
+      items: [
+        'guides/integrations/appsmith',
+        'guides/integrations/auth0',
+        'guides/integrations/clerk',
+        'guides/integrations/dashibase',
+        'guides/integrations/directus',
+        'guides/integrations/draftbit',
+        'guides/integrations/pgmustard',
+        'guides/integrations/plasmic',
+        'guides/integrations/prisma',
+        'guides/integrations/snaplet',
+        'guides/integrations/stytch',
+        'guides/integrations/supertokens',
+        'guides/integrations/vercel',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'See Also',
+      collapsed: true,
+      items: [
+        'faq',
+        'handbook/contributing',
+        'handbook/supasquad',
+        'company/terms',
+        'company/privacy',
+        'company/aup',
+        'company/sla',
+      ],
+    },
+  ],
+  reference: [
     {
       type: 'category',
       label: 'Reference',
-      link: { type: 'doc', id: 'about' },
+      link: { type: 'doc', id: 'reference' },
       collapsed: false,
       items: [
-        { type: 'link', label: 'Supabase CLI', href: '/cli' },
-        { type: 'link', label: 'Supabase API', href: '/api' },
+        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
+        { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
-          href: '/supabase-js',
+          href: '/reference/javascript',
         },
         {
           type: 'link',
           label: 'Supabase Dart Library',
-          href: '/supabase-dart',
+          href: '/reference/dart',
         },
       ],
     },
     {
       type: 'category',
       label: 'Community',
+      // link: { type: 'doc', id: 'about' },
       collapsed: false,
       items: [
         {
           type: 'link',
           label: 'Supabase Auth Helpers',
-          href: '/auth-helpers',
+          href: '/reference/auth-helpers',
         },
       ],
     },
@@ -51,8 +240,8 @@ const sidebars = {
       label: 'Self hosted',
       collapsed: false,
       items: [
-        { type: 'link', label: 'Auth Server', href: '/auth' },
-        { type: 'link', label: 'Storage Server', href: '/storage' },
+        { type: 'link', label: 'Auth Server', href: '/reference/auth' },
+        { type: 'link', label: 'Storage Server', href: '/reference/storage' },
       ],
     },
     // {

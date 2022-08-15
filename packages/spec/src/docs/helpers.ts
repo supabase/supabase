@@ -12,6 +12,11 @@ export const slugify = (text: string) => {
     .replace(/-+$/, '') // Trim - from end of text
 }
 
+// Uppercase the first letter of a string
+export const toTitle = (text: string) => {
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
 /**
  * writeToDisk()
  */

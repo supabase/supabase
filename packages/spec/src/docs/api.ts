@@ -1,23 +1,27 @@
 import template from './templates/ApiTemplate'
-import { slugify, toArrayWithKey } from './helpers'
+import { slugify, toArrayWithKey, toTitle } from './helpers'
 import { OpenAPIV3, OpenAPIV2 } from 'openapi-types'
 const fs = require('fs')
 const ejs = require('ejs')
 const Helpers = require('./Helpers')
 const { writeToDisk } = Helpers
 
-export default async function gen(inputFileName: string, outputDir: string) {
+export default async function gen(
+  inputFileName: string,
+  outputDir: string,
+  apiUrl: string
+) {
   const specRaw = fs.readFileSync(inputFileName, 'utf8')
   const spec = JSON.parse(specRaw)
   // console.log('spec', spec)
 
   switch (spec.openapi || spec.swagger) {
     case '3.0.0':
-      await gen_v3(spec, outputDir)
+      await gen_v3(spec, outputDir, { apiUrl })
       break
 
     case '2.0':
-      await gen_v2(spec, outputDir)
+      await gen_v2(spec, outputDir, { apiUrl })
       break
 
     default:
@@ -31,17 +35,54 @@ export default async function gen(inputFileName: string, outputDir: string) {
  */
 
 // OPENAPI-SPEC-VERSION: 3.0.0
-async function gen_v3(spec: OpenAPIV3.Document, dest: string) {
-  const paths = Object.entries(spec.paths).map(([key, path], i) => {
+type v3OperationWithPath = OpenAPIV3.OperationObject & {
+  path: string
+}
+type enrichedOperation = OpenAPIV3.OperationObject & {
+  path: string
+  fullPath: string
+  operationId: string
+}
+async function gen_v3(
+  spec: OpenAPIV3.Document,
+  dest: string,
+  { apiUrl }: { apiUrl: string }
+) {
+  const specLayout = spec.tags || []
+  const operations: enrichedOperation[] = []
+  Object.entries(spec.paths).forEach(([key, val]) => {
+    const fullPath = `${apiUrl}${key}`
+
+    toArrayWithKey(val!, 'operation').forEach((o) => {
+      const operation = o as v3OperationWithPath
+      const enriched = {
+        ...operation,
+        path: key,
+        fullPath,
+        operationId: slugify(operation.summary!),
+
+        responseList:
+          toArrayWithKey(operation.responses!, 'responseCode') || [],
+      }
+      operations.push(enriched)
+    })
+  })
+
+  const sections = specLayout.map((section) => {
     return {
-      path: key,
-      operations: toArrayWithKey(path!, 'operation'),
+      ...section,
+      title: toTitle(section.name),
+      id: slugify(section.name),
+      operations: operations.filter((operation) =>
+        operation.tags?.includes(section.name)
+      ),
     }
   })
 
   const content = ejs.render(template, {
     info: spec.info,
-    paths,
+    sections,
+    operations,
   })
   // console.log(content)
   // Write to disk
@@ -50,42 +91,49 @@ async function gen_v3(spec: OpenAPIV3.Document, dest: string) {
 }
 
 // OPENAPI-SPEC-VERSION: 2.0
-async function gen_v2(spec: OpenAPIV2.Document, dest: string) {
-  const paths = Object.entries(spec.paths).map(([key, path]) => {
+async function gen_v2(
+  spec: OpenAPIV2.Document,
+  dest: string,
+  { apiUrl }: { apiUrl: string }
+) {
+  const specLayout = spec.tags || []
+  const operations: enrichedOperation[] = []
+  Object.entries(spec.paths).forEach(([key, val]) => {
+    const fullPath = `${apiUrl}${key}`
+
+    toArrayWithKey(val!, 'operation').forEach((o) => {
+      const operation = o as v3OperationWithPath
+      const enriched = {
+        ...operation,
+        path: key,
+        fullPath,
+        operationId: slugify(operation.summary!),
+
+        responseList:
+          toArrayWithKey(operation.responses!, 'responseCode') || [],
+      }
+      operations.push(enriched)
+    })
+  })
+
+  const sections = specLayout.map((section) => {
     return {
-      path: key,
-      operations: toArrayWithKey(path!, 'operation').map((o) => {
-        const operation = o as OpenAPIV2.OperationObject & {
-          path: string
-        }
-        return {
-          ...operation,
-          operationId: slugify(operation.summary!),
-          responses: toArrayWithKey(operation.responses!, 'responseCode'),
-        }
-      }),
+      ...section,
+      title: toTitle(section.name),
+      id: slugify(section.name),
+      operations: operations.filter((operation) =>
+        operation.tags?.includes(section.name)
+      ),
     }
   })
 
   const content = ejs.render(template, {
     info: spec.info,
-    paths,
+    sections,
+    operations,
   })
   // console.log(content)
   // Write to disk
   await writeToDisk(dest, content)
   console.log('Saved: ', dest)
 }
-
-// const pathsToArrays = (pathObject: {
-//   path: string
-//   get?: object
-//   post?: object
-//   patch?: object
-//   delete?: object
-// }) => {
-//   return {
-//     path: pathObject.path,
-
-//   }
-// }

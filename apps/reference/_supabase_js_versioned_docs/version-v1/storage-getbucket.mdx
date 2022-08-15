@@ -1,12 +1,12 @@
 ---
 id: storage-getbucket
-title: "getBucket()"
+title: 'getBucket()'
 slug: storage-getbucket
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves the details of an existing Storage bucket.
 
@@ -18,18 +18,14 @@ Retrieves the details of an existing Storage bucket.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .getBucket('avatars')
+const { data, error } = await supabase.storage.getBucket('avatars')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -55,27 +51,15 @@ The unique identifier of the bucket you would like to retrieve.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `select` 
+  - `buckets` permissions: `select`
   - `objects` permissions: none
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Get bucket
-
-
 
 <Tabs
   defaultValue="js"
@@ -85,11 +69,8 @@ The unique identifier of the bucket you would like to retrieve.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
-  .getBucket('avatars')
+const { data, error } = await supabase.storage.getBucket('avatars')
 ```
-
 
 </TabItem>
 

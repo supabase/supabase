@@ -1,12 +1,12 @@
 ---
 id: insert
-title: "Create data: insert()"
+title: 'Create data: insert()'
 slug: insert
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs an INSERT into the table.
 
@@ -20,18 +20,14 @@ Performs an INSERT into the table.
 ```js
 const { data, error } = await supabase
   .from('cities')
-  .insert([
-    { name: 'The Shire', country_id: 554 }
-  ])
+  .insert([{ name: 'The Shire', country_id: 554 }])
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -55,7 +51,6 @@ The values to insert.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -70,7 +65,7 @@ The values to insert.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -78,27 +73,15 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
-
-
-
-
-
-
-
-
-
+  This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
+  If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
 
 ## Examples
 
 ### Create a record
-
-
 
 <Tabs
   defaultValue="js"
@@ -110,11 +93,8 @@ If you are using Row Level Security and you are encountering problems, try setti
 ```js
 const { data, error } = await supabase
   .from('cities')
-  .insert([
-    { name: 'The Shire', country_id: 554 }
-  ])
+  .insert([{ name: 'The Shire', country_id: 554 }])
 ```
-
 
 </TabItem>
 
@@ -122,9 +102,8 @@ const { data, error } = await supabase
 
 ### Bulk create
 
-When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are
 rolled back.
-
 
 <Tabs
   defaultValue="js"
@@ -134,14 +113,11 @@ rolled back.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .from('cities')
-  .insert([
-    { name: 'The Shire', country_id: 554 },
-    { name: 'Rohan', country_id: 555 },
-  ])
+const { data, error } = await supabase.from('cities').insert([
+  { name: 'The Shire', country_id: 554 },
+  { name: 'Rohan', country_id: 555 },
+])
 ```
-
 
 </TabItem>
 
@@ -149,12 +125,11 @@ const { data, error } = await supabase
 
 ### Upsert
 
-For upsert, if set to true, primary key columns would need to be included 
-in the data parameter in order for an update to properly happen. Also, primary keys 
-used must be natural, not surrogate. There are however, 
-[workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
+For upsert, if set to true, primary key columns would need to be included
+in the data parameter in order for an update to properly happen. Also, primary keys
+used must be natural, not surrogate. There are however,
+[workarounds](https://github.com/PostgREST/postgrest/issues/1118)
 for surrogate primary keys.
-
 
 <Tabs
   defaultValue="js"
@@ -164,17 +139,15 @@ for surrogate primary keys.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .from('cities')
-  .insert(
-    [
-      { name: 'The Shire', country_id: 554 },
-      { name: 'Rohan', country_id: 555 },
-      { name: 'City by the Bay', country_id:840}
-    ],
-    { upsert: true })
+const { data, error } = await supabase.from('cities').insert(
+  [
+    { name: 'The Shire', country_id: 554 },
+    { name: 'Rohan', country_id: 555 },
+    { name: 'City by the Bay', country_id: 840 },
+  ],
+  { upsert: true }
+)
 ```
-
 
 </TabItem>
 

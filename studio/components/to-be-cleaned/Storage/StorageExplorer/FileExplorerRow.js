@@ -9,6 +9,12 @@ import {
   IconMusic,
   IconFilm,
   IconFile,
+  IconAlertCircle,
+  IconDownload,
+  IconTrash,
+  IconCopy,
+  IconEdit,
+  IconMove,
 } from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import { useContextMenu } from 'react-contexify'
@@ -106,7 +112,7 @@ const FileExplorerRow = ({
 
     return (
       <div className="storage-row flex items-center justify-between rounded bg-gray-500">
-        <div className="flex flex-grow items-center h-full px-4">
+        <div className="flex flex-grow items-center h-full px-2.5">
           <div className="">
             <RowIcon
               view={view}
@@ -142,11 +148,36 @@ const FileExplorerRow = ({
           { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
         ]
       : [
-          { name: 'Copy URL', onClick: () => onCopyFileURL(itemWithColumnIndex) },
-          { name: 'Rename', onClick: () => onSelectItemRename(itemWithColumnIndex) },
-          { name: 'Move', onClick: () => onSelectItemMove(itemWithColumnIndex) },
-          { name: 'Download', onClick: () => onDownloadFile(itemWithColumnIndex) },
-          { name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) },
+          ...(!item.isCorrupted
+            ? [
+                {
+                  name: 'Copy URL',
+                  icon: <IconCopy size="tiny" />,
+                  onClick: () => onCopyFileURL(itemWithColumnIndex),
+                },
+                {
+                  name: 'Rename',
+                  icon: <IconEdit size="tiny" />,
+                  onClick: () => onSelectItemRename(itemWithColumnIndex),
+                },
+                {
+                  name: 'Move',
+                  icon: <IconMove size="tiny" />,
+                  onClick: () => onSelectItemMove(itemWithColumnIndex),
+                },
+                {
+                  name: 'Download',
+                  icon: <IconDownload size="tiny" />,
+                  onClick: () => onDownloadFile(itemWithColumnIndex),
+                },
+                { name: 'Separator' },
+              ]
+            : []),
+          {
+            name: 'Delete',
+            icon: <IconTrash size="tiny" />,
+            onClick: () => onSelectItemDelete(itemWithColumnIndex),
+          },
         ]
 
   const size = item.metadata ? formatBytes(item.metadata.size) : '-'
@@ -179,7 +210,7 @@ const FileExplorerRow = ({
     >
       <div
         className={`
-        storage-row px-4 flex items-center justify-between hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark
+        storage-row px-2.5 flex items-center justify-between hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark
         ${isOpened ? 'bg-scale-400' : ''} ${
           isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''
         } ${view === STORAGE_VIEWS.LIST ? 'min-w-min' : ''}
@@ -190,7 +221,7 @@ const FileExplorerRow = ({
           {/* Row Checkbox / Row Icon */}
           <div
             className="relative group"
-            style={{ width: view === STORAGE_VIEWS.COLUMNS ? '15%' : 'auto' }}
+            style={{ minWidth: view === STORAGE_VIEWS.COLUMNS ? '10%' : 'auto' }}
             onClick={(event) => event.stopPropagation()}
           >
             {!isSelected && (
@@ -233,7 +264,12 @@ const FileExplorerRow = ({
             }}
           >
             {view === STORAGE_VIEWS.COLUMNS ? (
-              <p className="text-sm w-full truncate">{item.name}</p>
+              <div className="flex items-center space-x-1 w-full">
+                <p className="text-sm w-full truncate">{item.name}</p>
+                {item.isCorrupted && (
+                  <IconAlertCircle size={18} strokeWidth={2} className="text-scale-1000" />
+                )}
+              </div>
             ) : (
               <>
                 <p className="text-sm truncate w-[30%] min-w-[250px]">{item.name}</p>
@@ -256,11 +292,21 @@ const FileExplorerRow = ({
               side="bottom"
               align="end"
               overlay={[
-                rowOptions.map((option) => (
-                  <Dropdown.Item key={option.name} onClick={option.onClick}>
-                    {option.name}
-                  </Dropdown.Item>
-                )),
+                rowOptions.map((option) => {
+                  if (option.name === 'Separator') {
+                    return <Dropdown.Seperator key="row-separator" />
+                  } else {
+                    return (
+                      <Dropdown.Item
+                        key={option.name}
+                        icon={option.icon || <></>}
+                        onClick={option.onClick}
+                      >
+                        {option.name}
+                      </Dropdown.Item>
+                    )
+                  }
+                }),
               ]}
             >
               <div className="storage-row-menu opacity-0">
