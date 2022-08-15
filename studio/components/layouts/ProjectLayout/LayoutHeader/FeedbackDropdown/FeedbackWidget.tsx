@@ -11,7 +11,7 @@ interface Props {
   onClose: () => void
 }
 
-const FeedbackWidget: FC<Props> = ({ onClose }: any) => {
+const FeedbackWidget: FC<Props> = ({ onClose }) => {
   const router = useRouter()
   const { ref } = router.query
 
