@@ -1,8 +1,9 @@
-import { TruckIcon } from '@heroicons/react/outline'
-import { Badge } from '@supabase/ui'
+import { PlayIcon, TruckIcon, XIcon } from '@heroicons/react/outline'
+import { Badge, Modal } from '@supabase/ui'
 
-import _days from './../days.json'
+import { useState } from 'react'
 import { Article, Product, WeekDayProps } from '../types'
+import _days from './../days.json'
 import ArticleButtonListItem from './ArticleButtonListItem'
 import ProductButton from './ProductButton'
 import ProductButtonListItem from './ProductButtonListItem'
@@ -12,6 +13,7 @@ const days = _days as WeekDayProps[]
 export const LaunchSection = (props: WeekDayProps) => {
   const lastIndex = props.index === days.length - 1
   const nextDayNotShipped = props.shipped && !days[props.index + 1]?.shipped
+  const [videoVisible, setVideoVisible] = useState(false)
 
   return (
     <div className="grid grid-cols-12">
@@ -26,13 +28,62 @@ export const LaunchSection = (props: WeekDayProps) => {
               />
             </div>
           ) : (
-            <div className="relative">
-              <img
-                className="top-0 left-0 rounded-xl border drop-shadow-lg"
-                src="/images/launchweek/launchweek-day-placeholder.jpg"
-                alt="Supabase"
-              />
-            </div>
+            <>
+              <div className="group relative cursor-pointer">
+                <img
+                  className="rounded-xl border drop-shadow-lg"
+                  src={`/images/launchweek/day${props.d}/thumb.jpg`}
+                  alt="Supabase"
+                />
+                <div
+                  onClick={() => setVideoVisible(true)}
+                  className="
+                      absolute    
+                      top-0
+                      left-0
+                      flex
+                          h-full
+                          w-full
+                          items-center
+                          justify-center
+                        "
+                >
+                  <PlayIcon
+                    strokeWidth={1.5}
+                    className="text-brand-900 absolute w-24 opacity-30 transition-all group-hover:scale-105 group-hover:opacity-75"
+                  />
+                </div>
+              </div>
+
+              <Modal
+                size="xxlarge"
+                visible={videoVisible}
+                onCancel={() => setVideoVisible(false)}
+                hideFooter
+                header={
+                  <div className="flex items-center justify-between">
+                    <span className="text-scale-1200">{props.title}</span>
+
+                    <XIcon
+                      className="text-scale-900 hover:text-scale-1200 w-4 cursor-pointer transition"
+                      onClick={() => setVideoVisible(false)}
+                    />
+                  </div>
+                }
+              >
+                <div className="">
+                  <div className="video-container">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}
+                      title="YouTube video player"
+                      frameBorder={0}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              </Modal>
+            </>
           )}
         </div>
       )}
