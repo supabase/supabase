@@ -104,10 +104,10 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
 .custom--main-menu-button {
+  margin-bottom: 1rem;
   padding-top: var(--custom-sidebar-menu-link-vertical-padding);
   padding-left: var(--custom-sidebar-padding);
   padding-right: var(--custom-sidebar-padding);
