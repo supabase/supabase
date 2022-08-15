@@ -2,7 +2,7 @@
 id: auth-api-createuser
 title: 'createUser()'
 slug: auth-api-createuser
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -12,13 +12,6 @@ Creates a new user.
 
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   email: 'user@email.com',
@@ -26,10 +19,6 @@ const { data: user, error } = await supabase.auth.api.createUser({
   user_metadata: { name: 'Yoda' },
 })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -67,13 +56,6 @@ The data you want to create the user with.
 
 ### Create a new user.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   email: 'user@email.com',
@@ -82,18 +64,7 @@ const { data: user, error } = await supabase.auth.api.createUser({
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Auto-confirm email.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
@@ -102,18 +73,7 @@ const { data: user, error } = await supabase.auth.api.createUser({
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Auto-confirm phone.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
@@ -121,7 +81,3 @@ const { data: user, error } = await supabase.auth.api.createUser({
   phone_confirm: true,
 })
 ```
-
-</TabItem>
-
-</Tabs>

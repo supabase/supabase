@@ -2,7 +2,7 @@
 id: storage-from-createsignedurls
 title: 'from.createSignedUrls()'
 slug: storage-from-createsignedurls
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,22 +10,11 @@ import TabItem from '@theme/TabItem'
 
 Create signed URLs to download files without requiring permissions. These URLs can be valid for a set number of seconds.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase.storage
   .from('avatars')
   .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -83,19 +72,8 @@ The number of seconds until the signed URLs expire. For example, `60` for URLs w
 
 ### Create Signed URLs
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase.storage
   .from('avatars')
   .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
 ```
-
-</TabItem>
-
-</Tabs>
