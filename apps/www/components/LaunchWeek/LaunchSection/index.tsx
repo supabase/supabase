@@ -16,7 +16,7 @@ export const LaunchSection = (props: WeekDayProps) => {
   const [videoVisible, setVideoVisible] = useState(false)
 
   return (
-    <div className="grid grid-cols-12">
+    <div className="grid grid-cols-12" id={`launch-week-5-day-${props.d}`}>
       {props.shippingHasStarted && (
         <div className="col-span-12 pb-16 lg:col-span-6 lg:pr-8">
           {!props.shipped ? (
