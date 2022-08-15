@@ -284,3 +284,40 @@ launch week
     background-position-y: -780px;
   }
 }
+
+.launch-week-gradientBg--anouncement-bar {
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
+  background-color: hsl(0, 0%, 11%);
+  width: 100%;
+  clear: both;
+  background-position: bottom;
+  background-position-y: -820px;
+  background-size: 1929px 1170px;
+  background-repeat: no-repeat;
+}
+
+.dark .launch-week-gradientBg--anouncement-bar {
+  background-image: url('/images/launchweek/supabase-launch-week-5-bg.jpg');
+  background-color: #1c1c1c;
+}
+
+@media screen and (min-width: 1032px) {
+  .launch-week-gradientBg--anouncement-bar {
+    background-position-y: -780px;
+  }
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

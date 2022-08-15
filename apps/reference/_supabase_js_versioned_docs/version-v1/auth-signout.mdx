@@ -2,7 +2,7 @@
 id: auth-signout
 title: 'signOut()'
 slug: auth-signout
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -13,36 +13,14 @@ and log them out - removing all items from localstorage and then trigger a "SIGN
 
 For server-side management, you can revoke all refresh tokens for a user by passing a user's JWT through to `auth.api.signOut(JWT: string)`. There is no way to revoke a user's session JWT before it automatically expires
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { error } = await supabase.auth.signOut()
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Examples
 
 ### Sign out
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { error } = await supabase.auth.signOut()
 ```
-
-</TabItem>
-
-</Tabs>

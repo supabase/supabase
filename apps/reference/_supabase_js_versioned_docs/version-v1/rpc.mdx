@@ -2,7 +2,7 @@
 id: rpc
 title: 'Postgres functions: rpc()'
 slug: rpc
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -19,20 +19,9 @@ create or replace function hello_world() returns text as $$
 $$ language sql;
 ```
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase.rpc('hello_world')
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -151,48 +140,19 @@ Count algorithm to use to count rows in a table.
 
 This is an example of invoking a Postgres function with no parameters.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase.rpc('hello_world')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With Parameters
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase.rpc('echo_city', { name: 'The Shire' })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Bulk processing
 
 You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await postgrest.rpc('echo_cities', {
@@ -200,22 +160,11 @@ const { data, error } = await postgrest.rpc('echo_cities', {
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With filters
 
 Postgres functions that return tables can also be combined with
 [Modifiers](/docs/reference/javascript/using-modifiers) and
 [Filters](/docs/reference/javascript/using-filters).
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -224,21 +173,10 @@ const { data, error } = await supabase
   .eq('name', 'The Shire')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With count option
 
 You can specify a count option to get the row count along with your data.
 Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error, count } = await supabase.rpc(
@@ -247,7 +185,3 @@ const { data, error, count } = await supabase.rpc(
   { count: 'exact' }
 )
 ```
-
-</TabItem>
-
-</Tabs>

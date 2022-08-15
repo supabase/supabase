@@ -2,7 +2,7 @@
 id: auth-signup
 title: 'signUp()'
 slug: auth-signup
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,23 +10,12 @@ import TabItem from '@theme/TabItem'
 
 Creates a new user.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { user, session, error } = await supabase.auth.signUp({
   email: 'example@email.com',
   password: 'example-password',
 })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -154,13 +143,6 @@ No description provided.
 
 ### Sign up.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { user, session, error } = await supabase.auth.signUp({
   email: 'example@email.com',
@@ -168,18 +150,7 @@ const { user, session, error } = await supabase.auth.signUp({
 })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Sign up with additional user meta data.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { user, session, error } = await supabase.auth.signUp(
@@ -196,10 +167,6 @@ const { user, session, error } = await supabase.auth.signUp(
 )
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Sign up with third-party providers.
 
 You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
@@ -207,13 +174,6 @@ You can sign up with OAuth providers using the [`signIn()`](/docs/reference/java
 ### Sign up with Phone.
 
 Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { user, session, error } = await supabase.auth.signUp({
@@ -227,7 +187,3 @@ let { session, error } = await supabase.auth.verifyOTP({
   token: '123456',
 })
 ```
-
-</TabItem>
-
-</Tabs>
