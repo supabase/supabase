@@ -18,7 +18,7 @@ In addition, we are also announcing the Admin API beta. The Admin API is a REST 
 
 ## Manage organizations, projects, Edge Functions, and more
 
-If you’ve used [Supabase Edge Functions](https://supabase.com/blog/2022/03/31/supabase-edge-functions#quickstart), you’ve used the Supabase CLI. We’re extending it to let you manage organizations and projects.
+If you've used [Supabase Edge Functions](https://supabase.com/blog/2022/03/31/supabase-edge-functions#quickstart), you've used the Supabase CLI. We're extending it to let you manage organizations and projects.
 
 ```bash
 supabase login
@@ -38,7 +38,7 @@ View the [Supabase CLI docs](https://supabase.com/new-docs/reference/cli) for th
 
 ## Schema migrations
 
-You asked for more database migration support, and we listened. We’ve made improvements to manually-written migrations and auto generated schema diffs.
+You asked for more database migration support, and we listened. We've made improvements to manually-written migrations and auto generated schema diffs.
 
 ### Schema diff-ing
 
@@ -64,7 +64,7 @@ supabase db branch new my_branch
 supabase db branch switch my_branch
 ```
 
-Now you can run any DDL statements from Studio UI’s SQL Editor. To undo the changes, simply switch back and delete the new branch.
+Now you can run any DDL statements from Studio UI's SQL Editor. To undo the changes, simply switch back and delete the new branch.
 
 ```bash
 supabase db branch switch main
@@ -101,13 +101,13 @@ supabase gen types typescript --local
 supabase gen types typescript --db-url $SUPABASE_DB_URL
 ```
 
-Of course, the types aren’t very useful on its own, you need some way to consume it. For that, stay tuned for tomorrow! 😉
+Of course, the types aren't very useful on its own, you need some way to consume it. For that, stay tuned for tomorrow! 😉
 
 # Admin API
 
-The CLI is the first consumer of our new Admin API. Over the next few weeks, we’ll be adding all the endpoints needed to programmatically add, remove, and update your Supabase projects. This is ideal for CI/CD workflows and spinning up test environments.
+The CLI is the first consumer of our new Admin API. Over the next few weeks, we'll be adding all the endpoints needed to programmatically add, remove, and update your Supabase projects. This is ideal for CI/CD workflows and spinning up test environments.
 
-Here’s an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://app.supabase.com/account/tokens)).
+Here's an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://app.supabase.com/account/tokens)).
 
 ```bash
 curl 'https://api.supabase.com/v1/projects' \
@@ -130,4 +130,4 @@ The response JSON should have the same fields as the example below:
 
 Check out the [API docs](https://supabase.com/docs/reference/api) to browse all the functionality added so far.
 
-The new API also opens the door to a whole new suite of integrations, including Zapier, Terraform, Pulumi etc. we’re looking forward to seeing how the dev community interacts with these new public endpoints.
+The new API also opens the door to a whole new suite of integrations, including Zapier, Terraform, Pulumi etc. We're looking forward to seeing how the dev community interacts with these new public endpoints.
