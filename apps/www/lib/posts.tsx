@@ -3,25 +3,32 @@ import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
 
+type Directories = '_blog' | '_case-studies' | '_alternatives'
+
 // substring amount for file names
 // based on YYYY-MM-DD format
 const FILENAME_SUBSTRING = 11
 
-type Directories = '_blog' | '_case-studies' | '_alternatives'
-
-export const getSortedPosts = (directory: Directories, limit?: number, tags?: any) => {
+export const getSortedPosts = (
+  directory: Directories,
+  limit?: number,
+  tags?: any,
+  runner?: any
+) => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
-
-  console.log(postDirectory)
 
   //Reads all the files in the post directory
   const fileNames = fs.readdirSync(postDirectory)
 
   // categories stored in this array
 
-  let allPostsData = fileNames.map((filename) => {
-    const slug = filename.replace('.mdx', '')
+  const allPostsData = fileNames.map((filename) => {
+    let slug = ''
+    slug = filename.replace('.mdx', '')
+    if (directory === '_blog') {
+      slug = slug.substring(FILENAME_SUBSTRING)
+    }
 
     const fullPath = path.join(postDirectory, filename)
 
@@ -37,18 +44,17 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
     // construct url to link to blog posts
     // based on datestamp in file name
     let url = ''
-    if (directory === '_blog') {
-      const dates = getDatesFromFileName(filename)
-      url = `${dates.year}/${dates.month}/${dates.day}/${slug.substring(FILENAME_SUBSTRING)}`
-    } else {
-      url = `/${directory.replace('_', '')}/${slug}`
-    }
+    let contentPath = ''
+
+    url = `/${directory.replace('_', '')}/${slug}`
+    contentPath = `/${directory.replace('_', '')}/${slug}`
 
     const frontmatter = {
       ...data,
       date: formattedDate,
       readingTime,
       url: url,
+      path: contentPath,
     }
     return {
       slug,
@@ -56,7 +62,9 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
     }
   })
 
-  allPostsData = allPostsData.sort((a, b) => {
+  let sortedPosts = [...allPostsData]
+
+  sortedPosts = sortedPosts.sort((a, b) => {
     if (new Date(a.date) < new Date(b.date)) {
       return 1
     } else {
@@ -65,15 +73,15 @@ export const getSortedPosts = (directory: Directories, limit?: number, tags?: an
   })
 
   if (tags) {
-    allPostsData = allPostsData.filter((post: any) => {
+    sortedPosts = sortedPosts.filter((post: any) => {
       const found = tags.some((tag: any) => post.tags.includes(tag))
       return found
     })
   }
 
-  if (limit) allPostsData = allPostsData.slice(0, limit)
+  if (limit) sortedPosts = sortedPosts.slice(0, limit)
 
-  return allPostsData
+  return sortedPosts
 }
 
 // Get Slugs

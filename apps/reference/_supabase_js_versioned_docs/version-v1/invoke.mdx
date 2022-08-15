@@ -1,12 +1,12 @@
 ---
 id: invoke
-title: "invoke()"
+title: 'invoke()'
 slug: invoke
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Invokes a Supabase Function.
 
@@ -19,7 +19,6 @@ Edge Functions are Experimental until 1 August 2022. There will breaking changes
 We have released Supabase Functions to gather feedback. You're welcome to try them out and send us feedback but we strongly advise against using them for anything in production.
 There will be breaking changes with no notice.
 
-
 <Tabs
   defaultValue="js"
   groupId="reference/supabase-js"
@@ -29,17 +28,15 @@ There will be breaking changes with no notice.
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -62,7 +59,6 @@ the name of the function to invoke
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -89,26 +85,14 @@ object with the following properties
 
 </ul>
 
-
 ## Notes
 
 - Requires an Authorization header.
 - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic invocation.
-
-
 
 <Tabs
   defaultValue="js"
@@ -119,10 +103,9 @@ object with the following properties
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
-
 
 </TabItem>
 
@@ -131,7 +114,6 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 ### Specifying response type.
 
 By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
-
 
 <Tabs
   defaultValue="js"
@@ -143,10 +125,9 @@ By default, `invoke()` will parse the response as JSON. You can parse the respon
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
   responseType: 'text',
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
-
 
 </TabItem>
 
@@ -155,7 +136,6 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 ### Parsing custom headers.
 
 You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
-
 
 <Tabs
   defaultValue="js"
@@ -166,13 +146,12 @@ You can pass custom headers to your function. Note: supabase-js automatically pa
 
 ```js
 const { data: user, error } = await supabase.functions.invoke('hello', {
-  headers: { 
-    "my-custom-header": 'my-custom-header-value' 
+  headers: {
+    'my-custom-header': 'my-custom-header-value',
   },
-  body: JSON.stringify({ foo: 'bar' })
+  body: JSON.stringify({ foo: 'bar' }),
 })
 ```
-
 
 </TabItem>
 

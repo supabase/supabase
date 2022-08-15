@@ -1,19 +1,16 @@
 ---
 id: auth-api-sendmobileotp
-title: "sendMobileOTP()"
+title: 'sendMobileOTP()'
 slug: auth-api-sendmobileotp
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Sends a mobile OTP via SMS. Will register the account if it doesn't already exist
 
-
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -37,7 +34,6 @@ The user's phone number WITH international prefix
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -52,7 +48,7 @@ The user's phone number WITH international prefix
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -73,12 +69,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -94,7 +89,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -106,26 +101,14 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Basic example.
-
-
 
 <Tabs
   defaultValue="js"
@@ -135,11 +118,8 @@ No description provided.
 <TabItem value="js">
 
 ```js
-const { data: user, error } = await supabase.auth
-  .api
-  .sendMobileOTP('12345879')
+const { data: user, error } = await supabase.auth.api.sendMobileOTP('12345879')
 ```
-
 
 </TabItem>
 

@@ -5,12 +5,12 @@ dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
 const generateRssItem = (post: any): string => {
-  post.url = post.url.substring(11)
+  // post.url = post.url.substring(11)
 
   return `<item>
-  <guid>https://supabase.com/blog/${post.url}</guid>
+  <guid>https://supabase.com${post.path}</guid>
   <title>${post.title}</title>
-  <link>https://supabase.com/blog/${post.url}</link>
+  <link>https://supabase.com${post.path}</link>
   <description>${post.description}</description>
   <pubDate>${dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:hh:mm')}</pubDate>
 </item>

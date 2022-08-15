@@ -1,19 +1,16 @@
 ---
 id: auth-api-generatelink
-title: "generateLink()"
+title: 'generateLink()'
 slug: auth-api-generatelink
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Generates links to be sent via email or other.
 
-
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -37,7 +34,6 @@ The link type ("signup" or "magiclink" or "recovery" or "invite").
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -58,7 +54,6 @@ The user's email.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -73,7 +68,7 @@ The user's email.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -94,12 +89,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -115,12 +109,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -136,7 +129,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -148,26 +141,14 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Generate invite link.
-
-
 
 <Tabs
   defaultValue="js"
@@ -182,7 +163,6 @@ const { data: user, error } = await supabase.auth.api.generateLink(
   'email@example.com'
 )
 ```
-
 
 </TabItem>
 

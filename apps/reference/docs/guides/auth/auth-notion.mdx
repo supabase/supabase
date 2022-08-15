@@ -1,0 +1,107 @@
+---
+id: auth-notion
+title: 'Login with Notion'
+description: Add Notion OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Notion logins for your application consists of 3 parts:
+
+- Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
+- Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](https://app.supabase.com)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Create your notion integration
+
+- Go to [developers.notion.com](https://developers.notion.com/).
+- Click "View my integrations" and login.
+
+![notion.so](/img/guides/auth-notion/notion.png)
+
+- Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
+- When creating your integration, ensure that you select "Public integration" under "Integration type" and "Read user information including email addresses" under "Capabilities".
+- You will need to add a redirect uri, see [Add the redirect uri](#add-the-redirect-uri)
+- Once you've filled in the necessary fields, click "Submit" to finish creating the integration.
+
+![notion.so](/img/guides/auth-notion/notion-developer.png)
+
+### Add the redirect uri
+
+- After selecting "Public integration", you should see an option to add "Redirect URIs".
+
+![notion.so](/img/guides/auth-notion/notion-redirect-uri.png)
+
+You can retrieve the redirect uri with the following steps:
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+Your redirect uri should look like the following: `https://<project-ref>.supabase.co/auth/v1/callback`
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Add your Notion credentials into your Supabase Project
+
+- Once you've created your notion integration, you should be able to retrieve the "OAuth client ID" and "OAuth client secret" from the "OAuth Domain and URIs" tab.
+
+![notion.so](/img/guides/auth-notion/notion-creds.png)
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Under `External OAuth Providers` turn `Notion Enabled` to ON
+- Enter the "OAuth client ID" and "OAuth client secret" obtained in the `client id` and `client secret` fields.
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'notion',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithNotion() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'notion',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Notion Account](https://notion.so)
+- [Notion Developer Portal](https://www.notion.so/my-integrations)

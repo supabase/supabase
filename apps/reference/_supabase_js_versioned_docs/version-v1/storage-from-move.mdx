@@ -1,12 +1,12 @@
 ---
 id: storage-from-move
-title: "from.move()"
+title: 'from.move()'
 slug: storage-from-move
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Moves an existing file.
 
@@ -18,19 +18,16 @@ Moves an existing file.
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .move('public/avatar1.png', 'private/avatar2.png')
 ```
-
 
 </TabItem>
 
 </Tabs>
 
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +51,6 @@ The original file path, including the current file name. For example `folder/ima
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -77,27 +73,15 @@ The new file path, including the new file name. For example `folder/image-new.pn
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `update` and `select`
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Move file
-
-
 
 <Tabs
   defaultValue="js"
@@ -107,12 +91,10 @@ The new file path, including the new file name. For example `folder/image-new.pn
 <TabItem value="js">
 
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .move('public/avatar1.png', 'private/avatar2.png')
 ```
-
 
 </TabItem>
 

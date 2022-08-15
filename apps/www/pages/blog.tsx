@@ -16,7 +16,7 @@ import PostTypes from '~/types/post'
 import BlogListItem from '~/components/Blog/BlogListItem'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_blog')
+  const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
@@ -145,7 +145,7 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
-      <Link href={`/blog/${blog.url}`}>
+      <Link href={`${blog.path}`}>
         <a className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           <div className="relative h-96 w-full overflow-auto rounded-lg border">
             <Image
