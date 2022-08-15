@@ -18,17 +18,22 @@ const PolicyRow: FC<Props> = ({
     <Panel.Content
       className={[
         'border-panel-border-light dark:border-panel-border-dark flex',
-        'w-full gap-4 border-b py-4 lg:items-center',
+        'w-full space-x-4 border-b py-4 lg:items-center',
       ].join(' ')}
     >
-      <div className="text-scale-900 font-mono text-xs">{policy.command}</div>
-      <div className="flex grow flex-col gap-2 truncate lg:flex-row">
-        <span className="text-scale-1200 max-w-xs truncate text-sm">{policy.name}</span>
-        <span className="text-scale-1100 truncate text-sm">
-          {policy.definition || policy.check}
-        </span>
+      <div className="flex grow flex-col truncate space-y-1">
+        <div className="flex items-center space-x-4">
+          <p className="text-scale-1000 font-mono text-xs">{policy.command}</p>
+          <p className="text-scale-1200 max-w-xs truncate text-sm">{policy.name}</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <p className="text-scale-1000 text-sm">Applied to:</p>
+          {policy.roles.map((role) => (
+            <code className="text-scale-1000 text-xs">{role}</code>
+          ))}
+        </div>
       </div>
-      <div className="">
+      <div>
         <Dropdown
           side="bottom"
           align="end"

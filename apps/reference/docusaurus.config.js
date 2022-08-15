@@ -5,14 +5,15 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
+const baseUrl = '/docs/'
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
-  baseUrl: '/docs/',
-  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
-  // onBrokenLinks: 'throw',
+  baseUrl: baseUrl,
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
   themes: ['docusaurus-theme-search-typesense'],
@@ -30,6 +31,7 @@ const config = {
   },
 
   plugins: [
+    'docusaurus-plugin-sass',
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -38,6 +40,8 @@ const config = {
         routeBasePath: '/reference/api',
         sidebarPath: require.resolve('./nav/api_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -48,6 +52,8 @@ const config = {
         routeBasePath: '/reference/cli',
         sidebarPath: require.resolve('./nav/cli_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -58,6 +64,8 @@ const config = {
         routeBasePath: '/reference/auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -68,6 +76,8 @@ const config = {
         routeBasePath: '/reference/storage',
         sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -78,6 +88,8 @@ const config = {
         routeBasePath: '/reference/dart',
         sidebarPath: require.resolve('./nav/supabase_dart_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -88,13 +100,15 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
-        lastVersion: 'current',
-        versions: {
-          current: {
-            label: 'v2',
-            // path: 'v2',
-          },
-        },
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        // lastVersion: 'current',
+        // versions: {
+        //   current: {
+        //     label: 'v2',
+        //     // path: 'v2',
+        //   },
+        // },
       },
     ],
     [
@@ -105,6 +119,8 @@ const config = {
         routeBasePath: '/reference/auth-helpers',
         sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
   ],
@@ -118,10 +134,12 @@ const config = {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./nav/_referenceSidebars.js'),
           breadcrumbs: false,
+          editUrl:
+            'https://github.com/supabase/supabase/edit/master/apps/reference',
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/css/custom.scss'),
         },
       }),
     ],
@@ -130,6 +148,11 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
+        },
+      },
       navbar: {
         // title: 'Supabase Docs',
         logo: {
@@ -137,7 +160,7 @@ const config = {
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
-        items: mainNavbar.navbar,
+        items: mainNavbar.buildNavbar({ baseUrl }),
       },
       footer: {
         links: [

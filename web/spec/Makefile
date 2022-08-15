@@ -30,3 +30,13 @@ combine.tsdoc.v1:
 	$(REPO_DIR)/tsdoc_v1/storage.json \
 	$(REPO_DIR)/tsdoc_v1/functions.json \
 	> $(REPO_DIR)/tsdoc_v1/combined.json
+
+combine.tsdoc.v2:
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
+	$(REPO_DIR)/tsdoc_v2/supabase.json \
+	$(REPO_DIR)/tsdoc_v2/gotrue.json \
+	$(REPO_DIR)/tsdoc_v2/postgrest.json \
+	$(REPO_DIR)/tsdoc_v2/realtime.json \
+	$(REPO_DIR)/tsdoc_v2/storage.json \
+	$(REPO_DIR)/tsdoc_v2/functions.json \
+	> $(REPO_DIR)/tsdoc_v2/combined.json

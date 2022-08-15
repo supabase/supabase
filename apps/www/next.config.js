@@ -61,13 +61,33 @@ module.exports = withMDX({
         source: '/docs/:path*',
         destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
       },
+      // rewrite to keep existing ticket urls working
       {
-        source: '/launch-week',
+        source: '/launch-week/tickets/:path',
+        destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/tickets/:path`,
+      },
+      // rewrite to move ticket website to another path
+      {
+        source: '/launch-week-register',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}`,
       },
       {
-        source: '/launch-week/:path*',
+        source: '/launch-week-register/:path*',
         destination: `${process.env.NEXT_PUBLIC_LAUNCHWEEKSITE_URL}/:path*`,
+      },
+      {
+        source: '/new-docs',
+        destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
+      },
+      {
+        // redirect /docs/
+        // trailing slash caused by docusaurus issue with multizone
+        source: '/new-docs/',
+        destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,
+      },
+      {
+        source: '/new-docs/:path*',
+        destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}/:path*`,
       },
       // misc rewrites
       {
@@ -1240,6 +1260,158 @@ module.exports = withMDX({
         permanent: true,
         source: '/blog/2022/08/03/supabase-beta-update-july-2022',
         destination: '/blog/supabase-beta-update-july-2022',
+      },
+
+      //  DOCS
+      {
+        permanent: true,
+        source: '/docs/reference/cli/about',
+        destination: '/docs/reference/cli',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/config-reference',
+        destination: '/docs/reference/cli/config',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-help',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-login',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-link',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-init',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-start',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-branch-list',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-branch-create',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-branch-delete',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-switch',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-changes',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-commit',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-reset',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-remote-set',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-remote-commit',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-db-push',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-functions-delete',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-functions-deploy',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-functions-new',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-functions-serve',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-migration-new',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-orgs-list',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-projects-list',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-projects-create',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-secrets-list',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-secrets-set',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/cli/supabase-secrets-unset',
+        destination: '/docs/reference/cli/usage',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/tools/reference-auth',
+        destination: '/docs/reference/auth',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/local-development',
+        destination: '/docs/guides/cli/local-development',
       },
     ]
   },

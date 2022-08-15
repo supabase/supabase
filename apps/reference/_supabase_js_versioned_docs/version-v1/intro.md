@@ -1,10 +1,16 @@
 ---
 id: intro
+title: 'Supabase JavaScript Library'
 slug: /
 sidebar_label: Supabase JavaScript Library
 ---
 
-You're viewing the documentation for supabase-js v1. View the latest docs here:
+This reference documents every object and method available in Supabase's isomorphic JavaScript library, `supabase-js`.
 
-- [Latest docs.](/docs/reference/javascript/)
-- [Migration Guide.](/docs/reference/javascript/migration-guide)
+You can use the `supabase-js` library to:
+
+- interact with your Postgres database
+- listen to database changes
+- invoke Deno Edge Functions
+- build login and user management functionality
+- manage large files

@@ -1,24 +1,17 @@
 ---
 id: maybesingle
-title: "maybeSingle()"
+title: 'maybeSingle()'
 slug: maybesingle
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves at most one row from the result. Result must be at most one row
 (e.g. using `eq` on a UNIQUE column), otherwise this will result in an
 error.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -26,41 +19,11 @@ const { data, error } = await supabase
   .eq('name', 'Singapore')
   .maybeSingle()
 ```
-
-
-</TabItem>
-
-</Tabs>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### With `select()`
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -68,8 +31,3 @@ const { data, error } = await supabase
   .eq('name', 'Singapore')
   .maybeSingle()
 ```
-
-
-</TabItem>
-
-</Tabs>
