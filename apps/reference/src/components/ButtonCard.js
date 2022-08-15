@@ -8,11 +8,15 @@ export default function ButtonCard({
   title,
   description,
   to,
+  layout = 'vertical',
 }) {
   return (
-    <Link to={to}>
-      <div className="button-card__container">
-        <img src={icon} width={24} />
+    <Link
+      to={to}
+      className={['button-card', `button-card--${layout}`].join(' ')}
+    >
+      <div className="button-card__inner">
+        {icon && typeof icon == 'string' ? <img src={icon} width={24} /> : icon}
         <h3>{title}</h3>
         <p>{description}</p>
       </div>

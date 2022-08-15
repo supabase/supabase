@@ -2,7 +2,7 @@
 id: upsert
 title: 'Upsert data: upsert()'
 slug: upsert
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,22 +10,11 @@ import TabItem from '@theme/TabItem'
 
 Performs an UPSERT into the table.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('messages')
   .upsert({ id: 3, message: 'foo', username: 'supabot' })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -167,31 +156,13 @@ Count algorithm to use to count rows in a table.
 
 ### Upsert your data
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('messages')
   .upsert({ id: 3, message: 'foo', username: 'supabot' })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Bulk Upsert your data
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase.from('messages').upsert([
@@ -200,22 +171,11 @@ const { data, error } = await supabase.from('messages').upsert([
 ])
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Upserting into tables with constraints
 
 Running the following will cause supabase to upsert data into the `users` table.
 If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
 based on the column passed into `onConflict`.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -223,18 +183,7 @@ const { data, error } = await supabase
   .upsert({ username: 'supabot' }, { onConflict: 'username' })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### Return the exact number of rows
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error, count } = await supabase.from('users').upsert(
@@ -248,7 +197,3 @@ const { data, error, count } = await supabase.from('users').upsert(
   }
 )
 ```
-
-</TabItem>
-
-</Tabs>

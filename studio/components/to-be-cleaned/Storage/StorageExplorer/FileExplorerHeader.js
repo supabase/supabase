@@ -372,7 +372,7 @@ const FileExplorerHeader = ({
             disabled={breadcrumbs.length === 0}
             onClick={onSelectUpload}
           >
-            Upload file
+            Upload files
           </Button>
           <Button
             icon={<IconFolderPlus size={16} strokeWidth={2} />}

@@ -1,0 +1,61 @@
+---
+id: match
+title: '.match()'
+slug: /match
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose columns match the specified `query` object.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .match({'name': 'Beijing', 'country_id': 156})
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .match({'name': 'Beijing', 'country_id': 156})
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .match({'name': 'Beijing', 'country_id': 156})
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .match({'name': 'Beijing', 'country_id': 156})
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .match({'name': 'Beijing', 'country_id': 156})
+  .execute();
+```

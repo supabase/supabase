@@ -270,8 +270,9 @@
         }
       },
       "get": {
-        "summary": "Deprecated (use GET /object/authenticated/{bucketName} instead): Retrieve an object",
-        "tags": ["object"],
+        "summary": "Get object (deprecated)",
+        "description": "use GET /object/authenticated/{bucketName} instead",
+        "tags": ["deprecated"],
         "parameters": [
           {
             "type": "string",
@@ -821,6 +822,7 @@
   },
   "tags": [
     { "name": "object", "description": "Object end-points" },
-    { "name": "bucket", "description": "Bucket end-points" }
+    { "name": "bucket", "description": "Bucket end-points" },
+    { "name": "deprecated", "description": "Deprecated end-points" }
   ]
 }

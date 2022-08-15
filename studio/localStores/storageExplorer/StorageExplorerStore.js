@@ -43,6 +43,7 @@ export const useStorageExplorerStore = () => {
   return useContext(StorageExplorerContext)
 }
 
+const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 const LIMIT = 200
 const OFFSET = 0
 const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 1 year
@@ -1344,11 +1345,22 @@ class StorageExplorerStore {
       items
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
         .map((item) => {
-          const itemObj = {
-            ...item,
-            type: item.id ? STORAGE_ROW_TYPES.FILE : STORAGE_ROW_TYPES.FOLDER,
-            status: STORAGE_ROW_STATUS.READY,
-          }
+          const type = item.id ? STORAGE_ROW_TYPES.FILE : STORAGE_ROW_TYPES.FOLDER
+
+          const durationSinceCreated = Number(new Date()) - Number(new Date(item.created_at))
+          const isCorrupted =
+            type === STORAGE_ROW_TYPES.FILE &&
+            !item.metadata &&
+            durationSinceCreated >= CORRUPTED_THRESHOLD_MS
+
+          const status =
+            type === STORAGE_ROW_TYPES.FILE &&
+            !item.metadata &&
+            durationSinceCreated <= CORRUPTED_THRESHOLD_MS
+              ? STORAGE_ROW_STATUS.LOADING
+              : STORAGE_ROW_STATUS.READY
+
+          const itemObj = { ...item, type, status, isCorrupted }
           return itemObj
         }) ?? []
     return formattedItems

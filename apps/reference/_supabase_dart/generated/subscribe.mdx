@@ -1,0 +1,119 @@
+---
+id: subscribe
+title: 'on().subscribe()'
+slug: /subscribe
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Subscribe to realtime changes in your database.
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.all, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+## Notes
+
+- Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+- If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+
+## Examples
+
+### Listen to all database changes
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.all, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+### Listening to a specific table
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.all, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+### Listening to inserts
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.insert, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+### Listening to updates
+
+By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+enable full replication for the table you are listening too:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.update, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+### Listening to deletes
+
+By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+enable full replication for the table you are listening too:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.delete, (payload) {
+    // Handle realtime payload
+  })
+  .subscribe();
+```
+
+### Listening to multiple events
+
+You can chain listeners if you want to listen to multiple events for each table.
+
+```dart
+final mySubscription = supabase
+  .from('countries')
+  .on(SupabaseEventTypes.insert, handleInsert)
+  .on(SupabaseEventTypes.delete, handleDelete)
+  .subscribe();
+```
+
+### Listening to row level changes
+
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+
+```dart
+final mySubscription = supabase
+  .from('countries:id=eq.200')
+  .on(SupabaseEventTypes.update, handleRecordUpdated)
+  .subscribe();
+```
