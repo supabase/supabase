@@ -5,7 +5,7 @@ const fs = require('fs')
 /**
  * tsDocCommentToMdParams()
  */
-export const tsDocCommentToMdParams = (tags?: TsDoc.CommentTag[]) =>
+export const tsDocCommentToMdParams = (tags: TsDoc.CommentTag[]) =>
   tags
     .filter((x) => x.tag == 'param')
     .map((x) =>
@@ -30,7 +30,7 @@ ${commentObject?.text || ''}
 /**
  * slugify()
  */
-export const slugify = (text) => {
+export const slugify = (text: string) => {
   return text
     .toString()
     .toLowerCase()
@@ -46,7 +46,7 @@ export const slugify = (text) => {
  */
 export const writeToDisk = (fileName: string, content: any) => {
   return new Promise((resolve, reject) => {
-    fs.writeFile(fileName, content, (err) => {
+    fs.writeFile(fileName, content, (err: Error) => {
       if (err) return reject(err)
       else return resolve(true)
     })
