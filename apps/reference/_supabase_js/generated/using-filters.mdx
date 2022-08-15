@@ -1,0 +1,65 @@
+---
+id: using-filters
+title: 'Using Filters'
+slug: /using-filters
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Filters can be used on `select()`, `update()`, and `delete()` queries.
+
+If a Postgres function returns a table response, you can also apply filters.
+
+### Applying Filters
+
+You must apply your filters to the end of your query. For example:
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'The Shire') // Correct
+
+const { data, error } = await supabase
+  .from('cities')
+  .eq('name', 'The Shire') // Incorrect
+  .select('name, country_id')
+```
+
+### Chaining
+
+Filters can be chained together to produce advanced queries. For example:
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('population', 1000)
+  .lt('population', 10000)
+```
+
+### Conditional Chaining
+
+Filters can be built up one step at a time and then executed. For example:
+
+```js
+const filterByName = null
+const filterPopLow = 1000
+const filterPopHigh = 10000
+
+let query = supabase.from('cities').select('name, country_id')
+
+if (filterByName) {
+  query = query.eq('name', filterByName)
+}
+if (filterPopLow) {
+  query = query.gte('population', filterPopLow)
+}
+if (filterPopHigh) {
+  query = query.lt('population', filterPopHigh)
+}
+
+const { data, error } = await query
+```

@@ -3,7 +3,7 @@ import Content from '@theme-original/DocSidebar/Desktop/Content'
 import { useLocation } from '@docusaurus/router'
 import Link from '@docusaurus/Link'
 
-const baseUrl = `new-docs`
+const baseUrl = `docs`
 const subNavRoutes = [
   // Add any routes which should have a subnav
   `/${baseUrl}/reference/api`,
@@ -29,7 +29,6 @@ const headerNames = {
   },
   storage: {
     name: 'Storage',
-    icon: 'javascript-icon',
   },
   javascript: {
     name: 'supabase-js',
@@ -41,12 +40,10 @@ const headerNames = {
   },
   'auth-helpers': {
     name: 'Auth Helpers',
-    // icon: 'javascript-icon',
   },
 }
 
 const requiresSubNav = (pathname, routes) => {
-  // if (pathname.includes('reference/auth-helpers')) return false
   const found = routes.find((route) => pathname.indexOf(route) == 0)
   return found
 }

@@ -2,7 +2,7 @@
 id: order
 title: 'order()'
 slug: order
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -10,23 +10,12 @@ import TabItem from '@theme/TabItem'
 
 Orders the result with the specified `column`.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
-  .select('name', 'country_id')
+  .select('name, country_id')
   .order('id', { ascending: false })
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -143,32 +132,14 @@ If `true`, the result will be in ascending order.
 
 ### With `select()`
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
-  .select('name', 'country_id')
+  .select('name, country_id')
   .order('id', { ascending: false })
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With embedded resources
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -178,6 +149,12 @@ const { data, error } = await supabase
   .order('name', { foreignTable: 'cities' })
 ```
 
-</TabItem>
+### Ordering multiple columns
 
-</Tabs>
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name', 'country_id')
+  .order('country_id', { ascending: false })
+  .order('name', { ascending: false })
+```
