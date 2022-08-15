@@ -111,14 +111,12 @@ if (!secret) {
   throw new Error("AUTHSIGNAL_SECRET is undefined");
 }
 
-export const authsignal = new Authsignal({ secret });
+const redirectUrl = "http://localhost:3001/api/callback";
+
+export const authsignal = new Authsignal({ secret, redirectUrl });
 ```
 
-Then add the following to `/lib/index.ts`:
-
-```
-export * from "./authsignal";
-```
+The `redirectUrl` here is a Next.js API route which Authsignal will redirect back to after an MFA challenge. We'll implement this below.
 
 ## Step 6: Managing session data in cookies
 
@@ -209,12 +207,6 @@ const ACCESS_TOKEN_COOKIE = "sb-access-token";
 const REFRESH_TOKEN_COOKIE = "sb-refresh-token";
 ```
 
-Then add the following to `/lib/index.ts`:
-
-```
-export * from "./cookies";
-```
-
 ## Step 7: Building the UI
 
 We will add some form components for signing in and signing up as well as a basic home page.
@@ -282,7 +274,6 @@ import { authsignal } from "../lib/authsignal";
 interface Props {
   user: User;
   isEnrolled: boolean;
-  mfaUrl: string;
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = withPageAuth({
@@ -290,25 +281,34 @@ export const getServerSideProps: GetServerSideProps<Props> = withPageAuth({
   async getServerSideProps(ctx) {
     const { user } = await getUser(ctx);
 
-    const { isEnrolled, url: mfaUrl } = await authsignal.mfa({
-      userId: user.id,
-      redirectUrl: "http://localhost:3000/api/callback",
-    });
+    const { isEnrolled } = await authsignal.getUser({userId: user.id});
 
     return {
-      props: { user, isEnrolled, mfaUrl },
+      props: { user, isEnrolled },
     };
   },
 });
 
-export default function HomePage({ user, isEnrolled, mfaUrl }: Props) {
+export default function HomePage({ user, isEnrolled }: Props) {
   const router = useRouter();
 
   return (
     <main>
       <section>
         <div> Signed in as: {user?.email}</div>
-        <button onClick={() => (window.location.href = mfaUrl)}>
+        <button 
+          onClick={async (e) => {
+            e.preventDefault();
+
+            const { mfaUrl } = await fetch("/api/mfa", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ isEnrolled }),
+            }).then((res) => res.json());
+
+            window.location.href = mfaUrl;
+          }}
+        >
           {isEnrolled ? "Manage MFA settings" : "Set up MFA"}
         </button>
         <button onClick={() => router.push("/api/sign-out")}>Sign out</button>
@@ -372,11 +372,12 @@ a {
 
 ## Step 8: Adding the API routes
 
-Now we'll replace the existing api routes in `/pages/api/` with 4 new routes:
+Now we'll replace the existing api routes in `/pages/api/` with 5 new routes:
 
 - `/sign-in.ts`: handles signing in with Supabase and initiating the MFA challenge with Authsignal
 - `/sign-up.ts`: handles signing up with Supabase
 - `/sign-out.ts`: clears the Supabase auth cookies and signs the user out
+- `/mfa.ts`: handles the user's attempt to set up MFA or to manage their existing MFA settings
 - `/callback.ts`: handles completing the MFA challenge with Authsignal
 
 Add the following code to `/pages/api/sign-in.ts`:
@@ -384,7 +385,8 @@ Add the following code to `/pages/api/sign-in.ts`:
 ```
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import { NextApiRequest, NextApiResponse } from "next";
-import { authsignal, setAuthCookie, setTempCookie } from "../../lib";
+import { authsignal } from "../../lib/authsignal";
+import { setAuthCookie, setTempCookie } from "../../lib/cookies";
 
 export default async function signIn(
   req: NextApiRequest,
@@ -401,21 +403,18 @@ export default async function signIn(
     return res.send({ error });
   }
 
-  const { state, challengeUrl } = await authsignal.track({
+  const { state, url: mfaUrl } = await authsignal.track({
     action: "signIn",
     userId: data.user.id,
-    redirectUrl: "http://localhost:3000/api/callback",
   });
 
-  // If an MFA challenge is required, set temp cookie and redirect to Authsignal
-  // Otherwise set Supabase auth cookies immediately and redirect to home
-  if (state === "CHALLENGE_REQUIRED" && challengeUrl) {
+  if (state === "CHALLENGE_REQUIRED") {
     await setTempCookie(data, res);
-    res.redirect(303, challengeUrl);
   } else {
     setAuthCookie(data, res);
-    res.redirect("/");
   }
+
+  res.send({ state, mfaUrl });
 }
 ```
 
@@ -425,7 +424,7 @@ Then to handle new sign-ups add the following to `/pages/api/sign-up.ts`:
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import { Session } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
-import { setAuthCookie } from "../../lib";
+import { setAuthCookie } from "../../lib/cookies";
 
 export default async function signUp(
   req: NextApiRequest,
@@ -439,12 +438,11 @@ export default async function signUp(
   );
 
   if (error || !isSession(data)) {
-    return res.send({ error });
+    res.send({ error });
+  } else {
+    setAuthCookie(data, res);
+    res.send({ data });
   }
-
-  setAuthCookie(data, res);
-
-  res.redirect("/");
 }
 
 const isSession = (data: any): data is Session => !!data?.access_token;
@@ -453,22 +451,55 @@ const isSession = (data: any): data is Session => !!data?.access_token;
 To clear the auth cookies on sign-out add the following to `/pages/api/sign-out.ts`:
 
 ```
+import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../lib";
 
 export default async function signOut(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  supabase.auth.api.deleteAuthCookie(req, res, { redirectTo: "/sign-in" });
+  supabaseClient.auth.api.deleteAuthCookie(req, res, { redirectTo: "/sign-in" });
 }
 ```
+
+To handle the user's actions to set up MFA or manage their existing MFA settings, add the following to `/pages/api/mfa.ts`:
+
+```
+import { getUser, withApiAuth } from "@supabase/auth-helpers-nextjs";
+import { NextApiRequest, NextApiResponse } from "next";
+import { authsignal } from "../../lib/authsignal";
+
+export default withApiAuth(async function mfa(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "POST") {
+    return res.status(405).send({ message: "Only POST requests allowed" });
+  }
+
+  const { user } = await getUser({ req, res });
+
+  const { isEnrolled } = req.body;
+
+  const { url: mfaUrl } = await authsignal.track({
+    action: isEnrolled ? "manageSettings" : "enroll",
+    userId: user.id,
+    redirectToSettings: isEnrolled,
+  });
+
+  res.send({ mfaUrl });
+});
+```
+Because the user should be authenticated with Supabase to set up or manage MFA, we can use Supabase's `withApiAuth` wrapper to protect this route.
+
+The `redirectToSettings` param specifies whether the user should be redirected to the MFA page settings panel after a challenge, rather than redirecting them immediately back to the application.
 
 Finally we need a route to handle the redirect back from Authsignal after an MFA challenge. Add the following to `/pages/api/callback.ts`:
 
 ```
 import { NextApiRequest, NextApiResponse } from "next";
-import { authsignal, getSessionFromTempCookie, setAuthCookie } from "../../lib";
+import { authsignal } from "../../lib/authsignal";
+import { getSessionFromTempCookie, setAuthCookie } from "../../lib/cookies";
 
 export default async function callback(
   req: NextApiRequest,
