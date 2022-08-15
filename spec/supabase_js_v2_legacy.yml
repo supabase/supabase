@@ -8,7 +8,7 @@ info:
     Supabase JavaScript.
 
   definition: ../../spec/enrichments/tsdoc_v2/combined.json
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v2_legacy.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
   slugPrefix: '/'
   libraries:
     - name: 'JavaScript'
@@ -20,10 +20,12 @@ info:
       - name: 'Auth'
         items:
           - auth.signUp()
-          - auth.signIn()
+          - auth.signInWithPassword()
+          - auth.signInWithOtp()
+          - auth.signInWithOAuth()
           - auth.signOut()
-          - auth.session()
-          - auth.user()
+          - auth.getSession()
+          - auth.getUser()
           - auth.update()
           - auth.setAuth()
           - auth.onAuthStateChange()
@@ -169,9 +171,193 @@ pages:
           })
           ```
 
-  auth.signIn():
-    title: 'signIn()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signIn'
+  auth.signInWithPassword():
+    title: 'signInWithPassword()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
+    notes: |
+      - A user can sign up either via email or OAuth.
+      - If you provide `email` without a `password`, the user will be sent a magic link.
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - Specifying a `provider` will open the browser to the relevant login page.
+    examples:
+      - name: Sign in with email.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+      - name: Sign in with magic link.
+        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            email: 'example@email.com'
+          })
+          ```
+      - name: Sign in using third-party providers.
+        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            // provider can be 'github', 'google', 'gitlab', and more
+            provider: 'github'
+          })
+          ```
+      - name: Sign in with Phone.
+        description: Supabase supports Phone Auth.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
+          })
+          ```
+      - name: Sign in with redirect.
+        description: |
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+           
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            redirectTo: 'https://example.com/welcome'
+          })
+          ```
+      - name: Sign in with scopes.
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          const oAuthToken = session.provider_token // use to access provider API
+          ```
+      - name: Sign in using a refresh token (e.g. in React Native).
+        description: |
+          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+        js: |
+          ```js
+          // An example using Expo's `AuthSession`
+          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
+          const provider = 'google';
+
+          AuthSession.startAsync({
+            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
+            returnUrl: redirectUri,
+          }).then(async (response: any) => {
+            if (!response) return;
+            const { user, session, error } = await supabase.auth.signIn({
+              refreshToken: response.params?.refresh_token,
+            });
+          });
+          ```
+
+  auth.signInWithOtp():
+    title: 'signInWithOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
+    notes: |
+      - A user can sign up either via email or OAuth.
+      - If you provide `email` without a `password`, the user will be sent a magic link.
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - Specifying a `provider` will open the browser to the relevant login page.
+    examples:
+      - name: Sign in with email.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+      - name: Sign in with magic link.
+        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            email: 'example@email.com'
+          })
+          ```
+      - name: Sign in using third-party providers.
+        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            // provider can be 'github', 'google', 'gitlab', and more
+            provider: 'github'
+          })
+          ```
+      - name: Sign in with Phone.
+        description: Supabase supports Phone Auth.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            phone: '+13334445555',
+            password: 'some-password',
+          })
+          ```
+      - name: Sign in with redirect.
+        description: |
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
+           
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            redirectTo: 'https://example.com/welcome'
+          })
+          ```
+      - name: Sign in with scopes.
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signIn({
+            provider: 'github'
+          }, {
+            scopes: 'repo gist notifications'
+          })
+          const oAuthToken = session.provider_token // use to access provider API
+          ```
+      - name: Sign in using a refresh token (e.g. in React Native).
+        description: |
+          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
+        js: |
+          ```js
+          // An example using Expo's `AuthSession`
+          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
+          const provider = 'google';
+
+          AuthSession.startAsync({
+            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
+            returnUrl: redirectUri,
+          }).then(async (response: any) => {
+            if (!response) return;
+            const { user, session, error } = await supabase.auth.signIn({
+              refreshToken: response.params?.refresh_token,
+            });
+          });
+          ```
+
+  auth.signInWithOAuth():
+    title: 'signInWithOAuth()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
@@ -272,9 +458,9 @@ pages:
           const { error } = await supabase.auth.signOut()
           ```
 
-  auth.session():
-    title: 'session()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.session'
+  auth.getSession():
+    title: 'getSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     examples:
       - name: Get the session data
         isSpotlight: true
@@ -283,9 +469,9 @@ pages:
           const session = supabase.auth.session()
           ```
 
-  auth.user():
-    title: 'user()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.user'
+  auth.getUser():
+    title: 'getUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
       This method gets the user object from memory.
     examples:
@@ -329,9 +515,9 @@ pages:
           })
           ```
 
-  auth.setAuth():
-    title: 'setAuth()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.setAuth'
+  auth.setSession():
+    title: 'setSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     examples:
       - name: Basic example.
         description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
@@ -707,7 +893,7 @@ pages:
 
   select():
     title: 'Fetch data: select()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
@@ -843,7 +1029,7 @@ pages:
 
   insert():
     title: 'Create data: insert()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
     notes: |
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
@@ -894,7 +1080,7 @@ pages:
 
   update():
     title: 'Modify data: update()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.update'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
     examples:
@@ -928,7 +1114,7 @@ pages:
 
   upsert():
     title: 'Upsert data: upsert()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
       - Primary keys should be included in the data payload in order for an update to work correctly. 
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
@@ -980,7 +1166,7 @@ pages:
 
   delete():
     title: 'Delete data: delete()'
-    $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
     notes: |
       - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
@@ -1012,7 +1198,7 @@ pages:
         select 'Hello world';
       $$ language sql;
       ```
-    $ref: '@supabase/postgrest-js."PostgrestClient".PostgrestClient.rpc'
+    $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - name: Call a Postgres function
         isSpotlight: true
@@ -1059,7 +1245,7 @@ pages:
 
   subscribe():
     title: 'on().subscribe()'
-    $ref: '@supabase/supabase-js.lib/SupabaseQueryBuilder.SupabaseQueryBuilder.on'
+    $ref: '@supabase/supabase-js.lib/SupabaseRealtimeChannel.SupabaseRealtimeChannel.on'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
@@ -1151,9 +1337,9 @@ pages:
             .subscribe()
           ```
 
-  removeSubscription():
-    title: 'removeSubscription()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeSubscription'
+  removeChannel():
+    title: 'removeChannel()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1161,12 +1347,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeSubscription(mySubscription)
+          supabase.removeChannel(mySubscription)
           ```
 
-  removeAllSubscriptions():
-    title: 'removeAllSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllSubscriptions'
+  removeAllChannels():
+    title: 'removeAllChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1174,23 +1360,23 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeAllSubscriptions()
+          supabase.removeAllChannels()
           ```
 
-  getSubscriptions():
-    title: 'getSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getSubscriptions'
+  getChannels():
+    title: 'getChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - name: Get all subscriptions
         isSpotlight: true
         js: |
           ```js
-          const subscriptions = supabase.getSubscriptions()
+          const subscriptions = supabase.getChannels()
           ```
 
   storage.listBuckets():
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.listBuckets'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -1207,7 +1393,7 @@ pages:
 
   storage.getBucket():
     title: 'getBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.getBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -1224,7 +1410,7 @@ pages:
 
   storage.createBucket():
     title: 'createBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.createBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `insert` 
@@ -1241,7 +1427,7 @@ pages:
 
   storage.emptyBucket():
     title: 'emptyBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.emptyBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` 
@@ -1257,7 +1443,7 @@ pages:
           ```
   storage.updateBucket():
     title: 'updateBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.updateBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `update`
@@ -1274,7 +1460,7 @@ pages:
 
   storage.deleteBucket():
     title: 'deleteBucket()'
-    $ref: '@supabase/storage-js."lib/StorageBucketApi".StorageBucketApi.deleteBucket'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select` and `delete`
@@ -1291,7 +1477,7 @@ pages:
 
   storage.from.upload():
     title: 'from.upload()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.upload'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1326,7 +1512,7 @@ pages:
 
   storage.from.update():
     title: 'from.update()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.update'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1361,7 +1547,7 @@ pages:
 
   storage.from.move():
     title: 'from.move()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.move'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1379,7 +1565,7 @@ pages:
 
   storage.from.copy():
     title: 'from.copy()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.copy'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1397,7 +1583,7 @@ pages:
 
   storage.from.createSignedUrl():
     title: 'from.createSignedUrl()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.createSignedUrl'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1415,7 +1601,7 @@ pages:
 
   storage.from.createSignedUrls():
     title: 'from.createSignedUrls()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.createSignedUrls'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1433,7 +1619,7 @@ pages:
 
   storage.from.getPublicUrl():
     title: 'from.getPublicUrl()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.getPublicUrl'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
@@ -1452,7 +1638,7 @@ pages:
 
   storage.from.download():
     title: 'from.download()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.download'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1470,7 +1656,7 @@ pages:
 
   storage.from.remove():
     title: 'from.remove()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.remove'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1488,7 +1674,7 @@ pages:
 
   storage.from.list():
     title: 'from.list()'
-    $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.list'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none 
@@ -1528,7 +1714,7 @@ pages:
       If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
   limit():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.limit'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.limit'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1550,7 +1736,7 @@ pages:
           ```
 
   order():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.order'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.order'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1572,7 +1758,7 @@ pages:
           ```
 
   range():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.range'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.range'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1585,7 +1771,7 @@ pages:
           ```
 
   single():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.single'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.single'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1599,7 +1785,7 @@ pages:
           ```
 
   maybeSingle():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.maybeSingle'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1667,7 +1853,7 @@ pages:
       ```
 
   .or():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.or'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
     notes: |
       - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -1706,7 +1892,7 @@ pages:
           ```
 
   .not():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.not'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
     notes: |
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -1753,7 +1939,7 @@ pages:
           ```
 
   .match():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.match'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1790,7 +1976,7 @@ pages:
           ```
 
   .eq():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.eq'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1827,7 +2013,7 @@ pages:
           ```
 
   .neq():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.neq'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1864,7 +2050,7 @@ pages:
           ```
 
   .gt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gt'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1901,7 +2087,7 @@ pages:
           ```
 
   .gte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.gte'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1938,7 +2124,7 @@ pages:
           ```
 
   .lt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lt'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -1975,7 +2161,7 @@ pages:
           ```
 
   .lte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.lte'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2012,7 +2198,7 @@ pages:
           ```
 
   .like():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.like'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2049,7 +2235,7 @@ pages:
           ```
 
   .ilike():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ilike'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2086,7 +2272,7 @@ pages:
           ```
 
   .is():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.is'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2123,7 +2309,7 @@ pages:
           ```
 
   .in():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.in'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2160,7 +2346,7 @@ pages:
           ```
 
   .contains():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cs'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
     notes: |
       - `.contains()` can work on array columns or range columns.
         It is very useful for finding rows where a tag array contains all the values in the filter array.
@@ -2207,7 +2393,7 @@ pages:
           ```
 
   .containedBy():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.cd'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
     notes: |
       - `.containedBy()` can work on array columns or range columns.
 
@@ -2253,7 +2439,7 @@ pages:
           ```
 
   .rangeLt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sl'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2290,7 +2476,7 @@ pages:
           ```
 
   .rangeGt():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.sr'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2327,7 +2513,7 @@ pages:
           ```
 
   .rangeGte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxl'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2364,7 +2550,7 @@ pages:
           ```
 
   .rangeLte():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.nxr'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2401,7 +2587,7 @@ pages:
           ```
 
   .rangeAdjacent():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.adj'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
     examples:
       - name: With `select()`
         isSpotlight: true
@@ -2438,7 +2624,7 @@ pages:
           ```
 
   .overlaps():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.ov'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     notes: |
       - `.overlaps()` can work on array columns or range columns.
 
@@ -2484,7 +2670,7 @@ pages:
           ```
 
   .textSearch():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.fts'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
     examples:
       - name: Text search
         js: |
@@ -2543,7 +2729,7 @@ pages:
           ```
 
   .filter():
-    $ref: '@supabase/postgrest-js."lib/PostgrestFilterBuilder".PostgrestFilterBuilder.filter'
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
         ```js
