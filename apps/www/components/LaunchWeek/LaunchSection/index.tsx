@@ -1,8 +1,9 @@
-import { TruckIcon } from '@heroicons/react/outline'
-import { Badge } from '@supabase/ui'
+import { PlayIcon, TruckIcon, XIcon } from '@heroicons/react/outline'
+import { Badge, Modal } from '@supabase/ui'
 
-import _days from './../days.json'
+import { useState } from 'react'
 import { Article, Product, WeekDayProps } from '../types'
+import _days from './../days.json'
 import ArticleButtonListItem from './ArticleButtonListItem'
 import ProductButton from './ProductButton'
 import ProductButtonListItem from './ProductButtonListItem'
@@ -12,41 +13,55 @@ const days = _days as WeekDayProps[]
 export const LaunchSection = (props: WeekDayProps) => {
   const lastIndex = props.index === days.length - 1
   const nextDayNotShipped = props.shipped && !days[props.index + 1]?.shipped
+  const [videoVisible, setVideoVisible] = useState(false)
 
-  return (
-    <div className="grid grid-cols-12">
-      {props.shippingHasStarted && (
-        <div className="col-span-12 pb-16 lg:col-span-6 lg:pr-8">
-          {!props.shipped ? (
-            <div className="relative overflow-hidden rounded-xl">
-              <img
-                className="opacity-30"
-                src="/images/launchweek/launchweek-day-placeholder.jpg"
-                alt="Supabase"
-              />
-            </div>
-          ) : (
-            <div className="relative">
-              <img
-                className="top-0 left-0 rounded-xl border drop-shadow-lg"
-                src="/images/launchweek/security.jpg"
-                alt="Supabase"
-              />
-            </div>
-          )}
-        </div>
-      )}
+  interface ClassNameComponent {
+    className?: string
+  }
+
+  const Header = ({ className }: ClassNameComponent) => (
+    <div className={['flex flex-col gap-3', className].join(' ')}>
+      {/* START timeline dot */}
       <div
         className={[
-          `relative col-span-12 flex flex-col
-              gap-8
-              lg:pl-8
-        `,
-          props.shipped ? 'border-brand-900' : 'border-purple-700',
-          props.shippingHasStarted && 'lg:col-span-6',
-          !lastIndex && 'pb-16',
+          'absolute mt-[4px] -ml-[21px] h-3 w-3 rounded-full border md:-ml-[37px] lg:-ml-[37.5px]',
+          props.shipped ? 'border-brand-900 bg-brand-400' : 'border-purple-900 bg-purple-300',
         ].join(' ')}
-      >
+      ></div>
+      {/* END timeline dot */}
+      <div className="flex items-center gap-3">
+        <span className="text-scale-1100 text-sm">{props.date}</span>
+        {props.shipped ? (
+          <Badge>
+            <div className="flex items-center gap-2">
+              <div className="w-4">
+                <TruckIcon />
+              </div>{' '}
+              Shipped
+            </div>
+          </Badge>
+        ) : (
+          <Badge color="purple">Not shipped yet</Badge>
+        )}
+      </div>
+      <h4 className="text-scale-1200 text-2xl md:text-3xl lg:text-4xl">
+        {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
+      </h4>
+
+      {/* {props.shipped && props.announcements && (
+      <div>
+        {props.announcements.map((announcement: Announcement) => (
+          <Announcement {...announcement} />
+        ))}
+      </div>
+    )} */}
+      {props.shipped && <p className="text-scale-1100 text-base">{props.description}</p>}
+    </div>
+  )
+
+  const TimelineLine = ({ className }: ClassNameComponent) => {
+    return (
+      <>
         {/* START timeline line */}
         {props.index !== days.length - 1 && (
           <div
@@ -57,49 +72,103 @@ export const LaunchSection = (props: WeekDayProps) => {
                 : props.shipped
                 ? 'border-brand-900'
                 : 'border-purple-700',
+              className,
             ].join(' ')}
           ></div>
         )}
         {/* END timeline line */}
+      </>
+    )
+  }
 
-        <div className="flex flex-col gap-4 pl-4 lg:pl-0">
-          {/* START timeline dot */}
-          <div
-            className={[
-              'absolute mt-[4px] -ml-[21px] h-3 w-3 rounded-full border lg:-ml-[37.5px]',
-              props.shipped ? 'border-brand-900 bg-brand-400' : 'border-purple-900 bg-purple-300',
-            ].join(' ')}
-          ></div>
-          {/* END timeline dot */}
-
-          <div className="flex items-center gap-3">
-            <span className="text-scale-1100 text-sm">{props.date}</span>
-            {props.shipped ? (
-              <Badge>
-                <div className="flex items-center gap-2">
-                  <div className="w-4">
-                    <TruckIcon />
-                  </div>{' '}
-                  Shipped
+  return (
+    <div className="relative grid grid-cols-12" id={`launch-week-5-day-${props.d}`}>
+      <TimelineLine className="block lg:hidden" />
+      {props.shippingHasStarted && (
+        <div className="col-span-12 pb-8 pl-4 md:pl-8 lg:col-span-6 lg:pb-16 lg:pl-0 lg:pr-8">
+          <Header className="mb-8 flex lg:hidden" />
+          {!props.shipped ? (
+            <div className="relative overflow-hidden rounded-xl">
+              <img
+                className="opacity-30"
+                src="/images/launchweek/launchweek-day-placeholder.jpg"
+                alt="Supabase"
+              />
+            </div>
+          ) : (
+            <>
+              <div className="group relative cursor-pointer">
+                <img
+                  className="rounded-xl border drop-shadow-lg"
+                  src={`/images/launchweek/day${props.d}/thumb.jpg`}
+                  alt="Supabase"
+                />
+                <div
+                  onClick={() => setVideoVisible(true)}
+                  className="
+                    absolute    
+                    top-0
+                    left-0
+                    flex
+                    h-full
+                    w-full
+                    items-center
+                    justify-center
+                  "
+                >
+                  <PlayIcon
+                    strokeWidth={1.5}
+                    className="text-brand-900 absolute w-24 opacity-30 transition-all group-hover:scale-105 group-hover:opacity-75"
+                  />
                 </div>
-              </Badge>
-            ) : (
-              <Badge color="purple">Not shipped yet</Badge>
-            )}
-          </div>
-          <h4 className="text-scale-1200 text-2xl md:text-3xl lg:text-4xl">
-            {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
-          </h4>
-
-          {/* {props.shipped && props.announcements && (
-              <div>
-                {props.announcements.map((announcement: Announcement) => (
-                  <Announcement {...announcement} />
-                ))}
               </div>
-            )} */}
-          {props.shipped && <p className="text-scale-1100 text-base">{props.description}</p>}
+
+              <Modal
+                size="xxlarge"
+                visible={videoVisible}
+                onCancel={() => setVideoVisible(false)}
+                hideFooter
+                header={
+                  <div className="flex items-center justify-between">
+                    <span className="text-scale-1200">{props.title}</span>
+                    <XIcon
+                      className="text-scale-900 hover:text-scale-1200 w-4 cursor-pointer transition"
+                      onClick={() => setVideoVisible(false)}
+                    />
+                  </div>
+                }
+              >
+                <div className="">
+                  <div className="video-container">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}
+                      title="YouTube video player"
+                      frameBorder={0}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              </Modal>
+            </>
+          )}
         </div>
+      )}
+      <div
+        className={[
+          `relative col-span-12 flex flex-col
+              gap-8
+              pl-4
+              md:pl-8
+              lg:pl-8
+        `,
+          props.shipped ? 'border-brand-900' : 'border-purple-700',
+          props.shippingHasStarted && 'lg:col-span-6',
+          !lastIndex && 'pb-8 lg:pb-16',
+        ].join(' ')}
+      >
+        <TimelineLine className="hidden lg:block" />
+        <Header className="hidden lg:flex" />
         {props.shipped && (
           <div className="flex flex-col gap-12">
             {props.articles &&
