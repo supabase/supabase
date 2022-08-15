@@ -3,7 +3,7 @@ import Content from '@theme-original/DocSidebar/Desktop/Content'
 import { useLocation } from '@docusaurus/router'
 import Link from '@docusaurus/Link'
 
-const baseUrl = `new-docs`
+const baseUrl = `docs`
 const subNavRoutes = [
   // Add any routes which should have a subnav
   `/${baseUrl}/reference/api`,
