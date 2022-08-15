@@ -25,43 +25,46 @@ const RedirectDomains = () => {
 
   const onAddNewDomain = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    try {
-      const payload = URI_ALLOW_LIST_ARRAY
-      payload.push(values.domain)
-      // convert payload to comma seperated string and update
-      await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
-      setSubmitting(false)
+    const payload = URI_ALLOW_LIST_ARRAY
+    payload.push(values.domain)
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    if (!error) {
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })
-    } catch (error: any) {
-      setSubmitting(false)
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to update domain: ${error?.message}`,
       })
     }
+
+    setSubmitting(false)
   }
 
   const onConfirmDeleteDomain = async (domain?: string) => {
     if (!domain) return
 
     setIsDeleting(true)
-    try {
-      // Remove selectedDomain from array and update
-      const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== domain)
-      await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
-      setIsDeleting(false)
+
+    // Remove selectedDomain from array and update
+    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== domain)
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+
+    if (!error) {
       setSelectedDomainToDelete(undefined)
       ui.setNotification({ category: 'success', message: 'Successfully removed domain' })
-    } catch (error: any) {
-      setIsDeleting(false)
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to remove domain: ${error?.message}`,
       })
     }
+
+    setIsDeleting(false)
   }
 
   return (
