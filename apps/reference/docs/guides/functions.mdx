@@ -56,9 +56,9 @@ Learn how to develop Edge Functions in less than 7 minutes:
 Follow the steps to prepare your Supabase project on your local machine.
 
 - Install the Supabase CLI. [Docs](/docs/reference/cli/installing-and-updating).
-- Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/supabase-login).
-- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/local-development#getting-started).
-- Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/supabase-link).
+- Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/usage#supabase-login).
+- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/cli/local-development#getting-started).
+- Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
 - Optional: Setup your environment: Follow [this setup guide](https://deno.land/manual/getting_started/setup_your_environment) to integrate the Deno language server with your editor.
 
 ## Getting Started
@@ -118,7 +118,7 @@ You can debug your deployed Edge Functions using the "Functions" section of the 
 
 ## Developing locally
 
-You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/supabase-functions-serve):
+You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
 
 ```bash
 supabase start # start the supabase stack
@@ -216,7 +216,7 @@ Never check your `.env` files into Git!
 
 :::
 
-Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/supabase-secrets-set):
+Let's push all the secrets from the `.env` file to our remote project using [`supabase secrets set`](/docs/reference/cli/usage#supabase-secrets-set):
 
 ```bash
 supabase secrets set --env-file ./supabase/.env
@@ -227,7 +227,7 @@ supabase secrets set MY_NAME=Chewbacca
 
 You don't need to re-deploy after setting your secrets.
 
-To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/supabase-secrets-list):
+To see all the secrets which you have set remotely, use [`supabase secrets list`](/docs/reference/cli/usage#supabase-secrets-list):
 
 ```bash
 supabase secrets list

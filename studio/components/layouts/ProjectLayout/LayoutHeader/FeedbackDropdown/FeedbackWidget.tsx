@@ -1,19 +1,24 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Typography, Divider, Input, Popover } from '@supabase/ui'
+import { Button, Input, Popover } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 
-const FeedbackWidget = ({ onClose, feedback, setFeedback, category, setCategory }: any) => {
+interface Props {
+  onClose: () => void
+}
+
+const FeedbackWidget: FC<Props> = ({ onClose }) => {
   const router = useRouter()
   const { ref } = router.query
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
 
+  const [feedback, setFeedback] = useState('')
   const [isSending, setSending] = useState(false)
 
   useEffect(() => {

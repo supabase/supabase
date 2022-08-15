@@ -2,7 +2,7 @@
 id: ilike
 title: '.ilike()'
 slug: ilike
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
@@ -11,23 +11,12 @@ import TabItem from '@theme/TabItem'
 Finds all rows whose value in the stated `column` matches the supplied
 `pattern` (case insensitive).
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
   .select('name, country_id')
   .ilike('name', '%la%')
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Parameters
 
@@ -79,13 +68,6 @@ The pattern to filter with.
 
 ### With `select()`
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('cities')
@@ -93,18 +75,7 @@ const { data, error } = await supabase
   .ilike('name', '%la%')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -113,18 +84,7 @@ const { data, error } = await supabase
   .ilike('name', '%la%')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -133,18 +93,7 @@ const { data, error } = await supabase
   .ilike('name', '%la%')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -152,7 +101,3 @@ const { data, error } = await supabase
   .rpc('echo_all_cities')
   .ilike('name', '%la%')
 ```
-
-</TabItem>
-
-</Tabs>

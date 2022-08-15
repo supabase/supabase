@@ -204,10 +204,11 @@ const sidebars = {
   reference: [
     {
       type: 'category',
-      label: 'Reference',
-      link: { type: 'doc', id: 'reference' },
+      label: 'Official',
+      // link: { type: 'doc', id: 'reference' },
       collapsed: false,
       items: [
+        { type: 'doc', id: 'reference' },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
         { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {

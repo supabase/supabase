@@ -1,0 +1,27 @@
+---
+id: auth-getuser
+title: 'getUser()'
+slug: /auth-getuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Returns the user data, refreshing the session if necessary.
+
+```js
+const user = supabase.auth.user()
+```
+
+## Notes
+
+This method gets the user object from memory.
+
+## Examples
+
+### Get the logged in user
+
+```js
+const user = supabase.auth.user()
+```
