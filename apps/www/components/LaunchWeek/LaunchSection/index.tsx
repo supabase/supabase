@@ -84,7 +84,7 @@ export const LaunchSection = (props: WeekDayProps) => {
   return (
     <div className="relative grid grid-cols-12" id={`launch-week-5-day-${props.d}`}>
       <TimelineLine className="block lg:hidden" />
-      {props.shippingHasStarted && (
+      {props.shippingHasStarted ? (
         <div className="col-span-12 pb-8 pl-4 md:pl-8 lg:col-span-6 lg:pb-16 lg:pl-0 lg:pr-8">
           <Header className="mb-8 flex lg:hidden" />
           {!props.shipped ? (
@@ -152,6 +152,10 @@ export const LaunchSection = (props: WeekDayProps) => {
               </Modal>
             </>
           )}
+        </div>
+      ) : (
+        <div className="col-span-12 pl-4 md:pl-8 lg:col-span-6 lg:pl-0 lg:pr-8">
+          <Header className="mb-8 flex lg:hidden" />
         </div>
       )}
       <div
