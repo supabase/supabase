@@ -111,7 +111,6 @@ function ChangelogPage(props: any) {
           <div>
             {props.changelog.map((changelog: any, i: number) => {
               const date = changelog.published_at.split('T')
-              console.log(date[0])
               return (
                 <div key={i} className="grid border-l pb-10  lg:grid-cols-12">
                   <div
