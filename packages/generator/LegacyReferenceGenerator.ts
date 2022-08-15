@@ -258,8 +258,7 @@ Not yet implemented
 function extractParamTypeAsString(paramDefinition) {
   if (paramDefinition.type?.name) {
     return `<code>${paramDefinition.type.name}</code>`
-  }
-  if (paramDefinition.type?.type == 'union') {
+  } else if (paramDefinition.type?.type == 'union') {
     return paramDefinition.type.types
       .map((x) =>
         x.value
@@ -271,9 +270,9 @@ function extractParamTypeAsString(paramDefinition) {
           : ''
       )
       .join(' | ')
-  } else {
-    return '<code>object</code>'
   }
+
+  return '<code>object</code>'
 }
 
 /**
