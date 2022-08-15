@@ -1,4 +1,4 @@
-const Tab = (library, exampleText) =>
+const Tab = (library: string, exampleText: string) =>
   `
 <TabItem value="${library}">
 

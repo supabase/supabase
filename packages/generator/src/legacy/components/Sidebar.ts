@@ -1,4 +1,4 @@
-const Sidebar = (categories) =>
+const Sidebar = (categories: string[]) =>
   `
 module.exports = {
   docs: [
