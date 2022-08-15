@@ -2,41 +2,23 @@
 id: rangelt
 title: '.rangeLt()'
 slug: rangelt
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('countries')
   .select('name, id, population_range_millions')
   .rangeLt('population_range_millions', '[150, 250]')
 ```
-
-</TabItem>
-
-</Tabs>
 
 ## Examples
 
 ### With `select()`
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('countries')
@@ -44,18 +26,7 @@ const { data, error } = await supabase
   .rangeLt('population_range_millions', '[150, 250]')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -64,18 +35,7 @@ const { data, error } = await supabase
   .rangeLt('population_range_millions', '[150, 250]')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -84,18 +44,7 @@ const { data, error } = await supabase
   .rangeLt('population_range_millions', '[150, 250]')
 ```
 
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -103,7 +52,3 @@ const { data, error } = await supabase
   .rpc('echo_all_countries')
   .rangeLt('population_range_millions', '[150, 250]')
 ```
-
-</TabItem>
-
-</Tabs>
