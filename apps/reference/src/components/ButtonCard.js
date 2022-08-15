@@ -15,9 +15,7 @@ export default function ButtonCard({
       to={to}
       className={['button-card', `button-card--${layout}`].join(' ')}
     >
-      {children ? (
-        children
-      ) : (
+      {children ? children : (
         <div className="button-card__inner">
           {icon && typeof icon == 'string' ? (
             <img src={icon} width={24} />
