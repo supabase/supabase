@@ -14,7 +14,7 @@ toc_depth: 3
 
 Today we are moving the Supabase CLI v1 out of beta. The Supabase CLI is capable of managing database migrations and generating TypeScript types. Follow these [install instructions](https://github.com/supabase/cli#getting-started) to get started.
 
-In addition, we are also announcing the Admin API beta. The Admin API is a REST API that allows you to manage organizations, projects, Edge Functions, and more. You can read the [docs](https://www.notion.so/Docs-ca2dbdd3f4954da49132d44bead83f1e) or interact with the Admin API from the Supabase CLI v1.
+In addition, we are also announcing the Admin API beta. The Admin API is a REST API that allows you to manage organizations, projects, Edge Functions, and more. You can read the [API docs](https://supabase.com/docs/reference/api) or interact with the Admin API from the Supabase CLI v1.
 
 ## Manage organizations, projects, Edge Functions, and more
 
@@ -26,7 +26,7 @@ supabase orgs list
 supabase projects create my-project --org-id cool-green-pqdr0qc --db-password ******** --region us-east-1
 ```
 
-Once created, link your Supabase project locally to begin development.
+Once your new Supabase project is created, use the CLI to link it locally to begin development.
 
 ```bash
 supabase link --project-ref <project-id>
@@ -51,7 +51,7 @@ $ supabase db diff --use-migra --file file_name
 # Creates a DDL script: supabase/migrations/<datetime_string>_file_name.sql
 ```
 
-Running the above command diffs the `public` schema of your local development database against a fresh shadow database. You may specify other schema by passing in the `--schema` flag multiple times or as a comma separate list. More details in our [migration guide](https://www.notion.so/Guide-local-staging-prod-workflow-b6666956d5b6432ebf1126e2b98d76c7).
+Running the above command diffs the `public` schema of your local development database against a fresh shadow database. You may specify other schema by passing in the `--schema` flag multiple times or as a comma separate list. More details in our [migration guide](https://supabase.com/docs/guides/cli/cicd-workflow#creating-a-new-migration).
 
 In the long-term we hope to consolidate on a single diff-ing tool which is perfect, but diff-ing is hard so we would need your help and feedback to improve tooling.
 
@@ -73,16 +73,16 @@ supabase db branch delete my_branch
 
 ## CI / CD
 
-Automating migrations and tests on your CI / CD pipeline gives developers more confidence that each PR contains a working migration script. CLI v1 focuses on both local and [GitHub Action](https://github.com/supabase/setup-cli) support for the following workflows.
+Automating migrations and tests on your CI / CD pipeline gives developers more confidence that each PR contains a working migration script. CLI v1 focuses on both local and [GitHub Actions](https://github.com/supabase/setup-cli) support for the following workflows.
 
-Testing all migrations on a fresh local database
+Test all migrations on a fresh local database:
 
 ```bash
 supabase init
 supabase start
 ```
 
-Releasing schema changes to staging and production
+Release schema changes to staging and production:
 
 ```bash
 $ supabase link --project-ref <project-id>
@@ -105,9 +105,9 @@ Of course, the types aren’t very useful on its own, you need some way to consu
 
 # Admin API
 
-The CLI is the first consumer of our new admin API. Over the next few weeks, we’ll be adding all the endpoints needed to programmatically add, remove, and update your Supabase projects. This is ideal for CI/CD workflows and spinning up test environments.
+The CLI is the first consumer of our new Admin API. Over the next few weeks, we’ll be adding all the endpoints needed to programmatically add, remove, and update your Supabase projects. This is ideal for CI/CD workflows and spinning up test environments.
 
-Here’s an example of how you can create a new project from the command line, you can generate your access tokens from [Supabase dashboard](https://app.supabase.com/account/tokens).
+Here’s an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://app.supabase.com/account/tokens)).
 
 ```bash
 curl 'https://api.supabase.com/v1/projects' \
@@ -128,6 +128,6 @@ The response JSON should have the same fields as the example below:
 }
 ```
 
-Check out the API docs to browse all the functionality added so far.
+Check out the [API docs](https://supabase.com/docs/reference/api) to browse all the functionality added so far.
 
 The new API also opens the door to a whole new suite of integrations, including Zapier, Terraform, Pulumi etc. we’re looking forward to seeing how the dev community interacts with these new public endpoints.
