@@ -13,7 +13,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update',
+    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected actionValue?: string[] | Dictionary<any> | Dictionary<any>[],
     protected actionOptions?: { returning: boolean }
   ) {}

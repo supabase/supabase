@@ -1,0 +1,33 @@
+---
+id: storage-deletebucket
+title: 'deleteBucket()'
+slug: /storage-deletebucket
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
+
+```dart
+final res = await supabase
+  .storage
+  .deleteBucket('avatars');
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select` and `delete`
+  - `objects` permissions: none
+
+## Examples
+
+### Delete bucket
+
+```dart
+final res = await supabase
+  .storage
+  .deleteBucket('avatars');
+```

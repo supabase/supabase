@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Badge, Menu } from '@supabase/ui'
 import ProductMenuItem from './ProductMenuItem'
-import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
+import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
 interface Props {
   page?: string

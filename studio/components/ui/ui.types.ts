@@ -5,4 +5,5 @@ export interface Route {
   label: string
   icon: ReactNode
   link: string
+  disabled?: boolean
 }

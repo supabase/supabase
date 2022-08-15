@@ -1,0 +1,65 @@
+---
+id: containedby
+title: '.containedBy()'
+slug: containedby
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+## Notes
+
+- `.containedBy()` can work on array columns or range columns.
+
+  ```js
+  .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
+  ```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .containedBy('main_exports', ['cars', 'food', 'machine'])
+```

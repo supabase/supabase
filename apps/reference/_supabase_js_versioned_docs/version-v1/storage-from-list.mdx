@@ -1,0 +1,114 @@
+---
+id: storage-from-list
+title: 'from.list()'
+slug: storage-from-list
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Lists all the files within a bucket.
+
+```js
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      path
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>undefined</code> | <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The folder path.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      options
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>SearchOptions</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Search options, including `limit`, `offset`, `sortBy`, and `search`.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      parameters
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>FetchParameters</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Fetch parameters, currently only supports `signal`, which is an AbortController's signal
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `select`
+
+## Examples
+
+### List files in a bucket
+
+```js
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+})
+```
+
+### Search files in a bucket
+
+```js
+const { data, error } = await supabase.storage.from('avatars').list('folder', {
+  limit: 100,
+  offset: 0,
+  sortBy: { column: 'name', order: 'asc' },
+  search: 'jon',
+})
+```

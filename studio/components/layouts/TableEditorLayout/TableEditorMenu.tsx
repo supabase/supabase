@@ -1,30 +1,31 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { partition } from 'lodash'
 import {
+  Alert,
   Button,
   Dropdown,
-  Typography,
-  Listbox,
-  Menu,
-  Input,
-  IconCopy,
   IconChevronDown,
+  IconCopy,
   IconEdit,
-  IconTrash,
-  IconSearch,
-  IconX,
   IconLoader,
   IconRefreshCw,
-  Alert,
+  IconSearch,
+  IconTrash,
+  IconX,
+  Input,
+  Listbox,
+  Menu,
+  Typography,
 } from '@supabase/ui'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedSchema?: string
@@ -184,7 +185,7 @@ const TableEditorMenu: FC<Props> = ({
                 <IconSearch size={12} strokeWidth={1.5} />
               </div>
             }
-            placeholder="Filter tables"
+            placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="tiny"
@@ -224,6 +225,7 @@ const TableEditorMenu: FC<Props> = ({
                   key={table.name}
                   url={`/project/${projectRef}/editor/${table.id}`}
                   name={table.name}
+                  hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
                     isActive && (
@@ -246,7 +248,7 @@ const TableEditorMenu: FC<Props> = ({
                           >
                             Duplicate Table
                           </Dropdown.Item>,
-                          <Dropdown.Seperator />,
+                          <Dropdown.Seperator key="separator" />,
                           <Dropdown.Item
                             key="delete-table"
                             icon={<IconTrash size="tiny" />}

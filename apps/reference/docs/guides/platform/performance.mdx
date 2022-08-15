@@ -1,0 +1,78 @@
+---
+id: performance
+title: Performance Tuning
+description: Getting the best results out of your Supabase project
+---
+
+The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the tier your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
+
+## Optimizing the number of connections
+
+By default, the number of connections allowed to Postgres and PgBouncer is configured based on the resources available to the database.
+
+| Compute Add-on | Postgresql connections | PGBouncer connections |
+| -------------- | ---------------------- | --------------------- |
+| None           | 60                     | 200                   |
+| Small          | 90                     | 200                   |
+| Medium         | 120                    | 200                   |
+| Large          | 160                    | 300                   |
+| XL             | 240                    | 700                   |
+| 2XL            | 380                    | 1500                  |
+| 4XL            | 480                    | 3000                  |
+| 8XL            | 490                    | 6000                  |
+| 12XL           | 500                    | 9000                  |
+| 16XL           | 500                    | 12000                 |
+
+If the number of connections is insufficient, you will receive the following error upon connecting to the DB:
+
+```shell
+$ psql -U postgres -h ...
+FATAL: remaining connection slots are reserved for non-replication superuser connections
+```
+
+In such a scenario, you can consider either upgrading to a larger compute add-on, or alternatively, by manually configuring the database for a higher number of connections.
+
+You can configure Postgres by executing the following statement, followed by a server restart:
+
+```sql
+alter system set max_connections = '<val-here>';
+```
+
+Note that [the default configuration used by the Supabase platform](https://github.com/supabase/supabase-admin-api/blob/master/optimizations/postgres.go) optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
+
+Once overridden, the Supabase platform will continue to respect your manually configured value (even if the add-on size is changed), unless the override is removed with the following statement, followed by a server restart:
+
+```sql
+alter system reset max_connections;
+alter system reset <other-overridden-conf>;
+...
+```
+
+Configuring the number of PgBouncer connections is not supported at this time.
+
+## Examining Query Performance
+
+Every Supabase project has [the pg_stat_statements extension](https://www.postgresql.org/docs/14/pgstatstatements.html) enabled by default. This extension records query execution performance details and is the best way to find queries that take the most time to execute. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
+
+Obtaining information from pg_stat_statements:
+
+```sql
+select mean_exec_time + stddev_exec_time, * from pg_stat_statements order by 1 desc;
+```
+
+Using the query plan analyzer on your expensive queries:
+
+```sql
+explain analyze <query-statement-here>;
+```
+
+Be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+
+Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
+
+- [Official docs.](https://www.postgresql.org/docs/current/using-explain.html)
+- [The Art of PostgreSQL.](https://theartofpostgresql.com/explain-plan-visualizer/)
+- [Postgres Wiki.](https://wiki.postgresql.org/wiki/Using_EXPLAIN)
+- [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
+
+You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](../platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.

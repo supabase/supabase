@@ -1,15 +1,14 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { InitialStateType } from '../store/reducers'
-import { formatSortURLParams, formatFilterURLParams } from '../SupabaseGrid.utils'
+import { Sort, Filter } from '../types'
 
 export async function fetchCount(
   state: InitialStateType,
   dispatch: (value: unknown) => void,
-  filter?: string[] // Come directly from URL param
+  filters: Filter[]
 ) {
   if (!state.rowService) return
 
-  const filters = formatFilterURLParams(filter)
   const { data, error } = await state.rowService.count(filters)
   if (error) {
     // TODO: handle fetch rows count error
@@ -24,14 +23,12 @@ export async function fetchCount(
 export async function fetchPage(
   state: InitialStateType,
   dispatch: (value: unknown) => void,
-  sort?: string[], // Come directly from URL param
-  filter?: string[] // Come directly from URL param
+  sorts: Sort[],
+  filters: Filter[]
 ) {
   if (!state.rowService) return
   dispatch({ type: 'SET_IS_LOADING', payload: { isLoading: true } })
 
-  const sorts = formatSortURLParams(sort)
-  const filters = formatFilterURLParams(filter)
   const { data, error } = await state.rowService.fetchPage(
     state.page,
     state.rowsPerPage,

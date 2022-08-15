@@ -183,6 +183,12 @@ const PolicyEditorModal: FC<Props> = ({
         />,
       ]}
       onCancel={onSelectCancel}
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <div className="">
         {view === POLICY_MODAL_VIEWS.SELECTION ? (

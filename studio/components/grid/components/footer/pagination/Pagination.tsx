@@ -24,13 +24,9 @@ type PaginationProps = {}
 const Pagination: FC<PaginationProps> = () => {
   const state = useTrackedState()
   const dispatch = useDispatch()
-  const [page, setPage] = useState(state.page)
+  const [page, setPage] = useState<number | null>(state.page)
   const maxPages = Math.ceil(state.totalRows / state.rowsPerPage)
   const totalPages = state.totalRows > 0 ? maxPages : 1
-
-  useEffect(() => {
-    if (state.page != page) setPage(state.page)
-  }, [state.page, page])
 
   // [Joshen] Oddly without this, state.selectedRows will be stale
   useEffect(() => {}, [state.selectedRows])
@@ -93,9 +89,11 @@ const Pagination: FC<PaginationProps> = () => {
 
   function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
-    const pageNum = Number(value)
-    setPage(pageNum)
-    updatePageDebounced(pageNum, dispatch)
+    const pageNum = Number(value) > maxPages ? maxPages : Number(value)
+    setPage(pageNum || null)
+    if (pageNum) {
+      updatePageDebounced(pageNum, dispatch)
+    }
   }
 
   function onRowsPerPageChange(value: string | number) {
@@ -118,9 +116,10 @@ const Pagination: FC<PaginationProps> = () => {
           <p className="text-scale-1100 text-sm">Page</p>
           <div className="sb-grid-pagination-input-container">
             <InputNumber
+              // [Fran] we'll have to upgrade the UI component types to accept the null value when users delete the input content
+              // @ts-ignore
               value={page}
               onChange={onPageChange}
-              className="sb-grid-pagination-input"
               size="tiny"
               style={{
                 width: '3rem',
@@ -150,7 +149,9 @@ const Pagination: FC<PaginationProps> = () => {
               style={{ padding: '3px 10px' }}
             >{`${state.rowsPerPage} rows`}</Button>
           </DropdownControl>
-          <p className="text-scale-1100 text-sm">{`${state.totalRows.toLocaleString()} records`}</p>
+          <p className="text-scale-1100 text-sm">{`${state.totalRows.toLocaleString()} ${
+            state.totalRows === 0 || state.totalRows > 1 ? `records` : 'record'
+          }`}</p>
           {state.isLoading && <IconLoader size={14} className="animate-spin" />}
         </>
       )}

@@ -1,18 +1,23 @@
 import { FC, useEffect, useRef } from 'react'
-import Editor from '@monaco-editor/react'
+import Editor, { EditorProps } from '@monaco-editor/react'
 
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
+import { merge } from 'lodash'
 
 interface Props {
   id: string
-  language: 'pgsql' | 'json'
+  language: 'pgsql' | 'json' | 'html'
   defaultValue?: string
   isReadOnly?: boolean
   onInputChange: (value?: string) => void
   onInputRun?: (value: string) => void
   hideLineNumbers?: boolean
+  className?: string
+  loading?: boolean
+  options?: EditorProps['options']
+  value?: string
 }
 
 const CodeEditor: FC<Props> = ({
@@ -23,6 +28,10 @@ const CodeEditor: FC<Props> = ({
   hideLineNumbers = false,
   onInputChange = () => {},
   onInputRun = () => {},
+  className,
+  loading,
+  options,
+  value,
 }) => {
   const editorRef = useRef()
 
@@ -53,27 +62,35 @@ const CodeEditor: FC<Props> = ({
     editorRef.current = editor
   }
 
+  const optionsMerged = merge(
+    {
+      tabSize: 2,
+      fontSize: 13,
+      readOnly: isReadOnly,
+      minimap: { enabled: false },
+      wordWrap: 'on',
+      fixedOverflowWidgets: true,
+      contextmenu: true,
+      lineNumbers: hideLineNumbers ? 'off' : undefined,
+      glyphMargin: hideLineNumbers ? false : undefined,
+      lineNumbersMinChars: hideLineNumbers ? 0 : undefined,
+      folding: hideLineNumbers ? false : undefined,
+    },
+    options
+  )
+
+  merge({ cpp: '12' }, { java: '23' }, { python: '35' })
+
   return (
     <Editor
+      value={value ?? undefined}
       path={id}
       theme="supabase"
-      className="monaco-editor"
+      className={`monaco-editor ${className}`}
       defaultLanguage={language}
-      defaultValue={defaultValue}
-      loading={<Connecting />}
-      options={{
-        tabSize: 2,
-        fontSize: 13,
-        readOnly: isReadOnly,
-        minimap: { enabled: false },
-        wordWrap: 'on',
-        fixedOverflowWidgets: true,
-        contextmenu: true,
-        lineNumbers: hideLineNumbers ? 'off' : undefined,
-        glyphMargin: hideLineNumbers ? false : undefined,
-        lineNumbersMinChars: hideLineNumbers ? 0 : undefined,
-        folding: hideLineNumbers ? false : undefined,
-      }}
+      defaultValue={defaultValue ?? undefined}
+      loading={loading || <Connecting />}
+      options={optionsMerged}
       onMount={onMount}
       onChange={onInputChange}
     />

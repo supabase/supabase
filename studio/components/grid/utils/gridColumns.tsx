@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { CalculatedColumn } from '@supabase/react-data-grid';
-import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types';
+import * as React from 'react'
+import { CalculatedColumn } from '@supabase/react-data-grid'
+import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
@@ -12,7 +12,7 @@ import {
   isNumericalColumn,
   isTextColumn,
   isTimeColumn,
-} from './types';
+} from './types'
 import {
   BooleanEditor,
   DateEditor,
@@ -25,25 +25,21 @@ import {
   TextEditor,
   TimeEditor,
   TimeWithTimezoneEditor,
-} from '../components/editor';
-import { AddColumn, ColumnHeader, SelectColumn } from '../components/grid';
-import { COLUMN_MIN_WIDTH } from '../constants';
-import {
-  BooleanFormatter,
-  DefaultFormatter,
-  ForeignKeyFormatter,
-} from '../components/formatter';
+} from '../components/editor'
+import { AddColumn, ColumnHeader, SelectColumn } from '../components/grid'
+import { COLUMN_MIN_WIDTH } from '../constants'
+import { BooleanFormatter, DefaultFormatter, ForeignKeyFormatter } from '../components/formatter'
 
 export function getGridColumns(
   table: SupaTable,
   options?: {
-    editable?: boolean;
-    defaultWidth?: string | number;
-    onAddColumn?: () => void;
+    editable?: boolean
+    defaultWidth?: string | number
+    onAddColumn?: () => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
-    const columnType = getColumnType(x);
+    const columnType = getColumnType(x)
     const columnDefinition: CalculatedColumn<SupaRow> = {
       key: x.name,
       name: x.name,
@@ -65,61 +61,55 @@ export function getGridColumns(
       ),
       editor: options?.editable ? getColumnEditor(x, columnType) : undefined,
       formatter: getColumnFormatter(x, columnType),
-    };
+    }
 
-    return columnDefinition;
-  });
+    return columnDefinition
+  })
 
-  const gridColumns = [SelectColumn, ...columns];
+  const gridColumns = [SelectColumn, ...columns]
   if (options?.onAddColumn) {
-    gridColumns.push(AddColumn);
+    gridColumns.push(AddColumn)
   }
 
-  return gridColumns;
+  return gridColumns
 }
 
 function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
   if (columnDefinition.isPrimaryKey || !columnDefinition.isUpdatable) {
-    return;
+    return
   }
 
   switch (columnType) {
     case 'boolean': {
-      return columnDefinition.isNullable
-        ? NullableBooleanEditor
-        : BooleanEditor;
+      return columnDefinition.isNullable ? NullableBooleanEditor : BooleanEditor
     }
     case 'date': {
-      return DateEditor;
+      return DateEditor
     }
     case 'datetime': {
-      return columnDefinition.format.endsWith('z')
-        ? DateTimeWithTimezoneEditor
-        : DateTimeEditor;
+      return columnDefinition.format.endsWith('z') ? DateTimeWithTimezoneEditor : DateTimeEditor
     }
     case 'time': {
-      return columnDefinition.format.endsWith('z')
-        ? TimeWithTimezoneEditor
-        : TimeEditor;
+      return columnDefinition.format.endsWith('z') ? TimeWithTimezoneEditor : TimeEditor
     }
     case 'enum': {
       const options = columnDefinition.enum!.map((x) => {
-        return { label: x, value: x };
-      });
-      return (p: any) => <SelectEditor {...p} options={options} />;
+        return { label: x, value: x }
+      })
+      return (p: any) => <SelectEditor {...p} options={options} />
     }
     case 'array':
     case 'json': {
-      return JsonEditor;
+      return JsonEditor
     }
     case 'number': {
-      return NumberEditor;
+      return NumberEditor
     }
     case 'text': {
-      return TextEditor;
+      return TextEditor
     }
     default: {
-      return undefined;
+      return undefined
     }
   }
 }
@@ -127,57 +117,57 @@ function getColumnEditor(columnDefinition: SupaColumn, columnType: ColumnType) {
 function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
   switch (columnType) {
     case 'boolean': {
-      return BooleanFormatter;
+      return BooleanFormatter
     }
     case 'foreign_key': {
       if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
-        return DefaultFormatter;
+        return DefaultFormatter
       } else {
-        return ForeignKeyFormatter;
+        return ForeignKeyFormatter
       }
     }
     default: {
-      return DefaultFormatter;
+      return DefaultFormatter
     }
   }
 }
 
 function getColumnType(columnDef: SupaColumn): ColumnType {
   if (isForeignKeyColumn(columnDef)) {
-    return 'foreign_key';
+    return 'foreign_key'
   } else if (isNumericalColumn(columnDef.dataType)) {
-    return 'number';
+    return 'number'
   } else if (isArrayColumn(columnDef.dataType)) {
-    return 'array';
+    return 'array'
   } else if (isJsonColumn(columnDef.dataType)) {
-    return 'json';
+    return 'json'
   } else if (isTextColumn(columnDef.dataType)) {
-    return 'text';
+    return 'text'
   } else if (isDateColumn(columnDef.format)) {
-    return 'date';
+    return 'date'
   } else if (isTimeColumn(columnDef.format)) {
-    return 'time';
+    return 'time'
   } else if (isDateTimeColumn(columnDef.format)) {
-    return 'datetime';
+    return 'datetime'
   } else if (isBoolColumn(columnDef.dataType)) {
-    return 'boolean';
+    return 'boolean'
   } else if (isEnumColumn(columnDef.dataType)) {
-    return 'enum';
-  } else return 'unknown';
+    return 'enum'
+  } else return 'unknown'
 }
 
 function getColumnWidth(columnDef: SupaColumn): string | number | undefined {
   if (isNumericalColumn(columnDef.dataType)) {
-    return 120;
+    return 120
   } else if (
     isDateTimeColumn(columnDef.format) ||
     isDateColumn(columnDef.format) ||
     isTimeColumn(columnDef.format)
   ) {
-    return 150;
+    return 150
   } else if (isBoolColumn(columnDef.dataType)) {
-    return 120;
+    return 120
   } else if (isEnumColumn(columnDef.dataType)) {
-    return 150;
-  } else return 250;
+    return 150
+  } else return 250
 }

@@ -11,6 +11,7 @@ export interface BaseInitialState {
   refreshPageFlag: number
   isInitialComplete: boolean
   editable: boolean
+  allRowsSelected: boolean
 }
 
 export const baseInitialState: BaseInitialState = {
@@ -20,6 +21,7 @@ export const baseInitialState: BaseInitialState = {
   refreshPageFlag: 0,
   isInitialComplete: false,
   editable: false,
+  allRowsSelected: false,
 }
 
 export type INIT_ACTIONTYPE =

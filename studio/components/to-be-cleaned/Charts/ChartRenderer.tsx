@@ -256,6 +256,8 @@ export function BarChart({
                     fill={CHART_COLORS.GREEN_1}
                     // barSize={2}
                     animationDuration={300}
+                    // max bar size required for LogEventChart, prevents bars from expanding to max width.
+                    maxBarSize={48}
                   >
                     {data?.map((entry: any, index: any) => (
                       <Cell

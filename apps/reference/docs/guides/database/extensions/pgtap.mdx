@@ -1,0 +1,125 @@
+---
+id: pgtap
+title: 'pgTAP: Unit Testing'
+description: Unit testing in PostgreSQL.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+`pgTAP` is a unit testing extension for PostgreSQL.
+
+## Overview
+
+Let's cover some basic concepts:
+
+- Unit tests: allow you to test small parts of a system (like a database table!).
+- TAP: stands for [Test Anything Protocol](http://testanything.org/). It is an framework which aims to simplify the error reporting during testing.
+
+## Usage
+
+### Enable the extension
+
+<Tabs
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pgtap" and enable the extension.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="/docs/videos/toggle-extensions.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+</TabItem>
+<TabItem value="sql">
+
+```sql
+-- Enable the "pgtap" extension
+create extension pgtap with schema extensions;
+
+-- Disable the "pgtap" extension
+drop extension if exists pgtap;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension you can call `drop extension`.
+
+It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+
+</TabItem>
+
+</Tabs>
+
+### Managing tests
+
+It's a good practice to keep all your tests in a separate schema.
+
+```sql
+create schema tests;
+```
+
+### Creating a test
+
+@TODO
+
+- Create a plan
+- We should come up with a recommendation on how to run the tests. Via a function? External scripts?
+- Eventually this can be done via our CLI
+
+### Running a test
+
+@TODO
+
+## Examples
+
+Let's look at a few different tests which could be helpful in your project.
+
+### Testing tables
+
+```sql
+begin;
+select plan( 1 );
+
+select has_table( 'profiles' );
+
+select * from finish();
+rollback;
+```
+
+API:
+
+- [`has_table()`](https://pgtap.org/documentation.html#has_table)
+
+### Testing columns
+
+```sql
+begin;
+select plan( 1 );
+
+select has_column( 'profiles', 'id' );
+select col_is_pk( 'profiles', 'id' );
+
+select * from finish();
+rollback;
+```
+
+API:
+
+- [`has_column()`](https://pgtap.org/documentation.html#has_column)
+- [`col_is_pk()`](https://pgtap.org/documentation.html#col_is_pk)
+
+## Resources
+
+- Official [`pgTAP` documentation](https://pgtap.org/)

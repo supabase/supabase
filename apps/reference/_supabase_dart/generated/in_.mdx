@@ -1,0 +1,63 @@
+---
+id: in_
+title: '.in_()'
+slug: /in_
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value on the stated `column` is found on the specified `values`.
+
+`is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in_('name', ['Rio de Janeiro', 'San Francisco'])
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in_('name', ['Rio de Janeiro', 'San Francisco'])
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .in_('name', ['Rio de Janeiro', 'San Francisco'])
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .in_('name', ['Rio de Janeiro', 'San Francisco'])
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .in_('name', ['Rio de Janeiro', 'San Francisco'])
+  .execute();
+```

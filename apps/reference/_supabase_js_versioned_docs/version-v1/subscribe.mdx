@@ -1,0 +1,165 @@
+---
+id: subscribe
+title: 'on().subscribe()'
+slug: subscribe
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Subscribe to realtime changes in your database.
+
+```js
+const mySubscription = supabase
+  .from('*')
+  .on('*', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      event
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>SupabaseEventTypes</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The database event which you would like to receive updates for, or you can use the special wildcard `*` to listen to all changes.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      callback
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A callback that will handle the payload that is sent whenever your database changes.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+- If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+
+## Examples
+
+### Listen to all database changes
+
+```js
+const mySubscription = supabase
+  .from('*')
+  .on('*', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to a specific table
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('*', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to inserts
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('INSERT', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to updates
+
+By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+enable full replication for the table you are listening too:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('UPDATE', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to deletes
+
+By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+enable full replication for the table you are listening too:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('DELETE', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to multiple events
+
+You can chain listeners if you want to listen to multiple events for each table.
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('INSERT', handleRecordInserted)
+  .on('DELETE', handleRecordDeleted)
+  .subscribe()
+```
+
+### Listening to row level changes
+
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+
+```js
+const mySubscription = supabase
+  .from('countries:id=eq.200')
+  .on('UPDATE', handleRecordUpdated)
+  .subscribe()
+```

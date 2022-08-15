@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--light.svg?sanitize=true#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/supabase-logo-wordmark--dark.svg?sanitize=true#gh-dark-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -23,7 +23,7 @@
 
 সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
-কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](./DEVELOPERS.md)
+কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
 
 ## কমিউনিটি ও সাপোর্ট
 
