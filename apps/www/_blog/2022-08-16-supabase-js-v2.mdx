@@ -243,6 +243,25 @@ if (error instanceof FunctionsHttpError) {
 }
 ```
 
+### Improvements for Edge Functions
+
+`supabase-js` now automatically detects the content type for the request/response bodies for all Edge Function invocations:
+
+```ts
+// v2
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  body: { foo: 'bar' },
+})
+
+// v1
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  headers: { 'Content-Type': 'application/json' }
+  body: JSON.stringify({ foo: 'bar' }),
+})
+```
+
+This improvement inspired by a Supabase community member. Thanks [@vejja](https://github.com/supabase/functions-js/pull/23)!
+
 ## Community
 
 Version 2.0 is the result of the combined work of over 100 contributors to our libraries, and over 450 contributors to our docs and websites.
