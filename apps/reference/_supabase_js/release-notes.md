@@ -8,7 +8,7 @@ Supabase.js v2 release notes.
 
 ## 2.0.0 Release Candidate
 
-Install the latest with `npm install @supabase/supabase-js@2.0.0-rc.1`.
+Install the latest with `npm install @supabase/supabase-js@rc`.
 
 ### Explicit constructor options
 
@@ -16,9 +16,6 @@ All client specific options within the constructor are keyed to the library: [PR
 
 ```jsx
 const supabase = createClient(apiURL, apiKey, {
-  // subclient specific options
-  // should map 1 - 1 with the constructor options of the underlying library
-  // any options here will override the common options later on in the client
   db: {
     schema: 'public',
   },
@@ -27,12 +24,10 @@ const supabase = createClient(apiURL, apiKey, {
     persistSession: true,
     detectSessionInUrl: true,
   },
-  // realtime already does this :heart-eyes:
   realtime: {
     channels,
     endpoint,
   },
-  // common across all libraries
   global: {
     fetch: customFetch,
     headers: DEFAULT_HEADERS,
