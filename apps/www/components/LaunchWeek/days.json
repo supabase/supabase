@@ -48,7 +48,7 @@
           },
           {
             "title": "Typescript support",
-            "url": "/docs/reference/javascript/next/migration-guide",
+            "url": "/docs/reference/javascript/next/typescript-support",
             "description": "Using types generated directly from your database."
           }
         ]
