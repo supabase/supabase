@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['reference/cli/index', 'reference/cli/installing-and-updating', 'reference/cli/config-reference'],
+      items: ['reference/cli/index', 'reference/cli/config-reference'],
       collapsed: true,
     },
     {
