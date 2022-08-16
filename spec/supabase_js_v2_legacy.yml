@@ -384,12 +384,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const user = await supabase.auth.getUser()
           ```
 
-  auth.update():
-    title: 'update()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.update'
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
       To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
@@ -403,19 +403,19 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          const { user, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({password: 'new password'})
+          const { user, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
       - name: Update a user's metadata.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({ 
+          const { user, error } = await supabase.auth.updateUser({ 
             data: { hello: 'world' } 
           })
           ```
@@ -533,9 +533,9 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  auth.api.getUser():
-    title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
+  auth.api.getUserById():
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
@@ -545,14 +545,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.api.getUser(
-            'ACCESS_TOKEN_JWT',
-          )
+          const { user, error } = await supabase.auth.api.getUserById(1)
           ```
 
   auth.api.listUsers():
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -566,7 +564,7 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -603,7 +601,7 @@ pages:
 
   auth.api.deleteUser():
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -619,7 +617,7 @@ pages:
 
   auth.api.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -633,25 +631,25 @@ pages:
             .inviteUserByEmail('email@example.com')
           ```
 
-  auth.api.sendMobileOTP():
-    title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Basic example.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .sendMobileOTP('12345879')
-          ```
+  # auth.api.sendMobileOTP():
+  #   title: 'sendMobileOTP()'
+  #   $ref: '@supabase/gotrue-js.GoTrueAdminApi.sendMobileOTP'
+  #   notes: |
+  #     - Requires a `service_role` key.
+  #     - This function should only be called on a server. Never expose your `service_role` key in the browser.
+  #   examples:
+  #     - name: Basic example.
+  #       isSpotlight: false
+  #       js: |
+  #         ```js
+  #         const { data: user, error } = await supabase.auth
+  #           .api
+  #           .sendMobileOTP('12345879')
+  #         ```
 
   auth.api.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -678,7 +676,7 @@ pages:
 
   auth.api.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -695,7 +693,7 @@ pages:
 
   auth.api.updateUserById():
     title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -1242,9 +1240,9 @@ pages:
             .subscribe()
           ```
 
-  removeSubscription():
-    title: 'removeSubscription()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeSubscription'
+  removeChannel():
+    title: 'removeChannel()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1252,12 +1250,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeSubscription(mySubscription)
+          supabase.removeChannel(mySubscription)
           ```
 
-  removeAllSubscriptions():
+  removeAllChannels():
     title: 'removeAllSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1265,18 +1263,18 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeAllSubscriptions()
+          supabase.removeAllChannels()
           ```
 
-  getSubscriptions():
+  getChannels():
     title: 'getSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - name: Get all subscriptions
         isSpotlight: true
         js: |
           ```js
-          const subscriptions = supabase.getSubscriptions()
+          const subscriptions = supabase.getChannels()
           ```
 
   storage.listBuckets():
