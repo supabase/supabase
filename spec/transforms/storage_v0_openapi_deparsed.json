@@ -13,7 +13,9 @@
           "type": "string"
         }
       },
-      "required": ["authorization"],
+      "required": [
+        "authorization"
+      ],
       "title": "authSchema"
     },
     "def-1": {
@@ -29,7 +31,11 @@
           "type": "string"
         }
       },
-      "required": ["statusCode", "error", "message"],
+      "required": [
+        "statusCode",
+        "error",
+        "message"
+      ],
       "title": "errorSchema"
     }
   },
@@ -37,7 +43,9 @@
     "/bucket/": {
       "post": {
         "summary": "Create a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -47,18 +55,26 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "examples": ["avatars"]
+                  "examples": [
+                    "avatars"
+                  ]
                 },
                 "id": {
                   "type": "string",
-                  "examples": ["avatars"]
+                  "examples": [
+                    "avatars"
+                  ]
                 },
                 "public": {
                   "type": "boolean",
-                  "examples": [false]
+                  "examples": [
+                    false
+                  ]
                 }
               },
-              "required": ["name"]
+              "required": [
+                "name"
+              ]
             }
           },
           {
@@ -76,10 +92,14 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "examples": ["avatars"]
+                  "examples": [
+                    "avatars"
+                  ]
                 }
               },
-              "required": ["name"]
+              "required": [
+                "name"
+              ]
             }
           },
           "400": {
@@ -97,7 +117,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -105,7 +129,9 @@
       },
       "get": {
         "summary": "Gets all buckets",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "in": "header",
@@ -142,7 +168,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["id", "name"],
+                "required": [
+                  "id",
+                  "name"
+                ],
                 "additionalProperties": false,
                 "examples": [
                   {
@@ -183,7 +212,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -193,11 +226,15 @@
     "/bucket/{bucketId}/empty": {
       "post": {
         "summary": "Empty a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketId"
@@ -217,7 +254,9 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "examples": ["Successfully emptied"]
+                  "examples": [
+                    "Successfully emptied"
+                  ]
                 }
               }
             }
@@ -237,7 +276,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -247,11 +290,15 @@
     "/bucket/{bucketId}": {
       "get": {
         "summary": "Get details of a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketId"
@@ -289,7 +336,10 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "name"],
+              "required": [
+                "id",
+                "name"
+              ],
               "additionalProperties": false,
               "examples": [
                 {
@@ -317,7 +367,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -325,7 +379,9 @@
       },
       "put": {
         "summary": "Update properties of a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -335,7 +391,9 @@
               "properties": {
                 "public": {
                   "type": "boolean",
-                  "examples": [false]
+                  "examples": [
+                    false
+                  ]
                 }
               }
             }
@@ -355,10 +413,14 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "examples": ["Successfully updated"]
+                  "examples": [
+                    "Successfully updated"
+                  ]
                 }
               },
-              "required": ["message"]
+              "required": [
+                "message"
+              ]
             }
           },
           "400": {
@@ -376,7 +438,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -384,11 +450,15 @@
       },
       "delete": {
         "summary": "Delete a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketId"
@@ -408,7 +478,9 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "examples": ["Successfully deleted"]
+                  "examples": [
+                    "Successfully deleted"
+                  ]
                 }
               }
             }
@@ -428,7 +500,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -438,18 +514,24 @@
     "/object/{bucketName}/{wildcard}": {
       "delete": {
         "summary": "Delete an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -469,7 +551,9 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "examples": ["Successfully deleted"]
+                  "examples": [
+                    "Successfully deleted"
+                  ]
                 }
               }
             }
@@ -489,26 +573,37 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
         }
       },
       "get": {
-        "summary": "Deprecated (use GET /object/authenticated/{bucketName} instead): Retrieve an object",
-        "tags": ["object"],
+        "summary": "Get object (deprecated)",
+        "description": "use GET /object/authenticated/{bucketName} instead",
+        "tags": [
+          "deprecated"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -536,7 +631,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -544,18 +643,24 @@
       },
       "put": {
         "summary": "Update the object at an existing key",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -575,10 +680,14 @@
               "properties": {
                 "Key": {
                   "type": "string",
-                  "examples": ["projectref/avatars/folder/cat.png"]
+                  "examples": [
+                    "projectref/avatars/folder/cat.png"
+                  ]
                 }
               },
-              "required": ["Key"]
+              "required": [
+                "Key"
+              ]
             }
           },
           "400": {
@@ -596,7 +705,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -604,18 +717,24 @@
       },
       "post": {
         "summary": "Upload a new object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -635,10 +754,14 @@
               "properties": {
                 "Key": {
                   "type": "string",
-                  "examples": ["avatars/folder/cat.png"]
+                  "examples": [
+                    "avatars/folder/cat.png"
+                  ]
                 }
               },
-              "required": ["Key"]
+              "required": [
+                "Key"
+              ]
             }
           },
           "400": {
@@ -656,7 +779,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -666,7 +793,9 @@
     "/object/{bucketName}": {
       "delete": {
         "summary": "Delete multiple objects",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -680,15 +809,24 @@
                     "type": "string"
                   },
                   "minItems": 1,
-                  "examples": [["folder/cat.png", "folder/morecats.png"]]
+                  "examples": [
+                    [
+                      "folder/cat.png",
+                      "folder/morecats.png"
+                    ]
+                  ]
                 }
               },
-              "required": ["prefixes"]
+              "required": [
+                "prefixes"
+              ]
             }
           },
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
@@ -792,7 +930,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"],
+                    "required": [
+                      "id",
+                      "name"
+                    ],
                     "additionalProperties": false,
                     "examples": [
                       {
@@ -805,7 +946,9 @@
                     ]
                   }
                 },
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "additionalProperties": false,
                 "examples": [
                   {
@@ -840,7 +983,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -850,18 +997,24 @@
     "/object/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -889,7 +1042,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -899,7 +1056,9 @@
     "/object/sign/{bucketName}/{wildcard}": {
       "post": {
         "summary": "Generate a presigned url to retrieve an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -910,22 +1069,30 @@
                 "expiresIn": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [60000]
+                  "examples": [
+                    60000
+                  ]
                 }
               },
-              "required": ["expiresIn"]
+              "required": [
+                "expiresIn"
+              ]
             }
           },
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -950,7 +1117,9 @@
                   ]
                 }
               },
-              "required": ["signedURL"]
+              "required": [
+                "signedURL"
+              ]
             }
           },
           "400": {
@@ -968,7 +1137,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -976,7 +1149,9 @@
       },
       "get": {
         "summary": "Retrieve an object via a presigned URL",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
@@ -989,14 +1164,18 @@
           },
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -1018,7 +1197,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1028,7 +1211,9 @@
     "/object/sign/{bucketName}": {
       "post": {
         "summary": "Generate presigned urls to retrieve objects",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -1039,7 +1224,9 @@
                 "expiresIn": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [60000]
+                  "examples": [
+                    60000
+                  ]
                 },
                 "paths": {
                   "type": "array",
@@ -1047,15 +1234,25 @@
                     "type": "string"
                   },
                   "minItems": 1,
-                  "examples": [["folder/cat.png", "folder/morecats.png"]]
+                  "examples": [
+                    [
+                      "folder/cat.png",
+                      "folder/morecats.png"
+                    ]
+                  ]
                 }
               },
-              "required": ["expiresIn", "paths"]
+              "required": [
+                "expiresIn",
+                "paths"
+              ]
             }
           },
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
@@ -1076,21 +1273,35 @@
                 "type": "object",
                 "properties": {
                   "error": {
-                    "error": ["string", "null"],
-                    "examples": ["Either the object does not exist or you do not have access to it"]
+                    "error": [
+                      "string",
+                      "null"
+                    ],
+                    "examples": [
+                      "Either the object does not exist or you do not have access to it"
+                    ]
                   },
                   "path": {
                     "type": "string",
-                    "examples": ["folder/cat.png"]
+                    "examples": [
+                      "folder/cat.png"
+                    ]
                   },
                   "signedURL": {
-                    "type": ["string", "null"],
+                    "type": [
+                      "string",
+                      "null"
+                    ],
                     "examples": [
                       "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
                     ]
                   }
                 },
-                "required": ["error", "path", "signedURL"]
+                "required": [
+                  "error",
+                  "path",
+                  "signedURL"
+                ]
               }
             }
           },
@@ -1109,7 +1320,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1119,7 +1334,9 @@
     "/object/move": {
       "post": {
         "summary": "Moves an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -1129,18 +1346,28 @@
               "properties": {
                 "bucketId": {
                   "type": "string",
-                  "examples": ["avatars"]
+                  "examples": [
+                    "avatars"
+                  ]
                 },
                 "sourceKey": {
                   "type": "string",
-                  "examples": ["folder/cat.png"]
+                  "examples": [
+                    "folder/cat.png"
+                  ]
                 },
                 "destinationKey": {
                   "type": "string",
-                  "examples": ["folder/newcat.png"]
+                  "examples": [
+                    "folder/newcat.png"
+                  ]
                 }
               },
-              "required": ["bucketId", "sourceKey", "destinationKey"]
+              "required": [
+                "bucketId",
+                "sourceKey",
+                "destinationKey"
+              ]
             }
           },
           {
@@ -1158,10 +1385,14 @@
               "properties": {
                 "message": {
                   "type": "string",
-                  "examples": ["Successfully moved"]
+                  "examples": [
+                    "Successfully moved"
+                  ]
                 }
               },
-              "required": ["message"]
+              "required": [
+                "message"
+              ]
             }
           },
           "400": {
@@ -1179,7 +1410,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1189,7 +1424,9 @@
     "/object/list/{bucketName}": {
       "post": {
         "summary": "Search for objects under a prefix",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -1199,37 +1436,55 @@
               "properties": {
                 "prefix": {
                   "type": "string",
-                  "examples": ["folder/subfolder"]
+                  "examples": [
+                    "folder/subfolder"
+                  ]
                 },
                 "limit": {
                   "type": "integer",
                   "minimum": 1,
-                  "examples": [10]
+                  "examples": [
+                    10
+                  ]
                 },
                 "offset": {
                   "type": "integer",
                   "minimum": 0,
-                  "examples": [0]
+                  "examples": [
+                    0
+                  ]
                 },
                 "sortBy": {
                   "type": "object",
                   "properties": {
                     "column": {
                       "type": "string",
-                      "enum": ["name", "updated_at", "created_at", "last_accessed_at"]
+                      "enum": [
+                        "name",
+                        "updated_at",
+                        "created_at",
+                        "last_accessed_at"
+                      ]
                     },
                     "order": {
                       "type": "string",
-                      "enum": ["asc", "desc"]
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ]
                     }
                   },
-                  "required": ["column"]
+                  "required": [
+                    "column"
+                  ]
                 },
                 "search": {
                   "type": "string"
                 }
               },
-              "required": ["prefix"]
+              "required": [
+                "prefix"
+              ]
             }
           },
           {
@@ -1337,7 +1592,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"],
+                    "required": [
+                      "id",
+                      "name"
+                    ],
                     "additionalProperties": false,
                     "examples": [
                       {
@@ -1350,7 +1608,9 @@
                     ]
                   }
                 },
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "additionalProperties": false,
                 "examples": [
                   {
@@ -1384,7 +1644,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1394,7 +1658,9 @@
     "/object/copy": {
       "post": {
         "summary": "Copies an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "name": "body",
@@ -1404,18 +1670,28 @@
               "properties": {
                 "sourceKey": {
                   "type": "string",
-                  "examples": ["folder/source.png"]
+                  "examples": [
+                    "folder/source.png"
+                  ]
                 },
                 "bucketId": {
                   "type": "string",
-                  "examples": ["avatars"]
+                  "examples": [
+                    "avatars"
+                  ]
                 },
                 "destinationKey": {
                   "type": "string",
-                  "examples": ["folder/destination.png"]
+                  "examples": [
+                    "folder/destination.png"
+                  ]
                 }
               },
-              "required": ["sourceKey", "bucketId", "destinationKey"]
+              "required": [
+                "sourceKey",
+                "bucketId",
+                "destinationKey"
+              ]
             }
           },
           {
@@ -1433,10 +1709,14 @@
               "properties": {
                 "Key": {
                   "type": "string",
-                  "examples": ["folder/destination.png"]
+                  "examples": [
+                    "folder/destination.png"
+                  ]
                 }
               },
-              "required": ["Key"]
+              "required": [
+                "Key"
+              ]
             }
           },
           "400": {
@@ -1454,7 +1734,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1464,18 +1748,24 @@
     "/object/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve an object from a public bucket",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "type": "string",
-            "examples": ["avatars"],
+            "examples": [
+              "avatars"
+            ],
             "required": true,
             "in": "path",
             "name": "bucketName"
           },
           {
             "type": "string",
-            "examples": ["folder/cat.png"],
+            "examples": [
+              "folder/cat.png"
+            ],
             "required": true,
             "in": "path",
             "name": "*"
@@ -1497,7 +1787,11 @@
                   "type": "string"
                 }
               },
-              "required": ["statusCode", "error", "message"],
+              "required": [
+                "statusCode",
+                "error",
+                "message"
+              ],
               "title": "errorSchema"
             }
           }
@@ -1513,6 +1807,10 @@
     {
       "name": "bucket",
       "description": "Bucket end-points"
+    },
+    {
+      "name": "deprecated",
+      "description": "Deprecated end-points"
     }
   ]
 }

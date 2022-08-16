@@ -1,4 +1,3 @@
-import { String } from 'lodash'
 import semver from 'semver'
 import { headWithTimeout, getWithTimeout } from './common/fetch'
 import { API_URL } from './constants'

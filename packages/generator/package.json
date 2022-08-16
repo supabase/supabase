@@ -24,10 +24,17 @@
     "supabase-js:v1:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js_versioned_docs/version-v1 ../../spec/supabase_js_v1_legacy.yml",
     "supabase-js:v1:olddocs": "ts-node ./LegacyReferenceGenerator.ts -o ../../web/docs/reference/javascript ../../spec/supabase_dart_v1_legacy.yml",
     "supabase-js:v2": "npm-run-all supabase-js:v2:ref supabase-js:format",
-    "supabase-js:v2:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js/generated ../../spec/supabase_js_v2_legacy.yml"
+    "supabase-js:v2:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js/generated ../../spec/supabase_js_v2_legacy.yml",
+    "tsdoc:dereference:functions": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/functions.json --output ../../spec/enrichments/tsdoc_v2/functions_dereferenced.json",
+    "tsdoc:dereference:gotrue": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/gotrue.json --output ../../spec/enrichments/tsdoc_v2/gotrue_dereferenced.json",
+    "tsdoc:dereference:postgrest": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/postgrest.json --output ../../spec/enrichments/tsdoc_v2/postgrest_dereferenced.json",
+    "tsdoc:dereference:realtime": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/realtime.json --output ../../spec/enrichments/tsdoc_v2/realtime_dereferenced.json",
+    "tsdoc:dereference:storage": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/storage.json --output ../../spec/enrichments/tsdoc_v2/storage_dereferenced.json",
+    "tsdoc:dereference:supabase": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/supabase.json --output ../../spec/enrichments/tsdoc_v2/supabase_dereferenced.json"
   },
   "devDependencies": {
     "@apidevtools/swagger-cli": "^4.0.4",
+    "@types/json-stringify-safe": "^5.0.0",
     "@types/lodash": "^4.14.182",
     "ejs": "^3.1.8",
     "js-yaml": "^4.1.0",
@@ -40,5 +47,8 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "dependencies": {
+    "json-stringify-safe": "^5.0.1"
   }
 }
