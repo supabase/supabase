@@ -48,8 +48,8 @@ pages:
               password: 'example-password',
             },
             {
-              data: { 
-                first_name: 'John', 
+              data: {
+                first_name: 'John',
                 age: 27,
               }
             }
@@ -122,10 +122,10 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -214,10 +214,10 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -306,10 +306,10 @@ pages:
           ```
       - name: Sign in with redirect.
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -384,18 +384,18 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const user = await supabase.auth.getUser()
           ```
 
-  auth.update():
-    title: 'update()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.update'
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
       To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
 
 
-      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
       - name: Update email for authenticated user.
@@ -403,20 +403,20 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          const { user, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({password: 'new password'})
+          const { user, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
       - name: Update a user's metadata.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({ 
-            data: { hello: 'world' } 
+          const { user, error } = await supabase.auth.updateUser({
+            data: { hello: 'world' }
           })
           ```
 
@@ -431,9 +431,9 @@ pages:
           ```js
           function apiFunction(req, res) {
             // Assuming the access token was sent as a header "X-Supabase-Auth"
-            const { access_token } = req.get('X-Supabase-Auth') 
+            const { access_token } = req.get('X-Supabase-Auth')
 
-            // You can now use it within a Supabase Client 
+            // You can now use it within a Supabase Client
             const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -468,9 +468,9 @@ pages:
           * Use the Auth token in your server-side function.
           */
           async function apiFunction(req, res) {
-            const { access_token } = req.get('X-Supabase-Auth') 
+            const { access_token } = req.get('X-Supabase-Auth')
 
-            // You can now use it within a Supabase Client 
+            // You can now use it within a Supabase Client
             const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -533,9 +533,9 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  auth.api.getUser():
-    title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
+  auth.api.getUserById():
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
@@ -545,14 +545,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.api.getUser(
-            'ACCESS_TOKEN_JWT',
-          )
+          const { user, error } = await supabase.auth.api.getUserById(1)
           ```
 
   auth.api.listUsers():
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -566,7 +564,7 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -603,7 +601,7 @@ pages:
 
   auth.api.deleteUser():
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -619,7 +617,7 @@ pages:
 
   auth.api.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -633,25 +631,25 @@ pages:
             .inviteUserByEmail('email@example.com')
           ```
 
-  auth.api.sendMobileOTP():
-    title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Basic example.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .sendMobileOTP('12345879')
-          ```
+  # auth.api.sendMobileOTP():
+  #   title: 'sendMobileOTP()'
+  #   $ref: '@supabase/gotrue-js.GoTrueAdminApi.sendMobileOTP'
+  #   notes: |
+  #     - Requires a `service_role` key.
+  #     - This function should only be called on a server. Never expose your `service_role` key in the browser.
+  #   examples:
+  #     - name: Basic example.
+  #       isSpotlight: false
+  #       js: |
+  #         ```js
+  #         const { data: user, error } = await supabase.auth
+  #           .api
+  #           .sendMobileOTP('12345879')
+  #         ```
 
   auth.api.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -678,7 +676,7 @@ pages:
 
   auth.api.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -695,7 +693,7 @@ pages:
 
   auth.api.updateUserById():
     title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -762,37 +760,52 @@ pages:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
     examples:
       - name: Basic invocation.
+        description:
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            body: JSON.stringify({ foo: 'bar' })
+            body: { foo: 'bar' }
           })
           ```
-      - name: Specifying response type.
+      - name: Error handling.
         description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
         isSpotlight: true
         js: |
           ```js
+          import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            responseType: 'text',
-            body: JSON.stringify({ foo: 'bar' })
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
           })
+
+          if (error instanceof FunctionsHttpError) {
+            console.log('Function returned an error', error.message)
+          } else if (error instanceof FunctionsRelayError) {
+            console.log('Relay error:', error.message)
+          } else if (error instanceof FunctionsFetchError) {
+            console.log('Fetch error:', error.message)
+          }
           ```
-      - name: Parsing custom headers.
+      - name: Passing custom headers.
         description: |
           You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
         js: |
           ```js
           const { data: user, error } = await supabase.functions.invoke('hello', {
-            headers: { 
-              "my-custom-header": 'my-custom-header-value' 
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
             },
-            body: JSON.stringify({ foo: 'bar' })
+            body: { foo: 'bar' }
           })
           ```
 
@@ -841,11 +854,11 @@ pages:
           For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
       - name: Query the same foreign table multiple times
         description: |
-          Sometimes you will need to query the same foreign table twice. 
-          In this case, you can use the name of the joined column to identify 
-          which join you intend to use. For convenience, you can also give an 
-          alias for each column. For example, if we had a shop of products, 
-          and we wanted to get the supplier and the purchaser at the same time 
+          Sometimes you will need to query the same foreign table twice.
+          In this case, you can use the name of the joined column to identify
+          which join you intend to use. For convenience, you can also give an
+          alias for each column. For example, if we had a shop of products,
+          and we wanted to get the supplier and the purchaser at the same time
           (both in the users) table:
         js: |
           ```js
@@ -859,7 +872,7 @@ pages:
           ```
       - name: Filtering with inner joins
         description: |
-          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted 
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
           to select all rows in a `message` table which belong to a user with the `username` "Jane":
         js: |
           ```js
@@ -880,10 +893,10 @@ pages:
           ```
       - name: Querying JSON data
         description: |
-          If you have data inside of a JSONB column, you can apply select 
-          and query filters to the data values. Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for querying JSON data. Also see 
+          If you have data inside of a JSONB column, you can apply select
+          and query filters to the data values. Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for querying JSON data. Also see
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         js: |
           ```js
@@ -935,10 +948,6 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    notes: |
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - name: Create a record
         isSpotlight: true
@@ -950,9 +959,19 @@ pages:
               { name: 'The Shire', country_id: 554 }
             ])
           ```
+      - name: Create a record and return it
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+            .select()
+          ```
       - name: Bulk create
         description: |
-          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are 
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are
           rolled back.
         js: |
           ```js
@@ -962,25 +981,6 @@ pages:
               { name: 'The Shire', country_id: 554 },
               { name: 'Rohan', country_id: 555 },
             ])
-          ```
-      - name: Upsert
-        description: |
-          For upsert, if set to true, primary key columns would need to be included 
-          in the data parameter in order for an update to properly happen. Also, primary keys 
-          used must be natural, not surrogate. There are however, 
-          [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
-          for surrogate primary keys.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .insert(
-              [
-                { name: 'The Shire', country_id: 554 },
-                { name: 'Rohan', country_id: 555 },
-                { name: 'City by the Bay', country_id:840}
-              ],
-              { upsert: true })
           ```
 
   update():
@@ -1000,16 +1000,16 @@ pages:
           ```
       - name: Updating JSON data
         description: |
-          Postgres offers a 
-          [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
-          for working with JSON data. Right now it is only possible to update an entire JSON document, 
-          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+          Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for working with JSON data. Right now it is only possible to update an entire JSON document,
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
         js: |
           ```js
           const { data, error } = await supabase
             .from('users')
             .update(`
-              address: { 
+              address: {
                 street: 'Melrose Place',
                 postcode: 90210
               }
@@ -1021,7 +1021,7 @@ pages:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
     notes: |
-      - Primary keys should be included in the data payload in order for an update to work correctly. 
+      - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
     examples:
       - name: Upsert your data
@@ -1045,8 +1045,8 @@ pages:
           ```
       - name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table. 
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row 
+          Running the following will cause supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         js: |
@@ -1061,11 +1061,11 @@ pages:
           ```js
           const { data, error, count } = await supabase
             .from('users')
-            .upsert({ 
-                id: 3, message: 'foo', 
-                username: 'supabot' 
-            }, { 
-              count: 'exact' 
+            .upsert({
+                id: 3, message: 'foo',
+                username: 'supabot'
+            }, {
+              count: 'exact'
             })
           ```
 
@@ -1129,7 +1129,7 @@ pages:
       - name: With filters
         description: |
           Postgres functions that return tables can also be combined with
-          [Modifiers](/docs/reference/javascript/using-modifiers) and 
+          [Modifiers](/docs/reference/javascript/using-modifiers) and
           [Filters](/docs/reference/javascript/using-filters).
         js: |
           ```js
@@ -1153,15 +1153,18 @@ pages:
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
     notes: |
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+      - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true
         js: |
           ```js
-          const mySubscription = supabase
-            .from('*')
-            .on('*', payload => {
+          const myChannel = supabase
+            .channel('*')
+            .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1169,9 +1172,9 @@ pages:
       - name: Listening to a specific table
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('*', payload => {
+          const myChannel = supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1179,43 +1182,43 @@ pages:
       - name: Listening to inserts
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('INSERT', payload => {
+          const myChannel = supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
       - name: Listening to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('UPDATE', payload => {
+          const myChannel = supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
           ```
       - name: Listening to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
-          enable full replication for the table you are listening too: 
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('DELETE', payload => {
+          const myChannel = supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
             .subscribe()
@@ -1224,10 +1227,10 @@ pages:
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries')
-            .on('INSERT', handleRecordInserted)
-            .on('DELETE', handleRecordDeleted)
+          const myChannel = supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
           ```
       - name: Listening to row level changes
@@ -1236,47 +1239,47 @@ pages:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
-          const mySubscription = supabase
-            .from('countries:id=eq.200')
-            .on('UPDATE', handleRecordUpdated)
+          const myChannel = supabase
+            .channel('public:countries:id=eq.200')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
 
-  removeSubscription():
-    title: 'removeSubscription()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeSubscription'
+  removeChannel():
+    title: 'removeChannel()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Remove a subscription
+      - name: Remove a channel
         isSpotlight: true
         js: |
           ```js
-          supabase.removeSubscription(mySubscription)
+          supabase.removeChannel(myChannel)
           ```
 
-  removeAllSubscriptions():
-    title: 'removeAllSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllSubscriptions'
+  removeAllChannels():
+    title: 'removeAllChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Removes all subscriptions
+      - name: Removes all channels
         isSpotlight: true
         js: |
           ```js
-          supabase.removeAllSubscriptions()
+          supabase.removeAllChannels()
           ```
 
-  getSubscriptions():
-    title: 'getSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getSubscriptions'
+  getChannels():
+    title: 'getChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
-      - name: Get all subscriptions
+      - name: Get all channels
         isSpotlight: true
         js: |
           ```js
-          const subscriptions = supabase.getSubscriptions()
+          const channels = supabase.getChannels()
           ```
 
   storage.listBuckets():
@@ -1284,7 +1287,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: none
     examples:
       - name: List buckets
@@ -1301,7 +1304,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: none
     examples:
       - name: Get bucket
@@ -1318,7 +1321,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `insert` 
+        - `buckets` permissions: `insert`
         - `objects` permissions: none
     examples:
       - name: Create bucket
@@ -1335,7 +1338,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: `select` 
+        - `buckets` permissions: `select`
         - `objects` permissions: `select` and `delete`
     examples:
       - name: Empty bucket
@@ -1385,7 +1388,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `insert`
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
@@ -1420,7 +1423,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
@@ -1455,7 +1458,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
     examples:
       - name: Move file
@@ -1473,7 +1476,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `update` and `select`
     examples:
       - name: Copy file
@@ -1491,14 +1494,14 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - name: Create Signed URL
         isSpotlight: true
         js: |
           ```js
-          const { signedURL, error } = await supabase
+          const { data, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
@@ -1509,7 +1512,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - name: Create Signed URLs
@@ -1528,14 +1531,14 @@ pages:
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: none
     examples:
       - name: Returns the URL for an asset in a public bucket
         isSpotlight: true
         js: |
           ```js
-          const { publicURL, error } = supabase
+          const { data, error } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
@@ -1546,7 +1549,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - name: Download file
@@ -1564,7 +1567,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `delete` and `select`
     examples:
       - name: Delete file
@@ -1582,7 +1585,7 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
       - Policy permissions required:
-        - `buckets` permissions: none 
+        - `buckets` permissions: none
         - `objects` permissions: `select`
     examples:
       - name: List files in a bucket
@@ -1614,7 +1617,7 @@ pages:
 
   Using Modifiers:
     description: |
-      Modifiers can be used on `select()` queries. 
+      Modifiers can be used on `select()` queries.
 
       If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
 
@@ -1705,7 +1708,7 @@ pages:
 
   Using Filters:
     description: |
-      Filters can be used on `select()`, `update()`, and `delete()` queries. 
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
 
       If a Postgres function returns a table response, you can also apply filters.
 
@@ -1749,7 +1752,7 @@ pages:
       let query = supabase
         .from('cities')
         .select('name, country_id')
-        
+
       if (filterByName)  { query = query.eq('name', filterByName) }
       if (filterPopLow)  { query = query.gte('population', filterPopLow) }
       if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
@@ -2583,8 +2586,8 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
-              config: 'english' 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              config: 'english'
             })
           ```
       - name: Basic normalization
@@ -2594,9 +2597,9 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
               type: 'plain',
-              config: 'english' 
+              config: 'english'
             })
           ```
       - name: Full normalization
@@ -2606,15 +2609,15 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat' & 'cat'`, { 
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
               type: 'phrase',
-              config: 'english' 
+              config: 'english'
             })
           ```
       - name: Websearch
         description: |
-          Uses PostgreSQL's `websearch_to_tsquery` function. 
-          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
@@ -2627,7 +2630,7 @@ pages:
           const { data, error } = await supabase
             .from('quotes')
             .select('catchphrase')
-            .textSearch('catchphrase', `'fat or cat'`, { 
+            .textSearch('catchphrase', `'fat or cat'`, {
               type: 'websearch',
               config: 'english'
             })

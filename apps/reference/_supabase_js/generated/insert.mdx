@@ -38,6 +38,10 @@ The values to insert.
 
   </div>
   
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
 </li>
 
 <li className="method-list-item">
@@ -79,6 +83,10 @@ Count algorithm to use to count rows in a table.
 
   </div>
   
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
 </li>
 
 <li className="method-list-item">
@@ -107,12 +115,6 @@ Rollback the operation
 
 </ul>
 
-## Notes
-
-- By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-  This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation.
-  If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
-
 ## Examples
 
 ### Create a record
@@ -121,6 +123,15 @@ Rollback the operation
 const { data, error } = await supabase
   .from('cities')
   .insert([{ name: 'The Shire', country_id: 554 }])
+```
+
+### Create a record and return it
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .insert([{ name: 'The Shire', country_id: 554 }])
+  .select()
 ```
 
 ### Bulk create
@@ -133,23 +144,4 @@ const { data, error } = await supabase.from('cities').insert([
   { name: 'The Shire', country_id: 554 },
   { name: 'Rohan', country_id: 555 },
 ])
-```
-
-### Upsert
-
-For upsert, if set to true, primary key columns would need to be included
-in the data parameter in order for an update to properly happen. Also, primary keys
-used must be natural, not surrogate. There are however,
-[workarounds](https://github.com/PostgREST/postgrest/issues/1118)
-for surrogate primary keys.
-
-```js
-const { data, error } = await supabase.from('cities').insert(
-  [
-    { name: 'The Shire', country_id: 554 },
-    { name: 'Rohan', country_id: 555 },
-    { name: 'City by the Bay', country_id: 840 },
-  ],
-  { upsert: true }
-)
 ```
