@@ -163,9 +163,9 @@ function BlogPostPage(props: any) {
         </div>
       </div>
       <div>
-        <p className="text-scale-1200">On this page</p>
         <div>
-          <div className={['prose prose-toc'].join(' ')}>
+          <p className="text-scale-1200 mb-4">On this page</p>
+          <div className="prose-toc">
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
