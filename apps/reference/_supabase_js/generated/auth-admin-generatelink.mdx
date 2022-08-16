@@ -1,19 +1,23 @@
 ---
-id: auth-signinwithotp
-title: 'signInWithOtp()'
-slug: /auth-signinwithotp
+id: auth-admin-generatelink
+title: 'generateLink()'
+slug: /auth-admin-generatelink
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Passwordless method for logging in an existing user.
+Generates links to be sent via email or other.
 
 ```js
-const { data, error } = await supabase.auth.signInWithOtp({
-  email: 'example@email.com',
-})
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
+)
 ```
 
 ## Parameters
@@ -23,42 +27,25 @@ const { data, error } = await supabase.auth.signInWithOtp({
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      SignInWithPasswordlessCredentials
+      GenerateLinkType
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>reflection</code> | <code>reflection</code>
+      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code> | <code>email_change_current</code> | <code>email_change_new</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The link type
 
   </div>
   
 <ul className="method-list-group">
   <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
 
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      phone
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's phone number.
-
-  </div>
-  
 </li>
 
 <li className="method-list-item">
@@ -75,7 +62,7 @@ The user's phone number.
   </h4>
   <div class="method-list-item-description">
 
-The user's email address.
+The user's email.
 
   </div>
   
@@ -86,8 +73,8 @@ The user's email address.
     <span className="method-list-item-label-name">
       options
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -105,7 +92,27 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      captchaToken
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Optional user metadata. For signup only.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -116,7 +123,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Verification token received when the user completes the captcha on the site.
+User password. For signup only.
 
   </div>
   
@@ -125,7 +132,7 @@ Verification token received when the user completes the captcha on the site.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      emailRedirectTo
+      redirectTo
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -136,34 +143,10 @@ Verification token received when the user completes the captcha on the site.
   </h4>
   <div class="method-list-item-description">
 
-The redirect url embedded in the email link
+The redirect url which should be appended to the generated link
 
   </div>
   
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      shouldCreateUser
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>boolean</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-If set to false, this method will not create a new user. Defaults to true.
-
-  </div>
-  
-</li>
-
-</ul>
-
 </li>
 
 </ul>
@@ -174,30 +157,28 @@ If set to false, this method will not create a new user. Defaults to true.
 
 ## Notes
 
-- This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
-- Requires either an email or phone number.
-- If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
-- If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
-- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+- Requires a `service_role` key.
+- This function should only be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 
-### Sign in with email.
-
-The user will be sent an otp to their email. By default, a given user can only request an otp once every 60 seconds.
+### Generate a signup link.
 
 ```js
-const { data, error } = await supabase.auth.signInWithOtp({
-  email: 'example@email.com',
-})
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
+)
 ```
 
-### Sign in with sms otp.
-
-The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
+### Generate an invite link.
 
 ```js
-const { data, error } = await supabase.auth.signInWithPassword({
-  phone: '+13334445555',
-})
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'invite',
+)
 ```
