@@ -225,6 +225,24 @@ For example, Auth has a config parameter called "storageKey", which was was ofte
 
 </details>
 
+### Better Errors
+
+We've created error types for all of the sub-libraries in `supabase-js`. Here's a example for Edge Functions:
+
+```ts
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+
+const { data: user, error } = await supabase.functions.invoke('hello')
+
+if (error instanceof FunctionsHttpError) {
+  console.log('Function returned an error', error.message)
+} else if (error instanceof FunctionsRelayError) {
+  console.log('Relay error:', error.message)
+} else if (error instanceof FunctionsFetchError) {
+  console.log('Fetch error:', error.message)
+}
+```
+
 ## Community
 
 Version 2.0 is the result of the combined work of over 100 contributors to our libraries, and over 450 contributors to our docs and websites.
