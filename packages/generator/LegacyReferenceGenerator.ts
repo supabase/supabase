@@ -136,7 +136,7 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
     paramDefinition.type?.dereferenced?.id
       ? paramDefinition.type?.dereferenced
       : paramDefinition
-  let children = param.type?.declaration?.children
+  let children = param.type?.declaration?.children ?? param.children
 
   const labelParams = {
     name: param.name,
