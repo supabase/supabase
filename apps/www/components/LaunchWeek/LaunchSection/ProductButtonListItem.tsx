@@ -14,11 +14,11 @@ export const ProductButtonListItem = (props: Article) => {
           transition
           dark:drop-shadow-sm"
         >
-          <div className="w-6">
+          <div className="w-5">
             <SparklesIcon strokeWidth={1} />
           </div>
           <div className="flex flex-col items-start gap-0">
-            <span className="group-hover:text-brand-900 text-base">{props.title}</span>
+            <span className="group-hover:text-brand-900 text-sm">{props.title}</span>
             <span className="text-scale-900 text-sm">{props.description}</span>
           </div>
         </button>
