@@ -33,7 +33,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
           })
@@ -42,230 +42,106 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp(
+          const { data, error } = await supabase.auth.signUp(
             {
               email: 'example@email.com',
               password: 'example-password',
-            },
-            {
-              data: { 
-                first_name: 'John', 
-                age: 27,
+              options: {
+                data: { 
+                  first_name: 'John', 
+                  age: 27,
+                }
               }
             }
           )
           ```
-      - name: Sign up with third-party providers.
-        hideCodeBlock: true
+  auth.signInWithPassword():
+    title: 'signInWithPassword()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    example:
+      - name: Sign in with Email.
         description: |
-          You can sign up with OAuth providers using the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers) method.
-      - name: Sign up with Phone.
+          Sign in with email and password. After a user has verified their email, they can use the [`signInWithPassword()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+      - name: Sign in with Phone.
         description: |
           Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
             password: 'some-password',
           })
 
           // After receiving an SMS with One Time Password.
-          let { session, error } = await supabase.auth.verifyOTP({
+          let { data, error } = await supabase.auth.verifyOtp({
             phone: '+13334445555',
             token: '123456',
           })
           ```
-
-  auth.signInWithPassword():
-    title: 'signInWithPassword()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
-    notes: |
-      - A user can sign up either via email or phone.
-    examples:
-      - name: Sign in with email.
-        isSpotlight: true
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signInWithPassword({
-            email: 'example@email.com',
-            password: 'example-password',
-          })
-          ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signInWithPassword({
-            phone: '+13334445555',
-            password: 'some-password',
-          })
-          ```
-      - name: Sign in with redirect.
-        description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signInWithPassword({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
-          ```
-
   auth.signInWithOtp():
     title: 'signInWithOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
-      - A user can sign up either via email or OAuth.
-      - If you provide `email` without a `password`, the user will be sent a magic link.
+      - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
+      - Requires either an email or phone number. 
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp. 
+      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp. 
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Specifying a `provider` will open the browser to the relevant login page.
     examples:
       - name: Sign in with email.
         isSpotlight: true
+        description: The user will be sent an otp to their email. By default, a given user can only request an otp once every 60 seconds.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOtp({
             email: 'example@email.com',
-            password: 'example-password',
           })
           ```
-      - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+      - name: Sign in with sms otp.
+        isSpotlight: true
+        description: The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com'
-          })
-          ```
-      - name: Sign in using third-party providers.
-        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', and more
-            provider: 'github'
-          })
-          ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
-            password: 'some-password',
           })
           ```
-      - name: Sign in with redirect.
-        description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
-          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
-          ```
-      - name: Sign in with scopes.
-        description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
-          })
-          const oAuthToken = session.provider_token // use to access provider API
-          ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signInWithOAuth():
     title: 'signInWithOAuth()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
-      - A user can sign up either via email or OAuth.
-      - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-      - Specifying a `provider` will open the browser to the relevant login page.
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
     examples:
-      - name: Sign in with email.
-        isSpotlight: true
+      - name: Sign in using a third-party provider.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com',
-            password: 'example-password',
-          })
-          ```
-      - name: Sign in with magic link.
-        description: If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            email: 'example@email.com'
-          })
-          ```
-      - name: Sign in using third-party providers.
-        description: Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            // provider can be 'github', 'google', 'gitlab', and more
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
           })
           ```
-      - name: Sign in with Phone.
-        description: Supabase supports Phone Auth.
-        js: |
-          ```js
-          const { user, session, error } = await supabase.auth.signIn({
-            phone: '+13334445555',
-            password: 'some-password',
-          })
-          ```
-      - name: Sign in with redirect.
+      - name: Sign in using a third-party provider with redirect.
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
-          the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+          The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
+          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for 
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { user, session, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
-          }, {
-            redirectTo: 'https://example.com/welcome'
-          })
+            options: {
+              redirectTo: 'https://example.com/welcome'
+            }
+          }
           ```
       - name: Sign in with scopes.
         description: |
@@ -273,33 +149,14 @@ pages:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
         js: |
           ```js
-          const { user, session, error } = await supabase.auth.signIn({
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'github'
-          }, {
-            scopes: 'repo gist notifications'
+            options: {
+              scopes: 'repo gist notifications'
+            }
           })
-          const oAuthToken = session.provider_token // use to access provider API
+          const oAuthToken = data.session.provider_token // use to access provider API
           ```
-      - name: Sign in using a refresh token (e.g. in React Native).
-        description: |
-          If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-        js: |
-          ```js
-          // An example using Expo's `AuthSession`
-          const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
-          const provider = 'google';
-
-          AuthSession.startAsync({
-            authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-            returnUrl: redirectUri,
-          }).then(async (response: any) => {
-            if (!response) return;
-            const { user, session, error } = await supabase.auth.signIn({
-              refreshToken: response.params?.refresh_token,
-            });
-          });
-          ```
-
   auth.signOut():
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
@@ -310,7 +167,6 @@ pages:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
-
   auth.getSession():
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -319,25 +175,30 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const session = supabase.auth.session()
+          const { data, error } = supabase.auth.getSession()
           ```
-
   auth.getUser():
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
-      This method gets the user object from memory.
+      - This method gets the user object using the current session.
+      - Fetches the user object from the database instead of local storage.
     examples:
-      - name: Get the logged in user
+      - name: Get the logged in user with the current existing session
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const user = supabase.auth.getUser()
           ```
-
-  auth.update():
-    title: 'update()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.update'
+      - name: Get the logged in user with a custom access token jwt.
+        isSpotlight: true
+        js: |
+          ```js
+          const user = supabase.auth.getUser(jwt)
+          ```
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
       To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
@@ -351,13 +212,13 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({password: 'new password'})
+          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
       - name: Update a user's metadata.
         isSpotlight: true
@@ -367,66 +228,18 @@ pages:
             data: { hello: 'world' } 
           })
           ```
-
   auth.setSession():
     title: 'setSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
     examples:
       - name: Basic example.
-        description: This is most useful on server-side functions where you cannot log the user in, but have access to the user's access token.
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         isSpotlight: true
         js: |
           ```js
-          function apiFunction(req, res) {
-            // Assuming the access token was sent as a header "X-Supabase-Auth"
-            const { access_token } = req.get('X-Supabase-Auth') 
-
-            // You can now use it within a Supabase Client 
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-            const { user, error } = supabase.auth.setAuth(access_token)
-
-            // This client will now send requests as this user
-            const { data } = await supabase.from('your_table').select()
+            const { data, error } = supabase.auth.setSession(refresh_token)
           }
           ```
-      - name: With Express.
-        isSpotlight: true
-        js: |
-          ```js
-
-          /**
-          * Make a request from the client to your server function
-          */
-          async function makeApiRequest() {
-            const token = newClient.session()?.access_token
-
-            await fetch('https://example.com/withAuth', {
-               method: 'GET',
-               withCredentials: true,
-               credentials: 'include',
-               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': bearer, // Your own auth
-                'X-Supabase-Auth': token, // Set the Supabase user
-               }
-            })
-          }
-
-          /**
-          * Use the Auth token in your server-side function.
-          */
-          async function apiFunction(req, res) {
-            const { access_token } = req.get('X-Supabase-Auth') 
-
-            // You can now use it within a Supabase Client 
-            const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
-            const { user, error } = supabase.auth.setAuth(access_token)
-
-            // This client will now send requests as this user
-            const { data } = await supabase.from('your_table').select()
-          }
-          ```
-
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
@@ -481,26 +294,9 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  auth.api.getUser():
-    title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
-    notes: |
-      - Fetches the user object from the database instead of local storage.
-      - Note that user() fetches the user object from local storage which might not be the most updated.
-      - Requires the user's access_token.
-    examples:
-      - name: Fetch the user object using the access_token jwt.
-        isSpotlight: true
-        js: |
-          ```js
-          const { user, error } = await supabase.auth.api.getUser(
-            'ACCESS_TOKEN_JWT',
-          )
-          ```
-
-  auth.api.listUsers():
+  auth.admin.listUsers():
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -509,12 +305,11 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.listUsers()
+          const { data: user, error } = await supabase.auth.admin.listUsers()
           ```
-
-  auth.api.createUser():
+  auth.admin.createUser():
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -524,7 +319,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             email: 'user@email.com',
             password: 'password',
             user_metadata: { name: 'Yoda' }
@@ -534,7 +329,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             email: 'user@email.com',
             email_confirm: true
           })
@@ -543,15 +338,14 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.createUser({
+          const { data, error } = await supabase.auth.admin.createUser({
             phone: '1234567890',
             phone_confirm: true
           })
           ```
-
-  auth.api.deleteUser():
+  auth.admin.deleteUser():
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -560,14 +354,14 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.deleteUser(
+          const { data, error } = await supabase.auth.admin.deleteUser(
             '715ed5db-f090-4b8c-a067-640ecee36aa0'
           )
           ```
 
-  auth.api.inviteUserByEmail():
+  auth.admin.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -576,34 +370,16 @@ pages:
         isSpotlight: false
         js: |
           ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .inviteUserByEmail('email@example.com')
+          const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
           ```
 
-  auth.api.sendMobileOTP():
-    title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Basic example.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .sendMobileOTP('12345879')
-          ```
-
-  auth.api.resetPasswordForEmail():
+  auth.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
-      When the user clicks the reset link in the email they will be forwarded to:
+      When the user clicks the reset link in the email they will be forwarded to the site url or the redirect url specified:
 
       `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
 
@@ -612,38 +388,50 @@ pages:
       You should then use the access_token in the url and new password to update the user as follows:
 
       ```js
-      const { error, data } = await supabase.auth.api
-            .updateUser(access_token, { password : new_password })
+      const { error, data } = await supabase.auth.updateUser({ password : new_password })
       ```
     examples:
       - name: Reset password
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase.auth.api
-            .resetPasswordForEmail('user@email.com')
+          const { error, data } = await supabase.auth.resetPasswordForEmail(email, options: {
+            redirectTo: 'https://example.com/update-password',
+          })
           ```
 
-  auth.api.generateLink():
+  auth.admin.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Generate invite link.
-        isSpotlight: false
+      - name: Generate a signup link.
+        isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.generateLink(
-            'invite',
+          const { data, error } = await supabase.auth.admin.generateLink(
             'email@example.com'
+            'signup',
+            {
+              'password': 'secret'
+            }
+          )
+          ```
+      - name: Generate an invite link.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink(
+            'email@example.com'
+            'invite',
           )
           ```
 
-  auth.api.updateUserById():
+  auth.admin.updateUserById():
     title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -652,7 +440,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { email: 'new@email.com' }
           )
@@ -661,7 +449,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { password: 'new_password' }
           )
@@ -670,7 +458,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { user_metadata: { hello: 'world' } }
           )
@@ -679,7 +467,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { app_metadata: { plan: 'trial' } }
           )
@@ -688,7 +476,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { email_confirm: true }
           )
@@ -697,7 +485,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data: user, error } = await supabase.auth.api.updateUserById(
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
             '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
             { phone_confirm: true }
           )
