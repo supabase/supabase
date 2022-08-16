@@ -4,10 +4,11 @@ import Table from 'components/to-be-cleaned/Table'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
 import { DATETIME_FORMAT } from '../Reports.constants'
+import { PathsDatum, StatusCodesDatum } from '../Reports.types'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps } from '../ReportWidget'
 
-export const renderStatusCodesChart = (props: ReportWidgetProps) => (
+export const renderStatusCodesChart = (props: ReportWidgetProps<StatusCodesDatum>) => (
   <StackedAreaChart
     dateFormat={DATETIME_FORMAT}
     data={props.data}
@@ -28,7 +29,7 @@ export const renderStatusCodesChart = (props: ReportWidgetProps) => (
   />
 )
 
-export const renderRequestsPathsTable = (props: ReportWidgetProps) => {
+export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) => {
   const requestPathsSums = props.data.map((v) => v.sum) as number[]
   const requestPathsSumMax = Math.max(...requestPathsSums)
   const requestPathsSumMin = Math.min(...requestPathsSums)

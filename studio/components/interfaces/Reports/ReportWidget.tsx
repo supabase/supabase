@@ -7,8 +7,8 @@ import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'
 import { LogsEndpointParams } from '../Settings/Logs'
 
-export interface ReportWidgetProps {
-  data: any[]
+export interface ReportWidgetProps<T = any> {
+  data: T[]
   title: string
   description: string
   className?: string
