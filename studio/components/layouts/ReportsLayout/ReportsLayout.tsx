@@ -2,8 +2,6 @@ import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth } from 'hooks'
-import { generateSettingsMenu } from './SettingsMenu.utils'
-
 import BaseLayout from '..'
 import ProductMenu from 'components/ui/ProductMenu'
 
