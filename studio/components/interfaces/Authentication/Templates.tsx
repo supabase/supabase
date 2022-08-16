@@ -17,11 +17,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 const Templates: FC<any> = ({ project }) => {
   const router = useRouter()
   const { ui } = useStore()
-  const magicLinkEnable = semver.gte(
-    // @ts-ignore
-    semver.coerce(toJS(project?.kpsVersion) || 'kps-v0.0.1'),
-    semver.coerce('kps-v2.5.3')
-  )
+  const magicLinkEnable = IS_PLATFORM
+    ? semver.gte(
+        // @ts-ignore
+        semver.coerce(project?.kpsVersion ?? 'kps-v0.0.1'),
+        semver.coerce('kps-v2.5.3')
+      )
+    : true
 
   const canUpdateTemplates = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
