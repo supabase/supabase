@@ -1,0 +1,110 @@
+---
+id: cli
+title: Supabase CLI
+description: The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
+sidebar_label: Overview
+toc_max_heading_level: 2
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.
+You can also use the CLI to manage your Supabase projects, handle database migrations and CI/CD workflows, and generate types directly from your database schema.
+
+## Installation
+
+<Tabs
+  groupId="platform"
+  defaultValue="macos"
+  values={[
+    {label: 'macOS', value: 'macos'},
+    {label: 'Windows', value: 'windows'},
+    {label: 'Linux', value: 'linux'},
+  ]}>
+<TabItem value="macos">
+
+Install the CLI with [Homebrew](https://brew.sh):
+
+```sh
+brew install supabase/tap/supabase
+```
+
+</TabItem>
+
+<TabItem value="windows">
+
+Install the CLI with [Scoop](https://scoop.sh):
+
+```powershell
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
+
+</TabItem>
+
+<TabItem value="linux">
+
+The CLI is available through [Homebrew](https://brew.sh) and Linux packages.
+
+### Homebrew
+
+```sh
+brew install supabase/tap/supabase
+```
+
+### Linux packages
+
+Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
+To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager
+and run one of the following:
+
+- `sudo apk add --allow-untrusted <...>.apk`
+- `sudo dpkg -i <...>.deb`
+- `sudo rpm -i <...>.rpm`
+
+</TabItem>
+</Tabs>
+
+## Updates
+
+When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
+
+<Tabs
+  groupId="platform"
+  defaultValue="macos"
+  values={[
+    {label: 'macOS', value: 'macos'},
+    {label: 'Windows', value: 'windows'},
+    {label: 'Linux', value: 'linux'},
+  ]}>
+<TabItem value="macos">
+
+```sh
+brew upgrade supabase
+```
+
+</TabItem>
+
+<TabItem value="windows">
+
+```powershell
+scoop update supabase
+```
+
+</TabItem>
+
+<TabItem value="linux">
+
+```sh
+brew upgrade supabase
+```
+
+</TabItem>
+</Tabs>
+
+## See also
+
+- [Supabase CLI Reference](/docs/reference/cli/usage)
+- [Local Development](/docs/guides/cli/local-development)
+- [CI/CD Workflow](/docs/guides/cli/cicd-workflow)
