@@ -35,7 +35,7 @@ export const PRESET_CONFIG = {
   [Presets.OVERVIEW]: {
     title: 'Overview',
     sql: {
-      statusCodes: () => `
+      statusCodes: `
   select 
     timestamp_trunc(timestamp, hour) as timestamp,
     r.status_code as status_code,
@@ -49,7 +49,7 @@ export const PRESET_CONFIG = {
     status_code
   ORDER BY
     timestamp ASC`,
-      requestPaths: (limit: number) => `
+      requestPaths: `
   select
     f2.path as path,
     f2.search as query_params,
@@ -74,7 +74,7 @@ export const PRESET_CONFIG = {
     sum DESC, 
     count desc, 
     avg_origin_time DESC 
-  LIMIT ${limit}
+  LIMIT 50
 `
     },
   },
