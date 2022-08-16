@@ -16,39 +16,37 @@ All client specific options within the constructor are keyed to the library: [PR
 
 ```jsx
 const supabase = createClient(apiURL, apiKey, {
-    // subclient specific options
-    // should map 1 - 1 with the constructor options of the underlying library
-    // any options here will override the common options later on in the client
-    db: {
-      schema: 'public',
-    },
-    auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-    },   
-    // realtime already does this :heart-eyes:
-    realtime: {
-        channels,
-        endpoint,
-    },
-    // common across all libraries
-	global: {
-        fetch: customFetch,
-        headers: DEFAULT_HEADERS
-	}
-});
+  // subclient specific options
+  // should map 1 - 1 with the constructor options of the underlying library
+  // any options here will override the common options later on in the client
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  // realtime already does this :heart-eyes:
+  realtime: {
+    channels,
+    endpoint,
+  },
+  // common across all libraries
+  global: {
+    fetch: customFetch,
+    headers: DEFAULT_HEADERS,
+  },
+})
 ```
 
 ### Typescript support
 
-
 The libraries now support typescript.
 
 ```ts
-
 // v2 - definitions are injected in `createClient()`
-import type { Database } from "./DatabaseDefinitions";
+import type { Database } from './DatabaseDefinitions'
 const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
 const { data } = await supabase.from('messages').select().match({ id: 1 })
 
@@ -76,6 +74,7 @@ const { data, error } = await supabase
     .eq('id', 1)
     .select()
 ```
+
 ### New ordering defaults
 
 `.order()` now defaults to Postgres’s default: [PR](https://github.com/supabase/postgrest-js/pull/283).
@@ -87,13 +86,15 @@ Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. 
 Storage key name in the Auth library has changed to include project reference which means that existing website that had their JWT expiry set to a longer time could find their user’s logged out with this upgrade.
 
 ```jsx
-const defaultStorageKey = `sb-${new URL(this.authUrl).hostname.split('.')[0]}-auth-token`
+const defaultStorageKey = `sb-${
+  new URL(this.authUrl).hostname.split('.')[0]
+}-auth-token`
 ```
 
 ### New Auth Types
 
 Typescript typings have been reworked. `Session` interface now guarantees that it will always have an `access_token`, `refresh_token` and `user`
-    
+
 ```jsx
 interface Session {
     provider_token?: string | null
@@ -158,11 +159,10 @@ We will deprecate the `.from().on().subscribe()` method previosuly used for list
 
 Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead, pass the custom header into the `createClient()` method provided: ([PR](https://github.com/supabase/gotrue-js/pull/340))
 
-
 ### All changes
 
 - `supabase-js`
-  - `shouldThrowOnError` has been removed until all the client libraries support this option ([PR](https://github.com/supabase/supabase-js/pull/490)). 
+  - `shouldThrowOnError` has been removed until all the client libraries support this option ([PR](https://github.com/supabase/supabase-js/pull/490)).
 - `postgrest-js`
   - TypeScript typings have been reworked [PR](https://github.com/supabase/postgrest-js/pull/279)
   - Use `undefined` instead of `null` for function params, types, etc. (https://github.com/supabase/postgrest-js/pull/278)
@@ -174,16 +174,16 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
     - client-level `throwOnError`
 - `gotrue-js`
   - `supabase-js` client allows passing a `storageKey` param which will allow the user to set the key used in local storage for storing the session. By default, this will be namespace-d with the supabase project ref. ([PR](https://github.com/supabase/supabase-js/pull/460))
-  - `signIn` method is now split into `signInWithPassword` , `signInWithPasswordless` , `signInWithOAuth`  ([PR](https://github.com/supabase/gotrue-js/pull/304))
+  - `signIn` method is now split into `signInWithPassword` , `signInWithPasswordless` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
   - Deprecated and removed `session()` , `user()` in favour of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
   - Deprecated and removed setting for `multitab` support because `getSession()` and gotrue’s reuse interval setting takes care of session management across multiple tabs ([PR](https://github.com/supabase/gotrue-js/pull/366))
   - No more throwing of random errors, gotrue-js v2 always returns a custom error type: ([PR](https://github.com/supabase/gotrue-js/pull/341))
-      - `AuthSessionMissingError`
-          - Indicates that a session is expected but missing
-      - `AuthNoCookieError`
-          - Indicates that a cookie is expected but missing
-      - `AuthInvalidCredentialsError`
-          - Indicates that the incorrect credentials were passed
+    - `AuthSessionMissingError`
+      - Indicates that a session is expected but missing
+    - `AuthNoCookieError`
+      - Indicates that a cookie is expected but missing
+    - `AuthInvalidCredentialsError`
+      - Indicates that the incorrect credentials were passed
   - Renamed the `api` namespace to `admin` , the `admin` namespace will only contain methods that should only be used in a trusted server-side environment with the service role key
   - Moved `resetPasswordForEmail` , `getUser` and `updateUser` to the `GoTrueClient` which means they will be accessible from the `supabase.auth` namespace in `supabase-js` instead of having to do `supabase.auth.api` to access them
   - Removed `sendMobileOTP` , `sendMagicLinkEmail` in favor of `signInWithOtp`
@@ -193,7 +193,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - Return types are more strict. Functions types used to indicate that the data returned could be null even if there was no error. We now make use of union types which only mark the data as null if there is an error and vice versa. ([PR](https://github.com/supabase/storage-js/pull/60))
   - The `upload` and `update` function returns the path of the object uploaded as the `path` parameter. Previously the returned value had the bucket name prepended to the path which made it harder to pass the value on to other storage-js methods since all methods take the bucket name and path separately. We also chose to call the returned value `path` instead of `Key` ([PR](https://github.com/supabase/storage-js/pull/75))
   - `getPublicURL` only returns the public URL inside the data object. This keeps it consistent with our other methods of returning only within the data object. No error is returned since this method cannot does not throw an error ([PR](https://github.com/supabase/storage-js/pull/93))
-  - signed urls are returned as `signedUrl` instead of `signedURL` in both `createSignedUrl` and `createSignedUrls`  ([PR](https://github.com/supabase/storage-js/pull/94))
+  - signed urls are returned as `signedUrl` instead of `signedURL` in both `createSignedUrl` and `createSignedUrls` ([PR](https://github.com/supabase/storage-js/pull/94))
   - Encodes URLs returned by `createSignedUrl`, `createSignedUrls` and `getPublicUrl` ([PR](https://github.com/supabase/storage-js/pull/86))
   - `createsignedUrl` used to return a url directly and and within the data object. This was inconsistent. Now we always return values only inside the data object across all methods. ([PR](https://www.notion.so/LW5-supabase-js-v2-7b0bfcdf571d4f20b9b7a9308883f24b))
   - `createBucket` returns a data object instead of the name of the bucket directly. ([PR](https://github.com/supabase/storage-js/pull/89))
@@ -213,4 +213,4 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - supabase-js v1 only threw an error if the fetch call itself threw an error (network errors, etc) and not if the function returned HTTP errors like 400s or 500s. We have changed this behaviour to return an error if your function throws an error.
   - We have introduced new error types to distinguish between different kinds of errors. A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
   - The correct content-type headers are automatically attached when sending the request if you don’t pass in a `Content-Type` header and pass in an argument to your function. We automatically attach the content type for `Blob`, `ArrayBuffer`, `File`, `FormData` ,`String` . If it doesn’t match any of these we assume the payload is `json` , we serialise the payload as JSON and attach the content type as `application/json`.
-  - `responseType` does not need to be explicitly passed in. We parse the response based on the `Content-Type`  response header sent by the function. We support parsing the responses as `text`, `json`, `blob`, `form-data` and are parsed as `text` by default.
+  - `responseType` does not need to be explicitly passed in. We parse the response based on the `Content-Type` response header sent by the function. We support parsing the responses as `text`, `json`, `blob`, `form-data` and are parsed as `text` by default.
