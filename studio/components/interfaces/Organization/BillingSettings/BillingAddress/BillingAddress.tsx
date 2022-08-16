@@ -4,7 +4,7 @@ import { Dictionary } from 'components/grid'
 import { Form, Input, Button, Select } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
@@ -22,11 +22,11 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
   const orgSlug = ui.selectedOrganization?.slug ?? ''
   const { city, country, line1, line2, postal_code, state } = address
 
+  const enablePermissions = useFlag('enablePermissions')
   const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = checkPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
-  )
+  const canUpdateBillingAddress = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.customer')
+    : ui.selectedOrganization?.is_owner
 
   const [isDirty, setIsDirty] = useState(false)
   const initialValues = {

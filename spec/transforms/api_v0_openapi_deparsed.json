@@ -33,14 +33,22 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "organization_id", "name", "region", "created_at"]
+                    "required": [
+                      "id",
+                      "organization_id",
+                      "name",
+                      "region",
+                      "created_at"
+                    ]
                   }
                 }
               }
             }
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -69,7 +77,10 @@
                   },
                   "plan": {
                     "type": "string",
-                    "enum": ["free", "pro"]
+                    "enum": [
+                      "free",
+                      "pro"
+                    ]
                   },
                   "region": {
                     "type": "string",
@@ -89,7 +100,13 @@
                     ]
                   }
                 },
-                "required": ["db_pass", "name", "organization_id", "plan", "region"]
+                "required": [
+                  "db_pass",
+                  "name",
+                  "organization_id",
+                  "plan",
+                  "region"
+                ]
               }
             }
           }
@@ -118,13 +135,21 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at"]
+                  "required": [
+                    "id",
+                    "organization_id",
+                    "name",
+                    "region",
+                    "created_at"
+                  ]
                 }
               }
             }
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -155,7 +180,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"]
+                    "required": [
+                      "id",
+                      "name"
+                    ]
                   }
                 }
               }
@@ -165,7 +193,9 @@
             "description": "Unexpected error listing organizations"
           }
         },
-        "tags": ["organizations"],
+        "tags": [
+          "organizations"
+        ],
         "security": [
           {
             "bearer": []
@@ -187,7 +217,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["name"]
+                "required": [
+                  "name"
+                ]
               }
             }
           }
@@ -207,7 +239,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"]
+                  "required": [
+                    "id",
+                    "name"
+                  ]
                 }
               }
             }
@@ -216,7 +251,9 @@
             "description": "Unexpected error creating an organization"
           }
         },
-        "tags": ["organizations"],
+        "tags": [
+          "organizations"
+        ],
         "security": [
           {
             "bearer": []
@@ -262,7 +299,11 @@
                         "type": "string"
                       },
                       "status": {
-                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                        "enum": [
+                          "ACTIVE",
+                          "REMOVED",
+                          "THROTTLED"
+                        ],
                         "type": "string"
                       },
                       "version": {
@@ -296,7 +337,9 @@
             "description": "Failed to retrieve project's functions"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -341,7 +384,11 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["slug", "name", "body"]
+                "required": [
+                  "slug",
+                  "name",
+                  "body"
+                ]
               }
             }
           }
@@ -364,7 +411,11 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "enum": [
+                        "ACTIVE",
+                        "REMOVED",
+                        "THROTTLED"
+                      ],
                       "type": "string"
                     },
                     "version": {
@@ -397,7 +448,9 @@
             "description": "Failed to create project's function"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -459,7 +512,11 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "enum": [
+                        "ACTIVE",
+                        "REMOVED",
+                        "THROTTLED"
+                      ],
                       "type": "string"
                     },
                     "version": {
@@ -495,7 +552,9 @@
             "description": "Failed to retrieve function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -568,7 +627,11 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "enum": [
+                        "ACTIVE",
+                        "REMOVED",
+                        "THROTTLED"
+                      ],
                       "type": "string"
                     },
                     "version": {
@@ -601,7 +664,9 @@
             "description": "Failed to update function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -643,7 +708,9 @@
             "description": "Failed to delete function with given slug"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -686,7 +753,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["name", "value"]
+                    "required": [
+                      "name",
+                      "value"
+                    ]
                   }
                 }
               }
@@ -696,7 +766,9 @@
             "description": "Failed to retrieve project's secrets"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -737,7 +809,10 @@
                       "pattern": {}
                     }
                   },
-                  "required": ["name", "value"]
+                  "required": [
+                    "name",
+                    "value"
+                  ]
                 }
               }
             }
@@ -751,7 +826,9 @@
             "description": "Failed to create project's secrets"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -803,7 +880,9 @@
             "description": "Failed to delete secrets with given names"
           }
         },
-        "tags": ["projects"],
+        "tags": [
+          "projects"
+        ],
         "security": [
           {
             "bearer": []
@@ -857,7 +936,13 @@
             "type": "string"
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at"]
+        "required": [
+          "id",
+          "organization_id",
+          "name",
+          "region",
+          "created_at"
+        ]
       },
       "CreateProjectBody": {
         "type": "object",
@@ -873,7 +958,10 @@
           },
           "plan": {
             "type": "string",
-            "enum": ["free", "pro"]
+            "enum": [
+              "free",
+              "pro"
+            ]
           },
           "region": {
             "type": "string",
@@ -893,7 +981,13 @@
             ]
           }
         },
-        "required": ["db_pass", "name", "organization_id", "plan", "region"]
+        "required": [
+          "db_pass",
+          "name",
+          "organization_id",
+          "plan",
+          "region"
+        ]
       },
       "OrganizationResponse": {
         "type": "object",
@@ -905,7 +999,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "CreateOrganizationBody": {
         "type": "object",
@@ -914,7 +1011,9 @@
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "FunctionResponse": {
         "type": "object",
@@ -929,7 +1028,11 @@
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "enum": [
+              "ACTIVE",
+              "REMOVED",
+              "THROTTLED"
+            ],
             "type": "string"
           },
           "version": {
@@ -945,7 +1048,15 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "status",
+          "version",
+          "created_at",
+          "updated_at"
+        ]
       },
       "CreateFunctionBody": {
         "type": "object",
@@ -964,7 +1075,11 @@
             "type": "boolean"
           }
         },
-        "required": ["slug", "name", "body"]
+        "required": [
+          "slug",
+          "name",
+          "body"
+        ]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -979,7 +1094,11 @@
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "enum": [
+              "ACTIVE",
+              "REMOVED",
+              "THROTTLED"
+            ],
             "type": "string"
           },
           "version": {
@@ -998,7 +1117,15 @@
             "type": "string"
           }
         },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "status",
+          "version",
+          "created_at",
+          "updated_at"
+        ]
       },
       "UpdateFunctionBody": {
         "type": "object",
@@ -1024,7 +1151,10 @@
             "type": "string"
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
       },
       "CreateSecretBody": {
         "type": "object",
@@ -1037,7 +1167,10 @@
             "pattern": {}
           }
         },
-        "required": ["name", "value"]
+        "required": [
+          "name",
+          "value"
+        ]
       }
     }
   }

@@ -116,6 +116,7 @@ const RedirectDomains = () => {
                     form="new-domain-form"
                     htmlType="submit"
                     size="medium"
+                    disabled={isSubmitting}
                     loading={isSubmitting}
                   >
                     Add domain
