@@ -1,72 +1,29 @@
 ---
 id: storage-listbuckets
-title: "listBuckets()"
+title: 'listBuckets()'
 slug: storage-listbuckets
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Retrieves the details of all Storage buckets within an existing project.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .listBuckets()
+const { data, error } = await supabase.storage.listBuckets()
 ```
-
-
-</TabItem>
-
-</Tabs>
-
-
-
-
 
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `select` 
+  - `buckets` permissions: `select`
   - `objects` permissions: none
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### List buckets
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .listBuckets()
+const { data, error } = await supabase.storage.listBuckets()
 ```
-
-
-</TabItem>
-
-</Tabs>

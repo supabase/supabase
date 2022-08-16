@@ -1,0 +1,61 @@
+---
+id: eq
+title: '.eq()'
+slug: /eq
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value on the stated `column` exactly matches the specified `value`.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'The shire')
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'The shire')
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .eq('name', 'San Francisco')
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .eq('name', 'Mordor')
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .eq('name', 'San Francisco')
+  .execute();
+```

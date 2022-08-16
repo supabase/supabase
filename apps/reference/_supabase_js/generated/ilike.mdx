@@ -1,0 +1,103 @@
+---
+id: ilike
+title: '.ilike()'
+slug: /ilike
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value in the stated `column` matches the supplied
+`pattern` (case insensitive).
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .ilike('name', '%la%')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ColumnName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      pattern
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The pattern to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .ilike('name', '%la%')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .ilike('name', '%la%')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .ilike('name', '%la%')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .ilike('name', '%la%')
+```

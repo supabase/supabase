@@ -1,20 +1,22 @@
 // @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github')
-const darkCodeTheme = require('prism-react-renderer/themes/dracula')
+const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
+const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
+
+const baseUrl = '/docs/'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Supabase Tools',
-  tagline: 'Documentation for the Supabase Ecosystem',
-  url: 'https://supabase.tools',
-  baseUrl: '/',
-  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
-  // onBrokenLinks: 'throw',
+  title: 'Supabase',
+  tagline: 'The open source Firebase alternative.',
+  url: 'https://supabase.com',
+  baseUrl: baseUrl,
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: '/favicon.ico',
+  themes: ['docusaurus-theme-search-typesense'],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -29,14 +31,17 @@ const config = {
   },
 
   plugins: [
+    'docusaurus-plugin-sass',
     [
       '@docusaurus/plugin-content-docs',
       {
         id: '_api',
         path: '_api',
-        routeBasePath: 'api',
+        routeBasePath: '/reference/api',
         sidebarPath: require.resolve('./nav/api_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -44,9 +49,11 @@ const config = {
       {
         id: '_cli',
         path: '_cli',
-        routeBasePath: 'cli',
+        routeBasePath: '/reference/cli',
         sidebarPath: require.resolve('./nav/cli_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -54,9 +61,11 @@ const config = {
       {
         id: '_gotrue',
         path: '_gotrue',
-        routeBasePath: 'auth',
+        routeBasePath: '/reference/auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -64,9 +73,11 @@ const config = {
       {
         id: '_storage',
         path: '_storage',
-        routeBasePath: 'storage',
+        routeBasePath: '/reference/storage',
         sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -74,9 +85,11 @@ const config = {
       {
         id: '_supabase_dart',
         path: '_supabase_dart',
-        routeBasePath: 'supabase-dart',
+        routeBasePath: '/reference/dart',
         sidebarPath: require.resolve('./nav/supabase_dart_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -84,9 +97,18 @@ const config = {
       {
         id: '_supabase_js',
         path: '_supabase_js',
-        routeBasePath: 'supabase-js',
+        routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        // lastVersion: 'current',
+        // versions: {
+        //   current: {
+        //     label: 'v2',
+        //     // path: 'v2',
+        //   },
+        // },
       },
     ],
     [
@@ -94,9 +116,11 @@ const config = {
       {
         id: '_auth_helpers',
         path: '_auth_helpers',
-        routeBasePath: 'auth-helpers',
+        routeBasePath: '/reference/auth-helpers',
         sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
   ],
@@ -110,10 +134,12 @@ const config = {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./nav/_referenceSidebars.js'),
           breadcrumbs: false,
+          editUrl:
+            'https://github.com/supabase/supabase/edit/master/apps/reference',
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/css/custom.scss'),
         },
       }),
     ],
@@ -122,14 +148,21 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      navbar: {
-        // title: 'Supabase Tools',
-        logo: {
-          alt: 'Supabase Tools',
-          src: 'img/supabase-logo-wordmark--light.svg',
-          srcDark: 'img/supabase-logo-wordmark--dark.svg',
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
         },
-        items: mainNavbar.navbar,
+      },
+      navbar: {
+        // title: 'Supabase Docs',
+        logo: {
+          alt: 'Supabase Docs',
+          href: 'https://supabase.com',
+          target: '_self',
+          src: '/img/supabase-logo-wordmark--light.svg',
+          srcDark: '/img/supabase-logo-wordmark--dark.svg',
+        },
+        items: mainNavbar.buildNavbar({ baseUrl }),
       },
       footer: {
         links: [
@@ -221,6 +254,27 @@ const config = {
         plugins: ['line-numbers', 'show-language'],
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+
+      typesense: {
+        typesenseCollectionName: 'supabase', // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+
+        typesenseServerConfig: {
+          nodes: [
+            {
+              host: 'doc-search.supabase.com',
+              port: 443,
+              protocol: 'https',
+            },
+          ],
+          apiKey: 't0HAJQy4KtcMk3aYGnm8ONqab2oAysJz',
+        },
+
+        // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+        typesenseSearchParameters: {},
+
+        // Optional
+        contextualSearch: true,
       },
     }),
 }

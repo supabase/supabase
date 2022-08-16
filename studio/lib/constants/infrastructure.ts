@@ -19,7 +19,7 @@ export const REGIONS = {
 }
 
 export const REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
   FREE: 'Free',

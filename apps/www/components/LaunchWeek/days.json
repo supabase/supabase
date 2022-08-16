@@ -1,0 +1,54 @@
+[
+  {
+    "title": "CLI and Admin API",
+    "shipped": true,
+    "date": "15th Aug 2022",
+    "description": "We are moving Supabase CLI v1 out of beta, and releasing Admin API beta.",
+    "d": 1,
+    "dd": "Monday",
+    "youtube_id": "OpPOaJI_Z28",
+    "articles": [
+      {
+        "title": "Supabase CLI v1 and Admin API Beta",
+        "url": "/blog/supabase-cli-v1-and-admin-api-beta",
+        "description": "Read our blog post outlining the new CLI and Admin API.",
+        "products": [
+          {
+            "title": "CLI Docs",
+            "url": "/docs/reference/cli",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "Admin API Docs",
+            "url": "/docs/reference/api",
+            "description": "Learn how to use the new Admin API"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "shipped": false,
+    "date": "16th Aug 2022",
+    "d": 2,
+    "dd": "Tuesday"
+  },
+  {
+    "shipped": false,
+    "date": "17th Aug 2022",
+    "d": 3,
+    "dd": "Wednesday"
+  },
+  {
+    "shipped": false,
+    "date": "18th Aug 2022",
+    "d": 4,
+    "dd": "Thursday"
+  },
+  {
+    "shipped": false,
+    "date": "19th Aug 2022",
+    "d": 5,
+    "dd": "Friday"
+  }
+]

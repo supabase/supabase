@@ -1,0 +1,35 @@
+---
+id: storage-from-remove
+title: 'from.remove()'
+slug: /storage-from-remove
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Deletes files within the same bucket
+
+```dart
+final res = await supabase
+  .storage
+  .from('avatars')
+  .remove(['avatar1.png']);
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `delete` and `select`
+
+## Examples
+
+### Delete file
+
+```dart
+final res = await supabase
+  .storage
+  .from('avatars')
+  .remove(['avatar1.png']);
+```

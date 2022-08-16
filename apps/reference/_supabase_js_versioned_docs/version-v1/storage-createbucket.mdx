@@ -1,35 +1,22 @@
 ---
 id: storage-createbucket
-title: "createBucket()"
+title: 'createBucket()'
 slug: storage-createbucket
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Creates a new Storage bucket
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .createBucket('avatars', { public: false })
+const { data, error } = await supabase.storage.createBucket('avatars', {
+  public: false,
+})
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -53,7 +40,6 @@ A unique identifier for the bucket you are creating.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -68,7 +54,7 @@ A unique identifier for the bucket you are creating.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -89,7 +75,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -101,42 +87,18 @@ No description provided.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: `insert` 
+  - `buckets` permissions: `insert`
   - `objects` permissions: none
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Create bucket
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
-  .createBucket('avatars', { public: false })
+const { data, error } = await supabase.storage.createBucket('avatars', {
+  public: false,
+})
 ```
-
-
-</TabItem>
-
-</Tabs>

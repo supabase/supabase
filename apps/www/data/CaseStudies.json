@@ -6,7 +6,8 @@
     "imgUrl": "images/case-study-monitoro.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Monitoro",
-    "url": "/blog/2020/12/02/case-study-monitoro",
+    "url": "/blog/case-study-monitoro",
+    "path": "/blog/case-study-monitoro",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
@@ -22,7 +23,8 @@
     "imgUrl": "images/case-study-xendit.jpg",
     "logoUrl": "images/logos/xendit.png",
     "organization": "Llama Lab",
-    "url": "/blog/2020/12/02/case-study-xendit",
+    "url": "/blog/case-study-xendit",
+    "path": "/blog/case-study-xendit",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
@@ -38,7 +40,8 @@
     "imgUrl": "images/case-study-tayfab.jpg",
     "logoUrl": "images/logos/monitoro.png",
     "organization": "Tayfab",
-    "url": "/blog/2020/12/02/case-study-tayfa",
+    "url": "/blog/case-study-tayfa",
+    "path": "/blog/case-study-tayfa",
     "postMeta": {
       "name": "Paul Copplestone",
       "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",

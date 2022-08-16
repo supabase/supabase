@@ -1,21 +1,14 @@
 ---
 id: delete
-title: "Delete data: delete()"
+title: 'Delete data: delete()'
 slug: delete
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Performs a DELETE on the table.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -24,13 +17,7 @@ const { data, error } = await supabase
   .match({ id: 666 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -48,7 +35,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -74,7 +61,6 @@ If `true`, return the deleted row(s) in the response.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -102,7 +88,6 @@ Count algorithm to use to count rows in a table.
 
 </ul>
 
-
 ## Notes
 
 - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
@@ -112,27 +97,9 @@ Count algorithm to use to count rows in a table.
   no rows are visible, so you need at least one `SELECT`/`ALL` policy that
   makes the rows visible.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Delete records
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -140,8 +107,3 @@ const { data, error } = await supabase
   .delete()
   .match({ id: 666 })
 ```
-
-
-</TabItem>
-
-</Tabs>

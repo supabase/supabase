@@ -1,0 +1,59 @@
+---
+id: auth-signin
+title: 'auth.signIn()'
+slug: /auth-signin
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Log in an existing user, or login via a third-party provider.
+
+```dart
+final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+## Notes
+
+- A user can sign up via email, phone number.
+- If you provide `email` without a `password`, the user will be sent a magic link.
+- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+- Similarly, if you provide `phone` without a `password`, the user will be sent a one time password.
+- If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
+
+## Examples
+
+### Sign in with email.
+
+```dart
+final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+
+final user = res.data?.user;
+final error = res.error;
+```
+
+### Sign in with magic link.
+
+If email is provided, but no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+
+```dart
+final res = await supabase.auth.signIn(email: 'example@email.com');
+
+final error = res.error;
+```
+
+### Get OAuth sign in URL.
+
+Passing provider parameter to `signIn()` will return a URL to sign your user in via OAuth.
+If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
+
+```dart
+final res = await supabase.auth.signIn(provider: Provider.github);
+
+final url = res.data?.url;
+final error = res.error;
+```

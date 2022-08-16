@@ -4,4 +4,8 @@ id: release-notes
 
 # Release Notes
 
-Start your release notes here.
+Supabase.js v2 release
+
+## 2.0.0
+
+TBD

@@ -1,20 +1,17 @@
 ---
 id: textsearch
-title: ".textSearch()"
+title: '.textSearch()'
 slug: textsearch
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows whose tsvector value on the stated `column` matches
 to_tsquery(`query`).
 
-
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -38,7 +35,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -59,7 +55,6 @@ The Postgres tsquery string to filter with.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -74,7 +69,7 @@ The Postgres tsquery string to filter with.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -107,102 +102,51 @@ The text search configuration to use.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Text search
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', `'fat' & 'cat'`, { 
-    config: 'english' 
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    config: 'english',
   })
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Basic normalization
 
 Uses PostgreSQL's `plainto_tsquery` function.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', `'fat' & 'cat'`, { 
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
     type: 'plain',
-    config: 'english' 
+    config: 'english',
   })
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Full normalization
 
 Uses PostgreSQL's `phraseto_tsquery` function.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', `'fat' & 'cat'`, { 
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
     type: 'phrase',
-    config: 'english' 
+    config: 'english',
   })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Websearch
 
-Uses PostgreSQL's `websearch_to_tsquery` function. 
-This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used 
+Uses PostgreSQL's `websearch_to_tsquery` function.
+This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
 with advanced operators.
 
 - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
@@ -210,25 +154,12 @@ with advanced operators.
 - `OR`: the word “or” will be converted to the | operator.
 - `-`: a dash will be converted to the ! operator.
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data, error } = await supabase
   .from('quotes')
   .select('catchphrase')
-  .textSearch('catchphrase', `'fat or cat'`, { 
+  .textSearch('catchphrase', `'fat or cat'`, {
     type: 'websearch',
-    config: 'english'
+    config: 'english',
   })
 ```
-
-
-</TabItem>
-
-</Tabs>

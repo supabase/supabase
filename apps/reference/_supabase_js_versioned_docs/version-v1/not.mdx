@@ -1,21 +1,14 @@
 ---
 id: not
-title: ".not()"
+title: '.not()'
 slug: not
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows which doesn't satisfy the filter.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -24,13 +17,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +41,6 @@ The column to filter on.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -74,7 +60,6 @@ The operator to filter with.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -98,7 +83,6 @@ The value to filter with.
 
 </ul>
 
-
 ## Notes
 
 - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
@@ -111,27 +95,9 @@ The value to filter with.
     .not('id','in',`(${arr})`)  // You can insert a javascript array.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -140,21 +106,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -163,21 +115,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -186,21 +124,7 @@ const { data, error } = await supabase
   .not('name', 'eq', 'Paris')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -208,8 +132,3 @@ const { data, error } = await supabase
   .rpc('echo_all_cities')
   .not('name', 'eq', 'Paris')
 ```
-
-
-</TabItem>
-
-</Tabs>

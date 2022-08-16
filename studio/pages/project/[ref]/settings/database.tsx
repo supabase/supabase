@@ -10,7 +10,7 @@ import generator from 'generate-password'
 import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
@@ -152,7 +152,10 @@ const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
-  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const enablePermissions = useFlag('enablePermissions')
+  const canResetDbPassword = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : ui.selectedOrganization?.is_owner
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)

@@ -1,0 +1,483 @@
+---
+id: client-libraries
+title: Client Libraries
+description: 'Supabase provides client libraries in several languages.'
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+The [Supabase Client](/docs/reference/javascript/installing) makes it simple for developers to build secure and scalable products.
+
+## Auth
+
+Create new users using [`signUp()`](/docs/reference/javascript/auth-signup). By default, the user will need to verify their email address before logging in.<br/>
+If confirmations are disabled the response will contain an access token and also a confirmed_at value, otherwise it will just contain a confirmation_sent_at attribute.
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signUp({
+  email: 'example@email.com',
+  password: 'example-password',
+})
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+import os
+from supabase import create_client, Client
+
+url: str = os.environ.get("SUPABASE_TEST_URL")
+key: str = os.environ.get("SUPABASE_TEST_KEY")
+supabase: Client = create_client(url, key)
+user = supabase.auth.sign_up(
+    email='example@email.com',
+    password='example-password',
+)
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Sign up user with email and password
+  final response = await client
+      .auth
+      .signUp('example@email.com', 'example-password');
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+Existing users can log in using [`signIn()`](/docs/reference/javascript/auth-signin).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signIn({
+  email: 'example@email.com',
+  password: 'example-password',
+})
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+import os
+from supabase import create_client, Client
+
+url: str = os.environ.get("SUPABASE_TEST_URL")
+key: str = os.environ.get("SUPABASE_TEST_KEY")
+supabase: Client = create_client(url, key)
+user = supabase.auth.sign_in(
+    email='example@email.com',
+    password='example-password'
+)
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Sign in user with email and password
+  final response = await client
+      .auth
+      .signIn(email: 'example@email.com', password: 'example-password');
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+If there is an email, but no password passed to [`signIn()`](/docs/reference/javascript/auth-signin), the user will receive a magic link.
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { error, data } = await supabase.auth.signIn({
+  email: 'example@email.com',
+})
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+import os
+from supabase import create_client, Client
+
+url: str = os.environ.get("SUPABASE_TEST_URL")
+key: str = os.environ.get("SUPABASE_TEST_KEY")
+supabase: Client = create_client(url, key)
+user = supabase.auth.sign_in(
+    email='example@email.com'
+)
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Sign in user with email and magic link
+  final response = await client
+      .auth
+      .signIn(email: 'example@email.com');
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+Third party logins are also handled through [`signIn()`](/docs/reference/javascript/auth-signin).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { user, error } = await supabase.auth.signIn({
+  // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
+  provider: 'github',
+})
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  final response = await client
+      .auth
+      .signIn(provider: Provider.github);
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Managing data
+
+Since Postgres is a Relational database, the client makes it simple to query tables and fetch related data in one round-trip, using [`select()`](/docs/reference/javascript/select).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase.from('countries').select(`
+    name,
+    cities (
+      name
+    )
+  `)
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+import os
+from supabase import create_client, Client
+
+url: str = os.environ.get("SUPABASE_TEST_URL")
+key: str = os.environ.get("SUPABASE_TEST_KEY")
+supabase: Client = create_client(url, key)
+
+data = supabase.table('countries').select('name').execute()
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Query tables and fetch related data in one round-trip, using select()
+  final response = await client
+      .from('countries')
+      .select('name')
+      .execute();
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+You can do advanced [filtering](/docs/reference/javascript/using-filters) to extract only the data that you need.
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lt('country_id', 100)
+  .limit(10)
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+data = supabase.table('cities').select('name, country_id').eq('name', 'Germany').execute()
+# Assert we pulled real data.
+assert len(data.get("data", [])) > 0
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // When fetching data, use advanced filtering to only extract data, that you need.
+  final response = await client
+      .from('cities')
+      .select('name,country_id')
+      .lt('country_id', 100)
+      .limit(10)
+      .execute();
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+You can create data easily using [`insert()`](/docs/reference/javascript/insert).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const { data, error } = await supabase.from('cities').insert([
+  { name: 'The Shire', country_id: 554 },
+  { name: 'Rohan', country_id: 555 },
+])
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+data = supabase.table('cities').insert({'name': 'Gotham', 'country_id': 556 }).execute()
+# assert if insert response is a success
+assert data.get("status_code") in (200, 201)
+
+# bulk insert
+data = supabase.table('cities').insert([
+{'name': 'Gotham', 'country_id': 556 },
+{'name': 'The Shire', 'country_id': 557 }
+]).execute()
+
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Create data easily, using insert()
+  final response = await client
+      .from('cities')
+      .insert([
+        { 'name': 'The Shire', 'country_id': 554 },
+        { 'name': 'Rohan', 'country_id': 555 },
+       ])
+      .execute();
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Realtime Changes
+
+The Supabase client makes it simple to listen to realtime database changes, using [`subscribe()`](/docs/reference/javascript/subscribe).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const mySubscription = supabase
+  .from('countries')
+  .on('*', (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // Listen to realtime database changes, using subscribe()
+  final response = await client
+      .from('countries')
+      .on(SupabaseEventTypes.all, (payload) {
+        print('Something happened: ${payload.eventType}');
+      })
+      .subscribe((String event, {String? errorMsg}) {
+        print('event: $event error: $errorMsg');
+      });
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+You can even [listen to Row Level changes](/docs/reference/javascript/subscribe#listening-to-row-level-changes).
+
+<Tabs
+  groupId="libraries"
+  defaultValue="js"
+  values={[{ label: 'JavaScript', value: 'js' },{ label: 'Python', value: 'py' },{ label: 'Dart', value: 'dart'}]}>
+
+<TabItem value="js">
+
+```js
+const mySubscription = supabase
+  .from('countries:id.eq.200')
+  .on('UPDATE', handleRecordUpdated)
+  .subscribe()
+```
+
+</TabItem>
+<TabItem value="py">
+
+```py
+# Not yet implemented
+```
+
+</TabItem>
+  
+<TabItem value="dart">
+
+```dart
+import 'package:supabase/supabase.dart';
+
+void main() async {
+  final client = SupabaseClient('supabaseUrl', 'supabaseKey');
+
+  // You can even listen to Row Level changes
+  final response = await client
+      .from('countries:id.eq.200')
+      .on(SupabaseEventTypes.update, (payload) {
+        print('Something happened: ${payload.eventType}');
+      })
+      .subscribe((String event, {String? errorMsg}) {
+        print('event: $event error: $errorMsg');
+      });
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Next steps
+
+- View the [Client Docs](/docs/reference/javascript/installing)
+- Sign in: [app.supabase.com](https://app.supabase.com)
