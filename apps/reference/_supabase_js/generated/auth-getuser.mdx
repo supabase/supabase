@@ -11,17 +11,24 @@ import TabItem from '@theme/TabItem'
 Returns the user data, refreshing the session if necessary.
 
 ```js
-const user = supabase.auth.user()
+const user = supabase.auth.getUser()
 ```
 
 ## Notes
 
-This method gets the user object from memory.
+- This method gets the user object using the current session.
+- Fetches the user object from the database instead of local storage.
 
 ## Examples
 
-### Get the logged in user
+### Get the logged in user with the current existing session
 
 ```js
-const user = supabase.auth.user()
+const user = supabase.auth.getUser()
+```
+
+### Get the logged in user with a custom access token jwt.
+
+```js
+const user = supabase.auth.getUser(jwt)
 ```
