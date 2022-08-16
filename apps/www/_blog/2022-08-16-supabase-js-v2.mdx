@@ -163,7 +163,16 @@ const { data } = await supabase.auth.getSession()
 const { data } = supabase.auth.session()
 ```
 
-This solves the “getting logged out” issue, which has been a recurring issue in our GitHub Discussions.
+This solves the “getting logged out” issue, which has been a recurring challenge in our GitHub Discussions.
+
+<details>
+
+<summary>ℹ️ Improvements from v1</summary>
+
+The previous implementation had a race condition when refreshing the auth token across multiple tabs. The async re-write forces the library to wait
+for a valid/invalid session before taking any action.
+
+</details>
 
 ### Scoped constructor config
 
