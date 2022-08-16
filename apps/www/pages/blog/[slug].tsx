@@ -40,7 +40,7 @@ const components = {
           className="
           next-image--dynamic-fill 
           to-scale-400  
-          from-scale-500 rounded-md
+          from-scale-500 rounded-lg
           border bg-gradient-to-r
         "
         >
@@ -163,9 +163,9 @@ function BlogPostPage(props: any) {
         </div>
       </div>
       <div>
-        <p className="text-scale-1200">On this page</p>
         <div>
-          <div className={['prose prose-toc'].join(' ')}>
+          <p className="text-scale-1200 mb-4">On this page</p>
+          <div className="prose-toc">
             <ReactMarkdown plugins={[gfm]}>{props.blog.toc.content}</ReactMarkdown>
           </div>
         </div>
@@ -276,7 +276,7 @@ function BlogPostPage(props: any) {
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   {props.blog.thumb && (
-                    <div className="relative mb-8 h-96 w-full overflow-auto rounded border">
+                    <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
                       <Image
                         src={'/images/blog/' + props.blog.thumb}
                         layout="fill"
