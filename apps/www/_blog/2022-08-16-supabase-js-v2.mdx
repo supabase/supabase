@@ -163,7 +163,52 @@ const { data } = await supabase.auth.getSession()
 const { data } = supabase.auth.session()
 ```
 
-This solves the “getting logged out” issue, which has been a recurring issue in our GitHub Discussions.
+This solves the “getting logged out” issue, which has been a recurring challenge in our GitHub Discussions.
+
+<details>
+
+<summary>ℹ️ Improvements from v1</summary>
+
+The previous implementation had a race condition when refreshing the auth token across multiple tabs. The async re-write forces the library to wait
+for a valid/invalid session before taking any action.
+
+</details>
+
+### Scoped constructor config
+
+We're being much more explicit about the modular approach that `supabase-js` uses:
+
+```ts
+const supabase = createClient(apiURL, apiKey, {
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+  },
+  realtime: {
+    channels,
+    endpoint,
+  },
+  // common across all libraries
+  global: {
+    fetch: customFetch,
+    headers: DEFAULT_HEADERS,
+  },
+})
+```
+
+This is clearer for developers - if you're only using some parts of Supabase, you only recieve the hints for those parts.
+
+<details>
+
+<summary>ℹ️ Improvements from v1</summary>
+
+We noticed a lot of confusion for the variable naming between each library.
+For example, Auth has a config parameter called "storageKey", which was was often confused with the `storage-js` library bundled in the `supabase-js` library.
+
+</details>
 
 ## Community
 
