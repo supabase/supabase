@@ -933,10 +933,6 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    notes: |
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - name: Create a record
         isSpotlight: true
@@ -947,6 +943,16 @@ pages:
             .insert([
               { name: 'The Shire', country_id: 554 }
             ])
+          ```
+      - name: Create a record and return it
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+            .select()
           ```
       - name: Bulk create
         description: |
@@ -960,25 +966,6 @@ pages:
               { name: 'The Shire', country_id: 554 },
               { name: 'Rohan', country_id: 555 },
             ])
-          ```
-      - name: Upsert
-        description: |
-          For upsert, if set to true, primary key columns would need to be included 
-          in the data parameter in order for an update to properly happen. Also, primary keys 
-          used must be natural, not surrogate. There are however, 
-          [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
-          for surrogate primary keys.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .insert(
-              [
-                { name: 'The Shire', country_id: 554 },
-                { name: 'Rohan', country_id: 555 },
-                { name: 'City by the Bay', country_id:840}
-              ],
-              { upsert: true })
           ```
 
   update():
@@ -1001,7 +988,7 @@ pages:
           Postgres offers a 
           [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
           for working with JSON data. Right now it is only possible to update an entire JSON document, 
-          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
         js: |
           ```js
           const { data, error } = await supabase
