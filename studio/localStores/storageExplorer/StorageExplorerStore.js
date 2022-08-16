@@ -637,7 +637,7 @@ class StorageExplorerStore {
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
-      const fileOptions = { cacheControl: 3600 }
+      const fileOptions = { cacheControl: '3600' }
       const metadata = { mimetype: file.type, size: file.size }
 
       const isWithinFolder = get(file, ['path'], '').split('/').length > 1
