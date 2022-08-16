@@ -157,6 +157,8 @@ const config = {
         // title: 'Supabase Docs',
         logo: {
           alt: 'Supabase Docs',
+          href: 'https://supabase.com',
+          target: '_self',
           src: '/img/supabase-logo-wordmark--light.svg',
           srcDark: '/img/supabase-logo-wordmark--dark.svg',
         },
