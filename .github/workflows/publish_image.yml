@@ -1,4 +1,4 @@
-name: Publish to Image Registries
+name: Publish to Image Registry
 
 on:
   push:
@@ -10,7 +10,6 @@ on:
 
 jobs:
   publish:
-    name: Publish to Docker Hub
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
