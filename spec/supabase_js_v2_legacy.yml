@@ -375,7 +375,7 @@ pages:
           ```
 
   auth.getUser():
-    title: 'getUserById()'
+    title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
       This method gets the user object from memory.
@@ -534,7 +534,7 @@ pages:
           })
           ```
   auth.api.getUserById():
-    title: 'getUser()'
+    title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database instead of local storage.
