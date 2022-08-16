@@ -1,18 +1,17 @@
 ---
-id: auth-setsession
-title: 'setSession()'
-slug: /auth-setsession
+id: auth-admin-getuserbyid
+title: 'getUserById()'
+slug: /auth-admin-getuserbyid
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+Get user by id.
 
 ```js
-  const { data, error } = supabase.auth.setSession(refresh_token)
-}
+const { user, error } = await supabase.auth.admin.getUserById(1)
 ```
 
 ## Parameters
@@ -22,7 +21,7 @@ Sets the session data from refresh_token and returns current session or an error
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      refresh_token
+      uid
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -33,7 +32,9 @@ Sets the session data from refresh_token and returns current session or an error
   </h4>
   <div class="method-list-item-description">
 
-The refresh token returned by gotrue.
+The user's unique identifier
+
+This function should only be called on a server. Never expose your `service_role` key in the browser.
 
   </div>
   
@@ -41,13 +42,16 @@ The refresh token returned by gotrue.
 
 </ul>
 
+## Notes
+
+- Fetches the user object from the database instead of local storage.
+- Note that user() fetches the user object from local storage which might not be the most updated.
+- Requires the user's access_token.
+
 ## Examples
 
-### Basic example.
-
-Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+### Fetch the user object using the access_token jwt.
 
 ```js
-  const { data, error } = supabase.auth.setSession(refresh_token)
-}
+const { user, error } = await supabase.auth.admin.getUserById(1)
 ```
