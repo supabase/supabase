@@ -47,9 +47,9 @@
             "description": "Updated documentation for supabase-js"
           },
           {
-            "title": "Migration guide",
-            "url": "/docs/reference/javascript/next/migration-guide",
-            "description": "Move from supabase-js v1 to supabase-js v2"
+            "title": "Typescript support",
+            "url": "/docs/reference/javascript/next/typescript-support",
+            "description": "Using types generated directly from your database."
           }
         ]
       }
