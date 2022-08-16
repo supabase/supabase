@@ -2,8 +2,8 @@
 title: 'Supabase.js v2 release candidate'
 description: First peek of Supabase-js v2, which focuses on quality-of-life improvements for developers.
 author: inian
-image: launchweek/day2/thumb.jpg
-thumb: launchweek/day2/thumb.jpg
+image: lw5-supabase-js/thumb.jpg
+thumb: lw5-supabase-js/thumb.jpg
 tags:
   - launch-week
 date: '2022-08-16'
@@ -37,7 +37,7 @@ supabase gen types typescript --local > DatabaseDefinitions.ts
 These types can now be used to enrich your development experience:
 
 ```tsx
-import type { Database } from "./DatabaseDefinitions";
+import type { Database } from './DatabaseDefinitions'
 
 const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
 
