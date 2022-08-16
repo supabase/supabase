@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sets the session data from refresh_token and returns current Session and Error
+Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
 
 ```js
 function apiFunction(req, res) {
@@ -42,7 +42,7 @@ function apiFunction(req, res) {
   </h4>
   <div class="method-list-item-description">
 
-a JWT token
+The refresh token returned by gotrue.
 
   </div>
   
