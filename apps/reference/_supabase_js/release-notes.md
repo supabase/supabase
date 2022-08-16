@@ -184,6 +184,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - Removed `sendMobileOTP` , `sendMagicLinkEmail` in favor of `signInWithOtp`
   - Removed `signInWithEmail`, `signInWithPhone` in favor of `signInWithPassword`
   - Removed `signUpWithEmail` , `signUpWithPhone` in favor of `signUp`
+  - Replaced `update` with `updateUser`
 - `storage-js`
   - Return types are more strict. Functions types used to indicate that the data returned could be null even if there was no error. We now make use of union types which only mark the data as null if there is an error and vice versa. ([PR](https://github.com/supabase/storage-js/pull/60))
   - The `upload` and `update` function returns the path of the object uploaded as the `path` parameter. Previously the returned value had the bucket name prepended to the path which made it harder to pass the value on to other storage-js methods since all methods take the bucket name and path separately. We also chose to call the returned value `path` instead of `Key` ([PR](https://github.com/supabase/storage-js/pull/75))
