@@ -1,0 +1,60 @@
+---
+id: auth-admin-deleteuser
+title: 'deleteUser()'
+slug: /auth-admin-deleteuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Delete a user. Requires a `service_role` key.
+
+```js
+const { data, error } = await supabase.auth.admin.deleteUser(
+  '715ed5db-f090-4b8c-a067-640ecee36aa0'
+)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      uid
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user uid you want to remove.
+
+This function should only be called on a server. Never expose your `service_role` key in the browser.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Requires a `service_role` key.
+- This function should be called on a server. Never expose your `service_role` key in the browser.
+
+## Examples
+
+### Remove a user completely.
+
+```js
+const { data, error } = await supabase.auth.admin.deleteUser(
+  '715ed5db-f090-4b8c-a067-640ecee36aa0'
+)
+```

@@ -1,14 +1,14 @@
 ---
-id: auth-api-sendmobileotp
-title: 'sendMobileOTP()'
-slug: /auth-api-sendmobileotp
+id: auth-admin-inviteuserbyemail
+title: 'inviteUserByEmail()'
+slug: /auth-admin-inviteuserbyemail
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sends a mobile OTP via SMS. Will register the account if it doesn't already exist
+Sends an invite link to an email address.
 
 ## Parameters
 
@@ -17,7 +17,7 @@ Sends a mobile OTP via SMS. Will register the account if it doesn't already exis
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      phone
+      email
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -28,7 +28,7 @@ Sends a mobile OTP via SMS. Will register the account if it doesn't already exis
   </h4>
   <div class="method-list-item-description">
 
-The user's phone number WITH international prefix
+The email address of the user.
 
   </div>
   
@@ -58,7 +58,27 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      captchaToken
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Optional user metadata
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      redirectTo
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -69,27 +89,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      shouldCreateUser
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>boolean</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-A boolean flag to indicate whether to automatically create a user on magiclink / otp sign-ins if the user doesn't exist. Defaults to true.
+A URL or mobile address to send the user to after they are confirmed.
 
   </div>
   
@@ -111,5 +111,7 @@ A boolean flag to indicate whether to automatically create a user on magiclink /
 ### Basic example.
 
 ```js
-const { data: user, error } = await supabase.auth.api.sendMobileOTP('12345879')
+const { data, error } = await supabase.auth.admin.inviteUserByEmail(
+  'email@example.com'
+)
 ```

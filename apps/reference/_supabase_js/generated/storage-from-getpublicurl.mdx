@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Retrieve URLs for assets in public buckets and encapsulates it in a return object
 
 ```js
-const { publicURL, error } = supabase.storage
+const { data, error } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
@@ -54,7 +54,7 @@ The file path to be downloaded, including the path and file name. For example `f
 ### Returns the URL for an asset in a public bucket
 
 ```js
-const { publicURL, error } = supabase.storage
+const { data, error } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
