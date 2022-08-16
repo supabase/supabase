@@ -78,7 +78,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, values, handleReset }: any) => {
+        {({ isSubmitting, values }: any) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
