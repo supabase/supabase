@@ -394,7 +394,7 @@ alter table todos enable row level security;
 
 Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key is designed to bypass Row Level Security - so it should only be used on a private server.
 
-We have [partnered with GitHub](https://supabase.com/blog/2022/03/28/community-day#supabase-is-now-a-github-secret-scanning-partner) to scan for Supabase `service_role` keys pushed to public repositories.
+We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.
 
 ### Safeguards towards accidental deletes and updates
