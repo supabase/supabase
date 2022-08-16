@@ -37,9 +37,9 @@ supabase gen types typescript --local > DatabaseDefinitions.ts
 These types can now be used to enrich your development experience:
 
 ```tsx
-import Definitions from './DatabaseDefinitions'
+import type { Database } from "./DatabaseDefinitions";
 
-const supabase = createClient<Definitions>(SUPABASE_URL, ANON_KEY)
+const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
 
 const { data } = await supabase.from('messages').select().match({ id: 1 })
 ```
