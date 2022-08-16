@@ -9,7 +9,7 @@
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>
-  <title>Supabase.js v2 release candidate</title>
+  <title>supabase-js v2 Release Candidate</title>
   <link>https://supabase.com/blog/supabase-js-v2</link>
   <description>First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.</description>
   <pubDate>Mon, 15 Aug 2022 05:05:00</pubDate>
