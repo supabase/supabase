@@ -26,7 +26,6 @@ const sidebars = {
         'initializing',
         'typescript-support',
         'release-notes',
-        'migration-guide',
       ],
       collapsed: false,
     },
