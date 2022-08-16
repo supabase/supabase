@@ -1,7 +1,7 @@
 ---
 id: reference
 title: Reference Documentation
-sidebar_label: About
+sidebar_label: Reference Documentation
 hide_table_of_contents: true
 ---
 
@@ -22,27 +22,19 @@ The Supabase Reference Docs provide technical descriptions of the products and h
         style={{ height: '100%' }}
         title="JavaScript"
         description="JavaScript and TypeScript documentation."
-      > 
-        
-      </ButtonCard>
+      />
     </div>
     {/* DART */}
     <div class="col col--6">
-      <ButtonCard icon={useBaseUrl("/img/icons/dart-icon.svg")} class="card" to={useBaseUrl("/reference/dart")} style={{ height: '100%' }} title="Dart" description="Dart and Flutter documentation.">
-        
-      </ButtonCard>
+      <ButtonCard icon={useBaseUrl("/img/icons/dart-icon.svg")} class="card" to={useBaseUrl("/reference/dart")} style={{ height: '100%' }} title="Dart" description="Dart and Flutter documentation."/>
     </div>
     {/* CLI */}
     <div class="col col--6">
-      <ButtonCard icon={useBaseUrl("/img/icons/cli-icon.svg")} class="card" to={useBaseUrl("/reference/cli")} style={{ height: '100%' }} title="Supabase CLI" description="Manage your Supabase projects.">
-        
-      </ButtonCard>
+      <ButtonCard icon={useBaseUrl("/img/icons/cli-icon.svg")} class="card" to={useBaseUrl("/reference/cli")} style={{ height: '100%' }} title="Supabase CLI" description="Manage your Supabase projects."/>
     </div>
     {/* API */}
     <div class="col col--6">
-      <ButtonCard icon={useBaseUrl("/img/icons/api-icon.svg")} class="card" to={useBaseUrl("/reference/api")} style={{ height: '100%' }} title="Supabase API" description="Manage your Supabase projects.">
-        
-      </ButtonCard>
+      <ButtonCard icon={useBaseUrl("/img/icons/api-icon.svg")} class="card" to={useBaseUrl("/reference/api")} style={{ height: '100%' }} title="Supabase API" description="Manage your Supabase projects."/>
     </div>
     {/*  */}
 
@@ -57,19 +49,14 @@ The Supabase Reference Docs provide technical descriptions of the products and h
   <div class="row is-multiline">
     {/* Auth */}
     <div class="col col--6">
-      <Link
+      <ButtonCard
         class="card"
         to={useBaseUrl('/reference/auth-helpers')}
         style={{ height: '100%' }}
-      >
-        <div class="card__body">
-          <h4>Auth Helpers</h4>
-          <p>
-            A collection of framework specific Auth utilities for working with
-            Supabase.
-          </p>
-        </div>
-      </Link>
+        title="Auth Helpers"
+        description="A collection of framework specific Auth utilities for working with
+            Supabase."
+      />
     </div>
     {/*  */}
   </div>
@@ -83,29 +70,23 @@ The Supabase Reference Docs provide technical descriptions of the products and h
   <div class="row is-multiline">
     {/* Examples - coming soon */}
     <div class="col col--6">
-      <Link
+      <ButtonCard
         class="card"
         to={useBaseUrl('/reference/auth')}
         style={{ height: '100%' }}
-      >
-        <div class="card__body">
-          <h4>Auth Server</h4>
-          <p>Auth reference.</p>
-        </div>
-      </Link>
+        title={'Auth Server'}
+        description="Auth reference"
+      />
     </div>
     {/*  */}
     <div class="col col--6">
-      <Link
+      <ButtonCard
         class="card"
         to={useBaseUrl('/reference/storage')}
         style={{ height: '100%' }}
-      >
-        <div class="card__body">
-          <h4>Storage</h4>
-          <p>Storage reference.</p>
-        </div>
-      </Link>
+        title={'Storage'}
+        description="Storage reference"
+      />
     </div>
     {/*  */}
   </div>

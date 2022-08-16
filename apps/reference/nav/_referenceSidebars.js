@@ -7,7 +7,8 @@ const sidebars = {
         'about',
         'architecture',
         'guides/hosting/platform',
-        'guides/local-development',
+        'guides/cli/local-development',
+        'guides/cli/cicd-workflow',
         'guides/examples',
       ],
       collapsed: true,
@@ -203,10 +204,11 @@ const sidebars = {
   reference: [
     {
       type: 'category',
-      label: 'Reference',
-      link: { type: 'doc', id: 'reference' },
+      label: 'Official',
+      // link: { type: 'doc', id: 'reference' },
       collapsed: false,
       items: [
+        { type: 'doc', id: 'reference' },
         { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
         { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {

@@ -36,15 +36,14 @@ It provides everything you need from a CRUD API:
 - Works with Postgres Functions
 - Works with the Postgres security model - including Row Level Security, Roles, and Grants.
 
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="480"
-  src="https://www.youtube-nocookie.com/embed/rPAJJFdtPw0"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/rPAJJFdtPw0"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 ### GraphQL API {#graphql-api-overview}
 
@@ -393,7 +392,7 @@ alter table todos enable row level security;
 
 ### The `service_role` key
 
-Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key can is designed to bypass Row Level Security - so it should only be used on a private server.
+Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key is designed to bypass Row Level Security - so it should only be used on a private server.
 
 We have [partnered with GitHub](https://supabase.com/blog/2022/03/28/community-day#supabase-is-now-a-github-secret-scanning-partner) to scan for Supabase `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.

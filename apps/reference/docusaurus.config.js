@@ -5,7 +5,7 @@ const lightCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const darkCodeTheme = require('@kiwicopple/prism-react-renderer/themes/vsDark')
 const mainNavbar = require('./nav/_referenceNavbar')
 
-const baseUrl = '/new-docs/'
+const baseUrl = '/docs/'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -13,8 +13,7 @@ const config = {
   tagline: 'The open source Firebase alternative.',
   url: 'https://supabase.com',
   baseUrl: baseUrl,
-  onBrokenLinks: 'ignore', // TODO: remove this when going into prod
-  // onBrokenLinks: 'throw',
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/favicon.ico',
   themes: ['docusaurus-theme-search-typesense'],
@@ -41,6 +40,8 @@ const config = {
         routeBasePath: '/reference/api',
         sidebarPath: require.resolve('./nav/api_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -51,6 +52,8 @@ const config = {
         routeBasePath: '/reference/cli',
         sidebarPath: require.resolve('./nav/cli_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -61,6 +64,8 @@ const config = {
         routeBasePath: '/reference/auth',
         sidebarPath: require.resolve('./nav/gotrue_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -71,6 +76,8 @@ const config = {
         routeBasePath: '/reference/storage',
         sidebarPath: require.resolve('./nav/storage_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -81,6 +88,8 @@ const config = {
         routeBasePath: '/reference/dart',
         sidebarPath: require.resolve('./nav/supabase_dart_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
     [
@@ -91,6 +100,8 @@ const config = {
         routeBasePath: '/reference/javascript',
         sidebarPath: require.resolve('./nav/supabase_js_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
         // lastVersion: 'current',
         // versions: {
         //   current: {
@@ -108,6 +119,8 @@ const config = {
         routeBasePath: '/reference/auth-helpers',
         sidebarPath: require.resolve('./nav/auth_helpers_sidebars.js'),
         breadcrumbs: false,
+        editUrl:
+          'https://github.com/supabase/supabase/edit/master/apps/reference/',
       },
     ],
   ],
@@ -121,6 +134,8 @@ const config = {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./nav/_referenceSidebars.js'),
           breadcrumbs: false,
+          editUrl:
+            'https://github.com/supabase/supabase/edit/master/apps/reference',
         },
         blog: false,
         theme: {

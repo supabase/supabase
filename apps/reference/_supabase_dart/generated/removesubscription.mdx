@@ -1,0 +1,27 @@
+---
+id: removesubscription
+title: 'removeSubscription()'
+slug: /removesubscription
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Removes an active subscription and returns the number of open connections.
+
+```dart
+supabase.removeSubscription(mySubscription);
+```
+
+## Notes
+
+- Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+
+## Examples
+
+### Remove a subscription
+
+```dart
+supabase.removeSubscription(mySubscription);
+```

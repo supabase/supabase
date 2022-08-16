@@ -1,0 +1,120 @@
+---
+id: range
+title: 'range()'
+slug: /range
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Limits the result to rows within the specified range, inclusive.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .range(0, 3)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      from
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>number</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The starting index from which to limit the result, inclusive.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      to
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>number</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The last index to which to limit the result, inclusive.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      foreignTable
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The foreign table to use (for foreign columns).
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      foreignTable
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .range(0, 3)
+```
