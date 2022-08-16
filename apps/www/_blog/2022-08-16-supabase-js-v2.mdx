@@ -120,9 +120,21 @@ Previously you could pass a `returning: 'minimal'` option to the `insert()`, `up
 
 </details>
 
-## Updated Realtime API
+## Multiplayer Sneak Peek
 
-There are a few changes to our Realtime interface:
+There is a new `channel()` interface which we have released in v2.
+This is a "preparatory" release for our upcoming [multiplayer](https://supabase.com/blog/supabase-realtime-with-multiplayer-features) features.
+
+```ts
+supabaseClient
+  .channel('any_string_you_want')
+  .on('presence', { event: 'track' }, (payload) => {
+    console.log(payload)
+  })
+  .subscribe()
+```
+
+As part of this change, the old `from().on().subscribe()` method for listening to database changes will be changing:
 
 ```ts
 // v2
@@ -140,7 +152,6 @@ supabaseClient
     }
   )
   .subscribe()
-
 // v1
 supabase
   .from('movies')
@@ -150,9 +161,8 @@ supabase
   .subscribe()
 ```
 
-There is a new `channel()` function which requires a string to denote the name of a channel.
-While this may seem more verbose, it's an important change for our upcoming [multiplayer](https://supabase.com/blog/supabase-realtime-with-multiplayer-features) features.
 You can listen to PostgreSQL database changes on any channel you want by subscribing to the `'postgres_changes'` event.
+For now, we will continue to support `from().on().subscribe()`, but in the future we will deprecate this in favor of the `channel().on().subscribe()` method.
 
 ## Community
 
