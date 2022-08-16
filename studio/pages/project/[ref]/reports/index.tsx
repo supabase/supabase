@@ -1,81 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import Loading from 'components/ui/Loading'
+import { useFlag, useStore } from 'hooks'
 import { ProjectLayoutWithAuth } from 'components/layouts'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
+import PresetReport from 'components/interfaces/Reports/PresetReport'
+import { Presets } from 'components/interfaces/Reports/Reports.types'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { DashboardReportPage } from './dashboard'
 
-const PageLayout: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState(true)
-
+export const ReportsOverviewPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
+  const reportsOverview = useFlag('reportsOverview')
 
-  const { ui } = useStore()
-  const project = ui.selectedProject
-
-  // const canCreateReport = checkPermissions(PermissionAction.CR
-  const contentStore = useProjectContentStore(ref)
-
-  useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
-    }
-  }, [project])
-
-  async function loadReports() {
-    await contentStore.load()
-    const reports = contentStore.reports()
-
-    if (reports.length >= 1) {
-      router.push(`/project/${ref}/reports/${reports[0].id}`)
-    } else {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadReports()
-  }, [ref])
+  const Layout = reportsOverview ? ReportsLayout : ProjectLayoutWithAuth
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl flex-grow space-y-16">
-      {loading ? (
-        <Loading />
+    <Layout>
+      {reportsOverview ? (
+        <PresetReport preset={Presets.OVERVIEW} projectRef={ref as string} />
       ) : (
-        <ProductEmptyState
-          title="Reports"
-          ctaButtonLabel="Create report"
-          onClickCta={() => {
-            try {
-              createReport({ router })
-            } catch (error: any) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to create report: ${error.message}`,
-              })
-            }
-          }}
-        >
-          <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
-          <p className="text-scale-1100 text-sm">
-            Get a high level overview of your network traffic, user actions, and infrastructure
-            health.
-          </p>
-        </ProductEmptyState>
+        <DashboardReportPage />
       )}
-    </div>
+    </Layout>
   )
 }
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+// TODO: uncomment when reportsOverview flag is removed
+// hooks do not work with next.js .getLayout
+// ReportsOverviewPage.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(PageLayout)
+export default observer(ReportsOverviewPage)
