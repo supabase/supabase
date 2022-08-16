@@ -332,12 +332,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.user()
+          const user = await supabase.auth.getUser()
           ```
 
-  auth.update():
-    title: 'update()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.update'
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
       To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
@@ -351,19 +351,19 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({email: 'new@email.com'})
+          const { user, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({password: 'new password'})
+          const { user, error } = await supabase.auth.updateUser({password: 'new password'})
           ```
       - name: Update a user's metadata.
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.update({ 
+          const { user, error } = await supabase.auth.updateUser({ 
             data: { hello: 'world' } 
           })
           ```
@@ -481,9 +481,9 @@ pages:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  auth.api.getUser():
-    title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.getUser'
+  auth.api.getUserById():
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database instead of local storage.
       - Note that user() fetches the user object from local storage which might not be the most updated.
@@ -493,14 +493,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { user, error } = await supabase.auth.api.getUser(
-            'ACCESS_TOKEN_JWT',
-          )
+          const { user, error } = await supabase.auth.api.getUserById(1)
           ```
 
   auth.api.listUsers():
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.listUsers'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -514,7 +512,7 @@ pages:
 
   auth.api.createUser():
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.createUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -551,7 +549,7 @@ pages:
 
   auth.api.deleteUser():
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.deleteUser'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
@@ -567,7 +565,7 @@ pages:
 
   auth.api.inviteUserByEmail():
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.inviteUserByEmail'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -581,25 +579,25 @@ pages:
             .inviteUserByEmail('email@example.com')
           ```
 
-  auth.api.sendMobileOTP():
-    title: 'sendMobileOTP()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.sendMobileOTP'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
-    examples:
-      - name: Basic example.
-        isSpotlight: false
-        js: |
-          ```js
-          const { data: user, error } = await supabase.auth
-            .api
-            .sendMobileOTP('12345879')
-          ```
+  # auth.api.sendMobileOTP():
+  #   title: 'sendMobileOTP()'
+  #   $ref: '@supabase/gotrue-js.GoTrueAdminApi.sendMobileOTP'
+  #   notes: |
+  #     - Requires a `service_role` key.
+  #     - This function should only be called on a server. Never expose your `service_role` key in the browser.
+  #   examples:
+  #     - name: Basic example.
+  #       isSpotlight: false
+  #       js: |
+  #         ```js
+  #         const { data: user, error } = await supabase.auth
+  #           .api
+  #           .sendMobileOTP('12345879')
+  #         ```
 
   auth.api.resetPasswordForEmail():
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.resetPasswordForEmail'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       Sends a reset request to an email address.
 
@@ -626,7 +624,7 @@ pages:
 
   auth.api.generateLink():
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.generateLink'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -643,7 +641,7 @@ pages:
 
   auth.api.updateUserById():
     title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueApi.updateUserById'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       - Requires a `service_role` key.
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
@@ -730,7 +728,7 @@ pages:
             body: JSON.stringify({ foo: 'bar' })
           })
           ```
-      - name: Parsing custom headers.
+      - name: Passing custom headers.
         description: |
           You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
@@ -883,10 +881,6 @@ pages:
   insert():
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
-    notes: |
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your Policies are not configured to allow the `select` operation. 
-      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `minimal`.
     examples:
       - name: Create a record
         isSpotlight: true
@@ -897,6 +891,16 @@ pages:
             .insert([
               { name: 'The Shire', country_id: 554 }
             ])
+          ```
+      - name: Create a record and return it
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+            .select()
           ```
       - name: Bulk create
         description: |
@@ -910,25 +914,6 @@ pages:
               { name: 'The Shire', country_id: 554 },
               { name: 'Rohan', country_id: 555 },
             ])
-          ```
-      - name: Upsert
-        description: |
-          For upsert, if set to true, primary key columns would need to be included 
-          in the data parameter in order for an update to properly happen. Also, primary keys 
-          used must be natural, not surrogate. There are however, 
-          [workarounds](https://github.com/PostgREST/postgrest/issues/1118) 
-          for surrogate primary keys.
-        js: |
-          ```js
-          const { data, error } = await supabase
-            .from('cities')
-            .insert(
-              [
-                { name: 'The Shire', country_id: 554 },
-                { name: 'Rohan', country_id: 555 },
-                { name: 'City by the Bay', country_id:840}
-              ],
-              { upsert: true })
           ```
 
   update():
@@ -951,7 +936,7 @@ pages:
           Postgres offers a 
           [number of operators](https://www.postgresql.org/docs/current/functions-json.html) 
           for working with JSON data. Right now it is only possible to update an entire JSON document, 
-          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
         js: |
           ```js
           const { data, error } = await supabase
@@ -1204,7 +1189,7 @@ pages:
           ```
 
   removeAllChannels():
-    title: 'removeAllChannels()'
+    title: 'removeAllSubscriptions()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
@@ -1217,7 +1202,7 @@ pages:
           ```
 
   getChannels():
-    title: 'getChannels()'
+    title: 'getSubscriptions()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - name: Get all subscriptions
@@ -1446,7 +1431,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { signedURL, error } = await supabase
+          const { data, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
@@ -1483,7 +1468,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { publicURL, error } = supabase
+          const { data, error } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')

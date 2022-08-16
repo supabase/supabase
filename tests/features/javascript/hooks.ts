@@ -54,20 +54,18 @@ export abstract class Hooks {
     })
     expect(signUpError).toBeNull()
 
-    const [{ confirmation_token: token }] = await this.getConfirmationToken(user)
-
-    await this.verify(token)
-
     return fakeUser
   }
 
+  // todo: rework this
   @step((token: string) => `verify with token ${token}`)
-  async verify(token: string): Promise<Response> {
+  async verify(token: string, email: string): Promise<Response> {
     return crossFetch(`${process.env.SUPABASE_GOTRUE}/verify`, {
       method: 'POST',
       body: JSON.stringify({
         type: 'signup',
         token: token,
+        email: email,
       }),
     })
   }
@@ -117,11 +115,6 @@ export abstract class Hooks {
   @step('Get user data, if there is a logged in user')
   getUser(supabase: SupabaseClient) {
     return supabase.auth.user()
-  }
-
-  @step('Get user data, if there is a logged in user')
-  getUserFromApi(supabase: SupabaseClient) {
-    return supabase.auth.api.getUser(supabase.auth.session().access_token)
   }
 
   @step((user: User) => `Get user by ID (${user.id}) from Supabase auth schema`)
