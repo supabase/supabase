@@ -17,21 +17,25 @@ Generates links to be sent via email or other.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      type
+      GenerateLinkType
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code>
+      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code> | <code>email_change_current</code> | <code>email_change_new</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The link type ("signup" or "magiclink" or "recovery" or "invite").
+The link type
 
   </div>
   
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
 </li>
 
 <li className="method-list-item">
@@ -129,7 +133,7 @@ User password. For signup only.
   </h4>
   <div class="method-list-item-description">
 
-The link type ("signup" or "magiclink" or "recovery" or "invite").
+The redirect url which should be appended to the generated link
 
   </div>
   
