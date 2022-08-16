@@ -53,7 +53,7 @@ const CreateBucketModal = ({
           <Button type="default" onClick={onSelectCancel}>
             Cancel
           </Button>
-          <Button type="primary" loading={saving} onClick={onCreateBucket}>
+          <Button type="primary" disabled={saving} loading={saving} onClick={onCreateBucket}>
             {saving ? 'Creating bucket' : 'Create bucket'}
           </Button>
         </div>

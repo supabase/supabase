@@ -24,13 +24,13 @@ const { user, session, error } = await supabase.auth.signUp({
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      UserCredentials
+      SignUpWithPasswordCredentials
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>object</code>
+      <code>reflection</code> | <code>reflection</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -45,50 +45,10 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's email address.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      password
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's password.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
       phone
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
       <code>string</code>
@@ -105,30 +65,10 @@ The user's phone number.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      provider
+      password
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>Provider</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The name of the provider.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      refreshToken
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
       <code>string</code>
@@ -136,14 +76,30 @@ The name of the provider.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The user's password.
 
   </div>
   
 </li>
 
-</ul>
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
 
+The user's email address.
+
+  </div>
+  
 </li>
 
 <li className="method-list-item">
@@ -151,8 +107,8 @@ No description provided.
     <span className="method-list-item-label-name">
       options
     </span>
-    <span className="method-list-item-label-badge required">
-      required
+    <span className="method-list-item-label-badge false">
+      optional
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -201,7 +157,7 @@ Verification token received when the user completes the captcha on the site.
   </h4>
   <div class="method-list-item-description">
 
-Optional user metadata.
+The user's metadata.
 
   </div>
   
@@ -210,7 +166,7 @@ Optional user metadata.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      redirectTo
+      emailRedirectTo
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -221,10 +177,14 @@ Optional user metadata.
   </h4>
   <div class="method-list-item-description">
 
-The redirect URL attached to the signup confirmation link. Does not redirect the user if it's a mobile signup.
+The redirect url embedded in the email link
 
   </div>
   
+</li>
+
+</ul>
+
 </li>
 
 </ul>
