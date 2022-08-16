@@ -176,13 +176,13 @@ pages:
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     examples:
-      - name: Verify Sms Otp
+      - name: Verify Sms One-Time Password (OTP)
         isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
           ```
-      - name: Verify Signup Otp
+      - name: Verify Signup One-Time Password (OTP)
         isSpotlight: false
         js: |
           ```js
