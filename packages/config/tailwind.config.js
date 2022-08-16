@@ -101,6 +101,10 @@ module.exports = ui({
               borderRadius: '4px',
               overflow: 'hidden',
             },
+            iframe: {
+              border: '1px solid ' + theme('borderColor.DEFAULT'),
+              borderRadius: theme('borderRadius.lg'),
+            },
           },
         },
 
