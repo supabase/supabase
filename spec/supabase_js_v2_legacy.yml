@@ -782,7 +782,7 @@ pages:
             body: JSON.stringify({ foo: 'bar' })
           })
           ```
-      - name: Parsing custom headers.
+      - name: Passing custom headers.
         description: |
           You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
@@ -1498,7 +1498,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { signedURL, error } = await supabase
+          const { data, error } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60)
@@ -1535,7 +1535,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { publicURL, error } = supabase
+          const { data, error } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
