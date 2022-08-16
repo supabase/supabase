@@ -41,7 +41,7 @@ export const DashboardReportPage: NextPageWithLayout = () => {
     const reports = contentStore.reports()
 
     if (reports.length >= 1) {
-      router.push(`/project/${ref}/reports/${reports[0].id}`)
+      router.push(`/project/${ref}/reports/dashboard/${reports[0].id}`)
     } else {
       setLoading(false)
     }
