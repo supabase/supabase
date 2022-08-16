@@ -8,7 +8,7 @@ import {
   IconPlus,
   IconChevronLeft,
   IconEdit3,
-  IconTrash
+  IconTrash,
 } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -73,15 +73,15 @@ const ColumnList: FC<{
           filterString={filterString}
           setFilterString={setFilterString}
           leftComponents={
-            <div className='flex items-center mr-4'>
-            <Button
-              type="outline"
-              className="mr-4"
-              onClick={() => onSelectBack()}
-              icon={<IconChevronLeft size="small" />}
-              style={{ padding: '5px' }}
-            />
-             <Typography.Text code>{selectedTable.name}</Typography.Text>           
+            <div className="flex items-center mr-4">
+              <Button
+                type="outline"
+                className="mr-4"
+                onClick={() => onSelectBack()}
+                icon={<IconChevronLeft size="small" />}
+                style={{ padding: '5px' }}
+              />
+              <Typography.Text code>{selectedTable.name}</Typography.Text>
             </div>
           }
           rightComponents={
