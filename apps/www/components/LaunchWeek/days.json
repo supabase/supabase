@@ -34,12 +34,12 @@
     "description": "Today we're releasing supabase-js v2, which focuses on “quality-of-life” improvements for developers.",
     "d": 2,
     "dd": "Tuesday",
-    "youtube_id": "OpPOaJI_Z28",
+    "youtube_id": "iqZlPtl_b-I",
     "articles": [
       {
-        "title": "Supabase.js v2 release candidate",
+        "title": "supabase-js v2 Release Candidate",
         "url": "/blog/supabase-js-v2",
-        "description": "First peek of Supabase-js v2, which focuses on quality-of-life improvements for developers.",
+        "description": "First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.",
         "products": [
           {
             "title": "Supabase.js v2 Docs",
