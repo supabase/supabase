@@ -137,7 +137,7 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 })
 ```
 
-### Parsing custom headers.
+### Passing custom headers.
 
 You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
 
