@@ -18,7 +18,7 @@ const ArticleButtonListItem = (props: Article) => {
             <NewspaperIcon strokeWidth={1} />
           </div>
           <div className="flex flex-col items-start gap-0">
-            <span className="group-hover:text-brand-900 text-left text-xl transition">
+            <span className="group-hover:text-brand-900 text-left text-base transition">
               {props.title}
             </span>
             <span className="text-scale-1100 text-left text-sm transition">
