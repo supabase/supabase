@@ -2,11 +2,15 @@
 id: with-nuxt-3
 title: 'Quickstart: Nuxt 3'
 description: Learn how to use Supabase in your Nuxt 3 App.
-sidebar_label: Nuxt 3
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+# Quickstart: Nuxt
+
+:::caution
+
+This example uses Nuxt Supabase v0, that depends on outdated supabase-js v1. It will be updated when updated Nuxt Supabase is released.
+
+:::
 
 ## Intro
 
@@ -44,23 +48,22 @@ Now we are going to set up the database schema. We can use the "User Management 
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
-  defaultValue="dashboard"
-  values={[
-    {label: 'Dashboard', value: 'dashboard'},
-    {label: 'SQL', value: 'sql'},
-  ]}>
-<TabItem value="dashboard">
+defaultActiveId="UI"
+>
+<TabsPanel id="UI" label="UI">
 
-1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
-2. Click **User Management Starter**.
-3. Click **Run**.
+```sh
+1. Go to the "SQL Editor" section.
+2. Click "User Management Starter".
+3. Click "Run".
+```
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
-</TabItem>
-<TabItem value="sql">
+</TabsPanel>
+<TabsPanel id="SQL" label="SQL">
 
 ```sql
 -- Create a table for public "profiles"
@@ -111,7 +114,7 @@ create policy "Anyone can upload an avatar."
 
 ```
 
-</TabItem>
+</TabsPanel>
 </Tabs>
 
 ### Get the API Keys
@@ -119,13 +122,24 @@ create policy "Anyone can upload an avatar."
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the URL and `anon` key from the API settings.
 
-1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
-2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
+<Tabs
+defaultActiveId="UI"
+>
+<TabsPanel id="UI" label="UI">
+
+```sh
+1. Go to the "Settings" section.
+2. Click "API" in the sidebar.
+3. Find your API URL in this page.
+4. Find your "anon" and "service_role" keys on this page.
+```
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
+
+</TabsPanel>
+</Tabs>
 
 ## Building the App
 
