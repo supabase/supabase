@@ -115,6 +115,7 @@ module.exports = ui({
               },
               a: {
                 display: 'block',
+                marginBottom: '0.4rem',
                 'text-decoration': 'none',
                 fontSize: '0.8rem',
                 fontWeight: '200',
