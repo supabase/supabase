@@ -11,9 +11,8 @@ import TabItem from '@theme/TabItem'
 Passwordless method for logging in an existing user.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
+const { data, error } = await supabase.auth.signInWithOtp({
   email: 'example@email.com',
-  password: 'example-password',
 })
 ```
 
@@ -175,106 +174,30 @@ If set to false, this method will not create a new user. Defaults to true.
 
 ## Notes
 
-- A user can sign up either via email or OAuth.
-- If you provide `email` without a `password`, the user will be sent a magic link.
+- This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
+- Requires either an email or phone number.
+- If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
+- If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
 - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-- Specifying a `provider` will open the browser to the relevant login page.
 
 ## Examples
 
 ### Sign in with email.
 
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-```
-
-### Sign in with magic link.
-
-If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
+The user will be sent an otp to their email. By default, a given user can only request an otp once every 60 seconds.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
+const { data, error } = await supabase.auth.signInWithOtp({
   email: 'example@email.com',
 })
 ```
 
-### Sign in using third-party providers.
+### Sign in with sms otp.
 
-Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  // provider can be 'github', 'google', 'gitlab', and more
-  provider: 'github',
-})
-```
-
-### Sign in with Phone.
-
-Supabase supports Phone Auth.
+The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
+const { data, error } = await supabase.auth.signInWithPassword({
   phone: '+13334445555',
-  password: 'some-password',
-})
-```
-
-### Sign in with redirect.
-
-Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
-the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-
-Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
-any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
-
-```js
-const { user, session, error } = await supabase.auth.signIn(
-  {
-    provider: 'github',
-  },
-  {
-    redirectTo: 'https://example.com/welcome',
-  }
-)
-```
-
-### Sign in with scopes.
-
-If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
-
-```js
-const { user, session, error } = await supabase.auth.signIn(
-  {
-    provider: 'github',
-  },
-  {
-    scopes: 'repo gist notifications',
-  }
-)
-const oAuthToken = session.provider_token // use to access provider API
-```
-
-### Sign in using a refresh token (e.g. in React Native).
-
-If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-
-```js
-// An example using Expo's `AuthSession`
-const redirectUri = AuthSession.makeRedirectUri({ useProxy: false })
-const provider = 'google'
-
-AuthSession.startAsync({
-  authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-  returnUrl: redirectUri,
-}).then(async (response: any) => {
-  if (!response) return
-  const { user, session, error } = await supabase.auth.signIn({
-    refreshToken: response.params?.refresh_token,
-  })
 })
 ```

@@ -12,3 +12,5 @@ export const HIDDEN_EXTENSIONS = [
   'pg_visibility',
   'pgstattuple',
 ]
+
+export const EXTENSIONS_IN_OWN_SCHEMA = ['postgis', 'pgsodium', 'vault']
