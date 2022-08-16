@@ -111,7 +111,7 @@ if (!secret) {
   throw new Error("AUTHSIGNAL_SECRET is undefined");
 }
 
-const redirectUrl = "http://localhost:3001/api/callback";
+const redirectUrl = "http://localhost:3000/api/callback";
 
 export const authsignal = new Authsignal({ secret, redirectUrl });
 ```
