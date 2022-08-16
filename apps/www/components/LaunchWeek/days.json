@@ -39,7 +39,7 @@
       {
         "title": "Introducing Supabase.js v2",
         "url": "/blog/supabase-js-v2",
-        "description": "Read our blog post outlining the major changes in supabase-js.",
+        "description": "First peek of Supabase-js v2, which focuses on quality-of-life improvements for developers.",
         "products": [
           {
             "title": "Supabase.js v2 Docs",
