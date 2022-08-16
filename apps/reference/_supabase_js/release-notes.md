@@ -33,11 +33,34 @@ const supabase = createClient(apiURL, apiKey, {
         endpoint,
     },
     // common across all libraries
-		global: {
-	    fetch: customFetch,
-      headers: DEFAULT_HEADERS
-		}
+	global: {
+        fetch: customFetch,
+        headers: DEFAULT_HEADERS
+	}
 });
+```
+
+### Typescript support
+
+
+The libraries now support typescript.
+
+```ts
+
+// v2 - definitions are injected in `createClient()`
+import type { Database } from "./DatabaseDefinitions";
+const supabase = createClient<Database>(SUPABASE_URL, ANON_KEY)
+const { data } = await supabase.from('messages').select().match({ id: 1 })
+
+// v1 -- previously definitions were injected in the `from()` method
+supabase.from<Definitions['Message']>('messages').select('*')
+```
+
+Types can be generated via the CLI:
+
+```bash
+supabase start
+supabase gen types typescript --local > DatabaseDefinitions.ts
 ```
 
 ### Data operations return minimal
@@ -55,7 +78,7 @@ const { data, error } = await supabase
 ```
 ### New ordering defaults
 
-`.order()`: `nullsFirst` defaults to Postgres’s default (https://github.com/supabase/postgrest-js/pull/283).
+`.order()` now defaults to Postgres’s default: [PR](https://github.com/supabase/postgrest-js/pull/283).
 
 Previously `nullsFirst` defaults to `false` , meaning `null`s are ordered last. This is bad for performance if e.g. the column uses an index with `NULLS FIRST` (which is the default direction for indexes).
 
@@ -82,19 +105,61 @@ interface Session {
     user: User
 }
 ```
+
+### New Auth methods
+
+We're removing the `signIn()` method in favor of more explicit function signatures:
+`signInWithPassword()`, `signInWithPasswordless()`, and `signInWithOtp()`.
+
+```ts
+// v2
+const { data } = await supabase.auth.signInWithPassword({
+  email: 'hello@example',
+  password: 'pass',
+})
+// v1
+const { data } = await supabase.auth.signIn({
+  email: 'hello@example',
+  password: 'pass',
+})
+```
+
+### New Realtime methods
+
+There is a new `channel()` method in the Realtime library, which will be used for our Multiplayer updates.
+
+```ts
+supabaseClient
+  .channel('any_string_you_want')
+  .on('presence', { event: 'track' }, (payload) => {
+    console.log(payload)
+  })
+  .subscribe()
+
+supabaseClient
+  .channel('any_string_you_want')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'movies',
+    },
+    (payload) => {
+      console.log(payload)
+    }
+  )
+  .subscribe()
+```
+
+We will deprecate the `.from().on().subscribe()` method previosuly used for listening to postgres changes.
+
 ### Deprecated setAuth()
 
 Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead, pass the custom header into the `createClient()` method provided: ([PR](https://github.com/supabase/gotrue-js/pull/340))
 
-```jsx
-// example of using supabase client on the server-side in a request handler
-app.get('/example', (req, res) => {
-    const supabase = createClient(process.env.SUPABASE_URL, req.cookies['sb-access-token'])
-    ...
-})
-```
 
-### Other changes
+### All changes
 
 - `supabase-js`
   - `shouldThrowOnError` has been removed until all the client libraries support this option ([PR](https://github.com/supabase/supabase-js/pull/490)). 
