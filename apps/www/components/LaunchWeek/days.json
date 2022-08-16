@@ -37,7 +37,7 @@
     "youtube_id": "OpPOaJI_Z28",
     "articles": [
       {
-        "title": "Introducing Supabase.js v2",
+        "title": "Supabase.js v2 release candidate",
         "url": "/blog/supabase-js-v2",
         "description": "First peek of Supabase-js v2, which focuses on quality-of-life improvements for developers.",
         "products": [
