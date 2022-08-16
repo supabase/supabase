@@ -1,6 +1,6 @@
 ---
 id: auth-getuser
-title: 'getUser()'
+title: 'getUserById()'
 slug: /auth-getuser
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Gets the current user details if there is an existing session.
 
 ```js
-const user = supabase.auth.user()
+const user = await supabase.auth.getUser()
 ```
 
 ## Parameters
@@ -49,5 +49,5 @@ This method gets the user object from memory.
 ### Get the logged in user
 
 ```js
-const user = supabase.auth.user()
+const user = await supabase.auth.getUser()
 ```

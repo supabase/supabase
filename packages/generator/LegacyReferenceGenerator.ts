@@ -176,11 +176,10 @@ const isUnion = (paramDefinition: TsDoc.TypeDefinition) => {
 
 const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
   const joined = paramDefinition.type.types.reduce((acc, x) => {
-    acc.push(...x.declaration.children)
+    acc.push(...(x.declaration?.children || []))
     return acc
   }, [])
 
-  console.log('joined', joined)
   return uniqBy(joined, 'name')
 }
 

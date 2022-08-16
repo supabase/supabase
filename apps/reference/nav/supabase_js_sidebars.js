@@ -58,7 +58,7 @@ const sidebars = {
         'generated/auth-api-deleteuser',
         'generated/auth-api-generatelink',
         'generated/auth-api-inviteuserbyemail',
-        'generated/auth-api-sendmobileotp',
+        // 'generated/auth-api-sendmobileotp',
         'generated/auth-api-updateuserbyid',
       ],
       collapsed: true,
