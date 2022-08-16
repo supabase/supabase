@@ -11,7 +11,7 @@ import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading/Loading'
-import { formReducer } from './SupportForm.utils'
+import { formReducer, uploadAttachments } from './SupportForm.utils'
 import {
   DEFAULT_VALUES,
   CATEGORY_OPTIONS,
@@ -32,7 +32,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT_VALUES)
 
-  const [uploadedFiles, setUploadedFiles] = useState<any>()
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>()
   const [uploadedDataUrls, setUploadedDataUrls] = useState<any>([])
 
   // Get all orgs and projects from global store
@@ -73,11 +73,12 @@ const SupportForm: FC<Props> = ({ setSent }) => {
 
   useEffect(() => {
     if (!uploadedFiles) return
-
-    console.log('UploadedFiles changed', uploadedFiles)
     const objectUrls = Array.prototype.map.call(uploadedFiles, (file) => URL.createObjectURL(file))
-    console.log('objectUrls', objectUrls)
     setUploadedDataUrls(objectUrls)
+
+    return () => {
+      objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
+    }
   }, [uploadedFiles])
 
   function handleOnChange(x: any) {
@@ -124,6 +125,12 @@ const SupportForm: FC<Props> = ({ setSent }) => {
 
     if (errors.length === 0) {
       const projectRef = formState.project.value
+
+      if (uploadedFiles) {
+        const uploadedAttachments = await uploadAttachments(projectRef, uploadedFiles)
+        console.log(uploadedAttachments)
+      }
+
       const payload = {
         projectRef,
         message: formState.body.value,
@@ -145,19 +152,21 @@ const SupportForm: FC<Props> = ({ setSent }) => {
         }
       }
 
-      setLoading(true)
-      const response = await post(`${API_URL}/feedback/send`, payload)
-      setLoading(false)
+      ui.setNotification({ category: 'success', message: 'hehe' })
 
-      if (response.error) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to submit support ticket: ${response.error.message}`,
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-        setSent(true)
-      }
+      // setLoading(true)
+      // const response = await post(`${API_URL}/feedback/send`, payload)
+      // setLoading(false)
+
+      // if (response.error) {
+      //   ui.setNotification({
+      //     category: 'error',
+      //     message: `Failed to submit support ticket: ${response.error.message}`,
+      //   })
+      // } else {
+      //   ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      //   setSent(true)
+      // }
     }
   }
 
