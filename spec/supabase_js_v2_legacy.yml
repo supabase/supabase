@@ -1156,6 +1156,7 @@ pages:
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true
