@@ -118,7 +118,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                 >
                   <PlayIcon
                     strokeWidth={1.5}
-                    className="text-brand-900 absolute w-24 opacity-30 transition-all group-hover:scale-105 group-hover:opacity-75"
+                    className="text-scale-1200 absolute w-24 opacity-50 transition-all group-hover:scale-105 group-hover:opacity-100"
                   />
                 </div>
               </div>
