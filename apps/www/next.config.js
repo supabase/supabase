@@ -374,6 +374,11 @@ module.exports = withMDX({
       },
       {
         permanent: false,
+        source: '/docs/client/auth-verifyotp',
+        destination: '/docs/reference/javascript/auth-verifyotp',
+      },
+      {
+        permanent: false,
         source: '/docs/client/auth-session',
         destination: '/docs/reference/javascript/auth-session',
       },
@@ -1428,6 +1433,11 @@ module.exports = withMDX({
       //   permanent: true,
       //   source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
       //   destination: '/docs/reference/javascript/auth-resetpasswordforemail',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-verifyotp',
+      //   destination: '/docs/reference/javascript/auth-verifyotp',
       // },
       // {
       //   permanent: true,
