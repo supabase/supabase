@@ -1242,9 +1242,9 @@ pages:
             .subscribe()
           ```
 
-  removeSubscription():
-    title: 'removeSubscription()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeSubscription'
+  removeChannel():
+    title: 'removeChannel()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1252,12 +1252,12 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeSubscription(mySubscription)
+          supabase.removeChannel(mySubscription)
           ```
 
-  removeAllSubscriptions():
+  removeAllChannels():
     title: 'removeAllSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
@@ -1265,18 +1265,18 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          supabase.removeAllSubscriptions()
+          supabase.removeAllChannels()
           ```
 
-  getSubscriptions():
+  getChannels():
     title: 'getSubscriptions()'
-    $ref: '@supabase/supabase-js.index.SupabaseClient.getSubscriptions'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     examples:
       - name: Get all subscriptions
         isSpotlight: true
         js: |
           ```js
-          const subscriptions = supabase.getSubscriptions()
+          const subscriptions = supabase.getChannels()
           ```
 
   storage.listBuckets():
