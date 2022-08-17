@@ -48,7 +48,7 @@ const Cursor = ({ className = '', color = 'none' }) => {
   )
 }
 
-function AuthPage() {
+function RealtimePage() {
   // base path for images
   const { basePath } = useRouter()
   const meta_title = 'Realtime | Sync your data in real time'
@@ -141,7 +141,6 @@ function AuthPage() {
             size="large"
             text={[
               <p key={0}>
-                {/* [TODO] Update copy */}
                 <p className="text-base lg:text-lg">
                   APIs that you can understand. With powerful libraries that work on client and
                   server-side applications.
@@ -192,10 +191,39 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
+        <SectionContainer>
+          <div className="grid grid-cols-12 lg:gap-16">
+            <div className="col-span-12 mb-8 lg:col-span-5">
+              <h2 className="h3">User permissions without the middleware</h2>
+
+              <p className="p text-base lg:text-lg">
+                Supabase Auth works without any additional servers. Build Authorization rules with
+                Postgres' Row Level Security, controlling who can create, edit and delete specific
+                rows in your database.
+              </p>
+              <p className="p">Policies can be written in SQL or using the dashboard online.</p>
+
+              <Link href="/docs/guides/auth#policy-examples">
+                <a>
+                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
+                    Explore documentation
+                  </Button>
+                </a>
+              </Link>
+            </div>
+            <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+              <SplitCodeBlockCarousel
+                // @ts-ignore
+                content={AuthSqlRulesExamples}
+              />
+            </div>
+          </div>
+        </SectionContainer>
+
         <CTABanner />
       </DefaultLayout>
     </>
   )
 }
 
-export default AuthPage
+export default RealtimePage
