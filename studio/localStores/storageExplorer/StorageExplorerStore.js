@@ -821,7 +821,7 @@ class StorageExplorerStore {
         .getPublicUrl(formattedPathToFile)
 
       if (!error) {
-        return data.publicUrl
+        return data.publicURL
       }
     }
 
@@ -830,7 +830,7 @@ class StorageExplorerStore {
       .createSignedUrl(formattedPathToFile, DEFAULT_EXPIRY)
 
     if (!error) {
-      return data.signedUrl
+      return data.signedURL
     }
 
     return null
