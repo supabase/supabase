@@ -1,8 +1,8 @@
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
-import { useEffect, useReducer, useState, FC, ChangeEvent } from 'react'
+import { useEffect, useReducer, useState, FC, ChangeEvent, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconMail, Input, Listbox } from '@supabase/ui'
+import { Button, IconMail, IconPlus, IconX, Input, Listbox } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { Project } from 'types'
@@ -18,6 +18,8 @@ import {
   SEVERITY_OPTIONS,
 } from 'components/interfaces/Support/Support.constants'
 
+const MAX_ATTACHMENTS = 5
+
 interface Props {
   setSent: (value: boolean) => void
 }
@@ -28,11 +30,11 @@ const SupportForm: FC<Props> = ({ setSent }) => {
   const projectRef = router.query.ref
   const category = router.query.category
 
-  const [errors, setErrors] = useState<any>([])
+  const uploadButtonRef = useRef()
   const [loading, setLoading] = useState<boolean>(false)
   const [formState, formDispatch] = useReducer(formReducer, DEFAULT_VALUES)
 
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>()
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<any>([])
 
   // Get all orgs and projects from global store
@@ -73,7 +75,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
 
   useEffect(() => {
     if (!uploadedFiles) return
-    const objectUrls = Array.prototype.map.call(uploadedFiles, (file) => URL.createObjectURL(file))
+    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
     setUploadedDataUrls(objectUrls)
 
     return () => {
@@ -121,8 +123,6 @@ const SupportForm: FC<Props> = ({ setSent }) => {
       errors.push([...errors, message])
     }
 
-    setErrors([...errors])
-
     if (errors.length === 0) {
       setLoading(true)
       const projectRef = formState.project.value
@@ -167,8 +167,28 @@ const SupportForm: FC<Props> = ({ setSent }) => {
   const onFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
     const items = event.target.files || (event as any).dataTransfer.items
-    console.log('onFilesUpload', items)
-    setUploadedFiles(items)
+    const itemsCopied = Array.prototype.map.call(items, (item) => item) as File[]
+    const itemsToBeUploaded = itemsCopied.slice(0, MAX_ATTACHMENTS - uploadedFiles.length)
+
+    setUploadedFiles(uploadedFiles.concat(itemsToBeUploaded))
+    if (items.length + uploadedFiles.length > MAX_ATTACHMENTS) {
+      ui.setNotification({
+        category: 'info',
+        message: `Only up to ${MAX_ATTACHMENTS} attachments are allowed`,
+      })
+    }
+
+    event.target.value = ''
+  }
+
+  const removeUploadedFile = (idx: number) => {
+    const updatedFiles = uploadedFiles?.slice()
+    updatedFiles.splice(idx, 1)
+    setUploadedFiles(updatedFiles)
+
+    const updatedDataUrls = uploadedDataUrls.slice()
+    uploadedDataUrls.splice(idx, 1)
+    setUploadedDataUrls(updatedDataUrls)
   }
 
   if (!isInitialized) {
@@ -300,31 +320,58 @@ const SupportForm: FC<Props> = ({ setSent }) => {
             error={formState.body.error}
           />
         </div>
-        <div className="px-6">
+        <div className="px-6 space-y-4">
           <div className="space-y-1">
             <p className="block text-scale-1100 text-sm">Attachments</p>
             <p className="block text-scale-1000 text-sm">
-              Upload any screenshots that might be relevant to the issue that you're facing
+              Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the issue that
+              you're facing
             </p>
           </div>
           <div className="">
-            <input multiple type="file" onChange={onFilesUpload} />
+            <input
+              multiple
+              type="file"
+              // @ts-ignore
+              ref={uploadButtonRef}
+              className="hidden"
+              accept="image/png, image/jpeg"
+              onChange={onFilesUpload}
+            />
           </div>
           <div className="flex items-center space-x-2">
-            {uploadedDataUrls.map((x: any) => (
+            {uploadedDataUrls.map((x: any, idx: number) => (
               <div
                 style={{ backgroundImage: `url("${x}")` }}
-                className="bg-center bg-cover bg-no-repeat h-14 w-14 rounded"
-              />
+                className="bg-center bg-cover bg-no-repeat h-14 w-14 rounded relative"
+              >
+                <div
+                  className={[
+                    'rounded-full w-4 h-4 bg-red-900 flex items-center justify-center',
+                    'absolute -top-1 -right-1 cursor-pointer',
+                  ].join(' ')}
+                  onClick={() => removeUploadedFile(idx)}
+                >
+                  <IconX size={12} strokeWidth={2} />
+                </div>
+              </div>
             ))}
+            {uploadedFiles.length < MAX_ATTACHMENTS && (
+              <div
+                className={[
+                  'border border-scale-800 transition opacity-50 hover:opacity-100',
+                  'w-14 h-14 rounded flex items-center justify-center group cursor-pointer',
+                ].join(' ')}
+                onClick={() => {
+                  if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
+                }}
+              >
+                <IconPlus strokeWidth={2} size={20} />
+              </div>
+            )}
           </div>
         </div>
       </div>
-      {errors.length >= 1 && (
-        <div className="px-6">
-          <p className="text-sm text-red-1000">There are errors here</p>
-        </div>
-      )}
       <div className="px-6">
         <div className="flex justify-end">
           <Button
