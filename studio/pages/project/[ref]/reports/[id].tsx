@@ -16,8 +16,6 @@ import {
   IconSave,
   IconSettings,
 } from '@supabase/ui'
-
-import { checkPermissions, useFlag } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -27,8 +25,6 @@ import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { NextPageWithLayout } from 'types'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -36,22 +32,16 @@ const LAYOUT_COLUMN_COUNT = 24
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
-const PageLayout: NextPageWithLayout = () => {
-  const reportsOverview = useFlag('reportsOverview')
-  const Layout = reportsOverview ? ReportsLayout : ProjectLayoutWithAuth
-  return (
-    // TODO: use .getLayout when reportsOverview flag is removed
-    <Layout>
-      <div className="mx-auto my-8 w-full max-w-7xl">
-        <Reports />
-      </div>
-      <EditReportModal />
-    </Layout>
-  )
-}
+const PageLayout: NextPageWithLayout = () => (
+  <>
+    <div className="mx-auto my-8 w-full max-w-7xl">
+      <Reports />
+    </div>
+    <EditReportModal />
+  </>
+)
 
-// TODO: uncomment when reportsOverview flag is removed
-// PageLayout.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
 export default observer(PageLayout)
 

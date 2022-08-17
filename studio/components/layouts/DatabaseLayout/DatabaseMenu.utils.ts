@@ -6,6 +6,7 @@ import { useFlag } from 'hooks'
 export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
   const logsRealtime = useFlag('logsRealtime')
+  const reportsOverview = useFlag('reportsOverview')
 
   const HOOKS_RELEASED = '2021-07-30T15:33:54.383Z'
   const showHooksRoute = project?.inserted_at ? project.inserted_at > HOOKS_RELEASED : false
@@ -38,66 +39,76 @@ export const generateDatabaseMenu = (project?: Project): ProductMenuGroup[] => {
     },
     ...(IS_PLATFORM
       ? [
-          {
-            title: 'Logs',
-            items: [
-              {
-                name: 'API logs',
-                key: 'api-logs',
-                url: `/project/${ref}/database/api-logs`,
-                items: [],
-              },
-              {
-                name: 'Postgres logs',
-                key: 'postgres-logs',
-                url: `/project/${ref}/database/postgres-logs`,
-                items: [],
-              },
-              ...(logsRealtime
-                ? [
-                    {
-                      name: 'Realtime logs',
-                      key: 'realtime-logs',
-                      url: `/project/${ref}/database/realtime-logs`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
+        {
+          title: 'Logs and Usage',
+          items: [
+            {
+              name: 'API logs',
+              key: 'api-logs',
+              url: `/project/${ref}/database/api-logs`,
+              items: [],
+            },
+            ...(reportsOverview
+              ? [
+                {
+                  name: 'API usage',
+                  key: 'api-usage',
+                  url: `/project/${ref}/database/api-usage`,
+                  items: [],
+                },
+              ]
+              : []),
+            {
+              name: 'Postgres logs',
+              key: 'postgres-logs',
+              url: `/project/${ref}/database/postgres-logs`,
+              items: [],
+            },
+            ...(logsRealtime
+              ? [
+                {
+                  name: 'Realtime logs',
+                  key: 'realtime-logs',
+                  url: `/project/${ref}/database/realtime-logs`,
+                  items: [],
+                },
+              ]
+              : []),
+          ],
+        },
+      ]
       : []),
     ...(IS_PLATFORM
       ? [
-          {
-            title: 'Alpha Preview',
-            isPreview: true,
-            items: [
-              {
-                name: 'Triggers',
-                key: 'triggers',
-                url: `/project/${ref}/database/triggers`,
-                items: [],
-              },
-              {
-                name: 'Functions',
-                key: 'functions',
-                url: `/project/${ref}/database/functions`,
-                items: [],
-              },
-              ...(showHooksRoute
-                ? [
-                    {
-                      name: 'Database Webhooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/database/hooks`,
-                      items: [],
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
+        {
+          title: 'Alpha Preview',
+          isPreview: true,
+          items: [
+            {
+              name: 'Triggers',
+              key: 'triggers',
+              url: `/project/${ref}/database/triggers`,
+              items: [],
+            },
+            {
+              name: 'Functions',
+              key: 'functions',
+              url: `/project/${ref}/database/functions`,
+              items: [],
+            },
+            ...(showHooksRoute
+              ? [
+                {
+                  name: 'Database Webhooks',
+                  key: 'hooks',
+                  url: `/project/${ref}/database/hooks`,
+                  items: [],
+                },
+              ]
+              : []),
+          ],
+        },
+      ]
       : []),
   ]
 }
