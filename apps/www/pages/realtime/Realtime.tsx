@@ -84,6 +84,7 @@ function RealtimePage() {
           image={[
             // [TODO] Just playing around with some ideas
             <div className="bg-scale-300 relative flex h-[372px] w-[560px] items-center justify-center rounded">
+              <p className="p absolute top-4 left-4">Just playing around with some ideas</p>
               <div
                 className={[
                   'bg-brand-900 border-brand-800 relative h-12 w-48 rounded-full border-[3px]',
