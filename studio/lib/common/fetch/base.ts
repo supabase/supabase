@@ -88,7 +88,9 @@ export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
 
-  const { session } = await auth.getSession()
+  const {
+    data: { session },
+  } = await auth.getSession()
   if (!session) {
     // try to get from url fragment
     const accessToken = getParameterByName('access_token')

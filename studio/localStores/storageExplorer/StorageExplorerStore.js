@@ -637,7 +637,7 @@ class StorageExplorerStore {
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
-      const fileOptions = { cacheControl: 3600 }
+      const fileOptions = { cacheControl: '3600' }
       const metadata = { mimetype: file.type, size: file.size }
 
       const isWithinFolder = get(file, ['path'], '').split('/').length > 1
@@ -821,7 +821,7 @@ class StorageExplorerStore {
         .getPublicUrl(formattedPathToFile)
 
       if (!error) {
-        return data.publicURL
+        return data.publicUrl
       }
     }
 
@@ -830,7 +830,7 @@ class StorageExplorerStore {
       .createSignedUrl(formattedPathToFile, DEFAULT_EXPIRY)
 
     if (!error) {
-      return data.signedURL
+      return data.signedUrl
     }
 
     return null
