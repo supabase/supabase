@@ -10,6 +10,7 @@ import {
 // [TODO] These need to be relooked - I'm using multiplayer.dev as a "docs"
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
+import RealtimeStyles from './Realtime.module.css'
 
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions.json'
@@ -28,14 +29,14 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
 
-const Cursor = (color: string = 'none') => {
+const Cursor = ({ className = '', color = 'none' }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill={color}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="h-8 w-8 stroke-black dark:stroke-white"
+      className={`h-12 w-12 stroke-black dark:stroke-white ${className}`}
     >
       <path
         strokeLinecap="round"
@@ -81,8 +82,33 @@ function AuthPage() {
             'Sync data across clients by listening to changes in your Database and broadcasting them over web sockets',
           ]}
           image={[
-            <div className="bg-scale-500 relative h-[372px] w-[560px] rounded">
-              <Cursor />
+            // [TODO] Just playing around with some ideas
+            <div className="bg-scale-300 relative flex h-[372px] w-[560px] items-center justify-center rounded">
+              <div
+                className={[
+                  'bg-brand-900 border-brand-800 relative h-12 w-48 rounded-full border-[3px]',
+                  `${RealtimeStyles['element']}`,
+                ].join(' ')}
+              />
+              <Cursor
+                color="#236574"
+                className={`${RealtimeStyles['cursor-1']} absolute top-[210px] right-[130px]`}
+              />
+              <Cursor
+                color="#170B6B"
+                className={`${RealtimeStyles['cursor-2']} absolute top-[300px] right-[400px]`}
+              />
+              <div
+                className={[
+                  'border-scale-1200 absolute bottom-[45px] left-[215px] flex h-10 w-32',
+                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-[#170B6B]',
+                  `${RealtimeStyles['comment-bubble']}`,
+                ].join(' ')}
+              >
+                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
+                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
+                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
+              </div>
             </div>,
             // <div className="header--light block w-full" key="light">
             //   <Image
