@@ -14,7 +14,7 @@ const DPA = () => {
               <div className="prose flex flex-col space-y-8 p-16">
                 <h1 className="text-center text-5xl">DPA</h1>
                 <p>
-                  We have a long standing commitment to customer privacy and data protection, and as
+                  We have a long-standing commitment to customer privacy and data protection, and as
                   part of that commitment we have prepared a pre-signed Data Processing Addendum
                   ("DPA").
                 </p>
