@@ -53,7 +53,7 @@ export const Section = ({ children, icon, img }) => (
 
 ### SOC 2
 
-Supabase is SOC2 type 1 compliant. Enterprise customers can request a copy of our SOC2 report by contacting
+Supabase is SOC2 Type 1 compliant. Enterprise customers can request a copy of our SOC2 report by contacting
 security@supabase.com
 
 <div className="w-16">
@@ -108,7 +108,7 @@ Supabase uses [Stripe](https://stripe.com) to process payments and does not stor
 Stripe is a certified PCI Service Provider Level 1, which is the highest level of certification in the payments industry.
 
 </Section>
- 
+
 <Section icon={<ClipboardCheckIcon strokeWidth={1}/>}>
 
 ### Vulnerability Management
@@ -133,12 +133,11 @@ In addition to internal security reviews, we use various tools to scan our code 
 Access Supabase’s security and compliance documents on our Security Portal, such as
 penetration testing and audit reports.
 
-<Link href="https://security.supabase.com" target="_blank">
-  <Button type="default" size="medium">
+<Link passHref href="https://security.supabase.com">
+  <Button type="default" size="medium" as="a" className="no-underline" target="_blank">
     View Report
   </Button>
 </Link>
-
   </div>
 </div>
 
