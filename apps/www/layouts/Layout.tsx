@@ -1,15 +1,11 @@
 import { MDXProvider } from '@mdx-js/react'
-import { useRouter } from 'next/router'
-
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ImageGrid from '~/components/ImageGrid'
-import Quote from '~/components/Quote'
-
-// plugins for next-mdx-remote
 import DefaultLayout from '~/components/Layouts/Default'
-import { NextSeo } from 'next-seo'
+import Quote from '~/components/Quote'
 
 const ignoreClass = 'ignore-on-export'
 
@@ -53,10 +49,6 @@ function getComponents(type: any) {
 }
 
 export default function ContentsLayout({ context }: any) {
-  const router = useRouter()
-
-  console.log(context)
-
   return (
     <DefaultLayout>
       <NextSeo {...context.meta} />
