@@ -159,7 +159,7 @@ const SupportForm: FC<Props> = ({ setSent }) => {
         })
       } else {
         ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-        // setSent(true)
+        setSent(true)
       }
     }
   }
