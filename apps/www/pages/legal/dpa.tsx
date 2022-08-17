@@ -19,7 +19,7 @@ const DPA = () => {
                   ("DPA").
                 </p>
 
-                <p>You can download the latest DPA document through our security portal</p>
+                <p>You can download the latest DPA document through our security portal.</p>
                 <div>
                   <Link href="https://security.supabase.com">
                     <Button size="medium" type="default">
