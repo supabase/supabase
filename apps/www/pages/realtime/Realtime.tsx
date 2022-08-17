@@ -191,6 +191,7 @@ function RealtimePage() {
           </div>
         </SectionContainer>
 
+        {/* Somehow removing this section messes up all the alignment? */}
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-5">
