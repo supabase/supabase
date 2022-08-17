@@ -1,18 +1,22 @@
 ---
-id: auth-api-resetpasswordforemail
-title: 'resetPasswordForEmail()'
-slug: /auth-api-resetpasswordforemail
+id: auth-admin-generatelink
+title: 'generateLink()'
+slug: /auth-admin-generatelink
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sends a reset request to an email address.
+Generates links to be sent via email or other.
 
 ```js
-const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-  'user@email.com'
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
 )
 ```
 
@@ -20,6 +24,30 @@ const { data, error } = await supabase.auth.api.resetPasswordForEmail(
 
 <ul className="method-list-group">
   
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateLinkType
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code> | <code>email_change_current</code> | <code>email_change_new</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The link type
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
+</li>
+
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -34,7 +62,7 @@ const { data, error } = await supabase.auth.api.resetPasswordForEmail(
   </h4>
   <div class="method-list-item-description">
 
-The email address of the user.
+The user's email.
 
   </div>
   
@@ -64,7 +92,27 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      captchaToken
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Optional user metadata. For signup only.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -75,7 +123,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+User password. For signup only.
 
   </div>
   
@@ -95,7 +143,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-A URL or mobile address to send the user to after they are confirmed.
+The redirect url which should be appended to the generated link
 
   </div>
   
@@ -109,28 +157,28 @@ A URL or mobile address to send the user to after they are confirmed.
 
 ## Notes
 
-Sends a reset request to an email address.
-
-When the user clicks the reset link in the email they will be forwarded to:
-
-`<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-You should then use the access_token in the url and new password to update the user as follows:
-
-```js
-const { error, data } = await supabase.auth.api.updateUser(access_token, {
-  password: new_password,
-})
-```
+- Requires a `service_role` key.
+- This function should only be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 
-### Reset password
+### Generate a signup link.
 
 ```js
-const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-  'user@email.com'
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
+)
+```
+
+### Generate an invite link.
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'invite',
 )
 ```

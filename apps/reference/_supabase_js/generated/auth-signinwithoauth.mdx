@@ -11,9 +11,8 @@ import TabItem from '@theme/TabItem'
 Log in an existing user via a third-party provider.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
-  email: 'example@email.com',
-  password: 'example-password',
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
 })
 ```
 
@@ -56,7 +55,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+One of the providers supported by GoTrue.
 
   </div>
   
@@ -71,12 +70,73 @@ No description provided.
       optional
     </span>
     <span className="method-list-item-validation">
-      <code>SignInWithOAuthOptions</code>
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
 No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      queryParams
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An object of query params
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      redirectTo
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A URL to send the user to after they are confirmed (OAuth logins only).
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      scopes
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A space-separated list of scopes granted to the OAuth application.
 
   </div>
   
@@ -88,73 +148,38 @@ No description provided.
 
 </ul>
 
+</li>
+
+</ul>
+
 ## Notes
 
-- A user can sign up either via email or OAuth.
-- If you provide `email` without a `password`, the user will be sent a magic link.
-- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
-- Specifying a `provider` will open the browser to the relevant login page.
+- This method is used for signing in using a third-party provider.
+- Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
 
 ## Examples
 
-### Sign in with email.
+### Sign in using a third-party provider.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn({
-  email: 'example@email.com',
-  password: 'example-password',
-})
-```
-
-### Sign in with magic link.
-
-If no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  email: 'example@email.com',
-})
-```
-
-### Sign in using third-party providers.
-
-Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  // provider can be 'github', 'google', 'gitlab', and more
+const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github',
 })
 ```
 
-### Sign in with Phone.
+### Sign in using a third-party provider with redirect.
 
-Supabase supports Phone Auth.
-
-```js
-const { user, session, error } = await supabase.auth.signIn({
-  phone: '+13334445555',
-  password: 'some-password',
-})
-```
-
-### Sign in with redirect.
-
-Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
-the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-
-Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
+The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
+In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
 any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
 
 ```js
-const { user, session, error } = await supabase.auth.signIn(
-  {
-    provider: 'github',
-  },
-  {
-    redirectTo: 'https://example.com/welcome',
+const { user, session, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github'
+  options: {
+    redirectTo: 'https://example.com/welcome'
   }
-)
+}
 ```
 
 ### Sign in with scopes.
@@ -163,33 +188,11 @@ If you need additional data from an OAuth provider, you can include a space-sepa
 You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
 
 ```js
-const { user, session, error } = await supabase.auth.signIn(
-  {
-    provider: 'github',
-  },
-  {
-    scopes: 'repo gist notifications',
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github'
+  options: {
+    scopes: 'repo gist notifications'
   }
-)
-const oAuthToken = session.provider_token // use to access provider API
-```
-
-### Sign in using a refresh token (e.g. in React Native).
-
-If you are completing a sign up or login in a React Native app you can pass the refresh token obtained from the provider to obtain a session.
-
-```js
-// An example using Expo's `AuthSession`
-const redirectUri = AuthSession.makeRedirectUri({ useProxy: false })
-const provider = 'google'
-
-AuthSession.startAsync({
-  authUrl: `https://MYSUPABASEAPP.supabase.co/auth/v1/authorize?provider=${provider}&redirect_to=${redirectUri}`,
-  returnUrl: redirectUri,
-}).then(async (response: any) => {
-  if (!response) return
-  const { user, session, error } = await supabase.auth.signIn({
-    refreshToken: response.params?.refresh_token,
-  })
 })
+const oAuthToken = data.session.provider_token // use to access provider API
 ```

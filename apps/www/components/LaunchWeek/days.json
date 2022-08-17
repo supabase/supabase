@@ -28,10 +28,32 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "supabase-js v2",
+    "shipped": true,
     "date": "16th Aug 2022",
+    "description": "Today we're releasing supabase-js v2, which focuses on “quality-of-life” improvements for developers.",
     "d": 2,
-    "dd": "Tuesday"
+    "dd": "Tuesday",
+    "youtube_id": "iqZlPtl_b-I",
+    "articles": [
+      {
+        "title": "supabase-js v2 Release Candidate",
+        "url": "/blog/supabase-js-v2",
+        "description": "First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.",
+        "products": [
+          {
+            "title": "Supabase.js v2 Docs",
+            "url": "/docs/reference/javascript/next/installing",
+            "description": "Updated documentation for supabase-js"
+          },
+          {
+            "title": "Typescript support",
+            "url": "/docs/reference/javascript/next/typescript-support",
+            "description": "Using types generated directly from your database."
+          }
+        ]
+      }
+    ]
   },
   {
     "shipped": false,

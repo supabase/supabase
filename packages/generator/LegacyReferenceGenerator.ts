@@ -17,6 +17,7 @@ import {
   writeToDisk,
 } from './src/legacy/lib/helpers'
 import { TsDoc, OpenRef } from './src/legacy/definitions'
+import { uniqBy } from 'lodash'
 
 const yaml = require('js-yaml')
 const fs = require('fs')
@@ -131,12 +132,10 @@ function getDescriptionFromDefintion(tsDefinition) {
 }
 
 function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
-  let param =
-    paramDefinition.type?.type == 'reference' &&
-    paramDefinition.type?.dereferenced?.id
-      ? paramDefinition.type?.dereferenced
-      : paramDefinition
-  let children = param.type?.declaration?.children
+  // If this is a reference to another Param, let's use the reference instead
+  let param = isDereferenced(paramDefinition)
+    ? paramDefinition.type?.dereferenced
+    : paramDefinition
 
   const labelParams = {
     name: param.name,
@@ -145,6 +144,12 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
     description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
   }
   let subContent = ''
+
+  let children = param.type?.declaration?.children
+    ? param.type?.declaration?.children
+    : isUnion(param)
+    ? mergeUnion(param)
+    : param.children
 
   if (!!children) {
     let properties = children
@@ -156,6 +161,26 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   }
 
   return methodListItemLabel(labelParams, subContent)
+}
+
+const isDereferenced = (paramDefinition: TsDoc.TypeDefinition) => {
+  return (
+    paramDefinition.type?.type == 'reference' &&
+    paramDefinition.type?.dereferenced?.id
+  )
+}
+
+const isUnion = (paramDefinition: TsDoc.TypeDefinition) => {
+  return paramDefinition.type?.type == 'union'
+}
+
+const mergeUnion = (paramDefinition: TsDoc.TypeDefinition) => {
+  const joined = paramDefinition.type.types.reduce((acc, x) => {
+    acc.push(...(x.declaration?.children || []))
+    return acc
+  }, [])
+
+  return uniqBy(joined, 'name')
 }
 
 const methodListGroup = (items) => `
