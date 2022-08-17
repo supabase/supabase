@@ -8,13 +8,13 @@ const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
+    // @ts-ignore
     multiTab: false,
     detectSessionInUrl: false,
     localStorage: {
-      // @ts-ignore
-      getItem: (key) => {},
-      setItem: (key, value) => {},
-      removeItem: (key) => {},
+      getItem: (key: string) => undefined,
+      setItem: (key: string, value: string) => {},
+      removeItem: (key: string) => {},
     },
   },
 })
@@ -45,7 +45,7 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
       return data
     })
   )
-  const keys = compact(uploadedFiles).map((file) => file.Key.split('/').slice(1).join('/'))
+  const keys = compact(uploadedFiles).map((file) => file.path)
 
   const { data, error } = await supportSupabaseClient.storage
     .from('support-attachments')
@@ -53,7 +53,7 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
   if (error) {
     console.error('Failed to retrieve URLs for attachments', error)
   }
-  return data ? data.map((file) => file.signedURL) : []
+  return data ? data.map((file) => file.signedUrl) : []
 }
 
 export const formatMessage = (message: string, attachments: string[]) => {
