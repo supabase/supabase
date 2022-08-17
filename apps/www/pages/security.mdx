@@ -1,4 +1,12 @@
-import { KeyIcon, LinkIcon } from '@heroicons/react/outline'
+import {
+  KeyIcon,
+  LinkIcon,
+  UserGroupIcon,
+  ShieldCheckIcon,
+  RewindIcon,
+  CreditCardIcon,
+  ClipboardCheckIcon,
+} from '@heroicons/react/outline'
 import { Button, IconGitHub } from '@supabase/ui'
 import Layout from '../layouts/Layout'
 import Link from 'next/link'
@@ -12,8 +20,8 @@ export const meta = {
 export const Section = ({ children, icon, img }) => (
   <div>
     {icon && (
-      <div className="bordershadow-scale-500 not-prose dark:bg-scale-400 -mb-4 flex h-7 w-7 items-center justify-center rounded-md bg-white">
-        <figure className="w-4">{icon}</figure>
+      <div className="bordershadow-scale-500 not-prose dark:bg-scale-400 -mb-4 flex h-8 w-8 items-center justify-center rounded-md bg-white">
+        <figure className="w-5">{icon}</figure>
       </div>
     )}
     {img && <div className="-mb-4 flex h-12 w-12 items-center justify-center">{img}</div>}
@@ -41,7 +49,7 @@ export const Section = ({ children, icon, img }) => (
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
 
-<Section icon={<LinkIcon />}>
+<Section icon={<ShieldCheckIcon />}>
 
 ### SOC 2
 
@@ -63,7 +71,7 @@ Sensitive information like access tokens and encryption keys are encrypted at th
 
 </Section>
 
-<Section icon={<IconGitHub size={15} />}>
+<Section icon={<IconGitHub size={19} />}>
 
 ### Github security integration
 
@@ -71,7 +79,7 @@ Sensitive information like access tokens and encryption keys are encrypted at th
 
 </Section>
 
-<Section icon={<KeyIcon strokeWidth={1}/>}>
+<Section icon={<UserGroupIcon strokeWidth={1}/>}>
 
 ### Role based access control
 
@@ -81,7 +89,7 @@ Sensitive information like access tokens and encryption keys are encrypted at th
 
 </Section>
 
-<Section icon={<KeyIcon strokeWidth={1}/>}>
+<Section icon={<RewindIcon strokeWidth={1}/>}>
 
 ### Backups
 
@@ -91,7 +99,7 @@ Enterprise customers have access to Point in Time Recovery which enables restori
 
 </Section>
 
-<Section icon={<KeyIcon strokeWidth={1}/>}>
+<Section icon={<CreditCardIcon strokeWidth={1}/>}>
 
 ### Payment processing
 
@@ -101,7 +109,7 @@ Stripe is a certified PCI Service Provider Level 1, which is the highest level 
 
 </Section>
  
-<Section icon={<KeyIcon strokeWidth={1}/>}>
+<Section icon={<ClipboardCheckIcon strokeWidth={1}/>}>
 
 ### Vulnerability Management
 
