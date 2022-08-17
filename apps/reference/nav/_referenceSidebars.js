@@ -217,8 +217,6 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'doc', id: 'reference' },
-        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
@@ -229,6 +227,8 @@ const sidebars = {
           label: 'Supabase Dart Library',
           href: '/reference/dart',
         },
+        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
+        { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
     {
