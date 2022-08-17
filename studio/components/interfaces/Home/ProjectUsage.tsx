@@ -18,7 +18,6 @@ import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import useSWR from 'swr'
 import { ChartIntervals } from 'types'
-import { EndpointResponse, PathsDatum, StatusCodesDatum } from './ChartData.types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {

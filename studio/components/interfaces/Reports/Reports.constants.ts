@@ -33,7 +33,7 @@ export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
 
 export const PRESET_CONFIG = {
   [Presets.OVERVIEW]: {
-    title: 'Overview',
+    title: 'API Usage',
     sql: {
       statusCodes: `
   select 
