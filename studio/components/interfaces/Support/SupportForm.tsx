@@ -11,7 +11,7 @@ import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 import Divider from 'components/ui/Divider'
 import Connecting from 'components/ui/Loading/Loading'
-import { formReducer, uploadAttachments } from './SupportForm.utils'
+import { formatMessage, formReducer, uploadAttachments } from './SupportForm.utils'
 import {
   DEFAULT_VALUES,
   CATEGORY_OPTIONS,
@@ -124,16 +124,13 @@ const SupportForm: FC<Props> = ({ setSent }) => {
     setErrors([...errors])
 
     if (errors.length === 0) {
+      setLoading(true)
       const projectRef = formState.project.value
-
-      if (uploadedFiles) {
-        const uploadedAttachments = await uploadAttachments(projectRef, uploadedFiles)
-        console.log(uploadedAttachments)
-      }
+      const attachments = uploadedFiles ? await uploadAttachments(projectRef, uploadedFiles) : []
 
       const payload = {
         projectRef,
-        message: formState.body.value,
+        message: formatMessage(formState.body.value, attachments),
         category: formState.category.value,
         verified: true,
         tags: ['dashboard-support-form'],
@@ -152,21 +149,18 @@ const SupportForm: FC<Props> = ({ setSent }) => {
         }
       }
 
-      ui.setNotification({ category: 'success', message: 'hehe' })
+      const response = await post(`${API_URL}/feedback/send`, payload)
+      setLoading(false)
 
-      // setLoading(true)
-      // const response = await post(`${API_URL}/feedback/send`, payload)
-      // setLoading(false)
-
-      // if (response.error) {
-      //   ui.setNotification({
-      //     category: 'error',
-      //     message: `Failed to submit support ticket: ${response.error.message}`,
-      //   })
-      // } else {
-      //   ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-      //   setSent(true)
-      // }
+      if (response.error) {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to submit support ticket: ${response.error.message}`,
+        })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+        // setSent(true)
+      }
     }
   }
 
