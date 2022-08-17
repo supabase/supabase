@@ -246,7 +246,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Self hosted',
+      label: 'Self-hosting',
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },
