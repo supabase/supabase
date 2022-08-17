@@ -2,8 +2,6 @@ import { compact } from 'lodash'
 import { createClient } from '@supabase/supabase-js'
 import { uuidv4 } from 'lib/helpers'
 
-// [Joshen TODO] To be shifted into an env vars before doing anything
-// Both bitwarden, .env, and vercel
 const SUPPORT_API_URL = process.env.NEXT_PUBLIC_SUPPORT_API_URL || ''
 const SUPPORT_API_KEY = process.env.NEXT_PUBLIC_SUPPORT_ANON_KEY || ''
 const supportSupabaseClient = createClient(SUPPORT_API_URL, SUPPORT_API_KEY, {
