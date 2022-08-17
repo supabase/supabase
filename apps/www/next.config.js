@@ -374,6 +374,11 @@ module.exports = withMDX({
       },
       {
         permanent: false,
+        source: '/docs/client/auth-verifyotp',
+        destination: '/docs/reference/javascript/auth-verifyotp',
+      },
+      {
+        permanent: false,
         source: '/docs/client/auth-session',
         destination: '/docs/reference/javascript/auth-session',
       },
@@ -1083,8 +1088,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2021/11/29/community-day',
-        destination: '/blog/community-day-3',
+        source: '/blog/2021/11/29/community-day-lw3',
+        destination: '/blog/community-day-lw3',
       },
       {
         permanent: true,
@@ -1158,8 +1163,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2022/03/28/community-day',
-        destination: '/blog/community-day-4',
+        source: '/blog/2022/03/28/community-day-lw4',
+        destination: '/blog/community-day-lw4',
       },
       {
         permanent: true,
@@ -1413,6 +1418,62 @@ module.exports = withMDX({
         source: '/docs/guides/local-development',
         destination: '/docs/guides/cli/local-development',
       },
+      // V2 redirects
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-update',
+      //   destination: '/docs/reference/javascript/auth-updateuser',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-getuser',
+      //   destination: '/docs/reference/javascript/auth-getuser',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
+      //   destination: '/docs/reference/javascript/auth-resetpasswordforemail',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-verifyotp',
+      //   destination: '/docs/reference/javascript/auth-verifyotp',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-listusers',
+      //   destination: '/docs/reference/javascript/auth-admin-listusers',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-createuser',
+      //   destination: '/docs/reference/javascript/auth-admin-createuser',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-deleteuser',
+      //   destination: '/docs/reference/javascript/auth-admin-deleteuser',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-generatelink',
+      //   destination: '/docs/reference/javascript/auth-admin-generatelink',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
+      //   destination: '/docs/reference/javascript/auth-admin-inviteuserbyemail',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-getuserbyid',
+      //   destination: '/docs/reference/javascript/auth-admin-getuserbyid',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-updateuserbyid',
+      //   destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
+      // },
     ]
   },
 })

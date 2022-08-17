@@ -213,6 +213,7 @@ module.exports = {
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
+        'guides/integrations/authsignal',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
         'guides/integrations/directus',

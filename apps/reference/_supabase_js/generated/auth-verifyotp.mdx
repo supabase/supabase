@@ -1,14 +1,22 @@
 ---
-id: auth-api-generatelink
-title: 'generateLink()'
-slug: /auth-api-generatelink
+id: auth-verifyotp
+title: 'verifyOtp()'
+slug: /auth-verifyotp
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Generates links to be sent via email or other.
+Log in a user given a User supplied OTP received via mobile.
+
+```js
+const { data, error } = await supabase.auth.verifyOtp({
+  phone,
+  token,
+  type: 'sms',
+})
+```
 
 ## Parameters
 
@@ -17,41 +25,25 @@ Generates links to be sent via email or other.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      type
+      VerifyOtpParams
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code>
+      <code>VerifyMobileOtpParams</code> | <code>VerifyEmailOtpParams</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The link type ("signup" or "magiclink" or "recovery" or "invite").
+No description provided.
 
   </div>
   
-</li>
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
 
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      email
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's email.
-
-  </div>
-  
 </li>
 
 <li className="method-list-item">
@@ -78,27 +70,7 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      data
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>object</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Optional user metadata. For signup only.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      password
+      captchaToken
     </span>
     <span className="method-list-item-label-badge false">
       optional
@@ -109,7 +81,7 @@ Optional user metadata. For signup only.
   </h4>
   <div class="method-list-item-description">
 
-User password. For signup only.
+Verification token received when the user completes the captcha on the site.
 
   </div>
   
@@ -129,7 +101,7 @@ User password. For signup only.
   </h4>
   <div class="method-list-item-description">
 
-The link type ("signup" or "magiclink" or "recovery" or "invite").
+A URL to send the user to after they are confirmed.
 
   </div>
   
@@ -141,18 +113,24 @@ The link type ("signup" or "magiclink" or "recovery" or "invite").
 
 </ul>
 
-## Notes
-
-- Requires a `service_role` key.
-- This function should only be called on a server. Never expose your `service_role` key in the browser.
-
 ## Examples
 
-### Generate invite link.
+### Verify Sms One-Time Password (OTP)
 
 ```js
-const { data: user, error } = await supabase.auth.api.generateLink(
-  'invite',
-  'email@example.com'
-)
+const { data, error } = await supabase.auth.verifyOtp({
+  phone,
+  token,
+  type: 'sms',
+})
+```
+
+### Verify Signup One-Time Password (OTP)
+
+```js
+const { data, error } = await supabase.auth.verifyOtp({
+  email,
+  token,
+  type: 'signup',
+})
 ```

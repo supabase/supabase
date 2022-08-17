@@ -44,7 +44,7 @@ The values to update.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      count
+      __namedParameters
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -55,7 +55,7 @@ The values to update.
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+No description provided.
 
   </div>
   
@@ -76,7 +76,31 @@ Count algorithm to use to count rows in a table.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Count algorithm to use to count rows in a table.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      rollback
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Rollback the operation
 
   </div>
   
@@ -108,14 +132,14 @@ const { data, error } = await supabase
 Postgres offers a
 [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
 for working with JSON data. Right now it is only possible to update an entire JSON document,
-but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
 
 ```js
 const { data, error } = await supabase
   .from('users')
   .update(
     `
-    address: { 
+    address: {
       street: 'Melrose Place',
       postcode: 90210
     }
