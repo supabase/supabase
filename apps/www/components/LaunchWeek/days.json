@@ -56,10 +56,45 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "Security",
+    "shipped": true,
     "date": "17th Aug 2022",
+    "description": "An update on the ongoing security improvements of Supabase.",
     "d": 3,
-    "dd": "Wednesday"
+    "dd": "Wednesday",
+    "youtube_id": "6bGQotxisoY",
+    "announcements": [
+      {
+        "title": "Supabase is now SOC2 compliant",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "type": "soc2"
+      }
+    ],
+    "articles": [
+      {
+        "title": "Supabase is SOC2 compliant",
+        "url": "/blog/supabase-soc2",
+        "description": "Supabase is now SOC2 Type 1 compliant. Let’s dig into what that means, and explain the process we went through to get there. If you’re building a SaaS product, this blog post should provide a rough guide to getting your SOC2 certification.",
+        "products": [
+          {
+            "title": "Security portal",
+            "url": "https://security.supabase.com/",
+            "description": "Monitor security at Supabase."
+          },
+          {
+            "title": "SOC 2 Document",
+            "url": "https://security.supabase.com/",
+            "description": "Request the SOC 2 Type I document through the Security Portal."
+          },
+          {
+            "title": "DPA Document",
+            "url": "https://security.supabase.com/",
+            "description": "Request Data Processing Agreement document through the Security Portal."
+          }
+        ]
+      }
+    ]
   },
   {
     "shipped": false,
