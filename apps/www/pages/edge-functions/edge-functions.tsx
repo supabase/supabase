@@ -33,7 +33,7 @@ const featureBlocks = [
     icon: <IconCode strokeWidth={1.5} />,
   },
   {
-    title: 'Async triggers',
+    title: 'Database webhooks',
     description: 'Invoke Edge Functions based on any event in your database',
     highlightLines: '28',
     icon: <IconRefreshCcw strokeWidth={1.5} />,
