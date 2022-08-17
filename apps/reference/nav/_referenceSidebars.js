@@ -7,8 +7,6 @@ const sidebars = {
         'about',
         'architecture',
         'guides/hosting/platform',
-        'guides/cli/local-development',
-        'guides/cli/cicd-workflow',
         'guides/examples',
       ],
       collapsed: true,
@@ -32,6 +30,16 @@ const sidebars = {
         'guides/with-svelte',
         'guides/with-sveltekit',
         'guides/with-vue-3',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Supabase CLI',
+      collapsed: true,
+      items: [
+        'guides/cli',
+        'guides/cli/local-development',
+        'guides/cli/cicd-workflow',
       ],
     },
     {
