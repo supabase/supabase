@@ -210,3 +210,81 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - We have introduced new error types to distinguish between different kinds of errors. A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
   - The correct content-type headers are automatically attached when sending the request if you don’t pass in a `Content-Type` header and pass in an argument to your function. We automatically attach the content type for `Blob`, `ArrayBuffer`, `File`, `FormData` ,`String` . If it doesn’t match any of these we assume the payload is `json` , we serialise the payload as JSON and attach the content type as `application/json`.
   - `responseType` does not need to be explicitly passed in. We parse the response based on the `Content-Type` response header sent by the function. We support parsing the responses as `text`, `json`, `blob`, `form-data` and are parsed as `text` by default.
+
+### Method changes
+
+Upgrading your Supabase-js projects from v1 to v2.
+
+Supabase-js v2 is a major upgrade to the library with new api methods and a number of breaking changes.
+
+___
+Auth methods
+
+#### Signing in with email and password
+
+```diff
+- const { user, error } = await supabase.auth.signIn({ email, password })
++ const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password })
+```
+
+#### Sign in with magic link
+```diff
+- const { error } = await supabase.auth.signIn({ email })
++ const { error } = await supabase.auth.signInWithOtp({ email })
+```
+
+#### Sign in with third party provider
+```diff
+- const { error } = await supabase.auth.signIn({ provider })
++ const { error } = await supabase.auth.signInWithOAuth({ provider })
+```
+
+#### Sign in with phone
+```diff
+- const { error } = await supabase.auth.signIn({ phone, password })
++ const { error } = await supabase.auth.signInWithOtp({ phone })
+```
+
+#### Get user current session
+```diff
+- const session = supabase.auth.session()
++ const { data: { session } } = await supabase.auth.getSession()
+```
+
+#### Get logged in user
+```diff
+- const user = supabase.auth.user()
++ const { data: { user } } = await supabase.auth.getUser()
+```
+
+#### Update user data for a logged in user
+```diff
+- const { user, error } = await supabase.auth.update({ attributes })
++ const { data: { user }, error } = await supabase.auth.updateUser({ attributes })
+```
+
+#### Using custom `access_token` jwt with supabase
+```diff
+- const { user, error } = supabase.auth.setAuth(access_token)
++ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
++   global: { 
++     headers: {
++       Authorization: `Bearer ${access_token}`
++     }
++   }
++ })
+```
+___
+Data methods
+
+#### Insert and return data
+```diff
+- const { data, error } = await supabase.auth.insert({ new_data })
++ const { data, error } = await supabase.auth.insert({ new_data }).select()
+```
+
+#### Update and return data
+```diff
+- const { data, error } = await supabase.auth.update({ new_data }).eq('id', id)
++ const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).select()
+```
