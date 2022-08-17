@@ -30,5 +30,13 @@
     "description_short": "",
     "label": "",
     "url": "/edge-functions"
+  },
+  "realtime": {
+    "name": "Realtime",
+    "icon": "M13 10V3L4 14h7v7l9-11h-7z",
+    "description": "Listen to changes in a Postgres Database and broadcast them over web sockets",
+    "description_short": "",
+    "label": "",
+    "url": "/realtime"
   }
 }
