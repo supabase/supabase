@@ -35,23 +35,23 @@ There are a few tools that plug into your cloud providers, task management syste
 
 Some of them had overly broad permissions when integrating with our vendors (read/write access to Github for example) which made them a no-go. Some came with a lightweight agent that we could use for Mobile Device Management (MDM). Other than that, the products are largely the same.
 
-We chose Vanta, with Drata coming in a close second. Vanta supported more compliance standards at that time and is a fellow YC company. The gap between these tools is much closer now since all of them support the compliance standards we have our eyes on.
+We chose Vanta, with Drata coming in a close second. Vanta supported more compliance standards (at that time) and is a fellow YC company (which sealed the deal). The gap between these tools is much closer now since all of them support the compliance standards we have our eyes on.
 
 ## Choosing an auditor
 
 After setting up Vanta (nb: pestering devs to install a security agent on their laptop) and working through the checklist of tasks required for SOC2, we started looking around for auditors. Vanta was helpful here - they made introductions to a few auditors and we chose one who has previously worked with a lot of SaaS companies. Our auditors were also familiar with how Vanta worked which made the audit easier for us.
 
-The engagement started with a scoping call where we reviewed the systems which are in scope for the audit. We then set a date at which the audit takes place. The Type 1 audit checks if we are adhering to our stated policies at this point in time.
+The engagement started with a call where we reviewed the systems which are in scope for the audit. We then set a date at which the audit takes place. The Type 1 audit verifies that we are adhering to our stated policies at this point in time.
 
 ## Off to the races
 
 Once the date for the audit was set, it was a mad scramble to get everything in order.
 
-Vanta has a lightweight read-only agent built on top of [osquery](https://github.com/osquery/osquery) to verify if all team members have important security features enabled: hard disk encryption, screen locks enabled, etc. It supports Mac, Windows, and Linux, although we had [some issues](https://github.com/system76/firmware-open/issues/268) with the agent running correctly in Linux. Getting hard disk encryption right is still difficult in some Linux distros. We decided to standardize on Mac and Windows to sidestep these issues. A more powerful MDM would enable us to remote wipe computers in case it is stolen, but we decided that the existing protections we had in place were sufficient to defend against this scenario.
+Vanta has a lightweight, read-only agent built on top of [osquery](https://github.com/osquery/osquery) to verify if all team members have important security features enabled: hard disk encryption, screen locks, etc. It supports Mac, Windows, and Linux, although we had [some issues](https://github.com/system76/firmware-open/issues/268) with the agent running correctly in Linux. Getting hard disk encryption right is still difficult in some Linux distros. We decided to standardize on Mac and Windows to sidestep these issues. A more powerful MDM would enable us to remote wipe computers in case it is stolen, but we decided that the existing protections we had in place were sufficient to defend against this scenario.
 
-We came up with a few important policies. For example, Access Control Policy, Data Management Policy, Asset Management Policy, etc. Vanta has templates that we used as a starting point and adapted to our requirements. Since our auditors were familiar with the Vanta templates, there wasn’t much back and forth regarding the policy language.
+We came up with a few important policies. For example, Access Control Policy, Data Management Policy, Asset Management Policy, etc. Vanta has templates which we used as a starting point and adapted to our requirements. Since our auditors are familiar with the Vanta templates, there wasn’t much back and forth regarding the policy language.
 
-For employee background checks, we use [Certn](https://certn.co/). They integrate with Vanta, making it easy to check the status of background checks from within the Vanta portal itself. Background checks aren’t _required_ for SOC2, but they are a factor in deciding whom we hire especially in certain roles like SRE and finance where there is little room for error.
+For employee background checks, we use [Certn](https://certn.co/). They integrate with Vanta, making it easy to check the status within the Vanta portal itself. Background checks aren’t _required_ for SOC2, but they are a factor in deciding whom we hire especially in certain roles like SRE and Finance where there is little room for error.
 
 We submitted a ton of evidence to prove we could stay on top of all activities in our cloud. We use [Vector](https://vector.dev/) to ship logs to [Logflare](http://logflare.com/), where they are retained at least for a year. Our [monitoring stack](https://supabase.com/blog/supabase-reports-and-metrics) consists of regional Victoria Metrics clusters and metrics are then aggregated into a centralized cluster. We also read from Cloudtrail logs and get notified in Slack when certain events like the root AWS account is logged into, a bucket is made public, an IAM policy changes, etc.
 
