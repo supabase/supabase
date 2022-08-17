@@ -48,6 +48,51 @@ const Cursor = ({ className = '', color = 'none' }) => {
   )
 }
 
+const exampleApps = [
+  {
+    img: 'notifications.svg',
+    title: 'Notifications',
+    description: 'sadcsdas sad asds dsdas asdas as',
+  },
+  {
+    img: 'live-avatars.svg',
+    title: 'Live avatars',
+    description: 'sadcsdas sad asds dsdas asdas as',
+  },
+  {
+    img: 'live-cursors.svg',
+    title: 'Live cursors',
+    description: 'sadcsdas sad asds dsdas asdas as',
+  },
+  {
+    img: 'leaderboard.svg',
+    title: 'Leaderboards',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.',
+  },
+  {
+    img: 'stock-market.svg',
+    title: 'Live charts',
+    description:
+      'Keep charts updated in realtime. Supabase can detect changes in your database and then update the client immediately.',
+  },
+  { img: 'in-app-chat.svg', title: 'In app chat', description: 'sadcsdas sad asds dsdas asdas as' },
+  // {
+  //   img: 'shared-docs.svg',
+  //   title: 'Shared text editor',
+  //   description: 'sadcsdas sad asds dsdas asdas as',
+  // },
+  {
+    img: 'text-editor.svg',
+    title: 'Shared code editor editor',
+    description: 'sadcsdas sad asds dsdas asdas as',
+  },
+
+  { img: 'whiteboard.svg', title: 'Shared whiteboard', description: 'bbb' },
+  { img: 'location.svg', title: 'Location', description: 'bbb' },
+  { img: 'multiplayer-game.svg', title: 'Multiplayer games', description: 'bbb' },
+]
+
 function RealtimePage() {
   // base path for images
   const { basePath } = useRouter()
@@ -75,8 +120,8 @@ function RealtimePage() {
       />
       <DefaultLayout>
         <ProductHeader
-          icon={Solutions['realtime'].icon}
-          title={Solutions['realtime'].name}
+          icon={Solutions['realtime']?.icon}
+          title={Solutions['realtime']?.name}
           h1={[<span key={'authentication-h1'}>Build reactive web and mobile applications</span>]}
           subheader={[
             'Sync data across clients by listening to changes in your Database and broadcasting them over web sockets',
@@ -134,6 +179,38 @@ function RealtimePage() {
           documentation_url={'/docs/guides/auth'}
         />
 
+        <SectionContainer className="flex flex-col gap-8">
+          <div className="flex flex-col items-center justify-center">
+            <h2 className="h3">What you can build with Realtime</h2>
+            <p className="p mx-auto text-center lg:w-1/2">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua.
+            </p>
+          </div>
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+            {exampleApps.map((example) => {
+              return (
+                <div className="flex flex-col gap-4">
+                  <img
+                    className="bg-scale-300 hidden rounded-lg dark:block"
+                    src={`/images/realtime/example-apps/dark/${example.img}`}
+                    alt={example.title}
+                  />
+                  <img
+                    className="bg-scale-300 block rounded-lg dark:hidden"
+                    src={`/images/realtime/example-apps/light/${example.img}`}
+                    alt={example.title}
+                  />
+                  <div>
+                    <h3 className="text-scale-1200 text-xl">{example.title}</h3>
+                    <p className="text-scale-1100 text-sm">{example.description}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </SectionContainer>
+
         <SectionContainer className="-mb-48">
           <APISection
             title="Simple and convenient APIs"
@@ -152,7 +229,6 @@ function RealtimePage() {
             documentation_link={'/docs/guides/auth'}
           />
         </SectionContainer>
-
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
@@ -168,7 +244,6 @@ function RealtimePage() {
             </div>
           </div>
         </div>
-
         <SectionContainer>
           <div className="grid grid-cols-12">
             <div className="col-span-12 text-center">
@@ -191,7 +266,6 @@ function RealtimePage() {
             </div>
           </div>
         </SectionContainer>
-
         {/* Somehow removing this section messes up all the alignment? */}
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
