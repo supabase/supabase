@@ -56,10 +56,45 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "Security",
+    "shipped": true,
     "date": "17th Aug 2022",
+    "description": "An update on the ongoing security improvements of Supabase.",
     "d": 3,
-    "dd": "Wednesday"
+    "dd": "Wednesday",
+    "youtube_id": "iqZlPtl_b-I",
+    "announcements": [
+      {
+        "title": "Supabase is now SOC2 compliant",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "type": "soc2"
+      }
+    ],
+    "articles": [
+      {
+        "title": "Supabase is SOC2 compliant",
+        "url": "/blog/supabase-soc2",
+        "description": "Supabase is SOC2 Type 1 compliant. We received an unqualified certification from our auditors.",
+        "products": [
+          {
+            "title": "Dashboard Organization permissions",
+            "url": "https://app.supabase.com/",
+            "description": "Click on an organization and go to the members section."
+          },
+          {
+            "title": "DPA Agreement",
+            "url": "/dpa",
+            "description": "You can now request a DPA agreement."
+          },
+          {
+            "title": "New Security page",
+            "url": "/security",
+            "description": "Learn how to install the CLI."
+          }
+        ]
+      }
+    ]
   },
   {
     "shipped": false,
