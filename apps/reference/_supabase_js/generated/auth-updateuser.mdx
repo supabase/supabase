@@ -12,7 +12,7 @@ Updates user data, if there is a logged in user.
 
 ```js
 const { user, error } = await supabase.auth.updateUser({
-  email: 'new@email.com',
+  data: { hello: 'world' },
 })
 ```
 
@@ -162,7 +162,7 @@ Use the `update()` method if you have data which rarely changes or is specific o
 Sends a "Confirm Email Change" email to the new email address.
 
 ```js
-const { user, error } = await supabase.auth.updateUser({
+const { data, error } = await supabase.auth.updateUser({
   email: 'new@email.com',
 })
 ```
@@ -170,7 +170,7 @@ const { user, error } = await supabase.auth.updateUser({
 ### Update password for authenticated user.
 
 ```js
-const { user, error } = await supabase.auth.updateUser({
+const { data, error } = await supabase.auth.updateUser({
   password: 'new password',
 })
 ```

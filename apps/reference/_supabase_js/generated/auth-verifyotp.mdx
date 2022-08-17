@@ -1,19 +1,21 @@
 ---
-id: auth-api-resetpasswordforemail
-title: 'resetPasswordForEmail()'
-slug: /auth-api-resetpasswordforemail
+id: auth-verifyotp
+title: 'verifyOtp()'
+slug: /auth-verifyotp
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Sends a reset request to an email address.
+Log in a user given a User supplied OTP received via mobile.
 
 ```js
-const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-  'user@email.com'
-)
+const { data, error } = await supabase.auth.verifyOtp({
+  phone,
+  token,
+  type: 'sms',
+})
 ```
 
 ## Parameters
@@ -23,21 +25,25 @@ const { data, error } = await supabase.auth.api.resetPasswordForEmail(
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email
+      VerifyOtpParams
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>string</code>
+      <code>VerifyMobileOtpParams</code> | <code>VerifyEmailOtpParams</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The email address of the user.
+No description provided.
 
   </div>
   
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+</ul>
+
 </li>
 
 <li className="method-list-item">
@@ -107,30 +113,24 @@ A URL to send the user to after they are confirmed.
 
 </ul>
 
-## Notes
+## Examples
 
-Sends a reset request to an email address.
-
-When the user clicks the reset link in the email they will be forwarded to:
-
-`<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
-
-Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
-
-You should then use the access_token in the url and new password to update the user as follows:
+### Verify Sms One-Time Password (OTP)
 
 ```js
-const { error, data } = await supabase.auth.api.updateUser(access_token, {
-  password: new_password,
+const { data, error } = await supabase.auth.verifyOtp({
+  phone,
+  token,
+  type: 'sms',
 })
 ```
 
-## Examples
-
-### Reset password
+### Verify Signup One-Time Password (OTP)
 
 ```js
-const { data, error } = await supabase.auth.api.resetPasswordForEmail(
-  'user@email.com'
-)
+const { data, error } = await supabase.auth.verifyOtp({
+  email,
+  token,
+  type: 'signup',
+})
 ```

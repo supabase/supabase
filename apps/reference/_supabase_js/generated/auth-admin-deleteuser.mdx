@@ -1,17 +1,19 @@
 ---
-id: auth-api-getuserbyid
-title: 'getUserById()'
-slug: /auth-api-getuserbyid
+id: auth-admin-deleteuser
+title: 'deleteUser()'
+slug: /auth-admin-deleteuser
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Get user by id.
+Delete a user. Requires a `service_role` key.
 
 ```js
-const { user, error } = await supabase.auth.api.getUserById(1)
+const { data, error } = await supabase.auth.admin.deleteUser(
+  '715ed5db-f090-4b8c-a067-640ecee36aa0'
+)
 ```
 
 ## Parameters
@@ -32,7 +34,7 @@ const { user, error } = await supabase.auth.api.getUserById(1)
   </h4>
   <div class="method-list-item-description">
 
-The user's unique identifier
+The user uid you want to remove.
 
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
@@ -44,14 +46,15 @@ This function should only be called on a server. Never expose your `service_role
 
 ## Notes
 
-- Fetches the user object from the database instead of local storage.
-- Note that user() fetches the user object from local storage which might not be the most updated.
-- Requires the user's access_token.
+- Requires a `service_role` key.
+- This function should be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 
-### Fetch the user object using the access_token jwt.
+### Remove a user completely.
 
 ```js
-const { user, error } = await supabase.auth.api.getUserById(1)
+const { data, error } = await supabase.auth.admin.deleteUser(
+  '715ed5db-f090-4b8c-a067-640ecee36aa0'
+)
 ```
