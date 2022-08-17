@@ -1,6 +1,7 @@
 import { KeyIcon, LinkIcon } from '@heroicons/react/outline'
 import { Button, IconGitHub } from '@supabase/ui'
 import Layout from '../layouts/Layout'
+import Link from 'next/link'
 
 export const meta = {
   type: 'lp',
@@ -116,17 +117,19 @@ In addition to internal security reviews, we use various tools to scan our code 
 
 ---
 
-<div className="container mx-auto mb-24 grid grid-cols-12 items-center px-8 sm:px-16 xl:px-20">
-  <div className="col-span-6">
+<div className="container mx-auto pb-24 pt-1 px-8 sm:px-16 xl:px-20">
+  <div className="max-w-xl">
 
 <h3 className="text-3xl">Vanta Security Portal</h3>
 
 Access Supabase’s security and compliance documents on our Security Portal, such as
 penetration testing and audit reports.
 
-<Button type="default" size="medium">
-  View Report
-</Button>
+<Link href="https://security.supabase.com" target="_blank">
+  <Button type="default" size="medium">
+    View Report
+  </Button>
+</Link>
 
   </div>
 </div>
