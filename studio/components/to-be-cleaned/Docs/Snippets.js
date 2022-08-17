@@ -474,7 +474,7 @@ curl -X POST '${endpoint}/auth/v1/token?grant_type=password' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithPassword({
   email: 'someone@email.com',
   password: '${randomPassword}'
 })
@@ -497,7 +497,7 @@ curl -X POST '${endpoint}/auth/v1/magiclink' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   email: 'someone@email.com'
 })
 `,
@@ -543,7 +543,7 @@ curl -X POST '${endpoint}/auth/v1/otp' \\
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555'
 })
 `,
@@ -604,7 +604,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
     js: {
       language: 'js',
       code: `
-let { user, error } = await supabase.auth.signIn({
+let { user, error } = await supabase.auth.signInWithOAuth({
   provider: 'github'
 })
 `,
