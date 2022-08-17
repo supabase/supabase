@@ -1,9 +1,18 @@
-const withMDX = require('@next/mdx')()
+const gfm = require('remark-gfm')
+const slug = require('rehype-slug')
+const withMDX = require('@next/mdx')({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [gfm],
+    rehypePlugins: [slug],
+    // If you use `MDXProvider`, uncomment the following line.
+    providerImportSource: '@mdx-js/react',
+  },
+})
 
 module.exports = withMDX({
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-
   trailingSlash: false,
   images: {
     dangerouslyAllowSVG: true,
