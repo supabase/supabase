@@ -39,7 +39,7 @@ pages:
           })
           ```
       - name: Sign up with additional user meta data.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.signUp(
@@ -60,8 +60,9 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
       - Requires either an email and password or a phone number and password.
-    example:
+    examples:
       - name: Sign in with Email.
+        isSpotlight: true
         description: |
           Sign in with email and password. After a user has verified their email, they can use the [`signInWithPassword()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
@@ -72,6 +73,7 @@ pages:
           })
           ```
       - name: Sign in with Phone.
+        isSpotlight: false
         description: |
           Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
@@ -107,7 +109,7 @@ pages:
           })
           ```
       - name: Sign in with sms otp.
-        isSpotlight: true
+        isSpotlight: false
         description: The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
         js: |
           ```js
@@ -123,6 +125,7 @@ pages:
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
     examples:
       - name: Sign in using a third-party provider.
+        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -130,6 +133,7 @@ pages:
           })
           ```
       - name: Sign in using a third-party provider with redirect.
+        isSpotlight: false
         description: |
           The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
           In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for 
@@ -144,6 +148,7 @@ pages:
           }
           ```
       - name: Sign in with scopes.
+        isSpotlight: false
         description: |
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
@@ -166,6 +171,22 @@ pages:
         js: |
           ```js
           const { error } = await supabase.auth.signOut()
+          ```
+  auth.verifyOtp():
+    title: 'verifyOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    examples:
+      - name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+          ```
+      - name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
   auth.getSession():
     title: 'getSession()'
@@ -191,7 +212,7 @@ pages:
           const user = supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const user = supabase.auth.getUser(jwt)
@@ -209,13 +230,13 @@ pages:
     examples:
       - name: Update email for authenticated user.
         description: Sends a "Confirm Email Change" email to the new email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
@@ -341,7 +362,6 @@ pages:
           })
           ```
       - name: Auto-confirm email.
-        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -350,7 +370,6 @@ pages:
           })
           ```
       - name: Auto-confirm phone.
-        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -382,7 +401,7 @@ pages:
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Basic example.
-        isSpotlight: false
+        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
@@ -435,7 +454,7 @@ pages:
           )
           ```
       - name: Generate an invite link.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.generateLink(
@@ -452,7 +471,7 @@ pages:
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Updates a user's email.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -461,7 +480,7 @@ pages:
           )
           ```
       - name: Updates a user's password.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -479,7 +498,7 @@ pages:
           )
           ```
       - name: Updates a user's app_metadata.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -488,7 +507,7 @@ pages:
           )
           ```
       - name: Confirms a user's email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -497,7 +516,7 @@ pages:
           )
           ```
       - name: Confirms a user's phone number.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
