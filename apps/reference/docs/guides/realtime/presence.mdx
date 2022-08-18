@@ -8,7 +8,7 @@ Supabase Presence stores and synchronize shared state across clients. Presence i
 
 The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when a new client joins the channel and `leave` when a client leaves.
 
-Each client can use the `track` method to store an object in the shared state.
+Each client can use the `track` method to store an object in the shared state. Each client can only track one object in the shared state. If `track` is called again by the same client, then the new object tracked will overwrite the previously tracked object in the shared state.
 
 The presence JS client methods are supported from supabase-js v2 release candidate.
 
