@@ -19,6 +19,9 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
+// Import Swiper styles
+import 'swiper/swiper.min.css'
+
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
     <svg
@@ -266,22 +269,24 @@ function RealtimePage() {
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
             {exampleApps.map((example) => {
               return (
-                <div className="flex flex-col gap-4">
-                  <img
-                    className="bg-scale-300 hidden rounded-lg dark:block"
-                    src={`/images/realtime/example-apps/dark/${example.img}`}
-                    alt={example.title}
-                  />
-                  <img
-                    className="bg-scale-300 block rounded-lg dark:hidden"
-                    src={`/images/realtime/example-apps/light/${example.img}`}
-                    alt={example.title}
-                  />
-                  <div className="prose">
-                    <h4 className="">{example.title}</h4>
-                    <p className="text-sm">{example.description}</p>
+                <>
+                  <div className="flex flex-col gap-4">
+                    <img
+                      className="bg-scale-300 hidden rounded-lg dark:block"
+                      src={`/images/realtime/example-apps/dark/${example.img}`}
+                      alt={example.title}
+                    />
+                    <img
+                      className="bg-scale-300 block rounded-lg dark:hidden"
+                      src={`/images/realtime/example-apps/light/${example.img}`}
+                      alt={example.title}
+                    />
+                    <div className="prose">
+                      <h4 className="">{example.title}</h4>
+                      <p className="text-sm">{example.description}</p>
+                    </div>
                   </div>
-                </div>
+                </>
               )
             })}
           </div>
