@@ -111,11 +111,6 @@
         "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
         "products": [
           {
-            "title": "supabase-js Realtime API",
-            "url": "...",
-            "description": "..."
-          },
-          {
             "title": "Broadcast Guide",
             "url": "/docs/guides/realtime/broadcast",
             "description": "Guide on how to use Broadcast feature"
@@ -124,6 +119,11 @@
             "title": "Presence Guide",
             "url": "/docs/guides/realtime/presence",
             "description": "Guide on how to use Presence feature"
+          },
+          {
+            "title": "Supabase.js v2 Docs",
+            "url": "/docs/reference/javascript/next/installing",
+            "description": "Updated documentation for supabase-js"
           }
         ]
       }
