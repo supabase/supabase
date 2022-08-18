@@ -97,10 +97,37 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "Realtime: Multiplayer Edition",
+    "shipped": true,
     "date": "18th Aug 2022",
+    "description": "Announcing the general availability of Realtime's Broadcast and Presence.",
     "d": 4,
-    "dd": "Thursday"
+    "dd": "Thursday",
+    "youtube_id": "CGZr5tybW18",
+    "articles": [
+      {
+        "title": "Realtime: Multiplayer Edition",
+        "url": "/blog/supabase-multiplayer",
+        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
+        "products": [
+          {
+            "title": "Broadcast Guide",
+            "url": "/docs/guides/realtime/broadcast",
+            "description": "Guide on how to use Broadcast feature"
+          },
+          {
+            "title": "Presence Guide",
+            "url": "/docs/guides/realtime/presence",
+            "description": "Guide on how to use Presence feature"
+          },
+          {
+            "title": "Supabase.js v2 Docs",
+            "url": "/docs/reference/javascript/next/installing",
+            "description": "Updated documentation for supabase-js"
+          }
+        ]
+      }
+    ]
   },
   {
     "shipped": false,
