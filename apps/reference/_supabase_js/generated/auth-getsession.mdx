@@ -12,7 +12,7 @@ Returns the session data, refreshing it if necessary.
 If no session is detected, the session returned will be null.
 
 ```js
-const { data, error } = supabase.auth.getSession()
+const { data, error } = await supabase.auth.getSession()
 ```
 
 ## Examples
@@ -20,5 +20,5 @@ const { data, error } = supabase.auth.getSession()
 ### Get the session data
 
 ```js
-const { data, error } = supabase.auth.getSession()
+const { data, error } = await supabase.auth.getSession()
 ```
