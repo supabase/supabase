@@ -30,22 +30,24 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           </div>
           <Dropdown
             align="end"
-            overlay={[
-              <Dropdown.Item
-                onClick={() => {
-                  router.push({
-                    pathname: `/project/${ref}/logs-explorer`,
-                    query: {
-                      q: props.params.sql,
-                      its: props.params.iso_timestamp_start,
-                      ite: props.params.iso_timestamp_end,
-                    },
-                  })
-                }}
-              >
-                Open in Logs Explorer
-              </Dropdown.Item>,
-            ]}
+            overlay={
+              <>
+                <Dropdown.Item
+                  onClick={() => {
+                    router.push({
+                      pathname: `/project/${ref}/logs-explorer`,
+                      query: {
+                        q: props.params.sql,
+                        its: props.params.iso_timestamp_start,
+                        ite: props.params.iso_timestamp_end,
+                      },
+                    })
+                  }}
+                >
+                  Open in Logs Explorer
+                </Dropdown.Item>
+              </>
+            }
             side="bottom"
           >
             <Button
