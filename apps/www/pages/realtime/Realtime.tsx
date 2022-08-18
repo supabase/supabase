@@ -230,10 +230,10 @@ function RealtimePage() {
                 Store and synchronize shared state across clients in a consistent manner, and have
                 that consolidated state sent back to the clients.
               </p>
-              <p>
+              <small>
                 Some of the common use cases of Presence include tracking which clients are
                 currently online.
-              </p>
+              </small>
             </div>
             <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4">
@@ -245,10 +245,10 @@ function RealtimePage() {
               </div>
               <h3>Broadcast</h3>
               <p>Enables a client to send any data to all clients connected the same channel.</p>
-              <p>
+              <small>
                 Other clients can decide to want messages based on that topic, spin up a Channel
                 with that topic name, and receive messages.
-              </p>
+              </small>
             </div>
           </div>
         </SectionContainer>
