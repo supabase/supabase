@@ -1,12 +1,12 @@
 ---
 id: broadcast
-title: Broadcast
+title: Supabase Broadcast
 description: Getting started with Realtime's broadcast feature
 ---
 
 Supabase Broadcast allows a client to broadcast messages and multiple receivers to receive the broadcasted message. The broadcasted messages are ephemeral, they are not persisted to the database and are directly relayed by the Realtime server.
 
-To broadcast a message
+To broadcast a message:
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
@@ -42,7 +42,7 @@ channel.subscribe(async (status) => {
 })
 ```
 
-To receive the broadcasted message, run this script in another tab
+To receive the broadcasted message, run this script in another tab:
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
