@@ -1,5 +1,6 @@
 import { Button, IconChevronRight } from '@supabase/ui'
 import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
+import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import Table from 'components/to-be-cleaned/Table'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
@@ -29,6 +30,20 @@ export const renderStatusCodesChart = (props: ReportWidgetProps<StatusCodesDatum
     }}
   />
 )
+export const renderErrorRateChart = (props: ReportWidgetProps) => {
+  return (
+    <div className="w-full flex flex-col">
+      <BarChart
+        data={props.data}
+        attribute="count"
+        label=""
+        minimalHeader
+        customDateFormat={DATETIME_FORMAT}
+        noDataMessage={'No errors yet'}
+      />
+    </div>
+  )
+}
 
 export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) => {
   const transformedData = props.data.map((data: PathsDatum) => ({

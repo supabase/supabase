@@ -1,22 +1,13 @@
-import {
-  Button,
-  Collapsible,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronUp,
-  IconRefreshCw,
-} from '@supabase/ui'
-import Table from 'components/to-be-cleaned/Table'
-import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
-import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
-import Panel from 'components/ui/Panel'
+import { Button, IconRefreshCw } from '@supabase/ui'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useState } from 'react'
 import { DatePickerToFrom } from '../Settings/Logs'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
-import { jsonSyntaxHighlight } from '../Settings/Logs/LogsFormatters'
-import { renderRequestsPathsTable, renderStatusCodesChart } from './renderers/OverviewRenderers'
-import { DATETIME_FORMAT, PRESET_CONFIG, REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
+import {
+  renderErrorRateChart,
+  renderRequestsPathsTable,
+  renderStatusCodesChart,
+} from './renderers/OverviewRenderers'
+import { PRESET_CONFIG, REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import { Presets } from './Reports.types'
 import ReportWidget from './ReportWidget'
 
@@ -42,14 +33,21 @@ const PresetReport: React.FC<Props> = ({ projectRef, preset }) => {
     ...DEFAULT_PARAMS,
   })
 
+  const [errorRate, errorRateHandlers] = useLogsQuery(projectRef, {
+    sql: config.sql.errorRate,
+    ...DEFAULT_PARAMS,
+  })
+
   const handleRefresh = () => {
     statusCodesHandlers.runQuery()
     requestPathsHandlers.runQuery()
+    errorRateHandlers.runQuery()
   }
   const handleDatepickerChange = ({ to, from }: DatePickerToFrom) => {
     const newParams = { iso_timestamp_start: from || '', iso_timestamp_end: to || '' }
     statusCodesHandlers.setParams((prev) => ({ ...prev, ...newParams }))
     requestPathsHandlers.setParams((prev) => ({ ...prev, ...newParams }))
+    errorRateHandlers.setParams((prev) => ({ ...prev, ...newParams }))
   }
   const isLoading = statusCodes.isLoading || requestPaths.isLoading
 
@@ -88,6 +86,15 @@ const PresetReport: React.FC<Props> = ({ projectRef, preset }) => {
           description="Distrubution of API reponses by status codes."
           data={statusCodes.logData}
           renderer={renderStatusCodesChart}
+        />
+        <ReportWidget
+          isLoading={isLoading}
+          params={errorRate.params}
+          className="col-span-4 col-start-1"
+          title="Error Rate"
+          description="Percentage of API 5XX and 4XX error responses."
+          data={errorRate.logData}
+          renderer={renderErrorRateChart}
         />
         <ReportWidget
           isLoading={isLoading}
