@@ -142,10 +142,7 @@ function RealtimePage() {
                 />
               </div>
               <h3>Database changes</h3>
-              <p>
-                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
-                Gitlab, Twitter, Discord, and many more.
-              </p>
+              <p>Listen to changes in the Database, such as new inserts, updates, and deletes.</p>
             </div>
             <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="p mb-4">
