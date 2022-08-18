@@ -1,4 +1,4 @@
-import { IconGrid, IconLayers, IconMenu } from '@supabase/ui'
+import { Button, IconGrid, IconLayers, IconMenu } from '@supabase/ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions.json'
@@ -13,6 +13,7 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
 import 'swiper/swiper.min.css'
+import Link from 'next/link'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -161,6 +162,13 @@ function RealtimePage() {
                 Some of the common use cases of Presence include tracking which clients are
                 currently online.
               </small>
+              <div className="not-prose mt-3">
+                <Link passHref href="/docs/guides/realtime/presence">
+                  <Button as="a" type="default">
+                    View docs
+                  </Button>
+                </Link>
+              </div>
             </div>
             <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4">
@@ -176,6 +184,13 @@ function RealtimePage() {
                 Other clients can decide to want messages based on that topic, spin up a Channel
                 with that topic name, and receive messages.
               </small>
+              <div className="not-prose mt-3">
+                <Link passHref href="/docs/guides/realtime/broadcast">
+                  <Button as="a" type="default">
+                    View docs
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </SectionContainer>
