@@ -288,3 +288,28 @@ Data methods
 - const { data, error } = await supabase.auth.update({ new_data }).eq('id', id)
 + const { data, error } = await supabase.auth.update({ new_data }).eq('id', id).select()
 ```
+
+___
+Realtime
+
+#### Realtime subscription
+```diff
+- const userListener = supabase.from('users')
+-   .on('*', 
+-     (payload) => handleAllEventsPayload(payload.new)
+-   )
+-   .subscribe()
++ const userListener = supabase.channel('public:user')
++   .on(
++     'postgres_changes',
++     { event: '*', schema: 'public', table: 'user' }
++     (payload) => handleAllEventsPayload()
++   )
++   .subscribe()
+```
+
+#### Realtime unsubscribe
+```diff
+- userListener.unsubscribe()
++ supabase.removeChannel('public:users')
+```
