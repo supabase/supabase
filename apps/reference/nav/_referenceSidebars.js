@@ -87,7 +87,7 @@ const sidebars = {
       items: [
         'guides/realtime/broadcast',
         'guides/realtime/presence',
-        'guides/realtime/postgres_changes'
+        'guides/realtime/postgres-changes'
       ],
     },
     {
