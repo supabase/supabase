@@ -126,8 +126,8 @@ export function prepareVercelEvns(
     type: 'encrypted' | string
   }[],
   project: {
-    db_host: string
-    db_pass: string
+    db_host?: string
+    db_pass?: string
     endpoint: string
     anon_key: string
     service_key: string
@@ -154,10 +154,10 @@ export function prepareVercelEvns(
         env.value = project.service_key
       }
       case INTEGRATION_ENVS_ALIAS.DBHOST: {
-        env.value = project.db_host
+        env.value = project.db_host ?? ''
       }
       case INTEGRATION_ENVS_ALIAS.DBPASSWORD: {
-        env.value = project.db_pass
+        env.value = project.db_pass ?? ''
       }
     }
 
