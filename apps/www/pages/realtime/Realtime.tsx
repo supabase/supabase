@@ -5,7 +5,6 @@ import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import 'swiper/swiper.min.css'
 import CTABanner from '~/components/CTABanner'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -14,6 +13,8 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
+
+import 'swiper/swiper.min.css'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
