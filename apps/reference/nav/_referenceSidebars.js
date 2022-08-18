@@ -84,7 +84,11 @@ const sidebars = {
       type: 'category',
       label: 'Realtime',
       collapsed: true,
-      items: ['guides/realtime/broadcast', 'guides/realtime/presence'],
+      items: [
+        'guides/realtime/overview',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+      ],
     },
     {
       type: 'category',
