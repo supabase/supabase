@@ -1,62 +1,62 @@
-export default [
+export default = [
   {
-    image: '',
-    title: 'Leaderboard',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+    img: 'toast-messages.svg',
+    title: 'Toast messages',
+    description: 'Listen to changes in the database and show users a toast message.',
   },
   {
-    image: '',
-    title: 'Shared code editor',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+    img: 'live-avatars.svg',
+    title: 'Live avatars',
+    description: 'Share the status of users across multiple clients.',
   },
   {
-    image: '',
-    title: 'Shared text editor',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+    img: 'live-cursors.svg',
+    title: 'Live cursors',
+    description: 'Share the position and status of multiple cursors across multiple clients.',
   },
   {
-    image: '',
-    title: 'Stock market',
+    img: 'leaderboard.svg',
+    title: 'Leaderboards',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+      'Listen to changes in your database regarding the scores of your users and display them live.',
   },
   {
-    image: '',
-    title: 'Share whiteboard',
+    img: 'stock-market.svg',
+    title: 'Live charts',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+      'Keep charts updated in Realtime by listening to changes in the database rather than polling at intervals.',
   },
   {
-    image: '',
-    title: 'Multiplayer',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
-  },
-  {
-    image: '',
-    title: 'Charts',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
-  },
-  {
-    image: '',
-    title: 'Location',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
-  },
-  {
-    image: '',
-    title: 'Notifications',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
-  },
-  {
-    image: '',
+    img: 'in-app-chat.svg',
     title: 'In app chat',
+    description: 'Listen to changes in the database to display up-to-date text messages.',
+  },
+  {
+    img: 'text-editor.svg',
+    title: 'Shared text editor',
+    description: 'Users can collaborate with text documents or even code editors.',
+  },
+
+  {
+    img: 'whiteboard.svg',
+    title: 'Shared whiteboard',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
+      'Allow users to collaorate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
+  },
+  {
+    img: 'location.svg',
+    title: 'Location',
+    description: 'Listen to changes in the database regarding the position of a moving coordinate.',
+  },
+  {
+    img: 'multiplayer-game.svg',
+    title: 'Multiplayer games',
+    description:
+      "Keep track of how long a player has been playing, who's turn it is and even share to other clients what the pllayer is doing.",
+  },
+  {
+    img: 'form-presence.svg',
+    title: 'Form presence',
+    description: 'Display the active selection of different users throughout an interactive form.',
   },
 ]
