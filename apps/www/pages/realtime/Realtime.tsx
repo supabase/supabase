@@ -76,6 +76,7 @@ const exampleApps = [
   { img: 'whiteboard.svg', title: 'Shared whiteboard', description: 'bbb' },
   { img: 'location.svg', title: 'Location', description: 'bbb' },
   { img: 'multiplayer-game.svg', title: 'Multiplayer games', description: 'bbb' },
+  { img: 'form-presence.svg', title: 'Form presence', description: 'bbb' },
 ]
 
 function RealtimePage() {
@@ -282,6 +283,7 @@ function RealtimePage() {
             documentation_link={'/docs/guides/auth'}
           />
         </SectionContainer>
+
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
@@ -297,36 +299,6 @@ function RealtimePage() {
             </div>
           </div>
         </div>
-
-        {/* Somehow removing this section messes up all the alignment? */}
-        <SectionContainer>
-          <div className="grid grid-cols-12 lg:gap-16">
-            <div className="col-span-12 mb-8 lg:col-span-5">
-              <h2 className="h3">User permissions without the middleware</h2>
-
-              <p className="p text-base lg:text-lg">
-                Supabase Auth works without any additional servers. Build Authorization rules with
-                Postgres' Row Level Security, controlling who can create, edit and delete specific
-                rows in your database.
-              </p>
-              <p className="p">Policies can be written in SQL or using the dashboard online.</p>
-
-              <Link href="/docs/guides/auth#policy-examples">
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
-            </div>
-            <div className="col-span-12 lg:col-span-6 lg:col-start-7">
-              <SplitCodeBlockCarousel
-                // @ts-ignore
-                content={AuthSqlRulesExamples}
-              />
-            </div>
-          </div>
-        </SectionContainer>
 
         <CTABanner />
       </DefaultLayout>
