@@ -97,10 +97,42 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "Realtime: Multiplayer Edition",
+    "shipped": true,
     "date": "18th Aug 2022",
+    "description": "Announcing the general availability of Realtime's Broadcast and Presence.",
     "d": 4,
-    "dd": "Thursday"
+    "dd": "Thursday",
+    "youtube_id": "CGZr5tybW18",
+    "articles": [
+      {
+        "title": "Realtime: Multiplayer Edition",
+        "url": "/blog/supabase-realtime-multiplayer-general-availability",
+        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
+        "products": [
+          {
+            "title": "Realtime Overview",
+            "url": "/docs/guides/realtime/overview",
+            "description": "Realtime Overview"
+          },
+          {
+            "title": "Broadcast Guide",
+            "url": "/docs/guides/realtime/broadcast",
+            "description": "Guide on how to use Broadcast feature"
+          },
+          {
+            "title": "Presence Guide",
+            "url": "/docs/guides/realtime/presence",
+            "description": "Guide on how to use Presence feature"
+          },
+          {
+            "title": "Postgres Changes Guide",
+            "url": "/docs/guides/realtime/postgres-changes",
+            "description": "Guide on how to use Postgres Changes feature"
+          }
+        ]
+      }
+    ]
   },
   {
     "shipped": false,
