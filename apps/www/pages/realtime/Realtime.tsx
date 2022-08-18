@@ -184,46 +184,51 @@ function RealtimePage() {
 
         <SectionContainer>
           <div className="grid grid-cols-12">
-            <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
+            <div className="prose col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <div className="p mb-4">
                 <img
                   src="/images/realtime/icons/database-changes.svg"
                   alt="realtime broadcast"
-                  className="w-9"
+                  className="-mb-4 w-9"
                 />
               </div>
-              <h4 className="h4">Database changes</h4>
-              <p className="p text-base">
+              <h3>Database changes</h3>
+              <p>
                 Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
                 Gitlab, Twitter, Discord, and many more.
               </p>
             </div>
-            <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
+            <div className="prose col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="p mb-4">
                 <img
                   src="/images/realtime/icons/presence.svg"
                   alt="realtime broadcast"
-                  className="w-9"
+                  className="-mb-4 w-9"
                 />
               </div>
-              <h4 className="h4">Presence</h4>
-              <p className="p text-base">
-                Incredibly simple Auth, without a single external authentication service. Built-in
-                Authentication, Authorization, and User Management.
+              <h3>Presence</h3>
+              <p>
+                Store and synchronize shared state across clients in a consistent manner, and have
+                that consolidated state sent back to the clients.
+              </p>
+              <p>
+                Some of the common use cases of Presence include tracking which clients are
+                currently online.
               </p>
             </div>
-            <div className="col-span-12 lg:col-span-3 lg:col-start-9">
+            <div className="prose col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4">
                 <img
                   src="/images/realtime/icons/broadcast.svg"
                   alt="realtime broadcast"
-                  className="w-9"
+                  className="-mb-4 w-9"
                 />
               </div>
-              <h4 className="h4">Broadcast</h4>
-              <p className="p text-base">
-                User data stored in your Supabase database so you never have to worry about 3rd
-                party privacy issues. Host your data in 8 different locations.
+              <h3>Broadcast</h3>
+              <p>Enables a client to send any data to all clients connected the same channel.</p>
+              <p>
+                Other clients can decide to want messages based on that topic, spin up a Channel
+                with that topic name, and receive messages.
               </p>
             </div>
           </div>
@@ -294,28 +299,7 @@ function RealtimePage() {
             </div>
           </div>
         </div>
-        <SectionContainer>
-          <div className="grid grid-cols-12">
-            <div className="col-span-12 text-center">
-              <h2 className="h3">What you can build with Realtime</h2>
-              <p className="p mx-auto lg:w-1/2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua.
-              </p>
-              <div className="col-span-12 grid grid-cols-12 gap-8 py-16">
-                {AppExamples.map((example) => {
-                  return (
-                    <div className="col-span-3">
-                      <div className="bg-scale-500 mb-4 h-40 w-full rounded" />
-                      <p className="p !mb-2 text-left">{example.title}</p>
-                      <p className="p text-left text-sm">{example.description}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        </SectionContainer>
+
         {/* Somehow removing this section messes up all the alignment? */}
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
