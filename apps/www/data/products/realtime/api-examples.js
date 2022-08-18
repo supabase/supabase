@@ -1,16 +1,20 @@
 export default [
   {
     lang: 'js',
-    title: 'Subscribing to events',
+    title: 'Database changes',
     description: '',
     code: `
-import { RealtimeClient } from '@supabase/realtime-js'
-const client = new RealtimeClient(process.env.REALTIME_URL)
+  import { createClient } from '@supabase/supabase-js'
 
-// Listen to events on the entire database.
-const databaseChanges = client.channel('realtime:*')
-databaseChanges.on('*', (e) => console.log(e))
-databaseChanges.subscribe()
+  const supabaseClient = createClient('URL', 'ANON')
+  const channel = supabaseClient
+    .channel('postgresChangesChannel')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages'
+    }, payload => console.log(payload))
+    .subscribe()
 
 
 
@@ -33,14 +37,21 @@ databaseChanges.subscribe()
     title: 'Presence',
     description: '',
     code: `
-import { RealtimeClient } from '@supabase/realtime-js'
-const client = new RealtimeClient(process.env.REALTIME_URL)
+  import { createClient } from '@supabase/supabase-js'
 
-const channel = client.channel('room:*')
-channel.on('presence', { event: 'SYNC' }, () => {
-  console.log('Presence synced')
-})
-channel.subscribe().receive('ok', () => console.log('Subscribed!))
+  const supabaseClient = createClient('URL', 'ANON')
+  const channel = supabaseClient.channel('presenceChannel', { configs: { presence: 'id123' } })
+
+  channel
+    .on('presence', { event: 'sync' }, () => console.log(channel.presenceState()))
+    .on('presence', { event: 'join' }, ({ key, currentPresences, newPresences }) => console.log(key, currentPresences, newPresences))
+    .on('presence', { event: 'leave' }, ({ key, currentPresences, leftPresences }) => console.log(key, currentPresences, leftPresences))
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        channel.track({ user_name: 'user123' })
+        channel.track({ user_name: 'user345' })
+      }
+    })
 
 
 
@@ -60,21 +71,30 @@ channel.subscribe().receive('ok', () => console.log('Subscribed!))
     title: 'Broadcast',
     description: '',
     code: `
-  // Sign in with magic links
-  const { user, error } = await supabase.auth.signIn({
-    email: 'example@email.com'
-  })
+  import { createClient } from '@supabase/supabase-js'
+
+  const supabaseClient = createClient('URL', 'ANON')
+  const channel = supabaseClient.channel('broadcastChannel', { configs: { broadcast: { self: true, ack: true } } })
+
+  channel
+    .on('broadcast', { event: 'pos' }, payload => console.log(payload))
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        channel
+        .send({ type: 'broadcast', event: 'pos', payload: { x: 0, y: 0 }})
+        .then(status => {
+          if (status === 'ok') console.log('ok')
+    
+          // if ack is false then channel.send will always return 'ok'
+          if (status === 'timed out') console.log('timed out')
+        })
+      }
+    })
 
 
 
 
-
-  
-
-
-
-
-
+    
 
 
 
