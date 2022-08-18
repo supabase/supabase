@@ -57,8 +57,7 @@ export const PRESET_CONFIG = {
     f3.status_code as status_code,
     avg(f3.origin_time) as avg_origin_time,
     sum(f3.origin_time) as sum,
-    --APPROX_QUANTILES(f3.origin_time, 100) as p95_array,
-    --APPROX_QUANTILES(f3.origin_time, 100) as p99_array,
+    APPROX_QUANTILES(f3.origin_time, 100) as quantiles,
     count(timestamp) as count
   FROM
     edge_logs
@@ -75,7 +74,7 @@ export const PRESET_CONFIG = {
     count desc, 
     avg_origin_time DESC 
   LIMIT 50
-`
+`,
     },
   },
 }

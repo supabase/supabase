@@ -14,4 +14,5 @@ export interface PathsDatum {
   sum: number
   method: string
   avg_origin_time: number
+  quantiles: number[]
 }
