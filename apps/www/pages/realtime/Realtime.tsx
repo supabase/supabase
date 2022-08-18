@@ -199,7 +199,6 @@ function RealtimePage() {
                   <div className="border-scale-1200 bg-scale-1000 z-[3] h-5 w-5 rounded-full border" />
                 </div>
               </div>
-              <p className="p absolute bottom-0 left-4">Just playing around with some ideas</p>
             </div>,
           ]}
           // [TODO] Point to the correct docs URL
