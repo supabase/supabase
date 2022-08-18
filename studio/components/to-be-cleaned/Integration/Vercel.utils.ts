@@ -127,7 +127,7 @@ export function prepareVercelEvns(
   }[],
   project: {
     db_host?: string
-    db_pass?: string
+    db_password?: string
     endpoint: string
     anon_key: string
     service_key: string
@@ -157,7 +157,7 @@ export function prepareVercelEvns(
         env.value = project.db_host ?? ''
       }
       case INTEGRATION_ENVS_ALIAS.DBPASSWORD: {
-        env.value = project.db_pass ?? ''
+        env.value = project.db_password ?? ''
       }
     }
 

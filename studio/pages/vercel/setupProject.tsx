@@ -215,7 +215,7 @@ const CreateProject = observer(() => {
       vercel_configuration_id: _store.configurationId,
     }
     const project = await post(`${API_URL}/projects`, data)
-    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_pass: dbPass }
+    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
   }
 
   async function onCreateProject() {
