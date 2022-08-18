@@ -56,8 +56,6 @@ function RealtimePage() {
           url: `https://supabase.com/realtime`,
           images: [
             {
-              // [TODO] Update OG image
-              // [TODO] Update to use an appropriate icon for realtime in Solutions.json
               url: `https://supabase.com${basePath}/images/realtime/og.jpg`,
             },
           ],
@@ -135,8 +133,7 @@ function RealtimePage() {
               </div>
             </div>,
           ]}
-          // [TODO] Point to the correct docs URL
-          documentation_url={'/docs/guides/auth'}
+          documentation_url={'/docs/guides/realtime/broadcast'}
         />
 
         <SectionContainer>
@@ -239,7 +236,7 @@ function RealtimePage() {
               </p>,
             ]}
             // [TODO] Point to the correct docs URL
-            documentation_link={'/docs/guides/auth'}
+            documentation_link={'/docs/guides//docs/guides/realtime/broadcast'}
           />
         </SectionContainer>
 
