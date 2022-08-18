@@ -81,7 +81,7 @@ const ColumnList: FC<{
                 icon={<IconChevronLeft size="small" />}
                 style={{ padding: '5px' }}
               />
-              <Typography.Text code>{selectedTable.name}</Typography.Text>
+              <code>{selectedTable.name}</code>
             </div>
           }
           rightComponents={
