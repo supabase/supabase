@@ -82,6 +82,12 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: ['guides/realtime/broadcast', 'guides/realtime/presence'],
+    },
+    {
+      type: 'category',
       label: 'APIs',
       collapsed: true,
       items: ['guides/api', 'guides/api/generating-types'],
