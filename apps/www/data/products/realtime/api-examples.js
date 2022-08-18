@@ -25,11 +25,6 @@ export default [
 
 
 
-
-
-
-
-
       `,
   },
   {
@@ -52,13 +47,6 @@ export default [
         channel.track({ user_name: 'user345' })
       }
     })
-
-
-
-
-
-
-
 
 
 
@@ -91,11 +79,7 @@ export default [
       }
     })
 
-
-
-
     
-
 
 
       `,
