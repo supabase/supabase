@@ -34,6 +34,10 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
   const requestPathsSums = props.data.map((v) => v.sum) as number[]
   const requestPathsSumMax = Math.max(...requestPathsSums)
   const requestPathsSumMin = Math.min(...requestPathsSums)
+  const requestPathsAvgs = props.data.map((v) => v.avg_origin_time) as number[]
+  const requestPathsAvgMax = Math.max(...requestPathsAvgs)
+  const requestPathsAvgMin = Math.min(...requestPathsAvgs)
+
   return (
     <Table
       containerClassName="max-h-72 w-full overflow-y-auto"
@@ -48,11 +52,13 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
       }
       body={
         <>
-          {props.data.map((row: any, index) => {
+          {props.data.map((row: PathsDatum, index) => {
             const [show, setShow] = useState(false)
 
             const totalQueryTimePercentage =
               ((row.sum - requestPathsSumMin) / requestPathsSumMax) * 100
+            const avgTimePercentage =
+              ((row.avg_origin_time - requestPathsAvgMin) / requestPathsAvgMax) * 100
             return (
               <>
                 <Table.tr key={index}>
@@ -79,8 +85,27 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
                   <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
                     {row.count}
                   </Table.td>
-                  <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
-                    {Number(row.avg_origin_time).toFixed(2)}
+                  <Table.td
+                    style={{
+                      padding: '0.5rem',
+                    }}
+                    className={`${
+                      avgTimePercentage >= 80
+                        ? 'bg-orange-600'
+                        : avgTimePercentage > 60
+                        ? 'bg-orange-500'
+                        : avgTimePercentage > 40
+                        ? 'bg-yellow-500'
+                        : avgTimePercentage > 20
+                        ? 'bg-yellow-400'
+                        : avgTimePercentage > 10
+                        ? 'bg-yellow-200'
+                        : 'bg-green-100'
+                    } text-xs align-top`}
+                  >
+                    <span className="text-scale-1100">
+                      {Number(row.avg_origin_time).toFixed(2)}
+                    </span>
                   </Table.td>
                   <Table.td className="align-top py-1">
                     <div
