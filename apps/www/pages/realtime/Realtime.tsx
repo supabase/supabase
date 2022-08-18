@@ -1,16 +1,12 @@
-import { Button, IconArrowUpRight, IconGrid, IconLayers, IconLink, IconMenu } from '@supabase/ui'
+import { IconGrid, IconLayers, IconMenu } from '@supabase/ui'
 
 // [TODO] These need to be relooked - I'm using multiplayer.dev as a "docs"
 import ApiExamples from 'data/products/realtime/api-examples'
-import AppExamples from 'data/products/realtime/app-examples'
 import RealtimeStyles from './Realtime.module.css'
 
-import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -67,24 +63,24 @@ const exampleApps = [
     img: 'stock-market.svg',
     title: 'Live charts',
     description:
-      'Keep charts updated in relatime by listening to changes in the database rather than polling at intervals.',
+      'Keep charts updated in Realtime by listening to changes in the database rather than polling at intervals.',
   },
   {
     img: 'in-app-chat.svg',
     title: 'In app chat',
-    description: 'Listen to changes in the database to display up to date text messages.',
+    description: 'Listen to changes in the database to display up-to-date text messages.',
   },
   {
     img: 'text-editor.svg',
     title: 'Shared text editor',
-    description: 'Users can colloborate with text documents or even code editors.',
+    description: 'Users can collaborate with text documents or even code editors.',
   },
 
   {
     img: 'whiteboard.svg',
     title: 'Shared whiteboard',
     description:
-      'Allow users to collaorate on a shared whiteboard, sharing positions and states of any kind of object in realtime.',
+      'Allow users to collaorate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
   },
   {
     img: 'location.svg',
