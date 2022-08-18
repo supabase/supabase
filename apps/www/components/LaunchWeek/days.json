@@ -107,9 +107,14 @@
     "articles": [
       {
         "title": "Realtime: Multiplayer Edition",
-        "url": "/blog/supabase-multiplayer",
+        "url": "/blog/supabase-realtime-multiplayer-general-availability",
         "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
         "products": [
+          {
+            "title": "Realtime Overview",
+            "url": "/docs/guides/realtime/overview",
+            "description": "Realtime Overview"
+          },
           {
             "title": "Broadcast Guide",
             "url": "/docs/guides/realtime/broadcast",
@@ -121,9 +126,9 @@
             "description": "Guide on how to use Presence feature"
           },
           {
-            "title": "Supabase.js v2 Docs",
-            "url": "/docs/reference/javascript/next/installing",
-            "description": "Updated documentation for supabase-js"
+            "title": "Postgres Changes Guide",
+            "url": "/docs/guides/realtime/postgres-changes",
+            "description": "Guide on how to use Postgres Changes feature"
           }
         ]
       }
