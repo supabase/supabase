@@ -261,8 +261,7 @@ function RealtimePage() {
           <div className="flex flex-col items-center justify-center">
             <h2 className="h3">What you can build with Realtime</h2>
             <p className="p mx-auto text-center lg:w-1/2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua.
+              Build any kind of Realtime application with ease, including any of these scenarios.
             </p>
           </div>
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
