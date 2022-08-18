@@ -308,7 +308,7 @@ launch week
 }
 
 .video-container {
-  @apply border rounded-xl overflow-hidden;
+  @apply overflow-hidden rounded-xl border;
   position: relative;
   width: 100%;
   padding-bottom: 56.25%;

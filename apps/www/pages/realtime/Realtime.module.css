@@ -4,7 +4,8 @@
 }
 
 @keyframes shape {
-  0%, 5% {
+  0%,
+  5% {
     opacity: 1;
     transform: scale(0, 0);
     border-radius: 0;
@@ -12,7 +13,8 @@
     box-shadow: none;
     border-width: 3px;
   }
-  10%, 37.3% {
+  10%,
+  37.3% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 0;
@@ -20,23 +22,26 @@
     box-shadow: none;
     border-width: 3px;
   }
-  38%, 42% {
+  38%,
+  42% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 0px;
-    border-color: #FFFFFF;
+    border-color: #ffffff;
     box-shadow: none;
     border-width: 3px;
   }
-  45%, 48.2% {
+  45%,
+  48.2% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 10px;
-    border-color: #FFFFFF;
+    border-color: #ffffff;
     box-shadow: none;
     border-width: 3px;
   }
-  49%, 71.2% {
+  49%,
+  71.2% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 10px;
@@ -44,28 +49,31 @@
     box-shadow: none;
     border-width: 3px;
   }
-  72%, 74% {
+  72%,
+  74% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 10px;
-    border-color: #FFFFFF;
+    border-color: #ffffff;
     box-shadow: none;
     border-width: 3px;
   }
-  76%, 92% {
+  76%,
+  92% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 10px;
-    border-color: #FFFFFF;
-    box-shadow: 0px 7px 20px 0px rgba(0,0,0,0.2);
+    border-color: #ffffff;
+    box-shadow: 0px 7px 20px 0px rgba(0, 0, 0, 0.2);
     border-width: 1.5px;
   }
-  94%, 100% {
+  94%,
+  100% {
     opacity: 1;
     transform: scale(1, 1);
     border-radius: 10px;
     border-color: hsla(153, 60%, 28%, 1);
-    box-shadow: 0px 7px 20px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 7px 20px 0px rgba(0, 0, 0, 0.2);
     border-width: 1.5px;
   }
 }
@@ -75,22 +83,26 @@
 }
 
 @keyframes button-text {
-  0%, 78.5% {
+  0%,
+  78.5% {
     opacity: 0;
     font-family: 'Arial';
     background-color: transparent;
   }
-  79%, 84% {
+  79%,
+  84% {
     opacity: 1;
     font-family: 'Arial';
     background-color: transparent;
   }
-  84.5%, 88% {
+  84.5%,
+  88% {
     opacity: 1;
     font-family: 'Arial';
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
   }
-  88.1%, 100% {
+  88.1%,
+  100% {
     opacity: 1;
     font-family: 'custom-font';
     background-color: transparent;
@@ -105,13 +117,16 @@
   0% {
     transform: translate(0px, 0px);
   }
-  2%, 5% {
+  2%,
+  5% {
     transform: translate(-202px, -63px);
   }
-  10%, 11% {
+  10%,
+  11% {
     transform: translate(-16px, -15px);
   }
-  13%, 100% {
+  13%,
+  100% {
     transform: translate(0, 0);
   }
 }
@@ -121,22 +136,28 @@
 }
 
 @keyframes cursor-two {
-  0%, 17% {
+  0%,
+  17% {
     transform: scale(1) translate(-200px, 300px);
   }
-  20%, 32% {
+  20%,
+  32% {
     transform: scale(1) translate(-85px, 89px);
   }
-  34%, 37.1% {
+  34%,
+  37.1% {
     transform: scale(1) translate(0px, 0px);
   }
-  37.4%, 37.7% {
+  37.4%,
+  37.7% {
     transform: scale(0.95) translate(0px, 0px);
   }
-  38%, 46% {
+  38%,
+  46% {
     transform: scale(1) translate(0px, 0px);
   }
-  49%, 100% {
+  49%,
+  100% {
     transform: scale(1) translate(-50px, 100px);
   }
 }
@@ -146,15 +167,18 @@
 }
 
 @keyframes cursor-two-comment {
-  0%, 22% {
+  0%,
+  22% {
     opacity: 0;
     transform: scale(0.95) translate(0px, 5px);
   }
-  24%, 30% {
+  24%,
+  30% {
     opacity: 1;
-    transform: scale(1.0) translate(0px, 0px);
+    transform: scale(1) translate(0px, 0px);
   }
-  32%, 100% {
+  32%,
+  100% {
     opacity: 0;
     transform: scale(0.95) translate(0px, 5px);
   }
@@ -165,32 +189,41 @@
 }
 
 @keyframes cursor-three {
-  0%, 50% {
+  0%,
+  50% {
     transform: scale(1) translate(50px, -250px);
   }
-  53%, 66% {
+  53%,
+  66% {
     transform: scale(1) translate(-40px, -120px);
   }
-  68%, 71% {
+  68%,
+  71% {
     transform: scale(1) translate(0px, 0px);
   }
-  71.3%, 71.6% {
+  71.3%,
+  71.6% {
     transform: scale(0.95) translate(0px, 0px);
   }
-  71.9%, 80% {
+  71.9%,
+  80% {
     transform: scale(1) translate(0px, 0px);
   }
-  82%, 84% {
+  82%,
+  84% {
     transform: scale(1) translate(-20px, 10px);
   }
-  84.5%, 85% {
+  84.5%,
+  85% {
     transform: scale(0.95) translate(-20px, 10px);
   }
-  85.5%, 91% {
+  85.5%,
+  91% {
     transform: scale(1) translate(-20px, 10px);
   }
-  93%, 100% {
-    transform: scale(1) translate(0px, -80px)
+  93%,
+  100% {
+    transform: scale(1) translate(0px, -80px);
   }
 }
 
@@ -199,15 +232,18 @@
 }
 
 @keyframes cursor-three-comment {
-  0%, 56% {
+  0%,
+  56% {
     opacity: 0;
     transform: scale(0.95) translate(0px, 5px);
   }
-  58%, 64% {
+  58%,
+  64% {
     opacity: 1;
-    transform: scale(1.0) translate(0px, 0px);
+    transform: scale(1) translate(0px, 0px);
   }
-  66%, 100% {
+  66%,
+  100% {
     opacity: 0;
     transform: scale(0.95) translate(0px, 5px);
   }
