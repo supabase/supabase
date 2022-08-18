@@ -49,6 +49,21 @@ export const PRESET_CONFIG = {
     status_code
   ORDER BY
     timestamp ASC`,
+      errorRate: `
+select
+  timestamp_trunc(timestamp, hour) as timestamp,
+  count(timestamp) as count
+FROM
+  edge_logs
+  LEFT JOIN UNNEST(metadata) AS f1 ON TRUE
+  LEFT JOIN UNNEST(f1.response) AS f3 ON TRUE
+WHERE
+  f3.status_code >= 400
+GROUP BY
+  timestamp
+ORDER BY
+  timestamp ASC
+`,
       requestPaths: `
   select
     f2.path as path,
