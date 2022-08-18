@@ -1,4 +1,4 @@
-import { Button, IconArrowUpRight, IconLink } from '@supabase/ui'
+import { Button, IconArrowUpRight, IconGrid, IconLayers, IconLink, IconMenu } from '@supabase/ui'
 
 // [TODO] These need to be relooked - I'm using multiplayer.dev as a "docs"
 import ApiExamples from 'data/products/realtime/api-examples'
@@ -18,8 +18,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { CursorClickIcon } from '@heroicons/react/outline'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -28,7 +26,7 @@ const Cursor = ({ className = '', color = 'none' }) => {
       fill={color}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={`h-12 w-12 stroke-black dark:stroke-white ${className}`}
+      className={`h-10 w-10 stroke-black dark:stroke-white ${className}`}
     >
       <path
         strokeLinecap="round"
@@ -114,73 +112,73 @@ function RealtimePage() {
             'Sync data across clients by listening to changes in your Database and broadcasting them over web sockets',
           ]}
           image={[
-            // [TODO] Just playing around with some ideas
-            <div className="bg-scale-300 relative flex h-[372px] w-[560px] items-center justify-center rounded">
-              <p className="p absolute top-4 left-4">Just playing around with some ideas</p>
+            <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border">
               <div
                 className={[
-                  'bg-brand-900 border-brand-800 relative h-12 w-48 rounded-full border-[3px]',
-                  `${RealtimeStyles['element']}`,
+                  'border-brand-800 relative h-12 w-48 bg-[#34B27B]',
+                  `flex items-center justify-center ${RealtimeStyles['shape']}`,
                 ].join(' ')}
-              />
+              >
+                <p
+                  className={`text-scale-1200 text-[18px] font-medium ${RealtimeStyles['button-text']}`}
+                >
+                  Start a project
+                </p>
+              </div>
               <Cursor
                 color="#236574"
-                className={`${RealtimeStyles['cursor-1']} absolute top-[210px] right-[130px]`}
+                className={`${RealtimeStyles['cursor-one']} absolute top-[220px] right-[130px]`}
               />
               <Cursor
                 color="#170B6B"
-                className={`${RealtimeStyles['cursor-2']} absolute top-[300px] right-[400px]`}
+                className={`${RealtimeStyles['cursor-two']} absolute top-[180px] right-[280px]`}
               />
               <div
                 className={[
-                  'border-scale-1200 absolute bottom-[45px] left-[215px] flex h-10 w-32',
+                  'border-scale-1200 absolute bottom-[40px] left-[175px] flex h-10 w-20',
                   'items-center justify-center space-x-2 rounded-full border-[3px] bg-[#170B6B]',
-                  `${RealtimeStyles['comment-bubble']}`,
+                  `${RealtimeStyles['cursor-two-comment']}`,
                 ].join(' ')}
               >
-                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
-                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
-                <div className="bg-scale-1200 h-2 w-2 rounded-full" />
+                <p className="text-lg">🤔</p>
               </div>
+              <Cursor
+                color="#FFCC00"
+                className={`${RealtimeStyles['cursor-three']} absolute top-[170px] right-[180px]`}
+              />
+              <div
+                className={[
+                  'border-scale-1200 absolute top-[72px] left-[320px] flex h-10 w-20',
+                  'items-center justify-center space-x-2 rounded-full border-[3px] bg-[#FFCC00]',
+                  `${RealtimeStyles['cursor-three-comment']}`,
+                ].join(' ')}
+              >
+                <p className="text-lg">😄</p>
+              </div>
+              <div className="bg-scale-100 border-scale-500 absolute left-0 h-full w-24 border-r py-9 shadow">
+                <div className="border-scale-500 h-7 border-b" />
+              </div>
+              <div className="bg-scale-100 border-scale-500 absolute right-0 h-full w-20 border-l py-9 shadow">
+                <div className="border-scale-500 h-7 border-b" />
+              </div>
+              <div className="bg-scale-100 border-scale-500 absolute top-0 flex h-9 w-full items-center justify-between border-b">
+                <div className="flex items-center">
+                  <IconMenu className="text-scale-1200 mx-3" strokeWidth={1} size={16} />
+                  <IconGrid className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
+                  <IconLayers className="text-scale-1200 mx-3" strokeWidth={1} size={15} />
+                </div>
+                <div className="mx-3 flex items-center">
+                  <div className="border-scale-1200 bg-scale-1000 relative -right-4 h-5 w-5 rounded-full border" />
+                  <div className="border-scale-1200 bg-scale-1000 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
+                  <div className="border-scale-1200 bg-scale-1000 z-[3] h-5 w-5 rounded-full border" />
+                </div>
+              </div>
+              <p className="p absolute bottom-0 left-4">Just playing around with some ideas</p>
             </div>,
-            // <div className="header--light block w-full" key="light">
-            //   <Image
-            //     src={`${basePath}/images/product/auth/header--light.png`}
-            //     alt="auth header"
-            //     layout="responsive"
-            //     width="1372"
-            //     height="1074"
-            //   />
-            // </div>,
-            // <div className="header--dark mr-0 w-full dark:block" key="dark">
-            //   <Image
-            //     src={`${basePath}/images/product/auth/header--dark.png`}
-            //     alt="auth header"
-            //     layout="responsive"
-            //     width="1372"
-            //     height="1074"
-            //   />
-            // </div>,
           ]}
           // [TODO] Point to the correct docs URL
           documentation_url={'/docs/guides/auth'}
         />
-
-        {/* <CodeBlock lang="js">
-          {`
-          function hello() {
-
-          return (
-<div className="flex flex-col items-center justify-center">
-  <div className="bg-scale-300 relative flex h-[372px] w-[560px] items-center justify-center rounded">               
-    <div className="bg-brand-900 border-brand-800 relative h-12 w-48 rounded-full border-[3px]"> 
-    </div>
-  </div>
-</div>
-  )
-}
-          `}
-        </CodeBlock> */}
 
         <SectionContainer>
           <div className="grid grid-cols-12">
