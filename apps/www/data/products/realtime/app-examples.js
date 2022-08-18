@@ -1,4 +1,4 @@
-export default = [
+export default [
   {
     img: 'toast-messages.svg',
     title: 'Toast messages',
