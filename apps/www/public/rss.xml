@@ -5,14 +5,21 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 16 Aug 2022 04:04:00 +0000</lastBuildDate>
+      <lastBuildDate>Wed, 17 Aug 2022 04:04:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</guid>
+  <title>Realtime: Multiplayer Edition</title>
+  <link>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</link>
+  <description>Announcing the general availability of Realtime's Broadcast and Presence.</description>
+  <pubDate>Wed, 17 Aug 2022 04:04:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-soc2</guid>
   <title>Supabase is SOC2 compliant</title>
   <link>https://supabase.com/blog/supabase-soc2</link>
   <description>Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.</description>
-  <pubDate>Tue, 16 Aug 2022 04:04:00 +0000</pubDate>
+  <pubDate>Tue, 16 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>

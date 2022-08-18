@@ -82,6 +82,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: [
+        'guides/realtime/overview',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
+      ],
+    },
+    {
+      type: 'category',
       label: 'APIs',
       collapsed: true,
       items: ['guides/api', 'guides/api/generating-types'],
@@ -181,6 +192,7 @@ const sidebars = {
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
+        'guides/integrations/authsignal',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
         'guides/integrations/directus',
@@ -217,8 +229,6 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'doc', id: 'reference' },
-        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
@@ -229,6 +239,8 @@ const sidebars = {
           label: 'Supabase Dart Library',
           href: '/reference/dart',
         },
+        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
+        { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
     {
@@ -246,7 +258,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Self hosted',
+      label: 'Self-hosting',
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },

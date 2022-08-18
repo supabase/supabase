@@ -132,7 +132,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
     mutate: mutateSettings,
   }: any = useSWR(`${API_URL}/props/project/${projectRef}/settings`, get)
   const { data: config, mutate: mutateConfig }: any = useSWR(
-    `${API_URL}/projects/${projectRef}/config?app=postgrest`,
+    `${API_URL}/projects/${projectRef}/config/postgrest`,
     get
   )
   const {
@@ -207,7 +207,7 @@ const ServiceList: FC<any> = ({ projectRef }) => {
     setIsSubmittingJwtSecretUpdateRequest(true)
     try {
       const trackingId = uuidv4()
-      const res = await patch(`${API_URL}/projects/${ref}/config?app=secrets`, {
+      const res = await patch(`${API_URL}/projects/${ref}/config/secrets`, {
         jwt_secret,
         change_tracking_id: trackingId,
       })
@@ -453,7 +453,7 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
   const updateConfig = async (updatedConfig: any) => {
     try {
       const response = await patch(
-        `${API_URL}/projects/${projectRef}/config?app=postgrest`,
+        `${API_URL}/projects/${projectRef}/config/postgrest`,
         updatedConfig
       )
       if (response.error) {

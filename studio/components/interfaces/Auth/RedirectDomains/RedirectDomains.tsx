@@ -28,7 +28,19 @@ const RedirectDomains = () => {
     const payload = URI_ALLOW_LIST_ARRAY
     payload.push(values.domain)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    const payloadString = payload.toString()
+
+    if (payloadString.length > 2 * 1024) {
+      ui.setNotification({
+        message: 'Too many redirect domains, please remove some or try to use wildcards',
+        category: 'error',
+      })
+
+      setSubmitting(false)
+      return
+    }
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
     if (!error) {
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })
