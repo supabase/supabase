@@ -31,13 +31,42 @@ export const renderStatusCodesChart = (props: ReportWidgetProps<StatusCodesDatum
 )
 
 export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) => {
-  const requestPathsSums = props.data.map((v) => v.sum) as number[]
+  const transformedData = props.data.map((data: PathsDatum) => ({
+    ...data,
+    p99_time: data.quantiles[98],
+  }))
+  const requestPathsSums = transformedData.map((v) => v.sum) as number[]
   const requestPathsSumMax = Math.max(...requestPathsSums)
   const requestPathsSumMin = Math.min(...requestPathsSums)
-  const requestPathsAvgs = props.data.map((v) => v.avg_origin_time) as number[]
+  const requestPathsAvgs = transformedData.map((v) => v.avg_origin_time) as number[]
   const requestPathsAvgMax = Math.max(...requestPathsAvgs)
   const requestPathsAvgMin = Math.min(...requestPathsAvgs)
+  const requestPathsP99s = transformedData.map((v) => v.p99_time) as number[]
+  const requestPathsP99Max = Math.max(...requestPathsP99s)
+  const requestPathsP99Min = Math.min(...requestPathsP99s)
 
+  const renderNumericCellWithColorScale = (value: number, percentage: number) => (
+    <Table.td
+      style={{
+        padding: '0.5rem',
+      }}
+      className={`${
+        percentage >= 80
+          ? 'bg-orange-600'
+          : percentage > 60
+          ? 'bg-orange-500'
+          : percentage > 40
+          ? 'bg-yellow-500'
+          : percentage > 20
+          ? 'bg-yellow-400'
+          : percentage > 10
+          ? 'bg-yellow-200'
+          : 'bg-green-100'
+      } text-xs align-top`}
+    >
+      <span className="text-scale-1100">{Number(value).toFixed(1)}</span>
+    </Table.td>
+  )
   return (
     <Table
       containerClassName="max-h-72 w-full overflow-y-auto"
@@ -47,18 +76,21 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
           <Table.th className="sticky top-0 z-10">Path</Table.th>
           <Table.th className="sticky top-0 z-10">Count</Table.th>
           <Table.th className="sticky top-0 z-10">Avg. Time (ms)</Table.th>
+          <Table.th className="sticky top-0 z-10">p99 Time (ms)</Table.th>
           <Table.th className="sticky top-0 z-10">Total Query Time</Table.th>
         </>
       }
       body={
         <>
-          {props.data.map((row: PathsDatum, index) => {
+          {transformedData.map((row, index) => {
             const [show, setShow] = useState(false)
 
             const totalQueryTimePercentage =
               ((row.sum - requestPathsSumMin) / requestPathsSumMax) * 100
             const avgTimePercentage =
               ((row.avg_origin_time - requestPathsAvgMin) / requestPathsAvgMax) * 100
+            const p99TimePercentage =
+              ((row.p99_time - requestPathsP99Min) / requestPathsP99Max) * 100
             return (
               <>
                 <Table.tr key={index}>
@@ -85,28 +117,8 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
                   <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
                     {row.count}
                   </Table.td>
-                  <Table.td
-                    style={{
-                      padding: '0.5rem',
-                    }}
-                    className={`${
-                      avgTimePercentage >= 80
-                        ? 'bg-orange-600'
-                        : avgTimePercentage > 60
-                        ? 'bg-orange-500'
-                        : avgTimePercentage > 40
-                        ? 'bg-yellow-500'
-                        : avgTimePercentage > 20
-                        ? 'bg-yellow-400'
-                        : avgTimePercentage > 10
-                        ? 'bg-yellow-200'
-                        : 'bg-green-100'
-                    } text-xs align-top`}
-                  >
-                    <span className="text-scale-1100">
-                      {Number(row.avg_origin_time).toFixed(2)}
-                    </span>
-                  </Table.td>
+                  {renderNumericCellWithColorScale(row.avg_origin_time, avgTimePercentage)}
+                  {renderNumericCellWithColorScale(row.p99_time, p99TimePercentage)}
                   <Table.td className="align-top py-1">
                     <div
                       className={`mt-1 h-2 rounded w-full bg-green-1100`}
