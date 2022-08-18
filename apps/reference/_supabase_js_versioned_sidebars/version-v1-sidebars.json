@@ -46,7 +46,58 @@
     {
       "type": "category",
       "label": "Database",
-      "items": ["select", "insert", "update", "upsert", "delete", "rpc"],
+      "items": [
+        "select",
+        "insert",
+        "update",
+        "upsert",
+        "delete",
+        "rpc",
+        {
+          "type": "category",
+          "label": "Modifiers",
+          "items": [
+            "using-modifiers",
+            "limit",
+            "order",
+            "range",
+            "single",
+            "maybesingle"
+          ],
+          "collapsed": true
+        },
+        {
+          "type": "category",
+          "label": "Filters",
+          "items": [
+            "using-filters",
+            "or",
+            "not",
+            "match",
+            "eq",
+            "neq",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "like",
+            "ilike",
+            "is",
+            "in",
+            "contains",
+            "containedby",
+            "rangelt",
+            "rangegt",
+            "rangegte",
+            "rangelte",
+            "rangeadjacent",
+            "overlaps",
+            "textsearch",
+            "filter"
+          ],
+          "collapsed": true
+        }
+      ],
       "collapsed": true
     },
     {
@@ -80,50 +131,6 @@
         "storage-from-createsignedurl",
         "storage-from-createsignedurls",
         "storage-from-getpublicurl"
-      ],
-      "collapsed": true
-    },
-    {
-      "type": "category",
-      "label": "Modifiers",
-      "items": [
-        "using-modifiers",
-        "limit",
-        "order",
-        "range",
-        "single",
-        "maybesingle"
-      ],
-      "collapsed": true
-    },
-    {
-      "type": "category",
-      "label": "Filters",
-      "items": [
-        "using-filters",
-        "or",
-        "not",
-        "match",
-        "eq",
-        "neq",
-        "gt",
-        "gte",
-        "lt",
-        "lte",
-        "like",
-        "ilike",
-        "is",
-        "in",
-        "contains",
-        "containedby",
-        "rangelt",
-        "rangegt",
-        "rangegte",
-        "rangelte",
-        "rangeadjacent",
-        "overlaps",
-        "textsearch",
-        "filter"
       ],
       "collapsed": true
     }
