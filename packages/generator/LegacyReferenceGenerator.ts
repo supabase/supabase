@@ -153,10 +153,14 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
       .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
-    let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
-    subContent = methodListGroup([heading].concat(properties).join('\n'))
-  }
 
+    // Parameters don't have properties
+    if (param.kindString !== 'Parameter') {
+      let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
+      subContent = methodListGroup([heading].concat(properties).join('\n'))
+      return methodListItemLabel(labelParams, subContent)
+    }
+  }
   return methodListItemLabel(labelParams, subContent)
 }
 
@@ -272,7 +276,7 @@ Not yet implemented
 
 function generateLabelParam(param: any) {
   let labelParams = {}
-  if (typeof param.type === 'string') {
+  if (typeof param.type === 'string' && param.type === 'literal') {
     labelParams = {
       name: param.name ?? param.value,
       isOptional: !!param.flags?.isOptional,
