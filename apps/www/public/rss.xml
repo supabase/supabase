@@ -9,9 +9,9 @@
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/supabase-soc2</guid>
-  <title>Supabase is SOC2 compliant.</title>
+  <title>Supabase is SOC2 compliant</title>
   <link>https://supabase.com/blog/supabase-soc2</link>
-  <description>Supabase is SOC2 Type 1 compliant. We received an unqualified certification from our auditors.</description>
+  <description>Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.</description>
   <pubDate>Tue, 16 Aug 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
@@ -190,9 +190,9 @@
   <pubDate>Mon, 28 Mar 2022 16:04:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/community-day</guid>
+  <guid>https://supabase.com/blog/community-day-lw4</guid>
   <title>Community Day</title>
-  <link>https://supabase.com/blog/community-day</link>
+  <link>https://supabase.com/blog/community-day-lw4</link>
   <description>Kicking off Launch Week 4 with contributors, partners, and friends.</description>
   <pubDate>Sun, 27 Mar 2022 16:04:00 +0000</pubDate>
 </item>
@@ -295,9 +295,9 @@
   <pubDate>Mon, 29 Nov 2021 16:04:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/community-day</guid>
+  <guid>https://supabase.com/blog/community-day-lw3</guid>
   <title>Community Day</title>
-  <link>https://supabase.com/blog/community-day</link>
+  <link>https://supabase.com/blog/community-day-lw3</link>
   <description>Kicking off launch week by highlighting the communities around Supabase.</description>
   <pubDate>Sun, 28 Nov 2021 16:04:00 +0000</pubDate>
 </item>
