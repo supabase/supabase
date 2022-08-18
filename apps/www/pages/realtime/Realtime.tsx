@@ -58,7 +58,7 @@ function RealtimePage() {
             {
               // [TODO] Update OG image
               // [TODO] Update to use an appropriate icon for realtime in Solutions.json
-              url: `https://supabase.com${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://supabase.com${basePath}/images/realtime/og.jpg`,
             },
           ],
         }}
