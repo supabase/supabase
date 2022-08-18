@@ -47,8 +47,8 @@ pages:
               email: 'example@email.com',
               password: 'example-password',
               options: {
-                data: { 
-                  first_name: 'John', 
+                data: {
+                  first_name: 'John',
                   age: 27,
                 }
               }
@@ -94,9 +94,9 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
-      - Requires either an email or phone number. 
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp. 
-      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp. 
+      - Requires either an email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
+      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
     examples:
       - name: Sign in with email.
@@ -136,7 +136,7 @@ pages:
         isSpotlight: false
         description: |
           The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
-          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for 
+          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -196,7 +196,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.getSession()
+          const { data, error } = await supabase.auth.getSession()
           ```
   auth.getUser():
     title: 'getUser()'
@@ -209,7 +209,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.getUser()
+          const user = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
         isSpotlight: false
