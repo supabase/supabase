@@ -88,6 +88,7 @@ const sidebars = {
         'guides/realtime/overview',
         'guides/realtime/broadcast',
         'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
       ],
     },
     {
