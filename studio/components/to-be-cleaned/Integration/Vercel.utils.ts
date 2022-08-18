@@ -144,21 +144,21 @@ export function prepareVercelEvns(
     } = { key: x.key, type: x.type, target: ['production', 'development', 'preview'], value: '' }
 
     switch (x.alias) {
-      case INTEGRATION_ENVS_ALIAS.ENDPOINT: {
+      case INTEGRATION_ENVS_ALIAS.ENDPOINT:
         env.value = project.endpoint
-      }
-      case INTEGRATION_ENVS_ALIAS.ANONKEY: {
+        break
+      case INTEGRATION_ENVS_ALIAS.ANONKEY:
         env.value = project.anon_key
-      }
-      case INTEGRATION_ENVS_ALIAS.SERVICEKEY: {
+        break
+      case INTEGRATION_ENVS_ALIAS.SERVICEKEY:
         env.value = project.service_key
-      }
-      case INTEGRATION_ENVS_ALIAS.DBHOST: {
+        break
+      case INTEGRATION_ENVS_ALIAS.DBHOST:
         env.value = project.db_host ?? ''
-      }
-      case INTEGRATION_ENVS_ALIAS.DBPASSWORD: {
+        break
+      case INTEGRATION_ENVS_ALIAS.DBPASSWORD:
         env.value = project.db_password ?? ''
-      }
+        break
     }
 
     envs.push(env)
