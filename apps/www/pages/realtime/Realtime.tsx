@@ -1,11 +1,4 @@
-import {
-  Button,
-  IconArrowUpRight,
-  IconBriefcase,
-  IconEye,
-  IconLink,
-  IconShield,
-} from '@supabase/ui'
+import { Button, IconArrowUpRight, IconLink } from '@supabase/ui'
 
 // [TODO] These need to be relooked - I'm using multiplayer.dev as a "docs"
 import ApiExamples from 'data/products/realtime/api-examples'
@@ -15,19 +8,18 @@ import RealtimeStyles from './Realtime.module.css'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
-import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import AuthProviders from '~/data/auth.json'
+import { CursorClickIcon } from '@heroicons/react/outline'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -50,8 +42,8 @@ const Cursor = ({ className = '', color = 'none' }) => {
 
 const exampleApps = [
   {
-    img: 'notifications.svg',
-    title: 'Notifications',
+    img: 'toast-messages.svg',
+    title: 'Toast messages',
     description: 'sadcsdas sad asds dsdas asdas as',
   },
   {
@@ -77,11 +69,6 @@ const exampleApps = [
       'Keep charts updated in realtime. Supabase can detect changes in your database and then update the client immediately.',
   },
   { img: 'in-app-chat.svg', title: 'In app chat', description: 'sadcsdas sad asds dsdas asdas as' },
-  // {
-  //   img: 'shared-docs.svg',
-  //   title: 'Shared text editor',
-  //   description: 'sadcsdas sad asds dsdas asdas as',
-  // },
   {
     img: 'text-editor.svg',
     title: 'Shared code editor editor',
@@ -178,6 +165,69 @@ function RealtimePage() {
           // [TODO] Point to the correct docs URL
           documentation_url={'/docs/guides/auth'}
         />
+
+        {/* <CodeBlock lang="js">
+          {`
+          function hello() {
+
+          return (
+<div className="flex flex-col items-center justify-center">
+  <div className="bg-scale-300 relative flex h-[372px] w-[560px] items-center justify-center rounded">               
+    <div className="bg-brand-900 border-brand-800 relative h-12 w-48 rounded-full border-[3px]"> 
+    </div>
+  </div>
+</div>
+  )
+}
+          `}
+        </CodeBlock> */}
+
+        <SectionContainer>
+          <div className="grid grid-cols-12">
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
+              <div className="p mb-4">
+                <img
+                  src="/images/realtime/icons/database-changes.svg"
+                  alt="realtime broadcast"
+                  className="w-9"
+                />
+              </div>
+              <h4 className="h4">Database changes</h4>
+              <p className="p text-base">
+                Enable social logins with the click of a button. Google, Facebook, GitHub, Azure,
+                Gitlab, Twitter, Discord, and many more.
+              </p>
+            </div>
+            <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
+              <div className="p mb-4">
+                <img
+                  src="/images/realtime/icons/presence.svg"
+                  alt="realtime broadcast"
+                  className="w-9"
+                />
+              </div>
+              <h4 className="h4">Presence</h4>
+              <p className="p text-base">
+                Incredibly simple Auth, without a single external authentication service. Built-in
+                Authentication, Authorization, and User Management.
+              </p>
+            </div>
+            <div className="col-span-12 lg:col-span-3 lg:col-start-9">
+              <div className="p mb-4">
+                <img
+                  src="/images/realtime/icons/broadcast.svg"
+                  alt="realtime broadcast"
+                  className="w-9"
+                />
+              </div>
+              <h4 className="h4">Broadcast</h4>
+              <p className="p text-base">
+                User data stored in your Supabase database so you never have to worry about 3rd
+                party privacy issues. Host your data in 8 different locations.
+              </p>
+            </div>
+          </div>
+        </SectionContainer>
 
         <SectionContainer className="flex flex-col gap-8">
           <div className="flex flex-col items-center justify-center">
