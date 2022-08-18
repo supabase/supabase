@@ -379,11 +379,17 @@ const supabase = createClient(
 import { createClient } from '@supabase/supabase-js'
 
 const options = {
-  schema: 'public',
-  headers: { 'x-my-custom-header': 'my-app-name' },
-  autoRefreshToken: true,
-  persistSession: true,
-  detectSessionInUrl: true,
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  global: {
+    headers: { 'x-my-custom-header': 'my-app-name' },
+  },
 }
 const supabase = createClient(
   'https://xyzcompany.supabase.co',
@@ -402,7 +408,7 @@ const supabase = createClient(
   'https://xyzcompany.supabase.co',
   'public-anon-key',
   {
-    schema: 'other_schema',
+    db: { schema: 'other_schema' },
   }
 )
 ```
@@ -421,7 +427,7 @@ const supabase = createClient(
   'https://xyzcompany.supabase.co',
   'public-anon-key',
   {
-    fetch: fetch.bind(globalThis),
+    global: { fetch: fetch.bind(globalThis) },
   }
 )
 ```
