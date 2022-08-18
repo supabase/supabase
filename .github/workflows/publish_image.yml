@@ -6,13 +6,24 @@ on:
       - studio
     paths:
       - 'studio/**'
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            supabase/studio
+            public.ecr.aws/t3w2s2c9/studio
+          flavor: |
+            latest=true
+          tags: |
+            type=ref,event=tag
 
       - uses: docker/setup-qemu-action@v2
         with:
@@ -35,10 +46,10 @@ jobs:
 
       - uses: docker/build-push-action@v3
         with:
-          context: studio
-          platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            supabase/studio:latest
-            public.ecr.aws/t3w2s2c9/studio:latest
+          context: studio
           target: production
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
