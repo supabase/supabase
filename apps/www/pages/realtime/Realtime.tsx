@@ -1,10 +1,6 @@
 import { IconGrid, IconLayers, IconMenu } from '@supabase/ui'
-
-// [TODO] These need to be relooked - I'm using multiplayer.dev as a "docs"
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
-import RealtimeStyles from './Realtime.module.css'
-
 import Solutions from 'data/Solutions.json'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
@@ -15,6 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import RealtimeStyles from './Realtime.module.css'
 
 // Import Swiper styles
 import 'swiper/swiper.min.css'
