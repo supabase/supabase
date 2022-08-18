@@ -27,6 +27,8 @@ module.exports = withMDX({
       'avatars.githubusercontent.com',
       'colab.research.google.com',
       'api.producthunt.com',
+      'https://s3-us-west-2.amazonaws.com',
+      's3-us-west-2.amazonaws.com',
     ],
   },
   async headers() {
