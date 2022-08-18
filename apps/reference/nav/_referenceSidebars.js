@@ -82,6 +82,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: [
+        'guides/realtime/overview',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
+      ],
+    },
+    {
+      type: 'category',
       label: 'APIs',
       collapsed: true,
       items: ['guides/api', 'guides/api/generating-types'],
@@ -181,6 +192,7 @@ const sidebars = {
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
+        'guides/integrations/authsignal',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
         'guides/integrations/directus',
