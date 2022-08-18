@@ -261,7 +261,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.getSession()
+          const { data, error } = await supabase.auth.getSession()
           ```
   auth.getUser():
     title: 'getUser()'
@@ -274,7 +274,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.getUser()
+          const user = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
         isSpotlight: false
