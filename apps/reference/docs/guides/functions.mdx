@@ -6,6 +6,7 @@ description: 'Globally distributed Typescript functions.'
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import ButtonCard from '@site/src/components/ButtonCard'
 const examples = [
   {
     name: 'With supabase-js',
@@ -240,14 +241,15 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
     {examples.map((x) => (
-      <div class="col col--6">
-        <a class="card" to={x.href} style={{ height: '100%' }}>
-          <div class="card__body">
-            <h4>{x.name}</h4>
-            <p>{x.description}</p>
-          </div>
-        </a>
-      </div>
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={x.href}
+        title={x.name}
+        description={x.description}
+        style={{ height: '100%' }}
+      />
+    </div>
     ))}
   </div>
 </div>
