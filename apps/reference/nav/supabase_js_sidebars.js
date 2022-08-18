@@ -23,7 +23,7 @@ const sidebars = {
       items: [
         'intro',
         'installing',
-        'initializing',
+        'generated/initializing',
         'typescript-support',
         'release-notes',
       ],

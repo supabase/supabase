@@ -217,3 +217,16 @@ const myChannel = supabase
   )
   .subscribe()
 ```
+
+### Listening to Broadcast changes
+
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+
+```js
+const myChannel = supabase
+  .channel('broadcastChannel', {
+    configs: { broadcast: { self: true, ack: true } },
+  })
+  .on('broadcast', { event: 'post' }, (payload) => console.log(payload))
+  .subscribe()
+```
