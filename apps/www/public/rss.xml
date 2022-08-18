@@ -5,14 +5,14 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 17 Aug 2022 05:05:00 +0000</lastBuildDate>
+      <lastBuildDate>Thu, 18 Aug 2022 05:05:00 +0000</lastBuildDate>
       <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/pg_json-schema</guid>
-  <title>pg_json schema thing</title>
-  <link>https://supabase.com/blog/pg_json-schema</link>
-  <description>Announcing the general availability of Realtime's Broadcast and Presence.</description>
-  <pubDate>Wed, 17 Aug 2022 05:05:00 +0000</pubDate>
+  <guid>https://supabase.com/blog/pg_jsonschema</guid>
+  <title>test 1233</title>
+  <link>https://supabase.com/blog/pg_jsonschema</link>
+  <description>Announcing the general availability of Realtimes Broadcast and Presence.</description>
+  <pubDate>Thu, 18 Aug 2022 05:05:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability copy</guid>
