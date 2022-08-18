@@ -1,10 +1,12 @@
 ---
 id: broadcast
-title: Supabase Broadcast
+title: Broadcast
 description: Getting started with Realtime's broadcast feature
 ---
 
-Supabase Broadcast allows a client to broadcast messages and multiple receivers to receive the broadcasted message. The broadcasted messages are ephemeral, they are not persisted to the database and are directly relayed by the Realtime server.
+Supabase Broadcast allows a client to broadcast messages and multiple receivers to receive the broadcasted message. The broadcasted messages are ephemeral, they are not persisted to the database and are directly relayed by the Realtime server. This is ideal for broadcasting information like mouse moments where latency is important, but need not be persisted.
+
+The broadcast JS client methods are supported from supabase-js v2 release candidate.
 
 To broadcast a message:
 
@@ -18,7 +20,7 @@ const supabase = createClient(
 
 // The name of the channel can be set to any string.
 // Set the same name across both the broadcasting and receiving clients.
-const channel = supabase.channel('broadcastChannel', {
+const channel = supabase.channel('user1-location', {
   configs: {
     broadcast: { ack: true },
   },
@@ -53,7 +55,7 @@ const supabase = createClient(
 )
 
 // use the same channel name as the client broadcasting the message is using
-const channel = supabase.channel('broadcastChannel')
+const channel = supabase.channel('user1-location')
 
 // listen to broadcasts
 channel
