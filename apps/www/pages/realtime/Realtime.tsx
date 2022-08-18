@@ -12,8 +12,6 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
-
-// Import Swiper styles
 import 'swiper/swiper.min.css'
 
 const Cursor = ({ className = '', color = 'none' }) => {
