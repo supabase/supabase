@@ -34,10 +34,9 @@ channel.subscribe(async (status) => {
     setInterval(async () => {
       const status = await channel.send({
         type: 'broadcast',
-        event: 'post',
-        payload: { x: 0, y: 0 },
+        event: 'location',
+        payload: { x: Math.random(), y: Math.random() },
       })
-
       console.log(status)
     }, 1000)
   }
@@ -59,7 +58,7 @@ const channel = supabase.channel('user1-location')
 
 // listen to broadcasts
 channel
-  .on('broadcast', { event: 'post' }, (payload) => console.log(payload))
+  .on('broadcast', { event: 'location' }, (payload) => console.log(payload))
   .subscribe(async (status) => {
     if (status === 'SUBSCRIBED') {
       console.log(status)
