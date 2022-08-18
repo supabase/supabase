@@ -1,0 +1,67 @@
+---
+id: broadcast
+title: Broadcast
+description: Getting started with Realtime's broadcast and presence features
+---
+
+Supabase Broadcast lets a client broadcast messages and multiple receivers to receive the broadcasted message. The broadcasted messages are emphermal, they are not persisted to the database. The messages are directly relayed by the Realtime server.
+
+To broadcast a message
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+// The name of the channel can be set to any string.
+// Set the same name across both the broadcasting and receiving clients.
+const channel = supabase.channel('broadcastChannel', {
+  configs: {
+    broadcast: { ack: true },
+  },
+})
+
+// subscribe registers your client with the server
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    // now you can start broadcasting messages
+    // sending a new message every second
+    setInterval(async () => {
+      const status = await channel.send({
+        type: 'broadcast',
+        event: 'post',
+        payload: { x: 0, y: 0 },
+      })
+
+      console.log(status)
+    }, 1000)
+  }
+})
+```
+
+To receiving the broadcasted message, run this script in another tab
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+// use the same channel name as the client broadcasting the message is using
+const channel = supabase.channel('broadcastChannel')
+
+// listen to broadcasts
+channel
+  .on('broadcast', { event: 'post' }, (payload) => console.log(payload))
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      console.log(status)
+      // your callback function will now be called with the received messages
+    }
+  })
+```
