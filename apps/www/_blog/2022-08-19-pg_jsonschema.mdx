@@ -80,9 +80,12 @@ create table some_table (
 
 insert into some_table (metadata)
 values (<SQL Input>);
+
 ```
 
 But the resulting schema is much more permissive than our intent. When inserting a mix of correct and incorrect values:
+
+![Table 1](/images/blog/lw5-pg_jsonschema/table-1.png)
 
 | SQL input                       | Inserted | metadata column value (json) | note                                |
 | ------------------------------- | -------- | ---------------------------- | ----------------------------------- |
@@ -175,6 +178,8 @@ values
 ```
 
 With that check constraint in place, we re-run the same test cases:
+
+![Table 2](/images/blog/lw5-pg_jsonschema/table-2.png)
 
 | SQL input                       | Inserted | metadata column value  | note                                |
 | ------------------------------- | -------- | ---------------------- | ----------------------------------- |
