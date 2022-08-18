@@ -1,8 +1,9 @@
-import { Collapsible, IconChevronRight } from '@supabase/ui'
+import { Button, IconChevronRight } from '@supabase/ui'
 import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'
+import { useState } from 'react'
 import { DATETIME_FORMAT } from '../Reports.constants'
 import { PathsDatum, StatusCodesDatum } from '../Reports.types'
 import { queryParamsToObject } from '../Reports.utils'
@@ -48,57 +49,70 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
       body={
         <>
           {props.data.map((row: any, index) => {
+            const [show, setShow] = useState(false)
+
             const totalQueryTimePercentage =
               ((row.sum - requestPathsSumMin) / requestPathsSumMax) * 100
             return (
-              <Table.tr key={index}>
-                <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
-                  <Collapsible className="w-full flex flex-col gap-2">
-                    <Collapsible.Trigger asChild>
-                      <button
-                        className="w-full text-scale-1200 flex justify-start space-x-1"
-                        type="button"
-                      >
-                        <IconChevronRight
-                          size="tiny"
-                          className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
-                        />
-                        <div className="flex space-x-2 items-center overflow-x-none">
-                          <p className="text-scale-1200 font-mono text-xs">{row.method}</p>
-                          <p className="font-mono text-scale-1200 text-xs truncate max-w-xs ">
-                            {row.path}
-                            <span className="text-scale-1000">{row.query_params}</span>
-                          </p>
-                        </div>
-                      </button>
-                    </Collapsible.Trigger>
-                    <Collapsible.Content className="bg-scale-300 p-2 rounded">
-                      <pre className="text-xs syntax-highlight overflow-x-auto">
-                        <div
-                          className="text-wrap"
-                          dangerouslySetInnerHTML={{
-                            __html: jsonSyntaxHighlight(queryParamsToObject(row.query_params)),
-                          }}
-                        />
-                      </pre>
-                    </Collapsible.Content>
-                  </Collapsible>
-                </Table.td>
-                <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
-                  {row.count}
-                </Table.td>
-                <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
-                  {Number(row.avg_origin_time).toFixed(2)}
-                </Table.td>
-                <Table.td className="align-top py-1">
-                  <div
-                    className={`mt-1 h-2 rounded w-full bg-green-1100`}
-                    style={{
-                      width: `${totalQueryTimePercentage}%`,
-                    }}
-                  />
-                </Table.td>
-              </Table.tr>
+              <>
+                <Table.tr key={index}>
+                  <Table.td className="max-w-sm lg:max-w-lg" style={{ padding: '0.3rem' }}>
+                    <Button
+                      onClick={() => setShow(!show)}
+                      type="text"
+                      className="w-full text-scale-1200 justify-start space-x-1 flex"
+                      icon={
+                        <span className={`transition ${show ? 'rotate-90' : 'rotate-0'}`}>
+                          <IconChevronRight size="tiny" />
+                        </span>
+                      }
+                    >
+                      <div className="flex space-x-2 items-center overflow-x-none">
+                        <p className="text-scale-1200 font-mono text-xs">{row.method}</p>
+                        <p className="font-mono text-scale-1200 text-xs truncate max-w-xs ">
+                          {row.path}
+                          <span className="text-scale-1000">{row.query_params}</span>
+                        </p>
+                      </div>
+                    </Button>
+                  </Table.td>
+                  <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
+                    {row.count}
+                  </Table.td>
+                  <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
+                    {Number(row.avg_origin_time).toFixed(2)}
+                  </Table.td>
+                  <Table.td className="align-top py-1">
+                    <div
+                      className={`mt-1 h-2 rounded w-full bg-green-1100`}
+                      style={{
+                        width: `${totalQueryTimePercentage}%`,
+                      }}
+                    />
+                  </Table.td>
+                </Table.tr>
+                <Table.tr className="transition-all duration-500">
+                  <Table.td
+                    colSpan={4}
+                    className={`w-full overflow-none ${
+                      show ? 'h-auto opacity-100' : 'table-cell !h-0 !p-0 opacity-0'
+                    }`}
+                  >
+                    <pre
+                      className={`max-w-lg text-xs syntax-highlight overflow-auto bg-scale-300 p-2 rounded  ${
+                        show ? '' : '!p-0 h-0'
+                      }`}
+                    >
+                      <div
+                        className="text-wrap"
+                        dangerouslySetInnerHTML={{
+                          __html: jsonSyntaxHighlight(queryParamsToObject(row.query_params)),
+                        }}
+                      />
+                    </pre>
+                  </Table.td>
+                </Table.tr>
+              </>
             )
           })}
         </>
