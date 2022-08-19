@@ -7,20 +7,20 @@ thumb: lw5/postgrest-v10.png
 tags:
   - launch-week
 date: '2022-08-19T07:02:00'
-toc_depth: 2
+toc_depth: 3
 ---
 
 PostgREST turns your PostgreSQL database automatically into a RESTful API. Today, PostgREST v10 was [released](https://github.com/PostgREST/postgrest/releases/tag/v10.0.0). v10 is not available on the Supabase Platform yet, but it is available for [self-hosting](https://supabase.com/docs/guides/hosting/overview) or as a [executable binary](https://github.com/PostgREST/postgrest/releases/tag/v10.0.0).
 
 Let's take a look at some of its new features that go hand in hand with [supabase-js v2](https://supabase.com/blog/supabase-js-v2).
 
-# EXPLAIN
+## EXPLAIN
 
 Akin to the [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html) command, you can now get the execution plan of a request through REST or `supabase-js`. This works transparently for reads, writes and RPC because every request to PostgREST generates a single SQL query.
 
 This is only suitable for development environments and is only enabled when the `db-plan-enabled` config is set to `true`.
 
-## Getting the execution plan through REST
+### Getting the execution plan through REST
 
 The execution plan can be obtained by using a vendor media type on the `Accept` header.
 
@@ -35,7 +35,7 @@ Aggregate  (cost=8.18..8.20 rows=1 width=112)
 
 The `text` format is used by default, which gives you the same output you’d get in other SQL clients like `psql`. You can change the format to JSON by using a media type suffix `application/vnd.pgrst.plan+json`.
 
-## Explaining supabase-js queries
+### Explaining supabase-js queries
 
 For `supabase-js`, you can get the execution plan using the `explain()` method. This works for every `supabase-js` method, including `rpc()`. Here’s an example for `select()`.
 
@@ -45,7 +45,7 @@ const { data, error } = await supabase.from('projects').select('*').eq('id', 1).
 console.log(data)
 ```
 
-```
+```text hideCopy
 Aggregate  (cost=8.18..8.20 rows=1 width=112)
   ->  Index Scan using projects_pkey on projects  (cost=0.15..8.17 rows=1 width=40)
         Index Cond: (id = 1)
@@ -53,7 +53,7 @@ Aggregate  (cost=8.18..8.20 rows=1 width=112)
 
 Explaining the plan output in detail is beyond the scope of this blog post but basically it’s a tree of operations that PostgreSQL will follow for executing a query. Here we see the “Aggregate” node which corresponds to the `json_agg` function used by the PostgREST generated query(more details on how to find these later) and the “Index Scan” node which means an index on “id” was used for a fast search.
 
-## Explaining RLS policies
+### Explaining RLS policies
 
 The raison d'etre of `explain()` is to provide quicker feedback on the performance of queries, especially in the presence of RLS policies. For instance, let’s say we have this basic policy:
 
@@ -77,7 +77,7 @@ const { data, error } = await supabase
 console.log(data)
 ```
 
-```
+```text hideCopy
 Aggregate  (cost=8.18..8.20 rows=1 width=112) (actual time=0.017..0.018 rows=1 loops=1)
   ->  Index Scan using projects_pkey on projects  (cost=0.15..8.17 rows=1 width=40) (actual time=0.012..0.012 rows=0 loops=1)
         Index Cond: (id = 1)
@@ -89,7 +89,7 @@ Execution Time: 0.046 ms
 
 Here you can see the “Filter” node, which is a simple `false` as defined by the above policy, this proves that the RLS policy is getting applied. Also the actual “Execution Time” is shown, which is a fraction of a millisecond. Note that this is only the query execution time, it doesn’t account for the latency for transferring the data from the database to the frontend.
 
-## Getting the Query Identifier
+### Getting the Query Identifier
 
 `explain()` is also useful for getting the [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) query identifier, which you can use in the Supabase logs to obtain the generated SQL queries. Here we use the json `format` and the `verbose` option to get it.
 
@@ -106,9 +106,9 @@ console.log(data[0]['Query Identifier'])
 
 For getting more detailed information, you can also use the `settings`, `buffers`, `wal` options with `explain()` .
 
-# Improved Relationship Detection
+## Improved Relationship Detection
 
-## One-to-one relationships
+### One-to-one relationships
 
 To avoid unnecessary JSON arrays in a query result, one-to-one relationships are now automatically detected. For this you can use a:
 
@@ -155,7 +155,7 @@ console.log(data)
 ]
 ```
 
-## Computed relationships
+### Computed relationships
 
 PostgREST uses foreign keys to detect relationships. This poses a problem on database objects that cannot have foreign keys, like views. Though PostgREST tries to infer relationships based on the views’ source tables foreign keys([docs](https://postgrest.org/en/latest/api.html#embedding-views)), this is not infallible - in particular, it fails when views have a complex definition (e.g. multiple UNIONs). For this you can use “computed relationships”, which are “inlinable” SQL functions similar to computed columns.
 
@@ -232,7 +232,7 @@ console.log(data)
 
 Computed relationships follow the rules of [Inlining of SQL Functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions), which basically allows them to be injected into PostgREST generated queries, making them efficient to use. You can also use computed relationships to override detected relationships.
 
-## Breaking change on many-to-many relationships
+### Breaking change on many-to-many relationships
 
 Detecting join tables for many-to-many relationships has been working for many releases. However on complex schemas join tables can be incorrectly detected, causing errors when used in resource embedding. For this the following BREAKING CHANGE had to be made:
 
@@ -262,7 +262,7 @@ If changing the PK is not feasible for a particular case, the alternative would 
 
 One-to-many and many-to-one relationships keep working as always, no change in their detection.
 
-# Closing up
+## Closing up
 
 Computed relationships are the first step towards PostgREST extensibility, customizing the aggregate used for the response and custom operators are planned for next releases.
 
