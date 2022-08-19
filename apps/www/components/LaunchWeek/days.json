@@ -148,76 +148,56 @@
         "description": "Outline of the community changes",
         "products": [
           {
-            "title": "postgrest  v10: native types, EXPLAIN",
-            "url": "Something",
-            "description": "Learn how to use the new Realtime"
+            "title": "pg_jsonschema: 0.1.0",
+            "url": "/blog/launch-week-5-community-day#pg_jsonschema",
+            "description": "For our Open Source Spotlight we're hearing from Dmitry Dygalo. "
           },
           {
-            "title": "postgres core contributions",
-            "url": "Something",
-            "description": "Learn how to use the new Realtime"
+            "title": "Postgrest v10: Native Types",
+            "url": "/blog/launch-week-5-community-day#postgrest-v10-native-types",
+            "description": "EXPLAIN, Query Planners, Improved Relationship Detection, and Computed relationships."
           },
           {
-            "title": "Replit templates",
-            "url": "Something",
-            "description": "Learn how to use the new Realtime"
+            "title": "Egghead course",
+            "url": "/blog/launch-week-5-community-day#free-egghead-course-cache-supabase-data-at-the-edge-with-cloudflare-workers-and-kv-storage",
+            "description": "Cache Supabase data at the Edge with Cloudflare Workers and KV Storage."
           }
         ]
       },
       {
-        "title": "Product updates",
-        "url": "Something",
-        "description": "Outline of the community changes",
+        "title": "One more thing",
+        "url": "/blog/launch-week-5-one-more-thing",
+        "description": "It's never just one more thing...",
         "products": [
           {
-            "title": "Egghead course",
-            "url": "Something",
-            "description": "Learn how to use the new Realtime"
-          },
-          {
-            "title": "Flutter v1",
-            "url": "Something",
-            "description": "Learn how to use the new Rest API"
-          },
-          {
-            "title": "pg_graphql: 0.4.0",
-            "url": "Something",
-            "description": "New landing page for realtime"
-          },
-          {
-            "title": "pg_jsonschema: 0.1.0",
-            "url": "Something",
-            "description": "New landing page for realtime"
-          },
-          {
-            "title": "Auth Helpers",
-            "url": "Something",
-            "description": "New landing page for realtime"
+            "title": "Supabase Vault",
+            "url": "/blog/supabase-vault",
+            "description": "Postgres extension for managing secrets and encryption inside your database."
           },
           {
             "title": "Auth UI",
-            "url": "Something",
-            "description": "New landing page for realtime"
+            "url": "/blog/launch-week-5-one-more-thing#auth-ui",
+            "description": "Customizable React UI component for Supabase Auth."
           },
           {
-            "title": "Auth hCaptcha",
-            "url": "Something",
-            "description": "New landing page for realtime"
+            "title": "Dashboard permissions",
+            "url": "/blog/launch-week-5-one-more-thing#dashboard-permissions",
+            "description": "We've released granular permissions on our Supabase dashboard."
           },
           {
-            "title": "Supabase Vault",
-            "url": "Something",
-            "description": "New landing page for realtime"
+            "title": "JSON schema validation",
+            "url": "/blog/launch-week-5-one-more-thing#json-schema-validation",
+            "description": "We've released a new Postgres extension on the Supabase platform today, pg_jsonschema."
           },
           {
-            "title": "Permissions 1 + three way schema + column encryption",
-            "url": "Something",
-            "description": "New landing page for realtime"
+            "title": "pg_graphql v0.4.0",
+            "url": "/blog/launch-week-5-one-more-thing#pg_graphql-v040",
+            "description": "We've released a new version of pg_graphql, our GraphQL extension for Postgres."
           },
           {
-            "title": "Auth | MFA",
-            "url": "Something",
-            "description": "Soft launch of MFA, you can sign up for early access"
+            "title": "Auth | Multi Factor Authentication",
+            "url": "/blog/launch-week-5-one-more-thing#multi-factor-authentication",
+            "description": "We've opened early-access signups for Multi-Factor Authentication (MFA)."
           }
         ]
       }
