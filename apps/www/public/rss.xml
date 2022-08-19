@@ -15,8 +15,15 @@
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgrest-v10</guid>
+  <title>PostgREST v10: EXPLAIN and Improved Relationship Detection</title>
+  <link>https://supabase.com/blog/postgrest-v10</link>
+  <description>Today, PostgREST 10 was released. Let's take a look at some of the new features that go hand in hand with supabase-js v2.</description>
+  <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/pg_jsonschema</guid>
-  <title>Supabase now support JSON Schema validation for JSON/B Columns</title>
+  <title>Supabase now supports JSON Schema validation for JSON/B Columns</title>
   <link>https://supabase.com/blog/pg_jsonschema</link>
   <description>Today we're releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
