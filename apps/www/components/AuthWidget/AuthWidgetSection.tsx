@@ -1,16 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button, IconArrowUpRight, IconCode, IconSearch, IconX, Radio, Tabs } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { useState } from 'react'
-import CodeBlock from '../CodeBlock/CodeBlock'
 // Import Swiper React components
 import { useRouter } from 'next/router'
 
-import { useTheme } from '../Providers'
-import Solutions from 'data/Solutions.json'
+import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { ArrowNarrowUpIcon, ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
-import ProductIcon from '../ProductIcon'
-import Link from 'next/link'
+import { useTheme } from '../Providers'
 
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
@@ -20,8 +16,6 @@ const supabase = createClient(
 function AuthWidgetSection() {
   const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
-  const [theme, setTheme] = useState('default')
-
   const [radius, setRadius] = useState('4px')
   const [brandColor, setBrandColor] = useState({
     brand: 'var(--colors-brand9)',
@@ -61,9 +55,9 @@ function AuthWidgetSection() {
   return (
     <div className="sbui-tabs--alt overflow-hidden">
       <div className={`dark:bg-scale-200 bg-scale-100 relative border py-2 pb-16`}>
-        <div className="sm:py-18 container relative mx-auto grid grid-cols-2 gap-32 px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
-          <div className="relative z-10 col-span-1">
-            <div className="relative mx-auto max-w-md">
+        <div className="sm:py-18 gap container relative mx-auto grid grid-cols-12 px-6 py-16 md:gap-16 md:py-24 lg:gap-16 lg:px-16 lg:py-24 xl:px-20">
+          <div className="relative z-10 col-span-12 mb-16 md:col-span-7 md:mb-0 lg:col-span-6">
+            <div className="relative lg:max-w-md">
               <div className="glow-area transition-all"></div>
 
               <div className="border-scale-400 dark:bg-scale-300 pointer-events-none relative rounded-xl border bg-white px-8 py-12 drop-shadow-sm">
@@ -116,27 +110,29 @@ function AuthWidgetSection() {
               </div>
             </div>
           </div>
-          <div>
-            <div className="mb-4 flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-900 text-white dark:bg-white dark:text-gray-900">
-                <ProductIcon icon={Solutions['authentication'].icon} />
-              </div>
-              <p className="text-scale-900 m-0">
-                <IconX />
-              </p>
-              <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
-            </div>
-
+          <div className="col-span-12 md:col-span-5 lg:col-span-6">
             <div className="prose !max-w-md">
-              <h3 className="">Auth UI</h3>
+              <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-scale-900 mt-0">
-                Supabase provides React libraries which handle common scenarios, including logging
-                in, signing up, magic link and forgot password forms.
-              </p>
+              <p className="text-scale-900 mt-0">Customizable authentication UI component.</p>
+              <div className="mb-4 flex items-center space-x-2">
+                <img className="m-0 w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
+                <small>Currently only available for React</small>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 py-8">
+            {/* <Link
+              href="https://github.com/supabase/ui#using-supabase-ui-auth"
+              as="https://github.com/supabase/ui#using-supabase-ui-auth"
+            >
+              <a>
+                <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
+                  Explore documentation
+                </Button>
+              </a>
+            </Link> */}
+
+            <div className="grid gap-8 py-8 lg:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <label className="text-scale-1200 text-base">Brand color</label>
                 <div className="flex items-center gap-3">
@@ -209,40 +205,67 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('4px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 ring-scale-400 border-scale-800 h-10 w-10 rounded-full border hover:scale-105',
+                      'bg-scale-100 dark:bg-scale-400 border-scale-500 ring-scale-400 border-scale-800 flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
                       radius === '4px'
                         ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
                         : '',
                     ].join(' ')}
-                  ></button>
+                  >
+                    <img
+                      src="/images/auth-ui/small--light.svg"
+                      className="hidden  w-4 text-red-900 dark:block"
+                    />
+                    <img
+                      src="/images/auth-ui/small--dark.svg"
+                      className="block  w-4 text-red-900 dark:hidden"
+                    />
+                  </button>
                   <button
                     onClick={() => setRadius('10px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 h-10 w-10 rounded-full border transition hover:scale-105 ',
+                      'bg-scale-100 dark:bg-scale-400 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '10px'
                         ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
                         : '',
                     ].join(' ')}
-                  ></button>
+                  >
+                    <img
+                      src="/images/auth-ui/medium--light.svg"
+                      className="hidden  w-4 text-red-900 dark:block"
+                    />
+                    <img
+                      src="/images/auth-ui/medium--dark.svg"
+                      className="block  w-4 text-red-900 dark:hidden"
+                    />
+                  </button>
                   <button
                     onClick={() => setRadius('32px')}
                     className={[
-                      'bg-scale-100 dark:bg-scale-400 border-scale-500 h-10 w-10 rounded-full border transition hover:scale-105 ',
+                      'bg-scale-100 dark:bg-scale-400 border-scale-500 flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '32px'
                         ? 'ring-scale-400 border-scale-800 border-2 ring-2 dark:ring-white'
                         : '',
                     ].join(' ')}
-                  ></button>
+                  >
+                    <img
+                      src="/images/auth-ui/large--dark.svg"
+                      className="hidden  w-4 text-red-900 dark:block"
+                    />
+                    <img
+                      src="/images/auth-ui/large--light.svg"
+                      className="block  w-4 text-red-900 dark:hidden"
+                    />
+                  </button>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <label className="text-scale-1200 text-base">Language</label>
                 <div className="flex items-center gap-3">
                   <Button type="default">English</Button>
                   <Button type="default">Japanese</Button>
                 </div>
-              </div>
+              </div> */}
 
               <div className="flex flex-col gap-2">
                 <label className="text-scale-1200 text-base">Social Auth Layout</label>
@@ -272,17 +295,6 @@ function AuthWidgetSection() {
                 </div>
               </div>
             </div>
-
-            <Link
-              href="https://github.com/supabase/ui#using-supabase-ui-auth"
-              as="https://github.com/supabase/ui#using-supabase-ui-auth"
-            >
-              <a>
-                <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
-            </Link>
           </div>
         </div>
       </div>
