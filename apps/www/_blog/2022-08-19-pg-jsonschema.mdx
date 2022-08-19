@@ -1,5 +1,5 @@
 ---
-title: Supabase now supports JSON Schema validation for JSON/B Columns
+title: 'pg_jsonschema: JSON Schema support for Postgres'
 description: "Today we're releasing pg_jsonschema, a Postgres extension for JSON validation."
 author: oli_rice
 image: lw5-pg_jsonschema/jsonschema-thumb.jpg
@@ -67,7 +67,7 @@ Now what about this part?
 
 The flexibility of document types also comes with some downsides.
 
-The schema of the json payload from the previous example is a little intense for a blog post so let's instead say we intend for a table's `json` column to hold objects with a `string` attribute named `foo` and no additional attributes.
+The schema of the json payload from the previous example is a little intense for a blog post, so let's instead say we intend for a table's `json` column to hold objects with a `string` attribute named `foo` and no additional attributes.
 
 Without constraints, the setup would be:
 
@@ -86,7 +86,7 @@ But the resulting schema is much more permissive than our intent. When inserting
 
 ![Check constraints](/images/blog/lw5-pg_jsonschema/table-1.png)
 
-Only 2 of our 8 test cases match our target data model.
+Only 2 of our 8 test cases were handled appropriately by our data model.
 
 A core strength of SQL databases is their ability to constrain data's [types](https://www.postgresql.org/docs/current/datatype.html), nullability,
 [referential integrity](https://www.postgresql.org/docs/current/tutorial-fk.html), [uniqueness](https://www.postgresql.org/docs/current/ddl-constraints.html),
