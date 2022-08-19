@@ -196,6 +196,14 @@ function AuthPage() {
                     text="Request additional user data permissions when using social logins."
                   />
                 </div>
+                <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
+                  <FeatureColumn
+                    icon={<IconBriefcase />}
+                    title="MFA"
+                    text="Support for SAML, Azure. More enterprise providers and SSO coming soon."
+                  />
+                  <Button>Get early access</Button>
+                </div>
               </div>,
             ]}
             documentation_link={'/docs/guides/auth'}
@@ -249,62 +257,6 @@ function AuthPage() {
 
         <AuthWidgetSection />
 
-        {/* <SectionContainer>
-          <div className="grid grid-cols-12 lg:gap-16">
-            <div className="order-last col-span-12 mt-8 lg:order-first lg:col-span-6 lg:mt-0">
-              <AuthComponentExample />
-            </div>
-            <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
-              <div className="mb-4 flex items-center space-x-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-900 text-white dark:bg-white dark:text-gray-900">
-                  <ProductIcon icon={Solutions['authentication'].icon} />
-                </div>
-                <p className="m-0">
-                  <IconX />
-                </p>
-                <img className="w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
-              </div>
-
-              <h2 className="h3">React Auth</h2>
-
-              <p className="p text-base lg:text-lg">
-                Pre-built auth widgets to get started in minutes.
-              </p>
-              <p className="p">
-                Supabase provides React libraries which handle common scenarios, including logging
-                in, signing up, magic link and forgot password forms.
-              </p>
-
-              <Link
-                href="https://github.com/supabase/ui#using-supabase-ui-auth"
-                as="https://github.com/supabase/ui#using-supabase-ui-auth"
-              >
-                <a>
-                  <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
-
-              <div className="mt-8 grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16">
-                <div className="col-span-12 lg:col-span-12 xl:col-span-4">
-                  <FeatureColumn
-                    icon={<IconBriefcase />}
-                    title="Social login support"
-                    text="Support for social logins are built in and the component "
-                  />
-                </div>
-                <div className="col-span-12 lg:col-span-12 xl:col-span-4">
-                  <FeatureColumn
-                    icon={<IconEye />}
-                    title="User context hooks"
-                    text="Access the auth status from any component."
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </SectionContainer> */}
         <CTABanner />
       </DefaultLayout>
     </>
