@@ -16,6 +16,71 @@ info:
       version: '0.0.1'
 
 pages:
+  Initializing:
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - name: With additional parameters
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {
+            db: {
+              schema: 'public',
+            },
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            },
+            global: {
+              headers: { 'x-my-custom-header': 'my-app-name' },
+            },
+          }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+      - name: API schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            db: { schema: 'other_schema' }
+          })
+          ```
+
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - name: Custom `fetch` implementation
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            global: { fetch: fetch.bind(globalThis) }
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -39,7 +104,7 @@ pages:
           })
           ```
       - name: Sign up with additional user meta data.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.signUp(
@@ -47,8 +112,8 @@ pages:
               email: 'example@email.com',
               password: 'example-password',
               options: {
-                data: { 
-                  first_name: 'John', 
+                data: {
+                  first_name: 'John',
                   age: 27,
                 }
               }
@@ -60,8 +125,9 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
       - Requires either an email and password or a phone number and password.
-    example:
+    examples:
       - name: Sign in with Email.
+        isSpotlight: true
         description: |
           Sign in with email and password. After a user has verified their email, they can use the [`signInWithPassword()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
@@ -72,6 +138,7 @@ pages:
           })
           ```
       - name: Sign in with Phone.
+        isSpotlight: false
         description: |
           Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
         js: |
@@ -92,9 +159,9 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
-      - Requires either an email or phone number. 
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp. 
-      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp. 
+      - Requires either an email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
+      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
     examples:
       - name: Sign in with email.
@@ -107,7 +174,7 @@ pages:
           })
           ```
       - name: Sign in with sms otp.
-        isSpotlight: true
+        isSpotlight: false
         description: The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
         js: |
           ```js
@@ -123,6 +190,7 @@ pages:
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
     examples:
       - name: Sign in using a third-party provider.
+        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -130,9 +198,10 @@ pages:
           })
           ```
       - name: Sign in using a third-party provider with redirect.
+        isSpotlight: false
         description: |
           The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
-          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for 
+          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -144,6 +213,7 @@ pages:
           }
           ```
       - name: Sign in with scopes.
+        isSpotlight: false
         description: |
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
@@ -167,6 +237,22 @@ pages:
           ```js
           const { error } = await supabase.auth.signOut()
           ```
+  auth.verifyOtp():
+    title: 'verifyOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    examples:
+      - name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+          ```
+      - name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
+          ```
   auth.getSession():
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
@@ -175,7 +261,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.getSession()
+          const { data, error } = await supabase.auth.getSession()
           ```
   auth.getUser():
     title: 'getUser()'
@@ -191,7 +277,7 @@ pages:
           const { data: { user } } = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: { user } } = await supabase.auth.getUser(jwt)
@@ -209,13 +295,13 @@ pages:
     examples:
       - name: Update email for authenticated user.
         description: Sends a "Confirm Email Change" email to the new email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
           ```
       - name: Update password for authenticated user.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.updateUser({password: 'new password'})
@@ -341,7 +427,6 @@ pages:
           })
           ```
       - name: Auto-confirm email.
-        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -350,7 +435,6 @@ pages:
           })
           ```
       - name: Auto-confirm phone.
-        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -382,7 +466,7 @@ pages:
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Basic example.
-        isSpotlight: false
+        isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
@@ -435,7 +519,7 @@ pages:
           )
           ```
       - name: Generate an invite link.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.generateLink(
@@ -452,7 +536,7 @@ pages:
       - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Updates a user's email.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -461,7 +545,7 @@ pages:
           )
           ```
       - name: Updates a user's password.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -479,7 +563,7 @@ pages:
           )
           ```
       - name: Updates a user's app_metadata.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -488,7 +572,7 @@ pages:
           )
           ```
       - name: Confirms a user's email address.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -497,7 +581,7 @@ pages:
           )
           ```
       - name: Confirms a user's phone number.
-        isSpotlight: true
+        isSpotlight: false
         js: |
           ```js
           const { data: user, error } = await supabase.auth.admin.updateUserById(
@@ -909,7 +993,7 @@ pages:
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-      - The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true

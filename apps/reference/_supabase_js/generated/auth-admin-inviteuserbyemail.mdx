@@ -10,6 +10,12 @@ import TabItem from '@theme/TabItem'
 
 Sends an invite link to an email address.
 
+```js
+const { data, error } = await supabase.auth.admin.inviteUserByEmail(
+  'email@example.com'
+)
+```
+
 ## Parameters
 
 <ul className="method-list-group">

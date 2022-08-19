@@ -11,8 +11,8 @@ import TabItem from '@theme/TabItem'
 Updates user data, if there is a logged in user.
 
 ```js
-const { data, error } = await supabase.auth.updateUser({
-  email: 'new@email.com',
+const { user, error } = await supabase.auth.updateUser({
+  data: { hello: 'world' },
 })
 ```
 

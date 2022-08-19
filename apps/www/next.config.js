@@ -1,9 +1,18 @@
-const withMDX = require('@next/mdx')()
+const gfm = require('remark-gfm')
+const slug = require('rehype-slug')
+const withMDX = require('@next/mdx')({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [gfm],
+    rehypePlugins: [slug],
+    // If you use `MDXProvider`, uncomment the following line.
+    providerImportSource: '@mdx-js/react',
+  },
+})
 
 module.exports = withMDX({
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-
   trailingSlash: false,
   images: {
     dangerouslyAllowSVG: true,
@@ -371,6 +380,11 @@ module.exports = withMDX({
         permanent: false,
         source: '/docs/client/auth-signout',
         destination: '/docs/reference/javascript/auth-signout',
+      },
+      {
+        permanent: false,
+        source: '/docs/client/auth-verifyotp',
+        destination: '/docs/reference/javascript/auth-verifyotp',
       },
       {
         permanent: false,
@@ -1083,8 +1097,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2021/11/29/community-day',
-        destination: '/blog/community-day-3',
+        source: '/blog/2021/11/29/community-day-lw3',
+        destination: '/blog/community-day-lw3',
       },
       {
         permanent: true,
@@ -1158,8 +1172,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2022/03/28/community-day',
-        destination: '/blog/community-day-4',
+        source: '/blog/2022/03/28/community-day-lw4',
+        destination: '/blog/community-day-lw4',
       },
       {
         permanent: true,
@@ -1428,6 +1442,11 @@ module.exports = withMDX({
       //   permanent: true,
       //   source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
       //   destination: '/docs/reference/javascript/auth-resetpasswordforemail',
+      // },
+      // {
+      //   permanent: true,
+      //   source: '/docs/reference/javascript/auth-api-verifyotp',
+      //   destination: '/docs/reference/javascript/auth-verifyotp',
       // },
       // {
       //   permanent: true,
