@@ -1,8 +1,9 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from '@supabase/ui'
 import { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface Props {
   visible: boolean
@@ -12,7 +13,38 @@ interface Props {
 
 const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
   const { ui, meta } = useStore()
+  const [defaultSchema, setDefaultSchema] = useState()
+  const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
+
   const schemas = meta.schemas.list()
+
+  // [Joshen] Worth checking in with users - whether having this schema selection
+  // might be confusing, and if we should have a tooltip to explain that schemas
+  // are just concepts of namespace, you can use that extension no matter where it's
+  // installed in
+
+  useEffect(() => {
+    let cancel = false
+
+    if (visible) {
+      const checkExtensionSchema = async () => {
+        if (!cancel) {
+          setFetchingSchemaInfo(true)
+          setDefaultSchema(undefined)
+        }
+        const res = await meta.query(
+          `select * from pg_available_extension_versions where name = '${extension.name}'`
+        )
+        if (!res.error && !cancel) setDefaultSchema(res[0].schema)
+        setFetchingSchemaInfo(false)
+      }
+      checkExtensionSchema()
+    }
+
+    return () => {
+      cancel = true
+    }
+  }, [visible])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -33,9 +65,15 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
       }
     }
 
+    const schema = defaultSchema
+      ? defaultSchema
+      : values.schema === 'custom'
+      ? values.name
+      : values.schema
+
     const { error } = await meta.extensions.create({
+      schema,
       name: extension.name,
-      schema: values.schema === 'custom' ? values.name : values.schema,
       version: extension.default_version,
       cascade: true,
     })
@@ -73,7 +111,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
       <Form
         initialValues={{
           name: extension.name, // Name of new schema, if creating new
-          schema: 'custom',
+          schema: 'extensions',
         }}
         validate={validate}
         onSubmit={onSubmit}
@@ -82,36 +120,54 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
-                <Listbox
-                  size="small"
-                  name="schema"
-                  label="Select a schema to enable the extension for"
-                >
-                  <Listbox.Option
-                    key="custom"
-                    id="custom"
-                    label={`Create a new schema "${extension.name}"`}
-                    value="custom"
-                    addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                {fetchingSchemaInfo ? (
+                  <div className="space-y-2">
+                    <ShimmeringLoader />
+                    <div className="w-3/4">
+                      <ShimmeringLoader />
+                    </div>
+                  </div>
+                ) : defaultSchema ? (
+                  <Input
+                    disabled
+                    id="schema"
+                    name="schema"
+                    value={defaultSchema}
+                    label="Select a schema to enable the extension for"
+                    descriptionText={`Extension must be installed in ${defaultSchema}.`}
+                  />
+                ) : (
+                  <Listbox
+                    size="small"
+                    name="schema"
+                    label="Select a schema to enable the extension for"
                   >
-                    Create a new schema "{extension.name}"
-                  </Listbox.Option>
-                  <Modal.Seperator />
-                  {/* @ts-ignore */}
-                  {schemas.map((schema: PostgresSchema) => {
-                    return (
-                      <Listbox.Option
-                        key={schema.id}
-                        id={schema.name}
-                        label={schema.name}
-                        value={schema.name}
-                        addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
-                      >
-                        {schema.name}
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
+                    <Listbox.Option
+                      key="custom"
+                      id="custom"
+                      label={`Create a new schema "${extension.name}"`}
+                      value="custom"
+                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                    >
+                      Create a new schema "{extension.name}"
+                    </Listbox.Option>
+                    <Modal.Seperator />
+                    {/* @ts-ignore */}
+                    {schemas.map((schema: PostgresSchema) => {
+                      return (
+                        <Listbox.Option
+                          key={schema.id}
+                          id={schema.name}
+                          label={schema.name}
+                          value={schema.name}
+                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                        >
+                          {schema.name}
+                        </Listbox.Option>
+                      )
+                    })}
+                  </Listbox>
+                )}
               </Modal.Content>
 
               {values.schema === 'custom' && (

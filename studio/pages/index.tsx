@@ -58,12 +58,12 @@ const UnauthorizedLanding = () => {
       const queryParams = (router.query as any) || {}
       const params = new URLSearchParams(queryParams)
       // trigger github signIn
-      auth.signIn(
-        { provider: 'github' },
-        {
+      auth.signInWithOAuth({
+        provider: 'github',
+        options: {
           redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?${params.toString()}`,
-        }
-      )
+        },
+      })
     }
   }, [])
 
