@@ -17,10 +17,7 @@ const PageLayout: NextPageWithLayout = () => {
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  const canUpdate = checkPermissions(
-    PermissionAction.SQL_UPDATE,
-    'postgres.public.custom_config_gotrue'
-  )
+  // const canUpdate = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   if (authConfig) {
     return (

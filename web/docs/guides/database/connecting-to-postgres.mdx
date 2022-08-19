@@ -1,6 +1,6 @@
 ---
 id: connecting-to-postgres
-title: 'Connecting'
+title: 'Database Connections'
 description: There are various ways to connect to your Postgres database.
 ---
 
@@ -14,7 +14,7 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 ### API vs Direct vs Pooling
 
-- The API is an auto-generated REST inteface. You should use this for all browser and application interactions.
+- The API is an auto-generated REST interface. You should use this for all browser and application interactions.
 - A "direct connection" is when a connection is made to the database using Postgres' native connection implementation. You should use this for tools which are always alive - usually installed on a long-running server.
 - A "connection pool" is a system (external to Postgres) which keeps connections "open". You should use this for serverless functions and tools which disconnect from the database frequently.
 
@@ -38,29 +38,13 @@ We provides several types of API to suit your preferences and use-case:
 
 You cannot manage the database schema via the API (for security reasons). To do that you can use the dashboard or connect directly to your database.
 
-### Finding your API URL
+### API URL and Keys
 
-You can find the API URL and Keys inside the Dashboard.
-
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Settings" section.
-2. Click "API" in the sidebar.
-3. Find your API URL and Keys in this page.
-```
+You can find the API URL and Keys in the [Dashboard](https://app.supabase.com/project/_/settings/api).
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
 
 ## Direct connections
 

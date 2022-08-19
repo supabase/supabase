@@ -1,0 +1,106 @@
+---
+id: auth-workos
+title: 'Login with WorkOS'
+description: Add WorkOS OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+In this guide, we will cover how to use Supabase OAuth with WorkOS to implement Single-Sign-On(SSO).
+
+The procedure consists of five broad steps:
+
+- Create a new organization from your WorkOS Dashboard.
+- Obtain the `Client ID` from the Configuration tab and configure redirect URI.
+- Obtain the `WorkOS Secret` from the credentials tab.
+- Connect a WorkOS Supported Identity Provider
+- Add your WorkOS credentials into your Supabase project
+
+## Steps
+
+### Create a WorkOS Organization
+
+Log in to the dashboard and hop over to the Organizations tab to create and organization
+![Create an Organization](/img/guides/auth-workos/workos-create-organization.png)
+
+### Obtain the Client ID and configure Redirect URI
+
+Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
+Note that this is distinct from the redirect URI referred to in the Supabase dashboard
+
+![Fetch Client ID and configure Redirect URI](/img/guides/auth-workos/workos-clientid-redirect-uri.png)
+
+### Obtain the WorkOS Secret
+
+Head over to the API Keys page and obtain the secret key.
+
+![WorkOS Secret Key](/img/guides/auth-workos/workos-secret-key.png)
+
+### Connect a WorkOS Supported Identity Provider
+
+Set up the identity provider by visiting the setup link.
+
+![Visiting the setup link](/img/guides/auth-workos/workos-setup-identity-provider.png)
+
+You can pick between any one of the many identity providers that WorkOS supports.
+
+### Add your WorkOS credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Under `External OAuth Providers` turn `WorkOS Enabled` to ON
+- Enter the `Client ID`, `Secret`, and `WorkOS URL` saved in the previous steps. The ``WorkOS URL` setting should be set to https://api.workos.com/
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented in the [Supabase OAuth Reference](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers). Note that you only need to include one of the three parameters: `connection`, `organization`, and `provider`.
+You can refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+```js
+const { user, session, error } = await supabase.auth.signIn(
+  {
+    provider: 'workos',
+  },
+  {
+    connection: '<your_connection>',
+    organization: '<your_organization',
+    provider: '<your_provider>',
+  }
+)
+```
+
+Add a function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithWorkOS() {
+  const { user, session, error } = await supabase.auth.signIn(
+    {
+      provider: 'workos',
+    },
+    {
+      connection: '<your_connection>',
+      organization: '<your_organization',
+      provider: '<your_provider>',
+    }
+  )
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [WorkOS Documentation](https://workos.com/docs/sso/guide)

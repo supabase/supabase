@@ -1,0 +1,184 @@
+---
+id: auth-updateuser
+title: 'updateUser()'
+slug: /auth-updateuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Updates user data, if there is a logged in user.
+
+```js
+const { user, error } = await supabase.auth.updateUser({
+  data: { hello: 'world' },
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      UserAttributes
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom data object for user_metadata that a user can modify. Can be any JSON.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's email.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email_change_token
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An email change token.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's password.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      phone
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's phone.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Notes
+
+User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
+To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
+
+User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
+Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+
+## Examples
+
+### Update email for authenticated user.
+
+Sends a "Confirm Email Change" email to the new email address.
+
+```js
+const { data, error } = await supabase.auth.updateUser({
+  email: 'new@email.com',
+})
+```
+
+### Update password for authenticated user.
+
+```js
+const { data, error } = await supabase.auth.updateUser({
+  password: 'new password',
+})
+```
+
+### Update a user's metadata.
+
+```js
+const { user, error } = await supabase.auth.updateUser({
+  data: { hello: 'world' },
+})
+```

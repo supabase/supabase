@@ -25,43 +25,58 @@ const RedirectDomains = () => {
 
   const onAddNewDomain = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    try {
-      const payload = URI_ALLOW_LIST_ARRAY
-      await payload.push(values.domain)
-      // convert payload to comma seperated string and update
-      authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    const payload = URI_ALLOW_LIST_ARRAY
+    payload.push(values.domain)
+
+    const payloadString = payload.toString()
+
+    if (payloadString.length > 2 * 1024) {
+      ui.setNotification({
+        message: 'Too many redirect domains, please remove some or try to use wildcards',
+        category: 'error',
+      })
+
       setSubmitting(false)
+      return
+    }
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
+    if (!error) {
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })
-    } catch (error: any) {
-      setSubmitting(false)
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to update domain: ${error?.message}`,
       })
     }
+
+    setSubmitting(false)
   }
 
   const onConfirmDeleteDomain = async (domain?: string) => {
     if (!domain) return
 
     setIsDeleting(true)
-    try {
-      // Remove selectedDomain from array and update
-      const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== domain)
-      await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
-      setIsDeleting(false)
+
+    // Remove selectedDomain from array and update
+    const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== domain)
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+
+    if (!error) {
       setSelectedDomainToDelete(undefined)
       ui.setNotification({ category: 'success', message: 'Successfully removed domain' })
-    } catch (error: any) {
-      setIsDeleting(false)
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to remove domain: ${error?.message}`,
       })
     }
+
+    setIsDeleting(false)
   }
 
   return (
@@ -113,6 +128,7 @@ const RedirectDomains = () => {
                     form="new-domain-form"
                     htmlType="submit"
                     size="medium"
+                    disabled={isSubmitting}
                     loading={isSubmitting}
                   >
                     Add domain

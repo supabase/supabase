@@ -1,21 +1,14 @@
 ---
 id: or
-title: ".or()"
+title: '.or()'
 slug: or
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Finds all rows satisfying at least one of the filters.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -24,13 +17,7 @@ const { data, error } = await supabase
   .or('id.eq.20,id.eq.30')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +41,6 @@ The filters to use, separated by commas.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -69,7 +55,7 @@ The filters to use, separated by commas.
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -102,7 +88,6 @@ The foreign table to use (if `column` is a foreign column).
 
 </ul>
 
-
 ## Notes
 
 - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
@@ -113,27 +98,9 @@ The foreign table to use (if `column` is a foreign column).
   .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -142,21 +109,7 @@ const { data, error } = await supabase
   .or('id.eq.20,id.eq.30')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Use `or` with `and`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -165,30 +118,11 @@ const { data, error } = await supabase
   .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Use `or` on foreign tables
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
   .from('countries')
   .select('id, cities(*)')
-  .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+  .or('name.eq.Wellington,name.eq.Paris', { foreignTable: 'cities' })
 ```
-
-
-</TabItem>
-
-</Tabs>

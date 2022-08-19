@@ -18,3 +18,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# _supabase_js/sdk/**/*
+# !_supabase_js/sdk/.gitkeep

@@ -186,7 +186,7 @@ select cron.unschedule('webhook-every-minute'); -- pass the name of the cron job
 There are plenty use-cases for this. For example:
 
 - **Sending welcome emails.** If you use an email provider with an HTTP API, then you batch emails to that service. Write a function that `selects` all your signups yesterday, then sends them to your favorite transactional email service. Schedule it every day to run at midnight.
-- **Aggregating data.** If you're providing analytical data, you might want to aggregate it into time periods for faster querying (which serves a similar purpose as a [Materialized View](/blog/2020/11/18/postgresql-views#materialized-views-vs-conventional-views)).
+- **Aggregating data.** If you're providing analytical data, you might want to aggregate it into time periods for faster querying (which serves a similar purpose as a [Materialized View](/blog/postgresql-views#materialized-views-vs-conventional-views)).
 - **Deleting old data.** Need to free up space? Run a scheduled job to delete data you no longer need.
 
 See a detailed list in the [`pg_cron` README](https://github.com/citusdata/pg_cron#example-use-cases).
@@ -215,10 +215,10 @@ Is Postgres the best place to put your cron jobs? `¯\_(ツ)_/¯`. Postgres data
 
 ## More Postgres resources
 
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/2022/07/18/seen-by-in-postgresql)
-- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/2022/06/28/partial-postgresql-data-dumps-with-rls)
-- [Postgres Views](https://supabase.com/blog/2020/11/18/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/2022/03/08/audit)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/2021/02/27/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/2020/07/09/postgresql-templates)
-- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/2021/12/01/realtime-row-level-security-in-postgresql)
+- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://supabase.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

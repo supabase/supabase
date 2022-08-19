@@ -1,21 +1,14 @@
 ---
 id: auth-api-updateuserbyid
-title: "updateUserById()"
+title: 'updateUserById()'
 slug: auth-api-updateuserbyid
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Updates the user data.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -24,13 +17,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -48,12 +35,11 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -79,33 +65,14 @@ This function should only be called on a server. Never expose your `service_role
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Updates a user's email.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -114,21 +81,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Updates a user's password.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -137,21 +90,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Updates a user's metadata.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -160,21 +99,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Updates a user's app_metadata.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -183,21 +108,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Confirms a user's email address.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -206,21 +117,7 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
 )
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Confirms a user's phone number.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.updateUserById(
@@ -228,8 +125,3 @@ const { data: user, error } = await supabase.auth.api.updateUserById(
   { phone_confirm: true }
 )
 ```
-
-
-</TabItem>
-
-</Tabs>

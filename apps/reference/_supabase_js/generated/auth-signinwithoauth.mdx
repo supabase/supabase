@@ -1,0 +1,198 @@
+---
+id: auth-signinwithoauth
+title: 'signInWithOAuth()'
+slug: /auth-signinwithoauth
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Log in an existing user via a third-party provider.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      SignInWithOAuthCredentials
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      provider
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>Provider</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+One of the providers supported by GoTrue.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      options
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      queryParams
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An object of query params
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      redirectTo
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A URL to send the user to after they are confirmed (OAuth logins only).
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      scopes
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A space-separated list of scopes granted to the OAuth application.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Notes
+
+- This method is used for signing in using a third-party provider.
+- Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+
+## Examples
+
+### Sign in using a third-party provider.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+})
+```
+
+### Sign in using a third-party provider with redirect.
+
+The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
+In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
+any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+
+```js
+const { user, session, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github'
+  options: {
+    redirectTo: 'https://example.com/welcome'
+  }
+}
+```
+
+### Sign in with scopes.
+
+If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'github'
+  options: {
+    scopes: 'repo gist notifications'
+  }
+})
+const oAuthToken = data.session.provider_token // use to access provider API
+```

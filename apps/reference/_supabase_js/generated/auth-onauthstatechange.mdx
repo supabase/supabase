@@ -1,0 +1,101 @@
+---
+id: auth-onauthstatechange
+title: 'onAuthStateChange()'
+slug: /auth-onauthstatechange
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Receive a notification every time an auth event happens.
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      callback
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A callback function to be invoked when an auth event happens.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### Listen to auth changes
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+})
+```
+
+### Listen to sign in
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
+})
+```
+
+### Listen to sign out
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
+})
+```
+
+### Listen to token refresh
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+})
+```
+
+### Listen to user updates
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
+})
+```
+
+### Listen to user deleted
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'USER_DELETED') console.log('USER_DELETED', session)
+})
+```
+
+### Listen to password recovery events
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
+})
+```
