@@ -234,7 +234,7 @@ test('te= query param will populate the timestamp to input', async () => {
       expect.stringContaining(`iso_timestamp_end=${encodeURIComponent(iso)}`)
     )
   })
-  userEvent.click(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByTitle('Custom'))
 })
 test('ts= query param will populate the timestamp from input', async () => {
   // get time 20 mins before
@@ -251,7 +251,7 @@ test('ts= query param will populate the timestamp from input', async () => {
       expect.stringContaining(`iso_timestamp_start=${encodeURIComponent(iso)}`)
     )
   })
-  userEvent.click(await screen.findByText('Custom'))
+  userEvent.click(await screen.findByTitle('Custom'))
   await screen.findByText(new RegExp(newDate.getFullYear()))
 })
 
