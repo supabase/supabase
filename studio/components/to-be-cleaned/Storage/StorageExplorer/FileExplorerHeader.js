@@ -313,13 +313,13 @@ const FileExplorerHeader = ({
               <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={onChangeSortBy}>
                 <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Sort by name</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>
-                  Sort by last created
+                  Sort by create time
                 </Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>
-                  Sort by last modified
+                  Sort by modified time
                 </Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
-                  Sort by last accessed
+                  Sort by last accessed time
                 </Dropdown.Radio>
               </Dropdown.RadioGroup>,
             ]}
