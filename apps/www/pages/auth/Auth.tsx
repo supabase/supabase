@@ -196,14 +196,6 @@ function AuthPage() {
                     text="Request additional user data permissions when using social logins."
                   />
                 </div>
-                <div className="col-span-12 sm:col-span-6 lg:col-span-12 xl:col-span-4">
-                  <FeatureColumn
-                    icon={<IconBriefcase />}
-                    title="MFA"
-                    text="Support for SAML, Azure. More enterprise providers and SSO coming soon."
-                  />
-                  <Button>Get early access</Button>
-                </div>
               </div>,
             ]}
             documentation_link={'/docs/guides/auth'}
@@ -227,7 +219,7 @@ function AuthPage() {
         </div>
 
         <SectionContainer>
-          <div className="grid grid-cols-12 lg:gap-16">
+          <div className="grid grid-cols-12 lg:mt-16 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-5">
               <h2 className="h3">User permissions without the middleware</h2>
 
