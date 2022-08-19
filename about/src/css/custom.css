@@ -1036,7 +1036,6 @@ h4.method-list-item-label .method-list-item-label-name {
   padding: var(--ifm-code-padding-vertical) 0;
 }
 h4.method-list-item-label .method-list-item-label-badge {
-  overflow-wrap: anywhere;
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.8rem;
   padding: 0 5px;
