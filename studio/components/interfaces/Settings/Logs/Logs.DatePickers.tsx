@@ -31,7 +31,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   useEffect(() => {
     if (selectedHelper && helperValue !== selectedHelper.text) {
       setHelperValue(selectedHelper.text)
-    } else if (!selectedHelper) {
+    } else if (!selectedHelper && (to || from)) {
       setHelperValue('')
     }
   }, [selectedHelper, to, from])
@@ -66,6 +66,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}
+        triggerButtonTitle="Custom"
         onChange={(value) => {
           setHelperValue('')
           if (onChange) onChange(value)
