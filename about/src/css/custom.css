@@ -1,5 +1,5 @@
-/* 
-  Font import 
+/*
+  Font import
 */
 
 @import url('https://rsms.me/inter/inter.css');
@@ -30,7 +30,7 @@
 :root[data-theme='dark'] {
   /* See theme-specific "--custom" vars below  */
 
-  /* 
+  /*
     Customization here for both Light and Dark themes
   */
   --custom-font-base: 'Inter', BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -71,7 +71,7 @@
   --custom-shadow-tl: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   --custom-shadow-xl: 0 30px 60px 0 rgba(0, 0, 0, 0.1);
 
-  /* 
+  /*
     Infirma overrides with customization
   */
   /* Colors */
@@ -542,8 +542,8 @@ a.card:hover {
   line-height: calc(var(--ifm-spacing-vertical) * 1);
 }
 
-/* 
-  Link chevrons 
+/*
+  Link chevrons
 */
 .menu .menu__link.menu__link--sublist::after {
   background-image: url('data:image/svg+xml;utf8,<svg alt="Arrow" xmlns="http://www.w3.org/2000/svg"  viewBox="-6 -6 38 38"><path fill="inherit" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>');
