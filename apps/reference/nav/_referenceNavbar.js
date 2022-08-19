@@ -14,7 +14,7 @@ const buildNavbar = ({ baseUrl }) => {
       position: 'left',
       activeBaseRegex: `^/${trimmedBaseUrl}/reference$|^/${trimmedBaseUrl}/reference/$`, // exactly match "/${trimmedBaseUrl}/reference/" only
     },
-    { href: 'https://app.supabase.com', label: 'Login', position: 'right' },
+    { href: 'https://app.supabase.com', label: 'Dashboard', position: 'right' },
     {
       href: 'https://github.com/supabase/supabase',
       className: 'navbar-item-github',
