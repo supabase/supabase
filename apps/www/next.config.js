@@ -1429,6 +1429,11 @@ module.exports = withMDX({
         source: '/docs/guides/local-development',
         destination: '/docs/guides/cli/local-development',
       },
+      {
+        permanent: true,
+        source: '/docs/guides/realtime/overview',
+        destination: '/docs/guides/realtime',
+      },
       // V2 redirects
       // {
       //   permanent: true,
