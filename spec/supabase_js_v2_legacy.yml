@@ -999,7 +999,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('*')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
@@ -1009,7 +1009,7 @@ pages:
       - name: Listening to a specific table
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1019,7 +1019,7 @@ pages:
       - name: Listening to inserts
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1036,7 +1036,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1053,7 +1053,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1064,7 +1064,7 @@ pages:
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
@@ -1076,7 +1076,7 @@ pages:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries:id=eq.200')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
