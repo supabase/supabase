@@ -125,17 +125,6 @@ function AuthWidgetSection() {
               </div>
             </div>
 
-            {/* <Link
-              href="https://github.com/supabase/ui#using-supabase-ui-auth"
-              as="https://github.com/supabase/ui#using-supabase-ui-auth"
-            >
-              <a>
-                <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
-            </Link> */}
-
             <div className="grid gap-8 py-8 lg:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <label className="text-scale-1200 text-base">Brand color</label>
@@ -262,14 +251,6 @@ function AuthWidgetSection() {
                   </button>
                 </div>
               </div>
-
-              {/* <div className="flex flex-col gap-2">
-                <label className="text-scale-1200 text-base">Language</label>
-                <div className="flex items-center gap-3">
-                  <Button type="default">English</Button>
-                  <Button type="default">Japanese</Button>
-                </div>
-              </div> */}
 
               <div className="flex flex-col gap-2">
                 <label className="text-scale-1200 text-base">Social Auth Layout</label>
