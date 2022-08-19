@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import dayjs from 'dayjs'
 import { Button, IconLoader, Modal } from '@supabase/ui'
 import { SetStateAction } from 'react'
 import { TIER_QUERY_LIMITS } from '.'
@@ -14,20 +13,12 @@ interface Props {
 
 const UpgradePrompt: React.FC<Props> = ({
   projectRef,
-  from,
   showUpgradePrompt,
   setShowUpgradePrompt,
 }) => {
-  const { subscription, isLoading, isError } = useProjectSubscription(projectRef)
+  const { isLoading, isError } = useProjectSubscription(projectRef)
   if (isLoading) return <IconLoader size={16} className="animate-spin" />
   if (isError) console.error('Error fetching project subscription')
-
-  const tier = subscription?.tier
-  const queryLimit = TIER_QUERY_LIMITS[(tier?.key || 'FREE') as keyof typeof TIER_QUERY_LIMITS]
-
-  const fromValue = from ? dayjs(from) : dayjs()
-  const fromMax = dayjs().startOf('day').subtract(queryLimit.value, queryLimit.unit)
-  const isExceedingLimit = fromValue.isBefore(fromMax)
 
   return (
     <>
