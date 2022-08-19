@@ -377,69 +377,22 @@ launch week
 }
 
 :root {
-  --card-height: 50vh;
-  /* --card-width: calc(var(--card-height) / 2); */
+  --auth-ui-card-height: 50vh;
 }
 
-/* body {
-  min-height: 100vh;
-  background: #212534;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  box-sizing: border-box;
-} */
 .glow-area {
-  /* background: #191c29; */
   width: 100%;
-  /* //var(--card-width); */
   height: 100%;
-  /* var(--card-height); */
-  /* padding: 3px; */
   position: absolute;
   background-color: transparent;
   z-index: -1;
-  /* position: relative; */
-  /* border-radius: 6px; */
-  /* justify-content: center;
-  align-items: center;
-  text-align: center;
-  display: flex; */
-  /* color: rgb(88 199 250 / 0%); */
   cursor: pointer;
-}
-
-/* .glow-area:hover {
-  color: rgb(88 199 250 / 100%);
-  transition: color 1s;
-} */
-/* .glow-area:hover:before,
-.glow-area:hover:after {
-  animation: none;
-  opacity: 0;
-} */
-
-.glow-area::before {
-  /* content: '';
-  width: 104%;
-  height: 102%; */
-  /* border-radius: 8px; */
-  /* background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2); */
-  /* position: absolute; */
-  /* z-index: -1; */
-  /* top: -1%;
-  left: -2%; */
-  /* animation: spin 10s linear infinite; */
 }
 
 .glow-area::after {
   position: absolute;
-  /* background: pink; */
   content: '';
-  top: calc(var(--card-height) / 8);
-  /* calc(var(--card-height) / 6); */
+  top: calc(var(--auth-ui-card-height) / 8);
   left: 0;
   right: 0;
   z-index: -1;
@@ -447,7 +400,7 @@ launch week
   width: 100%;
   margin: 0 auto;
   transform: scale(0.75);
-  filter: blur(calc(var(--card-height) / 6));
+  filter: blur(calc(var(--auth-ui-card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
     var(--colors-brand),
