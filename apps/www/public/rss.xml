@@ -22,9 +22,9 @@
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/pg_jsonschema</guid>
+  <guid>https://supabase.com/blog/pg-jsonschema</guid>
   <title>Supabase now supports JSON Schema validation for JSON/B Columns</title>
-  <link>https://supabase.com/blog/pg_jsonschema</link>
+  <link>https://supabase.com/blog/pg-jsonschema</link>
   <description>Today we're releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
