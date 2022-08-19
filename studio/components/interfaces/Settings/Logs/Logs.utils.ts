@@ -130,10 +130,10 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table} 
-  cross join unnest(metadata) as m 
-  cross join unnest(m.parsed) as parsed 
-  ${where} 
+      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+  ${where}
   limit 100
   `
 
@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     `
 
     case 'function_edge_logs':
-      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
+      return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request
@@ -156,7 +156,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
-  limit 100          
+  limit 100
   `
   }
 }
@@ -164,4 +164,22 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 /**
  * SQL query to retrieve only one log
  */
-export const genSingleLogQuery = (table: LogsTableName, id: string) => `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+export const genSingleLogQuery = (table: LogsTableName, id: string) =>
+  `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
+
+/**
+ * Determine if we should show the user an updgrade prompt while browsing logs
+ *
+ * There's only 1440 minutes in a day, but when we select "Last day" from the dropdown,
+ * it will set that to mean yesterday at midnight.
+ * So the max possible time from that midnight to the upcoming midnight is 2880
+ */
+export const maybeShowUpgradePrompt = (from: any) => {
+  const toTime = dayjs()
+  const fromTime = dayjs(from)
+  const hours = toTime.diff(fromTime, 'minutes')
+
+  if (hours > 2880) {
+    return true
+  }
+}

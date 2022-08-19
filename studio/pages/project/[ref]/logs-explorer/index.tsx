@@ -12,6 +12,7 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
+  maybeShowUpgradePrompt,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
 import { uuidv4 } from 'lib/helpers'
@@ -111,9 +112,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    if (tier?.key === 'FREE') {
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
+
+    if (shouldShowUpgradePrompt && tier?.key === 'FREE') {
       setShowUpgradePrompt(!showUpgradePrompt)
-      return
     }
 
     setParams((prev) => ({
