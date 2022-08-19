@@ -1,12 +1,19 @@
-import { useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Modal, Alert, Button } from '@supabase/ui'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
-const ToggleBucketPublicModal = ({
+interface Props {
+  visible: boolean
+  bucket: any
+  onSelectCancel: () => {}
+  onSelectSave: () => {}
+}
+
+const ToggleBucketPublicModal: FC<Props> = ({
   visible = false,
   bucket = {},
   onSelectCancel = () => {},
-  onSelectSave = () => {},
+  onSelectSave = (bucket: any) => {},
 }) => {
   const [saving, setSaving] = useState(false)
 
@@ -19,7 +26,7 @@ const ToggleBucketPublicModal = ({
     onSelectSave(bucket)
   }
 
-  const title = bucket.public
+  const header = bucket.public
     ? `Confirm making ${bucket.name} private`
     : `Confirm making ${bucket.name} public`
 
@@ -35,7 +42,7 @@ const ToggleBucketPublicModal = ({
     <ConfirmationModal
       danger
       visible={visible}
-      title={title}
+      header={header}
       children={
         <div className="py-4">
           <Modal.Content>
