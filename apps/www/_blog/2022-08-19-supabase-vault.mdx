@@ -6,7 +6,7 @@ image: lw5-vault/vault-thumb.jpg
 thumb: lw5-vault/vault-thumb.jpg
 tags:
   - launch-week
-date: '2022-08-19'
+date: '2022-08-19T07:04:00'
 toc_depth: 2
 ---
 
@@ -145,7 +145,8 @@ user_data   |
 Now you can encrypt table secrets with this new key by inserting its ID explicitly:
 
 ```sql
-insert into vault.secrets (secret, associated, key_id)
+insert into vault.secrets
+  (secret, associated, key_id)
 values (
   'apikey_XaYrurzcquqhEdBjzfTzfwAZqpd',
   'API_KEY_DEV',
