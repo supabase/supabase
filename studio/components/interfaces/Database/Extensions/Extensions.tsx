@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { partition, isNull } from 'lodash'
 import { Input, IconSearch } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -14,12 +14,17 @@ const Extensions: FC<Props> = ({}) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
+  const enableVaultExtension = useFlag('vaultExtension')
+  const hiddenExtensions = enableVaultExtension
+    ? HIDDEN_EXTENSIONS
+    : HIDDEN_EXTENSIONS.concat(['vault'])
+
   const extensions =
     filterString.length === 0
       ? meta.extensions.list()
       : meta.extensions.list((ext: any) => ext.name.includes(filterString))
   const extensionsWithoutHidden = extensions.filter(
-    (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
+    (ext: any) => !hiddenExtensions.includes(ext.name)
   )
   const [enabledExtensions, disabledExtensions] = partition(
     extensionsWithoutHidden,
