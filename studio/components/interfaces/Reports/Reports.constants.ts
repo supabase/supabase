@@ -3,11 +3,6 @@ import { DatetimeHelper } from '../Settings/Logs'
 import { Presets } from './Reports.types'
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
-  // {
-  //     text: 'Last 1 day',
-  //     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-  //     calcTo: () => '',
-  // },
   {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
