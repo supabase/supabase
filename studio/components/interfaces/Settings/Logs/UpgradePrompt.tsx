@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { useState } from 'react'
-import { Button, IconHelpCircle, IconLoader, Modal } from '@supabase/ui'
-
+import { Button, IconLoader, Modal } from '@supabase/ui'
+import { SetStateAction } from 'react'
 import { TIER_QUERY_LIMITS } from '.'
 import { useProjectSubscription } from 'hooks'
 
@@ -10,7 +9,7 @@ interface Props {
   projectRef: string
   from: string
   showUpgradePrompt: boolean
-  setShowUpgradePrompt: (showUpgradePrompt: boolean) => void
+  setShowUpgradePrompt: React.Dispatch<SetStateAction<boolean>>
 }
 
 const UpgradePrompt: React.FC<Props> = ({
