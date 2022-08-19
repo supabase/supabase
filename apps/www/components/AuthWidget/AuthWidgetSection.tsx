@@ -121,7 +121,7 @@ function AuthWidgetSection() {
               </p>
               <div className="mb-4 flex items-center space-x-2">
                 <img className="m-0 w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
-                <small>Currently only available for React</small>
+                <small>React only. Other frameworks coming soon.</small>
               </div>
             </div>
 
