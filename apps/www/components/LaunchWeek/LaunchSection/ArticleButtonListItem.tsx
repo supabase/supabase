@@ -5,7 +5,7 @@ import { Article } from '../types'
 const ArticleButtonListItem = (props: Article) => {
   return (
     <Link href={props.url}>
-      <div className="group mr-2 mb-2 cursor-pointer">
+      <a className="group mr-2 mb-2">
         <div className="flex flex-row">
           <div>
             <div className="flex flex-col">
@@ -16,7 +16,7 @@ const ArticleButtonListItem = (props: Article) => {
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </Link>
   )
 }
