@@ -33,8 +33,15 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           Allowed operation
         </label>
         <p className="text-scale-900 text-sm">
-          Based on the operations you have selected, you can use any of the highlighted functions in
-          the supabase-js JavaScript library
+          Based on the operations you have selected, you can use the highlighted functions in the{' '}
+          <a
+            href="https://supabase.com/docs/reference/javascript/storage-from-list"
+            target="_blank"
+            className="underline"
+          >
+            client library
+          </a>
+          .
         </p>
       </div>
       <div className="w-2/3">

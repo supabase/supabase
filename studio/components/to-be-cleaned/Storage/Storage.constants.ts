@@ -38,17 +38,16 @@ export const STORAGE_POLICY_DEFAULT_DEFINITION_PLACEHOLDER = `/*
 `
 
 export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
-  copyObject: ['INSERT'],
-  createObject: ['INSERT'],
-  deleteObject: ['SELECT', 'DELETE'],
-  deleteObjects: ['SELECT', 'DELETE'],
-  getObject: ['SELECT'],
-  getSignedObject: [],
-  getSignedUrl: ['SELECT'],
-  getSignedUrls: ['SELECT'],
-  listObjects: ['SELECT'],
-  moveObjects: ['SELECT', 'UPDATE'],
-  updateObject: ['SELECT', 'UPDATE'],
+  list: ['SELECT'],
+  upload: ['INSERT'],
+  download: ['SELECT'],
+  copy: ['INSERT'],
+  remove: ['SELECT', 'DELETE'],
+  move: ['SELECT', 'UPDATE'],
+  update: ['SELECT', 'UPDATE'],
+  createSignedUrl: ['SELECT'],
+  createSignedUrls: ['SELECT'],
+  getPublicUrl: ['SELECT'],
 }
 
 export const CONTEXT_MENU_KEYS = {
