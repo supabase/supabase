@@ -115,12 +115,12 @@ To avoid unnecessary JSON arrays in a query result, one-to-one relationships are
 ```sql
 -- A unique constraint on a foreign key
 create table country(
-  id int primary key
+  id serial primary key
 , name text
 );
 
 create table capital(
-  id int primary key
+  id serial primary key
 , name text
 , country_id int unique
 , foreign key (country_id) references country(id)
@@ -128,12 +128,12 @@ create table capital(
 
 -- or a primary key on a foreign key
 create table country(
-  id int primary key
+  id serial primary key
 , name text
 );
 
 create table capital(
-  id int primary key
+  id serial primary key
 , name text
 , foreign key (id) references country(id)
 );
@@ -148,10 +148,12 @@ const { data, error } = await supabase
   .in('id', [1, 2])
 
 console.log(data)
+```
 
+```json noCopy
 [
-  {"name":"Afghanistan","capital":{"name":"Kabul"}}
-, {"name":"Algeria","capital":{"name":"Algiers"}}
+  { "name": "Afghanistan", "capital": { "name": "Kabul" } },
+  { "name": "Algeria", "capital": { "name": "Algiers" } }
 ]
 ```
 
@@ -168,9 +170,16 @@ union
 select id, name from players_b;
 
 create materialized view scores as
-select name as lvl_name, compute_score(stats) as total, player_id from level_1;
+select
+  name as lvl_name,
+  compute_score(stats) as total, player_id
+from level_1;
 union
-select name as lvl_name, compute_score(stats) as total, player_id from level_2;
+select
+  name as lvl_name,
+  compute_score(stats) as total,
+  player_id
+from level_2;
 ```
 
 For this we can define a couple of computed relationships.
