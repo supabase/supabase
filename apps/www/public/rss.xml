@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/supabase-vault</guid>
   <title>Supabase Vault</title>
   <link>https://supabase.com/blog/supabase-vault</link>
-  <description>Today we're pre-releasing Vault,a Postgres extension for managing secrets and encryption inside your database.</description>
+  <description>Today we're announcing Vault, a Postgres extension for managing secrets and encryption inside your database.</description>
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
