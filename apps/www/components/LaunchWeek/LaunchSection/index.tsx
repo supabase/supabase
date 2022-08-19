@@ -176,8 +176,9 @@ export const LaunchSection = (props: WeekDayProps) => {
         {props.shipped && (
           <div className="flex flex-col gap-12">
             {props.articles &&
-              props.articles.map((article: Article) => (
+              props.articles.map((article: Article, index) => (
                 <div
+                  key={article.url + index}
                   className="
                 dark:bg-scale-300 rounded border bg-white
                 "
@@ -194,8 +195,8 @@ export const LaunchSection = (props: WeekDayProps) => {
                       <div className="flex flex-col gap-6 p-6 px-10 pb-10">
                         <h3 className="text-scale-1100 text-sm">New releases</h3>
                         {article.products &&
-                          article.products.map((product: Product) => (
-                            <ProductButtonListItem {...product} />
+                          article.products.map((product: Product, index) => (
+                            <ProductButtonListItem key={product.url + index} {...product} />
                           ))}
                       </div>
                     </>
@@ -204,10 +205,6 @@ export const LaunchSection = (props: WeekDayProps) => {
               ))}
           </div>
         )}
-        {/* <div className="">
-          {props.products &&
-            props.products.map((product: Product) => <ProductButton {...product} />)}
-        </div> */}
       </div>
     </div>
   )
