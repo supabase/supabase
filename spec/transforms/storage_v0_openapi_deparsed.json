@@ -87,10 +87,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "name": {
@@ -106,10 +107,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -151,10 +153,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -215,10 +218,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -272,10 +276,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": {
@@ -288,10 +293,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -345,10 +351,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "id": {
@@ -394,10 +401,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -454,10 +462,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": {
@@ -473,10 +482,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -528,10 +538,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": {
@@ -544,10 +555,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -611,10 +623,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": {
@@ -627,10 +640,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -758,10 +772,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": {
@@ -777,10 +792,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -842,10 +858,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": {
@@ -861,10 +878,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -944,10 +962,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -1071,10 +1090,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1138,10 +1158,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1225,10 +1246,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "signedURL": {
@@ -1244,10 +1266,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1311,10 +1334,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1400,10 +1424,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -1438,10 +1463,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1514,10 +1540,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": {
@@ -1533,10 +1560,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1644,10 +1672,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -1770,10 +1799,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1846,10 +1876,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": {
@@ -1865,10 +1896,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {
@@ -1924,10 +1956,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Error response",
                   "type": "object",
                   "properties": {
                     "statusCode": {

@@ -56,10 +56,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": { "name": { "type": "string", "example": "avatars" } },
                   "required": ["name"]
@@ -68,9 +69,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -88,10 +91,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -137,9 +141,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -166,10 +172,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Successfully emptied" }
@@ -179,9 +186,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -208,10 +217,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "id": { "type": "string" },
@@ -242,9 +252,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -272,10 +284,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Successfully updated" }
@@ -286,9 +299,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -313,10 +328,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Successfully deleted" }
@@ -326,9 +342,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -362,10 +380,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Successfully deleted" }
@@ -375,9 +394,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -444,10 +465,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": { "type": "string", "example": "projectref/avatars/folder/cat.png" }
@@ -458,9 +480,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -492,10 +516,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": { "type": "string", "example": "avatars/folder/cat.png" }
@@ -506,9 +531,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -554,10 +581,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -615,9 +643,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -651,9 +681,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
             }
           }
         }
@@ -701,10 +733,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "signedURL": {
@@ -718,9 +751,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -756,9 +791,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
             }
           }
         }
@@ -805,10 +842,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -830,9 +868,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -868,10 +908,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "message": { "type": "string", "example": "Successfully moved" }
@@ -882,9 +923,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -933,10 +976,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -993,9 +1037,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -1031,10 +1077,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Successful response",
                   "type": "object",
                   "properties": {
                     "Key": { "type": "string", "example": "folder/destination.png" }
@@ -1045,9 +1092,11 @@
             }
           },
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
             }
           }
         }
@@ -1075,9 +1124,11 @@
         ],
         "responses": {
           "4XX": {
-            "description": "Default Response",
+            "description": "Error response",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
             }
           }
         }
