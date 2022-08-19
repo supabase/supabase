@@ -126,7 +126,7 @@ If you take a backup, or pause your project, that data remains encrypted. We wil
 If you wish to use your own Key ID for different secrets, insted of the default Key ID we've generated, you can create one using the `pgsodium.create_key()` function:
 
 ```sql
-select * from pgsodium.create_key('API_KEY_DEV');
+select * from pgsodium.create_key('This is a comment for the new key');
 ```
 
 ```text hideCopy
@@ -149,7 +149,7 @@ insert into vault.secrets
   (secret, associated, key_id)
 values (
   'apikey_XaYrurzcquqhEdBjzfTzfwAZqpd',
-  'API_KEY_DEV',
+  'This is some different associated data.',
   'f9f176eb-7069-4743-9403-582c04354ffc'
 )
 returning *;
@@ -166,7 +166,7 @@ created_at | 2022-08-18 22:34:07.219941+00
 ```
 
 The type of encryption used by the Vault is called [Authenticated Encryption with Associated Data](https://en.wikipedia.org/wiki/Authenticated_encryption).
-The data you insert into the `associated` column is combined with the encrypted text when libsodium creates the authentication signature for the secret.
+The data you insert into the `associated` column, which is up to you, is combined with the encrypted text when libsodium creates the authentication signature for the secret.
 This means that when you read the secret, you know that the associated data is also authentic. The associated data could be an account ID or some
 information that ties your system to the secret. And as always, you can refer to rows in the secrets table by their primary key UUID.
 
