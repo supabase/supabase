@@ -10,7 +10,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
 
 const StorageSettings: FC<any> = ({ projectRef }) => {
-  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config?app=storage`, get)
+  const { data, error } = useSWR(`${API_URL}/projects/${projectRef}/config/storage`, get)
 
   if (error || data?.error) {
     return (
@@ -68,7 +68,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
       })
     } else {
       const payload = { fileSizeLimit: convertToBytes(values.fileSizeLimit, selectedUnit) }
-      const res = await patch(`${API_URL}/projects/${projectRef}/config?app=storage`, payload)
+      const res = await patch(`${API_URL}/projects/${projectRef}/config/storage`, payload)
       if (res?.error) {
         ui.setNotification({
           category: 'error',

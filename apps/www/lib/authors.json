@@ -175,5 +175,13 @@
     "position": "Support Engineer",
     "author_url": "https://github.com/mansueli",
     "author_image_url": "https://github.com/mansueli.png"
+  },
+  {
+    "author_id": "stas",
+    "author": "Stanislav Muzhyk",
+    "username": "abc3",
+    "position": "Engineering",
+    "author_url": "https://github.com/abc3",
+    "author_image_url": "https://github.com/abc3.png"
   }
 ]
