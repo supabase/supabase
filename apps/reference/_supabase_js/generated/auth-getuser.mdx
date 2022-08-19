@@ -11,7 +11,9 @@ import TabItem from '@theme/TabItem'
 Gets the current user details if there is an existing session.
 
 ```js
-const user = supabase.auth.getUser()
+const {
+  data: { user },
+} = await supabase.auth.getUser()
 ```
 
 ## Parameters
@@ -50,11 +52,15 @@ Takes in an optional access token jwt. If no jwt is provided, getUser() will att
 ### Get the logged in user with the current existing session
 
 ```js
-const user = supabase.auth.getUser()
+const {
+  data: { user },
+} = await supabase.auth.getUser()
 ```
 
 ### Get the logged in user with a custom access token jwt.
 
 ```js
-const user = supabase.auth.getUser(jwt)
+const {
+  data: { user },
+} = await supabase.auth.getUser(jwt)
 ```

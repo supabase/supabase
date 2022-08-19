@@ -4,6 +4,7 @@ title: Introduction
 description: 'What is Supabase?'
 slug: /
 hide_table_of_contents: true
+pagination_next: null
 ---
 
 import ThemedImage from '@theme/ThemedImage'
@@ -69,6 +70,26 @@ You can use it completely, or just the features you need.
 
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
+    {/* Auth */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/auth')}
+        title={'Auth'}
+        description={'User management with Row Level Security.'}
+        style={{ height: '100%' }}
+      />
+    </div>    
+    {/* Auto-generated APIs */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/api')}
+        title={'Auto-generated APIs'}
+        description={'Instantly generate APIs for your database.'}
+        style={{ height: '100%' }}
+      />
+    </div>
     {/* Database */}
     <div class="col col--4">
       <ButtonCard
@@ -79,17 +100,7 @@ You can use it completely, or just the features you need.
         style={{ height: '100%' }}
       />
     </div>
-    {/* API */}
-    <div class="col col--4">
-      <ButtonCard
-        class="card"
-        to={useBaseUrl('/guides/api')}
-        title={'Auto-generated APIs'}
-        description={'Instantly generate APIs for your database.'}
-        style={{ height: '100%' }}
-      />
-    </div>
-    {/* Functions */}
+    {/* Edge Functions */}
     <div class="col col--4">
       <ButtonCard
         class="card"
@@ -99,17 +110,7 @@ You can use it completely, or just the features you need.
         style={{ height: '100%' }}
       />
     </div>
-    {/* Auth */}
-    <div class="col col--4">
-      <ButtonCard
-        class="card"
-        to={useBaseUrl('/guides/auth')}
-        title={'Auth'}
-        description={'User management with Row Level Security.'}
-        style={{ height: '100%' }}
-      />
-    </div>
-    {/* Storage */}
+    {/* File Storage */}
     <div class="col col--4">
       <ButtonCard
         class="card"
@@ -129,7 +130,16 @@ You can use it completely, or just the features you need.
         style={{ height: '100%' }}
       />
     </div>
-    {/*  */}
+    {/* Realtime */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/realtime')}
+        title={'Realtime'}
+        description={'Build with Broadcast, Presence, and Postgres Changes.'}
+        style={{ height: '100%' }}
+      />
+    </div>
   </div>
 </div>
 

@@ -168,10 +168,10 @@ npx create-react-app supabase-react
 cd supabase-react
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js). We're going to install the "rc" (release candidate) version until this is released for general use.
 
 ```bash
-npm install @supabase/supabase-js
+npm install @supabase/supabase-js@rc
 ```
 
 And finally we want to save the environment variables in a `.env`.
@@ -195,7 +195,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/examples/main/supabase-js-v2/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
 
@@ -214,7 +214,7 @@ export default function Auth() {
 
     try {
       setLoading(true)
-      const { error } = await supabase.auth.signIn({ email })
+      const { error } = await supabase.auth.signInWithOtp({ email })
       if (error) throw error
       alert('Check your email for the login link!')
     } catch (error) {
@@ -278,7 +278,7 @@ const Account = ({ session }) => {
   const getProfile = async () => {
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const { user } = session
 
       let { data, error, status } = await supabase
         .from('profiles')
@@ -307,7 +307,7 @@ const Account = ({ session }) => {
 
     try {
       setLoading(true)
-      const user = supabase.auth.user()
+      const { user } = session
 
       const updates = {
         id: user.id,
@@ -317,9 +317,7 @@ const Account = ({ session }) => {
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
-        returning: 'minimal', // Don't return the value after inserting
-      })
+      let { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
         throw error
@@ -392,7 +390,9 @@ export default function App() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
-    setSession(supabase.auth.session())
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
