@@ -1,0 +1,80 @@
+---
+id: filter
+title: '.filter()'
+slug: /filter
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose `column` satisfies the filter.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .filter('name', 'in', '("Paris","Tokyo")')
+  .execute();
+```
+
+## Notes
+
+- `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+  ```dart
+    .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+    .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+    .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+    .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+  ```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .filter('name', 'in', '("Paris","Tokyo")')
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .filter('name', 'in', '("Paris","Tokyo")')
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .filter('name', 'in', '("Paris","Tokyo")')
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+### Filter embedded resources
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, countries ( name )')
+  .filter('countries.name', 'in', '("France","Japan")')
+  .execute();
+```

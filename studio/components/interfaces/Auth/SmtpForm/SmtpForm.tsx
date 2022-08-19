@@ -102,19 +102,19 @@ const SmtpForm = () => {
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
-    try {
-      setSubmitting(true)
-      await authConfig.update(payload)
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+    setSubmitting(true)
+    const { error } = await authConfig.update(payload)
 
+    if (!error) {
       setHidden(true)
       const updatedFormValues = generateFormValues(payload)
       resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-    } catch (error) {
+      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+    } else {
       ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
-    } finally {
-      setSubmitting(false)
     }
+
+    setSubmitting(false)
   }
 
   return (

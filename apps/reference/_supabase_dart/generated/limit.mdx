@@ -1,0 +1,42 @@
+---
+id: limit
+title: 'limit()'
+slug: /limit
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Limits the result with the specified count.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .execute();
+```
+
+### With embedded resources
+
+```dart
+final res = await supabase
+  .from('countries')
+  .select('name, cities(name)')
+  .eq('name', 'United States')
+  .limit(1,  foreignTable: 'cities' )
+  .execute();
+```

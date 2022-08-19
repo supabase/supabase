@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Button } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { delete_ } from 'lib/common/fetch'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
@@ -16,13 +16,17 @@ interface Props {
 const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
   const router = useRouter()
   const { app, ui } = useStore()
+  const enablePermissions = useFlag('enablePermissions')
 
   const project = ui.selectedProject
+  const isOwner = ui.selectedOrganization?.is_owner
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const canDeleteProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+  const canDeleteProject = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : isOwner
 
   const toggle = () => {
     if (loading) return
@@ -52,11 +56,9 @@ const DeleteProjectButton: FC<Props> = ({ type = 'danger' }) => {
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <div className="flex items-center">
-            <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
-              Delete project
-            </Button>
-          </div>
+          <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
+            Delete project
+          </Button>
         </Tooltip.Trigger>
         {!canDeleteProject && (
           <Tooltip.Content side="bottom">

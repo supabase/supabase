@@ -1,0 +1,103 @@
+---
+id: rangelte
+title: '.rangeLte()'
+slug: /rangelte
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose range value on the stated `column` does not extend
+to the right of the specified `range`.
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ColumnName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      range
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The range to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeLte('population_range_millions', '[150, 250]')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeLte('population_range_millions', '[150, 250]')
+```

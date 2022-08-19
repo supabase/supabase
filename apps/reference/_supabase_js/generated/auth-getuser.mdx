@@ -1,0 +1,66 @@
+---
+id: auth-getuser
+title: 'getUser()'
+slug: /auth-getuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Gets the current user details if there is an existing session.
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      jwt
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Takes in an optional access token jwt. If no jwt is provided, getUser() will attempt to get the jwt from the current session.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- This method gets the user object using the current session.
+- Fetches the user object from the database instead of local storage.
+
+## Examples
+
+### Get the logged in user with the current existing session
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser()
+```
+
+### Get the logged in user with a custom access token jwt.
+
+```js
+const {
+  data: { user },
+} = await supabase.auth.getUser(jwt)
+```

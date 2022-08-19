@@ -3,7 +3,7 @@ import { isEqual } from 'lodash'
 import { Input, Button, IconPlus, Select, IconX } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -49,8 +49,12 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
   }, [taxIds])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
+
+  const enablePermissions = useFlag('enablePermissions')
   const canReadTaxIds = checkPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
-  const canUpdateTaxIds = checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+  const canUpdateTaxIds = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.tax_ids')
+    : ui.selectedOrganization?.is_owner
 
   const onUpdateTaxId = (id: string, key: string, value: string) => {
     const updatedTaxIds = taxIdValues.map((taxId: any) => {

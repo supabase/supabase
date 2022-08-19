@@ -6,7 +6,10 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/temp-community-forum",
+    "apps/temp-community-tutorials",
+    "apps/temp-docs",
+    "apps/www",
     "packages/*"
   ],
   "scripts": {

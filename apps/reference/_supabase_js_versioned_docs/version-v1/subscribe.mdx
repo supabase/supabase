@@ -1,38 +1,25 @@
 ---
 id: subscribe
-title: "on().subscribe()"
+title: 'on().subscribe()'
 slug: subscribe
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Subscribe to realtime changes in your database.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
   .from('*')
-  .on('*', payload => {
+  .on('*', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -56,7 +43,6 @@ The database event which you would like to receive updates for, or you can use t
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -79,170 +65,85 @@ A callback that will handle the payload that is sent whenever your database chan
 
 </ul>
 
-
 ## Notes
 
 - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
 - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Listen to all database changes
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('*')
-  .on('*', payload => {
+  .on('*', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to a specific table
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('*', payload => {
+  .on('*', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to inserts
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('INSERT', payload => {
+  .on('INSERT', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to updates
 
-By default, Supabase will send only the updated record. If you want to receive the previous values as well you can 
-enable full replication for the table you are listening too: 
+By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+enable full replication for the table you are listening too:
 
 ```sql
 alter table "your_table" replica identity full;
 ```
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('UPDATE', payload => {
+  .on('UPDATE', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to deletes
 
-By default, Supabase does not send deleted records. If you want to receive the deleted record you can 
-enable full replication for the table you are listening too: 
+By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+enable full replication for the table you are listening too:
 
 ```sql
 alter table "your_table" replica identity full;
 ```
 
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const mySubscription = supabase
   .from('countries')
-  .on('DELETE', payload => {
+  .on('DELETE', (payload) => {
     console.log('Change received!', payload)
   })
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Listening to multiple events
 
 You can chain listeners if you want to listen to multiple events for each table.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -252,21 +153,9 @@ const mySubscription = supabase
   .subscribe()
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Listening to row level changes
 
 You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const mySubscription = supabase
@@ -274,8 +163,3 @@ const mySubscription = supabase
   .on('UPDATE', handleRecordUpdated)
   .subscribe()
 ```
-
-
-</TabItem>
-
-</Tabs>

@@ -1,21 +1,12 @@
 ---
 id: containedby
-title: ".containedBy()"
+title: '.containedBy()'
 slug: containedby
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ```js
 const { data, error } = await supabase
@@ -23,15 +14,6 @@ const { data, error } = await supabase
   .select('name, id, main_exports')
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
-
-
-</TabItem>
-
-</Tabs>
-
-
-
-
 
 ## Notes
 
@@ -44,27 +26,9 @@ const { data, error } = await supabase
   .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
   ```
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### With `select()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -73,21 +37,7 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `update()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -96,21 +46,7 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `delete()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data, error } = await supabase
@@ -119,21 +55,7 @@ const { data, error } = await supabase
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With `rpc()`
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 // Only valid if the Postgres function returns a table type.
@@ -141,8 +63,3 @@ const { data, error } = await supabase
   .rpc('echo_all_countries')
   .containedBy('main_exports', ['cars', 'food', 'machine'])
 ```
-
-
-</TabItem>
-
-</Tabs>

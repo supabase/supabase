@@ -85,7 +85,7 @@ At launch, you could pass in a `File` object and `supabase-js` used `FormData` t
 
 However, `FormData` is only supported in the browser, making `supabase-js` incompatible with Node.js. The simplest way to solve this would have been to include the [FormData polyfill](https://www.npmjs.com/package/form-data) along with the library.
 
-At Supabase, we are [maniacal about performance](/blog/2020/12/13/supabase-dashboard-performance). Keeping our client libraries lean is a key differentiator. Our entire client library (including the clients for postgrest, storage, realtime and auth) is just 15.8 kb. If you are just interested in using a single service like storage, you can use the `storage-js` library directly which is [even smaller](https://bundlephobia.com/package/@supabase/storage-js@1.4.0). This made including polyfills like Formdata a no-go.
+At Supabase, we are [maniacal about performance](/blog/supabase-dashboard-performance). Keeping our client libraries lean is a key differentiator. Our entire client library (including the clients for postgrest, storage, realtime and auth) is just 15.8 kb. If you are just interested in using a single service like storage, you can use the `storage-js` library directly which is [even smaller](https://bundlephobia.com/package/@supabase/storage-js@1.4.0). This made including polyfills like Formdata a no-go.
 
 ![Supabase JS bundle size](/images/blog/launch-week-sql-day-2/supabase-js-size.png)
 
@@ -139,7 +139,7 @@ We also have automated API docs generated [here](https://supabase.github.io/stor
 
 ### Storage in the wild
 
-We have a few production applications using Supabase Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using Supabase Storage to store short video clips uploaded to his [Spot app](/blog/2021/07/27/spot-flutter-with-postgres) built with Flutter
+We have a few production applications using Supabase Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using Supabase Storage to store short video clips uploaded to his [Spot app](/blog/spot-flutter-with-postgres) built with Flutter
 
 <Quote img="tyler-spot.jpg" caption="Tyler Shukert, creator of Spot">
   <p>

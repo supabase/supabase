@@ -55,17 +55,7 @@ class Authentication extends Hooks {
     expect(signUpError).toBeNull()
     expect(user).toBeDefined()
     expect(user.email).toEqual(fakeUser.email.toLowerCase())
-    expect(emptySession).toBeNull()
-
-    // check if user is not signed in cause he has not confirmed his email
-    const { error: errorInsertFailed } = await this.insertProfile(supabase, user, fakeUser)
-    log('check if insert failed caused user has not confirmed email')
-    expect(errorInsertFailed).not.toBeNull()
-
-    // confirm user email and sign in
-    const [{ confirmation_token: token }] = await this.getConfirmationToken(user)
-    const verifyResponse = await this.verify(token)
-    expect(verifyResponse.ok).toBeTruthy()
+    expect(emptySession).not.toBeNull()
 
     const { session, error: signInError } = await supabase.auth.signIn({
       email: fakeUser.email,
@@ -225,10 +215,6 @@ class Authentication extends Hooks {
     // todo check if returned user is updated
 
     const updatedUser = this.getUser(supabase)
-
-    // todo check if user is updated
-
-    const userFromApi = this.getUserFromApi(supabase)
 
     // todo check if user is updated on backend
   }

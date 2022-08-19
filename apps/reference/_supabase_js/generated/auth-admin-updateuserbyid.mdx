@@ -1,0 +1,326 @@
+---
+id: auth-admin-updateuserbyid
+title: 'updateUserById()'
+slug: /auth-admin-updateuserbyid
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Updates the user data.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { user_metadata: { hello: 'world' } }
+)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      uid
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      AdminUserAttributes
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      app_metadata
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom data object for app_metadata that.
+
+Only a service role can modify.
+
+Can be any JSON that includes app-specific info, such as identity providers, roles, and other
+access control information.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      data
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom data object for user_metadata that a user can modify. Can be any JSON.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's email.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email_change_token
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An email change token.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      email_confirm
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Sets if a user has confirmed their email address.
+
+Only a service role can modify.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      password
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's password.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      phone
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's phone.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      phone_confirm
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Sets if a user has confirmed their phone number.
+
+Only a service role can modify.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      user_metadata
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom data object for user_metadata.
+
+Can be any JSON.
+
+Only a service role can modify.
+
+Note: When using the GoTrueAdminApi and wanting to modify a user's user_metadata,
+this attribute is used instead of UserAttributes data.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Notes
+
+- Requires a `service_role` key.
+- This function should only be called on a server. Never expose your `service_role` key in the browser.
+
+## Examples
+
+### Updates a user's email.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { email: 'new@email.com' }
+)
+```
+
+### Updates a user's password.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { password: 'new_password' }
+)
+```
+
+### Updates a user's metadata.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { user_metadata: { hello: 'world' } }
+)
+```
+
+### Updates a user's app_metadata.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { app_metadata: { plan: 'trial' } }
+)
+```
+
+### Confirms a user's email address.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { email_confirm: true }
+)
+```
+
+### Confirms a user's phone number.
+
+```js
+const { data: user, error } = await supabase.auth.admin.updateUserById(
+  '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+  { phone_confirm: true }
+)
+```

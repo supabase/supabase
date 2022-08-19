@@ -16,10 +16,10 @@ module.exports = ui({
   mode: 'JIT',
   content: [
     '../../packages/common/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx,mdx}',
     './components/**/*.tsx',
     './layouts/**/*.tsx',
-    './pages/**/*.tsx',
+    './pages/**/*.{tsx,mdx}',
     './_blog/*.mdx',
     // purge styles from supabase ui theme
     '../../node_modules/@supabase/ui/dist/config/default-theme.js',
@@ -101,6 +101,10 @@ module.exports = ui({
               borderRadius: '4px',
               overflow: 'hidden',
             },
+            iframe: {
+              border: '1px solid ' + theme('borderColor.DEFAULT'),
+              borderRadius: theme('borderRadius.lg'),
+            },
           },
         },
 
@@ -115,6 +119,7 @@ module.exports = ui({
               },
               a: {
                 display: 'block',
+                marginBottom: '0.4rem',
                 'text-decoration': 'none',
                 fontSize: '0.8rem',
                 fontWeight: '200',

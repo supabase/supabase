@@ -1,0 +1,437 @@
+---
+id: initializing
+title: 'Initializing'
+slug: /initializing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+You can initialize a new Supabase client using the `createClient()` method.
+
+The Supabase client is your entrypoint to the rest of the Supabase functionality
+and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      supabaseUrl
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      supabaseKey
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      SupabaseClientOptions
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      auth
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      autoRefreshToken
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Automatically refreshes the token for logged in users.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      cookieOptions
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Options passed to the gotrue-js instance
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      detectSessionInUrl
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Detect a session from the URL. Used for OAuth login callbacks.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      persistSession
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Whether to persist a logged in session to storage.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      storage
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A storage provider. Used to store the logged in session.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      storageKey
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Optional key name used for storing tokens in local storage
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      db
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      schema
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>SchemaName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      global
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      fetch
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>Fetch</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A custom `fetch` implementation.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      headers
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>Record</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Optional headers for initializing the client.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      realtime
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>RealtimeClientOptions</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Options passed to the realtime-js instance
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Examples
+
+### createClient()
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key'
+)
+```
+
+### With additional parameters
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const options = {
+  db: {
+    schema: 'public',
+  },
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  global: {
+    headers: { 'x-my-custom-header': 'my-app-name' },
+  },
+}
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  options
+)
+```
+
+### API schemas
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Provide a custom schema. Defaults to "public".
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  {
+    db: { schema: 'other_schema' },
+  }
+)
+```
+
+By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+
+### Custom `fetch` implementation
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  {
+    global: { fetch: fetch.bind(globalThis) },
+  }
+)
+```
+
+`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+but an alternative `fetch` implementation can be provided as an option.
+This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
