@@ -1,7 +1,4 @@
-import { render } from '@headlessui/react/dist/utils/render'
 import { Button, Dropdown, IconMoreVertical } from '@supabase/ui'
-import { Misc } from '@supabase/ui/dist/cjs/components/Menu/Menu'
-import Loading from 'components/ui/Loading'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'
