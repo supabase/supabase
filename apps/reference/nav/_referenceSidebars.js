@@ -44,67 +44,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Database',
-      collapsed: true,
-      items: [
-        'guides/database',
-        'guides/database/connecting-to-postgres',
-        'guides/database/tables',
-        'guides/database/functions',
-        'guides/database/full-text-search',
-        // 'guides/database/json',
-        // 'guides/database/arrays',
-        // 'guides/database/sql-to-api',
-        {
-          type: 'category',
-          label: 'Extensions',
-          collapsed: true,
-          items: [
-            'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
-            'guides/database/extensions/plv8',
-            'guides/database/extensions/http',
-            'guides/database/extensions/uuid-ossp',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Configuration',
-          collapsed: true,
-          items: [
-            'guides/database/timeouts',
-            'guides/database/replication',
-            'guides/database/managing-passwords',
-            'guides/database/managing-timezones',
-          ],
-        },
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Realtime',
-      collapsed: true,
-      items: [
-        'guides/realtime/overview',
-        'guides/realtime/broadcast',
-        'guides/realtime/presence',
-        'guides/realtime/postgres-changes',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
-      label: 'Functions',
-      collapsed: true,
-      items: ['guides/functions'],
-    },
-    {
-      type: 'category',
       label: 'Auth',
       collapsed: true,
       items: [
@@ -149,6 +88,12 @@ const sidebars = {
         },
         {
           type: 'category',
+          label: 'Auth Helpers',
+          collapsed: true,
+          items: ['guides/auth/auth-helpers/auth-ui-overview'],
+        },
+        {
+          type: 'category',
           label: 'Deep Dive',
           collapsed: true,
           items: [
@@ -160,6 +105,56 @@ const sidebars = {
           ],
         },
       ],
+    },
+    {
+      type: 'category',
+      label: 'APIs',
+      collapsed: true,
+      items: ['guides/api', 'guides/api/generating-types'],
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      collapsed: true,
+      items: [
+        'guides/database',
+        'guides/database/connecting-to-postgres',
+        'guides/database/tables',
+        'guides/database/functions',
+        'guides/database/full-text-search',
+        // 'guides/database/json',
+        // 'guides/database/arrays',
+        // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Extensions',
+          collapsed: true,
+          items: [
+            'guides/database/extensions',
+            // 'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
+            'guides/database/extensions/http',
+            'guides/database/extensions/uuid-ossp',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Functions',
+      collapsed: true,
+      items: ['guides/functions'],
     },
     {
       type: 'category',
@@ -177,6 +172,17 @@ const sidebars = {
         'going-into-prod',
         'guides/platform/performance',
         'guides/platform/permissions',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: [
+        'guides/realtime',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
       ],
     },
     {

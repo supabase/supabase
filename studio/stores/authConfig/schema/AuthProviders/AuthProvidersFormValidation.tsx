@@ -20,7 +20,7 @@ const PROVIDER_EMAIL = {
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
       title: 'Secure email change',
-      description: `Users will be required to confirm any email change on both the old email address and new email address. 
+      description: `Users will be required to confirm any email change on both the old email address and new email address.
       If disabled, only the new email is required to confirm.`,
       type: 'boolean',
     },
@@ -59,7 +59,7 @@ const PROVIDER_PHONE = {
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
-      description: 'This will enable Email based login for your application',
+      description: 'This will enable phone based login for your application',
       type: 'boolean',
     },
     SMS_PROVIDER: {
@@ -299,7 +299,7 @@ const EXTERNAL_PROVIDER_APPLE = {
        */
       title: 'Services ID',
       description: `
-Client identifier when authenticating or validating users. 
+Client identifier when authenticating or validating users.
 [learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
       type: 'string',
     },
@@ -309,7 +309,7 @@ Client identifier when authenticating or validating users.
        */
       title: 'Secret key',
       description: `
-The secret key is a JWT token that must be generated. 
+The secret key is a JWT token that must be generated.
 [Learn more](https://supabase.com/docs/guides/auth/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,

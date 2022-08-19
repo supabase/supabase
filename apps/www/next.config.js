@@ -27,6 +27,8 @@ module.exports = withMDX({
       'avatars.githubusercontent.com',
       'colab.research.google.com',
       'api.producthunt.com',
+      'https://s3-us-west-2.amazonaws.com',
+      's3-us-west-2.amazonaws.com',
     ],
   },
   async headers() {
@@ -1426,6 +1428,11 @@ module.exports = withMDX({
         permanent: true,
         source: '/docs/guides/local-development',
         destination: '/docs/guides/cli/local-development',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/realtime/overview',
+        destination: '/docs/guides/realtime',
       },
       // V2 redirects
       // {

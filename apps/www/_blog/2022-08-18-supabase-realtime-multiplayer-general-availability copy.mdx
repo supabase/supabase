@@ -45,7 +45,7 @@ During Launch Week 3, we announced [Realtime RLS](https://supabase.com/blog/real
 
 We've modified the architecture of Realtime to introduce two core features: Broadcast and Presence.
 
-In this new version, everything is a [Channel](https://phoenixframework.readme.io/docs/channels). Channels are like “Rooms” where participants can join, and leave - very similar to Slack Channels or Discord Channels.
+In this new version, everything is a [Channel](https://hexdocs.pm/phoenix/Phoenix.Channel.html). Channels are like “Rooms” where participants can join, and leave - very similar to Slack Channels or Discord Channels.
 
 Broadcast and Presence are built into every Channel, and we've retro-fitted the Database change events into Channels too.
 
@@ -55,7 +55,7 @@ Broadcast follows the classic Publisher/Subscriber pattern. A client (publisher)
 
 Other clients (subscribers) can “listen” to these messages in real-time, using the unique identifier. If they are listening to the `#random` channel, then they will receive the message.
 
-This functionality is [baked into the Phoenix framework](https://phoenixframework.readme.io/docs/channels) and we've already been using this to [broadcast Postgres changes](https://supabase.com/docs/reference/javascript/subscribe).
+This functionality is [baked into the Phoenix framework](https://hexdocs.pm/phoenix/Phoenix.Channel.html) and we've already been using this to [broadcast Postgres changes](https://supabase.com/docs/reference/javascript/subscribe).
 With this release we're exposing the underlying primitives which unlocks a variety of use-cases for developers.
 
 A common use-case is sharing a user's cursor position with other clients in an online game. Previously, developers were sending all the mouse movements through their Postgres database which added latency and degraded database performance. In contrast, Broadcasts are ephemeral - they bypass the database completely.
@@ -219,7 +219,7 @@ We have some great news! [Chris McCord](https://twitter.com/chris_mccord), the c
 
 Chris works at Fly, and will continue to work there. His role as an advisor is mostly to express our gratitude for the work he's already done (admittedly, we'll probably need his advice for some upcoming challenges). Realtime is made possible by his open source work.
 
-We also want to thank [José Valim](https://twitter.com/josevalim), and everyone in the Elixir ecosystem, for your open source contributions that have made our lives here on the Supabase Realtime team a lot easier.
+We also want to thank [José Valim](https://twitter.com/josevalim), and everyone in the Erlang/Elixir ecosystem, for your open source contributions that have made our lives here on the Supabase Realtime team a lot easier.
 
 ## Announcement video and discussion
 
