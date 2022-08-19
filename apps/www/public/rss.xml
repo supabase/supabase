@@ -11,7 +11,14 @@
   <guid>https://supabase.com/blog/supabase-vault</guid>
   <title>Supabase Vault</title>
   <link>https://supabase.com/blog/supabase-vault</link>
-  <description></description>
+  <description>Today we're pre-releasing Vault,a Postgres extension for managing secrets and encryption inside your database.</description>
+  <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pg_jsonschema</guid>
+  <title>Supabase now support JSON Schema validation for JSON/B Columns</title>
+  <link>https://supabase.com/blog/pg_jsonschema</link>
+  <description>Today we're releasing pg_jsonschema, a Postgres extension for JSON validation.</description>
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
@@ -29,7 +36,7 @@
   <pubDate>Thu, 18 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</guid>
+  <guid>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability copy</guid>
   <title>Realtime: Multiplayer Edition</title>
   <link>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability copy</link>
   <description>Announcing the general availability of Realtime's Broadcast and Presence.</description>
@@ -40,7 +47,7 @@
   <title>Supabase is SOC2 compliant</title>
   <link>https://supabase.com/blog/supabase-soc2</link>
   <description>Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.</description>
-  <pubDate>Tue, 16 Aug 2022 05:05:00 +0000</pubDate>
+  <pubDate>Tue, 16 Aug 2022 22:10:00 +0000</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-js-v2</guid>
