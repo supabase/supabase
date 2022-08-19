@@ -251,7 +251,7 @@ Let's create a new component for that called `Profile.svelte`.
   let website = null
   let avatar_url = null
 
-  function getProfile(node: HTMLElement) {
+  function getProfile(node) {
   try {
     loading = true;
     const user = supabase.auth.user();
@@ -269,7 +269,7 @@ Let's create a new component for that called `Profile.svelte`.
         }
         if (error && status !== 406) throw error;
       });
-    } catch (error: any) {
+    } catch (error) {
       alert(error.message);
     } finally {
       loading = false;
