@@ -149,6 +149,12 @@ const sidebars = {
         },
         {
           type: 'category',
+          label: 'Auth Helpers',
+          collapsed: true,
+          items: ['guides/auth/auth-ui/auth-ui-overview'],
+        },
+        {
+          type: 'category',
           label: 'Deep Dive',
           collapsed: true,
           items: [
@@ -157,15 +163,6 @@ const sidebars = {
             'learn/auth-deep-dive/auth-policies',
             'learn/auth-deep-dive/auth-gotrue',
             'learn/auth-deep-dive/auth-google-oauth',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Auth UI',
-          collapsed: true,
-          items: [
-            'guides/auth/auth-ui/auth-ui-install',
-            'guides/auth/auth-ui/auth-ui-customization',
           ],
         },
       ],
