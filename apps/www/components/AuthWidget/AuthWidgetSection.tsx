@@ -57,7 +57,7 @@ function AuthWidgetSection() {
       <div className={`dark:bg-scale-200 bg-scale-100 relative border py-2 pb-16`}>
         <div className="sm:py-18 gap container relative mx-auto grid grid-cols-12 px-6 py-16 md:gap-16 md:py-24 lg:gap-16 lg:px-16 lg:py-24 xl:px-20">
           <div className="relative z-10 col-span-12 mb-16 md:col-span-7 md:mb-0 lg:col-span-6">
-            <div className="relative lg:max-w-md">
+            <div className="relative lg:mx-auto lg:max-w-md">
               <div className="glow-area transition-all"></div>
 
               <div className="border-scale-400 dark:bg-scale-300 pointer-events-none relative rounded-xl border bg-white px-8 py-12 drop-shadow-sm">
@@ -81,12 +81,13 @@ function AuthWidgetSection() {
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
                     <Auth
+                      // @ts-ignore
                       socialLayout={layout}
                       theme={isDarkMode ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       localization={{
-                        lang: 'ja',
+                        lang: 'en',
                       }}
                       appearance={{
                         theme: ThemeSupa,
@@ -114,7 +115,10 @@ function AuthWidgetSection() {
             <div className="prose !max-w-md">
               <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-scale-900 mt-0">Customizable authentication UI component.</p>
+              <p className="text-scale-900 mt-0">
+                Customizable authentication UI component with custom themes and extensible styles to
+                match your brand and aesthetic
+              </p>
               <div className="mb-4 flex items-center space-x-2">
                 <img className="m-0 w-8" src={`${basePath}/images/product/auth/react-icon.svg`} />
                 <small>Currently only available for React</small>
