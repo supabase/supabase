@@ -77,7 +77,7 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <RefreshButton filters={filters} sorts={sorts} />
         <FilterDropdown />
         <SortPopover />
