@@ -190,5 +190,12 @@
     "position": "Developer Advocate",
     "author_url": "https://twitter.com/jonmeyers_io",
     "author_image_url": "https://github.com/dijonmusters.png"
+  },
+  {
+    "author_id": "michel",
+    "author": "Michel Pelletier",
+    "position": "Engineering",
+    "author_url": "https://github.com/michelp",
+    "author_image_url": "https://github.com/michelp.png"
   }
 ]
