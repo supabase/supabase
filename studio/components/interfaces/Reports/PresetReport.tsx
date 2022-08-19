@@ -109,36 +109,5 @@ const PresetReport: React.FC<Props> = ({ projectRef, preset }) => {
     </div>
   )
 }
-// const usePresetReport = (projectRef: string, preset: Presets) => {
-// const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
-// const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-//   params as any
-// )}`
-// const {
-//   data,
-//   error: swrError,
-//   isValidating,
-//   mutate,
-// } = useSWR<any>(endpointUrl, get, {
-//   revalidateOnFocus: false,
-//   revalidateIfStale: false,
-//   revalidateOnReconnect: false,
-//   dedupingInterval: 5000,
-// })
-
-//   let error: null | string | object = swrError ? swrError.message : null
-//   return [
-//     {
-//       logData: data?.result ? data.result[0] : undefined,
-//       isLoading: isValidating,
-//       error,
-//     },
-//     {
-//       refresh: () => mutate(),
-//     },
-//   ]
-// }
-
-// const useWidgetQuery = (sql: string) => {}
 
 export default PresetReport
