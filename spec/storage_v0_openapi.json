@@ -404,7 +404,7 @@
         }
       },
       "get": {
-        "summary": "Get object (deprecated)",
+        "summary": "Get object",
         "tags": ["deprecated"],
         "description": "use GET /object/authenticated/{bucketName} instead",
         "parameters": [
