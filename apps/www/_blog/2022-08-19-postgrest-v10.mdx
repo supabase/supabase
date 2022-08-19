@@ -40,7 +40,11 @@ The `text` format is used by default, which gives you the same output you’d ge
 For `supabase-js`, you can get the execution plan using the `explain()` method. This works for every `supabase-js` method, including `rpc()`. Here’s an example for `select()`.
 
 ```jsx
-const { data, error } = await supabase.from('projects').select('*').eq('id', 1).explain()
+const { data, error } = await supabase
+  .from('projects')
+  .select('*')
+  .eq('id', 1)
+  .explain()
 
 console.log(data)
 ```
