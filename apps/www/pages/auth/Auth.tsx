@@ -18,6 +18,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
+import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
 import FeatureColumn from '~/components/FeatureColumn'
@@ -246,14 +247,16 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
+        <AuthWidgetSection />
+
         {/* <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
-            <div className="order-last col-span-12 lg:order-first lg:col-span-6 mt-8 lg:mt-0">
+            <div className="order-last col-span-12 mt-8 lg:order-first lg:col-span-6 lg:mt-0">
               <AuthComponentExample />
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7 xl:col-span-4 xl:col-start-8">
               <div className="mb-4 flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex justify-center items-center">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-900 text-white dark:bg-white dark:text-gray-900">
                   <ProductIcon icon={Solutions['authentication'].icon} />
                 </div>
                 <p className="m-0">
@@ -283,7 +286,7 @@ function AuthPage() {
                 </a>
               </Link>
 
-              <div className="grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16 mt-8">
+              <div className="mt-8 grid grid-cols-12 md:gap-8 lg:gap-0 xl:gap-16">
                 <div className="col-span-12 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconBriefcase />}
