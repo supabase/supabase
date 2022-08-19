@@ -53,6 +53,14 @@ import TabItem from '@theme/TabItem';
         <%- parameter.type %>
         </span>
     </h4>
+    <% if(parameter.example){ %>
+    <h4 className="method-list-item-label">
+        Example:
+        <span className="method-list-item-label-badge">
+            <%- parameter.example %>
+        </span>
+    </h4>
+    <% } %>
     <div class="method-list-item-description">
         <%- parameter.description %>
     </div>
@@ -78,6 +86,14 @@ import TabItem from '@theme/TabItem';
         <%- parameter.type %>
         </span>
     </h4>
+    <% if(parameter.example){ %>
+    <h4 className="method-list-item-label">
+        Example:
+        <span className="method-list-item-label-badge">
+            <%- parameter.example %>
+        </span>
+    </h4>
+    <% } %>
     <div class="method-list-item-description">
         <%- parameter.description %>
     </div>
