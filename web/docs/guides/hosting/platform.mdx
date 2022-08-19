@@ -4,7 +4,6 @@ title: Supabase Platform
 description: Getting started with the Supabase platform.
 ---
 
-
 Supabase is a hosted platform which makes it very simple to get started without needing to manage any infrastructure.
 
 Visit [app.supabase.com](https://app.supabase.com) and sign in to start creating projects.
@@ -15,18 +14,50 @@ Organizations are a way to group your projects. Every Organization can be config
 
 ### Managing Team Members
 
-You can invite your Team members into your Organizations so that you can collaborate on projects.
+You can invite your team members into your organizations so that you can collaborate on projects.
 
 <video width="99%" muted playsInline controls="true">
-<source src="/docs/videos/invite-team.mp4" type="video/mp4" muted playsInline />
+  <source src="/docs/videos/invite-team.mp4" type="video/mp4" muted playsInline />
 </video>
+
+You can also assign roles to your team members to restrict what they can do. The table below shows the corresponding permissions for each available role in the dashboard.
+
+| Permissions                  | Owner | Administrator | Developer |
+| ---------------------------- | ----- | ------------- | --------- |
+| Can change organization name | ✅    |               |           |
+| Can delete organization      | ✅    |               |           |
+| Can add an Owner             | ✅    |               |           |
+| Can remove an Owner          | ✅    |               |           |
+| Can add an Adminstrator      | ✅    | ✅            |           |
+| Can remove an Administrator  | ✅    | ✅            |           |
+| Can add a Developer          | ✅    | ✅            |           |
+| Can remove a Developer       | ✅    | ✅            |           |
+| Can revoke an invite         | ✅    | ✅            |           |
+| Can resend an invite         | ✅    | ✅            |           |
+| Can read invoices            | ✅    | ✅            | ✅        |
+| Can read billing email       | ✅    | ✅            | ✅        |
+| Can change billing email     | ✅    |               |           |
+| Can view subscription        | ✅    | ✅            | ✅        |
+| Can update subscription      | ✅    | ✅            |           |
+| Can read billing address     | ✅    | ✅            | ✅        |
+| Can update billing address   | ✅    | ✅            |           |
+| Can read tax codes           | ✅    | ✅            | ✅        |
+| Can update tax codes         | ✅    | ✅            |           |
+| Can read payment methods     | ✅    | ✅            | ✅        |
+| Can update payment methods   | ✅    | ✅            |           |
+| Can create a project         | ✅    | ✅            |           |
+| Can delete a project         | ✅    | ✅            |           |
+| Can update a project         | ✅    | ✅            |           |
+| Can pause a project          | ✅    | ✅            |           |
+| Can resume a project         | ✅    | ✅            |           |
+| Can restart a project        | ✅    | ✅            | ✅        |
 
 ## Projects
 
 Each project on Supabase comes with these features:
 
 - A dedicated Postgres database. [Learn more](/docs/guides/database)
-- Auto-generated APIs.  [Learn more](/docs/guides/api)
+- Auto-generated APIs. [Learn more](/docs/guides/api)
 - Auth and User management. [Learn more](/docs/guides/auth)
 - Storage. [Learn more](/docs/guides/storage)
 
