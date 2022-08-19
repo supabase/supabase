@@ -1,0 +1,92 @@
+---
+id: reference
+title: Reference Documentation
+sidebar_label: Reference Documentation
+hide_table_of_contents: true
+---
+
+import Link from '@docusaurus/Link'
+import ButtonCard from '@site/src/components/ButtonCard'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+
+Reference documentation for the official Supabase client libraries, APIs, and tools.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Javascript */}
+    <div class="col col--6">
+      <ButtonCard
+        icon={useBaseUrl("/img/icons/javascript-icon.svg")}
+        class="card"
+        to={useBaseUrl("/reference/javascript")}
+        style={{ height: '100%' }}
+        title="JavaScript"
+        description="JavaScript and TypeScript documentation."
+      />
+    </div>
+    {/* DART */}
+    <div class="col col--6">
+      <ButtonCard icon={useBaseUrl("/img/icons/dart-icon.svg")} class="card" to={useBaseUrl("/reference/dart")} style={{ height: '100%' }} title="Dart" description="Dart and Flutter documentation."/>
+    </div>
+    {/* CLI */}
+    <div class="col col--6">
+      <ButtonCard icon={useBaseUrl("/img/icons/cli-icon.svg")} class="card" to={useBaseUrl("/reference/cli")} style={{ height: '100%' }} title="Supabase CLI" description="Tools for developing your Supabase projects locally."/>
+    </div>
+    {/* API */}
+    <div class="col col--6">
+      <ButtonCard icon={useBaseUrl("/img/icons/api-icon.svg")} class="card" to={useBaseUrl("/reference/api")} style={{ height: '100%' }} title="Supabase API" description="Manage your Supabase organizations and projects."/>
+    </div>
+    {/*  */}
+
+  </div>
+</div>
+
+## Community
+
+Reference documentation for community-contributed utilities.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Auth */}
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/reference/auth-helpers')}
+        style={{ height: '100%' }}
+        title="Auth Helpers"
+        description="Collection of framework-specific auth utilities for working with Supabase."
+      />
+    </div>
+    {/*  */}
+  </div>
+</div>
+
+## Self-hosting
+
+Reference documentation for self-hosting Supabase features.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Examples - coming soon */}
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/reference/auth')}
+        style={{ height: '100%' }}
+        title={'Auth Server'}
+        description=" JSON Web Token (JWT)-based API for managing users and issuing access tokens."
+      />
+    </div>
+    {/*  */}
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/reference/storage')}
+        style={{ height: '100%' }}
+        title={'Storage'}
+        description="S3-compatible object storage service that integrates with Postgres."
+      />
+    </div>
+    {/*  */}
+  </div>
+</div>

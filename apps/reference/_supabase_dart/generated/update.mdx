@@ -1,0 +1,55 @@
+---
+id: update
+title: 'Modify data: update()'
+slug: /update
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Performs an UPDATE on the table.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Middle Earth' })
+  .match({ 'name': 'Auckland' })
+  .execute();
+```
+
+## Notes
+
+- `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+
+## Examples
+
+### Updating your data
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Middle Earth' })
+  .match({ 'name': 'Auckland' })
+  .execute();
+```
+
+### Updating JSON data
+
+Postgres offers a
+[number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+for working with JSON data. Right now it is only possible to update an entire JSON document,
+but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+
+```dart
+final res = await supabase
+  .from('users')
+  .update({
+    'address': {
+      'street': 'Melrose Place',
+      'postcode': 90210
+    }
+  })
+  .eq('address->postcode', 90210)
+  .execute();
+```

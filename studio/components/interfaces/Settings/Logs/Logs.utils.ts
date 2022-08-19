@@ -16,12 +16,7 @@ export const isUnixMicro = (unix: string | number): boolean => {
 }
 
 export const isDefaultLogPreviewFormat = (log: LogData) =>
-  log &&
-  log.timestamp &&
-  log.metadata &&
-  log.event_message &&
-  log.id &&
-  Object.keys(log).length === 4
+  log && log.timestamp && log.event_message && log.id
 
 /**
  * Recursively retrieve all nested object key paths.
@@ -125,7 +120,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
 
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, metadata, request, response, request.method, request.path, response.status_code
+      return `select id, timestamp, event_message, request, response, request.method, request.path, response.status_code
   from ${table}
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
@@ -133,24 +128,21 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   ${where}
   limit 100
   `
-      break
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, metadata, metadataparsed.error_severity from ${table} 
+      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table} 
   cross join unnest(metadata) as m 
-  cross join unnest(m.parsed) as metadataparsed 
+  cross join unnest(m.parsed) as parsed 
   ${where} 
   limit 100
   `
-      break
 
     case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level, metadata from ${table}
+      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
   cross join unnest(metadata) as metadata
   ${where}
   limit 100
     `
-      break
 
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, response, request, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table} 
@@ -162,10 +154,14 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     default:
-      return `select id, ${table}.timestamp, event_message, metadata from ${table}
+      return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
   limit 100          
   `
-      break
   }
 }
+
+/**
+ * SQL query to retrieve only one log
+ */
+export const genSingleLogQuery = (table: LogsTableName, id: string) => `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`

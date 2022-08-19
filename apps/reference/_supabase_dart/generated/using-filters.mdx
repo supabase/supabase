@@ -1,0 +1,44 @@
+---
+id: using-filters
+title: 'Using Filters'
+slug: /using-filters
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Filters can be used on `select()`, `update()`, and `delete()` queries.
+
+If a Stored Procedure returns a table response, you can also apply filters.
+
+### Applying Filters
+
+You must apply your filters to the end of your query. For example:
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'The Shire')    // Correct
+  .execute();
+
+final res = await supabase
+  .from('cities')
+  .eq('name', 'The Shire')    // Incorrect
+  .select('name, country_id')
+  .execute();
+```
+
+### Chaining
+
+Filters can be chained together to produce advanced queries. For example:
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('population', 1000)
+  .lt('population', 10000)
+  .execute();
+```

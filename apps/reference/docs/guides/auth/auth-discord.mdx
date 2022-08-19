@@ -1,0 +1,113 @@
+---
+id: auth-discord
+title: 'Login with Discord'
+description: Add Discord OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable Discord Auth for your project, you need to set up a Discord Application and add the Application OAuth credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Discord logins for your application consists of 3 parts:
+
+- Create and configure a Discord Application [Discord Developer Portal](https://discord.com/developers)
+- Add your Discord OAuth Consumer keys to your [Supabase Project](https://app.supabase.com)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Access your Discord account
+
+- Go to [discord.com](https://discord.com/).
+- Click on `Login` at the top right to log in.
+
+![Discord Portal.](/img/guides/auth-discord/discord-portal.png)
+
+- Once logged in, go to [discord.com/developers](https://discord.com/developers).
+
+![Discord Portal.](/img/guides/auth-discord/discord-developer-portal.png)
+
+### Find your callback URL
+
+In the next step you require a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Create a Discord Application
+
+- Click on `New Application` at the top right.
+- Enter the name of your application and click `Create`.
+- Click on `OAuth2` under `Settings` in the left side panel.
+- Click `Add Redirect` under `Redirects`.
+- Type or paste your `callback URL` into the `Redirects` box.
+- Click `Save Changes` at the bottom.
+- Copy your `Client ID` and `Client Secret` under `Client information`.
+
+### Add your Discord credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `External OAuth Providers` turn `Discord Enabled` to ON
+- Enter your `client_id` and `client_secret` saved in the previous step
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'discord',
+})
+```
+
+:::note
+
+If you call `signIn()` when already logged in, Discord will prompt the user again for authorization.
+
+:::
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithDiscord() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'discord',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Discord Account](https://discord.com)
+- [Discord Developer Portal](https://discord.com/developers)

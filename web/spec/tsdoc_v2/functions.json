@@ -1,0 +1,1542 @@
+{
+	"id": 0,
+	"name": "@supabase/functions-js",
+	"kind": 1,
+	"flags": {},
+	"originalName": "",
+	"children": [
+		{
+			"id": 1,
+			"name": "index",
+			"kind": 2,
+			"kindString": "Module",
+			"flags": {},
+			"children": [
+				{
+					"id": 69,
+					"name": "FunctionsError",
+					"kind": 16777216,
+					"kindString": "Reference",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/index.ts",
+							"line": 3,
+							"character": 2
+						}
+					],
+					"target": 13
+				},
+				{
+					"id": 70,
+					"name": "FunctionsFetchError",
+					"kind": 16777216,
+					"kindString": "Reference",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/index.ts",
+							"line": 4,
+							"character": 2
+						}
+					],
+					"target": 20
+				},
+				{
+					"id": 71,
+					"name": "FunctionsHttpError",
+					"kind": 16777216,
+					"kindString": "Reference",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/index.ts",
+							"line": 5,
+							"character": 2
+						}
+					],
+					"target": 30
+				},
+				{
+					"id": 72,
+					"name": "FunctionsRelayError",
+					"kind": 16777216,
+					"kindString": "Reference",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/index.ts",
+							"line": 6,
+							"character": 2
+						}
+					],
+					"target": 25
+				},
+				{
+					"id": 73,
+					"name": "FunctionsResponse",
+					"kind": 16777216,
+					"kindString": "Reference",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/index.ts",
+							"line": 7,
+							"character": 2
+						}
+					],
+					"target": 11
+				},
+				{
+					"id": 42,
+					"name": "FunctionsClient",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"children": [
+						{
+							"id": 43,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 16,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 44,
+									"name": "new FunctionsClient",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 45,
+											"name": "url",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 46,
+											"name": "__namedParameters",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 47,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 49,
+															"name": "customFetch",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "src/FunctionsClient.ts",
+																	"line": 23,
+																	"character": 6
+																}
+															],
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 50,
+																	"name": "__type",
+																	"kind": 65536,
+																	"kindString": "Type literal",
+																	"flags": {},
+																	"signatures": [
+																		{
+																			"id": 51,
+																			"name": "__type",
+																			"kind": 4096,
+																			"kindString": "Call signature",
+																			"flags": {},
+																			"parameters": [
+																				{
+																					"id": 52,
+																					"name": "input",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {},
+																					"type": {
+																						"type": "reference",
+																						"qualifiedName": "RequestInfo",
+																						"package": "typescript",
+																						"name": "RequestInfo"
+																					}
+																				},
+																				{
+																					"id": 53,
+																					"name": "init",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {
+																						"isOptional": true
+																					},
+																					"type": {
+																						"type": "reference",
+																						"qualifiedName": "RequestInit",
+																						"package": "typescript",
+																						"name": "RequestInit"
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "reference",
+																				"typeArguments": [
+																					{
+																						"type": "reference",
+																						"qualifiedName": "Response",
+																						"package": "typescript",
+																						"name": "Response"
+																					}
+																				],
+																				"qualifiedName": "Promise",
+																				"package": "typescript",
+																				"name": "Promise"
+																			}
+																		}
+																	]
+																}
+															}
+														},
+														{
+															"id": 48,
+															"name": "headers",
+															"kind": 1024,
+															"kindString": "Property",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "src/FunctionsClient.ts",
+																	"line": 22,
+																	"character": 6
+																}
+															],
+															"type": {
+																"type": "reference",
+																"typeArguments": [
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																],
+																"qualifiedName": "Record",
+																"package": "typescript",
+																"name": "Record"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Properties",
+															"kind": 1024,
+															"children": [
+																49,
+																48
+															]
+														}
+													]
+												}
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 42,
+										"name": "FunctionsClient"
+									}
+								}
+							]
+						},
+						{
+							"id": 56,
+							"name": "fetch",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true
+							},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 14,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 57,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {},
+									"signatures": [
+										{
+											"id": 58,
+											"name": "__type",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {},
+											"parameters": [
+												{
+													"id": 59,
+													"name": "input",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {},
+													"type": {
+														"type": "reference",
+														"qualifiedName": "RequestInfo",
+														"package": "typescript",
+														"name": "RequestInfo"
+													}
+												},
+												{
+													"id": 60,
+													"name": "init",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isOptional": true
+													},
+													"type": {
+														"type": "reference",
+														"qualifiedName": "RequestInit",
+														"package": "typescript",
+														"name": "RequestInit"
+													}
+												}
+											],
+											"type": {
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"qualifiedName": "Response",
+														"package": "typescript",
+														"name": "Response"
+													}
+												],
+												"qualifiedName": "Promise",
+												"package": "typescript",
+												"name": "Promise"
+											}
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 55,
+							"name": "headers",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true
+							},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 13,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								],
+								"qualifiedName": "Record",
+								"package": "typescript",
+								"name": "Record"
+							}
+						},
+						{
+							"id": 54,
+							"name": "url",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isProtected": true
+							},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 12,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 64,
+							"name": "invoke",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 45,
+									"character": 8
+								}
+							],
+							"signatures": [
+								{
+									"id": 65,
+									"name": "invoke",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Invokes a function"
+									},
+									"typeParameter": [
+										{
+											"id": 66,
+											"name": "T",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {},
+											"default": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 67,
+											"name": "functionName",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"shortText": "the name of the function to invoke"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 68,
+											"name": "invokeOptions",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"id": 35,
+												"name": "FunctionInvokeOptions"
+											},
+											"defaultValue": "{}"
+										}
+									],
+									"type": {
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"id": 11,
+												"typeArguments": [
+													{
+														"type": "reference",
+														"id": 66,
+														"name": "T"
+													}
+												],
+												"name": "FunctionsResponse"
+											}
+										],
+										"qualifiedName": "Promise",
+										"package": "typescript",
+										"name": "Promise"
+									}
+								}
+							]
+						},
+						{
+							"id": 61,
+							"name": "setAuth",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/FunctionsClient.ts",
+									"line": 35,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 62,
+									"name": "setAuth",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Updates the authorization header"
+									},
+									"parameters": [
+										{
+											"id": 63,
+											"name": "token",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"shortText": "the new jwt token sent in the authorisation header\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								43
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								56,
+								55,
+								54
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								64,
+								61
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/FunctionsClient.ts",
+							"line": 11,
+							"character": 13
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "References",
+					"kind": 16777216,
+					"children": [
+						69,
+						70,
+						71,
+						72,
+						73
+					]
+				},
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						42
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/index.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		},
+		{
+			"id": 2,
+			"name": "types",
+			"kind": 2,
+			"kindString": "Module",
+			"flags": {},
+			"children": [
+				{
+					"id": 13,
+					"name": "FunctionsError",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"children": [
+						{
+							"id": 14,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 19,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 15,
+									"name": "new FunctionsError",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 16,
+											"name": "message",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 17,
+											"name": "name",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											},
+											"defaultValue": "'FunctionsError'"
+										},
+										{
+											"id": 18,
+											"name": "context",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 13,
+										"name": "FunctionsError"
+									},
+									"overwrites": {
+										"type": "reference",
+										"name": "Error.constructor"
+									}
+								}
+							],
+							"overwrites": {
+								"type": "reference",
+								"name": "Error.constructor"
+							}
+						},
+						{
+							"id": 19,
+							"name": "context",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 18,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								14
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								19
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 17,
+							"character": 13
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"qualifiedName": "Error",
+							"package": "typescript",
+							"name": "Error"
+						}
+					],
+					"extendedBy": [
+						{
+							"type": "reference",
+							"id": 20,
+							"name": "FunctionsFetchError"
+						},
+						{
+							"type": "reference",
+							"id": 25,
+							"name": "FunctionsRelayError"
+						},
+						{
+							"type": "reference",
+							"id": 30,
+							"name": "FunctionsHttpError"
+						}
+					]
+				},
+				{
+					"id": 20,
+					"name": "FunctionsFetchError",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"children": [
+						{
+							"id": 21,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 27,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 22,
+									"name": "new FunctionsFetchError",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 23,
+											"name": "context",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 20,
+										"name": "FunctionsFetchError"
+									},
+									"overwrites": {
+										"type": "reference",
+										"id": 15,
+										"name": "FunctionsError.constructor"
+									}
+								}
+							],
+							"overwrites": {
+								"type": "reference",
+								"id": 14,
+								"name": "FunctionsError.constructor"
+							}
+						},
+						{
+							"id": 24,
+							"name": "context",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 18,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 19,
+								"name": "FunctionsError.context"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								21
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								24
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 26,
+							"character": 13
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 13,
+							"name": "FunctionsError"
+						}
+					]
+				},
+				{
+					"id": 30,
+					"name": "FunctionsHttpError",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"children": [
+						{
+							"id": 31,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 39,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 32,
+									"name": "new FunctionsHttpError",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 33,
+											"name": "context",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 30,
+										"name": "FunctionsHttpError"
+									},
+									"overwrites": {
+										"type": "reference",
+										"id": 15,
+										"name": "FunctionsError.constructor"
+									}
+								}
+							],
+							"overwrites": {
+								"type": "reference",
+								"id": 14,
+								"name": "FunctionsError.constructor"
+							}
+						},
+						{
+							"id": 34,
+							"name": "context",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 18,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 19,
+								"name": "FunctionsError.context"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								31
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								34
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 38,
+							"character": 13
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 13,
+							"name": "FunctionsError"
+						}
+					]
+				},
+				{
+					"id": 25,
+					"name": "FunctionsRelayError",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"children": [
+						{
+							"id": 26,
+							"name": "constructor",
+							"kind": 512,
+							"kindString": "Constructor",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 33,
+									"character": 2
+								}
+							],
+							"signatures": [
+								{
+									"id": 27,
+									"name": "new FunctionsRelayError",
+									"kind": 16384,
+									"kindString": "Constructor signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 28,
+											"name": "context",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 25,
+										"name": "FunctionsRelayError"
+									},
+									"overwrites": {
+										"type": "reference",
+										"id": 15,
+										"name": "FunctionsError.constructor"
+									}
+								}
+							],
+							"overwrites": {
+								"type": "reference",
+								"id": 14,
+								"name": "FunctionsError.constructor"
+							}
+						},
+						{
+							"id": 29,
+							"name": "context",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 18,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"id": 19,
+								"name": "FunctionsError.context"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Constructors",
+							"kind": 512,
+							"children": [
+								26
+							]
+						},
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								29
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 32,
+							"character": 13
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"id": 13,
+							"name": "FunctionsError"
+						}
+					]
+				},
+				{
+					"id": 8,
+					"name": "FunctionsResponseFailure",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {},
+					"children": [
+						{
+							"id": 9,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 12,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "literal",
+								"value": null
+							}
+						},
+						{
+							"id": 10,
+							"name": "error",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 13,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								9,
+								10
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 11,
+							"character": 17
+						}
+					]
+				},
+				{
+					"id": 4,
+					"name": "FunctionsResponseSuccess",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {},
+					"comment": {
+						"shortText": "Response format"
+					},
+					"children": [
+						{
+							"id": 5,
+							"name": "data",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 8,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 7,
+								"name": "T"
+							}
+						},
+						{
+							"id": 6,
+							"name": "error",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 9,
+									"character": 2
+								}
+							],
+							"type": {
+								"type": "literal",
+								"value": null
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								5,
+								6
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 7,
+							"character": 17
+						}
+					],
+					"typeParameter": [
+						{
+							"id": 7,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {}
+						}
+					]
+				},
+				{
+					"id": 3,
+					"name": "Fetch",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 1,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "query",
+						"queryType": {
+							"type": "reference",
+							"id": 50,
+							"qualifiedName": "fetch",
+							"package": "typescript",
+							"name": "fetch"
+						}
+					}
+				},
+				{
+					"id": 35,
+					"name": "FunctionInvokeOptions",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 44,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 36,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 41,
+									"name": "body",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "the body of the request"
+									},
+									"sources": [
+										{
+											"fileName": "src/types.ts",
+											"line": 52,
+											"character": 2
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"qualifiedName": "File",
+												"package": "typescript",
+												"name": "File"
+											},
+											{
+												"type": "reference",
+												"qualifiedName": "Blob",
+												"package": "typescript",
+												"name": "Blob"
+											},
+											{
+												"type": "reference",
+												"qualifiedName": "ArrayBuffer",
+												"package": "typescript",
+												"name": "ArrayBuffer"
+											},
+											{
+												"type": "reference",
+												"qualifiedName": "FormData",
+												"package": "typescript",
+												"name": "FormData"
+											},
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"qualifiedName": "Uint8Array",
+														"package": "typescript",
+														"name": "Uint8Array"
+													}
+												],
+												"qualifiedName": "ReadableStream",
+												"package": "typescript",
+												"name": "ReadableStream"
+											},
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "intrinsic",
+														"name": "any"
+													}
+												],
+												"qualifiedName": "Record",
+												"package": "typescript",
+												"name": "Record"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								},
+								{
+									"id": 37,
+									"name": "headers",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "object representing the headers to send with the request"
+									},
+									"sources": [
+										{
+											"fileName": "src/types.ts",
+											"line": 48,
+											"character": 2
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 38,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "src/types.ts",
+													"line": 48,
+													"character": 12
+												}
+											],
+											"indexSignature": {
+												"id": 39,
+												"name": "__index",
+												"kind": 8192,
+												"kindString": "Index signature",
+												"flags": {},
+												"parameters": [
+													{
+														"id": 40,
+														"name": "key",
+														"kind": 32768,
+														"flags": {},
+														"type": {
+															"type": "intrinsic",
+															"name": "string"
+														}
+													}
+												],
+												"type": {
+													"type": "intrinsic",
+													"name": "string"
+												}
+											}
+										}
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Properties",
+									"kind": 1024,
+									"children": [
+										41,
+										37
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "src/types.ts",
+									"line": 44,
+									"character": 36
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 11,
+					"name": "FunctionsResponse",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/types.ts",
+							"line": 15,
+							"character": 12
+						}
+					],
+					"typeParameter": [
+						{
+							"id": 12,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {}
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "reference",
+								"id": 4,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"id": 12,
+										"name": "T"
+									}
+								],
+								"name": "FunctionsResponseSuccess"
+							},
+							{
+								"type": "reference",
+								"id": 8,
+								"name": "FunctionsResponseFailure"
+							}
+						]
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						13,
+						20,
+						30,
+						25
+					]
+				},
+				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						8,
+						4
+					]
+				},
+				{
+					"title": "Type Aliases",
+					"kind": 4194304,
+					"children": [
+						3,
+						35,
+						11
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/types.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Modules",
+			"kind": 2,
+			"children": [
+				1,
+				2
+			]
+		}
+	]
+}

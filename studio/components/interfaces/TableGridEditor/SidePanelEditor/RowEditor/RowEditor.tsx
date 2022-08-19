@@ -156,6 +156,12 @@ const RowEditor: FC<Props> = ({
       }`}
       onCancel={closePanel}
       hideFooter
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">

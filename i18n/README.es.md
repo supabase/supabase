@@ -10,18 +10,24 @@
 [Supabase](https://supabase.com) es una alternativa de código abierto a Firebase. Estamos construyendo las funcionalidades de Firebase usando herramientas de código abierto de nivel empresarial.
 
 - [x] Alojamiento de base de datos Postgres
-- [x] Suscripciones en tiempo real
 - [x] Autenticación y autorización
 - [x] API autogenerada
-- [x] Panel de control
-- [x] Almacenamiento
+  - [x] REST
+  - [x] Suscripciones en tiempo real
+  - [x] GraphQL (Beta)
 - [x] Funciones
+  - [x] Funciones de Bases de Datos
+  - [x] Edge Functions
+- [x] Almacenamiento
+- [x] Panel de control
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentación
 
 Para ver la documentación completa, visita [supabase.com/docs](https://supabase.com/docs).
+
+Para ver como contribuir, visita los [Primeros Pasos](../DEVELOPERS.md)
 
 ## Comunidad y soporte
 

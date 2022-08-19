@@ -214,7 +214,8 @@ const CreateProject = observer(() => {
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
-    return await post(`${API_URL}/projects`, data)
+    const project = await post(`${API_URL}/projects`, data)
+    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
   }
 
   async function onCreateProject() {
@@ -260,7 +261,7 @@ const CreateProject = observer(() => {
       const query = new URLSearchParams(_store.queryParams).toString()
       router.push(`/vercel/complete?${query}`)
     } catch (error) {
-      console.log('error', error)
+      console.error('Error', error)
       setLoading(false)
     }
   }

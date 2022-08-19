@@ -1,0 +1,309 @@
+---
+id: select
+title: 'Fetch data: select()'
+slug: /select
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Performs vertical filtering with SELECT.
+
+```js
+const { data, error } = await supabase.from('cities').select()
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      columns
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>Query</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The columns to retrieve, separated by commas.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      __namedParameters
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      count
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>exact</code> | <code>planned</code> | <code>estimated</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Count algorithm to use to count rows in a table.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      estimated
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      planned
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      exact
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      head
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+When set to true, select will void data.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Notes
+
+- By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+- `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
+- `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
+- If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+
+## Examples
+
+### Getting your data
+
+```js
+const { data, error } = await supabase.from('cities').select()
+```
+
+### Selecting specific columns
+
+You can select specific fields from your tables.
+
+```js
+const { data, error } = await supabase.from('cities').select('name')
+```
+
+### Query foreign tables
+
+If your database has foreign key relationships, you can query related tables too.
+
+```js
+const { data, error } = await supabase.from('countries').select(`
+    name,
+    cities (
+      name
+    )
+  `)
+```
+
+:::note What about join tables
+If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
+you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
+For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
+
+:::
+
+### Query the same foreign table multiple times
+
+Sometimes you will need to query the same foreign table twice.
+In this case, you can use the name of the joined column to identify
+which join you intend to use. For convenience, you can also give an
+alias for each column. For example, if we had a shop of products,
+and we wanted to get the supplier and the purchaser at the same time
+(both in the users) table:
+
+```js
+const { data, error } = await supabase.from('products').select(`
+    id,
+    supplier:supplier_id ( name ),
+    purchaser:purchaser_id ( name )
+  `)
+```
+
+### Filtering with inner joins
+
+If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
+to select all rows in a `message` table which belong to a user with the `username` "Jane":
+
+```js
+const { data, error } = await supabase
+  .from('messages')
+  .select('*, users!inner(*)')
+  .eq('users.username', 'Jane')
+```
+
+### Querying with count option
+
+You can get the number of rows by using the count option.
+Allowed values for count option are `null`, [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
+
+```js
+const { data, error, count } = await supabase
+  .from('cities')
+  .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
+```
+
+### Querying JSON data
+
+If you have data inside of a JSONB column, you can apply select
+and query filters to the data values. Postgres offers a
+[number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+for querying JSON data. Also see
+[PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
+
+```js
+const { data, error } = await supabase
+  .from('users')
+  .select(
+    `
+    id, name,
+    address->street
+  `
+  )
+  .eq('address->postcode', 90210)
+```
+
+### Return data as CSV
+
+By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
+
+```js
+const { data, error } = await supabase.from('users').select().csv()
+```
+
+### Aborting requests in-flight
+
+You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` doesn't mean anything for aborted requests, since the request wasn't actually fulfilled.
+
+```js
+const ac = new AbortController()
+supabase
+  .from('very_big_table')
+  .select()
+  .abortSignal(ac.signal)
+  .then(console.log)
+ac.abort()
+// {
+//   error: {
+//     message: 'FetchError: The user aborted a request.',
+//     details: '',
+//     hint: '',
+//     code: ''
+//   },
+//   data: null,
+//   body: null,
+//   count: null,
+//   status: 400,
+//   statusText: 'Bad Request'
+// }
+```

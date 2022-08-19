@@ -8,7 +8,6 @@ import MadeForDevelopers from 'components/MadeForDevelopers/index'
 import AdminAccess from 'components/AdminAccess/index'
 import CaseStudies from 'components/CaseStudies/index'
 import CTABanner from 'components/CTABanner/index'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import TwitterSocialSection from '~/components/TwitterSocialSection'
 
 // Import Swiper styles if swiper used on page
