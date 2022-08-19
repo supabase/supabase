@@ -4,11 +4,8 @@ import {
   IconArrowUpRight,
   IconBriefcase,
   IconEye,
-  IconKey,
   IconLink,
   IconShield,
-  IconX,
-  Space,
 } from '@supabase/ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
@@ -17,7 +14,6 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import AuthComponentExample from '~/components/AuthWidget/AuthComponentExample'
 import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -25,7 +21,6 @@ import FeatureColumn from '~/components/FeatureColumn'
 import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
