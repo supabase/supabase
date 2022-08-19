@@ -88,6 +88,12 @@ const sidebars = {
         },
         {
           type: 'category',
+          label: 'Auth Helpers',
+          collapsed: true,
+          items: ['guides/auth/auth-helpers/auth-ui-overview'],
+        },
+        {
+          type: 'category',
           label: 'Deep Dive',
           collapsed: true,
           items: [
