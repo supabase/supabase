@@ -274,13 +274,13 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = await supabase.auth.getUser()
+          const { data: { user } } = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
         isSpotlight: false
         js: |
           ```js
-          const user = supabase.auth.getUser(jwt)
+          const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
   auth.updateUser():
     title: 'updateUser()'
@@ -993,13 +993,13 @@ pages:
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-      - The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('*')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
@@ -1009,7 +1009,7 @@ pages:
       - name: Listening to a specific table
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1019,7 +1019,7 @@ pages:
       - name: Listening to inserts
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1036,7 +1036,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1053,7 +1053,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -1064,7 +1064,7 @@ pages:
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
@@ -1076,7 +1076,7 @@ pages:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries:id=eq.200')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
