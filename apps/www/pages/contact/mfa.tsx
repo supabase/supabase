@@ -1,7 +1,7 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
-import MfaContactForm from '~/components/MFAContactForm'
+import MfaContactForm from '~/components/MfaContactForm'
 
 const meta_title = 'MFA early access | Supabase'
 const meta_description = ''
