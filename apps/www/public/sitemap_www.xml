@@ -61,13 +61,25 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/edge-functions/edge-functions</loc>
+    <loc>https://supabase.com/contact/mfa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc>https://supabase.com/database</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/edge-functions/edge-functions</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/legal/dpa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -505,7 +517,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/community-day</loc>
+    <loc>https://supabase.com/blog/community-day-lw3</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -595,7 +607,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/community-day</loc>
+    <loc>https://supabase.com/blog/community-day-lw4</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -746,6 +758,18 @@
 
   <url>
     <loc>https://supabase.com/blog/supabase-js-v2</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-soc2</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-realtime-multiplayer-general-availability</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

@@ -187,26 +187,24 @@ export const LaunchSection = (props: WeekDayProps) => {
                     <ArticleButtonListItem {...article} />
                   </div>
 
-                  {/* border */}
-                  <div className="bg-scale-300 dark:bg-scale-400 h-px w-full"></div>
+                  {article.products && (
+                    <>
+                      {/* border */}
+                      <div className="bg-scale-300 dark:bg-scale-400 h-px w-full"></div>
 
-                  <div className="flex flex-col gap-6 p-6 px-10 pb-10">
-                    <h3 className="text-scale-1100 mb-2">New releases</h3>
-                    {article.products &&
-                      article.products.map((product: Product, index) => (
-                        <ProductButtonListItem key={product.url + index} {...product} />
-                      ))}
-                  </div>
+                      <div className="flex flex-col gap-6 p-6 px-10 pb-10">
+                        <h3 className="text-scale-1100 text-sm">New releases</h3>
+                        {article.products &&
+                          article.products.map((product: Product, index) => (
+                            <ProductButtonListItem key={product.url + index} {...product} />
+                          ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
           </div>
         )}
-        <div className="">
-          {props.products &&
-            props.products.map((product: Product, index) => (
-              <ProductButton key={product.url + index} {...product} />
-            ))}
-        </div>
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ const ArticleButtonListItem = (props: Article) => {
               <span className="text-scale-1200 group-hover:text-brand-900 text-left text-base transition">
                 {props.title}
               </span>
-              <span className="text-scale-1100 text-sm transition">{props.description}</span>
+              <p className="text-scale-1100 text-left text-sm transition">{props.description}</p>
             </div>
           </div>
         </div>
