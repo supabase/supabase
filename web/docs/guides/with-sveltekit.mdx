@@ -2,6 +2,7 @@
 id: with-sveltekit
 title: "Quickstart: SvelteKit"
 description: Learn how to use Supabase in your SvelteKit App.
+sidebar_label: SvelteKit
 ---
 
 import Tabs from '@theme/Tabs';
@@ -43,26 +44,23 @@ Now we are going to set up the database schema. We can use the "User Management 
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "Home" section.
-2. Click "SQL Editor" in the sidebar.
-3. Click "User Management Starter".
-4. Click "Run".
-```
+1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
+2. Click **User Management Starter**.
+3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 -- Create a table for public "profiles"
@@ -123,26 +121,13 @@ create policy "Anyone can upload an avatar."
 Now that you've created some database tables, you are ready to insert data using the auto-generated API. 
 We just need to get the URL and `anon` key from the API settings.
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Home" section.
-2. Click "API" in the sidebar.
-3. Click the "Authentication" heading under "API Docs".
-4. Find your "SUPABASE_KEY" and "SUPABASE_URL" keys on this page (right hand side as you scroll down).
-```
+1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
+2. Click **API** in the sidebar.
+3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
 
 ## Building the App
 
@@ -256,28 +241,28 @@ Let's create a new component for that called `Profile.svelte`.
   let website = null
   let avatar_url = null
 
-  async function getProfile() {
-    try {
-      loading = true
-      const user = supabase.auth.user()
+  function getProfile(node: HTMLElement) {
+  try {
+    loading = true;
+    const user = supabase.auth.user();
 
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
-        .single()
-
-      if (error && status !== 406) throw error
-
-      if (data) {
-        username = data.username
-        website = data.website
-        avatar_url = data.avatar_url
-      }
-    } catch (error) {
-      alert(error.message)
+    supabase
+      .from("profiles")
+      .select(`username, website, avatar_url`)
+      .eq("id", user?.id)
+      .single()
+      .then(({ data, error, status }) => {
+        if (data) {
+          username = data.username;
+          website = data.website;
+          avatar_url = data.avatar_url;
+        }
+        if (error && status !== 406) throw error;
+      });
+    } catch (error: any) {
+      alert(error.message);
     } finally {
-      loading = false
+      loading = false;
     }
   }
 
@@ -415,15 +400,17 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
   const dispatch = createEventDispatcher();
 
-  async function downloadImage() {
-    try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
-      if (error) throw error
-      
-      src = URL.createObjectURL(data)
-    } catch (error) {
-      console.error('Error downloading image: ', error.message)
-    }
+  function downloadImage() {
+    supabase.storage
+      .from("avatars")
+      .download(path)
+      .then(({ data, error }) => {
+        if (error) throw error;
+        src = URL.createObjectURL(data);
+      })
+      .catch((error) =>
+        console.error("Error downloading image: ", error.message)
+      );
   }
 
   async function uploadAvatar() {

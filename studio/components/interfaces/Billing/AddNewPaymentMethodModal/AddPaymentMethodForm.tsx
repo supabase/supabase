@@ -29,6 +29,11 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
 
     setIsSaving(true)
 
+    if (document !== undefined) {
+      // [Joshen] This is to ensure that any 3DS popup from Stripe remains clickable
+      document.body.classList.add('!pointer-events-auto')
+    }
+
     const { error } = await stripe.confirmSetup({
       elements,
       confirmParams: { return_url: returnUrl },
@@ -41,12 +46,20 @@ const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel }) => {
         message: error?.message ?? ' Failed to save card details',
       })
     }
+
+    if (document !== undefined) {
+      document.body.classList.remove('!pointer-events-auto')
+    }
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <Modal.Content>
-        <PaymentElement />
+        <div
+          className={`transition ${isSaving ? 'opacity-75 pointer-events-none' : 'opacity-100'}`}
+        >
+          <PaymentElement />
+        </div>
       </Modal.Content>
       <Modal.Seperator />
       <Modal.Content>

@@ -1,0 +1,32 @@
+---
+id: single
+title: 'single()'
+slug: single
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Retrieves only one row from the result. Result must be one row (e.g. using
+`limit`), otherwise this will result in an error.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .single()
+```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .limit(1)
+  .single()
+```

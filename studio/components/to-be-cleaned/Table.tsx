@@ -48,7 +48,7 @@ const Th: React.FC<ThProps> = ({ children, className, style }) => {
   if (className) classes.push(className)
   return (
     <th className={classes.join(' ')} style={style}>
-      <Typography.Text type="secondary">{children}</Typography.Text>
+      {children}
     </th>
   )
 }

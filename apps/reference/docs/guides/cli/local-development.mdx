@@ -1,0 +1,220 @@
+---
+id: local-development
+title: Local Development
+description: How to use Supabase on your local development machine.
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Learn how to use the Supabase CLI to develop your project locally and deploy to the Supabase Platform.
+
+## Prerequisites
+
+Make sure you have these installed on your local machine:
+
+- [Docker](https://docs.docker.com/engine/install/)
+- [Git](https://github.com/git-guides/install-git)
+- [Supabase CLI](/docs/guides/cli)
+
+## Log in to the Supabase CLI
+
+```bash
+supabase login
+```
+
+## Initialize your project
+
+Create a new folder for your project and start a new git repository:
+
+```bash
+# create your project folder
+mkdir your-project
+
+# move into the new folder
+cd your-project
+
+# start a new git repository
+git init
+```
+
+## Start Supabase services
+
+[Initialize](/reference/cli/usage#supabase-init) Supabase to set up the configuration for developing your project locally:
+
+```bash
+supabase init
+```
+
+Make sure Docker is running. The [start](/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/architecture).
+This command may take a while to run if this is the first time using the CLI.
+
+```bash
+supabase start
+```
+
+Once all of the Supabase services are running, you'll see output containing your local Supabase credentials.
+You can use the [stop](/reference/cli/usage#supabase-stop) command at any time to stop all services.
+
+## Access services
+
+You can access services directly with any Postgres client or through the API Gateway ([Kong](https://github.com/Kong/kong)).
+
+<Tabs
+  defaultValue="postgres"
+  values={[
+    {label: 'Postgres', value: 'postgres'},
+    {label: 'API Gateway', value: 'kong'},
+  ]}>
+<TabItem value="postgres">
+
+```sh
+# Default URL:
+postgresql://postgres:postgres@localhost:54322/postgres
+```
+
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
+or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
+
+For example:
+
+```bash
+psql 'postgresql://postgres:postgres@localhost:54322/postgres'
+```
+
+</TabItem>
+<TabItem value="kong">
+
+```sh
+# Default URL:
+http://localhost:54321
+```
+
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
+Learn more about JWT headers in our [Resources](/learn/auth-deep-dive/auth-deep-dive-jwts).
+
+```sh
+curl 'http://localhost:54321/rest/v1/' \
+    -H "apikey: <anon key>" \
+    -H "Authorization: Bearer <anon key>"
+
+http://localhost:54321/rest/v1/           # REST (PostgREST)
+http://localhost:54321/realtime/v1/       # Realtime
+http://localhost:54321/storage/v1/        # Storage
+http://localhost:54321/auth/v1/           # Auth (GoTrue)
+```
+
+</TabItem>
+</Tabs>
+
+## Database migrations
+
+Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.
+
+### Make database changes
+
+For this guide, create a table called `employees`. In Supabase Studio, navigate to the **SQL Editor** page and run the following SQL command:
+
+```sql
+create table employees (
+	id integer primary key generated always as identity,
+	name text
+);
+```
+
+:::note
+You can execute any SQL using the `DB URL` shown by [`supabase status`](/reference/cli/usage#supabase-status).
+:::
+
+Run the [`db diff`](/reference/cli/usage#supabase-db-diff) command to detect changes in the local database:
+
+```sh
+supabase db diff create_employees -f create_employees
+```
+
+This creates a new migration named `supabase/migrations/<timestamp>_create_employees.sql`, representing any changes made to the local database since [`supabase start`](/reference/cli/usage#supabase-start).
+
+### Add sample data
+
+Use the seed script in `supabase/seed.sql` (created with [`supabase init`](/reference/cli/usage#supabase-init)) to add sample data to the table.
+
+```sql
+-- in supabase/seed.sql
+insert into public.employees (name)
+values
+  ('Erlich Backman'),
+  ('Richard Hendricks'),
+  ('Monica Hall');
+```
+
+Rerun the migration and seed scripts:
+
+```bash
+supabase db reset
+```
+
+You should now see the contents of `employees` in Studio.
+
+### Reset database changes
+
+Use the [`reset`](/reference/cli/usage#supabase-db-reset) command to revert any changes to the local database.
+
+```sql
+-- run on local database to make a change
+alter table employees
+  add department text default 'Hooli';
+```
+
+Run the following command to reset the local database:
+
+```sh
+supabase db reset
+```
+
+## Deploy your project
+
+Go to the [Supabase Dashboard](https://app.supabase.com) and create a project to deploy the changes.
+
+### Link your project
+
+:::note
+There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
+:::
+
+Associate your project with your remote project using [`supabase link`](/reference/cli/usage#supabase-link).
+
+```bash
+supabase link --project-ref <project-id>
+# You can get <project-id> from your project’s dashboard URL: https://app.supabase.com/project/<project-id>
+
+supabase db remote commit
+# Capture any changes that you have made to your database before setting up the CLI
+```
+
+`supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
+This migration captures any changes required for your local database to match the schema of your remote Supabase project.
+
+### Deploy database changes
+
+Deploy any local database migrations using [`db push`](/reference/cli/usage#supabase-db-push):
+
+```sh
+supabase db push
+```
+
+### Deploy Edge Functions
+
+Deploy any Edge Functions using [`functions deploy`](/reference/cli/usage#supabase-functions-deploy):
+
+```sh
+supabase functions deploy <function_name>
+```
+
+## Limitations
+
+The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:
+
+- The Storage interface is coming soon.
+- The Functions interface is coming soon.
+- Logs are not supported through the interface (however you can access them through the Docker containers).
+- You cannot update your project settings in the Dashboard—this must be done using the CLI.

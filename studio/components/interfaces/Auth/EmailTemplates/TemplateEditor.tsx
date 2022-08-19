@@ -42,20 +42,21 @@ const TemplateEditor: FC<Props> = ({ template }) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    try {
-      setSubmitting(true)
-      await authConfig.update(payload)
+    setSubmitting(true)
+    const { error } = await authConfig.update(payload)
+
+    if (!error) {
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
       resetForm({
         values: values,
         initialValues: values,
       })
       setBodyValue(authConfig?.config?.[messageSlug])
-    } catch (error) {
+    } else {
       ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-    } finally {
-      setSubmitting(false)
     }
+
+    setSubmitting(false)
   }
 
   return (

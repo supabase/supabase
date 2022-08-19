@@ -1,0 +1,250 @@
+---
+id: textsearch
+title: '.textSearch()'
+slug: /textsearch
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose text or tsvector value on the stated `column` matches
+the tsquery in `query`.
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ColumnName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      query
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The Postgres tsquery string to filter with.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      options
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      config
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      type
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>plain</code> | <code>phrase</code> | <code>websearch</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      websearch
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      phrase
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      plain
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      literal
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Examples
+
+### Text search
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    config: 'english',
+  })
+```
+
+### Basic normalization
+
+Uses PostgreSQL's `plainto_tsquery` function.
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    type: 'plain',
+    config: 'english',
+  })
+```
+
+### Full normalization
+
+Uses PostgreSQL's `phraseto_tsquery` function.
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat' & 'cat'`, {
+    type: 'phrase',
+    config: 'english',
+  })
+```
+
+### Websearch
+
+Uses PostgreSQL's `websearch_to_tsquery` function.
+This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
+with advanced operators.
+
+- `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+- `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+- `OR`: the word “or” will be converted to the | operator.
+- `-`: a dash will be converted to the ! operator.
+
+```js
+const { data, error } = await supabase
+  .from('quotes')
+  .select('catchphrase')
+  .textSearch('catchphrase', `'fat or cat'`, {
+    type: 'websearch',
+    config: 'english',
+  })
+```

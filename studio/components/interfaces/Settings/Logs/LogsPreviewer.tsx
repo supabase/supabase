@@ -156,11 +156,13 @@ export const LogsPreviewer: React.FC<Props> = ({
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
+            projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
+            params={params}
           />
         </LoadingOpacity>
         {!error && (

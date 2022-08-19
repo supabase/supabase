@@ -7,7 +7,7 @@
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
-  url: 'https://supabase.com',
+  url: 'https://reference-docs.vercel.app',
   baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
@@ -15,6 +15,11 @@ module.exports = {
   onBrokenLinks: 'ignore',
   themes: ['docusaurus-theme-search-typesense'],
   themeConfig: {
+    docs: {
+      sidebar: {
+        autoCollapseCategories: true,
+      },
+    },
     colorMode: {
       // "light" | "dark"
       defaultMode: 'dark',
@@ -191,6 +196,7 @@ module.exports = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
+          breadcrumbs: false,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

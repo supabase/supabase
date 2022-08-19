@@ -4,8 +4,6 @@ import FeedbackWidget from './FeedbackWidget'
 
 const FeedbackDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [feedback, setFeedback] = useState('')
-  const [category, setCategory] = useState('Feedback')
 
   function onOpen() {
     setIsOpen((isOpen) => !isOpen)
@@ -18,15 +16,7 @@ const FeedbackDropdown = () => {
       size="content"
       side="bottom"
       align="end"
-      overlay={
-        <FeedbackWidget
-          onClose={() => setIsOpen(false)}
-          setFeedback={setFeedback}
-          feedback={feedback}
-          category={category}
-          setCategory={setCategory}
-        />
-      }
+      overlay={<FeedbackWidget onClose={() => setIsOpen(false)} />}
     >
       <Button
         as="span"
