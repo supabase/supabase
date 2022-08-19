@@ -1,0 +1,56 @@
+---
+id: auth-ui-install
+title: Installation
+description: Securing your user data with Row Level Security.
+---
+
+# Auth UI
+
+Auth UI is a React component that provides a simple way to authenticate users.
+
+It is currently only available for React, however it is planned to be available for other frameworks.
+
+Auth UI relies on [@supabase/supabase-js](/docs/reference/javascript/next/) to work, so you will need to firstly also install [@supabase/supabase-js](/docs/reference/javascript/next/) and perhaps be already familair with that package.
+
+### Install via NPM
+
+Install the NPM package from @supabase/react-ui-react
+
+```bash
+npm install @supabase/react-ui-react
+```
+
+### Import Auth component
+
+The most simplest way to use the component is to just pass `supabaseClient` from @supabase/supabase-js as a prop to the component.
+
+```js title="/src/index.js"
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/react-ui-react'
+
+const supabase = createClient(
+  '<INSERT PROJECT URL>',
+  '<INSERT PROJECT ANON API KEY>'
+)
+
+const App = () => <Auth supabaseClient={supabase} />
+```
+
+You may notice that the above renders the Auth component without any styling.
+
+It is reccomended that you use one of the provided themes to style the UI.
+Import the theme you want to use and pass it to the `appearence.theme` prop.
+
+```diff js title="/src/index.js"
+import {
+    Auth,
++   ThemeSupa
+} from '@supabase/react-ui-react'
+
+const App = () => (
+    <Auth
+        supabaseClient={supabase}
++       appearance={{ theme: ThemeSupa }}
+    />
+)
+```
