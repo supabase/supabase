@@ -237,10 +237,10 @@ function BlogPostPage(props: any) {
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.content.renderedOutput)}</p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
                     {author.map((author: any) => {
                       return (
-                        <div className="mt-6 mb-8 mr-4 w-max lg:mb-0">
+                        <div className="mr-4 w-max">
                           <Link href={author.author_url}>
                             <a className="cursor-pointer">
                               <div className="flex items-center gap-3">
