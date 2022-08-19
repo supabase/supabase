@@ -141,10 +141,11 @@
     "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
     "d": 5,
     "dd": "Friday",
+    "youtube_id": "s9UePQjLT0U",
     "articles": [
       {
-        "title": "Community spotlight",
-        "url": "Something",
+        "title": "Community Day",
+        "url": "/blog/launch-week-5-community-day",
         "description": "Outline of the community changes",
         "products": [
           {
