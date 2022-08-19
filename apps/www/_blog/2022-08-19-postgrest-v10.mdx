@@ -16,7 +16,7 @@ Let's take a look at some of its new features that go hand in hand with [supabas
 
 ## EXPLAIN
 
-Akin to the [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html) command, you can now get the execution plan of a request through REST or `supabase-js`. This works transparently for reads, writes and RPC because every request to PostgREST generates a single SQL query.
+Akin to the [PostgreSQL EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html) command, you can now get the execution plan of a request through HTTP or `supabase-js`. This works transparently for reads, writes and RPC because every request to PostgREST generates a single SQL query.
 
 This is only suitable for development environments and is only enabled when the `db-plan-enabled` config is set to `true`.
 
