@@ -193,6 +193,21 @@ test('poll count for new messages', async () => {
   await waitFor(() => screen.queryByText(/125/) === null)
   await screen.findByText(/some-uuid123/)
 })
+test('log event chart', async () => {
+  get.mockImplementation((url) => {
+    // truncate
+    if (url.includes('trunc')) {
+      return { result: [{ timestamp: new Date().toISOString(), count: 125 }] }
+    }
+    return {
+      result: [logDataFixture({ id: 'some-uuid123' })],
+    }
+  })
+  render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+
+  await waitFor(() => screen.queryByText(/some-uuid123/) === null)
+  expect(get).toBeCalledWith(expect.stringContaining('trunc'))
+})
 
 test('s= query param will populate the search bar', async () => {
   const router = defaultRouterMock()
@@ -289,6 +304,9 @@ test('bug: load older btn does not error out when previous page is empty', async
 })
 
 test('log event chart hide', async () => {
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await screen.findByText('Events')
   const toggle = await screen.findByText(/Chart/)

@@ -11,7 +11,7 @@ import {
   QueryType,
   LogEventChart,
   Filters,
-  unixMicroToIsoTimestamp,
+  ensureNoTimestampConflict,
 } from 'components/interfaces/Settings/Logs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
@@ -52,7 +52,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
   const [
-    { error, logData, params, newCount, filters, isLoading },
+    { error, logData, params, newCount, filters, isLoading, eventChartData },
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
 
@@ -83,24 +83,48 @@ export const LogsPreviewer: React.FC<Props> = ({
       },
     })
   }
-
-  const handleSearch: LogSearchCallback = async ({ query = '', to, from }) => {
-    setParams((prev) => ({
-      ...prev,
-      iso_timestamp_start: from || prev.iso_timestamp_start || '',
-      iso_timestamp_end: to || prev.iso_timestamp_end || '',
-    }))
-    setFilters((prev) => ({ ...prev, search_query: query }))
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        s: query || '',
-        its: from || its || '',
-        ite: to || ite || '',
-      },
-    })
+  const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
+    if (event === 'search-input-change') {
+      setFilters((prev) => ({ ...prev, search_query: query }))
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, s: query },
+      })
+    } else if (event === 'event-chart-bar-click') {
+      const [nextStart, nextEnd] = ensureNoTimestampConflict(
+        [params.iso_timestamp_start || '', params.iso_timestamp_end || ''],
+        [from || '', to || '']
+      )
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: nextStart,
+        iso_timestamp_end: nextEnd,
+      }))
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          its: nextStart,
+          ite: nextEnd,
+        },
+      })
+    } else if (event === 'datepicker-change') {
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: from || '',
+        iso_timestamp_end: to || '',
+      }))
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          its: from || '',
+          ite: to || '',
+        },
+      })
+    }
   }
+
   return (
     <div className="h-full flex flex-col flex-grow">
       <PreviewFilterPanel
@@ -143,10 +167,13 @@ export const LogsPreviewer: React.FC<Props> = ({
         <div className={condensedLayout ? 'px-4' : ''}>
           {showChart && (
             <LogEventChart
-              data={!isLoading ? logData : undefined}
-              onBarClick={(timestampMicro) => {
-                const to = unixMicroToIsoTimestamp(timestampMicro)
-                handleSearch({ query: filters.search_query as string, to, from: null })
+              data={!isLoading && eventChartData ? eventChartData : undefined}
+              onBarClick={(isoTimestamp) => {
+                handleSearch('event-chart-bar-click', {
+                  query: filters.search_query as string,
+                  to: isoTimestamp as string,
+                  from: null,
+                })
               }}
             />
           )}
