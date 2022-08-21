@@ -72,7 +72,7 @@ function AuthWidgetSection() {
                     >
                       <ColorSwatchIcon strokeWidth={1.5} />
                     </div>
-                    <h1 className="text-scale-1200 text-2xl">Acne Company Ltd</h1>
+                    <h1 className="text-scale-1200 text-2xl">Acme Industries</h1>
                   </div>
                   <p className="text-scale-1100 text-auth-widget-test">
                     Sign in today for Supa stuff
