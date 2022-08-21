@@ -123,7 +123,7 @@ Now you can see a new `decrypted_secret` column that contains the decrypted secr
 This `vault.decrypted_secrets` view automatically decrypts rows in the `vault.secrets` table “on-the-fly” as you query them, but the secret is stored on disk in _encrypted_ form.
 If you take a backup, or pause your project, that data remains encrypted. We will keep your hidden root key safe in our backend systems for when you need to restore or un-pause your projects.
 
-If you wish to use your own Key ID for different secrets, insted of the default Key ID we've generated, you can create one using the `pgsodium.create_key()` function:
+If you wish to use your own Key ID for different secrets, instead of the default Key ID we've generated, you can create one using the `pgsodium.create_key()` function:
 
 ```sql
 select * from pgsodium.create_key('This is a comment for the new key');
