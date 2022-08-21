@@ -14,10 +14,10 @@ Auth UI relies on [@supabase/supabase-js](/docs/reference/javascript/next/). You
 
 ### Install via NPM
 
-Install the NPM package from @supabase/react-ui-react
+Install the NPM package from @supabase/auth-ui-react
 
 ```bash
-npm install @supabase/react-ui-react @supabase/supabase-js@rc
+npm install @supabase/auth-ui-react @supabase/supabase-js@rc
 ```
 
 ### Import Auth component
@@ -26,7 +26,7 @@ The simplest way to use the component is to pass `supabaseClient` from @supabase
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth } from '@supabase/react-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -45,7 +45,7 @@ Import the theme you want to use and pass it to the `appearence.theme` prop.
 import {
     Auth,
 +   ThemeSupa
-} from '@supabase/react-ui-react'
+} from '@supabase/auth-ui-react'
 
 const App = () => (
     <Auth
@@ -82,7 +82,7 @@ Import the theme you want to use and pass it to the `appearence.theme` prop.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/react-ui-react'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -106,7 +106,7 @@ Auth UI comes with 2 theme variations: `default` and `dark`. You can switch betw
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/react-ui-react'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -132,7 +132,7 @@ The available variable tokens [can be viewed here](https://github.com/supabase-c
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth, ThemeSupa } from '@supabase/react-ui-react'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -165,7 +165,7 @@ The available tokens within a theme [can be viewed here](https://github.com/supa
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth } from '@supabase/react-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -219,7 +219,7 @@ The elements available that can have a CSS classname applied are the following:
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth } from '@supabase/react-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -249,7 +249,7 @@ The elements available that can have CSS inline style applied are the following:
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth } from '@supabase/react-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
@@ -280,7 +280,7 @@ You can add your custom labels to `localization.variables`.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
-import { Auth } from '@supabase/react-ui-react'
+import { Auth } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
   '<INSERT PROJECT URL>',
