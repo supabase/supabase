@@ -28,7 +28,7 @@ export const generateRss = (posts: any[]): string => {
       <lastBuildDate>${dayjs(posts[0].date)
         .utc()
         .format('ddd, DD MMM YYYY HH:hh:mm ZZ')}</lastBuildDate>
-      <atom:link href="https://supabase.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
   </rss>
