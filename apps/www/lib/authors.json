@@ -197,5 +197,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/michelp",
     "author_image_url": "https://github.com/michelp.png"
+  },
+  {
+    "author_id": "joel",
+    "author": "Joel Lee",
+    "username": "j0",
+    "position": "Engineering",
+    "author_url": "https://github.com/j0",
+    "author_image_url": "https://github.com/j0.png"
   }
 ]
