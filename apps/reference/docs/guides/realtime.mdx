@@ -1,0 +1,44 @@
+---
+id: realtime
+title: Realtime
+description: Using Supabase Realtime for multiplayer functionality.
+sidebar_label: Overview
+---
+
+Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime).
+
+You can use this to:
+
+- broadcast messages between users
+- manage shared state between users
+- listen to database changes over websockets
+
+## Realtime Channels
+
+In Realtime, everything is a [_channel_](https://hexdocs.pm/phoenix/channels.html).
+Channels are like chatrooms where participants can join and leave—similar to Slack or Discord channels.
+
+### Broadcast
+
+Broadcast follows the classic Publisher/Subscriber pattern. A client (publisher) “broadcasts” messages using a unique identifier. For example, a user could send a message to a `#random` channel.
+
+Other clients (subscribers) can “listen” to these messages in real-time, using the unique identifier. If they are listening to the `#random` channel, then they will receive the message.
+
+A common use-case for Broadcast is sharing a user's cursor position with other clients in an online game.
+
+### Presence
+
+Presence synchronizes shared state between users.
+Presence is very similar to Broadcast, except that the state is “persisted” in the Channel
+so that new joiners immediately receive the state without waiting for another user to broadcast it.
+In our Slack example, when you turn on Slack you can see who's online without each individual user
+sending an “I'm online” message to the new-joiner. Presence utilizes Broadcast as the transport layer.
+
+The neat thing about Presence is that if a user is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state.
+If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+
+### Database changes
+
+You can subscribe to database changes using Realtime.
+The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
+called `supabase_realtime`, and by managing this publication you can control which data is broadcast.

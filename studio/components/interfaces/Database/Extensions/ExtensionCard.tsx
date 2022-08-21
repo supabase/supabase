@@ -4,7 +4,6 @@ import { Badge, IconLoader, Toggle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { EXTENSIONS_IN_OWN_SCHEMA } from './Extensions.constants'
 import EnableExtensionModal from './EnableExtensionModal'
 
 interface Props {
@@ -19,40 +18,7 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
   async function enableExtension() {
-    if (EXTENSIONS_IN_OWN_SCHEMA.includes(extension.name)) {
-      return setShowConfirmEnableModal(true)
-    }
-
-    confirmAlert({
-      title: 'Confirm to enable extension',
-      message: `Are you sure you want to turn ON "${extension.name}" extension?`,
-      onAsyncConfirm: async () => {
-        try {
-          setLoading(true)
-          const response = await meta.extensions.create({
-            name: extension.name,
-            schema: 'extensions',
-            version: extension.default_version,
-            cascade: true,
-          })
-          if (response.error) {
-            throw response.error
-          } else {
-            ui.setNotification({
-              category: 'success',
-              message: `${extension.name.toUpperCase()} is on.`,
-            })
-          }
-        } catch (error: any) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to toggle ${extension.name.toUpperCase()}: ${error.message}`,
-          })
-        } finally {
-          setLoading(false)
-        }
-      },
-    })
+    return setShowConfirmEnableModal(true)
   }
 
   async function disableExtension() {
