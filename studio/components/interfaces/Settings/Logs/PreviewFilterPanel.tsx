@@ -117,7 +117,9 @@ const PreviewFilterPanel: FC<Props> = ({
       setShowUpgradePrompt(!showUpgradePrompt)
     }
 
-    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
+    if (!shouldShowUpgradePrompt) {
+      onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
+    }
   }
   return (
     <div
