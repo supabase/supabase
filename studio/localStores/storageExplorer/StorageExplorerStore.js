@@ -629,10 +629,13 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
+    const infoToastId = toast('Please do not close the browser until the upload is completed', {
+      duration: Infinity,
+    })
     const toastId = toast.loading(
       `Uploading ${formattedFilesToUpload.length} file${
         formattedFilesToUpload.length > 1 ? 's' : ''
-      }...`
+      }`
     )
 
     // Upload files in batches
@@ -747,8 +750,9 @@ class StorageExplorerStore {
         category: 'error',
       })
     }
-    const t2 = new Date()
+    toast.dismiss(infoToastId)
 
+    const t2 = new Date()
     console.log(
       `Total time taken for ${formattedFilesToUpload.length} files: ${(t2 - t1) / 1000} seconds`
     )
@@ -759,6 +763,10 @@ class StorageExplorerStore {
     const formattedNewPathToFile = newPaths.join('/')
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
+
+    const infoToastId = toast('Please do not close the browser until the delete is completed', {
+      duration: Infinity,
+    })
 
     await Promise.all(
       this.selectedItemsToMove.map(async (item) => {
@@ -799,6 +807,8 @@ class StorageExplorerStore {
       })
     }
 
+    toast.dismiss(infoToastId)
+
     // Clear file preview cache if moved files exist in cache
     const idsOfItemsToMove = this.selectedItemsToMove.map((item) => item.id)
     const updatedFilePreviewCache = this.filePreviewCache.filter(
@@ -838,6 +848,9 @@ class StorageExplorerStore {
 
   deleteFiles = async (files, isDeleteFolder = false) => {
     this.closeFilePreview()
+    const infoToastId = toast('Please do not close the browser until the delete is completed', {
+      duration: Infinity,
+    })
 
     // If every file has the 'prefix' property, then just construct the prefix
     // directly (from delete folder). Otherwise go by the opened folders.
@@ -891,11 +904,12 @@ class StorageExplorerStore {
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
     }
+    toast.dismiss(infoToastId)
   }
 
   downloadSelectedFiles = async () => {
     const showIndividualToast = false
-    const toastId = toast(`Retrieving ${this.selectedItems.length} files...`, {
+    const toastId = toast.loading(`Retrieving ${this.selectedItems.length} files...`, {
       autoClose: false,
       hideProgressBar: true,
     })
@@ -1159,6 +1173,13 @@ class StorageExplorerStore {
 
   renameFolder = async (folder, newName, columnIndex) => {
     const originalName = folder.name
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: `Renaming folder to ${newName}`,
+    })
+    const infoToastId = toast('Please do not close the browser until the rename is completed', {
+      duration: Infinity,
+    })
 
     /**
      * Catch any folder names that contain slash or backslash
@@ -1219,11 +1240,13 @@ class StorageExplorerStore {
 
         if (!hasErrors) {
           this.ui.setNotification({
+            id: toastId,
             message: `Successfully renamed folder to ${newName}`,
             category: 'success',
           })
         } else {
           this.ui.setNotification({
+            id: toastId,
             message: `Renamed folder to ${newName} with some errors`,
             category: 'error',
           })
@@ -1238,11 +1261,13 @@ class StorageExplorerStore {
         this.filePreviewCache = updatedFilePreviewCache
       } catch (e) {
         this.ui.setNotification({
+          id: toastId,
           message: `Failed to rename folder to ${newName}`,
           category: 'error',
         })
       }
     }
+    toast.dismiss(infoToastId)
   }
 
   /*
