@@ -41,6 +41,12 @@ const RestartServerButton: FC<Props> = ({ project }) => {
   }
 
   const requestDatabaseRestart = async () => {
+    if (!canRestartProject) {
+      return ui.setNotification({
+        category: 'error',
+        message: 'You do not have the required permissions to restart this project',
+      })
+    }
     setLoading(true)
     const res = await post(`${API_URL}/projects/${projectRef}/restart-services`, {
       restartRequest: {
