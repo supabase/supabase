@@ -178,7 +178,7 @@ pages:
         description: The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
         js: |
           ```js
-          const { data, error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabase.auth.signInWithOtp({
             phone: '+13334445555',
           })
           ```
