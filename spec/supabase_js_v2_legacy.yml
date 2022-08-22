@@ -1314,7 +1314,7 @@ pages:
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+        - `objects` permissions: `insert` and `select`
     examples:
       - name: Copy file
         isSpotlight: true
