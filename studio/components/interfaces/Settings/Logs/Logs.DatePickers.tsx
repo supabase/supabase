@@ -2,7 +2,12 @@ import { Alert, Button, Dropdown, IconClock } from '@supabase/ui'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
+import {
+  DatetimeHelper,
+  getDefaultHelper,
+  LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
+  maybeShowUpgradePrompt,
+} from '.'
 
 interface Props {
   to: string
@@ -15,9 +20,14 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
 
   const handleHelperChange = (newValue: string) => {
-    setHelperValue(newValue)
-
     const selectedHelper = helpers.find((h) => h.text === newValue)
+    const fromTime = selectedHelper?.calcFrom()
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(fromTime)
+
+    if (!shouldShowUpgradePrompt) {
+      setHelperValue(newValue)
+    }
+
     if (onChange && selectedHelper) {
       onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
     }
