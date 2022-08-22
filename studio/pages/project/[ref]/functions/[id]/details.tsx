@@ -98,6 +98,14 @@ const PageLayout: NextPageWithLayout = () => {
   const apiKeys = apiService?.service_api_keys ?? []
   const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
 
+  const endpoint = apiService?.app_config.endpoint ?? ''
+  const endpointSections = endpoint.split('.')
+  const functionsEndpoint = [
+    ...endpointSections.slice(0, 1),
+    'functions',
+    ...endpointSections.slice(1),
+  ].join('.')
+
   const invokeCommands: any = [
     {
       command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
@@ -107,9 +115,9 @@ const PageLayout: NextPageWithLayout = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/{selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON
-            KEY]' {`--data '{"name":"Functions"}'`}
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{functionsEndpoint}/
+            {selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },
