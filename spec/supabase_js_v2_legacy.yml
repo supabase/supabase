@@ -1375,7 +1375,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase
+          const { data } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')

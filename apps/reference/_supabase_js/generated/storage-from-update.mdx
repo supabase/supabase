@@ -38,7 +38,7 @@ const { data, error } = await supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
 
   </div>
   
@@ -304,7 +304,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-the `Cache-Control: max-age=<seconds>` seconds value.
+The number of seconds the asset is cached in the browser and in the Supabase CDN. Defaults to 3600 seconds. This is set in the `Cache-Control: max-age=<seconds>` header.
 
   </div>
   
@@ -344,7 +344,7 @@ the `Content-Type` header value. Should be specified if using a `fileBody` that 
   </h4>
   <div class="method-list-item-description">
 
-whether to perform an upsert
+When upsert is set to true, the file will be overwritten if it exists. When set to false, an error will be thrown if the object already exists. Defaults to false.
 
   </div>
   
