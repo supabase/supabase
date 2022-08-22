@@ -46,12 +46,13 @@ This function should only be called on a server. Never expose your `service_role
 
 ## Notes
 
+- The `deleteUser()` method requires the user's id which maps to the `auth.users.id` column.
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 
-### Remove a user completely.
+### Remove a user completely
 
 ```js
 const { data, error } = await supabase.auth.admin.deleteUser(

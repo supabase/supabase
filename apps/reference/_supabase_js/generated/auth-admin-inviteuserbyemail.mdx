@@ -111,10 +111,11 @@ A URL or mobile address to send the user to after they are confirmed.
 
 - Requires a `service_role` key.
 - This function should only be called on a server. Never expose your `service_role` key in the browser.
+- Sends an invite link to the user's email address.
 
 ## Examples
 
-### Basic example.
+### Invite a user
 
 ```js
 const { data, error } = await supabase.auth.admin.inviteUserByEmail(

@@ -250,11 +250,11 @@ this attribute is used instead of UserAttributes data.
 
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
-- If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
+- To confirm the user's email or phone number, you will need to set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
 
 ## Examples
 
-### Create a new user.
+### Create a new user with custom user metadata
 
 ```js
 const { data, error } = await supabase.auth.admin.createUser({
@@ -264,7 +264,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 })
 ```
 
-### Auto-confirm email.
+### Auto-confirm the user's email
 
 ```js
 const { data, error } = await supabase.auth.admin.createUser({
@@ -273,7 +273,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 })
 ```
 
-### Auto-confirm phone.
+### Auto-confirm the user's phone number
 
 ```js
 const { data, error } = await supabase.auth.admin.createUser({
