@@ -118,15 +118,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setShowUpgradePrompt(!showUpgradePrompt)
     }
 
-    setParams((prev) => ({
-      ...prev,
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
-    }))
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, its: from || '', ite: to || '' },
-    })
+    if (!shouldShowUpgradePrompt) {
+      setParams((prev) => ({
+        ...prev,
+        iso_timestamp_start: from || '',
+        iso_timestamp_end: to || '',
+      }))
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, its: from || '', ite: to || '' },
+      })
+    }
   }
 
   return (
