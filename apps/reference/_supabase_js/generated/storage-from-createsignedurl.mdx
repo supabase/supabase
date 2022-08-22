@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Create signed URL to download file without requiring permissions. This URL can be valid for a set number of seconds.
+Create a signed URL. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time.
 
 ```js
 const { data, error } = await supabase.storage
@@ -34,7 +34,7 @@ const { data, error } = await supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-The file path to be downloaded, including the current file name. For example `folder/image.png`.
+The file path, including the current file name. For example `folder/image.png`.
 
   </div>
   

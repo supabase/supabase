@@ -473,7 +473,7 @@
 															"kindString": "Property",
 															"flags": {},
 															"comment": {
-																"shortText": "The visibility of the bucket. By default, buckets are not public."
+																"shortText": "The visibility of the bucket. By default, buckets are not public. Public buckets don't require an authorization token to download objects, but still require an valid token for all other operations."
 															},
 															"sources": [
 																{
@@ -2421,7 +2421,7 @@
 								"isOptional": true
 							},
 							"comment": {
-								"shortText": "the `Cache-Control: max-age=<seconds>` seconds value."
+								"shortText": "The number of seconds the asset is cached in the browser and in the Supabase CDN. Defaults to 3600 seconds. This is set in the `Cache-Control: max-age=<seconds>` header."
 							},
 							"sources": [
 								{
@@ -2467,7 +2467,7 @@
 								"isOptional": true
 							},
 							"comment": {
-								"shortText": "whether to perform an upsert"
+								"shortText": "When upsert is set to true, the file will be overwritten if it exists. When set to false, an error will be thrown if the object already exists. Defaults to false."
 							},
 							"sources": [
 								{
@@ -3047,7 +3047,7 @@
 															"kindString": "Property",
 															"flags": {},
 															"comment": {
-																"shortText": "The visibility of the bucket. By default, buckets are not public."
+																"shortText": "The visibility of the bucket. By default, buckets are not public. Public buckets don't require an authorization token to download objects, but still require an valid token for all other operations."
 															},
 															"sources": [
 																{
@@ -4482,7 +4482,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Copies an existing file."
+										"shortText": "Copies an existing file to a new path in the same bucket."
 									},
 									"parameters": [
 										{
@@ -4703,7 +4703,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Create signed URL to download file without requiring permissions. This URL can be valid for a set number of seconds."
+										"shortText": "Create a signed URL. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time."
 									},
 									"parameters": [
 										{
@@ -4713,7 +4713,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "The file path to be downloaded, including the current file name. For example `folder/image.png`."
+												"shortText": "The file path, including the current file name. For example `folder/image.png`."
 											},
 											"type": {
 												"type": "intrinsic",
@@ -4924,7 +4924,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Create signed URLs to download files without requiring permissions. These URLs can be valid for a set number of seconds."
+										"shortText": "This is the batch endpoint for creating multiple signed URLs. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time."
 									},
 									"parameters": [
 										{
@@ -5217,7 +5217,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "The file path to be downloaded, including the path and file name. For example `folder/image.png`.\n"
+												"shortText": "The file to be downloaded, including the path and file name. For example `folder/image.png`.\n"
 											},
 											"type": {
 												"type": "intrinsic",
@@ -5369,7 +5369,7 @@
 							"sources": [
 								{
 									"fileName": "src/packages/StorageFileApi.ts",
-									"line": 376,
+									"line": 377,
 									"character": 2
 								}
 							],
@@ -5381,7 +5381,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Retrieve URLs for assets in public buckets and encapsulates it in a return object"
+										"shortText": "Retrieve the URL for an asset in a public bucket.\nThis function does not actually verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset."
 									},
 									"parameters": [
 										{
@@ -5391,7 +5391,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "The file path to be downloaded, including the path and file name. For example `folder/image.png`.\n"
+												"shortText": "The path and name of the file to generate the public URL for. For example `folder/image.png`.\n"
 											},
 											"type": {
 												"type": "intrinsic",
@@ -5417,7 +5417,7 @@
 													"sources": [
 														{
 															"fileName": "src/packages/StorageFileApi.ts",
-															"line": 376,
+															"line": 377,
 															"character": 32
 														}
 													],
@@ -5439,7 +5439,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 376,
+																			"line": 377,
 																			"character": 40
 																		}
 																	],
@@ -5485,7 +5485,7 @@
 							"sources": [
 								{
 									"fileName": "src/packages/StorageFileApi.ts",
-									"line": 482,
+									"line": 483,
 									"character": 8
 								}
 							],
@@ -5569,7 +5569,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 488,
+																			"line": 489,
 																			"character": 8
 																		}
 																	],
@@ -5591,7 +5591,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 489,
+																			"line": 490,
 																			"character": 8
 																		}
 																	],
@@ -5631,7 +5631,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 492,
+																			"line": 493,
 																			"character": 8
 																		}
 																	],
@@ -5649,7 +5649,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 493,
+																			"line": 494,
 																			"character": 8
 																		}
 																	],
@@ -5703,7 +5703,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Moves an existing file."
+										"shortText": "Moves an existing file to a new path in the same bucket."
 									},
 									"parameters": [
 										{
@@ -5912,7 +5912,7 @@
 							"sources": [
 								{
 									"fileName": "src/packages/StorageFileApi.ts",
-									"line": 386,
+									"line": 387,
 									"character": 8
 								}
 							],
@@ -5969,7 +5969,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 390,
+																			"line": 391,
 																			"character": 8
 																		}
 																	],
@@ -5991,7 +5991,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 391,
+																			"line": 392,
 																			"character": 8
 																		}
 																	],
@@ -6031,7 +6031,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 394,
+																			"line": 395,
 																			"character": 8
 																		}
 																	],
@@ -6049,7 +6049,7 @@
 																	"sources": [
 																		{
 																			"fileName": "src/packages/StorageFileApi.ts",
-																			"line": 395,
+																			"line": 396,
 																			"character": 8
 																		}
 																	],
@@ -6113,7 +6113,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload."
+												"shortText": "The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update."
 											},
 											"type": {
 												"type": "intrinsic",

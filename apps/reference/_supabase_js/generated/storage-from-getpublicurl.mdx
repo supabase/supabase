@@ -8,10 +8,11 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Retrieve URLs for assets in public buckets and encapsulates it in a return object
+Retrieve the URL for an asset in a public bucket.
+This function does not actually verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
 
 ```js
-const { data, error } = supabase.storage
+const { data } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
@@ -34,7 +35,7 @@ const { data, error } = supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-The file path to be downloaded, including the path and file name. For example `folder/image.png`.
+The path and name of the file to generate the public URL for. For example `folder/image.png`.
 
   </div>
   
@@ -54,7 +55,7 @@ The file path to be downloaded, including the path and file name. For example `f
 ### Returns the URL for an asset in a public bucket
 
 ```js
-const { data, error } = supabase.storage
+const { data } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
