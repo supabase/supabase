@@ -356,6 +356,62 @@
         "tags": ["projects"],
         "security": [{ "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/pgsodium": {
+      "get": {
+        "operationId": "getConfig",
+        "summary": "Gets project's pgsodium config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdatePgsodiumConfigBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update project's pgsodium config" }
+        },
+        "tags": ["pgsodium (beta)"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -474,6 +530,11 @@
           "value": { "type": "string", "pattern": {} }
         },
         "required": ["name", "value"]
+      },
+      "UpdatePgsodiumConfigBody": {
+        "type": "object",
+        "properties": { "root_key": { "type": "string" } },
+        "required": ["root_key"]
       }
     }
   }

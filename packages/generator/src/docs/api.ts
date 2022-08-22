@@ -17,6 +17,7 @@ export default async function gen(
 
   switch (spec.openapi || spec.swagger) {
     case '3.0.0':
+    case '3.0.3':
       await gen_v3(spec, outputDir, { apiUrl })
       break
 

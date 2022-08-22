@@ -162,7 +162,7 @@ We need the API URL and the `anon` key that you copied [earlier](#get-the-api-ke
 These variables will be exposed on the browser, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js title="lib/supabase.ts"
+```ts title="lib/supabase.ts"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js'
 
@@ -182,7 +182,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 Let's set up a React Native component to manage logins and sign ups.
 Users would be able to sign in with their email and password.
 
-```jsx title="components/Auth.tsx"
+```tsx title="components/Auth.tsx"
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
 import { supabase } from '../lib/supabase'
@@ -278,7 +278,7 @@ After a user is signed in we can allow them to edit their profile details and ma
 
 Let's create a new component for that called `Account.tsx`.
 
-```jsx title="components/Account.tsx"
+```tsx title="components/Account.tsx"
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { StyleSheet, View, Alert } from "react-native";
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
 
 Now that we have all the components in place, let's update `App.tsx`:
 
-```jsx title="App.tsx"
+```tsx title="App.tsx"
 import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
@@ -423,7 +423,7 @@ import { View } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 
 export default function App() {
-  const [session, setSession] = (useState < Session) | (null > null)
+  const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
     setSession(supabase.auth.session())
@@ -463,7 +463,7 @@ photos and videos.
 Let's create an avatar for the user so that they can upload a profile photo.
 We can start by creating a new component:
 
-```jsx title="components/Avatar.js"
+```jsx title="components/Avatar.jsx"
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Alert, StyleSheet, View, Image } from 'react-native'
