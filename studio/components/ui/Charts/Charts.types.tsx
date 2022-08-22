@@ -1,9 +1,9 @@
-export type HeaderType<Datum> = {
+export type HeaderType<D> = {
   attribute: string
   focus: number | null
   format?: string
   highlightedValue?: number
-  data?: Datum[]
+  data?: D[]
   customDateFormat?: string
   label: string
   minimalHeader?: boolean
