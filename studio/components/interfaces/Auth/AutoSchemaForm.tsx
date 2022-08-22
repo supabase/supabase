@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useStore, useFlag, checkPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -19,6 +20,8 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
+
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
@@ -94,6 +97,12 @@ const AutoSchemaForm = observer(() => {
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
                   />
                 </div>
               }
@@ -106,6 +115,7 @@ const AutoSchemaForm = observer(() => {
                     label="Allow new users to sign up"
                     layout="flex"
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>
@@ -119,6 +129,7 @@ const AutoSchemaForm = observer(() => {
                     size="small"
                     label="Site URL"
                     descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     id="JWT_EXP"
@@ -126,6 +137,7 @@ const AutoSchemaForm = observer(() => {
                     label="JWT expiry limit"
                     descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
                     actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
@@ -134,6 +146,7 @@ const AutoSchemaForm = observer(() => {
                     label="Reuse Interval"
                     descriptionText="Time interval where the same refresh token can be used to request for an access token."
                     actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>
@@ -145,6 +158,7 @@ const AutoSchemaForm = observer(() => {
                     label="hCaptcha protection"
                     layout="flex"
                     descriptionText="If enabled, protects auth endpoints from abuse."
+                    disabled={!canUpdateConfig}
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <Input
@@ -152,6 +166,7 @@ const AutoSchemaForm = observer(() => {
                       type={hidden ? 'password' : 'text'}
                       size="small"
                       label="hCaptcha secret"
+                      disabled={!canUpdateConfig}
                       actions={
                         <Button
                           icon={hidden ? <IconEye /> : <IconEyeOff />}
