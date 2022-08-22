@@ -125,7 +125,7 @@ const SQLEditor: FC<Props> = ({ queryId, templateId }) => {
   }
 
   const onSelectFavourite = () => {
-    console.log('Favourite query')
+    // console.log('Favourite query')
   }
 
   return (

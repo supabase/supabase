@@ -34,29 +34,27 @@ We provide a SQL editor within the Dashboard, or you can [connect](/docs/guides/
 and run the SQL queries yourself.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'Dashboard', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  groupId="dashboard-or-sql"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
 </video>
 
-```sh
-1. Go to the "Table editor" section.
-2. Click "New Table".
-3. Enter the table name "todos".
-4. Click "Save".
-5. Click "New Column".
-6. Enter the column name "task" and make the type "text".
-7. Click "Save".
-```
+1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+2. Click **New Table** and create a table with the name `todos`.
+3. Click **Save**.
+4. Click **New Column** and create a column with the name `task` and type `text`.
+5. Click **Save**.
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 create table movies (
@@ -69,7 +67,9 @@ create table movies (
 </TabItem>
 </Tabs>
 
-It is best practice to use lowercase and underscores when naming tables. For example: `table_name`, not `Table Name`.
+:::note
+When naming tables, use lowercase and underscores instead of spaces (e.g., `table_name`, not `Table Name`).
+:::
 
 ## Columns
 
@@ -173,13 +173,14 @@ Use the "Bulk Loading" instructions if you are loading large data sets.
 ### Basic data loading
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JavaScript', value: 'JS'},
-  {label: 'Dart', value: 'DART'},
-]}>
-<TabItem value="SQL">
+  defaultValue="sql"
+  values={[
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Dart', value: 'dart'},
+  ]}>
+
+<TabItem value="sql">
 
 ```sql
 insert into movies
@@ -190,7 +191,8 @@ values
 ```
 
 </TabItem>
-<TabItem value="JS">
+
+<TabItem value="javascript">
 
 ```sql
 const { data, error } = await supabase
@@ -205,7 +207,8 @@ const { data, error } = await supabase
 ```
 
 </TabItem>
-<TabItem value="DART">
+
+<TabItem value="dart">
 
 ```sql
 final res = await supabase
@@ -270,12 +273,28 @@ For example if you had the following situations:
 - An `actor` can perfom in several movies.
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'Dashboard', value: 'UI'},
-]}>
-<TabItem value="SQL">
+  groupId="dashboard-or-sql"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+<iframe
+  className="video-with-border w-full"
+  width="640"
+  height="420"
+  src="https://www.youtube-nocookie.com/embed/TKwF3IGij5c"
+  frameBorder="1"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+</TabItem>
+
+<TabItem value="sql">
 
 ```sql
 create table movies (
@@ -295,19 +314,6 @@ create table performances (
   actor_id bigint not null references actors
 );
 ```
-
-</TabItem>
-<TabItem value="UI">
-
-<iframe
-  className="video-with-border w-full"
-  width="640"
-  height="420"
-  src="https://www.youtube-nocookie.com/embed/TKwF3IGij5c"
-  frameBorder="1"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
 
 </TabItem>
 </Tabs>

@@ -1,0 +1,2022 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Supabase Storage API",
+    "description": "API documentation for Supabase Storage",
+    "version": "0.0.1"
+  },
+  "components": {
+    "schemas": {
+      "def-0": {
+        "type": "object",
+        "properties": {
+          "authorization": {
+            "type": "string",
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        },
+        "required": [
+          "authorization"
+        ],
+        "title": "authSchema"
+      },
+      "def-1": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ],
+        "title": "errorSchema"
+      }
+    }
+  },
+  "paths": {
+    "/bucket/": {
+      "post": {
+        "summary": "Create a bucket",
+        "tags": [
+          "bucket"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "avatars"
+                  },
+                  "id": {
+                    "type": "string",
+                    "example": "avatars"
+                  },
+                  "public": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "avatars"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Gets all buckets",
+        "tags": [
+          "bucket"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "owner": {
+                        "type": "string"
+                      },
+                      "public": {
+                        "type": "boolean"
+                      },
+                      "created_at": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "title": "bucketSchema",
+                    "example": {
+                      "id": "bucket2",
+                      "name": "bucket2",
+                      "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                      "created_at": "2021-02-17T04:43:32.770206+00:00",
+                      "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                    }
+                  },
+                  "example": [
+                    {
+                      "id": "bucket2",
+                      "name": "bucket2",
+                      "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                      "created_at": "2021-02-17T04:43:32.770206+00:00",
+                      "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                    }
+                  ]
+                },
+                "example": [
+                  {
+                    "id": "bucket2",
+                    "name": "bucket2",
+                    "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                    "created_at": "2021-02-17T04:43:32.770206+00:00",
+                    "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                  }
+                ]
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bucket/{bucketId}/empty": {
+      "post": {
+        "summary": "Empty a bucket",
+        "tags": [
+          "bucket"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketId",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully emptied"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bucket/{bucketId}": {
+      "get": {
+        "summary": "Get details of a bucket",
+        "tags": [
+          "bucket"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketId",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "public": {
+                      "type": "boolean"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "example": {
+                    "id": "bucket2",
+                    "name": "bucket2",
+                    "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                    "created_at": "2021-02-17T04:43:32.770206+00:00",
+                    "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                  }
+                },
+                "example": {
+                  "id": "bucket2",
+                  "name": "bucket2",
+                  "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                  "created_at": "2021-02-17T04:43:32.770206+00:00",
+                  "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update properties of a bucket",
+        "tags": [
+          "bucket"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "public": {
+                    "type": "boolean",
+                    "example": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully updated"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a bucket",
+        "tags": [
+          "bucket"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketId",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/{bucketName}/{wildcard}": {
+      "delete": {
+        "summary": "Delete an object",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get object",
+        "tags": [
+          "deprecated"
+        ],
+        "description": "use GET /object/authenticated/{bucketName} instead",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update the object at an existing key",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": {
+                      "type": "string",
+                      "example": "projectref/avatars/folder/cat.png"
+                    }
+                  },
+                  "required": [
+                    "Key"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload a new object",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": {
+                      "type": "string",
+                      "example": "avatars/folder/cat.png"
+                    }
+                  },
+                  "required": [
+                    "Key"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/{bucketName}": {
+      "delete": {
+        "summary": "Delete multiple objects",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prefixes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "example": [
+                      "folder/cat.png",
+                      "folder/morecats.png"
+                    ]
+                  }
+                },
+                "required": [
+                  "prefixes"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "bucket_id": {
+                        "type": "string"
+                      },
+                      "owner": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "updated_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "created_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "last_accessed_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "metadata": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "buckets": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "owner": {
+                            "type": "string"
+                          },
+                          "public": {
+                            "type": "boolean"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "additionalProperties": false,
+                        "example": {
+                          "id": "bucket2",
+                          "name": "bucket2",
+                          "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                          "created_at": "2021-02-17T04:43:32.770206+00:00",
+                          "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                        }
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "title": "objectSchema",
+                    "example": {
+                      "name": "folder/cat.png",
+                      "bucket_id": "avatars",
+                      "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
+                      "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
+                      "updated_at": "2021-04-06T16:30:35.394674+00:00",
+                      "created_at": "2021-04-06T16:30:35.394674+00:00",
+                      "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
+                      "metadata": {
+                        "size": 1234
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/authenticated/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Retrieve an object",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/sign/{bucketName}/{wildcard}": {
+      "post": {
+        "summary": "Generate a presigned url to retrieve an object",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expiresIn": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 60000
+                  }
+                },
+                "required": [
+                  "expiresIn"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "signedURL": {
+                      "type": "string",
+                      "example": "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+                    }
+                  },
+                  "required": [
+                    "signedURL"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve an object via a presigned URL",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk"
+            },
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk",
+            "in": "query",
+            "name": "token",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/sign/{bucketName}": {
+      "post": {
+        "summary": "Generate presigned urls to retrieve objects",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expiresIn": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 60000
+                  },
+                  "paths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "example": [
+                      "folder/cat.png",
+                      "folder/morecats.png"
+                    ]
+                  }
+                },
+                "required": [
+                  "expiresIn",
+                  "paths"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "error": [
+                          "string",
+                          "null"
+                        ],
+                        "example": "Either the object does not exist or you do not have access to it"
+                      },
+                      "path": {
+                        "type": "string",
+                        "example": "folder/cat.png"
+                      },
+                      "signedURL": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "example": "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+                      }
+                    },
+                    "required": [
+                      "error",
+                      "path",
+                      "signedURL"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/move": {
+      "post": {
+        "summary": "Moves an object",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bucketId": {
+                    "type": "string",
+                    "example": "avatars"
+                  },
+                  "sourceKey": {
+                    "type": "string",
+                    "example": "folder/cat.png"
+                  },
+                  "destinationKey": {
+                    "type": "string",
+                    "example": "folder/newcat.png"
+                  }
+                },
+                "required": [
+                  "bucketId",
+                  "sourceKey",
+                  "destinationKey"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully moved"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/list/{bucketName}": {
+      "post": {
+        "summary": "Search for objects under a prefix",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prefix": {
+                    "type": "string",
+                    "example": "folder/subfolder"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 10
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 0
+                  },
+                  "sortBy": {
+                    "type": "object",
+                    "properties": {
+                      "column": {
+                        "type": "string",
+                        "enum": [
+                          "name",
+                          "updated_at",
+                          "created_at",
+                          "last_accessed_at"
+                        ]
+                      },
+                      "order": {
+                        "type": "string",
+                        "enum": [
+                          "asc",
+                          "desc"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "column"
+                    ]
+                  },
+                  "search": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "prefix"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "bucket_id": {
+                        "type": "string"
+                      },
+                      "owner": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "updated_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "created_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "last_accessed_at": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "metadata": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": true
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "buckets": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "owner": {
+                            "type": "string"
+                          },
+                          "public": {
+                            "type": "boolean"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "additionalProperties": false,
+                        "example": {
+                          "id": "bucket2",
+                          "name": "bucket2",
+                          "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                          "created_at": "2021-02-17T04:43:32.770206+00:00",
+                          "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                        }
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "example": {
+                      "name": "folder/cat.png",
+                      "bucket_id": "avatars",
+                      "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
+                      "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
+                      "updated_at": "2021-04-06T16:30:35.394674+00:00",
+                      "created_at": "2021-04-06T16:30:35.394674+00:00",
+                      "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
+                      "metadata": {
+                        "size": 1234
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/copy": {
+      "post": {
+        "summary": "Copies an object",
+        "tags": [
+          "object"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sourceKey": {
+                    "type": "string",
+                    "example": "folder/source.png"
+                  },
+                  "bucketId": {
+                    "type": "string",
+                    "example": "avatars"
+                  },
+                  "destinationKey": {
+                    "type": "string",
+                    "example": "folder/destination.png"
+                  }
+                },
+                "required": [
+                  "sourceKey",
+                  "bucketId",
+                  "destinationKey"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": {
+                      "type": "string",
+                      "example": "folder/destination.png"
+                    }
+                  },
+                  "required": [
+                    "Key"
+                  ]
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/object/public/{bucketName}/{wildcard}": {
+      "get": {
+        "summary": "Retrieve an object from a public bucket",
+        "tags": [
+          "object"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "avatars"
+            },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "folder/cat.png"
+            },
+            "example": "folder/cat.png",
+            "in": "path",
+            "name": "*",
+            "required": true
+          }
+        ],
+        "responses": {
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Error response",
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
+                  "title": "errorSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "object",
+      "description": "Object end-points"
+    },
+    {
+      "name": "bucket",
+      "description": "Bucket end-points"
+    },
+    {
+      "name": "deprecated",
+      "description": "Deprecated end-points"
+    }
+  ]
+}

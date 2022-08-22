@@ -156,11 +156,13 @@ export const LogsPreviewer: React.FC<Props> = ({
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
+            projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
+            params={params}
           />
         </LoadingOpacity>
         {!error && (
@@ -168,7 +170,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
-            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''}/>
+            <UpgradePrompt projectRef={projectRef} from={params.iso_timestamp_start || ''} />
           </div>
         )}
         {error && (

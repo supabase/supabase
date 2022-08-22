@@ -1,0 +1,65 @@
+---
+id: extensions
+title: Overview
+description: Using Postgres extensions.
+---
+
+import ExtensionsComponent from '@site/src/components/Extensions'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Extensions are exactly as they sound - they "extend" the database with functionality which isn't part of the Postgres core.
+Supabase has pre-installed some of the most useful open source extensions.
+
+### Enable and disable extensions
+
+<Tabs
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click **Extensions** in the sidebar.
+3. Enable or disable an extension.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="/docs/videos/toggle-extensions.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+</TabItem>
+
+<TabItem value="sql">
+
+```sql
+-- Example: enable the "pgtap" extension and ensure it is installed
+create extension pgtap with schema extensions;
+
+-- Example: disable the "pgtap" extension
+drop extension pgtap;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension call `drop extension`.
+
+:::caution
+Enabling some extensions with `create extension <extension-name> with schema extensions` may lead to permission issues (e.g., `dblink`, `http`, `pg_cron`).
+:::
+
+</TabItem>
+
+</Tabs>
+
+### Full list of extensions
+
+Supabase is pre-configured with over 50 extensions. You can also install your own SQL extensions directly in the database through our SQL editor.
+
+<ExtensionsComponent />

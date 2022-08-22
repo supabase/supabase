@@ -1,0 +1,33 @@
+---
+id: maybesingle
+title: 'maybeSingle()'
+slug: /maybesingle
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Retrieves at most one row from the result. Result must be at most one row
+(e.g. using `eq` on a UNIQUE column), otherwise this will result in an
+error.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'Singapore')
+  .maybeSingle()
+```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .eq('name', 'Singapore')
+  .maybeSingle()
+```

@@ -8,6 +8,7 @@ function ConfirmModal({
   onConfirm,
   onAsyncConfirm,
   variant = 'danger',
+  confirmText = 'Confirm',
 }) {
   const [loading, setLoading] = useState(false)
 
@@ -46,7 +47,7 @@ function ConfirmModal({
             Cancel
           </Button>
           <Button type="primary" onClick={() => onConfirmClick()} loading={loading}>
-            Confirm
+            {confirmText}
           </Button>
         </div>
       }

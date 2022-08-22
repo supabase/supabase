@@ -1,0 +1,107 @@
+---
+id: lte
+title: '.lte()'
+slug: /lte
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lte('country_id', 250)
+  .execute();
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      value
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The value to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .lte('country_id', 250)
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .lte('country_id', 250)
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .lte('country_id', 250)
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .lte('country_id', 250)
+  .execute();
+```

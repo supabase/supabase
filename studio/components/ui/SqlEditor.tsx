@@ -4,12 +4,12 @@ import { Typography } from '@supabase/ui'
 import { useStore } from 'hooks'
 
 interface Props {
-  contextmenu?: boolean;
-  defaultValue?: string;
-  language?: string;
-  onInputChange?: OnChange;
-  queryId?: string;
-  readOnly?: boolean;
+  contextmenu?: boolean
+  defaultValue?: string
+  language?: string
+  onInputChange?: OnChange
+  queryId?: string
+  readOnly?: boolean
 }
 
 const SqlEditor: FC<Props> = ({

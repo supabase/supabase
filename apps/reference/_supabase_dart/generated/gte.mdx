@@ -1,0 +1,61 @@
+---
+id: gte
+title: '.gte()'
+slug: /gte
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('country_id', 250)
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .gte('country_id', 250)
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .gte('country_id', 250)
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .gte('country_id', 250)
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities')
+  .gte('country_id', 250)
+  .execute();
+```

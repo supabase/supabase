@@ -1,3 +1,3 @@
 export interface ServiceError {
-  message: string;
+  message: string
 }
