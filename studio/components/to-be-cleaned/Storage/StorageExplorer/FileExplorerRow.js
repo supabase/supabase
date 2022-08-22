@@ -218,35 +218,27 @@ const FileExplorerRow = ({
       `}
       >
         <div className="w-full flex flex-grow items-center">
-          {/* Row Checkbox / Row Icon */}
+          <Checkbox
+            label={''}
+            className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+              isSelected ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'
+            }`}
+            checked={isSelected}
+            onChange={() => onCheckItem(itemWithColumnIndex)}
+          />
           <div
-            className="relative group"
+            className="relative group flex items-center"
             style={{ minWidth: view === STORAGE_VIEWS.COLUMNS ? '10%' : 'auto' }}
             onClick={(event) => event.stopPropagation()}
           >
-            {!isSelected && (
-              <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
-                style={{ top: '2px' }}
-              >
-                <RowIcon
-                  view={view}
-                  status={item.status}
-                  fileType={item.type}
-                  mimeType={item.metadata?.mimetype}
-                />
-              </div>
-            )}
-            <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              }`}
-              checked={isSelected}
-              onChange={() => onCheckItem(itemWithColumnIndex)}
-            />
+            <div>
+              <RowIcon
+                view={view}
+                status={item.status}
+                fileType={item.type}
+                mimeType={item.metadata?.mimetype}
+              />
+            </div>
           </div>
 
           {/* Row Text */}
