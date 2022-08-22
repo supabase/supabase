@@ -114,7 +114,9 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
   const onRowsDelete = () => {
     confirmAlert({
       title: 'Confirm to delete',
-      message: `Are you sure you want to delete the selected ${selectedRows.size} rows? This action cannot be undone.`,
+      message: `Are you sure you want to delete the selected ${selectedRows.size} row${
+        selectedRows.size > 1 ? 's' : ''
+      }? This action cannot be undone.`,
       confirmText: `Delete ${selectedRows.size} rows`,
       onAsyncConfirm: async () => {
         if (allRowsSelected) {

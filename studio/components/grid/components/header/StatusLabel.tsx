@@ -31,11 +31,11 @@ const StatusLabel: FC<Props> = ({}) => {
   }, [])
 
   return (
-    <div className="sb-grid-status-label">
+    <div className="sb-grid-status-label flex items-center justify-center">
       {status === 'saving' ? (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <IconLoader className="animate-spin mx-1" size={14} strokeWidth={2} />
+            <IconLoader className="animate-spin mx-1 text-scale-1100" size={14} strokeWidth={2} />
           </Tooltip.Trigger>
           <Tooltip.Content side="left">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
