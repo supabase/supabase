@@ -1513,7 +1513,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Updates a new Storage bucket"
+										"shortText": "Updates a Storage bucket"
 									},
 									"parameters": [
 										{
@@ -1552,7 +1552,7 @@
 															"kindString": "Property",
 															"flags": {},
 															"comment": {
-																"shortText": "The visibility of the bucket.\n"
+																"shortText": "The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require an valid token for all other operations.\n"
 															},
 															"sources": [
 																{
@@ -3990,7 +3990,7 @@
 									"kindString": "Call signature",
 									"flags": {},
 									"comment": {
-										"shortText": "Updates a new Storage bucket"
+										"shortText": "Updates a Storage bucket"
 									},
 									"parameters": [
 										{
@@ -4029,7 +4029,7 @@
 															"kindString": "Property",
 															"flags": {},
 															"comment": {
-																"shortText": "The visibility of the bucket.\n"
+																"shortText": "The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require an valid token for all other operations.\n"
 															},
 															"sources": [
 																{
@@ -5934,7 +5934,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "An array of files to be deleted, including the path and file name. For example [`folder/image.png`].\n"
+												"shortText": "An array of files to be deleted, including the path and file name. For example [`'folder/image.png'`].\n"
 											},
 											"type": {
 												"type": "array",
@@ -6415,7 +6415,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload."
+												"shortText": "The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload."
 											},
 											"type": {
 												"type": "intrinsic",
