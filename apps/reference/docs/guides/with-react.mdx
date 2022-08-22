@@ -390,25 +390,14 @@ export default function App() {
   const [session, setSession] = useState(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await supabase.auth.getSession()
-      return data
-    }
-
-    if (!session) {
-      fetchData()
-        .then(({ session }) => {
-          setSession(session)
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
-  }, [session])
+  }, [])
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
