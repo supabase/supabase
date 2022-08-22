@@ -2,7 +2,6 @@ import React from 'react'
 import { ComponentMeta } from '@storybook/react'
 import Chart from './AreaChart'
 import dayjs from 'dayjs'
-import Divider from '../Divider'
 
 export default {
   title: 'Charts',
@@ -14,12 +13,15 @@ const DATA = [290, 430, 649, 422, 321, 893, 111].map((value, index) => ({
 }))
 
 export const AreaChart = () => (
-  <div className="flex flex-col gap-4">
-    <ExampleName>Normal</ExampleName>
-    <Chart title="Memory usage" xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
-    <Divider light={false} />
-    <ExampleName>No title prop</ExampleName>
-    <Chart xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
+  <div className="flex flex-row gap-4 flex-wrap">
+    <div className="w-72">
+      <ExampleName>Normal</ExampleName>
+      <Chart title="Memory usage" xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
+    </div>
+    <div className="w-72">
+      <ExampleName>No title prop</ExampleName>
+      <Chart xAxisKey="timestamp" yAxisKey="ram_usage" data={DATA} />
+    </div>
   </div>
 )
 
