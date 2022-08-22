@@ -32,6 +32,14 @@ const EmptyFunctions = () => {
   const apiKeys = apiService?.service_api_keys ?? []
   const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
 
+  const endpoint = apiService?.app_config.endpoint ?? ''
+  const endpointSections = endpoint.split('.')
+  const functionsEndpoint = [
+    ...endpointSections.slice(0, 1),
+    'functions',
+    ...endpointSections.slice(1),
+  ].join('.')
+
   interface Commands {
     command: string
     description: string
@@ -39,42 +47,6 @@ const EmptyFunctions = () => {
     comment?: string
   }
   const commands: Commands[] = [
-    // {
-    //   command: 'supabase init',
-    //   description: "Needed if the project hasen't been inited before",
-    //   jsx: () => {
-    //     return (
-    //       <>
-    //         <span className="text-brand-1100">supabase</span> init
-    //       </>
-    //     )
-    //   },
-    //   comment: 'Initialize Supabase locally',
-    // },
-    // {
-    //   command: 'supabase login',
-    //   description: "Writes the user's API token to disk",
-    //   jsx: () => {
-    //     return (
-    //       <>
-    //         <span className="text-brand-1100">supabase</span> login
-    //       </>
-    //     )
-    //   },
-    //   comment: 'Login using your access token',
-    // },
-    // {
-    //   command: `supabase link --ref ${ref}`,
-    //   description: `Associate the current folder with your Supabase project ${ref}`,
-    //   jsx: () => {
-    //     return (
-    //       <>
-    //         <span className="text-brand-1100">supabase</span> link --ref {ref}
-    //       </>
-    //     )
-    //   },
-    //   comment: 'Link this project',
-    // },
     {
       command: 'supabase functions new hello-world',
       description: ' creates a function stub at ./functions/hello-world/index.ts',
@@ -108,8 +80,8 @@ const EmptyFunctions = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{functionsEndpoint}
+            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
             {`--data '{"name":"Functions"}'`}
           </>
         )
