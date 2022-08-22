@@ -1,0 +1,141 @@
+---
+id: filter
+title: '.filter()'
+slug: filter
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose `column` satisfies the filter.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      operator
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>FilterOperator</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The operator to filter with.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      value
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>any</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The value to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+  ```js
+    .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+    .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+    .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
+    .filter('id','in',`(${arr})`)  // You can insert a javascript array.
+  ```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .filter('name', 'in', '("Paris","Tokyo")')
+```
+
+### Filter embedded resources
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, countries ( name )')
+  .filter('countries.name', 'in', '("France","Japan")')
+```

@@ -1,0 +1,2527 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-js
+  title: Supabase Client
+  description: |
+
+    Supabase JavaScript.
+
+  definition: ../../spec/enrichments/tsdoc_v2/combined.json
+  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+  slugPrefix: '/'
+  libraries:
+    - name: 'JavaScript'
+      id: 'js'
+      version: '0.0.1'
+
+pages:
+  Initializing:
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - name: With additional parameters
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {
+            db: {
+              schema: 'public',
+            },
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            },
+            global: {
+              headers: { 'x-my-custom-header': 'my-app-name' },
+            },
+          }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+      - name: API schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            db: { schema: 'other_schema' }
+          })
+          ```
+
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - name: Custom `fetch` implementation
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            global: { fetch: fetch.bind(globalThis) }
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
+  auth.signUp():
+    title: 'signUp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
+    notes: |
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
+      - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - If signUp() is called for an existing confirmed user:
+          - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
+          - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
+      - To check if a user already exists, refer to getUser().
+    examples:
+      - name: Sign up.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signUp({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+      - name: Sign up with additional user meta data.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signUp(
+            {
+              email: 'example@email.com',
+              password: 'example-password',
+              options: {
+                data: {
+                  first_name: 'John',
+                  age: 27,
+                }
+              }
+            }
+          )
+          ```
+  auth.signInWithPassword():
+    title: 'signInWithPassword()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - name: Sign in with Email.
+        isSpotlight: true
+        description: |
+          Sign in with email and password. After a user has verified their email, they can use the [`signInWithPassword()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: 'example@email.com',
+            password: 'example-password',
+          })
+          ```
+      - name: Sign in with Phone.
+        isSpotlight: false
+        description: |
+          Supabase supports Phone Auth. After a user has verified their number, they can use the [`signIn()`](/docs/reference/javascript/auth-signin#sign-in-using-phone) method.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithPassword({
+            phone: '+13334445555',
+            password: 'some-password',
+          })
+
+          // After receiving an SMS with One Time Password.
+          let { data, error } = await supabase.auth.verifyOtp({
+            phone: '+13334445555',
+            token: '123456',
+          })
+          ```
+  auth.signInWithOtp():
+    title: 'signInWithOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
+    notes: |
+      - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
+      - Requires either an email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
+      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+    examples:
+      - name: Sign in with email.
+        isSpotlight: true
+        description: The user will be sent an otp to their email. By default, a given user can only request an otp once every 60 seconds.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithOtp({
+            email: 'example@email.com',
+          })
+          ```
+      - name: Sign in with sms otp.
+        isSpotlight: false
+        description: The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithPassword({
+            phone: '+13334445555',
+          })
+          ```
+  auth.signInWithOAuth():
+    title: 'signInWithOAuth()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
+    notes: |
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    examples:
+      - name: Sign in using a third-party provider.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'github'
+          })
+          ```
+      - name: Sign in using a third-party provider with redirect.
+        isSpotlight: false
+        description: |
+          The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
+          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
+          any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
+        js: |
+          ```js
+          const { user, session, error } = await supabase.auth.signInWithOAuth({
+            provider: 'github'
+            options: {
+              redirectTo: 'https://example.com/welcome'
+            }
+          }
+          ```
+      - name: Sign in with scopes.
+        isSpotlight: false
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'github'
+            options: {
+              scopes: 'repo gist notifications'
+            }
+          })
+          const oAuthToken = data.session.provider_token // use to access provider API
+          ```
+  auth.signOut():
+    title: 'signOut()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
+    examples:
+      - name: Sign out
+        isSpotlight: true
+        js: |
+          ```js
+          const { error } = await supabase.auth.signOut()
+          ```
+  auth.verifyOtp():
+    title: 'verifyOtp()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    examples:
+      - name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+          ```
+      - name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
+          ```
+  auth.getSession():
+    title: 'getSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
+    examples:
+      - name: Get the session data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.getSession()
+          ```
+  auth.getUser():
+    title: 'getUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
+    notes: |
+      - This method gets the user object using the current session.
+      - Fetches the user object from the database instead of local storage.
+    examples:
+      - name: Get the logged in user with the current existing session
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: { user } } = await supabase.auth.getUser()
+          ```
+      - name: Get the logged in user with a custom access token jwt.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: { user } } = await supabase.auth.getUser(jwt)
+          ```
+  auth.updateUser():
+    title: 'updateUser()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
+    notes: |
+      User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
+      To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
+
+
+      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
+      Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+    examples:
+      - name: Update email for authenticated user.
+        description: Sends a "Confirm Email Change" email to the new email address.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
+          ```
+      - name: Update password for authenticated user.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
+          ```
+      - name: Update a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.updateUser({
+            data: { hello: 'world' }
+          })
+          ```
+  auth.setSession():
+    title: 'setSession()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
+    examples:
+      - name: Basic example.
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        isSpotlight: true
+        js: |
+          ```js
+            const { data, error } = supabase.auth.setSession(refresh_token)
+          }
+          ```
+  auth.onAuthStateChange():
+    title: 'onAuthStateChange()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
+    examples:
+      - name: Listen to auth changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+          })
+          ```
+      - name: Listen to sign in
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
+          })
+          ```
+      - name: Listen to sign out
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
+          })
+          ```
+      - name: Listen to token refresh
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+          })
+          ```
+      - name: Listen to user updates
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
+          })
+          ```
+      - name: Listen to user deleted
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'USER_DELETED') console.log('USER_DELETED', session)
+          })
+          ```
+      - name: Listen to password recovery events
+        js: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
+          })
+          ```
+  auth.admin.getUserById():
+    title: 'getUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
+    notes: |
+      - Fetches the user object from the database instead of local storage.
+      - Note that user() fetches the user object from local storage which might not be the most updated.
+      - Requires the user's access_token.
+    examples:
+      - name: Fetch the user object using the access_token jwt.
+        isSpotlight: true
+        js: |
+          ```js
+          const { user, error } = await supabase.auth.admin.getUserById(1)
+          ```
+
+  auth.admin.listUsers():
+    title: 'listUsers()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Get a full list of users.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.listUsers()
+          ```
+  auth.admin.createUser():
+    title: 'createUser()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+      - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
+    examples:
+      - name: Create a new user.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.createUser({
+            email: 'user@email.com',
+            password: 'password',
+            user_metadata: { name: 'Yoda' }
+          })
+          ```
+      - name: Auto-confirm email.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.createUser({
+            email: 'user@email.com',
+            email_confirm: true
+          })
+          ```
+      - name: Auto-confirm phone.
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.createUser({
+            phone: '1234567890',
+            phone_confirm: true
+          })
+          ```
+  auth.admin.deleteUser():
+    title: 'deleteUser()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Remove a user completely.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.deleteUser(
+            '715ed5db-f090-4b8c-a067-640ecee36aa0'
+          )
+          ```
+
+  auth.admin.inviteUserByEmail():
+    title: 'inviteUserByEmail()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Basic example.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
+          ```
+
+  auth.resetPasswordForEmail():
+    title: 'resetPasswordForEmail()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
+    notes: |
+      Sends a reset request to an email address.
+
+      When the user clicks the reset link in the email they will be forwarded to the site url or the redirect url specified:
+
+      `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
+
+      Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
+
+      You should then use the access_token in the url and new password to update the user as follows:
+
+      ```js
+      const { error, data } = await supabase.auth.updateUser({ password : new_password })
+      ```
+    examples:
+      - name: Reset password
+        isSpotlight: true
+        js: |
+          ```js
+          const { error, data } = await supabase.auth.resetPasswordForEmail(email, options: {
+            redirectTo: 'https://example.com/update-password',
+          })
+          ```
+
+  auth.admin.generateLink():
+    title: 'generateLink()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Generate a signup link.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink(
+            'email@example.com'
+            'signup',
+            {
+              'password': 'secret'
+            }
+          )
+          ```
+      - name: Generate an invite link.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink(
+            'email@example.com'
+            'invite',
+          )
+          ```
+
+  auth.admin.updateUserById():
+    title: 'updateUserById()'
+    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
+    notes: |
+      - Requires a `service_role` key.
+      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+    examples:
+      - name: Updates a user's email.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { email: 'new@email.com' }
+          )
+          ```
+      - name: Updates a user's password.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { password: 'new_password' }
+          )
+          ```
+      - name: Updates a user's metadata.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { user_metadata: { hello: 'world' } }
+          )
+          ```
+      - name: Updates a user's app_metadata.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { app_metadata: { plan: 'trial' } }
+          )
+          ```
+      - name: Confirms a user's email address.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { email_confirm: true }
+          )
+          ```
+      - name: Confirms a user's phone number.
+        isSpotlight: false
+        js: |
+          ```js
+          const { data: user, error } = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            { phone_confirm: true }
+          )
+          ```
+  invoke():
+    title: 'invoke()'
+    description: |
+      Invokes a Supabase Function.
+    $ref: '@supabase/functions-js.index.FunctionsClient.invoke'
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
+    examples:
+      - name: Basic invocation.
+        description:
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' }
+          })
+          ```
+      - name: Error handling.
+        description: |
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+        isSpotlight: true
+        js: |
+          ```js
+          import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
+          })
+
+          if (error instanceof FunctionsHttpError) {
+            console.log('Function returned an error', error.message)
+          } else if (error instanceof FunctionsRelayError) {
+            console.log('Relay error:', error.message)
+          } else if (error instanceof FunctionsFetchError) {
+            console.log('Fetch error:', error.message)
+          }
+          ```
+      - name: Passing custom headers.
+        description: |
+          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data: user, error } = await supabase.functions.invoke('hello', {
+            headers: {
+              "my-custom-header": 'my-custom-header-value'
+            },
+            body: { foo: 'bar' }
+          })
+          ```
+
+  select():
+    title: 'Fetch data: select()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
+    notes: |
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
+      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    examples:
+      - name: Getting your data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select()
+          ```
+      - name: Selecting specific columns
+        description: You can select specific fields from your tables.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name')
+          ```
+      - name: Query foreign tables
+        description: If your database has foreign key relationships, you can query related tables too.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select(`
+              name,
+              cities (
+                name
+              )
+            `)
+          ```
+        note: |
+          What about join tables
+          If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
+          you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
+          For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
+      - name: Query the same foreign table multiple times
+        description: |
+          Sometimes you will need to query the same foreign table twice.
+          In this case, you can use the name of the joined column to identify
+          which join you intend to use. For convenience, you can also give an
+          alias for each column. For example, if we had a shop of products,
+          and we wanted to get the supplier and the purchaser at the same time
+          (both in the users) table:
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('products')
+            .select(`
+              id,
+              supplier:supplier_id ( name ),
+              purchaser:purchaser_id ( name )
+            `)
+          ```
+      - name: Filtering with inner joins
+        description: |
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
+          to select all rows in a `message` table which belong to a user with the `username` "Jane":
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .select('*, users!inner(*)')
+            .eq('users.username', 'Jane')
+          ```
+      - name: Querying with count option
+        description: |
+          You can get the number of rows by using the count option.
+          Allowed values for count option are `null`, [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
+        js: |
+          ```js
+          const { data, error, count } = await supabase
+            .from('cities')
+            .select('name', { count: 'exact' }) // if you don't want to return any rows, you can use { count: 'exact', head: true }
+          ```
+      - name: Querying JSON data
+        description: |
+          If you have data inside of a JSONB column, you can apply select
+          and query filters to the data values. Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for querying JSON data. Also see
+          [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              id, name,
+              address->street
+            `)
+            .eq('address->postcode', 90210)
+          ```
+      - name: Return data as CSV
+        description: |
+          By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('users')
+            .select()
+            .csv()
+          ```
+      - name: Aborting requests in-flight
+        description: |
+          You can use an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) to abort requests. Note that `status` and `statusText` doesn't mean anything for aborted requests, since the request wasn't actually fulfilled.
+        js: |
+          ```js
+          const ac = new AbortController()
+          supabase
+            .from('very_big_table')
+            .select()
+            .abortSignal(ac.signal)
+            .then(console.log)
+          ac.abort()
+          // {
+          //   error: {
+          //     message: 'FetchError: The user aborted a request.',
+          //     details: '',
+          //     hint: '',
+          //     code: ''
+          //   },
+          //   data: null,
+          //   body: null,
+          //   count: null,
+          //   status: 400,
+          //   statusText: 'Bad Request'
+          // }
+          ```
+
+  insert():
+    title: 'Create data: insert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
+    examples:
+      - name: Create a record
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+          ```
+      - name: Create a record and return it
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 }
+            ])
+            .select()
+          ```
+      - name: Bulk create
+        description: |
+          When running a bulk create, the operation is handled in a single transaction. If any of the inserts fail, all other operations are
+          rolled back.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .insert([
+              { name: 'The Shire', country_id: 554 },
+              { name: 'Rohan', country_id: 555 },
+            ])
+          ```
+
+  update():
+    title: 'Modify data: update()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.update'
+    notes: |
+      - `update()` should always be combined with [Filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to update.
+    examples:
+      - name: Updating your data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Middle Earth' })
+            .match({ name: 'Auckland' })
+          ```
+      - name: Updating JSON data
+        description: |
+          Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for working with JSON data. Right now it is only possible to update an entire JSON document,
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys. For example:
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('users')
+            .update(`
+              address: {
+                street: 'Melrose Place',
+                postcode: 90210
+              }
+            `)
+            .eq('address->postcode', 90210)
+          ```
+
+  upsert():
+    title: 'Upsert data: upsert()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.upsert'
+    notes: |
+      - Primary keys should be included in the data payload in order for an update to work correctly.
+      - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+    examples:
+      - name: Upsert your data
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .upsert({ id: 3, message: 'foo', username: 'supabot' })
+          ```
+      - name: Bulk Upsert your data
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('messages')
+            .upsert([
+            { id: 3, message: 'foo', username: 'supabot' },
+            { id: 4, message: 'bar', username: 'supabot' }
+            ])
+          ```
+      - name: Upserting into tables with constraints
+        description: |
+          Running the following will cause supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+          based on the column passed into `onConflict`.
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('users')
+            .upsert({ username: 'supabot' }, { onConflict: 'username' })
+          ```
+      - name: Return the exact number of rows
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error, count } = await supabase
+            .from('users')
+            .upsert({
+                id: 3, message: 'foo',
+                username: 'supabot'
+            }, {
+              count: 'exact'
+            })
+          ```
+
+  delete():
+    title: 'Delete data: delete()'
+    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.delete'
+    notes: |
+      - `delete()` should always be combined with [filters](/docs/reference/javascript/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have
+        [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+        rows visible through `SELECT` policies are deleted. Note that by default
+        no rows are visible, so you need at least one `SELECT`/`ALL` policy that
+        makes the rows visible.
+    examples:
+      - name: Delete records
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .match({ id: 666 })
+          ```
+
+  rpc():
+    title: 'Postgres functions: rpc()'
+    description: |
+      You can call Postgres functions as a "Remote Procedure Call".
+
+      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+      It's especially useful when the logic rarely changes - like password resets and updates.
+
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
+    $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
+    examples:
+      - name: Call a Postgres function
+        isSpotlight: true
+        description: This is an example of invoking a Postgres function with no parameters.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('hello_world')
+          ```
+      - name: With Parameters
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('echo_city', { name: 'The Shire' })
+          ```
+      - name: Bulk processing
+        description: You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
+        js: |
+          ```js
+          const { data, error } = await postgrest
+            .rpc('echo_cities', { names: ['The Shire', 'Mordor'] })
+          ```
+      - name: With filters
+        description: |
+          Postgres functions that return tables can also be combined with
+          [Modifiers](/docs/reference/javascript/using-modifiers) and
+          [Filters](/docs/reference/javascript/using-filters).
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .select('name, population')
+            .eq('name', 'The Shire')
+          ```
+      - name: With count option
+        description: |
+          You can specify a count option to get the row count along with your data.
+          Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
+        js: |
+          ```js
+          const { data, error, count } = await supabase
+            .rpc('hello_world', {}, { count: 'exact' })
+          ```
+
+  subscribe():
+    title: 'on().subscribe()'
+    $ref: '@supabase/realtime-js.RealtimeChannel.on'
+    notes: |
+      - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+      - Row level security is not applied to delete statements.
+      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+      - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
+    examples:
+      - name: Listen to all database changes
+        isSpotlight: true
+        js: |
+          ```js
+          supabase
+            .channel('*')
+            .on('postgres_changes', { event: '*', schema: '*' }, payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+      - name: Listening to a specific table
+        js: |
+          ```js
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+      - name: Listening to inserts
+        js: |
+          ```js
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+      - name: Listening to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        js: |
+          ```js
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+      - name: Listening to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        js: |
+          ```js
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
+              console.log('Change received!', payload)
+            })
+            .subscribe()
+          ```
+      - name: Listening to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        js: |
+          ```js
+          supabase
+            .channel('public:countries')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
+            .subscribe()
+          ```
+      - name: Listening to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        notes: |
+          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+        js: |
+          ```js
+          supabase
+            .channel('public:countries:id=eq.200')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
+            .subscribe()
+          ```
+
+  removeChannel():
+    title: 'removeChannel()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
+    notes: |
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - name: Remove a channel
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeChannel(myChannel)
+          ```
+
+  removeAllChannels():
+    title: 'removeAllChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - name: Removes all channels
+        isSpotlight: true
+        js: |
+          ```js
+          supabase.removeAllChannels()
+          ```
+
+  getChannels():
+    title: 'getChannels()'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
+    examples:
+      - name: Get all channels
+        isSpotlight: true
+        js: |
+          ```js
+          const channels = supabase.getChannels()
+          ```
+
+  storage.listBuckets():
+    title: 'listBuckets()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+    examples:
+      - name: List buckets
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .listBuckets()
+          ```
+
+  storage.getBucket():
+    title: 'getBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+    examples:
+      - name: Get bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .getBucket('avatars')
+          ```
+
+  storage.createBucket():
+    title: 'createBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `insert`
+        - `objects` permissions: none
+    examples:
+      - name: Create bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .createBucket('avatars', { public: false })
+          ```
+
+  storage.emptyBucket():
+    title: 'emptyBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: `select` and `delete`
+    examples:
+      - name: Empty bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .emptyBucket('avatars')
+          ```
+  storage.updateBucket():
+    title: 'updateBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `update`
+        - `objects` permissions: none
+    examples:
+      - name: Update bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .updateBucket('avatars', { public: false })
+          ```
+
+  storage.deleteBucket():
+    title: 'deleteBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` and `delete`
+        - `objects` permissions: none
+    examples:
+      - name: Delete bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .deleteBucket('avatars')
+          ```
+
+  storage.from.upload():
+    title: 'from.upload()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
+    examples:
+      - name: Upload file
+        isSpotlight: true
+        js: |
+          ```js
+          const avatarFile = event.target.files[0]
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .upload('public/avatar1.png', avatarFile, {
+              cacheControl: '3600',
+              upsert: false
+            })
+          ```
+      - name: Upload file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import { decode } from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .upload('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
+            })
+          ```
+
+  storage.from.update():
+    title: 'from.update()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `update` and `select`
+      - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
+    examples:
+      - name: Update file
+        isSpotlight: true
+        js: |
+          ```js
+          const avatarFile = event.target.files[0]
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .update('public/avatar1.png', avatarFile, {
+              cacheControl: '3600',
+              upsert: false
+            })
+          ```
+      - name: Update file using `ArrayBuffer` from base64 file data
+        js: |
+          ```js
+          import {decode} from 'base64-arraybuffer'
+
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .update('public/avatar1.png', decode('base64FileData'), {
+              contentType: 'image/png'
+            })
+          ```
+
+  storage.from.move():
+    title: 'from.move()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `update` and `select`
+    examples:
+      - name: Move file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .move('public/avatar1.png', 'private/avatar2.png')
+          ```
+
+  storage.from.copy():
+    title: 'from.copy()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `update` and `select`
+    examples:
+      - name: Copy file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .copy('public/avatar1.png', 'private/avatar2.png')
+          ```
+
+  storage.from.createSignedUrl():
+    title: 'from.createSignedUrl()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - name: Create Signed URL
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('folder/avatar1.png', 60)
+          ```
+
+  storage.from.createSignedUrls():
+    title: 'from.createSignedUrls()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - name: Create Signed URLs
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrls(['folder/avatar1.png', 'folder/avatar2.png'], 60)
+          ```
+
+  storage.from.getPublicUrl():
+    title: 'from.getPublicUrl()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: none
+    examples:
+      - name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('folder/avatar1.png')
+          ```
+
+  storage.from.download():
+    title: 'from.download()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - name: Download file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .download('folder/avatar1.png')
+          ```
+
+  storage.from.remove():
+    title: 'from.remove()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `delete` and `select`
+    examples:
+      - name: Delete file
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .remove(['folder/avatar1.png'])
+          ```
+
+  storage.from.list():
+    title: 'from.list()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - name: List files in a bucket
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+            })
+          ```
+      - name: Search files in a bucket
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .storage
+            .from('avatars')
+            .list('folder', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'name', order: 'asc' },
+              search: 'jon'
+            })
+          ```
+
+  Using Modifiers:
+    description: |
+      Modifiers can be used on `select()` queries.
+
+      If a Postgres function returns a table response, you can also apply modifiers to the `rpc()` function.
+
+  limit():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.limit'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1)
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .limit(1, { foreignTable: 'cities' })
+          ```
+
+  order():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.order'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name', 'country_id')
+            .order('id', { ascending: false })
+          ```
+      - name: With embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .order('name', {foreignTable: 'cities'})
+          ```
+
+  range():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.range'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .range(0,3)
+          ```
+
+  single():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.single'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1)
+            .single()
+          ```
+
+  maybeSingle():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.maybeSingle'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'Singapore')
+            .maybeSingle()
+          ```
+
+  Using Filters:
+    description: |
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
+
+      If a Postgres function returns a table response, you can also apply filters.
+
+      ### Applying Filters
+
+      You must apply your filters to the end of your query. For example:
+
+      ```js
+      const { data, error } = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .eq('name', 'The Shire')    // Correct
+
+      const { data, error } = await supabase
+        .from('cities')
+        .eq('name', 'The Shire')    // Incorrect
+        .select('name, country_id')
+      ```
+
+      ### Chaining
+
+      Filters can be chained together to produce advanced queries. For example:
+
+      ```js
+      const { data, error } = await supabase
+        .from('cities')
+        .select('name, country_id')
+        .gte('population', 1000)
+        .lt('population', 10000)
+      ```
+
+      ### Conditional Chaining
+
+      Filters can be built up one step at a time and then executed. For example:
+
+      ```js
+      const filterByName = null
+      const filterPopLow = 1000
+      const filterPopHigh = 10000
+
+      let query = supabase
+        .from('cities')
+        .select('name, country_id')
+
+      if (filterByName)  { query = query.eq('name', filterByName) }
+      if (filterPopLow)  { query = query.gte('population', filterPopLow) }
+      if (filterPopHigh) { query = query.lt('population', filterPopHigh) }
+
+      const { data, error } = await query
+      ```
+
+  .or():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.or'
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+        .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
+        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
+        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.eq.20,id.eq.30')
+          ```
+      - name: Use `or` with `and`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+          ```
+      - name: Use `or` on foreign tables
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('id, cities(*)')
+            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+          ```
+
+  .not():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.not'
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```js
+          .not('name','eq','Paris')
+          .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .not('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .not('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .not('name', 'eq', 'Paris')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .not('name', 'eq', 'Paris')
+          ```
+
+  .match():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.match'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .match({name: 'Beijing', country_id: 156})
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .match({name: 'Beijing', country_id: 156})
+          ```
+
+  .eq():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.eq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The shire')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .eq('name', 'San Francisco')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .eq('name', 'Mordor')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'San Francisco')
+          ```
+
+  .neq():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.neq'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .neq('name', 'The shire')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .neq('name', 'San Francisco')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .neq('name', 'Mordor')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .neq('name', 'Lagos')
+          ```
+
+  .gt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gt('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gt('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gt('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .gt('country_id', 250)
+          ```
+
+  .gte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.gte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .gte('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .gte('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .gte('country_id', 250)
+          ```
+
+  .lt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lt('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lt('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lt('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .lt('country_id', 250)
+          ```
+
+  .lte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lte('country_id', 250)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .lte('country_id', 250)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .lte('country_id', 250)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .lte('country_id', 250)
+          ```
+
+  .like():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.like'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .like('name', '%la%')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .like('name', '%la%')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .like('name', '%la%')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .like('name', '%la%')
+          ```
+
+  .ilike():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.ilike'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .ilike('name', '%la%')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .ilike('name', '%la%')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .ilike('name', '%la%')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .ilike('name', '%la%')
+          ```
+
+  .is():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.is'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .is('name', null)
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .is('name', null)
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .is('name', null)
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .is('name', null)
+          ```
+
+  .in():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.in'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .in('name', ['Rio de Janeiro', 'San Francisco'])
+          ```
+
+  .contains():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.contains'
+    notes: |
+      - `.contains()` can work on array columns or range columns.
+        It is very useful for finding rows where a tag array contains all the values in the filter array.
+
+        ```js
+        .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .contains('main_exports', ['oil'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .contains('main_exports', ['oil'])
+          ```
+
+  .containedBy():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.containedBy'
+    notes: |
+      - `.containedBy()` can work on array columns or range columns.
+
+        ```js
+        .containedBy('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .containedBy('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .containedBy('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .containedBy('rangecol',`(${arr}]`) // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .containedBy('main_exports', ['cars', 'food', 'machine'])
+          ```
+
+  .rangeLt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeLt('population_range_millions', '[150, 250]')
+          ```
+
+  .rangeGt():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGt'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeGt('population_range_millions', '[150, 250]')
+          ```
+
+  .rangeGte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeGte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeGte('population_range_millions', '[150, 250]')
+          ```
+
+  .rangeLte():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeLte('population_range_millions', '[150, 250]')
+          ```
+
+  .rangeAdjacent():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent'
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .rangeAdjacent('population_range_millions', '[70, 185]')
+          ```
+
+  .overlaps():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
+    notes: |
+      - `.overlaps()` can work on array columns or range columns.
+
+        ```js
+        .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
+        .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+        .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
+        .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          let countries = await supabase
+            .from('countries')
+            .update({ name: 'Mordor' })
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('countries')
+            .delete()
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_countries')
+            .overlaps('main_exports', ['computers', 'minerals'])
+          ```
+
+  .textSearch():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.textSearch'
+    examples:
+      - name: Text search
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              config: 'english'
+            })
+          ```
+      - name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              type: 'plain',
+              config: 'english'
+            })
+          ```
+      - name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat' & 'cat'`, {
+              type: 'phrase',
+              config: 'english'
+            })
+          ```
+      - name: Websearch
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', `'fat or cat'`, {
+              type: 'websearch',
+              config: 'english'
+            })
+          ```
+
+  .filter():
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
+    notes: |
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```js
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () for in filter.
+          .filter('id','in',`(${arr})`)  // You can insert a javascript array.
+        ```
+    examples:
+      - name: With `select()`
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `update()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .update({ name: 'Mordor' })
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `delete()`
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: With `rpc()`
+        js: |
+          ```js
+          // Only valid if the Postgres function returns a table type.
+          const { data, error } = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'in', '("Paris","Tokyo")')
+          ```
+      - name: Filter embedded resources
+        js: |
+          ```js
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'in', '("France","Japan")')
+          ```

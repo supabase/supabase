@@ -1,0 +1,27 @@
+---
+id: removeallchannels
+title: 'removeAllChannels()'
+slug: /removeallchannels
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Unsubscribes and removes all Realtime channels from Realtime client.
+
+```js
+supabase.removeAllChannels()
+```
+
+## Notes
+
+- Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+
+## Examples
+
+### Removes all channels
+
+```js
+supabase.removeAllChannels()
+```

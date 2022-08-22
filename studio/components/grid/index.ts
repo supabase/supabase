@@ -1,7 +1,7 @@
-export * from './SupabaseGrid';
-export { parseSupaTable } from './SupabaseGrid.utils';
-export * from './types';
+export * from './SupabaseGrid'
+export { parseSupaTable } from './SupabaseGrid.utils'
+export * from './types'
 
-import Query from './query';
+import Query from './query'
 
-export { Query };
+export { Query }

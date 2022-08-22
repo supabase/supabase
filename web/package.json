@@ -9,9 +9,12 @@
     "swizzle": "docusaurus swizzle",
     "traction": "node traction.js",
     "gen:all": "npm run gen:supabase && npm run gen:dart && npm run gen:cli",
-    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/reference/javascript spec/supabase.yml",
+    "gen:supabase": "ts-node ReferenceGenerator.ts -o docs/reference/javascript spec/supabase_js_v1_ref.yml",
+    "gen:supabase:new": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_js_versioned_docs/version-v1 spec/supabase_js_v1_ref.yml",
+    "gen:supabase:v2": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_js/sdk spec/supabase_js_v2_ref.yml",
     "gen:cli": "ts-node ReferenceGenerator.ts -o docs/reference/cli spec/cli.yml",
-    "gen:dart": "ts-node ReferenceGenerator.ts -o docs/reference/dart spec/dart.yml",
+    "gen:dart": "ts-node ReferenceGenerator.ts -o docs/reference/dart spec/supabase_dart_v1_ref.yml",
+    "gen:dart:new": "ts-node ReferenceGenerator.ts -o ../apps/reference/_supabase_dart/generated spec/supabase_dart_v1_ref.yml",
     "gen:postgres": "ts-node ReferenceGenerator.ts -o docs/reference/postgres spec/postgres.yml"
   },
   "dependencies": {

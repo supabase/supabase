@@ -1,0 +1,184 @@
+---
+id: about
+title: Introduction
+description: 'What is Supabase?'
+slug: /
+hide_table_of_contents: true
+pagination_next: null
+---
+
+import ThemedImage from '@theme/ThemedImage'
+import AngularLogo from '@site/static/img/libraries/angular-icon.svg'
+import ExpoLogo from '@site/static/img/libraries/expo-icon.svg'
+import DartLogo from '@site/static/img/libraries/dart-icon.svg'
+import JavascriptLogo from '@site/static/img/libraries/javascript-icon.svg'
+import NextjsDarkLogo from '@site/static/img/libraries/nextjs-dark-icon.svg'
+import NextjsLightLogo from '@site/static/img/libraries/nextjs-light-icon.svg'
+import ReactLogo from '@site/static/img/libraries/react-icon.svg'
+import SolidJSLogo from '@site/static/img/libraries/solidjs-icon.svg'
+import RedwoodJsLogo from '@site/static/img/libraries/redwoodjs-icon.svg'
+import SvelteLogo from '@site/static/img/libraries/svelte-icon.svg'
+import VuejsLogo from '@site/static/img/libraries/vuejs-icon.svg'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+import Link from '@docusaurus/Link'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import ButtonCard from '@site/src/components/ButtonCard'
+const frameworks = [
+  {
+    name: 'Angular',
+    logo: AngularLogo,
+    href: '/guides/with-angular',
+  },
+  {
+    name: 'Expo',
+    logo: ExpoLogo,
+    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/expo-todo-list',
+  },
+  { name: 'Flutter', logo: DartLogo, href: '/guides/with-flutter' },
+  {
+    name: 'JavaScript',
+    logo: JavascriptLogo,
+    href: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth',
+  },
+  {
+    name: 'Next.js',
+    themed: true,
+    logo: {
+      dark: '/img/libraries/nextjs-dark-icon.svg',
+      light: '/img/libraries/nextjs-light-icon.svg',
+    },
+    href: '/guides/with-nextjs',
+  },
+  { name: 'React', logo: ReactLogo, href: '/guides/with-react' },
+  {
+    name: 'RedwoodJS',
+    logo: RedwoodJsLogo,
+    href: '/guides/with-redwoodjs',
+  },
+  { name: 'SolidJS', logo: SolidJSLogo, href: '/guides/with-solidjs' },
+  { name: 'Svelte', logo: SvelteLogo, href: '/guides/with-svelte' },
+  { name: 'Vue', logo: VuejsLogo, href: '/guides/with-vue-3' },
+]
+
+Supabase is an open source Firebase alternative providing all the backend features you need to build a product.
+You can use it completely, or just the features you need.
+
+[Start a project](https://app.supabase.com) with the hosted platform or learn how to [host Supabase](/docs/guides/hosting/overview) yourself.
+
+## Learn about features
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Auth */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/auth')}
+        title={'Auth'}
+        description={'User management with Row Level Security.'}
+        style={{ height: '100%' }}
+      />
+    </div>    
+    {/* Auto-generated APIs */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/api')}
+        title={'Auto-generated APIs'}
+        description={'Instantly generate APIs for your database.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Database */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/database')}
+        title={'Database'}
+        description={'A dedicated, scalable Postgres database.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Edge Functions */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/functions')}
+        title={'Edge Functions'}
+        description={'Server-side functions, distributed globally.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* File Storage */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/storage')}
+        title={'File Storage'}
+        description={'Store, organize, and serve large files.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Observability */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/platform/logs')}
+        title={'Observability'}
+        description={'Monitor and debug your infrastucture.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+    {/* Realtime */}
+    <div class="col col--4">
+      <ButtonCard
+        class="card"
+        to={useBaseUrl('/guides/realtime')}
+        title={'Realtime'}
+        description={'Build with Broadcast, Presence, and Postgres Changes.'}
+        style={{ height: '100%' }}
+      />
+    </div>
+  </div>
+</div>
+
+## Start with a framework
+
+Supabase is just Postgres, which makes it compatible with a large number of tools and frameworks.
+
+<div>
+  <div class="row is-multiline">
+    {frameworks.map((x) => (
+      <div key={x.name} class="col col--3">
+        <ButtonCard
+          layout="horizontal"
+          icon={
+            x.logo && !x.themed ? (
+              <x.logo
+                width="20"
+                alt={x.name}
+                style={{ display: 'block', maxHeight: 20 }}
+              />
+            ) : (
+              <ThemedImage
+                style={{ display: 'block', maxHeight: 20 }}
+                alt={x.name}
+                width="20"
+                sources={{
+                  light: useBaseUrl(x.logo.light),
+                  dark: useBaseUrl(x.logo.dark),
+                }}
+              />
+            )
+          }
+          class="card"
+          to={useBaseUrl(x.href)}
+          title={x.name}
+          description={x.description}
+          style={{ height: '100%' }}
+        />
+      </div>
+    ))}
+  </div>
+</div>

@@ -73,13 +73,16 @@ const ColumnList: FC<{
           filterString={filterString}
           setFilterString={setFilterString}
           leftComponents={
-            <Button
-              type="outline"
-              className="mr-4"
-              onClick={() => onSelectBack()}
-              icon={<IconChevronLeft size="small" />}
-              style={{ padding: '5px' }}
-            />
+            <div className="flex items-center mr-4">
+              <Button
+                type="outline"
+                className="mr-4"
+                onClick={() => onSelectBack()}
+                icon={<IconChevronLeft size="small" />}
+                style={{ padding: '5px' }}
+              />
+              <code>{selectedTable.name}</code>
+            </div>
           }
           rightComponents={
             <Button icon={<IconPlus />} onClick={() => onAddColumn()}>

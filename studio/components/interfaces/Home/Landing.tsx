@@ -13,14 +13,12 @@ const Landing = () => {
 
   async function handleGithubSignIn() {
     try {
-      const { error } = await auth.signIn(
-        {
-          provider: 'github',
+      const { error } = await auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?auth=true`,
         },
-        {
-          redirectTo: process.env.NEXT_PUBLIC_SITE_URL,
-        }
-      )
+      })
       if (error) throw error
     } catch (error) {
       console.error(error)

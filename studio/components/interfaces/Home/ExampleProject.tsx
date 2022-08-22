@@ -16,7 +16,7 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
 
   return (
     <Link href={url}>
-      <a target='_blank'>
+      <a target="_blank">
         <div
           className={[
             'group relative',
@@ -29,7 +29,9 @@ const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
           <div className="flex flex-col mr-4">
             <img
               className="transition-all group-hover:scale-110"
-              src={`/img/libraries/${framework.toLowerCase()}${framework.toLowerCase() == "nextjs" ? isDarkTheme ? "-dark" : "" : ""}-icon.svg`}
+              src={`/img/libraries/${framework.toLowerCase()}${
+                framework.toLowerCase() == 'nextjs' ? (isDarkTheme ? '-dark' : '') : ''
+              }-icon.svg`}
               alt={`${framework} logo`}
               width={26}
               height={26}

@@ -19,16 +19,7 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
   if (isError) console.error('Error fetching project subscription')
 
   const tier = subscription?.tier
-  const tierSupabaseProdId = tier?.supabase_prod_id.toLowerCase()
-  const queryLimitKey = Object.keys(TIER_QUERY_LIMITS).find((key) =>
-    tierSupabaseProdId?.includes(key.toLowerCase())
-  )
-
-  if (tier && !queryLimitKey) {
-    console.error('Tier is unknown, defaulting to Free')
-  }
-
-  const queryLimit = TIER_QUERY_LIMITS[(queryLimitKey || 'FREE') as keyof typeof TIER_QUERY_LIMITS]
+  const queryLimit = TIER_QUERY_LIMITS[(tier?.key || 'FREE') as keyof typeof TIER_QUERY_LIMITS]
 
   const fromValue = from ? dayjs(from) : dayjs()
   const fromMax = dayjs().startOf('day').subtract(queryLimit.value, queryLimit.unit)
@@ -50,7 +41,7 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
           className="text-scale-1100 hover:text-scale-1200 cursor-pointer transition"
           onClick={() => setShowHelperModal(true)}
         />
-        {!tierSupabaseProdId?.includes('payg') && (
+        {queryLimit.promptUpgrade && (
           <Link href={`/project/${projectRef}/settings/billing`}>
             <Button size="tiny">Upgrade</Button>
           </Link>
@@ -80,15 +71,15 @@ const UpgradePrompt: React.FC<Props> = ({ projectRef, from }) => {
                 <div className="py-1">
                   <div className="flex items-center px-4 py-1">
                     <p className="w-[40%] text-sm">Free</p>
-                    <p className="w-[60%] text-sm">1 day</p>
+                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.FREE.text}</p>
                   </div>
                   <div className="flex items-center px-4 py-1">
                     <p className="w-[40%] text-sm">Pro</p>
-                    <p className="w-[60%] text-sm">7 days</p>
+                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.PRO.text}</p>
                   </div>
                   <div className="flex items-center px-4 py-1">
                     <p className="w-[40%] text-sm">Enterprise</p>
-                    <p className="w-[60%] text-sm">Contact us</p>
+                    <p className="w-[60%] text-sm">{TIER_QUERY_LIMITS.ENTERPRISE.text}</p>
                   </div>
                 </div>
               </div>

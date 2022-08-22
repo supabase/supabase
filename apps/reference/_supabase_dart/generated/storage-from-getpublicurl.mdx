@@ -1,0 +1,40 @@
+---
+id: storage-from-getpublicurl
+title: 'from.getPublicUrl()'
+slug: /storage-from-getpublicurl
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Retrieve URLs for assets in public buckets
+
+```dart
+final res = supabase
+  .storage
+  .from('public-bucket')
+  .getPublicUrl('avatar1.png');
+
+final publicURL = res.data;
+```
+
+## Notes
+
+- The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: none
+
+## Examples
+
+### Returns the URL for an asset in a public bucket
+
+```dart
+final res = supabase
+  .storage
+  .from('public-bucket')
+  .getPublicUrl('avatar1.png');
+
+final publicURL = res.data;
+```
