@@ -358,9 +358,10 @@ When upsert is set to true, the file is overwritten if it exists. When set to fa
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: `update` and `select`
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: `update` and `select`
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
 
 ## Examples
