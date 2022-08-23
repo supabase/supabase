@@ -77,13 +77,7 @@ const TableGridEditor: FC<Props> = ({
   }
 
   if (!canRead) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="w-[400px]">
-          <NoPermission resourceText={`access the table "${selectedTable.name}"`} />
-        </div>
-      </div>
-    )
+    return <NoPermission isFullPage resourceText={`access the table "${selectedTable.name}"`} />
   }
 
   const tableId = selectedTable?.id
