@@ -43,9 +43,10 @@ The unique identifier of the bucket you would like to delete.
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: `select` and `delete`
-  - `objects` permissions: none
+- RLS policy permissions required:
+  - `buckets` table permissions: `select` and `delete`
+  - `objects` table permissions: none
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 

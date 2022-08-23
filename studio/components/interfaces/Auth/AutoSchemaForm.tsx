@@ -27,6 +27,7 @@ const AutoSchemaForm = observer(() => {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
     JWT_EXP: authConfig.config.JWT_EXP,
     SITE_URL: authConfig.config.SITE_URL,
+    REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
@@ -38,6 +39,7 @@ const AutoSchemaForm = observer(() => {
     JWT_EXP: number()
       .max(604800, 'Must be less than 604800')
       .required('Must have a JWT expiry value'),
+    REFRESH_TOKEN_ROTATION_ENABLED: boolean().required(),
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
       .min(0, 'Must be a value more than 0')
       .required('Must have a Reuse Interval value'),
@@ -139,15 +141,6 @@ const AutoSchemaForm = observer(() => {
                     actions={<span className="text-scale-900 mr-3">seconds</span>}
                     disabled={!canUpdateConfig}
                   />
-                  <InputNumber
-                    id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    size="small"
-                    min={0}
-                    label="Reuse Interval"
-                    descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                    actions={<span className="text-scale-900 mr-3">seconds</span>}
-                    disabled={!canUpdateConfig}
-                  />
                 </FormSectionContent>
               </FormSection>
               <FormSection header={<FormSectionLabel>Security and Protection</FormSectionLabel>}>
@@ -155,9 +148,9 @@ const AutoSchemaForm = observer(() => {
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"
                     size="small"
-                    label="hCaptcha protection"
+                    label="Enable hCaptcha protection"
                     layout="flex"
-                    descriptionText="If enabled, protects auth endpoints from abuse."
+                    descriptionText="Protect authentication endpoints from abuse."
                     disabled={!canUpdateConfig}
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
@@ -174,6 +167,25 @@ const AutoSchemaForm = observer(() => {
                           onClick={() => setHidden(!hidden)}
                         />
                       }
+                    />
+                  )}
+                  <Toggle
+                    id="REFRESH_TOKEN_ROTATION_ENABLED"
+                    size="small"
+                    label="Enable automatic reuse detection"
+                    layout="flex"
+                    descriptionText="Prevent replay attacks from compromised refresh tokens."
+                    disabled={!canUpdateConfig}
+                  />
+                  {values.REFRESH_TOKEN_ROTATION_ENABLED && (
+                    <InputNumber
+                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                      size="small"
+                      min={0}
+                      label="Reuse Interval"
+                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
+                      actions={<span className="text-scale-900 mr-3">seconds</span>}
+                      disabled={!canUpdateConfig}
                     />
                   )}
                 </FormSectionContent>
