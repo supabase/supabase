@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { IconCode } from '@supabase/ui'
 
 import { useStore, withAuth } from 'hooks'
-import FunctionsNav from './FunctionsNav'
+import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import BaseLayout from 'components/layouts'
 
 const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {

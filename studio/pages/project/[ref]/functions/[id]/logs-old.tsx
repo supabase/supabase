@@ -7,9 +7,7 @@ import {
   Button,
   Checkbox,
   IconCalendar,
-  IconChevronRight,
   IconExternalLink,
-  IconGlobe,
   IconSearch,
   Input,
   Popover,
@@ -18,129 +16,17 @@ import {
 
 import { withAuth } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import FunctionLogsItem from 'components/interfaces/Functions/FunctionLogsItem'
 import { LOGS_DATA } from 'components/interfaces/Functions/Functions.data'
 
-const EmptyFunctions = () => {
-  return (
-    <>
-      <p className="text-scale-1200 text-base max-w-lg">
-        Scalable pay-as-you-go functions as a service (FaaS) to run your code with zero server
-        management.
-      </p>
-      <p className="text-scale-1100 text-sm max-w-lg">
-        No servers to provision, manage, or upgrade Automatically scale based on the load Integrated
-        monitoring, logging, and debugging capability Built-in security at role and per function
-        level based on the principle of least privilege Key networking capabilities for hybrid and
-        multi-cloud scenarios
-      </p>
-      <div className="flex gap-2">
-        <Button iconRight={<IconChevronRight />}>Get started</Button>
-        <Button type="link" iconRight={<IconExternalLink />}>
-          Documentation
-        </Button>
-      </div>
-      <div className="bg-scale-300 rounded px-10 py-8 flex flex-col gap-8">
-        <h2 className="text-sm text-scale-1100">Function examples</h2>
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="flex flex-col gap-3">
-            <div
-              className="
-              h-10 w-10 
-              bg-indigo-900 
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
-            >
-              <IconGlobe />
-            </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <div
-              className="
-              h-10 w-10 
-              bg-indigo-900 
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
-            >
-              <IconGlobe />
-            </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <div
-              className="
-              h-10 w-10 
-              bg-indigo-900 
-              bordershadow-indigo-900
-              rounded-md
-              text-scale-fixed-100
-              flex items-center justify-center
-            "
-            >
-              <IconGlobe />
-            </div>
-            <div className="">
-              <h3 className="text-scale-1200">Stripe payments</h3>
-              <p className="text-scale-1100">
-                Charge a payment credit card when a database event occurs
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
+// [Joshen] Is this supposed to be deprecated?
 
 const FunctionsList = () => {
   const [detailVisible, setDetailVisible] = useState(false)
 
   const router = useRouter()
   const { ref } = router.query
-
-  const PageState = {
-    functions: [
-      {
-        name: 'hello-world',
-        id: 1,
-        runtime: 'Node14',
-        memory: 256,
-        created_at: 1646524256,
-      },
-      {
-        name: 'charge',
-        id: 2,
-        runtime: 'Node14',
-        memory: 256,
-        created_at: 1646524256,
-      },
-      {
-        name: 'projects',
-        id: 3,
-        runtime: 'Node14',
-        memory: 512,
-        created_at: 1646524256,
-      },
-    ],
-  }
 
   const logDetails = (
     <div className="grid grid-cols-12 gap-2">
@@ -177,11 +63,6 @@ const FunctionsList = () => {
       <div className="col-span-7 text-sm text-scale-1200">
         <span className="">Something</span>
       </div>
-
-      {/* <div className="col-span-3 text-sm text-scale-900 w-32 grow">User agent</div>
-              <div className="col-span-7 flex text-scale-1200">
-                <span className="">{LOGS_DATA[0].user_agent}</span>
-              </div> */}
     </div>
   )
 
@@ -315,15 +196,6 @@ const FunctionsList = () => {
 }
 
 const PageLayout = () => {
-  const [pageState, setPageState] = useState('list')
-
-  const Selection = () => (
-    <div>
-      <Button onClick={() => setPageState('empty')}>empty list</Button>
-      <Button onClick={() => setPageState('list')}>list</Button>
-    </div>
-  )
-
   return (
     <FunctionsLayout>
       <FunctionsList />
