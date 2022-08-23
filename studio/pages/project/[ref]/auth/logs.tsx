@@ -11,8 +11,7 @@ const LogsPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const canReadAuthLogs = false
-  // const canReadAuthLogs = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+  const canReadAuthLogs = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
   return !canReadAuthLogs ? (
     <NoPermission isFullPage resourceText="access your project's authentication logs" />
