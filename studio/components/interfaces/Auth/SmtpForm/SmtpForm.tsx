@@ -145,7 +145,7 @@ const SmtpForm = () => {
             />
             <FormPanel
               footer={
-                <div className="flex justify-between py-4 px-8">
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
