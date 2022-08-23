@@ -4,7 +4,7 @@ import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
 
-import { useStore, useFlag, checkPermissions } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
