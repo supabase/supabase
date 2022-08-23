@@ -11,8 +11,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const UsersList = ({}) => {
   const PageState: any = useContext(PageContext)
-  const canRemoveUser = false
-  // const canRemoveUser = checkPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
+  const canRemoveUser = checkPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
 
   return (
     <Loading active={PageState.usersLoading}>
