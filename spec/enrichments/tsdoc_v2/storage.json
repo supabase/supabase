@@ -5934,7 +5934,7 @@
 											"kindString": "Parameter",
 											"flags": {},
 											"comment": {
-												"shortText": "An array of files to be delete, including the path and file name. For example [`'folder/image.png'`].\n"
+												"shortText": "An array of files to delete, including the path and file name. For example [`'folder/image.png'`].\n"
 											},
 											"type": {
 												"type": "array",
