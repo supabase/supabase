@@ -150,7 +150,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     </div>
                   </>
                 )}
-                <div className="col-span-12 flex w-full justify-between">
+                <div className="col-span-12 flex w-full">
                   <FormActions
                     handleReset={() => {
                       resetForm({
