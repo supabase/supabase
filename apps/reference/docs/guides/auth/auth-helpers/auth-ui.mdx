@@ -1,28 +1,32 @@
 ---
-id: auth-ui-overview
+id: auth-ui
 title: Auth UI
-description: Securing your user data with Row Level Security.
+description: A prebuilt, customizable React component for authenticating users.
 ---
 
-# Auth UI
+Auth UI is a pre-built React component for authenticating users.
+It supports custom themes and extensible styles to match your brand and aesthetic.
 
-Auth UI is a React component that provides a simple way to authenticate users.
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="https://supabase.com/images/blog/lw5-one-more/auth-ui-demo.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
 
-It is currently only available for React, however it is planned to be available for other frameworks.
+## Set up Auth UI
 
-Auth UI relies on [@supabase/supabase-js](/docs/reference/javascript/next/). You need to also [install @supabase/supabase-js](/docs/reference/javascript/next/installing).
-
-### Install via NPM
-
-Install the NPM package from @supabase/auth-ui-react
+Install the latest version of [supabase-js](/docs/reference/javascript/next/) and the Auth UI package:
 
 ```bash
-npm install @supabase/auth-ui-react @supabase/supabase-js@rc
+npm install @supabase/supabase-js@rc @supabase/auth-ui-react
 ```
 
-### Import Auth component
+### Import the Auth component
 
-The simplest way to use the component is to pass `supabaseClient` from @supabase/supabase-js as a prop to the component.
+Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
@@ -36,52 +40,44 @@ const supabase = createClient(
 const App = () => <Auth supabaseClient={supabase} />
 ```
 
-The example above renders the Auth component without any styling.
-
-We recommend using one of the themes provided to style the UI.
+This renders the Auth component without any styling.
+We recommend using one of the predefined themes to style the UI.
 Import the theme you want to use and pass it to the `appearence.theme` prop.
 
 ```diff js title="/src/index.js"
 import {
     Auth,
-+   ThemeSupa
+    // highlight-next-line
+    ThemeSupa
 } from '@supabase/auth-ui-react'
 
 const App = () => (
     <Auth
         supabaseClient={supabase}
-+       appearance={{ theme: ThemeSupa }}
+        // highlight-next-line
+        appearance={{ theme: ThemeSupa }}
     />
 )
 ```
 
-# Customizing Auth UI
-
-Auth UI is a React component that provides a UI that 'works out of the box'.
+## Customization
 
 There are several ways to customize Auth UI:
 
-- Using one of the [predefined Themes](#themes) that comes with Auth UI.
-- Extending a theme by [overriding the variable tokens](#overwriting-themes) in a theme.
-- [Creating your own Theme](#creating-your-own-theme)
-- [Using your own CSS classes](#using-your-own-css-classes)
-- [Using inline styles](#using-your-own-inline-styles)
-- [Using your own labels](#using-your-own-custom-labels)
-
----
-
-## Themes
+- Use one of the [predefined themes](#predefined-themes) that comes with Auth UI
+- Extend a theme by [overriding the variable tokens](#override-themes) in a theme
+- [Create your own theme](#create-theme)
+- [Use your own CSS classes](#custom-css-classes)
+- [Use inline styles](#custom-inline-styles)
+- [Use your own labels](#custom-labels)
 
 ### Predefined themes
 
-Auth UI comes with several themes to customize the appearance.
-
-Each predefined theme comes with at least 2 variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop.
-
-Import the theme you want to use and pass it to the `appearence.theme` prop.
+Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearence.theme` prop.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
+//highlight-next-line
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 
 const supabase = createClient(
@@ -90,19 +86,21 @@ const supabase = createClient(
 )
 
 const App = () => (
-  <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+  <Auth
+    supabaseClient={supabase}
+    // highlight-next-line
+    appearance={{ theme: ThemeSupa }}
+  />
 )
 ```
 
 :::info
-
-Currently there is only 1 predefined theme available, but we plan to add more.
-
+Currently there is only one predefined theme available, but we plan to add more.
 :::
 
-### Switching theme variations
+### Switch theme variations
 
-Auth UI comes with 2 theme variations: `default` and `dark`. You can switch between these themes by using the `theme` prop.
+Auth UI comes with two theme variations: `default` and `dark`. You can switch between these themes with the `theme` prop.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
@@ -117,18 +115,17 @@ const App = () => (
   <Auth
     supabaseClient={supabase}
     appearance={{ theme: ThemeSupa }}
+    // highlight-next-line
     theme="dark"
   />
 )
 ```
 
-If you don't pass a value to `theme` it will use the `"default"` theme. You can pass `"dark"` to the theme prop to switch to the `dark` theme. If your theme has other variations, use the name of the variation in this prop.
+If you don't pass a value to `theme` it uses the `"default"` theme. You can pass `"dark"` to the theme prop to switch to the `dark` theme. If your theme has other variations, use the name of the variation in this prop.
 
-## Overwriting themes
+### Override themes
 
-Auth UI themes can be overridden using variable tokens.
-
-The available variable tokens [can be viewed here](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
+Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
@@ -144,6 +141,7 @@ const App = () => (
     supabaseClient={supabase}
     appearance={{
       theme: ThemeSupa,
+      // highlight-start
       variables: {
         default: {
           colors: {
@@ -152,16 +150,18 @@ const App = () => (
           },
         },
       },
+      // highlight-end
     }}
   />
 )
 ```
 
-If you are using a theme that you have created, you will probably not need to override any of the them.
+If you created your own theme, you may not need to override any of the them.
 
-## Creating your own theme
+### Create your own theme {#create-theme}
 
-The available tokens within a theme [can be viewed here](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx). You can create your own theme by following the same structure within a `appearance.theme` property.
+You can create your own theme by following the same structure within a `appearance.theme` property.
+See the list of [tokens within a theme](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/theming/Themes.tsx).
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
@@ -208,13 +208,11 @@ const App = () => (
 )
 ```
 
-You can swich between different variations of your theme [by using the "theme" prop](#switching-theme-variations).
+You can swich between different variations of your theme with the ["theme" prop](#switch-theme-variations).
 
-## Custom CSS classes {#custom-css-classes}
+### Custom CSS classes {#custom-css-classes}
 
-You can use custom CSS classes with Auth UI.
-
-The elements available that can have a CSS classname applied are the following:
+You can use custom CSS classes for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
 ```js title="/src/index.js"
@@ -240,11 +238,9 @@ const App = () => (
 )
 ```
 
-## Customized inline CSS {#custom-css-inline}
+### Custom inline CSS {#custom-inline-styles}
 
-You can use custom CSS inline styles with Auth UI.
-
-The elements available that can have CSS inline style applied are the following:
+You can use custom CSS inline styles for the following elements:
 `"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
 
 ```js title="/src/index.js"
@@ -270,13 +266,9 @@ const App = () => (
 )
 ```
 
-## Custom labels {#custom-labels}
+### Custom labels {#custom-labels}
 
-You can use your own labels with Auth UI.
-
-A breakdown of what labels can be overwritten [can be viewed on GitHub](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json).
-
-You can add your custom labels to `localization.variables`.
+You can use custom labels with `localization.variables`. See the [list of labels](https://github.com/supabase-community/auth-ui/blob/main/packages/react/common/lib/Localization/en.json) that can be overwritten.
 
 ```js title="/src/index.js"
 import { createClient } from '@supabase/supabase-js'
@@ -290,6 +282,7 @@ const supabase = createClient(
 const App = () => (
   <Auth
     supabaseClient={supabase}
+    //highlight-start
     localization={{
       variables: {
         sign_in: {
@@ -298,6 +291,7 @@ const App = () => (
         },
       },
     }}
+    //highlight-end
   />
 )
 ```
