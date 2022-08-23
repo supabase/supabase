@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Updates a new Storage bucket
+Updates a Storage bucket
 
 ```js
 const { data, error } = await supabase.storage.updateBucket('avatars', {
@@ -75,7 +75,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-The visibility of the bucket.
+The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations.
 
   </div>
   
@@ -89,9 +89,10 @@ The visibility of the bucket.
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: `update`
-  - `objects` permissions: none
+- RLS policy permissions required:
+  - `buckets` table permissions: `update`
+  - `objects` table permissions: none
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 
