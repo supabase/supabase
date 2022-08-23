@@ -26,7 +26,7 @@ Using `curl`, you can obtain the execution plan by specifying a vendor media typ
 
 ```bash
 $ curl -H 'Accept: application/vnd.pgrst.plan' \
-       'https://<project>.supabase.co/clients?select=*&id=eq.1'
+       'https://<project>.supabase.co/rest/v1/clients?select=*&id=eq.1'
 
 Aggregate  (cost=8.18..8.20 rows=1 width=112)
   ->  Index Scan using clients_pkey on clients  (cost=0.15..8.17 rows=1 width=36)

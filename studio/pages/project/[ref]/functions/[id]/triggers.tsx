@@ -1,4 +1,4 @@
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 

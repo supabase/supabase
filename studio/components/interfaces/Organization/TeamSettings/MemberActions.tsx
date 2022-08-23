@@ -113,9 +113,11 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
   async function handleResendInvite(member: Member) {
     setLoading(true)
 
+    const roleId = (member?.role_ids ?? [])[0]
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: member.primary_email,
       owner_id: member.invited_id,
+      ...(enablePermissions ? { role_id: roleId } : {}),
     })
 
     if (response.error) {
