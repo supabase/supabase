@@ -1123,9 +1123,10 @@ pages:
     title: 'listBuckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List buckets
         isSpotlight: true
@@ -1140,9 +1141,10 @@ pages:
     title: 'getBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Get bucket
         isSpotlight: true
@@ -1157,9 +1159,10 @@ pages:
     title: 'createBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `insert`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `insert`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create bucket
         isSpotlight: true
@@ -1174,9 +1177,10 @@ pages:
     title: 'emptyBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: `select` and `delete`
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: `select` and `delete`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Empty bucket
         isSpotlight: true
@@ -1190,9 +1194,10 @@ pages:
     title: 'updateBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `update`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Update bucket
         isSpotlight: true
@@ -1207,9 +1212,10 @@ pages:
     title: 'deleteBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` and `delete`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `delete`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete bucket
         isSpotlight: true
@@ -1224,9 +1230,10 @@ pages:
     title: 'from.upload()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `insert`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Upload file
@@ -1259,9 +1266,10 @@ pages:
     title: 'from.update()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Update file
@@ -1294,9 +1302,10 @@ pages:
     title: 'from.move()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Move file
         isSpotlight: true
@@ -1312,9 +1321,10 @@ pages:
     title: 'from.copy()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Copy file
         isSpotlight: true
@@ -1330,9 +1340,10 @@ pages:
     title: 'from.createSignedUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URL
         isSpotlight: true
@@ -1348,9 +1359,10 @@ pages:
     title: 'from.createSignedUrls()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URLs
         isSpotlight: true
@@ -1367,15 +1379,16 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Returns the URL for an asset in a public bucket
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase
+          const { data } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
@@ -1385,9 +1398,10 @@ pages:
     title: 'from.download()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Download file
         isSpotlight: true
@@ -1403,9 +1417,10 @@ pages:
     title: 'from.remove()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `delete` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `delete` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete file
         isSpotlight: true
@@ -1421,9 +1436,10 @@ pages:
     title: 'from.list()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List files in a bucket
         isSpotlight: true

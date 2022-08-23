@@ -41,7 +41,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          // Create a single supabase client for interacting with your database 
+          // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
       - id: example-init-with-params
@@ -62,7 +62,7 @@ functions:
       - id: example-init-scheams
         summary: API schemas
         description: |
-          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard. 
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
           Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
@@ -71,22 +71,22 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Provide a custom schema. Defaults to "public".
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
-            schema: 'other_schema' 
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            schema: 'other_schema'
           })
           ```
       - id: example-init-fetch
         summary: Custom `fetch` implementation
         description: |
-          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests, 
-          but an alternative `fetch` implementation can be provided as an option. 
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
-            fetch: fetch.bind(globalThis) 
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            fetch: fetch.bind(globalThis)
           })
           ```
 
@@ -128,8 +128,8 @@ functions:
               password: 'example-password',
             },
             {
-              data: { 
-                first_name: 'John', 
+              data: {
+                first_name: 'John',
                 age: 27,
               }
             }
@@ -203,10 +203,10 @@ functions:
       - id: example-signin-redirect
         summary: Sign in with redirect.
         description: |
-          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by 
+          Note that the `redirectTo` param is only relevant for OAuth logins, where the login flow is managed by
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
-           
-          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for 
+
+          Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         code: |
           ```js
@@ -294,7 +294,7 @@ functions:
       To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
 
 
-      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`). 
+      User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
     examples:
       - id: example-auth-update-email
@@ -314,8 +314,8 @@ functions:
         summary: Update a user's metadata.
         code: |
           ```js
-          const { user, error } = await supabase.auth.update({ 
-            data: { hello: 'world' } 
+          const { user, error } = await supabase.auth.update({
+            data: { hello: 'world' }
           })
           ```
 
@@ -330,9 +330,9 @@ functions:
           ```js
           function apiFunction(req, res) {
             // Assuming the access token was sent as a header "X-Supabase-Auth"
-            const { access_token } = req.get('X-Supabase-Auth') 
+            const { access_token } = req.get('X-Supabase-Auth')
 
-            // You can now use it within a Supabase Client 
+            // You can now use it within a Supabase Client
             const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -367,9 +367,9 @@ functions:
           * Use the Auth token in your server-side function.
           */
           async function apiFunction(req, res) {
-            const { access_token } = req.get('X-Supabase-Auth') 
+            const { access_token } = req.get('X-Supabase-Auth')
 
-            // You can now use it within a Supabase Client 
+            // You can now use it within a Supabase Client
             const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key")
             const { user, error } = supabase.auth.setAuth(access_token)
 
@@ -1410,7 +1410,7 @@ functions:
     description: |
       - Policy permissions required:
         - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+        - `objects` permissions: `insert` and `select`
     examples:
       - id: example-storage-file-copy
         summary: Copy file

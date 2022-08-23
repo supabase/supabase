@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Moves an existing file.
+Moves an existing file to a new path in the same bucket.
 
 ```js
 const { data, error } = await supabase.storage
@@ -64,9 +64,10 @@ The new file path, including the new file name. For example `folder/image-new.pn
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: `update` and `select`
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: `update` and `select`
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 
