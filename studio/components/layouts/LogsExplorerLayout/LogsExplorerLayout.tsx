@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react'
-import BaseLayout from 'components/layouts'
 import { observer } from 'mobx-react-lite'
-import { useStore, withAuth } from 'hooks'
 import { Badge, IconList, Loading } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { checkPermissions, useStore, withAuth } from 'hooks'
+import BaseLayout from 'components/layouts'
+import NoPermission from 'components/ui/NoPermission'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
 const PageLayout = ({
@@ -17,6 +20,18 @@ const PageLayout = ({
   useEffect(() => {
     content.load()
   }, [ui.selectedProject])
+
+  const canUseLogsExplorer = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+
+  if (!canUseLogsExplorer) {
+    return (
+      <BaseLayout>
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          <NoPermission isFullPage resourceText="access your project's logs explorer" />
+        </main>
+      </BaseLayout>
+    )
+  }
 
   if (!content.isLoaded) {
     return (
