@@ -75,7 +75,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-The visibility of the bucket. By default, buckets are not public.
+The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
 
   </div>
   
@@ -89,9 +89,10 @@ The visibility of the bucket. By default, buckets are not public.
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: `insert`
-  - `objects` permissions: none
+- RLS policy permissions required:
+  - `buckets` table permissions: `insert`
+  - `objects` table permissions: none
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 
