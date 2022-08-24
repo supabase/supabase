@@ -1,7 +1,15 @@
 {
   "extends": "./tsconfig.test.json",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true
   },
   "exclude": [
     "hooks",
@@ -37,6 +45,9 @@
     "types/**",
     "tmp/**",
     "*.js",
-    "**/*.stories.*"
+    "**/*.stories.*",
+    "components/interfaces/Settings/Logs/LogColumnRenderers/**",
+    "components/interfaces/Settings/Logs/LogSelectionRenderers/**",
+    "components/interfaces/Settings/Logs/*.tsx"
   ]
 }
