@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
@@ -311,7 +311,7 @@ const LogTable = ({
           `}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
-            onSelectedCellChange={({ idx, rowIdx }) => {
+            onSelectedCellChange={({ rowIdx }) => {
               if (!hasId) return
               setFocusedLog(data[rowIdx] as LogData)
             }}

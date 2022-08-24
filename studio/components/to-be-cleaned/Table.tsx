@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Typography } from '@supabase/ui'
 
 type TableProps = {
   body: JSX.Element | JSX.Element[]

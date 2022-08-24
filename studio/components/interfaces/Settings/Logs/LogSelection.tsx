@@ -1,19 +1,13 @@
 import { FC } from 'react'
-import { IconX, Loading } from '@supabase/ui'
-
+import { IconX } from '@supabase/ui'
 import { LogData, QueryType } from './Logs.types'
-
-import DatabaseApiSelectionRender, {
-  DatabaseApiSelectionHeaderRender,
-} from './LogSelectionRenderers/DatabaseApiSelectionRender'
+import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import FunctionInvocationSelectionRender, {
-  FunctionInvocationHeaderRender,
-} from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { isDefaultLogPreviewFormat, LogsEndpointParams, LogsTableName } from '.'
+import { isDefaultLogPreviewFormat, LogsEndpointParams } from '.'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import Connecting from 'components/ui/Loading/Loading'
 

@@ -8,7 +8,6 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ReferenceLine,
   Cell,
   ResponsiveContainer,
 } from 'recharts'
@@ -143,20 +142,6 @@ const NoData = ({ title = 'No data to show', message = 'May take 24 hours for da
     </div>
   </div>
 )
-const total = (data: any, format: any, attribute: any) => {
-  let total = 0
-  data?.map((item: any) => {
-    total = total + Number(item[attribute])
-  })
-  if (format === '%') {
-    return Number(total).toFixed(2)
-  }
-  return numberWithCommas(total)
-}
-
-function numberWithCommas(x: any) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
 
 export function BarChart({
   data,
@@ -259,7 +244,7 @@ export function BarChart({
                     // max bar size required for LogEventChart, prevents bars from expanding to max width.
                     maxBarSize={48}
                   >
-                    {data?.map((entry: any, index: any) => (
+                    {data?.map((_entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         className={`transition-all duration-300 ${
@@ -313,7 +298,7 @@ export function AreaChart({
   const hasData = dataCheck(data, attribute)
 
   const [focusBar, setFocusBar] = useState<any>(null)
-  const [mouseLeave, setMouseLeave] = useState<any>(true)
+  const [_mouseLeave, setMouseLeave] = useState<any>(true)
 
   const onMouseMove = (state: any) => {
     if (state?.activeTooltipIndex) {

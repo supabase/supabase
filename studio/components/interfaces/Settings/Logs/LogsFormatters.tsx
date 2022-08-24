@@ -34,7 +34,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           </div>
         </div>
       )
-      break
     // 5XX responses
     case '5':
       return (
@@ -49,7 +48,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           </div>
         </div>
       )
-      break
     // 4XX || 3XX responses
     case '4':
     case '3':
@@ -67,7 +65,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           </div>
         </div>
       )
-      break
     // All other responses
     default:
       return (
@@ -82,7 +79,6 @@ export const ResponseCodeFormatter = ({ value }: any) => {
           </div>
         </div>
       )
-      break
   }
 }
 
@@ -115,7 +111,6 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <span className="!text-red-900 !block titlecase">{value}</span>
         </div>
       )
-      break
 
     case 'INFO':
 
@@ -128,7 +123,6 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <span className="!text-blue-900 !block titlecase">{value}</span>
         </div>
       )
-      break
 
     case 'LOG':
       return (
@@ -139,7 +133,6 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <span className="!text-blue-900 !block titlecase">{value}</span>
         </div>
       )
-      break
 
     case 'WARNING':
       return (
@@ -150,7 +143,6 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <span className="!text-amber-900 !block titlecase">{value}</span>
         </div>
       )
-      break
 
     // All other responses
     default:
@@ -161,7 +153,6 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           </div>
         </div>
       )
-      break
   }
 }
 
