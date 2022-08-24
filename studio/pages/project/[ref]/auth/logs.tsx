@@ -1,14 +1,21 @@
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { NextPageWithLayout } from 'types'
+import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { NextPageWithLayout } from 'types'
+import NoPermission from 'components/ui/NoPermission'
 
 const LogsPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  return (
+  const canReadAuthLogs = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
+
+  return !canReadAuthLogs ? (
+    <NoPermission isFullPage resourceText="access your project's authentication logs" />
+  ) : (
     <>{project && <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />}</>
   )
 }
