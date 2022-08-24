@@ -76,9 +76,9 @@ const TableGridEditor: FC<Props> = ({
     return <NotFoundState id={Number(router.query.id)} />
   }
 
-  if (!canRead) {
-    return <NoPermission isFullPage resourceText={`access the table "${selectedTable.name}"`} />
-  }
+  // if (!canRead) {
+  //   return <NoPermission isFullPage resourceText={`access the table "${selectedTable.name}"`} />
+  // }
 
   const tableId = selectedTable?.id
 
