@@ -1,5 +1,5 @@
 import GeneralContent from './GeneralContent'
 import ResourceContent from './ResourceContent'
-import RpcContent from './RPCContent'
+import RpcContent from './RpcContent'
 
 export { GeneralContent, ResourceContent, RpcContent }
