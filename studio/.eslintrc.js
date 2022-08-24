@@ -17,6 +17,11 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react', '@typescript-eslint', 'prettier'],
-  rules: {},
+  rules: {
+    //   dont use proptypes to check for prop validity
+    'react/prop-types': 'off',
+    // some code uses fallthroughs
+    'no-fallthrough': 'off',
+  },
   ignorePatterns: tsConfig.exclude,
 }
