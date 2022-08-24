@@ -8,8 +8,6 @@ on:
     paths:
       - 'studio/**'
 
-defaults:
-  working-directory: ./studio
 
 jobs:
   check:
@@ -28,5 +26,7 @@ jobs:
         cache: 'npm'
     - name: Install deps
       run: npm ci
+      working-directory: ./studio
     - name: Run ${{ matrix.check-type }}
       run: npm run ${{ matrix.check-type }}
+      working-directory: ./studio
