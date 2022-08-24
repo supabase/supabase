@@ -1,4 +1,6 @@
 import { screen, getByText, fireEvent } from '@testing-library/react'
+import React from 'react'
+import { SWRConfig } from 'swr'
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -35,3 +37,18 @@ export const clickDropdown = (elem: HTMLElement) => {
     })
   )
 }
+
+/**
+ * Wraps a component with a test SWR config, to reset the cache between tests.
+ */
+export const wrapWithSwrTestConfig = (Component: React.FC<unknown>) => (props: any) =>
+  (
+    <SWRConfig
+      value={{
+        provider: () => new Map(),
+        shouldRetryOnError: false,
+      }}
+    >
+      <Component {...props} />
+    </SWRConfig>
+  )
