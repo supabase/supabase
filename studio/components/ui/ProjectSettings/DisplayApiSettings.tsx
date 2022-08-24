@@ -84,7 +84,7 @@ const DisplayApiSettings = () => {
               reveal={x.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
               value={
                 !canReadAPIKeys
-                  ? 'You need additional permissions to read API keys'
+                  ? 'You need additional permissions to view API keys'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
                   ? 'JWT secret update failed, new API key may have issues'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating

@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
@@ -25,7 +26,7 @@ import {
 import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { patch, get } from 'lib/common/fetch'
-import { useStore, useJwtSecretUpdateStatus } from 'hooks'
+import { useStore, useJwtSecretUpdateStatus, checkPermissions } from 'hooks'
 
 import Panel from 'components/ui/Panel'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -35,6 +36,7 @@ import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   projectRef: string
@@ -83,6 +85,12 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
     JWT_SECRET_UPDATE_PROGRESS_MESSAGES[jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
   const previousJwtSecretUpdateStatus = useRef()
+
+  const canReadJWTSecret = checkPermissions(PermissionAction.READ, 'postgrest_config')
+  const canGenerateNewJWTSecret = checkPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'queue_job.projects.update_jwt'
+  )
 
   useEffect(() => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
@@ -194,11 +202,13 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
               <Input
                 label="JWT Secret"
                 readOnly
-                copy={isNotUpdatingJwtSecret}
-                reveal={isNotUpdatingJwtSecret}
+                copy={canReadJWTSecret && isNotUpdatingJwtSecret}
+                reveal={canReadJWTSecret && isNotUpdatingJwtSecret}
                 disabled
                 value={
-                  isJwtSecretUpdateFailed
+                  !canReadJWTSecret
+                    ? 'You need additional permissions to view the JWT secret'
+                    : isJwtSecretUpdateFailed
                     ? 'JWT secret update failed'
                     : isUpdatingJwtSecret
                     ? 'Updating JWT secret...'
@@ -223,7 +233,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                     <div className="w-full space-y-2">
                       <div className="flex w-full items-center justify-between">
                         <div className="flex flex-col space-y-1">
-                          <Typography.Text>Generate a new JWT secret</Typography.Text>
+                          <p>Generate a new JWT secret</p>
                           <p className="text-sm opacity-50">
                             A random secret will be created, or you can create your own.
                           </p>
@@ -233,6 +243,32 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                             <Button loading type="secondary">
                               Updating JWT secret...
                             </Button>
+                          ) : !canGenerateNewJWTSecret ? (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <Button
+                                  disabled
+                                  as="span"
+                                  type="default"
+                                  iconRight={<IconChevronDown />}
+                                >
+                                  Generate a new secret
+                                </Button>
+                              </Tooltip.Trigger>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                                    'border-scale-200 border',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-scale-1200 text-xs">
+                                    You need additional permissions to generate a new JWT secret
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Root>
                           ) : (
                             <Dropdown
                               align="end"
@@ -272,7 +308,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                     Change tracking ID: {changeTrackingId} <br />
                     Error message: {jwtSecretUpdateErrorMessage}
                   </Alert>
-                ) : (
+                ) : canGenerateNewJWTSecret ? (
                   <Alert
                     withIcon
                     variant="warning"
@@ -283,6 +319,8 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
                     project will also be restarted during this process, which will terminate any
                     existing connections.
                   </Alert>
+                ) : (
+                  <></>
                 )}
               </div>
             </Panel.Content>
