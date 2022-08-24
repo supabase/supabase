@@ -10,6 +10,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const nextConfig = {
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
