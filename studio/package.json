@@ -11,7 +11,9 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "typecheck": "tsc --noEmit --project tsconfig.strict.json",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -113,8 +115,13 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
+    "@typescript-eslint/eslint-plugin": "^5.34.0",
+    "@typescript-eslint/parser": "^5.34.0",
     "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.3",
+    "eslint": "^8.22.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.30.1",
     "jest": "^27.4.0",
     "jest-canvas-mock": "^2.3.1",
     "postcss": "^8.4.6",

@@ -1,0 +1,41 @@
+{
+  "extends": "./tsconfig.test.json",
+  "compilerOptions": {
+    "strict": true
+  },
+  "exclude": [
+    "hooks",
+    ".storybook",
+    ".vercel",
+    "components/grid/**",
+    "components/ui/**",
+    "components/layouts/**",
+    "components/to-be-cleaned/**",
+    "components/interfaces/Account/**",
+    "components/interfaces/App/**",
+    "components/interfaces/Auth/**",
+    "components/interfaces/Authentication/**",
+    "components/interfaces/Billing/**",
+    "components/interfaces/Database/**",
+    "components/interfaces/Functions/**",
+    "components/interfaces/Home/**",
+    "components/interfaces/Organization/**",
+    "components/interfaces/Settings/General/**",
+    "components/interfaces/SQLEditor/**",
+    "components/interfaces/Support/**",
+    "components/interfaces/TableGridEditor/**",
+    "components/interfaces/*.ts",
+    "hooks/**",
+    "lib/**",
+    "localStores/**",
+    "pages/**",
+    "node_modules/**",
+    "public/**",
+    "stores/**",
+    "styles/**",
+    "tests/**",
+    "types/**",
+    "tmp/**",
+    "*.js"
+  ]
+}
