@@ -1,13 +1,15 @@
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { useProjectSettings, useStore } from 'hooks'
+import { IconGlobe, IconTerminal } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { NextPageWithLayout } from 'types'
+import { checkPermissions, useProjectSettings, useStore } from 'hooks'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { IconGlobe, IconTerminal } from '@supabase/ui'
-import dayjs from 'dayjs'
-import { NextPageWithLayout } from 'types'
+import NoPermission from 'components/ui/NoPermission'
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
@@ -124,6 +126,11 @@ const PageLayout: NextPageWithLayout = () => {
       comment: 'Invoke your function',
     },
   ]
+
+  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, id as string)
+  if (!canReadFunction) {
+    return <NoPermission isFullPage resourceText="access this edge function's details" />
+  }
 
   return (
     <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
