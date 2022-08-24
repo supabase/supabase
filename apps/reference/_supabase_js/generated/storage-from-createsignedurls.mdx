@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Create signed URLs to download files without requiring permissions. These URLs can be valid for a set number of seconds.
+Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
 
 ```js
 const { data, error } = await supabase.storage
@@ -64,9 +64,10 @@ The number of seconds until the signed URLs expire. For example, `60` for URLs w
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: `select`
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: `select`
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 

@@ -92,7 +92,13 @@ export const ResponseCodeFormatter = ({ value }: any) => {
  * for http response codes
  */
 
-export const SeverityFormatter = ({ value }: { value: string }) => {
+export const SeverityFormatter = ({
+  value,
+  uppercase = true,
+}: {
+  value: string
+  uppercase?: boolean
+}) => {
   if (!value) {
     return (
       <div>
@@ -101,9 +107,11 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
     )
   }
 
-  value = value.toUpperCase()
+  const uppercasedValue = value.toUpperCase()
+  const text = uppercase ? uppercasedValue : value
 
-  switch (value) {
+  switch (uppercasedValue) {
+    case 'UNCAUGHTEXCEPTION':
     case 'PANIC':
     case 'FATAL':
     case 'ERROR':
@@ -112,7 +120,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <div className=" p-0.5 rounded !text-red-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-red-900 !block titlecase">{value}</span>
+          <span className="!text-red-900 !block titlecase">{text}</span>
         </div>
       )
       break
@@ -125,7 +133,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <div className=" p-0.5 rounded !text-blue-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
         </div>
       )
       break
@@ -136,7 +144,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <div className=" p-0.5 rounded !text-blue-900">
             <IconInfo size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{value}</span>
+          <span className="!text-blue-900 !block titlecase">{text}</span>
         </div>
       )
       break
@@ -147,7 +155,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
           <div className=" p-0.5 rounded !text-amber-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-amber-900 !block titlecase">{value}</span>
+          <span className="!text-amber-900 !block titlecase">{text}</span>
         </div>
       )
       break
@@ -157,7 +165,7 @@ export const SeverityFormatter = ({ value }: { value: string }) => {
       return (
         <div className="flex items-center h-full">
           <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
-            <label className="block font-mono text-sm text-scale-900">{value}</label>
+            <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
         </div>
       )

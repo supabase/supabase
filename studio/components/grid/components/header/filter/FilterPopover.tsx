@@ -16,10 +16,10 @@ const FilterPopover: FC = () => {
   return (
     <Popover size="large" align="start" className="sb-grid-filter-popover" overlay={<Filter />}>
       <Button
-        as={'span'}
-        type="text"
+        as="span"
+        type={(filters || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-900">
+          <div className="text-scale-1000">
             <IconFilter strokeWidth={1.5} />
           </div>
         }
