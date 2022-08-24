@@ -6,9 +6,12 @@ import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'
 import UserListItem from './UsersListItem'
 import UsersPagination from './UsersPagination'
+import { checkPermissions } from 'hooks'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const UsersList = ({}) => {
   const PageState: any = useContext(PageContext)
+  const canRemoveUser = checkPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
 
   return (
     <Loading active={PageState.usersLoading}>
@@ -56,7 +59,9 @@ const UsersList = ({}) => {
               </Table.tr>
             )}
             {PageState.users.length > 0 &&
-              PageState.users.map((x: any) => <UserListItem key={x.id} user={x} />)}
+              PageState.users.map((x: any) => (
+                <UserListItem key={x.id} user={x} canRemoveUser={canRemoveUser} />
+              ))}
             <Table.tr>
               <Table.td colSpan={7}>
                 <UsersPagination />

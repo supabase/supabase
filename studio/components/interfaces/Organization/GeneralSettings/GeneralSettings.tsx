@@ -88,21 +88,17 @@ const GeneralSettings = observer(() => {
           return (
             <FormPanel
               footer={
-                <div
-                  className={`flex py-4 px-8 ${
-                    canUpdateOrganization ? 'justify-end' : 'justify-between'
-                  }`}
-                >
-                  {!canUpdateOrganization && (
-                    <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this organization's settings
-                    </p>
-                  )}
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    helper={
+                      !canUpdateOrganization
+                        ? "You need additional permissions to manage this organization's settings"
+                        : undefined
+                    }
                   />
                 </div>
               }
