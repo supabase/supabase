@@ -1,5 +1,3 @@
-import React, { useState } from 'react'
-
 import DefaultErrorRenderer from './DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './ResourcesExceededErrorRenderer'
 import { Alert } from '@supabase/ui'
@@ -51,8 +49,9 @@ export const ErrorRenderers = () => (
           },
         }}
       />,
-    ].map((child) => (
+    ].map((child, index) => (
       <Alert
+        key={index}
         variant="danger"
         title="Sorry! An error occured when fetching data."
         withIcon

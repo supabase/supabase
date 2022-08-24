@@ -68,7 +68,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   }, [s, ite, its])
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
+    setFilters((prev) => ({ ...prev, search_query: template.searchString }))
   }
 
   const handleRefresh = () => {

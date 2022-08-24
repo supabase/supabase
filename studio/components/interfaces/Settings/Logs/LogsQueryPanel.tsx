@@ -8,7 +8,6 @@ import {
   Popover,
   Alert,
 } from '@supabase/ui'
-import Flag from 'components/ui/Flag/Flag'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
@@ -83,6 +82,7 @@ bg-panel-header-light dark:bg-panel-header-dark
             side="bottom"
             align="start"
             overlay={templates
+              .filter((template) => template.label)
               .sort((a, b) => a.label!.localeCompare(b.label!))
               .map((template: LogTemplate) => (
                 <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>

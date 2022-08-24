@@ -19,7 +19,7 @@ interface Props {
   defaultSearchValue?: string
   defaultToValue?: string
   defaultFromValue?: string
-  templates?: any
+  templates?: LogTemplate[]
   isLoading: boolean
   newCount: number
   onRefresh?: () => void
@@ -27,7 +27,7 @@ interface Props {
   onExploreClick?: () => void
   onSelectTemplate: (template: LogTemplate) => void
   table: LogsTableName
-  condensedLayout: Boolean
+  condensedLayout: boolean
   isShowingEventChart: boolean
   onToggleEventChart: () => void
   csvData?: unknown[]
@@ -42,7 +42,7 @@ const PreviewFilterPanel: FC<Props> = ({
   isLoading,
   newCount,
   onRefresh,
-  onSearch = () => {},
+  onSearch = () => null,
   defaultSearchValue = '',
   defaultToValue = '',
   defaultFromValue = '',
@@ -187,7 +187,7 @@ const PreviewFilterPanel: FC<Props> = ({
             Chart
           </Button>
         </div>
-        <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
+        <CSVButton data={csvData} disabled={!csvData} title="Download data" />
       </div>
 
       <Button type="secondary" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>

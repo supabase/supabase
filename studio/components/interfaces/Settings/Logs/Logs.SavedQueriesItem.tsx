@@ -1,12 +1,13 @@
 import dayjs from 'dayjs'
 import { FC, useState } from 'react'
-import { Button, IconChevronRight, IconMaximize2, IconPlay } from '@supabase/ui'
+import { Button, IconChevronRight, IconPlay } from '@supabase/ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
+import { LogSqlSnippets, UserContent } from 'types'
 
 interface Props {
-  item: any
+  item: UserContent<LogSqlSnippets.Content>
 }
 
 const SavedQueriesItem: FC<Props> = ({ item }: Props) => {

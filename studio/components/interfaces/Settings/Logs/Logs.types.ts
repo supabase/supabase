@@ -104,6 +104,9 @@ export type FilterTableSet = {
   }
 }
 
+export type FilterTemplate = string | ((value: string) => string)
+
+
 export interface Filters {
   [key: string]: string | string[] | boolean | undefined | Filters
 }
