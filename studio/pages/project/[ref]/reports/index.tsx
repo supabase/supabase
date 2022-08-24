@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -13,7 +11,7 @@ import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 
-const PageLayout: NextPageWithLayout = () => {
+export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
@@ -78,6 +76,6 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+UserReportPage.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
-export default observer(PageLayout)
+export default observer(UserReportPage)
