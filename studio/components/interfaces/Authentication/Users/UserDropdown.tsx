@@ -1,5 +1,6 @@
 import { FC, useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Dropdown, Divider, IconTrash, IconMail, IconMoreHorizontal } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -8,8 +9,14 @@ import { post, delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { User } from './Users.types'
 
-const UserDropdown: FC<{ user: any }> = ({ user }) => {
+interface Props {
+  user: User
+  canRemoveUser: boolean
+}
+
+const UserDropdown: FC<Props> = ({ user, canRemoveUser }) => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const [loading, setLoading] = useState<boolean>(false)
@@ -134,9 +141,32 @@ const UserDropdown: FC<{ user: any }> = ({ user }) => {
             </Dropdown.Item>
           ) : null}
           <Dropdown.Seperator />
-          <Dropdown.Item onClick={handleDelete} icon={<IconTrash size="tiny" />}>
-            Delete user
-          </Dropdown.Item>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full">
+              <Dropdown.Item
+                onClick={handleDelete}
+                icon={<IconTrash size="tiny" />}
+                disabled={!canRemoveUser}
+              >
+                Delete user
+              </Dropdown.Item>
+            </Tooltip.Trigger>
+            {!canRemoveUser && (
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                    'border-scale-200 border',
+                  ].join(' ')}
+                >
+                  <span className="text-scale-1200 text-xs">
+                    You need additional permissions to delete users
+                  </span>
+                </div>
+              </Tooltip.Content>
+            )}
+          </Tooltip.Root>
         </>
       }
     >
