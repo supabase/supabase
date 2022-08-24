@@ -1,0 +1,335 @@
+openapi: 3.0.0
+info:
+  title: GoTrue MFA
+  version: '1.0'
+  contact:
+    name: Supabase
+    url: support@supabase.io
+    email: support@supabase.io
+  license:
+    name: MIT
+    url: 'https://github.com/supabase/gotrue/blob/master/LICENSE'
+  description: |+
+    Supabase Auth(GoTrue) API Endpoints
+
+    Main Repo at: https://github.com/supabase/gotrue
+
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/user/{user_id}/factor':
+    post:
+      summary: Enroll a new factor
+      operationId: enroll-factor
+      responses:
+        '200':
+          description: Factor Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  created_at:
+                    type: string
+                  type:
+                    type: string
+                  TOTP:
+                    type: object
+                    properties:
+                      qr_code:
+                        type: string
+                      secret:
+                        type: string
+                      uri:
+                        type: string
+                x-examples:
+                  example-1:
+                    id: factor_A8QmoHIjOUvJ0FZNu0jUDw
+                    created_at: ''
+                    type: totp
+                    TOTP:
+                      qr_code: 'data:img/png;base64,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'
+                      secret: UVMMGWP3GS7RM3SW4FQWYKHPBBGKGRT6
+                      uri: 'otpauth://totp/supabase.com:testemail@gmail.com?algorithm=SHA1&digits=6&issuer=supabase.com&period=30&secret=UVMMGWP3GS7RM3SW4FQWYKHPBBGKGRT6'
+              examples:
+                Enroll Factor Response:
+                  value:
+                    id: factor_A8QmoHIjOUvJ0FZNu0jUDw
+                    created_at: ''
+                    type: totp
+                    TOTP:
+                      qr_code: 'data:img/png;base64,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'
+                      secret: UVMMGWP3GS7RM3SW4FQWYKHPBBGKGRT6
+                      uri: 'otpauth://totp/supabase.com:testemail@gmail.com?algorithm=SHA1&digits=6&issuer=supabase.com&period=30&secret=UVMMGWP3GS7RM3SW4FQWYKHPBBGKGRT6'
+        '400':
+          description: |-
+            Bad Request: Could not decode params
+
+            Occurs when the request body is not well formed, resulting in an error when attempting to decode parameters
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                description: |
+                  Returns an error
+        '401':
+          description: |-
+            Unauthorized
+
+            User does not have necessary permissions or authorization header to access endpoint
+          content:
+            application/json:
+              schema:
+                type: 'object'
+        '422':
+          description: |
+            Unprocessable Entity Error: Factor Type needs to be either TOTP or WebAuthn
+
+
+            Parameters passed in are not valid.
+          content:
+            application/json:
+              schema:
+                type: 'object'
+        '500':
+          description: 'Internal Server Error: Error generating QR Code Secret Key'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                friendly_name:
+                  type: string
+                  description: |
+                    Human readable description of factor. Allows user to quickly registered factors to factors available
+                factor_type:
+                  type: string
+                  enum:
+                    - totp
+                    - webauthn
+                  description: 'The type of device that one will be authenticating against. For now, this can only be set to TOTP'
+                issuer:
+                  type: string
+                  description: Website registering the factor
+              required:
+                - friendly_name
+                - factor_type
+                - issuer
+            examples:
+              Enroll TOTP Simple Factor:
+                value:
+                  friendly_name: myfavfactor
+                  factor_type: totp
+                  issuer: supabase.com
+        description: Post the necessary fields for the API to create a new factor.
+      description: |-
+        Enrolls a Time Based One Time Factor such as a Mobile Device linked to Google Authenticator, Duo or similar
+
+        If factor is successfully enrolled, this returns a resizable SVG QR Code encoded as a base64 string
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+  '/user/{user_id}/factor/{factor_id}/challenge':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/factor_id'
+    post:
+      summary: Create challenge
+      responses:
+        '200':
+          description: 'Creates a challenge against a factor which has a default lifespan of 300 seconds. '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Challenge ID which one can make use of to perform a verification
+                  expires_at:
+                    type: string
+                    description: Time at which the challenge expires
+              examples:
+                Example Response:
+                  value:
+                    id: string
+                    created_at: string
+                    expires_at: string
+        '500':
+          description: 'Internal Server Error: Database Error Creating Challenge'
+      operationId: create-challenge
+      description: |-
+        This endpoint might seem initially confusing. It creates a `challenge_id` which can be used to identify what type of device is authenticating against the factor and also to send an SMS/Response for methods like SMS verification or WebAuth. Note that we don't have plans to support SMS Authentication as of V1 of this endpoint
+
+        Used in the following manner:
+        `/challenge`
+        `/verify` -> With the `challenge_id`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'object'
+              x-examples:
+                example-1:
+                  factor_id: factor_<uuid>
+                  friendly_name: bob
+            examples: {}
+        description: Authentication Factor
+  '/{user_id}/factor/{factor_id}/verify':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/factor_id'
+    post:
+      summary: Verify Factor
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+              examples:
+                Sample Response:
+                  value:
+                    challenge_id: string
+                    type: string
+                    success: string
+        '403':
+          description: Challenge has expired
+      operationId: verify-factor
+      description: Allows a user to challenge a factor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                challenge_id:
+                  type: string
+                  description: Challenge we are attempting to verify against. Obtained from the /challenge endpoint
+                code:
+                  type: string
+                  description: |
+                    TOTP Code generated via an Authenticator Application (e.g. Duo/Authy)
+        description: Contains Challenge ID and Code
+  '/user/{user_id}/factor/{factor_id}/login':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/factor_id'
+    post:
+      summary: Step up login
+      responses:
+        '200':
+          description: OK
+      operationId: step-up-login
+      description: |-
+        This endpoint is called after step up login -- User would first login as per usual
+
+
+        Should return a set of recovery codes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        description: 'Needs a challenge id and a type '
+  '/user/{user_id}/factor/{factor_id}':
+    parameters:
+      - $ref: '#/components/parameters/factor_id'
+      - $ref: '#/components/parameters/user_id'
+    delete:
+      summary: Unenroll Factor
+      operationId: delete-mfa-userId-factor-factor_id
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: 'Unauthorized Error: Invalid code entered'
+      description: Upon submission of a code generated by TOTP factor or SMS user's device is removed from the system
+  '/admin/users/{user_id}/factor/{factor_id}':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/factor_id'
+    get:
+      summary: 'Admin: List Factor'
+      responses:
+        '200':
+          description: OK
+      operationId: get-admin-users-user_id-mfa-factors
+      description: Allows a given admin to list all factors registered or disabled by a particular user
+      x-internal: true
+    delete:
+      summary: 'Admin: Delete Factor'
+      operationId: admin-delete-factor
+      responses:
+        '200':
+          description: OK
+      description: Allows user to delete a factor if necessary
+    post:
+      summary: 'Admin: Update Factor'
+      operationId: post-admin-users-user_id-factor-factor_id
+      responses:
+        '200':
+          description: OK
+      description: 'Update factor properties -- restricted to status, type'
+  '/admin/users/{user_id}/factor':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+    get:
+      summary: 'Admin: Get Factors for a User'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: 'Unauthorized: lacking in bearer token'
+      operationId: get-admin-users-user_id-factor
+      x-internal: true
+      description: Gets all given factors for a user
+  '/admin/user/{user_id}/recovery_codes':
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+    delete:
+      summary: 'Admin: Delete Recovery Codes'
+      operationId: delete-admin-user-user_id-recovery_codes
+      responses:
+        '200':
+          description: OK
+      description: Deletes all recovery codes linked to a user
+      x-internal: true
+components:
+  schemas: {}
+  securitySchemes:
+    token:
+      type: http
+      scheme: bearer
+    apikey:
+      name: API Key
+      type: apiKey
+      in: header
+  parameters:
+    user_id:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: User ID obtained via signing up or signing in
+    factor_id:
+      name: factor_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Factor id obtained by enrolling an authenticator through the /enroll endpoint
