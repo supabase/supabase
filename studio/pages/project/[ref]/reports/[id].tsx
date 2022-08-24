@@ -16,8 +16,6 @@ import {
   IconSave,
   IconSettings,
 } from '@supabase/ui'
-
-import { checkPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -27,7 +25,6 @@ import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { NextPageWithLayout } from 'types'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -35,19 +32,14 @@ const LAYOUT_COLUMN_COUNT = 24
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
-/*
- * PageLayout is used to setup layout - as usual it will requires inject global store
- */
-const PageLayout: NextPageWithLayout = () => {
-  return (
-    <>
-      <div className="mx-auto my-8 w-full max-w-7xl">
-        <Reports />
-      </div>
-      <EditReportModal />
-    </>
-  )
-}
+const PageLayout: NextPageWithLayout = () => (
+  <>
+    <div className="mx-auto my-8 w-full max-w-7xl">
+      <Reports />
+    </div>
+    <EditReportModal />
+  </>
+)
 
 PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
