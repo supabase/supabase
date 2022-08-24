@@ -1,0 +1,33 @@
+---
+id: storage-createbucket
+title: 'createBucket()'
+slug: /storage-createbucket
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Creates a new Storage bucket
+
+```dart
+final res = await supabase
+  .storage
+  .createBucket('avatars');
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `insert`
+  - `objects` permissions: none
+
+## Examples
+
+### Create bucket
+
+```dart
+final res = await supabase
+  .storage
+  .createBucket('avatars');
+```

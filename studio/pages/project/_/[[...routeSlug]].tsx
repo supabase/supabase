@@ -11,14 +11,14 @@ interface Props {}
 
 const Header: FC<Props> = () => {
   return (
-    <div className="p-3 border-b dark:border-dark">
-      <div className="space-x-2 flex items-center">
+    <div className="dark:border-dark border-b p-3">
+      <div className="flex items-center space-x-2">
         <Link href="/">
           <a>
             <img
               src="/img/supabase-logo.svg"
               alt="Supabase"
-              className="border dark:border-dark rounded p-1 hover:border-white"
+              className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}
             />
           </a>
@@ -50,14 +50,10 @@ const GenericProjectPage: NextPage = () => {
   return (
     <div>
       <Header />
-      <div className="py-8 w-full max-w-5xl mx-auto">
+      <div className="mx-auto w-full max-w-5xl py-8">
         <h3 className="text-2xl">Select a project to continue</h3>
         <div className="my-6 space-y-8">
-          <ProjectList
-            rewriteHref={urlRewriterFactory(routeSlug)}
-            onSelectDelete={() => {}}
-            onSelectRestore={() => {}}
-          />
+          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} />
         </div>
       </div>
     </div>

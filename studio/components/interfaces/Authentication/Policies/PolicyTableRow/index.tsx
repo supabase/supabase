@@ -5,7 +5,7 @@ import { useStore } from 'hooks'
 
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 import PolicyRow from './PolicyRow'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 interface Props {
   table: PostgresTable

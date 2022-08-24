@@ -1,0 +1,187 @@
+---
+id: rpc
+title: 'Postgres functions: rpc()'
+slug: rpc
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+You can call Postgres functions as a "Remote Procedure Call".
+
+That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+It's especially useful when the logic rarely changes - like password resets and updates.
+
+```sql
+create or replace function hello_world() returns text as $$
+  select 'Hello world';
+$$ language sql;
+```
+
+```js
+const { data, error } = await supabase.rpc('hello_world')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      fn
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The function name to call.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      params
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>undefined</code> | <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The parameters to pass to the function call.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      __namedParameters
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      head
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>boolean</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+When set to true, no data will be returned.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      count
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>null</code> | <code>exact</code> | <code>planned</code> | <code>estimated</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+Count algorithm to use to count rows in a table.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Examples
+
+### Call a Postgres function
+
+This is an example of invoking a Postgres function with no parameters.
+
+```js
+const { data, error } = await supabase.rpc('hello_world')
+```
+
+### With Parameters
+
+```js
+const { data, error } = await supabase.rpc('echo_city', { name: 'The Shire' })
+```
+
+### Bulk processing
+
+You can process large payloads at once using [array parameters](https://postgrest.org/en/stable/api.html#calling-functions-with-array-parameters).
+
+```js
+const { data, error } = await postgrest.rpc('echo_cities', {
+  names: ['The Shire', 'Mordor'],
+})
+```
+
+### With filters
+
+Postgres functions that return tables can also be combined with
+[Modifiers](/docs/reference/javascript/using-modifiers) and
+[Filters](/docs/reference/javascript/using-filters).
+
+```js
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .select('name, population')
+  .eq('name', 'The Shire')
+```
+
+### With count option
+
+You can specify a count option to get the row count along with your data.
+Allowed values for count option are `null`, `exact`, `planned` and `estimated`.
+
+```js
+const { data, error, count } = await supabase.rpc(
+  'hello_world',
+  {},
+  { count: 'exact' }
+)
+```

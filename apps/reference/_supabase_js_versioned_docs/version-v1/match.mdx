@@ -1,0 +1,83 @@
+---
+id: match
+title: '.match()'
+slug: match
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose columns match the specified `query` object.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .match({ name: 'Beijing', country_id: 156 })
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      query
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>Record</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The object to filter with, with column names as keys mapped
+to their filter values.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .match({ name: 'Beijing', country_id: 156 })
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .match({ name: 'Beijing', country_id: 156 })
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .match({ name: 'Beijing', country_id: 156 })
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .match({ name: 'Beijing', country_id: 156 })
+```

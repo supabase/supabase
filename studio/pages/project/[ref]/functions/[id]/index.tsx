@@ -7,13 +7,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from '@supabase/ui'
 
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
 
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { ChartIntervals, NextPageWithLayout } from 'types'
 
 const CHART_INTERVALS: ChartIntervals[] = [

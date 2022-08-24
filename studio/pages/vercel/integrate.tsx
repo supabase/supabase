@@ -345,7 +345,7 @@ const ProjectLinks: FC = observer(() => {
           vercelToken: _store.token,
         })
         if (fetchEnvsError) {
-          console.log('envsError: ', fetchEnvsError)
+          console.error('envsError: ', fetchEnvsError)
           runInAction(() => {
             item.result = {
               status: 'fail',
@@ -356,7 +356,7 @@ const ProjectLinks: FC = observer(() => {
         }
         const found = existedEnvs.find((x: any) => x.key.includes('SUPABASE'))
         if (!!found) {
-          console.log('Existed Supabase env: ', found)
+          console.error('Existed Supabase env: ', found)
           runInAction(() => {
             item.result = {
               status: 'fail',
@@ -368,7 +368,7 @@ const ProjectLinks: FC = observer(() => {
         // If not, pull project detail info
         const projectDetails = await get(`${API_URL}/props/project/${item.supabaseProjectRef}/api`)
         if (projectDetails.error) {
-          console.log('project info error: ', projectDetails.error)
+          console.error('project info error: ', projectDetails.error)
           runInAction(() => {
             item.result = {
               status: 'fail',
@@ -565,7 +565,6 @@ const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
 
     return (
       <li className="py-2">
-        {console.log('re-rendered the ProjectLinkItem')}
         <div className="relative flex w-full space-x-2">
           <div className="w-1/2 flex-grow">
             <Listbox

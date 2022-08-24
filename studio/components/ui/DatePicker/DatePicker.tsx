@@ -21,6 +21,7 @@ export interface DatePickerProps {
   from?: string
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
+  triggerButtonTitle?: string
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
 }
 
@@ -36,6 +37,7 @@ function _DatePicker({
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
+  triggerButtonTitle,
   renderFooter = () => null,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
@@ -220,6 +222,7 @@ function _DatePicker({
       }
     >
       <Button
+        title={triggerButtonTitle}
         type={triggerButtonType}
         as="span"
         icon={<IconCalendar />}

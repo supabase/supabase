@@ -1,6 +1,6 @@
 import { Button, Typography, Modal } from '@supabase/ui'
 import { useState } from 'react'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 
 const ReviewEmptyState = () => {
   return (

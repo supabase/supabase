@@ -1,0 +1,59 @@
+---
+id: storage-getbucket
+title: 'getBucket()'
+slug: /storage-getbucket
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Retrieves the details of an existing Storage bucket.
+
+```dart
+final res = await supabase
+  .storage
+  .getBucket('avatars')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      id
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The unique identifier of the bucket you would like to retrieve.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select`
+  - `objects` permissions: none
+
+## Examples
+
+### Get bucket
+
+```dart
+final res = await supabase
+  .storage
+  .getBucket('avatars')
+```

@@ -8,6 +8,7 @@ function TextLink({ url, label }: any) {
       className="text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm"
     >
       <div className="group flex items-center gap-1">
+        <span className="sr-only">{`${label} about ${url}`}</span>
         <span>{label}</span>
         <div className="transition-all group-hover:ml-0.5">
           <IconChevronRight size={14} strokeWidth={2} />

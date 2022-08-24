@@ -1,0 +1,219 @@
+---
+id: subscribe
+title: 'on().subscribe()'
+slug: /subscribe
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```js
+supabase
+  .channel('*')
+  .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      type
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+"postgres_changes" is the only type supported at this time
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      filter
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+An object with an event property and a schema property. Event property can be `*`, `insert`, `create`, `update`, or `delete`.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      callback
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>Function</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A callback function that will be called when the channel receives a message.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
+- Row level security is not applied to delete statements.
+- If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+- When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+- The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
+
+## Examples
+
+### Listen to all database changes
+
+```js
+supabase
+  .channel('*')
+  .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
+```
+
+### Listening to a specific table
+
+```js
+supabase
+  .channel('public:countries')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'countries' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+```
+
+### Listening to inserts
+
+```js
+supabase
+  .channel('public:countries')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'countries' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+```
+
+### Listening to updates
+
+By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+enable full replication for the table you are listening to:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```js
+supabase
+  .channel('public:countries')
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 'countries' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+```
+
+### Listening to deletes
+
+By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+enable full replication for the table you are listening too:
+
+```sql
+alter table "your_table" replica identity full;
+```
+
+```js
+supabase
+  .channel('public:countries')
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: 'countries' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+```
+
+### Listening to multiple events
+
+You can chain listeners if you want to listen to multiple events for each table.
+
+```js
+supabase
+  .channel('public:countries')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'countries' },
+    handleRecordInserted
+  )
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: 'countries' },
+    handleRecordDeleted
+  )
+  .subscribe()
+```
+
+### Listening to row level changes
+
+You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+
+```js
+supabase
+  .channel('public:countries:id=eq.200')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'countries',
+      filter: 'id=eq.200',
+    },
+    handleRecordUpdated
+  )
+  .subscribe()
+```

@@ -1,0 +1,57 @@
+---
+id: auth-admin-getuserbyid
+title: 'getUserById()'
+slug: /auth-admin-getuserbyid
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Get user by id.
+
+```js
+const { user, error } = await supabase.auth.admin.getUserById(1)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      uid
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The user's unique identifier
+
+This function should only be called on a server. Never expose your `service_role` key in the browser.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Fetches the user object from the database instead of local storage.
+- Note that user() fetches the user object from local storage which might not be the most updated.
+- Requires the user's access_token.
+
+## Examples
+
+### Fetch the user object using the access_token jwt.
+
+```js
+const { user, error } = await supabase.auth.admin.getUserById(1)
+```

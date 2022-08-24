@@ -7,7 +7,7 @@
 module.exports = {
   title: 'Supabase',
   tagline: 'The open source Firebase alternative.',
-  url: 'https://supabase.com',
+  url: 'https://reference-docs.vercel.app',
   baseUrl: '/docs/',
   favicon: '/favicon.ico',
   organizationName: 'supabase', // Usually your GitHub org/user name.
@@ -15,6 +15,11 @@ module.exports = {
   onBrokenLinks: 'ignore',
   themes: ['docusaurus-theme-search-typesense'],
   themeConfig: {
+    docs: {
+      sidebar: {
+        autoCollapseCategories: true,
+      },
+    },
     colorMode: {
       // "light" | "dark"
       defaultMode: 'dark',
@@ -63,7 +68,7 @@ module.exports = {
           label: 'Guides',
           to: '/',
           activeBaseRegex:
-            '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
+            '.*.docs/$|^/docs/architecture|(^/docs/guides/(database|auth|storage|api|examples!))|(^/docs/guides/(examples|with-angular|with-flutter|with-nextjs|with-nuxt-3|with-react|with-redwoodjs|with-svelte|with-vue-3)|^/docs/faq|^/docs/going-into-prod|^/docs/handbook|^/docs/company)',
           position: 'left',
         },
         {
@@ -191,6 +196,7 @@ module.exports = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/supabase/supabase/edit/master/web',
+          breadcrumbs: false,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -204,7 +210,7 @@ module.exports = {
       },
     ],
   ],
-  scripts: [{ src: '/scripts/telemetry.js' }],
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
   // plugins: [
   //   // [
   //   //   '@docusaurus/plugin-content-docs',

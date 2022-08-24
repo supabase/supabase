@@ -6,7 +6,7 @@ import { useProfile, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { AccountLayout } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import { NextPageWithLayout } from 'types'
 
@@ -90,11 +90,11 @@ const GithubProfile = observer(() => {
 
   return (
     <Panel
-      title={[
+      title={
         <Typography.Title key="panel-title" level={5} className="mb-0">
           Account Information
-        </Typography.Title>,
-      ]}
+        </Typography.Title>
+      }
     >
       <Panel.Content>
         <div className="space-y-2">
@@ -123,11 +123,11 @@ const ThemeSettings = observer(() => {
 
   return (
     <Panel
-      title={[
+      title={
         <Typography.Title key="panel-title" level={5}>
           Theme
-        </Typography.Title>,
-      ]}
+        </Typography.Title>
+      }
     >
       <Panel.Content>
         <Listbox

@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isEmpty } from 'lodash'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface Props {

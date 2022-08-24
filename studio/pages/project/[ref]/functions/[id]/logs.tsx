@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { NextPageWithLayout } from 'types'
 
 /**

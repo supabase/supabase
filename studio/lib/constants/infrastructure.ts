@@ -18,7 +18,8 @@ export const REGIONS = {
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
 }
 
-export const REGIONS_DEFAULT = REGIONS.EAST_US
+export const REGIONS_DEFAULT =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
   FREE: 'Free',
@@ -29,6 +30,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
   FREE: 'tier_free',
   PRO: 'tier_pro',
   PAYG: 'tier_payg',
+  ENTERPRISE: 'tier_enterprise',
 }
 
 export const PRICING_TIER_FREE_KEY = 'FREE'
@@ -138,7 +140,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 }
 
 export const DEFAULT_FREE_PROJECTS_LIMIT = 2
-
-export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1

@@ -3,16 +3,15 @@ import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Typography, Loading, IconArrowRight } from '@supabase/ui'
 
+import { Project, NextPageWithLayout } from 'types'
 import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
+import ProjectUsage from 'components/ui/Usage'
 import LoadingUI from 'components/ui/Loading'
 import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
-
-import ProjectUsage from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
-import { NextPageWithLayout } from 'types'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -33,9 +32,10 @@ ProjectBilling.getLayout = (page) => (
 
 export default observer(ProjectBilling)
 
-type SettingsProps = {
-  project: any
+interface SettingsProps {
+  project?: Project
 }
+
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
 
@@ -110,7 +110,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project.ref} subscription_id={project.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>

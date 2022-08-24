@@ -103,7 +103,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     EXTERNAL_ZOOM_ENABLED: false,
     EXTERNAL_ZOOM_CLIENT_ID: null,
     EXTERNAL_ZOOM_SECRET: null,
-    
+
     MAILER_SUBJECTS_INVITE: 'You have been invited',
     MAILER_SUBJECTS_CONFIRMATION: 'Confirm Your Signup',
     MAILER_SUBJECTS_RECOVERY: 'Reset Your Password',

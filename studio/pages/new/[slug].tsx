@@ -1,17 +1,15 @@
-/**
- * Org is selected, creating a new project
- */
-
 import Router, { useRouter } from 'next/router'
 import { useRef, useState, useEffect } from 'react'
 import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
+import generator from 'generate-password'
 import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { passwordStrength } from 'lib/helpers'
-import { post } from 'lib/common/fetch'
+import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { get, post } from 'lib/common/fetch'
 import {
   API_URL,
   PROVIDERS,
@@ -24,10 +22,10 @@ import {
   DEFAULT_FREE_PROJECTS_LIMIT,
   PRICING_TIER_PRODUCT_IDS,
 } from 'lib/constants'
-import { useStore, useFlag, withAuth, useSubscriptionStats } from 'hooks'
+import { useStore, useFlag, withAuth, useSubscriptionStats, checkPermissions } from 'hooks'
 
 import { WizardLayoutWithoutAuth } from 'components/layouts'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import {
@@ -36,31 +34,14 @@ import {
   EmptyPaymentMethodWarning,
 } from 'components/interfaces/Organization/NewProject'
 
-interface StripeCustomer {
-  paymentMethods: any
-  customer: any
-  error?: any
-}
-
-async function fetchStripeAccount(stripeCustomerId: string) {
-  try {
-    const customer = await post(`${API_URL}/stripe/customer`, {
-      stripe_customer_id: stripeCustomerId,
-    })
-    if (customer.error) throw customer.error
-    return customer
-  } catch (error: any) {
-    return { error }
-  }
-}
-
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = router.query
   const { app, ui } = useStore()
 
-  const subscriptionStats = useSubscriptionStats()
+  const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const subscriptionStats = useSubscriptionStats()
 
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
@@ -70,26 +51,29 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [stripeCustomer, setStripeCustomer] = useState<StripeCustomer | undefined>(undefined)
+  const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
 
   const organizations = values(toJS(app.organizations.list()))
   const currentOrg = organizations.find((o: any) => o.slug === slug)
   const stripeCustomerId = currentOrg?.stripe_customer_id
 
-  const totalFreeProjects = subscriptionStats.total_free_projects
+  const isOrganizationOwner = ui.selectedOrganization?.is_owner
+  const totalFreeProjects = subscriptionStats.total_active_free_projects
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
+  const availableRegions = getAvailableRegions()
 
-  const isOrganizationOwner = currentOrg?.is_owner || !app.organizations.isInitialized
+  const isAdmin = enablePermissions
+    ? checkPermissions(PermissionAction.CREATE, 'projects')
+    : isOrganizationOwner
+
   const isEmptyOrganizations = organizations.length <= 0 && app.organizations.isInitialized
-  const isEmptyPaymentMethod = stripeCustomer
-    ? stripeCustomer.paymentMethods?.data?.length <= 0
-    : undefined
+  const isEmptyPaymentMethod = paymentMethods ? !paymentMethods.length : false
   const isOverFreeProjectLimit = totalFreeProjects >= freeProjectsLimit
   const isInvalidSlug = isUndefined(currentOrg)
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
 
   const canCreateProject =
-    currentOrg?.is_owner &&
+    isAdmin &&
     !subscriptionStats.isError &&
     !subscriptionStats.isLoading &&
     (!isSelectFreeTier || (isSelectFreeTier && !isOverFreeProjectLimit))
@@ -129,17 +113,17 @@ const Wizard: NextPageWithLayout = () => {
   }, [])
 
   useEffect(() => {
-    async function loadStripeAccountAsync(id: string) {
-      const res = await fetchStripeAccount(id)
-      if (!res.error) {
-        setStripeCustomer(res)
+    async function getPaymentMethods(slug: string) {
+      const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
+      if (!error) {
+        setPaymentMethods(paymentMethods)
       }
     }
 
-    if (stripeCustomerId) {
-      loadStripeAccountAsync(stripeCustomerId)
+    if (slug) {
+      getPaymentMethods(slug as string)
     }
-  }, [stripeCustomerId])
+  }, [slug])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -193,10 +177,30 @@ const Wizard: NextPageWithLayout = () => {
     }
   }
 
+  // [Joshen] Refactor: DB Password could be a common component
+  // used in multiple pages with repeated logic
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
+  }
+
+  // [Fran] Enforce APSE1 region on staging
+  function getAvailableRegions() {
+    return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? pluckObjectFields(REGIONS, ['SOUTHEAST_ASIA'])
+      : REGIONS
+  }
+
   return (
     <Panel
       hideHeaderStyling
-      isLoading={app.organizations.isInitialized}
+      loading={!app.organizations.isInitialized}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
@@ -237,7 +241,7 @@ const Wizard: NextPageWithLayout = () => {
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-b border-t">
+            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -258,11 +262,11 @@ const Wizard: NextPageWithLayout = () => {
                 </Listbox>
               )}
 
-              {!isOrganizationOwner && <NotOrganizationOwnerWarning />}
+              {!isAdmin && <NotOrganizationOwnerWarning />}
             </Panel.Content>
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b border-t">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -278,6 +282,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
                   <Input
                     id="password"
+                    copy={dbPass.length > 0}
                     layout="horizontal"
                     label="Database Password"
                     type="password"
@@ -289,6 +294,7 @@ const Wizard: NextPageWithLayout = () => {
                         passwordStrengthScore={passwordStrengthScore}
                         password={dbPass}
                         passwordStrengthMessage={passwordStrengthMessage}
+                        generateStrongPassword={generateStrongPassword}
                       />
                     }
                     error={passwordStrengthWarning}
@@ -305,8 +311,8 @@ const Wizard: NextPageWithLayout = () => {
                     onChange={(value: string) => onDbRegionChange(value)}
                     descriptionText="Select a region close to you for the best performance."
                   >
-                    {Object.keys(REGIONS).map((option: string, i) => {
-                      const label = Object.values(REGIONS)[i]
+                    {Object.keys(availableRegions).map((option: string, i) => {
+                      const label = Object.values(availableRegions)[i] as string
                       return (
                         <Listbox.Option
                           key={option}
@@ -315,7 +321,7 @@ const Wizard: NextPageWithLayout = () => {
                           addOnBefore={({ active, selected }: any) => (
                             <img
                               className="w-5 rounded-sm"
-                              src={`/img/regions/${Object.keys(REGIONS)[i]}.svg`}
+                              src={`/img/regions/${Object.keys(availableRegions)[i]}.svg`}
                             />
                           )}
                         >
@@ -327,7 +333,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
               </>
             )}
-            {currentOrg?.is_owner && (
+            {isAdmin && (
               <Panel.Content className="Form section-block--body has-inputs-centered ">
                 <Listbox
                   label="Pricing Plan"

@@ -1,21 +1,24 @@
 import dayjs from 'dayjs'
 import useSWR from 'swr'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
+import generator from 'generate-password'
 import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import Panel from 'components/to-be-cleaned/Panel'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
+import Panel from 'components/ui/Panel'
+import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
@@ -48,7 +51,7 @@ export default observer(ProjectSettings)
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const { ref } = router.query
+  const ref = router.query.ref as string
 
   return (
     <>
@@ -149,6 +152,11 @@ const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
 
+  const enablePermissions = useFlag('enablePermissions')
+  const canResetDbPassword = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : ui.selectedOrganization?.is_owner
+
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
 
@@ -201,6 +209,16 @@ const ResetDbPassword: FC<any> = () => {
     }
   }
 
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+    setPassword(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <>
       <Panel>
@@ -215,9 +233,32 @@ const ResetDbPassword: FC<any> = () => {
               </div>
             </div>
             <div className="flex items-end justify-end">
-              <Button type="default" onClick={() => setShowResetDbPass(true)}>
-                Reset Database Password
-              </Button>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="default"
+                    disabled={!canResetDbPassword}
+                    onClick={() => setShowResetDbPass(true)}
+                  >
+                    Reset Database Password
+                  </Button>
+                </Tooltip.Trigger>
+                {!canResetDbPassword && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                        'border-scale-200 border ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-scale-1200 text-xs">
+                        You need additional permissions to reset the database password
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </div>
           </div>
         </Panel.Content>
@@ -236,6 +277,8 @@ const ResetDbPassword: FC<any> = () => {
           <div className="w-full space-y-8 py-8">
             <Input
               type="password"
+              value={password}
+              copy={password.length > 0}
               onChange={onDbPassChange}
               error={passwordStrengthWarning}
               // @ts-ignore
@@ -244,6 +287,7 @@ const ResetDbPassword: FC<any> = () => {
                   passwordStrengthScore={passwordStrengthScore}
                   passwordStrengthMessage={passwordStrengthMessage}
                   password={password}
+                  generateStrongPassword={generateStrongPassword}
                 />
               }
             />
@@ -282,7 +326,7 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
             <Typography.Text className="block">SSL Connection</Typography.Text>
             <div style={{ maxWidth: '420px' }}>
               <p className="text-sm opacity-50">
-                Use this cert when connecting to your database to prevent snooping and
+                Use this certificate when connecting to your database to prevent snooping and
                 man-in-the-middle attacks.
               </p>
             </div>
@@ -327,7 +371,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
-const uriConnString =
+  const uriConnString =
     `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
     `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
     `/${connectionInfo.db_name}`
@@ -345,12 +389,12 @@ const uriConnString =
       <div className="">
         <section className="mt-6 space-y-6">
           <Panel
-            title={[
+            title={
               <Typography.Title key="panel-title" level={5} className="mb-0">
                 Connection info
-              </Typography.Title>,
+              </Typography.Title>
               // <Title level={4}>Connection info</Title>
-            ]}
+            }
           >
             <Panel.Content className="space-y-6">
               <Input

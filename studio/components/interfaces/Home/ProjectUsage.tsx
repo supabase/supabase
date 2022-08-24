@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@supabase/ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 import Table from 'components/to-be-cleaned/Table'
 import { USAGE_COLORS } from 'components/ui/Charts/Charts.constants'
 import StackedAreaChart from 'components/ui/Charts/StackedAreaChart'

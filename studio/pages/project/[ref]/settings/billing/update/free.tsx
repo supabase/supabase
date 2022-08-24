@@ -5,10 +5,11 @@ import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 import { useStore, useFlag } from 'hooks'
 import { get } from 'lib/common/fetch'
-import { API_URL, STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { API_URL, PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 
 import { BillingLayout } from 'components/layouts'
 import { ExitSurvey, StripeSubscription } from 'components/interfaces/Billing'
+import Connecting from 'components/ui/Loading/Loading'
 
 const BillingUpdateFree: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -19,7 +20,9 @@ const BillingUpdateFree: NextPageWithLayout = () => {
 
   const [products, setProducts] = useState<{ tiers: any[]; addons: any[] }>()
   const [subscription, setSubscription] = useState<StripeSubscription>()
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false)
+
+  const isEnterprise =
+    subscription && subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
     if (projectUpdateDisabled) {
@@ -30,12 +33,16 @@ const BillingUpdateFree: NextPageWithLayout = () => {
     }
   }, [projectRef])
 
+  useEffect(() => {
+    if (isEnterprise) {
+      router.push(`/project/${projectRef}/settings/billing/update/enterprise`)
+    }
+  }, [subscription])
+
   const getStripeProducts = async () => {
     try {
-      setIsLoadingProducts(true)
       const products = await get(`${API_URL}/stripe/products`)
       setProducts(products)
-      setIsLoadingProducts(false)
     } catch (error: any) {
       ui.setNotification({
         error,
@@ -64,6 +71,13 @@ const BillingUpdateFree: NextPageWithLayout = () => {
   }
 
   const freeTier = products?.tiers.find((tier: any) => tier.id === STRIPE_PRODUCT_IDS.FREE)
+
+  if (isEnterprise)
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Connecting />
+      </div>
+    )
 
   return (
     <div className="mx-auto my-10 max-w-5xl">

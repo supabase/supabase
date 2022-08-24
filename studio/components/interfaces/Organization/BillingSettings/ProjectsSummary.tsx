@@ -4,7 +4,7 @@ import { FC, useEffect } from 'react'
 import { IconChevronRight, IconLoader } from '@supabase/ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 interface ProjectSummaryProps {
   project: any

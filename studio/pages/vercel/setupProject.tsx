@@ -6,6 +6,7 @@ import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
 import { Button, Input, Listbox, Typography } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
+import generator from 'generate-password'
 
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
@@ -136,8 +137,8 @@ const SetupProject = () => {
 export default observer(SetupProject)
 
 const Connecting = () => (
-  <div className="w-full h-full flex flex-col items-center justify-center">
-    <div className="w-32 flex items-center justify-center">
+  <div className="flex h-full w-full flex-col items-center justify-center">
+    <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
     <Typography.Text>
@@ -190,6 +191,17 @@ const CreateProject = observer(() => {
     setPasswordStrengthMessage(message)
   }
 
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    setDbPass(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   async function createSupabaseProject(dbSql: string) {
     const data = {
       cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
@@ -202,7 +214,8 @@ const CreateProject = observer(() => {
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
-    return await post(`${API_URL}/projects`, data)
+    const project = await post(`${API_URL}/projects`, data)
+    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
   }
 
   async function onCreateProject() {
@@ -248,7 +261,7 @@ const CreateProject = observer(() => {
       const query = new URLSearchParams(_store.queryParams).toString()
       router.push(`/vercel/complete?${query}`)
     } catch (error) {
-      console.log('error', error)
+      console.error('Error', error)
       setLoading(false)
     }
   }
@@ -275,12 +288,14 @@ const CreateProject = observer(() => {
           type="password"
           placeholder="Type in a strong password"
           value={dbPass}
+          copy={dbPass.length > 0}
           onChange={onDbPassChange}
           descriptionText={
             <PasswordStrengthBar
               passwordStrengthScore={passwordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
+              generateStrongPassword={generateStrongPassword}
             />
           }
         />
