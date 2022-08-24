@@ -4,12 +4,15 @@ import { AutoField } from 'uniforms-bootstrap4'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import MultiSelect from 'components/ui/MultiSelect'
 import { PageContext } from 'pages/project/[ref]/settings/api'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+// [Joshen TODO] Refactor to use supabase form component and FormPanel component
 
 const PostgrestConfig = observer(({ config, projectRef }: any) => {
   const PageState: any = useContext(PageContext)
@@ -21,6 +24,11 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
     max_rows: config.max_rows,
     db_extra_search_path: config.db_extra_search_path || '',
   })
+
+  const canUpdatePostgrestConfig = checkPermissions(
+    PermissionAction.UPDATE,
+    'custom_config_postgrest'
+  )
 
   const updateConfig = async (updatedConfig: any) => {
     try {
@@ -91,12 +99,18 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
           type: 'object',
         }}
         model={updates}
+        message={
+          !canUpdatePostgrestConfig
+            ? "You need additional permissions to update your project's API settings"
+            : undefined
+        }
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(config)}
       >
         <div className="space-y-6 py-4">
           {schema.length >= 1 && (
             <MultiSelect
+              disabled={!canUpdatePostgrestConfig}
               options={schema}
               // value must be passed as array of strings
               value={updates.db_schema.replace(/ /g, '').split(',')}
@@ -126,8 +140,20 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
               }
             />
           )}
-          <AutoField name="db_extra_search_path" showInlineError errorMessage="Must be a string." />
-          <AutoField name="max_rows" showInlineError errorMessage="Must be a number." />
+          <AutoField
+            disabled={!canUpdatePostgrestConfig}
+            name="db_extra_search_path"
+            showInlineError
+            errorMessage="Must be a string."
+            className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
+          />
+          <AutoField
+            disabled={!canUpdatePostgrestConfig}
+            name="max_rows"
+            showInlineError
+            errorMessage="Must be a number."
+            className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
+          />
         </div>
       </SchemaFormPanel>
     </>
