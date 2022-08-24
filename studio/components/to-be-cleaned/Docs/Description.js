@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useRouter } from 'next/router'
 import { Button, IconLoader } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -20,47 +19,52 @@ const temp_removePostgrestText = (content) => {
   return cleansed
 }
 
-export default function Description({ content, metadata, onChange = () => {} }) {
-  const router = useRouter()
-  const { meta } = useStore()
+export default function Description({ content, metadata, disabled = false, onChange = () => {} }) {
+  const { meta, ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const { ref } = router.query
   const { table, column, rpc } = metadata
 
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
-  const buttonCss = `inline-block text-sm border text-white font-bold rounded py-1 px-3 w-20 cursor-pointer`
-  const primaryCss = `${buttonCss} ${animateCss} bg-gray-500 border-gray-400 hover:border-green-500 hover:bg-green-500 `
-  const secondaryCss = `${buttonCss} ${animateCss} bg-gray-500 border-gray-400 hover:border-red-500 hover:bg-red-500 `
 
   const updateDescription = async () => {
     if (isUpdating) return false
-    try {
-      setIsUpdating(true)
-      let query = ''
-      let description = value.replaceAll("'", "''")
-      if (table && column)
-        query = `comment on column public."${table}"."${column}" is '${description}';`
-      if (table && !column) query = `comment on table public."${table}" is '${description}';`
-      if (rpc) query = `comment on function ${rpc} is '${description}';`
 
-      if (query) {
-        await meta.query(query)
-        // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
-        await timeout(500)
+    setIsUpdating(true)
+    let query = ''
+    let description = value.replaceAll("'", "''")
+    if (table && column)
+      query = `comment on column public."${table}"."${column}" is '${description}';`
+    if (table && !column) query = `comment on table public."${table}" is '${description}';`
+    if (rpc) query = `comment on function ${rpc} is '${description}';`
+
+    if (query) {
+      const res = await meta.query(query)
+      if (res.error) {
+        ui.setNotification({
+          error: res.error,
+          category: 'error',
+          message: `Failed to update description: ${res.error.message}`,
+        })
       }
-
-      onChange(value)
-    } catch (error) {
-      console.error('Update description error:', error)
-    } finally {
-      setIsUpdating(false)
+      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
+      await timeout(500)
     }
+
+    onChange(value)
+    setIsUpdating(false)
   }
+
+  if (disabled) {
+    return (
+      <span className={`block ${value ? 'text-scale-1200' : ''}`}>{value || 'No description'}</span>
+    )
+  }
+
   return (
     <div className="space-y-2">
       <AutoTextArea
