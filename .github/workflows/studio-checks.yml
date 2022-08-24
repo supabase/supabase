@@ -1,4 +1,4 @@
-name: Studio Build
+name: Studio Checks
 
 on:
   pull_request:
@@ -7,8 +7,8 @@ on:
       - studio
     paths:
       - 'studio/**'
+
 defaults:
-  runs-on: ubuntu-latest
   strategy:
     matrix:
       node-version: [14.x]
@@ -17,8 +17,8 @@ defaults:
 
 jobs:
   check:
+    runs-on: ubuntu-latest
     name: ${{ matrix.check-type }}
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
