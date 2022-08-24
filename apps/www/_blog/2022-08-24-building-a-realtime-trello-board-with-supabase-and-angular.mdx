@@ -2,8 +2,8 @@
 title: 'Building a Realtime Trello Board with Supabase and Angular'
 description: Go beyond the hello world example with this real world project.
 author: simon_grimm
-image: simon-grimm-angular-realtime/og.jpg
-thumb: simon-grimm-angular-realtime/og.jpg
+image: images/blog/simon-grimm-angular-realtime/angular-supabase.png
+thumb: images/blog/simon-grimm-angular-realtime/angular-supabase.png
 tags:
   - angular
   - realtime
@@ -26,6 +26,9 @@ Along our jurney we will:
 - implement **magic link sign in** and user authentication with Angular
 - make use of **the realtime capabilities**!
 
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jmCiI_OSarA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> Watch the video version of the tutorial.
+
+
 Since there are quite some code snippets we need I've put together the [full source code on Github](https://github.com/saimon24/supabase-trello-angular) so you can easily run the project yourself!
 
 If you are not familiar with [Trello](https://trello.com/), it's a way to manage projects with different boards, lists and cards!
@@ -34,7 +37,7 @@ Ready for a wild adventure? Then let's begin inside our Supabase account!
 
 ## Creating the Supabase Project
 
-First of all we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/)!
+First of all we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://app.supabase.com/)!
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
@@ -42,7 +45,7 @@ The only thing we will change manually for now is disabling the email confirmati
 
 ![Disable Email confirm](/images/blog/simon-grimm-angular-realtime/disable-email-confirm.png)
 
-Everything else regarding authnetication is handled by Supabase and we don't need to worry about it at the moment!
+Everything else regarding authentication[https://supabase.com/docs/guides/auth] is handled by Supabase and we don't need to worry about it at the moment!
 
 ## Defining your Tables with SQL
 
