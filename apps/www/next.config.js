@@ -1439,6 +1439,11 @@ module.exports = withMDX({
         source: '/docs/reference/javascript/next/migration-guide',
         destination: '/docs/reference/javascript/next/release-notes',
       },
+      {
+        permanent: true,
+        source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
+        destination: '/docs/guides/auth/auth-helpers/auth-ui',
+      },
 
       // V2 redirects
       // {

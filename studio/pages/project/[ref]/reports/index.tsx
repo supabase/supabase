@@ -22,9 +22,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  // const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
-  //   resource: { type: 'report' },
-  // })
+  // const canCreateReport = checkPermissions(PermissionAction.CR
   const contentStore = useProjectContentStore(ref)
 
   useEffect(() => {

@@ -254,7 +254,7 @@ export const LOGS_TABLES = {
   functions: LogsTableName.FUNCTIONS,
   fn_edge: LogsTableName.FN_EDGE,
   auth: LogsTableName.AUTH,
-  realtime: LogsTableName.REALTIME
+  realtime: LogsTableName.REALTIME,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -265,8 +265,6 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
 }
-
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
 
 export const genQueryParams = (params: { [k: string]: string }) => {
   // remove keys which are empty strings, null, or undefined
