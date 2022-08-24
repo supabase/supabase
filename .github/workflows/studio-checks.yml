@@ -9,14 +9,14 @@ on:
       - 'studio/**'
 
 defaults:
-  strategy:
-    matrix:
-      node-version: [14.x]
-      check-type: [build, lint, test, typecheck]
   working-directory: ./studio
 
 jobs:
   check:
+    strategy:
+      matrix:
+        node-version: [14.x]
+        check-type: [build, lint, test, typecheck]
     runs-on: ubuntu-latest
     name: ${{ matrix.check-type }}
     steps:
