@@ -134,7 +134,7 @@ const Index = ({}: Props) => {
                     >
                       <a target="_blank">
                         <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
-                          Join The Discussion
+                          Join the discussion
                         </Button>
                       </a>
                     </Link>
