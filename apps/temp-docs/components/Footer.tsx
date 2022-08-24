@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import footer from '../data/footer.json'
 import { useTheme } from './Providers'
@@ -17,10 +18,11 @@ const Footer = () => {
         <div className="space-y-8 xl:col-span-1">
           <Link href="/">
             <a>
-              <img
-                className="w-40"
+              <Image
                 src={isDarkMode ? `/supabase-dark.svg` : `/supabase-light.svg`}
                 alt="Supabase"
+                width={160}
+                height={22}
               />
             </a>
           </Link>
@@ -28,6 +30,7 @@ const Footer = () => {
             <a
               href="https://twitter.com/supabase"
               target="_blank"
+              rel="noreferrer"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">Twitter</span>
@@ -39,6 +42,7 @@ const Footer = () => {
             <a
               href="https://github.com/supabase"
               target="_blank"
+              rel="noreferrer"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">GitHub</span>
@@ -54,6 +58,7 @@ const Footer = () => {
             <a
               href="https://discord.supabase.com/"
               target="_blank"
+              rel="noreferrer"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">Discord</span>
@@ -69,6 +74,7 @@ const Footer = () => {
             <a
               href="https://youtube.com/c/supabase"
               target="_blank"
+              rel="noreferrer"
               className="text-scale-900 hover:text-scale-1100"
             >
               <span className="sr-only">Youtube</span>

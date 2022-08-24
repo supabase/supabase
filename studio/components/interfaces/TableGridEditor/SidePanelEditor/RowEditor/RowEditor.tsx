@@ -82,6 +82,7 @@ const RowEditor: FC<Props> = ({
       ui.setNotification({
         category: 'error',
         message: `Please enter a value in the ${row.name} field first`,
+        duration: 4000,
       })
     }
     const foreignKey = row.foreignKey
@@ -108,6 +109,7 @@ const RowEditor: FC<Props> = ({
         return ui.setNotification({
           category: 'error',
           message: `Unable to find the corresponding row in ${foreignKey.target_table_schema}.${foreignKey.target_table_name} where ${foreignKey.target_column_name} equals ${row.value}`,
+          duration: 4000,
         })
       }
       setReferenceRow({ loading: false, foreignKey, row: res[0] })
@@ -154,6 +156,12 @@ const RowEditor: FC<Props> = ({
       }`}
       onCancel={closePanel}
       hideFooter
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
@@ -207,7 +215,7 @@ const RowEditor: FC<Props> = ({
               column={selectedValueForJsonEdit?.column ?? ''}
               jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
               closePanel={() => setSelectedValueForJsonEdit(undefined)}
-              onSaveJSON={(value: string) => {
+              onSaveJSON={(value: string | number) => {
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
                 setSelectedValueForJsonEdit(undefined)
               }}

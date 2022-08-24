@@ -1,0 +1,134 @@
+---
+id: not
+title: '.not()'
+slug: not
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows which doesn't satisfy the filter.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .not('name', 'eq', 'Paris')
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      operator
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>FilterOperator</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The operator to filter with.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      value
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>any</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The value to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+  ```js
+    .not('name','eq','Paris')
+    .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+    .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+    .not('id','in','(6,7)')  // Use Postgres list () for in filter.
+    .not('id','in',`(${arr})`)  // You can insert a javascript array.
+  ```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .not('name', 'eq', 'Paris')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .not('name', 'eq', 'Paris')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .not('name', 'eq', 'Paris')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .not('name', 'eq', 'Paris')
+```

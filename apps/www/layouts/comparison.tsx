@@ -39,7 +39,7 @@ const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
   const NextCard = (props: any) => {
     const { post, label, className } = props
     return (
-      <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
+      <Link href={`${post.url}`} as={`${post.url}`}>
         <div className={className}>
           <div className="border-scale-500 hover:bg-scale-100 dark:hover:bg-scale-300 cursor-pointer rounded border p-6 transition">
             <div className="space-y-4">
@@ -64,7 +64,7 @@ const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.com/blog/${props.blog.slug}`,
+          url: `https://supabase.com/alternatives/${props.blog.slug}`,
           type: 'article',
           article: {
             //

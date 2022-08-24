@@ -12,7 +12,7 @@ interface Props {
   project: Project
 }
 
-const ProjectRestartingState: FC<Props> = ({ project }) => {
+const ConnectingState: FC<Props> = ({ project }) => {
   const { app } = useStore()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
@@ -26,7 +26,7 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   }, [])
 
   useEffect(() => {
-    if (!project.restUrl || !project.internalApiKey) return
+    if (!project.restUrl) return
 
     // Check project connection status every 4 seconds
     // pingPostgrest timeouts in 2s, wait for another 2s before checking again
@@ -37,7 +37,7 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   }, [project])
 
   const testProjectConnection = async () => {
-    const result = await pingPostgrest(project.restUrl!, project.internalApiKey!, {
+    const result = await pingPostgrest(project.restUrl!, project.ref, {
       kpsVersion: project.kpsVersion,
     })
     if (result) {
@@ -146,4 +146,4 @@ const ProjectRestartingState: FC<Props> = ({ project }) => {
   )
 }
 
-export default observer(ProjectRestartingState)
+export default observer(ConnectingState)

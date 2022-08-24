@@ -10,6 +10,7 @@ import NavigationBar from './NavigationBar/NavigationBar'
 import ProductMenuBar from './ProductMenuBar'
 import LayoutHeader from './LayoutHeader'
 import ConnectingState from './ConnectingState'
+import PausingState from './PausingState'
 import BuildingState from './BuildingState'
 
 interface Props {
@@ -110,13 +111,15 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
   const isProjectBuilding = [PROJECT_STATUS.COMING_UP, PROJECT_STATUS.RESTORING].includes(
     ui.selectedProject?.status ?? ''
   )
-
+  const isProjectPausing = ui.selectedProject?.status === PROJECT_STATUS.GOING_DOWN
   const isProjectOffline = ui.selectedProject?.postgrestStatus === 'OFFLINE'
 
   return (
     <>
       {isLoading || ui.selectedProject === undefined ? (
         <Connecting />
+      ) : isProjectPausing ? (
+        <PausingState project={ui.selectedProject} />
       ) : requiresPostgrestConnection && isProjectOffline ? (
         <ConnectingState project={ui.selectedProject} />
       ) : requiresDbConnection && isProjectBuilding ? (

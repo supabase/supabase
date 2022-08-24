@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { Badge, Button, IconDownload } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
@@ -17,17 +17,26 @@ interface Props {
 
 const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   const router = useRouter()
-  const { ui } = useStore()
+  const { app, ui } = useStore()
 
   const [isDownloading, setDownloading] = useState<boolean>(false)
   const [isRestoring, setRestoring] = useState<boolean>(false)
+
+  const projectId = ui.selectedProject?.id ?? -1
 
   async function restore(backup: any) {
     setRestoring(true)
     try {
       post(`${API_URL}/database/${projectRef}/backups/restore`, backup).then(() => {
         setTimeout(() => {
-          router.push('/project/[id]', `/project/${projectRef}`)
+          app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+          ui.setNotification({
+            category: 'success',
+            message: `Restoring database back to ${dayjs(backup.inserted_at).format(
+              'DD MMM YYYY HH:mm:ss'
+            )}`,
+          })
+          router.push(`/project/${projectRef}`)
         }, 3000)
       })
     } catch (error) {
@@ -46,7 +55,7 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
       const res = await post(`${API_URL}/database/${projectRef}/backups/download`, backup)
       const { fileUrl } = await res
 
-      // triger browser download by create,trigger and remove tempLink
+      // Trigger browser download by create,trigger and remove tempLink
       const tempLink = document.createElement('a')
       tempLink.href = fileUrl
       document.body.appendChild(tempLink)
@@ -101,18 +110,16 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   }
 
   return (
-    <>
-      <div
-        className={`flex h-12 items-center justify-between px-6 ${
-          index ? 'dark:border-dark border-t' : ''
-        }`}
-      >
-        <p className="text-scale-1200 text-sm ">
-          {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
-        </p>
-        <div className="">{generateSideButtons(backup)}</div>
-      </div>
-    </>
+    <div
+      className={`flex h-12 items-center justify-between px-6 ${
+        index ? 'dark:border-dark border-t' : ''
+      }`}
+    >
+      <p className="text-scale-1200 text-sm ">
+        {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
+      </p>
+      <div className="">{generateSideButtons(backup)}</div>
+    </div>
   )
 }
 

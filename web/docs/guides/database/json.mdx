@@ -10,21 +10,42 @@ import TabItem from '@theme/TabItem'
 PostgreSQL supports [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html) which gives flexibility when storing data inside a database column.
 
 PostgreSQL supports two types of JSON columns: `JSON` and `JSONB`.
-
 The recommended type is `JSONB` for almost all cases.
 When you use the `JSONB` format, the data is parsed when it's put into the database so it's faster when querying and also it can be indexed.
 
-## Steps
-
-### Create a table with a JSON column.
+## Create a table with a JSON column
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'UI', value: 'UI'},
-]}>
-<TabItem value="SQL">
+  groupId="json"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+2. Click **New Table** and create a table called `books`.
+3. Include a primary key with the following properties:
+   - Name: `id`
+   - Type: `int8`
+   - Default value: `Automatically generate as indentity`
+4. Click **Save**.
+5. Click **New Column** and add 3 columns with the following properties:
+   - **title** column
+     - Name: `title`
+     - Type: `text`
+   - **author** column
+     - Name: `author`
+     - Type: `text`
+   - **metadata** column
+     - Name: `metadata`
+     - Type: `jsonb`
+
+</TabItem>
+
+<TabItem value="sql">
 
 ```sql
 create table books (
@@ -36,50 +57,24 @@ create table books (
 ```
 
 </TabItem>
-<TabItem value="UI">
-
-```sh
-Create the table:
-
-1. Go to the Table Editor
-2. Click "New Table"
-3. Name the table "books"
-4. Include a primary key with the following properties:
-  - Name: "id"
-  - Type: "int8"
-  - Default value: "Automatically generate as indentity"
-5. Click "Save"
-
-
-Click "New Column" and 3 new columns with the following properties:
-
-1. title column:
-  - Name: "title"
-  - Type: "text"
-
-2. author column:
-  - Name: "author"
-  - Type: "text"
-
-3. metadata column:
-  - Name: "metadata"
-  - Type: "jsonb"
-```
-
-</TabItem>
 </Tabs>
 
-### Insert data into the table.
+## Insert data into the table
 
 <Tabs
-defaultValue="Data"
-values={[
-  {label: 'Data', value: 'Data'},
-  {label: 'SQL', value: 'SQL'},
-  {label: 'UI', value: 'UI'},
-  {label: 'JS', value: 'JavaScript'},
-]}>
-<TabItem value="Data">
+  groupId="json"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+  ]}>
+
+<TabItem value="dashboard">
+
+1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+2. Select the `books` table in the sidebar.
+3. Click **+ Insert row** and add 5 rows with the following properties:
 
 | id  | title                               | author                 | metadata                                                                                                       |
 | --- | ----------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -90,7 +85,8 @@ values={[
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                 |
 
 </TabItem>
-<TabItem value="SQL">
+
+<TabItem value="sql">
 
 ```sql
 insert into books
@@ -124,40 +120,8 @@ values
 ```
 
 </TabItem>
-<TabItem value="UI">
 
-```bash
-- click `Table Editor`
-- click `books`
-- click `+ Insert Row`
-    - `title`: `The Poky Little Puppy`
-    - `author`: 'Janette Sebring Lowrey'
-    - `metadata`: {"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}
-    - click `Save`
-- click `+ Insert Row`
-    - `title`: `The Tale of Peter Rabbit`
-    - `author`: 'Beatrix Potter'
-    - `metadata`: {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}
-    - click `Save`
-- click `+ Insert Row`
-    - `title`: `Tootle`
-    - `author`: 'Gertrude Crampton'
-    - `metadata`: {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}
-    - click `Save`
-- click `+ Insert Row`
-    - `title`: `Green Eggs and Ham`
-    - `author`: 'Dr. Seuss'
-    - `metadata`: {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."}
-    - click `Save`
-- click `+ Insert Row`
-    - `title`: `Harry Potter and the Goblet of Fire`
-    - `author`: 'J.K. Rowling'
-    - `metadata`: {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}
-    - click `Save`
-```
-
-</TabItem>
-<TabItem value="JavaScript">
+<TabItem value="javascript">
 
 ```js
 const { data, error } = await supabase.from('books').insert([
@@ -204,16 +168,18 @@ const { data, error } = await supabase.from('books').insert([
 </TabItem>
 </Tabs>
 
-### View the data.
+## View the data
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JavaScript'},
-  {label: 'Data', value: 'Data'},
-]}>
-<TabItem value="SQL">
+  groupId="json"
+  defaultValue="sql"
+  values={[
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Result', value: 'result'},
+  ]}>
+
+<TabItem value="sql">
 
 ```sql
 select *
@@ -221,7 +187,8 @@ from books;
 ```
 
 </TabItem>
-<TabItem value="JavaScript">
+
+<TabItem value="javascript">
 
 ```js
 const { data, error } = await supabase.from('books').select('*')
@@ -229,7 +196,8 @@ console.log(JSON.stringify(data, null, 2))
 ```
 
 </TabItem>
-<TabItem value="Data">
+
+<TabItem value="result">
 
 | id  | title                               | author                 | metadata                                                                                                       |
 | --- | ----------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -239,26 +207,25 @@ console.log(JSON.stringify(data, null, 2))
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."} |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}                 |
 
-NOTICE: The data as it appears here will have the `JSONB` fields in a different order than when we inserted them.
-As we said earlier about the differences between the `JSON` and `JSONB` fields:
-
-> When you use the `JSONB` format, the data is parsed when it's put into the database...
+The data as it appears here has the `JSONB` fields in a different order than when inserted. As mentioned earlier, data is parsed as its inserted when using the JSONB format.
 
 </TabItem>
 </Tabs>
 
-### Query the `JSONB` data.
+## Query the `JSONB` data
 
-#### Select title, description, price, and age range for each book.
+Select the title, description, price, and age range for each book.
 
 <Tabs
-defaultValue="SQL"
-values={[
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JS', value: 'JavaScript'},
-  {label: 'Results', value: 'Results'}
-]}>
-<TabItem value="SQL">
+  groupId="json"
+  defaultValue="sql"
+  values={[
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Result', value: 'result'}
+  ]}>
+
+<TabItem value="sql">
 
 ```sql
 select
@@ -272,7 +239,8 @@ from
 ```
 
 </TabItem>
-<TabItem value="JavaScript">
+
+<TabItem value="javascript">
 
 ```js
 const { data, error } = await supabase
@@ -284,7 +252,8 @@ console.log(JSON.stringify(data, null, 2))
 ```
 
 </TabItem>
-<TabItem value="Results">
+
+<TabItem value="result">
 
 | title                               | description                                                        | price | low_age | high_age |
 | ----------------------------------- | ------------------------------------------------------------------ | ----- | ------- | -------- |
@@ -297,16 +266,13 @@ console.log(JSON.stringify(data, null, 2))
 </TabItem>
 </Tabs>
 
-#### Data Types
+Note that the `->` operator returns JSONB data. If you want TEXT/STRING data returned, use the `->>` operator.
 
-One last thing to note: the -> operator returns JSONB data. If you want TEXT/STRING data returned, you need to use the ->> operator.
-
-- metadata -> 'description' (this returns a JSON object)
-- metadata ->> 'description' (this returns STRING/TEXT data)
+- metadata -> 'description' (returns a JSON object)
+- metadata ->> 'description' (returns STRING/TEXT data)
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [PostgreSQL: JSON Functions and Operators](https://www.postgresql.org/docs/12/functions-json.html)
 - [PostgreSQL JSON types](https://www.postgresql.org/docs/12/datatype-json.html)

@@ -170,13 +170,13 @@ const TriggersList: FC<any> = observer(
         {hooks.length == 0 ? (
           <div className="flex h-full w-full items-center justify-center">
             <ProductEmptyState
-              title="Function Hooks"
-              ctaButtonLabel="Create Function Hook"
+              title="Database Webhooks"
+              ctaButtonLabel="Create Webhook"
               onClickCta={() => createHook()}
             >
               <AlphaPreview />
               <p className="text-scale-1100 text-sm">
-                Function Hooks can be used to trigger serverless functions or send requests to an
+                Database Webhooks can be used to trigger serverless functions or send requests to an
                 HTTP endpoint.
               </p>
             </ProductEmptyState>

@@ -5,7 +5,7 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { SettingsLoadingState } from './SettingsLoadingState'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 const DisplayApiSettings = () => {
   const router = useRouter()

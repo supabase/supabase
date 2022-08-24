@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { NextPageWithLayout } from 'types'
 
 /**
@@ -16,7 +16,7 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       queryType={'fn_edge'}
-      filterOverride={{function_id: id}}
+      filterOverride={{ function_id: id }}
     />
   )
 }

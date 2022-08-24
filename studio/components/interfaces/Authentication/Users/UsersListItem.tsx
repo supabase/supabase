@@ -6,26 +6,14 @@ import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import UserDropdown from './UserDropdown'
 import { getDateFromIsoString } from './Users.utils'
+import { User } from './Users.types'
 
 interface Props {
-  user: {
-    id: string
-    email: string
-    phone: string
-    email_confirmed_at: string
-    phone_confirmed_at: string
-    created_at: string
-    last_sign_in_at: string
-    raw_app_meta_data?: {
-      provider: string
-    }
-    app_metadata?: {
-      provider: string
-    }
-  }
+  user: User
+  canRemoveUser: boolean
 }
 
-const UserListItem: FC<Props> = ({ user }) => {
+const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = getDateFromIsoString(user.created_at)
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
@@ -63,7 +51,7 @@ const UserListItem: FC<Props> = ({ user }) => {
         </SimpleCodeBlock>
       </Table.td>
       <Table.td className="text-right">
-        <UserDropdown user={user} />
+        <UserDropdown user={user} canRemoveUser={canRemoveUser} />
       </Table.td>
     </Table.tr>
   )

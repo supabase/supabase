@@ -47,20 +47,22 @@ async function generate() {
             if (route === '/alternatives/[slug]') return null
             if (route === '/partners/[slug]') return null
 
-            //
-            // blog specific urls
-            //
+            /**
+             * Blog based urls
+             */
             if (route.includes('/blog/')) {
-              // clean blog post route from string
+              /**
+               * remove directory from route
+               */
               const _route = route.replace('/blog/', '')
-              // splut the url
-              let split = _route.split('')
-              // target and replace the `-` between dates
-              split[4] = '/'
-              split[7] = '/'
-              split[10] = '/'
-              // reconstruct the url
-              route = '/blog/' + split.join('')
+              /**
+               * remove the date from the file name
+               */
+              const substring = _route.substring(11)
+              /**
+               * reconsruct the route
+               */
+              route = '/blog/' + substring
             }
 
             return `

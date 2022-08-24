@@ -1,5 +1,27 @@
 Pricing Changelog
 
+### 16 June 2022
+----
+
+Auth
+- New item “MAUs (Monthly Active Users)”
+Security & Compliance
+- New item: “Security questionnaire help” for enterprise
+- New item - “Metrics Endpoint” for enterprise and pro tier users
+Database Compute Add ons
+- New item: “4XL”
+- New item: “8XL”
+- New item: “12XL”
+- New item: “16XL”
+Database
+- New item: “Point in time recovery” for enterprise
+Clarifications
+- General - Clearer language that we charge on a per project per month
+- Storage - Uploads for Pro, changed from 3GB → 5GB in title card
+- Storage - file upload size - clarified that it can be changed in dashboard
+- All products - “Transfer” renamed to “Egress”
+- Database compute add-ons - Number of connections more accurate
+- Storage - Free tier egress per month clarified
 
 ### 31 March 2022
 ----

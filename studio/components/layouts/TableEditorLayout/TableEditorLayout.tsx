@@ -37,6 +37,8 @@ const TableEditorLayout: FC<Props> = ({
       meta.schemas.load()
       meta.tables.load()
       meta.types.load()
+      meta.policies.load()
+      meta.publications.load()
     }
   }, [ui.selectedProject])
 

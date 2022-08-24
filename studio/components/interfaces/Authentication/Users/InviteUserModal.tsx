@@ -1,51 +1,42 @@
-import { useContext, useState, useRef } from 'react'
+import { useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Modal, Input, IconPlus, IconMail } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Button, Modal, Input, IconPlus, IconMail, Form } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
 const InviteUserModal = () => {
-  const PageState: any = useContext(PageContext)
-  const inputRef = useRef<any>(null)
   const { ui } = useStore()
+  const PageState: any = useContext(PageContext)
+  const [visible, setVisible] = useState(false)
 
-  const [visible, setVisible] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [emailValue, setEmailValue] = useState<string>('')
+  const handleToggle = () => setVisible(!visible)
+  const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
-  function handleToggle() {
-    // reset data before showing modal again
-    if (!visible) {
-      setEmailValue('')
-    }
-    setVisible(!visible)
-  }
-
-  function onInputChange(e: any) {
-    setEmailValue(e.target.value)
-  }
-
-  async function onInviteUser() {
+  const validate = (values: any) => {
+    const errors: any = {}
     const emailValidateRegex =
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-    if (!emailValidateRegex.test(emailValue)) {
-      inputRef?.current?.focus()
-      const message =
-        emailValue.trim() === ''
-          ? 'Please enter a valid email'
-          : `${emailValue} is an invalid email`
-      ui.setNotification({ category: 'error', message: message })
-      return
+
+    if (values.email.length === 0) {
+      errors.email = 'Please enter a valid email'
+    } else if (!emailValidateRegex.test(values.email)) {
+      errors.email = `${values.email} is an invalid email`
     }
 
-    setLoading(true)
-    const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
-      email: emailValue,
-    })
+    return errors
+  }
 
+  const onInviteuser = async (values: any, { setSubmitting }: any) => {
+    setSubmitting(true)
+
+    const response = await post(`${API_URL}/auth/${PageState.projectRef}/invite`, {
+      email: values.email,
+    })
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -55,52 +46,81 @@ const InviteUserModal = () => {
       PageState.fetchData(1)
       ui.setNotification({
         category: 'success',
-        message: `Sent invite email to ${emailValue}`,
+        message: `Sent invite email to ${values.email}`,
       })
+      setVisible(false)
     }
 
-    setLoading(false)
-    setVisible(false)
+    setSubmitting(false)
   }
 
   return (
     <div>
-      <Button onClick={handleToggle} icon={<IconPlus />}>
-        Invite
-      </Button>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button as="span" onClick={handleToggle} icon={<IconPlus />} disabled={!canInviteUsers}>
+            Invite
+          </Button>
+        </Tooltip.Trigger>
+        {!canInviteUsers && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to invite users
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <Modal
+        closable
+        hideFooter
         size="small"
         key="invite-user-modal"
         visible={visible}
-        header="Invite new user"
-        hideFooter
+        header="Invite a new user"
         onCancel={handleToggle}
-        closable
       >
-        <div className="py-4 space-y-6">
-          <Modal.Content>
-            <Input
-              label="User email"
-              icon={<IconMail />}
-              descriptionText="Type in the full email address"
-              autoFocus
-              // @ts-ignore
-              ref={inputRef}
-              value={emailValue}
-              onChange={onInputChange}
-              type="email"
-              name="email"
-              id="email"
-              placeholder="User email"
-              className="w-full"
-            />
-          </Modal.Content>
-          <Modal.Content>
-            <Button onClick={onInviteUser} size="small" loading={loading} disabled={loading} block>
-              Invite user
-            </Button>
-          </Modal.Content>
-        </div>
+        <Form
+          validateOnBlur
+          initialValues={{ email: '' }}
+          validate={validate}
+          onSubmit={onInviteuser}
+        >
+          {({ isSubmitting }: { isSubmitting: boolean }) => (
+            <div className="py-4 space-y-6">
+              <Modal.Content>
+                <Input
+                  autoFocus
+                  id="email"
+                  className="w-full"
+                  label="User email"
+                  icon={<IconMail />}
+                  type="email"
+                  name="email"
+                  placeholder="User email"
+                />
+              </Modal.Content>
+              <Modal.Content>
+                <Button
+                  block
+                  size="small"
+                  htmlType="submit"
+                  loading={isSubmitting}
+                  disabled={!canInviteUsers || isSubmitting}
+                >
+                  Invite user
+                </Button>
+              </Modal.Content>
+            </div>
+          )}
+        </Form>
       </Modal>
     </div>
   )

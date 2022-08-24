@@ -78,7 +78,7 @@ For any support please get in touch at beta at [supabase.com](https://supabase.c
 
 ### Resources
 
-- JWT debugger: https://jwt.io/​
+- [JWT debugger](https://jwt.io)
 
 ### Next steps
 

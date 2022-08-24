@@ -473,7 +473,7 @@
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs;
+  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {
@@ -617,7 +617,7 @@
 }
 
 .foreign-table-modal__row-item {
-  @apply border-scale-400 dark:border-scale-500 overflow-hidden rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
+  @apply border-scale-400 dark:border-scale-500 overflow-scroll rounded border border-solid px-5 py-2 shadow-sm first:mt-2;
 }
 
 .foreign-table-modal__row-item__inner {
@@ -707,4 +707,3 @@ header/sort/SortRow
 .sb-grid-sort-row__item__move {
   @apply flex cursor-move;
 }
-

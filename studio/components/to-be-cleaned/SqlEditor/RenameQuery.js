@@ -1,19 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
 
 import { useStore } from 'hooks'
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-import { useProjectContentStore } from 'stores/projectContentStore'
 import { Button, Form, Input, Modal } from '@supabase/ui'
 
 const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
-  const { ui } = useStore()
+  const { ui, content: contentStore } = useStore()
 
-  const router = useRouter()
-  const { ref } = router.query
-
-  const contentStore = useProjectContentStore(ref)
   const sqlEditorStore = useSqlStore()
   const model = prepareModel()
 
@@ -28,17 +22,18 @@ const RenameQuery = observer(({ tabId, onComplete, visible, onCancel }) => {
   async function onRename(model) {
     try {
       /*
-       * old localStorage save
-       */
-      sqlEditorStore.renameQuery(tabId, model)
-      /*
        * new main db save
        */
       await contentStore.update(tabId, {
         name: model.name,
         description: model.desc,
       })
-      await contentStore.load()
+
+      /*
+       * old localStorage save
+       */
+      sqlEditorStore.renameQuery(tabId, model)
+
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error) {

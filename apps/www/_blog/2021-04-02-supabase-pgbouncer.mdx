@@ -60,7 +60,7 @@ as mentioned above, PgBouncer allows your database to be able to handle more tha
 
 PgBouncer is like a Queue. With regular Postgres, when you hit your connection limit, new connections are rejected. PgBouncer overcomes this
 limitation. When all connections in the pool are in-use, it doesn't reject any incoming requests. Instead,
-[PgBouncer queues them](https://www.percona.com/blog/2021/02/26/connection-queuing-in-pgbouncer-is-it-a-magical-remedy/) until a
+[PgBouncer queues them](https://www.percona.com/blog/connection-queuing-in-pgbouncer-is-it-a-magical-remedy/) until a
 connection is returned to the pool and made available. This doesn't mean connection pooling is a magic bullet. If your clients is
 running expensive queries then the connections might take a long time before they are returned to the pool. The natural solution to
 this is to increase your database resources so that it processes queries faster or PgBouncer can open more connections.
@@ -96,4 +96,4 @@ Try out connection pooling now with a new project in the [dashboard.](https://ap
 
 Eventually, we will expose more PgBouncer settings to the UI such as `Pool Size`. At the moment it is set to `15`.
 
-We are still working towards getting the latest version of Supabase Postgres to both the AWS and Digital Ocean marketplaces. Follow us on [Twitter](https://www.notion.so/PgBouncer-is-now-available-in-Supabase-345a74d402464670923cf404b714a354) to be informed once it's released!
+We are still working towards getting the latest version of Supabase Postgres to both the AWS and Digital Ocean marketplaces. Follow us on [Twitter](https://twitter.com/supabase) to be informed once it's released!

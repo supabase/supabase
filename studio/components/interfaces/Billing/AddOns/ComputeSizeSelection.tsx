@@ -8,11 +8,17 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 
 interface Props {
   computeSizes: any[]
+  currentComputeSize?: any
   selectedComputeSize: any
   onSelectOption: (option: any) => void
 }
 
-const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, onSelectOption }) => {
+const ComputeSizeSelection: FC<Props> = ({
+  computeSizes,
+  currentComputeSize,
+  selectedComputeSize,
+  onSelectOption,
+}) => {
   const { ui } = useStore()
   const projectRef = ui.selectedProjectRef
   const addonUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -39,7 +45,15 @@ const ComputeSizeSelection: FC<Props> = ({ computeSizes, selectedComputeSize, on
                 hidden
                 key={option.id}
                 align="vertical"
-                label={option.name}
+                // @ts-ignore
+                label={
+                  <div className="flex items-center space-x-4">
+                    <p>{option.name}</p>
+                    {currentComputeSize?.id === option.id && (
+                      <Badge color="brand">Current selection</Badge>
+                    )}
+                  </div>
+                }
                 // @ts-ignore
                 description={
                   <div>

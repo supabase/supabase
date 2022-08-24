@@ -9,9 +9,11 @@ import {
   Modal,
   Alert,
 } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
-import { STRIPE_PRODUCT_IDS } from 'lib/constants'
+import { checkPermissions, useFlag, useStore } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS, STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { SubscriptionPreview } from '../Billing.types'
 import { getProductPrice } from '../Billing.utils'
 import PaymentTotal from './PaymentTotal'
@@ -59,14 +61,28 @@ const PaymentSummaryPanel: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const projectRegion = ui.selectedProject?.region
+  const isOwner = ui.selectedOrganization?.is_owner
+
+  const enablePermissions = useFlag('enablePermissions')
+  const canUpdatePaymentMethods = enablePermissions
+    ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.payment_methods')
+    : isOwner
+
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  const isEnterprise = currentPlan.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   const isChangingPlan =
-    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && currentPlan.prod_id !== selectedPlan?.id) ||
+    (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG &&
+      selectedPlan &&
+      currentPlan.prod_id !== selectedPlan.id) ||
     (currentPlan.prod_id !== STRIPE_PRODUCT_IDS.PAYG && !isSpendCapEnabled) ||
     (currentPlan.prod_id === STRIPE_PRODUCT_IDS.PAYG && isSpendCapEnabled)
   const isChangingComputeSize = currentComputeSize.id !== selectedComputeSize.id
-  const hasChangesToPlan = subscriptionPreview?.has_changes ?? false
+
+  // If it's enterprise we only only changing of add-ons
+  const hasChangesToPlan = isEnterprise
+    ? isChangingComputeSize
+    : subscriptionPreview?.has_changes ?? false
 
   const getPlanName = (plan: any) => {
     if (plan.prod_id === STRIPE_PRODUCT_IDS.PAYG || plan.id === STRIPE_PRODUCT_IDS.PAYG) {
@@ -172,13 +188,36 @@ const PaymentSummaryPanel: FC<Props> = ({
                 <IconAlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm">No saved payment methods</p>
               </div>
-              <Button
-                type="default"
-                icon={<IconCreditCard />}
-                onClick={onSelectAddNewPaymentMethod}
-              >
-                Add new
-              </Button>
+
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="default"
+                    disabled={!canUpdatePaymentMethods}
+                    icon={<IconCreditCard />}
+                    onClick={onSelectAddNewPaymentMethod}
+                  >
+                    Add new
+                  </Button>
+                </Tooltip.Trigger>
+                {!canUpdatePaymentMethods && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                        'border-scale-200 w-48 border text-center', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-scale-1200 text-xs">
+                        {enablePermissions
+                          ? 'You need additional permissions to add new payment methods to this organization'
+                          : 'Only organization owners can add new payment methods'}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </div>
           ) : (
             <Listbox value={selectedPaymentMethod?.id} onChange={onSelectPaymentMethod}>

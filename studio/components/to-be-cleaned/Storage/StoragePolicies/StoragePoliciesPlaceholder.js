@@ -1,5 +1,5 @@
 import { IconArchive } from '@supabase/ui'
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 const StoragePoliciesPlaceholder = ({ guiHeight }) => (
   <Panel

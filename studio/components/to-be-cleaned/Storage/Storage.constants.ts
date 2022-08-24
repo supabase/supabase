@@ -10,6 +10,11 @@ export const STORAGE_SORT_BY = {
   LAST_ACCESSED_AT: 'last_accessed_at',
 }
 
+export const STORAGE_SORT_BY_ORDER = {
+  ASC: 'asc',
+  DESC: 'desc',
+}
+
 export const STORAGE_ROW_TYPES = {
   BUCKET: 'BUCKET',
   FILE: 'FILE',
@@ -33,17 +38,16 @@ export const STORAGE_POLICY_DEFAULT_DEFINITION_PLACEHOLDER = `/*
 `
 
 export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
-  copyObject: ['INSERT'],
-  createObject: ['INSERT'],
-  deleteObject: ['SELECT', 'DELETE'],
-  deleteObjects: ['SELECT', 'DELETE'],
-  getObject: ['SELECT'],
-  getSignedObject: [],
-  getSignedUrl: ['SELECT'],
-  getSignedUrls: ['SELECT'],
-  listObjects: ['SELECT'],
-  moveObjects: ['SELECT', 'UPDATE'],
-  updateObject: ['SELECT', 'UPDATE'],
+  upload: ['INSERT'],
+  download: ['SELECT'],
+  list: ['SELECT'],
+  update: ['SELECT', 'UPDATE'],
+  move: ['SELECT', 'UPDATE'],
+  copy: ['SELECT', 'INSERT'],
+  remove: ['SELECT', 'DELETE'],
+  createSignedUrl: ['SELECT'],
+  createSignedUrls: ['SELECT'],
+  getPublicUrl: [],
 }
 
 export const CONTEXT_MENU_KEYS = {

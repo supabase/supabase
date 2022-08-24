@@ -16,10 +16,10 @@ module.exports = ui({
   mode: 'JIT',
   content: [
     '../../packages/common/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx,mdx}',
     './components/**/*.tsx',
     './layouts/**/*.tsx',
-    './pages/**/*.tsx',
+    './pages/**/*.{tsx,mdx}',
     './_blog/*.mdx',
     // purge styles from supabase ui theme
     '../../node_modules/@supabase/ui/dist/config/default-theme.js',
@@ -52,7 +52,7 @@ module.exports = ui({
             '--tw-prose-body': theme('colors.scale[1100]'),
             '--tw-prose-headings': theme('colors.scale[1200]'),
             '--tw-prose-lead': theme('colors.scale[1100]'),
-            '--tw-prose-links': theme('colors.brand[900]'),
+            '--tw-prose-links': theme('colors.scale[1100]'),
             '--tw-prose-bold': theme('colors.scale[1100]'),
             '--tw-prose-counters': theme('colors.scale[1100]'),
             '--tw-prose-bullets': theme('colors.scale[900]'),
@@ -88,9 +88,6 @@ module.exports = ui({
             p: {
               fontWeight: '400',
             },
-            a: {
-              fontWeight: '400',
-            },
             pre: {
               background: 'none',
               padding: 0,
@@ -100,6 +97,27 @@ module.exports = ui({
               border: '1px solid var(--colors-scale4)',
               borderRadius: '4px',
               overflow: 'hidden',
+            },
+            iframe: {
+              border: '1px solid ' + theme('borderColor.DEFAULT'),
+              borderRadius: theme('borderRadius.lg'),
+            },
+            code: {
+              fontWeight: '400',
+              padding: '0.2rem 0.4rem',
+              backgroundColor: theme('colors.scale[400]'),
+              border: '1px solid ' + theme('colors.scale[500]'),
+              borderRadius: theme('borderRadius.lg'),
+            },
+            a: {
+              transition: 'box-shadow 0.1s ease-in-out',
+              paddingBottom: '2px',
+              textDecoration: 'none',
+              boxShadow: "theme('colors.brand[900]') 0px -3px 0px -1px inset",
+            },
+            'a:hover': {
+              boxShadow: "inset 0 -30px 0 -1px theme('colors.brand[900]')",
+              color: 'var(--tw-prose-headings)',
             },
           },
         },
@@ -115,6 +133,7 @@ module.exports = ui({
               },
               a: {
                 display: 'block',
+                marginBottom: '0.4rem',
                 'text-decoration': 'none',
                 fontSize: '0.8rem',
                 fontWeight: '200',

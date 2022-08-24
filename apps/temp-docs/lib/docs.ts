@@ -32,14 +32,14 @@ function walk(dir: string) {
   const list = fs.readdirSync(dir)
   list.forEach(function (file) {
     file = dir + '/' + file
-    const stat = fs.statSync(file)
-    if (stat && stat.isDirectory()) {
-      /* Recurse into a subdirectory */
-      results = results.concat(walk(file))
-    } else {
-      /* Is a file */
-      results.push(file)
-    }
+    let slugs = []
+
+    fs.readdirSync(dir).forEach((file) => {
+      let absolute = join(dir, file)
+      if (fs.statSync(absolute).isDirectory()) {
+        fs.readdirSync(absolute).forEach((subFile) => slugs.push(file.concat('/' + subFile)))
+      }
+    })
   })
   return results
 }

@@ -1,7 +1,7 @@
 import { Button, Modal } from '@supabase/ui'
 import { isEmpty } from 'lodash'
 import { FC, useState } from 'react'
-import SqlEditor from 'components/to-be-cleaned/SqlEditor'
+import SqlEditor from 'components/ui/SqlEditor'
 import { PolicyForReview } from './Policies.types'
 
 interface Props {

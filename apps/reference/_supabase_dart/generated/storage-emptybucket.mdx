@@ -1,0 +1,33 @@
+---
+id: storage-emptybucket
+title: 'emptyBucket()'
+slug: /storage-emptybucket
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Removes all objects inside a single bucket.
+
+```dart
+final res = await supabase
+  .storage
+  .emptyBucket('avatars');
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select`
+  - `objects` permissions: `select` and `delete`
+
+## Examples
+
+### Empty bucket
+
+```dart
+final res = await supabase
+  .storage
+  .emptyBucket('avatars');
+```

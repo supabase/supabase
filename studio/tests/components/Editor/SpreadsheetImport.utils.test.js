@@ -35,6 +35,15 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     const type2 = inferColumnType('isRetired', mockData2)
     expect(type2).toBe('boolean')
   })
+  test('should infer boolean type for a supposed boolean column if one of the rows has a null value', () => {
+    const mockData3 = [
+      { name: 'bob', height: '161.72', isRetired: 'false' },
+      { name: 'bob', height: '161.72', isRetired: 'true' },
+      { name: 'bob', height: '161.72', isRetired: null },
+    ]
+    const type3 = inferColumnType('isRetired', mockData3)
+    expect(type3).toBe('boolean')
+  })
   test('should infer objects as jsonb types correctly', () => {
     const mockData = [{ name: 'bob', metadata: '{}' }]
     const type = inferColumnType('metadata', mockData)
