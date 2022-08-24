@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Badge, IconList, Loading } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -8,13 +8,12 @@ import BaseLayout from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import LogsNavigation from 'components/interfaces/Settings/Logs/LogsNavigation'
 
-const PageLayout = ({
-  subtitle,
-  children,
-}: {
-  subtitle?: React.ReactNode
-  children?: React.ReactNode
-}) => {
+interface Props {
+  subtitle?: ReactNode
+  children?: ReactNode
+}
+
+const PageLayout: FC<Props> = ({ subtitle, children }) => {
   const { content, ui } = useStore()
 
   useEffect(() => {
