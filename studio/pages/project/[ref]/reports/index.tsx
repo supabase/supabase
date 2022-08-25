@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { NextPageWithLayout } from 'types'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -20,10 +22,11 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  // const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
-  //   resource: { type: 'report' },
-  // })
   const contentStore = useProjectContentStore(ref)
+  const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
@@ -64,6 +67,8 @@ export const UserReportPage: NextPageWithLayout = () => {
               })
             }
           }}
+          disabled={!canCreateReport}
+          disabledMessage="You need additional permissions to create a report"
         >
           <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
           <p className="text-scale-1100 text-sm">
