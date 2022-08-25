@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Button, IconLoader } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { timeout } from 'lib/helpers'
 
@@ -19,7 +20,7 @@ const temp_removePostgrestText = (content) => {
   return cleansed
 }
 
-export default function Description({ content, metadata, disabled = false, onChange = () => {} }) {
+export default function Description({ content, metadata, onChange = () => {} }) {
   const { meta, ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
@@ -31,8 +32,10 @@ export default function Description({ content, metadata, disabled = false, onCha
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
+  const canUpdateDescription = checkPermissions(PermissionAction.TENANT_SQL_QUERY, '*')
+
   const updateDescription = async () => {
-    if (isUpdating) return false
+    if (isUpdating || !canUpdateDescription) return false
 
     setIsUpdating(true)
     let query = ''
@@ -44,22 +47,29 @@ export default function Description({ content, metadata, disabled = false, onCha
 
     if (query) {
       const res = await meta.query(query)
+
+      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
+      await timeout(500)
+
       if (res.error) {
         ui.setNotification({
           error: res.error,
           category: 'error',
           message: `Failed to update description: ${res.error.message}`,
         })
+      } else {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated description`,
+        })
       }
-      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
-      await timeout(500)
     }
 
     onChange(value)
     setIsUpdating(false)
   }
 
-  if (disabled) {
+  if (!canUpdateDescription) {
     return (
       <span className={`block ${value ? 'text-scale-1200' : ''}`}>{value || 'No description'}</span>
     )
