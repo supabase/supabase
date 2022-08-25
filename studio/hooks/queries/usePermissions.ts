@@ -4,7 +4,6 @@ import jsonLogic from 'json-logic-js'
 import { useFlag, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { toJS } from 'mobx'
 
 export function usePermissions(returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
