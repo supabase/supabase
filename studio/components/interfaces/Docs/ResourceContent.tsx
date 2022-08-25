@@ -1,6 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { checkPermissions } from 'hooks'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 import Param from 'components/to-be-cleaned/Docs/Param'
@@ -30,8 +27,6 @@ const ResourceContent = ({
     required: resourceDefinition?.required?.includes(id),
   }))
 
-  const canUpdateDescription = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
   return (
     <>
       <h2 className="text-scale-1200mt-0">
@@ -44,7 +39,6 @@ const ResourceContent = ({
             content={description}
             metadata={{ table: resourceId }}
             onChange={refreshDocs}
-            disabled={!canUpdateDescription}
           />
         </article>
         <article className="code"></article>
@@ -66,7 +60,6 @@ const ResourceContent = ({
                     column: x.id,
                   }}
                   onDesciptionUpdated={refreshDocs}
-                  canUpdateDescription={canUpdateDescription}
                 />
               </article>
               <article className="code">

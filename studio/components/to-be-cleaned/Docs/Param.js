@@ -8,7 +8,6 @@ const Param = ({
   required,
   description,
   metadata = {},
-  canUpdateDescription = false,
   onDesciptionUpdated = () => {},
 }) => {
   return (
@@ -27,12 +26,7 @@ const Param = ({
       {description !== false && (
         <>
           <label className="uppercase text-xs font-mono text-scale-900">Description</label>
-          <Description
-            content={description}
-            metadata={metadata}
-            onChange={onDesciptionUpdated}
-            disabled={!canUpdateDescription}
-          />
+          <Description content={description} metadata={metadata} onChange={onDesciptionUpdated} />
         </>
       )}
     </>

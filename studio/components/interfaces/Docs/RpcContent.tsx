@@ -1,6 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { checkPermissions } from 'hooks'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 import Param from 'components/to-be-cleaned/Docs/Param'
@@ -37,8 +34,6 @@ const RpcContent = ({
     .filter((x) => !!x.name)
   const paramList = rpcParams.map((x) => x.type).join(', ')
 
-  const canUpdateDescription = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
   return (
     <>
       <h2 className="text-scale-1200 mt-0">
@@ -51,7 +46,6 @@ const RpcContent = ({
             content={summary}
             metadata={{ rpc: `${rpcId} (${paramList})` }}
             onChange={refreshDocs}
-            disabled={!canUpdateDescription}
           />
         </article>
         <article className="code">
