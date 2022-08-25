@@ -2,9 +2,10 @@ import { FC, ReactNode, useEffect } from 'react'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, withAuth } from 'hooks'
+import { checkPermissions, useStore, withAuth } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
+import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -12,6 +13,8 @@ import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Stora
 import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   title: string
@@ -97,6 +100,17 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
         })
       )
     }
+  }
+
+  const canAccessStorage = checkPermissions(PermissionAction.READ, 'service_api_keys')
+  if (!canAccessStorage) {
+    return (
+      <BaseLayout title={title || 'Storage'} product="Storage">
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          <NoPermission isFullPage resourceText="access your project's storage" />
+        </main>
+      </BaseLayout>
+    )
   }
 
   return (
