@@ -38,7 +38,7 @@ jobs:
       - name: Install Deps
         run: npm ci
         working-directory: ./apps/reference
-        
+
       - name: Pull Specs
         run: make
         working-directory: ./spec
