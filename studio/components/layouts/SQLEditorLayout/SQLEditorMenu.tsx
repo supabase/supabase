@@ -14,9 +14,10 @@ import {
   Modal,
   IconEdit2,
 } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useOptimisticSqlSnippetCreate, useStore } from 'hooks'
 import QueryTab from 'localStores/sqlEditor/QueryTab'
 import { useSqlStore, TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
 
@@ -24,22 +25,24 @@ import RenameQuery from 'components/to-be-cleaned/SqlEditor/RenameQuery'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 
-const OpenQueryItem = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
-  const sqlEditorStore: any = useSqlStore()
-  const { id, name } = tabInfo || {}
-  const active = sqlEditorStore.activeTab.id === id
+const OpenQueryItem = observer(
+  ({ tabInfo, canCreateSQLSnippet }: { tabInfo: QueryTab; canCreateSQLSnippet: boolean }) => {
+    const sqlEditorStore: any = useSqlStore()
+    const { id, name } = tabInfo || {}
+    const active = sqlEditorStore.activeTab.id === id
 
-  return (
-    <ProductMenuItem
-      key={id}
-      isActive={active}
-      name={name}
-      action={active && <DropdownMenu tabInfo={tabInfo} />}
-      onClick={() => sqlEditorStore.selectTab(id)}
-      textClassName="w-44"
-    />
-  )
-})
+    return (
+      <ProductMenuItem
+        key={id}
+        isActive={active}
+        name={name}
+        action={active && canCreateSQLSnippet && <DropdownMenu tabInfo={tabInfo} />}
+        onClick={() => sqlEditorStore.selectTab(id)}
+        textClassName="w-44"
+      />
+    )
+  }
+)
 
 const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
   const {
@@ -126,11 +129,16 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
 })
 
 const SideBarContent = observer(() => {
+  const { ui } = useStore()
   const sqlEditorStore: any = useSqlStore()
-
   const [filterString, setFilterString] = useState('')
 
-  const handleNewQuery = useOptimisticSqlSnippetCreate()
+  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
+
+  const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)
 
   const getStartedTabs = (sqlEditorStore?.tabs ?? []).filter((tab: any) => {
     return tab.type === TAB_TYPES.WELCOME
@@ -217,7 +225,13 @@ const SideBarContent = observer(() => {
                   <div className="space-y-1">
                     {favouriteTabs.map((tabInfo: any) => {
                       const { id } = tabInfo || {}
-                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                      return (
+                        <OpenQueryItem
+                          key={id}
+                          tabInfo={tabInfo}
+                          canCreateSQLSnippet={canCreateSQLSnippet}
+                        />
+                      )
                     })}
                   </div>
                 </div>
@@ -228,7 +242,13 @@ const SideBarContent = observer(() => {
                   <div className="space-y-1">
                     {queryTabs.map((tabInfo: any) => {
                       const { id } = tabInfo || {}
-                      return <OpenQueryItem key={id} tabInfo={tabInfo} />
+                      return (
+                        <OpenQueryItem
+                          key={id}
+                          tabInfo={tabInfo}
+                          canCreateSQLSnippet={canCreateSQLSnippet}
+                        />
+                      )
                     })}
                   </div>
                 </div>
