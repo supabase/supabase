@@ -11,12 +11,9 @@ const Hero = () => {
           Do the best work of your career and join in our mission to accelerate human progress by
           connecting communities all over the world through software collaboration.
         </p>
-        <div className="mx-auto flex w-fit space-x-4">
+        <div className="mx-auto w-fit">
           <Link href="#positions">
             <a className="text-brand-900">Open positions</a>
-          </Link>
-          <Link href="#positions">
-            <a className="text-brand-900">Internships</a>
           </Link>
         </div>
       </div>
