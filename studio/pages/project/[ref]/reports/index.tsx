@@ -24,7 +24,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { owner_id: ui.profile?.id },
+    resource: { type: 'report', owner_id: ui.profile?.id },
     subject: { id: ui.profile?.id },
   })
 

@@ -49,6 +49,7 @@ const Reports = () => {
   const contentStore = useProjectContentStore(ref)
   const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
     resource: {
+      type: 'report',
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
@@ -56,6 +57,7 @@ const Reports = () => {
   })
   const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
+      type: 'report',
       visibility: report?.visibility,
       owner_id: report?.owner_id,
     },
