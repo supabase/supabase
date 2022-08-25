@@ -2,12 +2,15 @@ import { observer } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
 import { useStore } from 'hooks'
-import Table from 'components/to-be-cleaned/Table'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
-import FunctionsListItem from 'components/interfaces/Functions/FunctionsListItem'
+
+import Table from 'components/to-be-cleaned/Table'
 import { Function } from 'components/interfaces/Functions/Functions.types'
-import FunctionsEmptyState from 'components/interfaces/Functions/FunctionsEmptyState'
-import TerminalInstructions from 'components/interfaces/Functions/TerminalInstructions'
+import {
+  FunctionsListItem,
+  FunctionsEmptyState,
+  TerminalInstructions,
+} from 'components/interfaces/Functions'
 
 const FunctionsList = ({ functions }: { functions: Function[] }) => {
   return (
