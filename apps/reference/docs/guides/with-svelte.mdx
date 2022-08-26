@@ -30,7 +30,7 @@ By the end of this guide you'll have an app which allows users to login and upda
 
 ### GitHub
 
-Whenever you get stuck at any point, take a look at [this repo](https://github.com/yustarandomname/svelte-supabase-quickstart).
+Whenever you get stuck at any point, take a look at [this repo](https://github.com/supabase/examples/tree/main/supabase-js-v2/user-management/svelte-user-management).
 
 ## Project set up
 
@@ -149,8 +149,7 @@ Let's start building the Svelte app from scratch.
 
 ### Initialize a Svelte app
 
-We can use the [Quickstart Svelte Template](https://svelte.dev/blog/the-easiest-way-to-get-started) to initialize
-an app called `supabase-svelte`:
+We can use the Vite Svelte TypeScript Template to initialize an app called `supabase-svelte`:
 
 ```bash
 npm create vite@latest supabase-svelte -- --template svelte-ts
@@ -191,7 +190,7 @@ You can find the full contents of this file [here](https://raw.githubusercontent
 
 Let's set up a Svelte component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
-```html title="/src/lib/Auth.svelte"
+```html title="src/lib/Auth.svelte"
 <script lang="ts">
   import { supabase } from "src/supabaseClient";
 
