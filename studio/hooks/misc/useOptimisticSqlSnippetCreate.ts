@@ -9,8 +9,6 @@ export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
 
   const sqlEditorStore: any = useSqlStore()
 
-  console.log('useOptimisticSqlSnippetCreate', canCreateSQLSnippet)
-
   return useCallback(
     async (args?: Parameters<typeof createSqlSnippetSkeleton>[0]) => {
       // get currently selected tab id in case we need to roll back to it
