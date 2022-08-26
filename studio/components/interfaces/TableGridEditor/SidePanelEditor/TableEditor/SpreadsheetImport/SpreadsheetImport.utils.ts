@@ -127,7 +127,7 @@ export const inferColumnType = (column: string, rows: object[]) => {
       else return includes(['true', 'false'], item.toString().toLowerCase())
     })
     if (isAllBoolean) {
-      return 'boolean'
+      return 'bool'
     }
   }
 
