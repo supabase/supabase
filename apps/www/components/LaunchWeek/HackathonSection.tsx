@@ -11,7 +11,7 @@ export default function LaunchHero() {
           <div className="flex flex-col gap-3">
             <h3 className="text-scale-1200 text-4xl tracking-tight">Launch Week Hackathon</h3>
             <div>
-              <Badge>In progress</Badge>
+              <Badge color="red">Closed</Badge>
             </div>
             <h4 className="text-scale-1100 text-xl">
               Submissions close Sunday 21st Aug 23:59 (PT).
@@ -19,9 +19,9 @@ export default function LaunchHero() {
           </div>
 
           <div className="flex gap-3">
-            <Link href="https://www.madewithsupabase.com/launch-week-5">
+            <Link href="https://www.madewithsupabase.com/tag/Launch%20Week%205">
               <Button type="primary" size="small" className="text-white">
-                Submit your project
+                view projects
               </Button>
             </Link>
             <Link href="/blog/launch-week-5-hackathon">
