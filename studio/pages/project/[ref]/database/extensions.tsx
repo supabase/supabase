@@ -13,11 +13,7 @@ const DatabaseExtensions: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="view database extensions" />
   }
 
-  return (
-    <div className="p-4">
-      <Extensions />
-    </div>
-  )
+  return <Extensions />
 }
 
 DatabaseExtensions.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
