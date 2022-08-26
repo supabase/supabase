@@ -10,7 +10,7 @@ import Panel from 'components/ui/Panel'
 interface Props {
   table: PostgresTable
   onSelectToggleRLS: (table: PostgresTable) => void
-  onSelectCreatePolicy: () => void
+  onSelectCreatePolicy: (table: PostgresTable) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
