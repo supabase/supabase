@@ -3,13 +3,13 @@ const sidebars = {
     {
       type: 'category',
       label: 'Overview',
+      collapsed: true,
       items: [
         'about',
         'architecture',
         'guides/hosting/platform',
         'guides/examples',
       ],
-      collapsed: true,
     },
     {
       type: 'category',
@@ -32,6 +32,17 @@ const sidebars = {
         'guides/with-vue-3',
       ],
     },
+    {
+      type: 'category',
+      label: 'Migrate to Supabase',
+      collapsed: true,
+      items: [
+        'guides/migrations/firebase-auth',
+        'guides/migrations/firestore-data',
+        'guides/migrations/firebase-storage',
+        'guides/migrations/heroku',
+      ],
+    },    
     {
       type: 'category',
       label: 'Supabase CLI',
