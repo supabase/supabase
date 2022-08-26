@@ -12,6 +12,7 @@ export default function SchemaFormPanel({
   onSubmit,
   submitLabel = 'Save',
   cancelLabel = 'Cancel',
+  message = '',
 }) {
   let formRef
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
@@ -65,6 +66,7 @@ export default function SchemaFormPanel({
             {submitLabel || 'Save'}
           </Button>
         </div>
+        <span className="text-sm text-scale-900">{message}</span>
       </div>
 
       <div className="Form section-block--body px-6 py-3">
