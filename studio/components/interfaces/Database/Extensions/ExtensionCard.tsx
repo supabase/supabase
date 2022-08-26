@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Badge, IconLoader, Toggle } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -82,31 +81,12 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
           {loading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Toggle
-                  size="tiny"
-                  checked={isOn}
-                  disabled={!canUpdateExtentions}
-                  onChange={() => (isOn ? disableExtension() : enableExtension())}
-                />
-              </Tooltip.Trigger>
-              {!canUpdateExtentions && (
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
-                    ].join(' ')}
-                  >
-                    <span className="text-scale-1200 text-xs">
-                      You need additional permissions to update database extensions
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              )}
-            </Tooltip.Root>
+            <Toggle
+              size="tiny"
+              checked={isOn}
+              disabled={!canUpdateExtentions}
+              onChange={() => (isOn ? disableExtension() : enableExtension())}
+            />
           )}
         </div>
         <div
