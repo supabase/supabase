@@ -84,11 +84,9 @@ const TableSelection: FC = observer(({}) => {
               </div>
             )}
           >
-            <div className="flex flex-row items-center space-x-1">
-              <Typography.Text>{x.name}</Typography.Text>
-              <Typography.Text type="secondary" className="opacity-50" small>
-                {x.schema}
-              </Typography.Text>
+            <div className="flex flex-row items-center space-x-2">
+              <p>{x.name}</p>
+              <p className="text-scale-1100">{x.schema}</p>
             </div>
           </Listbox.Option>
         )
