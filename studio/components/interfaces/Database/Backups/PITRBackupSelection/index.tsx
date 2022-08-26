@@ -6,9 +6,8 @@ import { IconSearch, IconInfo, Input, Listbox, Popover, Button, Modal } from '@s
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import Loading from 'components/ui/Loading'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 import BackupsError from '../BackupsError'
@@ -25,27 +24,9 @@ interface Props {}
 const PITRBackupSelection: FC<Props> = () => {
   const router = useRouter()
   const { app, ui, backups } = useStore()
-  const isAvailable = useFlag('pitrBackups')
 
   const projectId = ui.selectedProject?.id ?? -1
   const projectRef = ui.selectedProject?.ref ?? 'default'
-
-  if (!isAvailable) {
-    return (
-      <div className="block w-full rounded border border-gray-400 border-opacity-50 bg-gray-300 p-3">
-        <div className="flex space-x-3">
-          <IconInfo size={20} strokeWidth={1.5} />
-          <p className="text-scale-1100 text-sm">
-            Coming soon - Point in time backups is an Enterprise feature. Reach out to us{' '}
-            <Link href={`/support/new?ref=${projectRef}&category=sales`}>
-              <a className="text-brand-900">here</a>
-            </Link>{' '}
-            if you're interested!
-          </p>
-        </div>
-      </div>
-    )
-  }
 
   const [searchString, setSearchString] = useState<string>('')
   const [selectedTimezone, setSelectedTimezone] = useState<any>(getClientTimezone())
