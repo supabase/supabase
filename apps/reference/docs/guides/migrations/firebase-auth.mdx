@@ -8,11 +8,10 @@ sidebar_label: Firebase Auth
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are three parts to the migration process:
+Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are two parts to the migration process:
 
 - `firestoreusers2json` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.js)) exports users from an existing Firebase project to a `.json` file on your local system.
 - `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
-- The [middleware](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth/middleware/verify-firebase-pw) server component verifies a user's existing Firebase password and updates that password in your Supabase project the first time a user logs in (currently supports local node development server and hosting with fly.io).
 
 ## Generate a Firebase private key {#generate-firebase-private-key}
 
@@ -42,64 +41,19 @@ hash_config {
 
 ## Set up the `supabase-service.json` file {#set-up-supabase-service-file}
 
-1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
-    ```
-    git clone https://github.com/supabase-community/firebase-to-supabase.git
-    ```
-1. Rename [supabase-service-sample.json](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/supabase-service-sample.json) to `supabase-service.json`.
+Create a file named `supabase-service.json` in the root of your migration project with the following contents:
+```json
+{
+    "host": "database.server.com",
+    "password": "secretpassword",
+    "user": "postgres",
+    "database": "postgres",
+    "port": 5432
+}
+```
 1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
-1. Save the `supabase-service.json` file.
-
-## Set up the middleware {#set-up-middleware}
-
-You can set up the middleware on a local development server or host with [fly.io](https://fly.io).
-
-<Tabs
-  defaultValue="local-server"
-  values={[
-    {label: 'Local development server', value: 'local-server'},
-    {label: 'Host with fly.io', value: 'host-with-fly'},
-  ]}>
-<TabItem value="local-server">
-
-1. Rename [local.env.sh.sample](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/middleware/verify-firebase-pw/local.env.sh.sample) to `local.env.sh`.
-1. Edit the `MEMCOST`, `ROUNDS`, `SALTSEPARATOR`, and `SIGNERKEY` environment variables with your Firebase password hash parameters.
-    ```bash title="local.env.sh"
-    export PORT=3000
-    export MEMCOST=14
-    export ROUNDS=8
-    export SALTSEPARATOR=Aa== 
-    export SIGNERKEY=XXXX/XXX+XXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==
-    ```
-1. Run `npm i` in `auth/middleware/verify-firebase-pw/` to install dependencies.
-1. Run `./local.sh` to start the server on the port listed in `local.env.sh` (defaults to `3000`).
-
-</TabItem>
-<TabItem value="host-with-fly">
-
-1. Rename [fly.toml.sample](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/middleware/verify-firebase-pw/fly.toml.sample) to `fly.toml`.
-1. Edit the `[env]` section with your Firebase password hash parameters.
-    ```bash title="fly.toml"
-    ...
-    [env]
-    PORT = "8080"
-    MEMCOST = 14
-    ROUNDS = 8
-    SALTSEPARATOR = "Aa==" 
-    SIGNERKEY = "XXXX/XXX+XXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX=="
-    ...
-    ```
-1. Install the [flyctl](https://fly.io/docs/getting-started/installing-flyctl/) command line utility.
-1. [Log in or sign up with fly.io](https://fly.io/docs/getting-started/log-in-to-fly/).
-1. Launch the Fly app with `flyctl launch`.
-1. Deploy the Fly app with `flyctl deploy`.
-
-See [Build, Deploy and Run a Node Application](https://fly.io/docs/getting-started/node/) for more details.
-
-</TabItem>
-</Tabs>
 
 ## Command line options
 
@@ -116,3 +70,7 @@ See [Build, Deploy and Run a Node Application](https://fly.io/docs/getting-start
 
 - `path_to_json_file`: full local path and filename of .json input file (of users)
 - `batch_size`: (optional) number of users to process in a batch (defaults to 100)
+
+## Notes
+
+For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your Supabase project the first time a user logs in, see the [firebase-to-supabase repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
