@@ -147,7 +147,7 @@ We can use the [SvelteKit Skeleton Project](https://kit.svelte.dev/docs) to init
 an app called `supabase-sveltekit` (for this tutorial you do not need TypeScript, ESLint, Prettier, or Playwright):
 
 ```bash
-npm create svelte supabase-sveltekit
+npm init svelte@next supabase-sveltekit
 cd supabase-sveltekit
 npm install
 ```
@@ -348,9 +348,9 @@ Let's create a new component for that called `Profile.svelte`.
 
 ### Launch!
 
-Now that we have all the components in place, let's update `src/routes/index.svelte`:
+Now that we have all the components in place, let's update `src/routes/+page.svelte`:
 
-```html title="src/routes/index.svelte"
+```html title="src/routes/+page.svelte"
 <script>
   import { user } from '$lib/sessionStore'
   import { supabase } from '$lib/supabaseClient'
@@ -379,7 +379,7 @@ Once that's done, run this in a terminal window:
 npm run dev
 ```
 
-And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
+And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
 ![Supabase Svelte](/img/supabase-svelte-demo.png)
 
