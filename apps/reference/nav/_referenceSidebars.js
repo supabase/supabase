@@ -42,7 +42,7 @@ const sidebars = {
         'guides/migrations/firebase-storage',
         'guides/migrations/heroku',
       ],
-    },    
+    },
     {
       type: 'category',
       label: 'Supabase CLI',
