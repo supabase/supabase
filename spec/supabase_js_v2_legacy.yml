@@ -16,6 +16,71 @@ info:
       version: '0.0.1'
 
 pages:
+  Initializing:
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize a new Supabase client using the `createClient()` method.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - name: createClient()
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Create a single supabase client for interacting with your database
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          ```
+      - name: With additional parameters
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const options = {
+            db: {
+              schema: 'public',
+            },
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            },
+            global: {
+              headers: { 'x-my-custom-header': 'my-app-name' },
+            },
+          }
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          ```
+      - name: API schemas
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          // Provide a custom schema. Defaults to "public".
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            db: { schema: 'other_schema' }
+          })
+          ```
+
+          By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
+          Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
+
+          Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - name: Custom `fetch` implementation
+        js: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+
+          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            global: { fetch: fetch.bind(globalThis) }
+          })
+          ```
+
+          `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+          but an alternative `fetch` implementation can be provided as an option.
+          This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
   auth.signUp():
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -47,8 +112,8 @@ pages:
               email: 'example@email.com',
               password: 'example-password',
               options: {
-                data: { 
-                  first_name: 'John', 
+                data: {
+                  first_name: 'John',
                   age: 27,
                 }
               }
@@ -94,9 +159,9 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
-      - Requires either an email or phone number. 
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp. 
-      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp. 
+      - Requires either an email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
+      - If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
       - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
     examples:
       - name: Sign in with email.
@@ -136,7 +201,7 @@ pages:
         isSpotlight: false
         description: |
           The `redirectTo` param will only applied on the callback made from the third-party provider. It does not redirect the user immediately after invoking this method.
-          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for 
+          In order for the `redirectTo` param to be allowed, one needs to include it in an allowlist. Supabase supports this for
           any URL path on your website (the URL must either be on the same domain as your Site URL [see Auth>Settings in dashboard], or must match one of the Additional Redirect URLs [also in Auth>Settings]).
         js: |
           ```js
@@ -196,7 +261,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase.auth.getSession()
+          const { data, error } = await supabase.auth.getSession()
           ```
   auth.getUser():
     title: 'getUser()'
@@ -209,13 +274,13 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const user = supabase.auth.getUser()
+          const { data: { user } } = await supabase.auth.getUser()
           ```
       - name: Get the logged in user with a custom access token jwt.
         isSpotlight: false
         js: |
           ```js
-          const user = supabase.auth.getUser(jwt)
+          const { data: { user } } = await supabase.auth.getUser(jwt)
           ```
   auth.updateUser():
     title: 'updateUser()'
@@ -928,13 +993,13 @@ pages:
       - Row level security is not applied to delete statements.
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-      - The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
+      - The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
     examples:
       - name: Listen to all database changes
         isSpotlight: true
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('*')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
@@ -944,7 +1009,7 @@ pages:
       - name: Listening to a specific table
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -954,7 +1019,7 @@ pages:
       - name: Listening to inserts
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -971,7 +1036,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -988,7 +1053,7 @@ pages:
           ```
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
@@ -999,7 +1064,7 @@ pages:
         description: You can chain listeners if you want to listen to multiple events for each table.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
@@ -1011,7 +1076,7 @@ pages:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         js: |
           ```js
-          const myChannel = supabase
+          supabase
             .channel('public:countries:id=eq.200')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
@@ -1058,9 +1123,10 @@ pages:
     title: 'listBuckets()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List buckets
         isSpotlight: true
@@ -1075,9 +1141,10 @@ pages:
     title: 'getBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Get bucket
         isSpotlight: true
@@ -1092,9 +1159,10 @@ pages:
     title: 'createBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.createBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `insert`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `insert`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create bucket
         isSpotlight: true
@@ -1109,9 +1177,10 @@ pages:
     title: 'emptyBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.emptyBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select`
-        - `objects` permissions: `select` and `delete`
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: `select` and `delete`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Empty bucket
         isSpotlight: true
@@ -1125,9 +1194,10 @@ pages:
     title: 'updateBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.updateBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `update`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Update bucket
         isSpotlight: true
@@ -1142,9 +1212,10 @@ pages:
     title: 'deleteBucket()'
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.deleteBucket'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: `select` and `delete`
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `delete`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete bucket
         isSpotlight: true
@@ -1159,9 +1230,10 @@ pages:
     title: 'from.upload()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `insert`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Upload file
@@ -1194,9 +1266,10 @@ pages:
     title: 'from.update()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.update'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - name: Update file
@@ -1229,9 +1302,10 @@ pages:
     title: 'from.move()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.move'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Move file
         isSpotlight: true
@@ -1247,9 +1321,10 @@ pages:
     title: 'from.copy()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.copy'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `update` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Copy file
         isSpotlight: true
@@ -1265,9 +1340,10 @@ pages:
     title: 'from.createSignedUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrl'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URL
         isSpotlight: true
@@ -1283,9 +1359,10 @@ pages:
     title: 'from.createSignedUrls()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.createSignedUrls'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Create Signed URLs
         isSpotlight: true
@@ -1302,15 +1379,16 @@ pages:
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
       - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: none
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Returns the URL for an asset in a public bucket
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = supabase
+          const { data } = supabase
             .storage
             .from('public-bucket')
             .getPublicUrl('folder/avatar1.png')
@@ -1320,9 +1398,10 @@ pages:
     title: 'from.download()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.download'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Download file
         isSpotlight: true
@@ -1338,9 +1417,10 @@ pages:
     title: 'from.remove()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.remove'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `delete` and `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `delete` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: Delete file
         isSpotlight: true
@@ -1356,9 +1436,10 @@ pages:
     title: 'from.list()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.list'
     notes: |
-      - Policy permissions required:
-        - `buckets` permissions: none
-        - `objects` permissions: `select`
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
     examples:
       - name: List files in a bucket
         isSpotlight: true

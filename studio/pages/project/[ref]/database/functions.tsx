@@ -253,7 +253,7 @@ const FunctionList: FC<FunctionListProps> = observer(
             <Table.td>
               <Typography.Text>{x.name}</Typography.Text>
             </Table.td>
-            <Table.td className="hidden md:table-cell">
+            <Table.td className="hidden md:table-cell md:overflow-auto">
               <Typography.Text>{x.argument_types}</Typography.Text>
             </Table.td>
             <Table.td className="hidden lg:table-cell">

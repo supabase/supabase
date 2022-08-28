@@ -84,13 +84,6 @@ export const generateOtherRoutes = (ref: string, project?: ProjectBase): Route[]
   const isProjectBuilding = project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY
   const buildingUrl = `/project/${ref}/building`
 
-  const canReadStats = checkPermissions(PermissionAction.READ, 'stats_daily_projects', {
-    resource: { type: 'report' },
-  })
-  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
-    resource: { type: 'report' },
-  })
-
   return [
     ...(IS_PLATFORM
       ? [

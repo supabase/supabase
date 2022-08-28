@@ -44,56 +44,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Database',
-      collapsed: true,
-      items: [
-        'guides/database',
-        'guides/database/connecting-to-postgres',
-        'guides/database/tables',
-        'guides/database/functions',
-        'guides/database/full-text-search',
-        // 'guides/database/json',
-        // 'guides/database/arrays',
-        // 'guides/database/sql-to-api',
-        {
-          type: 'category',
-          label: 'Extensions',
-          collapsed: true,
-          items: [
-            'guides/database/extensions',
-            // 'guides/database/extensions/pgtap',
-            'guides/database/extensions/plv8',
-            'guides/database/extensions/http',
-            'guides/database/extensions/uuid-ossp',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Configuration',
-          collapsed: true,
-          items: [
-            'guides/database/timeouts',
-            'guides/database/replication',
-            'guides/database/managing-passwords',
-            'guides/database/managing-timezones',
-          ],
-        },
-      ],
-    },
-    {
-      type: 'category',
-      label: 'APIs',
-      collapsed: true,
-      items: ['guides/api', 'guides/api/generating-types'],
-    },
-    {
-      type: 'category',
-      label: 'Functions',
-      collapsed: true,
-      items: ['guides/functions'],
-    },
-    {
-      type: 'category',
       label: 'Auth',
       collapsed: true,
       items: [
@@ -138,6 +88,12 @@ const sidebars = {
         },
         {
           type: 'category',
+          label: 'Auth Helpers',
+          collapsed: true,
+          items: ['guides/auth/auth-helpers/auth-ui'],
+        },
+        {
+          type: 'category',
           label: 'Deep Dive',
           collapsed: true,
           items: [
@@ -148,6 +104,67 @@ const sidebars = {
             'learn/auth-deep-dive/auth-google-oauth',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'APIs',
+      collapsed: true,
+      items: ['guides/api', 'guides/api/generating-types'],
+    },
+    {
+      type: 'category',
+      label: 'Database',
+      collapsed: true,
+      items: [
+        'guides/database',
+        'guides/database/connecting-to-postgres',
+        'guides/database/tables',
+        'guides/database/functions',
+        'guides/database/full-text-search',
+        // 'guides/database/json',
+        // 'guides/database/arrays',
+        // 'guides/database/sql-to-api',
+        {
+          type: 'category',
+          label: 'Extensions',
+          collapsed: true,
+          items: [
+            'guides/database/extensions',
+            // 'guides/database/extensions/pgtap',
+            'guides/database/extensions/plv8',
+            'guides/database/extensions/http',
+            'guides/database/extensions/uuid-ossp',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuration',
+          collapsed: true,
+          items: [
+            'guides/database/timeouts',
+            'guides/database/replication',
+            'guides/database/managing-passwords',
+            'guides/database/managing-timezones',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Functions',
+      collapsed: true,
+      items: ['guides/functions'],
+    },
+    {
+      type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: [
+        'guides/realtime',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
       ],
     },
     {
@@ -181,6 +198,7 @@ const sidebars = {
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
+        'guides/integrations/authsignal',
         'guides/integrations/clerk',
         'guides/integrations/dashibase',
         'guides/integrations/directus',
@@ -217,8 +235,6 @@ const sidebars = {
       collapsed: false,
       items: [
         { type: 'doc', id: 'reference' },
-        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
-        { type: 'link', label: 'Supabase API', href: '/reference/api' },
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
@@ -229,6 +245,8 @@ const sidebars = {
           label: 'Supabase Dart Library',
           href: '/reference/dart',
         },
+        { type: 'link', label: 'Supabase CLI', href: '/reference/cli' },
+        { type: 'link', label: 'Supabase API', href: '/reference/api' },
       ],
     },
     {
@@ -246,7 +264,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Self hosted',
+      label: 'Self-hosting',
       collapsed: false,
       items: [
         { type: 'link', label: 'Auth Server', href: '/reference/auth' },

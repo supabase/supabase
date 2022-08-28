@@ -1,16 +1,17 @@
-import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
-import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { find, isUndefined } from 'lodash'
+import { FC, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, useRef } from 'react'
-
+import { find, isUndefined } from 'lodash'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
+import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+
 import { checkPermissions, useStore } from 'hooks'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
+import { SchemaView } from 'components/layouts/TableEditorLayout/TableEditorLayout.types'
+import { Dictionary, parseSupaTable, SupabaseGrid, SupabaseGridRef } from 'components/grid'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   /** Theme for the editor */
@@ -59,16 +60,27 @@ const TableGridEditor: FC<Props> = ({
   const gridRef = useRef<SupabaseGridRef>(null)
   const projectRef = ui.selectedProject?.ref
 
-  if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(router.query.id)} />
-  }
+  // Permissions scaffolding
+  const canRead = false
+  const canInsert = false
+  const canUpdate = false
+  const canDelete = false
 
-  const tableId = selectedTable?.id
   // [Joshen] When we get to this, double check again what are the actions
   // const canUpdate = checkPermissions(PermissionAction.TENANT_SQL_UPDATE, String(tableId))
   // const canAdminWrite = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, String(tableId))
   // const canInsert = checkPermissions(PermissionAction.CREATE, String(tableId))
   // const canEdit = canAdminWrite && canInsert && canUpdate
+
+  if (isUndefined(selectedTable)) {
+    return <NotFoundState id={Number(router.query.id)} />
+  }
+
+  // if (!canRead) {
+  //   return <NoPermission isFullPage resourceText={`access the table "${selectedTable.name}"`} />
+  // }
+
+  const tableId = selectedTable?.id
 
   // @ts-ignore
   const schema = meta.schemas.list().find((schema) => schema.name === selectedSchema)

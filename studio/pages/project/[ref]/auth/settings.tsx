@@ -9,6 +9,7 @@ import AutoSchemaForm from 'components/interfaces/Auth/AutoSchemaForm'
 import RedirectDomains from 'components/interfaces/Auth/RedirectDomains/RedirectDomains'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
+import NoPermission from 'components/ui/NoPermission'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ui, authConfig } = useStore()
@@ -17,9 +18,11 @@ const PageLayout: NextPageWithLayout = () => {
     authConfig.load()
   }, [ui.selectedProjectRef])
 
-  // const canUpdate = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canReadAuthSettings = checkPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
-  if (authConfig) {
+  if (!canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+  } else if (authConfig) {
     return (
       <FormsContainer>
         <AutoSchemaForm />

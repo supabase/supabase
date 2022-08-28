@@ -1,11 +1,12 @@
 ---
 id: functions
 title: Edge Functions
-description: 'Globally distributed Typescript functions.'
+description: 'Globally distributed TypeScript functions.'
 ---
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
+import ButtonCard from '@site/src/components/ButtonCard'
 const examples = [
   {
     name: 'With supabase-js',
@@ -29,13 +30,13 @@ const examples = [
   },
 ]
 
-Edge Functions are server-side Typescript functions, distributed globally at the edge - close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties, like Stripe.
+Edge Functions are server-side TypeScript functions, distributed globally at the edge - close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties, like Stripe.
 
 Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
 
 - It is open source.
 - It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
-- It is Typescript first and supports WASM.
+- It is TypeScript first and supports WASM.
 - Edge Functions are globally distributed for low-latency.
 
 ## Quickstart
@@ -240,14 +241,15 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 <div class="container" style={{ padding: 0 }}>
   <div class="row is-multiline">
     {examples.map((x) => (
-      <div class="col col--6">
-        <a class="card" to={x.href} style={{ height: '100%' }}>
-          <div class="card__body">
-            <h4>{x.name}</h4>
-            <p>{x.description}</p>
-          </div>
-        </a>
-      </div>
+    <div class="col col--6">
+      <ButtonCard
+        class="card"
+        to={x.href}
+        title={x.name}
+        description={x.description}
+        style={{ height: '100%' }}
+      />
+    </div>
     ))}
   </div>
 </div>
@@ -259,7 +261,7 @@ You can find a list of useful [Edge Function Examples](https://github.com/supaba
 For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database
 and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
 
-For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in Typescript.
+For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in TypeScript.
 
 ### Organizing your Edge Functions
 

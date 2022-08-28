@@ -1,20 +1,23 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { IconChevronRight, Typography } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
-
 import Telemetry from 'lib/telemetry'
-import { useOptimisticSqlSnippetCreate } from 'hooks'
-import { partition } from 'lodash'
-
+import { useOptimisticSqlSnippetCreate, checkPermissions, useStore } from 'hooks'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import CardButton from 'components/ui/CardButton'
 
 const TabWelcome = observer(() => {
+  const { ui } = useStore()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
-
-  const handleNewQuery = useOptimisticSqlSnippetCreate()
+  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
+  const handleNewQuery = useOptimisticSqlSnippetCreate(canCreateSQLSnippet)
 
   return (
     <div className="block h-full space-y-8 overflow-y-auto p-6">

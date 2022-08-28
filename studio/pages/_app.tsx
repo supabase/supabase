@@ -19,12 +19,11 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { AppPropsWithLayout } from 'types'
 
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
-import { getParameterByName } from 'lib/common/fetch'
 import { GOTRUE_ERRORS } from 'lib/constants'
+import { auth } from 'lib/gotrue'
 
 import { PortalToast, RouteValidationWrapper, AppBannerWrapper } from 'components/interfaces/App'
 import PageTelemetry from 'components/ui/PageTelemetry'
@@ -36,17 +35,21 @@ dayjs.extend(timezone)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const [rootStore] = useState(() => new RootStore())
-  const router = useRouter()
 
   useEffect(() => {
-    const errorDescription = getParameterByName('error_description', router.asPath)
-    if (errorDescription === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
-      rootStore.ui.setNotification({
-        category: 'error',
-        message:
-          'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
-      })
+    async function handleEmailVerificationError() {
+      const { error } = await auth.initialize()
+
+      if (error?.message === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
+        rootStore.ui.setNotification({
+          category: 'error',
+          message:
+            'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
+        })
+      }
     }
+
+    handleEmailVerificationError()
   }, [])
 
   const getLayout = Component.getLayout ?? ((page) => page)

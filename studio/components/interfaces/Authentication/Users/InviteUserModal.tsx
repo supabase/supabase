@@ -1,8 +1,10 @@
 import { useContext, useState } from 'react'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Modal, Input, IconPlus, IconMail, Form } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -13,6 +15,7 @@ const InviteUserModal = () => {
   const [visible, setVisible] = useState(false)
 
   const handleToggle = () => setVisible(!visible)
+  const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -53,9 +56,28 @@ const InviteUserModal = () => {
 
   return (
     <div>
-      <Button onClick={handleToggle} icon={<IconPlus />}>
-        Invite
-      </Button>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Button as="span" onClick={handleToggle} icon={<IconPlus />} disabled={!canInviteUsers}>
+            Invite
+          </Button>
+        </Tooltip.Trigger>
+        {!canInviteUsers && (
+          <Tooltip.Content side="bottom">
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            <div
+              className={[
+                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                'border-scale-200 border',
+              ].join(' ')}
+            >
+              <span className="text-scale-1200 text-xs">
+                You need additional permissions to invite users
+              </span>
+            </div>
+          </Tooltip.Content>
+        )}
+      </Tooltip.Root>
       <Modal
         closable
         hideFooter
@@ -91,7 +113,7 @@ const InviteUserModal = () => {
                   size="small"
                   htmlType="submit"
                   loading={isSubmitting}
-                  disabled={isSubmitting}
+                  disabled={!canInviteUsers || isSubmitting}
                 >
                   Invite user
                 </Button>

@@ -52,6 +52,32 @@ export interface IProjectContentStore {
         error: unknown
       }
   >
+  updateSql: (
+    id: any,
+    updates: any
+  ) => Promise<
+    | {
+        data: UserContent
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  >
+  updateReport: (
+    id: any,
+    updates: any
+  ) => Promise<
+    | {
+        data: UserContent
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  >
 
   del(id: any): Promise<{ data: boolean; error: unknown }>
   delOptimistically(id: string): { data: boolean; error: null }

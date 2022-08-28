@@ -277,6 +277,7 @@ const config = {
         contextualSearch: true,
       },
     }),
+  scripts: [{ src: '/docs/scripts/telemetry.js' }],
 }
 
 module.exports = config
