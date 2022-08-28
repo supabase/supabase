@@ -9,7 +9,7 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 ```js
-const myChannel = supabase
+supabase
   .channel('*')
   .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
     console.log('Change received!', payload)
@@ -89,14 +89,14 @@ A callback function that will be called when the channel receives a message.
 - Row level security is not applied to delete statements.
 - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
 - When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
-- The channel name must exactly match the schema/table/filter you want to listen to separated by semicolons. See below examples for additional context.
+- The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
 
 ## Examples
 
 ### Listen to all database changes
 
 ```js
-const myChannel = supabase
+supabase
   .channel('*')
   .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
     console.log('Change received!', payload)
@@ -107,7 +107,7 @@ const myChannel = supabase
 ### Listening to a specific table
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries')
   .on(
     'postgres_changes',
@@ -122,7 +122,7 @@ const myChannel = supabase
 ### Listening to inserts
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries')
   .on(
     'postgres_changes',
@@ -144,7 +144,7 @@ alter table "your_table" replica identity full;
 ```
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries')
   .on(
     'postgres_changes',
@@ -166,7 +166,7 @@ alter table "your_table" replica identity full;
 ```
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries')
   .on(
     'postgres_changes',
@@ -183,7 +183,7 @@ const myChannel = supabase
 You can chain listeners if you want to listen to multiple events for each table.
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries')
   .on(
     'postgres_changes',
@@ -203,7 +203,7 @@ const myChannel = supabase
 You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
 
 ```js
-const myChannel = supabase
+supabase
   .channel('public:countries:id=eq.200')
   .on(
     'postgres_changes',

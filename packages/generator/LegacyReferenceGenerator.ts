@@ -136,30 +136,28 @@ function recurseThroughParams(paramDefinition: TsDoc.TypeDefinition) {
   let param = isDereferenced(paramDefinition)
     ? paramDefinition.type?.dereferenced
     : paramDefinition
-
-  const labelParams = {
-    name: param.name,
-    isOptional: !!param.flags.isOptional,
-    type: extractParamTypeAsString(param),
-    description: param.comment ? tsDocCommentToMdComment(param.comment) : null,
-  }
+  const labelParams = generateLabelParam(param)
   let subContent = ''
 
-  let children = param.type?.declaration?.children
-    ? param.type?.declaration?.children
-    : isUnion(param)
-    ? mergeUnion(param)
-    : param.children
+  let children = param?.children
+  if (param.type?.declaration?.children) {
+    children = param.type?.declaration?.children
+  } else if (isUnion(param)) {
+    children = param.type.types
+  } else if (param.type === 'reflection') {
+    children = param.declaration.children
+  }
 
   if (!!children) {
     let properties = children
-      .sort((a, b) => a.name.localeCompare(b.name)) // first alphabetical
+      .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
+
     let heading = `<h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>`
     subContent = methodListGroup([heading].concat(properties).join('\n'))
+    return methodListItemLabel(labelParams, subContent)
   }
-
   return methodListItemLabel(labelParams, subContent)
 }
 
@@ -272,6 +270,30 @@ const notImplemented = `
 Not yet implemented
 \`\`\`
 `
+
+function generateLabelParam(param: any) {
+  let labelParams = {}
+  if (typeof param.type === 'string' && param.type === 'literal') {
+    labelParams = {
+      name: param.name ?? param.value,
+      isOptional: !!param.flags?.isOptional,
+      type: param.type,
+      description: param.comment
+        ? tsDocCommentToMdComment(param.comment)
+        : null,
+    }
+  } else {
+    labelParams = {
+      name: param.name ?? extractParamTypeAsString(param),
+      isOptional: !!param.flags?.isOptional,
+      type: extractParamTypeAsString(param),
+      description: param.comment
+        ? tsDocCommentToMdComment(param.comment)
+        : null,
+    }
+  }
+  return labelParams
+}
 
 function extractParamTypeAsString(paramDefinition) {
   if (paramDefinition.type?.name) {

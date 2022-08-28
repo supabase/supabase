@@ -1,0 +1,46 @@
+---
+id: presence
+title: Presence
+description: Getting started with Realtime's presence feature
+---
+
+Supabase Presence stores and synchronize shared state across clients. Presence is very similar to Broadcast, except that the state is “persisted” in the Channel so that new joiners can immediately get the state without waiting for another user to broadcast a message.
+
+The `sync` event is triggered whenever the shared state changes. The `join` event is triggered when a new client joins the channel and `leave` when a client leaves.
+
+Each client can use the `track` method to store an object in the shared state. Each client can only track one object in the shared state. If `track` is called again by the same client, then the new object will overwrite the previously tracked object in the shared state.
+
+The presence JS client methods are supported from supabase-js v2 release candidate.
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+const channel = supabase.channel('online-users')
+
+function getRandomUser() {
+  const users = ['Alice', 'Bob', 'Mallory', 'Inian']
+  return users[Math.floor(Math.random() * users.length)]
+}
+
+channel
+  .on('presence', { event: 'sync' }, () => {
+    console.log('currently online users', channel.presenceState())
+  })
+  .on('presence', { event: 'join' }, ({ newUser }) => {
+    console.log('a new user has joined', newUser)
+  })
+  .on('presence', { event: 'leave' }, ({ leftUser }) =>
+    console.log('a user has left', leftUser)
+  )
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      const status = await channel.track({ user_name: getRandomUser() })
+      console.log(status)
+    }
+  })
+```

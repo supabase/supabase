@@ -1,9 +1,18 @@
-const withMDX = require('@next/mdx')()
+const gfm = require('remark-gfm')
+const slug = require('rehype-slug')
+const withMDX = require('@next/mdx')({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [gfm],
+    rehypePlugins: [slug],
+    // If you use `MDXProvider`, uncomment the following line.
+    providerImportSource: '@mdx-js/react',
+  },
+})
 
 module.exports = withMDX({
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-
   trailingSlash: false,
   images: {
     dangerouslyAllowSVG: true,
@@ -18,6 +27,8 @@ module.exports = withMDX({
       'avatars.githubusercontent.com',
       'colab.research.google.com',
       'api.producthunt.com',
+      'https://s3-us-west-2.amazonaws.com',
+      's3-us-west-2.amazonaws.com',
     ],
   },
   async headers() {
@@ -1088,8 +1099,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2021/11/29/community-day',
-        destination: '/blog/community-day-3',
+        source: '/blog/2021/11/29/community-day-lw3',
+        destination: '/blog/community-day-lw3',
       },
       {
         permanent: true,
@@ -1163,8 +1174,8 @@ module.exports = withMDX({
       },
       {
         permanent: true,
-        source: '/blog/2022/03/28/community-day',
-        destination: '/blog/community-day-4',
+        source: '/blog/2022/03/28/community-day-lw4',
+        destination: '/blog/community-day-lw4',
       },
       {
         permanent: true,
@@ -1418,6 +1429,22 @@ module.exports = withMDX({
         source: '/docs/guides/local-development',
         destination: '/docs/guides/cli/local-development',
       },
+      {
+        permanent: true,
+        source: '/docs/guides/realtime/overview',
+        destination: '/docs/guides/realtime',
+      },
+      {
+        permanent: true,
+        source: '/docs/reference/javascript/next/migration-guide',
+        destination: '/docs/reference/javascript/next/release-notes',
+      },
+      {
+        permanent: true,
+        source: '/docs/guides/auth/auth-helpers/auth-ui-overview',
+        destination: '/docs/guides/auth/auth-helpers/auth-ui',
+      },
+
       // V2 redirects
       // {
       //   permanent: true,

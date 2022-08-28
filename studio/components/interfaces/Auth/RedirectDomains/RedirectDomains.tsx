@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { object, string } from 'yup'
 import { observer } from 'mobx-react-lite'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Form, Input, Modal } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { FormHeader } from 'components/ui/Forms'
 import { domainRegex } from '../Auth.constants'
 import DomainList from './DomainList'
@@ -19,6 +21,8 @@ const RedirectDomains = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedDomainToDelete, setSelectedDomainToDelete] = useState<string>()
 
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
   const newDomainSchema = object({
     domain: string().matches(domainRegex, 'URL is not valid').required(),
   })
@@ -28,7 +32,19 @@ const RedirectDomains = () => {
     const payload = URI_ALLOW_LIST_ARRAY
     payload.push(values.domain)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    const payloadString = payload.toString()
+
+    if (payloadString.length > 2 * 1024) {
+      ui.setNotification({
+        message: 'Too many redirect domains, please remove some or try to use wildcards',
+        category: 'error',
+      })
+
+      setSubmitting(false)
+      return
+    }
+
+    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
     if (!error) {
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully added domain' })
@@ -74,9 +90,30 @@ const RedirectDomains = () => {
           title="Redirect URLs"
           description="URLs that auth providers are permitted to redirect to post authentication"
         />
-        <Button onClick={() => setOpen(true)}>Add domain</Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button disabled={!canUpdateConfig} onClick={() => setOpen(true)}>
+              Add domain
+            </Button>
+          </Tooltip.Trigger>
+          {!canUpdateConfig && (
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                  'border-scale-200 border',
+                ].join(' ')}
+              >
+                <span className="text-scale-1200 text-xs">
+                  You need additional permissions to update redirect URLs
+                </span>
+              </div>
+            </Tooltip.Content>
+          )}
+        </Tooltip.Root>
       </div>
-      <DomainList onSelectDomainToDelete={setSelectedDomainToDelete} />
+      <DomainList canUpdate={canUpdateConfig} onSelectDomainToDelete={setSelectedDomainToDelete} />
       <Modal
         hideFooter
         size="small"

@@ -1,64 +1,60 @@
 # Developing Supabase
 
-- [Development Setup](#development-setup)
-  - [Installing Dependencies](#installing-dependencies)
-  - [Forking Supabase on GitHub](#forking-supabase-on-github)
-- [Building Supabase](#building-supabase)
-  - [Choosing Directory](#choosing-directory)
-- [Start a Development Server](#start-a-development-server)
-  - [Supabase Website Development Server](#supabase-website-development-server)
-  - [Supabase Docs Development Server](#supabase-docs-development-server)
-  - [Supabase Studio Development Server](#supabase-studio-development-server)
+1. [Development setup](#development-setup)
+    - [Install dependencies](#install-dependencies)
+    - [Fork the repository](#fork-the-repository)
+1. [Build Supabase](#build-supabase)
+    - [Choose a directory](#choose-a-directory)
+1. [Start a development server](#start-a-development-server)
+    - [Supabase Website](#supabase-website)
+    - [Supabase Docs](#supabase-docs)
+    - [Supabase Studio](#supabase-studio)
+1. [Create a pull request](#create-a-pull-request)
+
+- [Common tasks](#common-tasks)
+  - [Add a redirect](#add-a-redirect)
 - [Monorepo](#monorepo)
   - [Getting started](#getting-started)
   - [Shared components](#shared-components)
   - [Installing packages](#installing-packages)
   - [Development](#development)
-- [Common Tasks](#common-tasks)
-  - [Adding Redirects](#adding-redirects)
-- [Finally](#finally)
-- [Community Channels](#community-channels)
+- [Community channels](#community-channels)
 
-## Development Setup
+## Development setup
 
-First off, thanks for your interest in Supabase and for wanting to contribute! before you begin, read the
+Thanks for your interest in Supabase and for wanting to contribute! Before you begin, read the
 [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) and check out the
 [existing issues](https://github.com/supabase/supabase/issues).
 This document describes how to set up your development environment to build and test Supabase.
 
-### Installing Dependencies
+### Install dependencies
 
-Before you can build Supabase, you must install and configure the following dependencies on your
-machine:
+You need to install and configure the following dependencies on your machine to build Supabase:
 
 - [Git](http://git-scm.com/)
-
 - [Node.js v16.x (LTS)](http://nodejs.org)
+- [npm](https://www.npmjs.com/) version 7+ or [Yarn](https://yarnpkg.com/)
 
-- [npm](https://www.npmjs.com/) version 7+.
+### Fork the repository
 
-### Forking Supabase on GitHub
+To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase).
 
-To contribute code to Supabase, you must fork the [Supabase Repository](https://github.com/supabase/supabase). After you fork the repository, you may now begin editing the source code.
+## Build Supabase
 
-## Building Supabase
-
-To build Supabase, you clone the source code repository:
-
-2. Clone your GitHub forked repository:
+1. Clone your GitHub forked repository:
 
    ```sh
    git clone https://github.com/<github_username>/supabase.git
    ```
 
-3. Go to the Supabase directory:
+1. Go to the Supabase directory:
    ```sh
    cd supabase
    ```
 
-### Choosing Directory
+### Choose a directory
 
-Before you start a development server, you must choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.com).
+Choose if you want to work on the [Supabase Website](https://supabase.com), [Supabase Docs](https://supabase.com/docs), or [Supabase Studio](https://app.supabase.com).
 
 1. Go to the [Supabase Website](https://supabase.com) directory
 
@@ -69,7 +65,7 @@ Before you start a development server, you must choose if you want to work on th
    Go to the [Supabase Docs](https://supabase.com/docs) directory
 
    ```sh
-   cd web
+   cd apps/reference
    ```
 
    Go to the [Supabase Studio](https://app.supabase.com) directory
@@ -78,7 +74,7 @@ Before you start a development server, you must choose if you want to work on th
    cd studio
    ```
 
-2. Install npm dependencies:
+1. Install npm/yarn dependencies:
 
    npm
 
@@ -92,19 +88,19 @@ Before you start a development server, you must choose if you want to work on th
    yarn install
    ```
 
-## Start a Development Server
+## Start a development server
 
-To debug code, and to see changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
+To debug code and to see your changes in real time, it is often useful to have a local HTTP server. Click one of the three links below to choose which development server you want to start.
 
-- [Supabase Website](#Supabase-Website-Development-Server)
-- [Supabase Docs](#Supabase-Docs-Development-Server)
-- [Supabase Studio](#Supabase-Studio-Development-Server)
+- [Supabase Website](#supabase-website)
+- [Supabase Docs](#supabase-docs)
+- [Supabase Studio](#supabase-studio)
 
-### Supabase Website Development Server
+### Supabase Website
 
 The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) section below.
 
-### Supabase Docs Development Server
+### Supabase Docs
 
 1. Build development server
 
@@ -120,7 +116,7 @@ The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) sec
    yarn build
    ```
 
-2. Start development server
+1. Start development server
 
    npm
 
@@ -134,13 +130,9 @@ The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) sec
    yarn start
    ```
 
-3. To access the local server, enter the following URL into your web browser:
+1. Access the local server in your web browser at http://localhost:3010/docs.
 
-   ```sh
-   http://localhost:3005/docs
-   ```
-
-### Supabase Studio Development Server
+### Supabase Studio
 
 1. Start development server
 
@@ -156,13 +148,22 @@ The website is moving to a new monorepo setup. See the [Monorepo](#monorepo) sec
    yarn dev
    ```
 
-2. To access the local server, enter the following URL into your web browser:
+1. Access the local server in your web browser at http://localhost:8082/.
+See the [Supabase Studio readme](./studio/README.md) for more information.
 
-   ```sh
-   http://localhost:8082/
-   ```
+## Create a pull request
 
-For more information on Supabase Studio, see the [Supabase Studio readme](./studio/README.md).
+After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
+
+Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+
+---
+
+## Common tasks
+
+### Add a redirect
+
+Create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
 
 ## Monorepo
 
@@ -179,16 +180,12 @@ npm run dev # start all the applications
 
 Then edit and visit any of the following sites:
 
-- `/apps/www`: http://localhost:3000
-  - The main website.
-- `/apps/reference`: http://localhost:3010
-  - Reference Documentation.
-- `/apps/temp-docs`: http://localhost:3001
-  - We are migrating the docs to a Next.js application.
-- `/apps/temp-community-forum`: http://localhost:3002
-  - pulls all our github discussions into a nextjs site. Temporary/POC
-- `/apps/temp-community-tutorials`: http://localhost:3003
-  - pulls all our DEV articles (which community members can write) into a nextjs site. Temporary/POC
+Site | Directory | Description | Local development server
+---- | --------- | ----------- | ------------------------
+[supabase.com](https://supabase.com) | `/apps/www` | The main website | http://localhost:3000
+[supabase.com/docs](https://supabase.com/docs) | `apps/reference` | Guides and Reference documentaion | http://localhost:3010/docs
+[POC] Community forum | `/apps/temp-community-forum` | GitHub Discussions in a Next.js site | http://localhost:3002
+[POC] DEV articles site | `/apps/temp-community-tutorials` | A Next.js site for our DEV articles (which community members can write) | http://localhost:3003
 
 ### Shared components
 
@@ -216,18 +213,8 @@ You do not need to install `devDependencies` in each workspace. These can all be
 
 `npm run dev`
 
-## Common Tasks
+---
 
-### Adding Redirects
+## Community channels
 
-To add a redirect, simple create a new entry in the [`next.config.js`](https://github.com/supabase/supabase/blob/master/apps/www/next.config.js) file in our main site.
-
-## Finally
-
-After making your changes to the file(s) you'd like to update, it's time to open a pull request. Once you submit your pull request, others from the Supabase team/community will review it with you.
-
-Did you have an issue, like a merge conflict, or don't know how to open a pull request? Check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors)
-
-## Community Channels
-
-Stuck somewhere? Have any questions? please join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+Stuck somewhere? Have any questions? Join the [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
