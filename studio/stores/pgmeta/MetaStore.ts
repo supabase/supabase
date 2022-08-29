@@ -144,6 +144,7 @@ export default class MetaStore implements IMetaStore {
     'net',
     'pg_catalog',
     'pgsodium',
+    'pgsodium_masks',
     'pgbouncer',
     'realtime',
     'storage',
