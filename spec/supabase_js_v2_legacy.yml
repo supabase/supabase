@@ -416,7 +416,7 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
       - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
+      - This function should only be used on the server. Never expose your `service_role` key in the browser.
       - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
     examples:
       - name: Create a new user with custom user metadata
