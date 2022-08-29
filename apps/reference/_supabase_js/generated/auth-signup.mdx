@@ -330,14 +330,14 @@ The redirect url embedded in the email link
 
 ## Notes
 
-- By default, the user will need to verify their email address before logging in. To disable this, you can toggle off the "Confirm email" setting in [your project](https://app.supabase.com/project/_/auth/settings).
-- The "Confirm email" setting determines if users need to confirm their email address after signing up.
-  - If "Confirm email" is turned on, a `user` is returned but `session` will be null.
-  - If "Confirm email" is turned off, both a `user` and a `session` will be returned
-- When the user confirms their email address, they will be redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
+- By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
+- **Confirm email** determines if users need to confirm their email address after signing up.
+  - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+  - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+- When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/settings).
 - If signUp() is called for an existing confirmed user:
-  - If "Confirm email" is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated / fake user object will be returned.
-  - If "Confirm email" is disabled, an error with a message "User already registered" will be returned.
+  - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated/fake user object is returned.
+  - If **Confirm email** is disabled, the error message, `User already registered` is returned.
 - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/next/auth-getuser).
 
 ## Examples
@@ -351,7 +351,7 @@ const { data, error } = await supabase.auth.signUp({
 })
 ```
 
-### Sign up with additional user meta data.
+### Sign up with additional user metadata.
 
 ```js
 const { data, error } = await supabase.auth.signUp({

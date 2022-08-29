@@ -158,7 +158,7 @@ pages:
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
-      - If you're using phone, you can configure whether you want the user to receive an otp.
+      - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
       - name: Sign in with email.
@@ -170,9 +170,9 @@ pages:
             email: 'example@email.com',
           })
           ```
-      - name: Sign in with sms otp.
+      - name: Sign in with SMS OTP.
         isSpotlight: false
-        description: The user will be sent an sms which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
+        description: The user will be sent an SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithPassword({
@@ -238,6 +238,9 @@ pages:
   auth.verifyOtp():
     title: 'verifyOtp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    notes: |
+      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
     examples:
       - name: Verify Sms One-Time Password (OTP)
         isSpotlight: true
@@ -265,8 +268,8 @@ pages:
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
-      - This method gets the user object using the current session.
-      - Fetches the user object from the database instead of local storage.
+      - This method gets the user object from the current session.
+      - Fetches the user object from the database instead of local session.
     examples:
       - name: Get the logged in user with the current existing session
         isSpotlight: true
@@ -315,8 +318,8 @@ pages:
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
-      - Refresh token rotation (see `REFRESH_TOKEN_ROTATION_ENABLED`(https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks. 
-      - You can configure the `REFRESH_TOKEN_REUSE_INTERVAL`(https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks. 
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - name: Refresh the session
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
@@ -324,7 +327,6 @@ pages:
         js: |
           ```js
             const { data, error } = supabase.auth.setSession(refresh_token)
-          }
           ```
   auth.onAuthStateChange():
     title: 'onAuthStateChange()'
@@ -392,8 +394,6 @@ pages:
     title: 'getUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
     notes: |
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
       - Fetches the user object from the database based on the user's id.
       - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
     examples:
@@ -407,9 +407,6 @@ pages:
   auth.admin.listUsers():
     title: 'listUsers()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Get a full list of users.
         isSpotlight: true
@@ -421,8 +418,6 @@ pages:
     title: 'createUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
     notes: |
-      - Requires a `service_role` key.
-      - This function should only be used on the server. Never expose your `service_role` key in the browser.
       - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
     examples:
       - name: Create a new user with custom user metadata
@@ -456,10 +451,8 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
-      - Requires a `service_role` key.
-      - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Remove a user
+      - name: Removes a user
         isSpotlight: true
         js: |
           ```js
@@ -472,8 +465,6 @@ pages:
     title: 'inviteUserByEmail()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
-      - Requires a `service_role` key.
-      - This function should only be used on the server. Never expose your `service_role` key in the browser.
       - Sends an invite link to the user's email address.
     examples:
       - name: Invite a user
@@ -487,15 +478,15 @@ pages:
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
-      Sends a reset request to an email address.
+      Sends a password reset request to an email address.
 
-      When the user clicks the reset link in the email they will be forwarded to the site url or the redirect url specified:
+      When the user clicks the password reset link in the email, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/settings).
 
       `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=recovery`
 
       Your app must detect `type=recovery` in the fragment and display a password reset form to the user.
 
-      You should then use the access_token in the url and new password to update the user as follows:
+      You should then [update the user](/docs/reference/javascript/next/auth-updateuser) as follows:
 
       ```js
       const { error, data } = await supabase.auth.updateUser({ password : new_password })
@@ -513,9 +504,6 @@ pages:
   auth.admin.generateLink():
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Generate a signup link.
         isSpotlight: true
@@ -542,9 +530,6 @@ pages:
   auth.admin.updateUserById():
     title: 'updateUserById()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
-    notes: |
-      - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
     examples:
       - name: Updates a user's email.
         isSpotlight: false
@@ -1099,7 +1084,7 @@ pages:
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Remove a channel
+      - name: Removes a channel
         isSpotlight: true
         js: |
           ```js
@@ -1112,7 +1097,7 @@ pages:
     notes: |
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
-      - name: Removes all channels
+      - name: Remove all channels
         isSpotlight: true
         js: |
           ```js

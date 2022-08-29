@@ -293,9 +293,9 @@ If set to false, this method will not create a new user. Defaults to true.
 ## Notes
 
 - Requires either an email or phone number.
-- This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
-- If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
-- If you're using phone, you can configure whether you want the user to receive an otp.
+- This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
+- If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
+- If you're using phone, you can configure whether you want the user to receive an OTP.
 - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
 
 ## Examples
@@ -310,9 +310,9 @@ const { data, error } = await supabase.auth.signInWithOtp({
 })
 ```
 
-### Sign in with sms otp.
+### Sign in with SMS OTP.
 
-The user will be sent an sms which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
+The user will be sent an SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
 
 ```js
 const { data, error } = await supabase.auth.signInWithPassword({

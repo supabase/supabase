@@ -19,11 +19,6 @@ const {
 } = await supabase.auth.admin.listUsers()
 ```
 
-## Notes
-
-- Requires a `service_role` key.
-- This function should be called on a server. Never expose your `service_role` key in the browser.
-
 ## Examples
 
 ### Get a full list of users.

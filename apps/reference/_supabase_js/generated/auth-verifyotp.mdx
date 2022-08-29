@@ -89,6 +89,11 @@ No description provided.
 
 </ul>
 
+## Notes
+
+- The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+- The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+
 ## Examples
 
 ### Verify Sms One-Time Password (OTP)
