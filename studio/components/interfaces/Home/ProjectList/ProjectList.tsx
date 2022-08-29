@@ -29,7 +29,6 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
         )
         const isEmpty = sortedProjects?.length == 0
         const canReadProjects = checkPermissions(PermissionAction.READ, 'projects', undefined, id)
-        console.log('canReadProjects', name, canReadProjects)
 
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
