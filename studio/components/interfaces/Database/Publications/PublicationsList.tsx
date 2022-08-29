@@ -123,7 +123,9 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                         size="tiny"
                         checked={x[event.key]}
                         disabled={!canUpdatePublications}
-                        onChange={() => toggleListenEvent(x, 'insert', x[event.key])}
+                        onChange={() =>
+                          toggleListenEvent(x, event.event.toLowerCase(), x[event.key])
+                        }
                       />
                     </div>
                   </Table.td>
