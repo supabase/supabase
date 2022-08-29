@@ -7,6 +7,8 @@ const ORGANIZATIONS_PERMISSIONS = {
         owner: true,
         admin: false,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -15,6 +17,8 @@ const ORGANIZATIONS_PERMISSIONS = {
         owner: true,
         admin: false,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
   ],
@@ -29,6 +33,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: false,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -37,6 +43,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: false,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -45,6 +53,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -53,6 +63,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -61,6 +73,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -69,6 +83,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -77,6 +93,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -85,6 +103,8 @@ const MEMBERS_MANAGEMENT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
   ],
@@ -99,6 +119,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -107,6 +129,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -115,6 +139,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: false,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -123,6 +149,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -131,6 +159,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -139,6 +169,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -147,6 +179,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -155,6 +189,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -163,6 +199,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -171,6 +209,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -179,6 +219,8 @@ const BILLING_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
   ],
@@ -188,11 +230,23 @@ const PROJECT_PERMISSIONS = {
   title: 'Projects',
   actions: [
     {
+      description: 'Can view projects',
+      permissions: {
+        owner: true,
+        admin: true,
+        developer: true,
+        read_only: true,
+        billing_only: false,
+      },
+    },
+    {
       description: 'Can create a project',
       permissions: {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -201,6 +255,8 @@ const PROJECT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -209,6 +265,8 @@ const PROJECT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -217,6 +275,8 @@ const PROJECT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -225,6 +285,8 @@ const PROJECT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: false,
+        read_only: false,
+        billing_only: false,
       },
     },
     {
@@ -233,6 +295,8 @@ const PROJECT_PERMISSIONS = {
         owner: true,
         admin: true,
         developer: true,
+        read_only: false,
+        billing_only: false,
       },
     },
   ],
