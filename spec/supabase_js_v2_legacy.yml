@@ -156,7 +156,7 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       - Requires either an email or phone number.
-      - This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
+      - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
       - If you're using phone, you can configure whether you want the user to receive an otp.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
