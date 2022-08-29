@@ -92,7 +92,7 @@ pages:
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://app.supabase.com/project/_/auth/settings).
       - If signUp() is called for an existing confirmed user:
           - If **Confirm email** is enabled in [your project](https://app.supabase.com/project/_/auth/settings), an obfuscated/fake user object is returned.
-          - If "Confirm email" is disabled, an error with a message "User already registered" will be returned.
+          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/next/auth-getuser).
     examples:
       - name: Sign up.
