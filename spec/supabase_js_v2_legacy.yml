@@ -449,7 +449,7 @@ pages:
     title: 'deleteUser()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
     notes: |
-      - The `deleteUser()` method requires the user's id which maps to the `auth.users.id` column.
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
