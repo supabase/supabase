@@ -120,7 +120,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -130,7 +130,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -140,7 +140,7 @@ const BILLING_PERMISSIONS = {
         admin: false,
         developer: false,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -150,7 +150,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -160,7 +160,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: false,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -170,7 +170,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -180,7 +180,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: false,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -190,7 +190,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -200,7 +200,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: false,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -210,7 +210,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: true,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
     {
@@ -220,7 +220,7 @@ const BILLING_PERMISSIONS = {
         admin: true,
         developer: false,
         read_only: false,
-        billing_only: false,
+        billing_only: true,
       },
     },
   ],
