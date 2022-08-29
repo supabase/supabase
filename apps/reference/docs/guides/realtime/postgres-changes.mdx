@@ -4,9 +4,11 @@ title: Postgres Changes
 description: Getting started with Realtime's Postgres Changes feature
 ---
 
-Supabase Postgres Changes enable clients to listen Postgres database events, specifically INSERT, UPDATE, and DELETE events.
+Supabase Postgres Changes enable clients to listen Postgres database events, specifically INSERT, UPDATE, and DELETE events. 
 
-Clients can elect to get changes for all tables in the public schema, a specific table, or a specific column's value.
+Clients can elect to get changes for all tables in the public schema, a specific table, or a specific column's value. Replication is not enabled by default, enable it for the entities you are interested in the dashboard [here](https://app.supabase.com/project/_/database/replication). 
+
+Anyone with access to a valid JWT signed with the project's JWT secret would be able to access database changes, unless the tables enabled for replication are protected with [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security). 
 
 The postgres changes functionality is supported by supabase-js v2 release candidate.
 
