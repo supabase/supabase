@@ -453,7 +453,7 @@ pages:
       - Requires a `service_role` key.
       - This function should be called on a server. Never expose your `service_role` key in the browser.
     examples:
-      - name: Remove a user completely
+      - name: Remove a user
         isSpotlight: true
         js: |
           ```js
