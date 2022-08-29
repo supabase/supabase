@@ -1,25 +1,26 @@
 import { useRouter } from 'next/router'
-import { Input } from '@supabase/ui'
+import { IconAlertCircle, IconLoader, Input } from '@supabase/ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Panel from 'components/ui/Panel'
-import { SettingsLoadingState } from './SettingsLoadingState'
 
 const DisplayApiSettings = () => {
   const router = useRouter()
   const { ref } = router.query
+
   const {
     services,
-    isLoading: isProjectSettingsLoading,
+    error: projectSettingsError,
     isError: isProjectSettingsError,
+    isLoading: isProjectSettingsLoading,
   } = useProjectSettings(ref as string | undefined)
   const {
+    jwtSecretUpdateStatus,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-    jwtSecretUpdateStatus,
   }: any = useJwtSecretUpdateStatus(ref)
 
   const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
@@ -30,7 +31,7 @@ const DisplayApiSettings = () => {
   const apiService = (services ?? []).find((x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
   const apiKeys = apiService?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
-  const isApikeysEmpty = apiKeys.length === 0
+  const isApiKeysEmpty = apiKeys.length === 0
 
   return (
     <Panel
@@ -45,11 +46,22 @@ const DisplayApiSettings = () => {
         </div>
       }
     >
-      {isProjectSettingsLoading || isJwtSecretUpdateStatusLoading || isApikeysEmpty ? (
-        <SettingsLoadingState
-          isError={isProjectSettingsError || isJwtSecretUpdateStatusError}
-          errorMessage="Failed to fetch API keys"
-        />
+      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
+          </p>
+        </div>
+      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+        <div className="py-8 flex items-center justify-center space-x-2">
+          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-scale-1100">
+            {isProjectSettingsLoading || isApiKeysEmpty
+              ? 'Retrieving API keys'
+              : 'JWT secret is being updated'}
+          </p>
+        </div>
       ) : (
         apiKeys.map((x: any, i: number) => (
           <Panel.Content
