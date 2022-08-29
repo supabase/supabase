@@ -467,7 +467,7 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Requires a `service_role` key.
-      - This function should only be called on a server. Never expose your `service_role` key in the browser.
+      - This function should only be used on the server. Never expose your `service_role` key in the browser.
       - Sends an invite link to the user's email address.
     examples:
       - name: Invite a user
