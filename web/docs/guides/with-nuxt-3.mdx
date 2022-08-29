@@ -184,7 +184,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
 ```html title="/components/Auth.vue"
 <template>
-    <form class="row flex flex-center" @submit.prevent="handleLogin">
+    <form class="flex row flex-center" @submit.prevent="handleLogin">
         <div class="col-6 form-widget">
             <h1 class="header">Supabase + Nuxt 3</h1>
             <p class="description">Sign in via magic link with your email below</p>
@@ -192,7 +192,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
                 <input class="inputField" type="email" placeholder="Your email" v-model="email" />
             </div>
             <div>
-                <input type="submit" class="button block" :value="loading ? 'Loading' : 'Send magic link'"
+                <input type="submit" class="block button" :value="loading ? 'Loading' : 'Send magic link'"
                     :disabled="loading" />
             </div>
         </div>
@@ -221,11 +221,7 @@ const handleLogin = async () => {
 
 ### User state
 
-To access the user information in other places, will create a user state. Create a new file called `states.ts` and utilize `useState` method of Nuxt 3.
-
-```typescript title="composables/states.ts"
-export const useUser = () => useState('user', () => null)
-```
+To access the user information, you can use the composable [useSupabaseUser](https://supabase.nuxtjs.org/usage/composables/use-supabase-user) provided by the Supabase Nuxt module.
 
 ### Account component
 
@@ -249,12 +245,12 @@ Let's create a new component for that called `Account.vue`.
         </div>
 
         <div>
-            <input type="submit" class="button block primary" :value="loading ? 'Loading ...' : 'Update'"
+            <input type="submit" class="block button primary" :value="loading ? 'Loading ...' : 'Update'"
                 :disabled="loading" />
         </div>
 
         <div>
-            <button class="button block" @click="signOut" :disabled="loading">
+            <button class="block button" @click="signOut" :disabled="loading">
                 Sign Out
             </button>
         </div>
@@ -271,7 +267,7 @@ const avatar_path = ref('')
 
 
 loading.value = true
-const user = useUser();
+const user = useSupabaseUser();
 let { data } = await supabase
     .from('profiles')
     .select(`username, website, avatar_url`)
@@ -287,7 +283,7 @@ loading.value = false
 async function updateProfile() {
     try {
         loading.value = true
-        const user = useUser();
+        const user = useSupabaseUser();
         const updates = {
             id: user.value.id,
             username: username.value,
@@ -326,16 +322,6 @@ Now that we have all the components in place, let's update `app.vue`:
 
 ```html title="app.vue"
 <template>
-  <div>
-    <NuxtPage />
-  </div>
-</template>
-```
-
-We now need to create an index page called `pages/index.vue`:
-
-```html title="pages/index.vue"
-<template>
     <div class="container" style="padding: 50px 0 100px 0">
         <Account v-if="user" />
         <Auth v-else />
@@ -343,16 +329,7 @@ We now need to create an index page called `pages/index.vue`:
 </template>
 
 <script setup>
-
-const supabase = useSupabaseClient()
-
-const user = useUser();
-
-user.value = useSupabaseUser()
-supabase.auth.onAuthStateChange((_, session) => {
-    user.value = session?.user
-})
-
+const user = useSupabaseUser();
 </script>
 ```
 
@@ -381,7 +358,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         <div v-else class="avatar no-image" :style="{ height: size, width: size }" />
 
         <div style="width: 10em; position: relative;">
-            <label class="button primary block" for="single">
+            <label class="block button primary" for="single">
                 {{ uploading ? "Uploading ..." : "Upload" }}
             </label>
             <input style="position: absolute; visibility: hidden;" type="file" id="single" accept="image/*"
@@ -469,12 +446,12 @@ And then we can add the widget to the Account page:
         </div>
 
         <div>
-            <input type="submit" class="button block primary" :value="loading ? 'Loading ...' : 'Update'"
+            <input type="submit" class="block button primary" :value="loading ? 'Loading ...' : 'Update'"
                 :disabled="loading" />
         </div>
 
         <div>
-            <button class="button block" @click="signOut" :disabled="loading">
+            <button class="block button" @click="signOut" :disabled="loading">
                 Sign Out
             </button>
         </div>
@@ -491,7 +468,7 @@ const avatar_path = ref('')
 
 
 loading.value = true
-const user = useUser();
+const user = useSupabaseUser();
 let { data } = await supabase
     .from('profiles')
     .select(`username, website, avatar_url`)
@@ -507,7 +484,7 @@ loading.value = false
 async function updateProfile() {
     try {
         loading.value = true
-        const user = useUser();
+        const user = useSupabaseUser();
         const updates = {
             id: user.value.id,
             username: username.value,
