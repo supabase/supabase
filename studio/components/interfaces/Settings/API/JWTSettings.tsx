@@ -53,7 +53,7 @@ const JWTSettings: FC<Props> = ({}) => {
   const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
     useState<boolean>(false)
 
-  const canReadJWTSecret = checkPermissions(PermissionAction.READ, 'postgrest_config')
+  const canReadJWTSecret = checkPermissions(PermissionAction.READ, 'field.jwt_secret')
   const canGenerateNewJWTSecret = checkPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.projects.update_jwt'
