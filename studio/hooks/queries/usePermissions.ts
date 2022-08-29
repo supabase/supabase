@@ -1,9 +1,8 @@
-import useSWR from 'swr'
-import jsonLogic from 'json-logic-js'
-
 import { useFlag, useStore } from 'hooks'
+import jsonLogic from 'json-logic-js'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
+import useSWR from 'swr'
 
 export function usePermissions(returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
@@ -22,6 +21,9 @@ export function usePermissions(returning?: 'minimal') {
     isError: !!anyError,
   }
 }
+
+const toRegexpString = (actionOrResource: string) =>
+  `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
 
 export function checkPermissions(
   action: string,
@@ -45,12 +47,8 @@ export function checkPermissions(
         organization_id: number
         resources: string[]
       }) =>
-        permission.actions.some((act) =>
-          action ? action.match(act.replace('.', '.').replace('%', '.*')) : null
-        ) &&
-        permission.resources.some((res) =>
-          resource.match(res.replace('.', '.').replace('%', '.*'))
-        ) &&
+        permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
+        permission.resources.some((res) => resource.match(toRegexpString(res))) &&
         permission.organization_id === orgid
     )
     .some(
