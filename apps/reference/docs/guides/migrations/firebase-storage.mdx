@@ -9,6 +9,17 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 1. Files are downloaded from a Firebase storage bucket to a local filesystem.
 2. Files are uploaded from the local filesystem to a Supabase storage bucket.
 
+## Set up the migration tool {#set-up-migration-tool}
+
+1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
+  ```
+  git clone https://github.com/supabase-community/firebase-to-supabase.git
+  ```
+1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
+1. Go to your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard.
+1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
+1. Under **Project API keys**, copy the **service_role** key and update the `SUPABASE_KEY` value in `supabase-keys.js`.
+
 ## Generate a Firebase private key {#generate-firebase-private-key}
 
 1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
@@ -16,18 +27,6 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 1. Click **Service Accounts** and select **Firebase Admin SDK**.
 1. Click **Generate new private key**.
 1. Rename the downloaded file to `firebase-service.json`.
-
-## Set up the `supabase-keys.js` file {#set-up-supabase-keys}
-
-1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
-    ```
-    git clone https://github.com/supabase-community/firebase-to-supabase.git
-    ```
-1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
-1. Go to your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard.
-1. Copy the **Project URL** and update the `SUPABASE_URL` value in `supabase-keys.js`.
-1. Under **Project API keys**, copy the **service_role** key and update the `SUPABASE_KEY` value in `supabase-keys.js`.
-1. Save the `supabase-keys.js` file.
 
 ## Command line options
 
