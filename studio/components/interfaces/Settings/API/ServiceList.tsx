@@ -64,7 +64,7 @@ const ServiceList: FC<Props> = ({ projectRef }) => {
 
   return (
     <>
-      <div className="max-w-4xl p-4">
+      <div className="">
         <section>
           <Panel title={<h5 className="mb-0">Project URL</h5>}>
             <Panel.Content>
