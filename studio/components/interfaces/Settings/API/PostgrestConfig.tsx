@@ -1,10 +1,11 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, FC } from 'react'
 import { indexOf } from 'lodash'
+import { useRouter } from 'next/router'
 import { AutoField } from 'uniforms-bootstrap4'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from '@supabase/ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useProjectPostgrestConfig } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
@@ -14,15 +15,22 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 // [Joshen TODO] Refactor to use supabase form component and FormPanel component
 
-const PostgrestConfig = observer(({ config, projectRef }: any) => {
+interface Props {}
+
+const PostgrestConfig: FC<Props> = ({}) => {
   const PageState: any = useContext(PageContext)
   const { ui } = useStore()
   const { meta } = PageState
 
+  const router = useRouter()
+  const { ref } = router.query
+
+  const { config, isError } = useProjectPostgrestConfig(ref as string | undefined)
+
   const [updates, setUpdates] = useState({
-    db_schema: config.db_schema,
-    max_rows: config.max_rows,
-    db_extra_search_path: config.db_extra_search_path || '',
+    db_schema: config?.db_schema,
+    max_rows: config?.max_rows,
+    db_extra_search_path: config?.db_extra_search_path ?? '',
   })
 
   const canUpdatePostgrestConfig = checkPermissions(
@@ -32,10 +40,7 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
 
   const updateConfig = async (updatedConfig: any) => {
     try {
-      const response = await patch(
-        `${API_URL}/projects/${projectRef}/config/postgrest`,
-        updatedConfig
-      )
+      const response = await patch(`${API_URL}/projects/${ref}/config/postgrest`, updatedConfig)
       if (response.error) {
         throw response.error
       } else {
@@ -107,57 +112,64 @@ const PostgrestConfig = observer(({ config, projectRef }: any) => {
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(config)}
       >
-        <div className="space-y-6 py-4">
-          {schema.length >= 1 && (
-            <MultiSelect
+        {isError ? (
+          <div className="py-8 flex items-center justify-center space-x-2">
+            <IconAlertCircle size={16} strokeWidth={1.5} />
+            <p className="text-sm text-scale-1100">Failed to retrieve API settings</p>
+          </div>
+        ) : (
+          <div className="space-y-6 py-4">
+            {schema.length >= 1 && (
+              <MultiSelect
+                disabled={!canUpdatePostgrestConfig}
+                options={schema}
+                // value must be passed as array of strings
+                value={updates.db_schema.replace(/ /g, '').split(',')}
+                // onChange returns array of strings
+                onChange={(event) => {
+                  let payload = updates
+                  payload.db_schema = event.join(', ') // permanentSchema.concat(event).join(', ')
+                  setUpdates({ ...payload })
+                  updateConfig({ ...payload })
+                }}
+                label={'Schema'}
+                descriptionText={
+                  <>
+                    The schema to expose in your API. Tables, views and stored procedures in this
+                    schema will get API endpoints.<code>public</code> and <code>storage</code> are
+                    protected by default.
+                  </>
+                }
+                emptyMessage={
+                  <>
+                    <IconAlertCircle strokeWidth={2} />
+                    <div className="mt-2 flex flex-col text-center">
+                      <p className="text-sm align-center">No schema available to choose</p>
+                      <p className="text-xs opacity-50">New schemas you create will appear here</p>
+                    </div>
+                  </>
+                }
+              />
+            )}
+            <AutoField
               disabled={!canUpdatePostgrestConfig}
-              options={schema}
-              // value must be passed as array of strings
-              value={updates.db_schema.replace(/ /g, '').split(',')}
-              // onChange returns array of strings
-              onChange={(event) => {
-                let payload = updates
-                payload.db_schema = event.join(', ') // permanentSchema.concat(event).join(', ')
-                setUpdates({ ...payload })
-                updateConfig({ ...payload })
-              }}
-              label={'Schema'}
-              descriptionText={
-                <>
-                  The schema to expose in your API. Tables, views and stored procedures in this
-                  schema will get API endpoints.<code>public</code> and <code>storage</code> are
-                  protected by default.
-                </>
-              }
-              emptyMessage={
-                <>
-                  <IconAlertCircle strokeWidth={2} />
-                  <div className="mt-2 flex flex-col text-center">
-                    <p className="text-sm align-center">No schema available to choose</p>
-                    <p className="text-xs opacity-50">New schemas you create will appear here</p>
-                  </div>
-                </>
-              }
+              name="db_extra_search_path"
+              showInlineError
+              errorMessage="Must be a string."
+              className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
             />
-          )}
-          <AutoField
-            disabled={!canUpdatePostgrestConfig}
-            name="db_extra_search_path"
-            showInlineError
-            errorMessage="Must be a string."
-            className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
-          />
-          <AutoField
-            disabled={!canUpdatePostgrestConfig}
-            name="max_rows"
-            showInlineError
-            errorMessage="Must be a number."
-            className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
-          />
-        </div>
+            <AutoField
+              disabled={!canUpdatePostgrestConfig}
+              name="max_rows"
+              showInlineError
+              errorMessage="Must be a number."
+              className={`${!canUpdatePostgrestConfig ? 'opacity-50' : ''}`}
+            />
+          </div>
+        )}
       </SchemaFormPanel>
     </>
   )
-})
+}
 
-export default PostgrestConfig
+export default observer(PostgrestConfig)
