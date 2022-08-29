@@ -9,6 +9,26 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`.  If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to Supabase.
 
+## Set up the migration tool {#set-up-migration-tool}
+
+1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
+  ```
+  git clone https://github.com/supabase-community/firebase-to-supabase.git
+  ```
+1. In the `/firestore` directory, create a file named `supabase-service.json` with the following contents:
+  ```json
+  {
+    "host": "database.server.com",
+    "password": "secretpassword",
+    "user": "postgres",
+    "database": "postgres",
+    "port": 5432
+  }
+  ```
+1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
+1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
+
 ## Generate a Firebase private key {#generate-firebase-private-key}
 
 1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
@@ -16,22 +36,6 @@ The Firestore `collection` is "flattened" and converted to a table with basic co
 1. Click **Service Accounts** and select **Firebase Admin SDK**.
 1. Click **Generate new private key**.
 1. Rename the downloaded file to `firebase-service.json`.
-
-## Set up the `supabase-service.json` file {#set-up-supabase-service-file}
-
-Create a file named `supabase-service.json` in the root of your migration project with the following contents:
-```json
-{
-    "host": "database.server.com",
-    "password": "secretpassword",
-    "user": "postgres",
-    "database": "postgres",
-    "port": 5432
-}
-```
-1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
-1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
-1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
 ## Command line options
 
