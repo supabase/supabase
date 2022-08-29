@@ -85,7 +85,7 @@ pages:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. To disable this, you can toggle off the "Confirm email"  setting in [your project](https://app.supabase.com/project/_/auth/settings).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://app.supabase.com/project/_/auth/settings).
       - The "Confirm email" setting determines if users need to confirm their email address after signing up.
         - If "Confirm email" is turned on, a `user` is returned but `session` will be null.
         - If "Confirm email" is turned off, both a `user` and a `session` will be returned
