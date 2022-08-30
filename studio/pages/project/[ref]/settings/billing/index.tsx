@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconArrowRight } from '@supabase/ui'
+import { Loading, IconArrowRight } from '@supabase/ui'
 
 import { Project, NextPageWithLayout } from 'types'
 import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
@@ -79,7 +79,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         <Loading active={loading}>
           <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
             <div className="bg-panel-body-light dark:bg-panel-body-dark flex items-center justify-center px-6 py-6">
-              <Typography.Text>Loading usage breakdown</Typography.Text>
+              <p>Loading usage breakdown</p>
             </div>
           </div>
         </Loading>
@@ -95,15 +95,15 @@ const Settings: FC<SettingsProps> = ({ project }) => {
             />
             {dateRange && (
               <div className="flex items-center space-x-2">
-                <Typography.Text type="secondary">
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_start.date).format('MMM D, YYYY')}
-                </Typography.Text>
-                <Typography.Text type="secondary" className="opacity-50">
+                </p>
+                <p className="text-scale-1000">
                   <IconArrowRight size={12} />
-                </Typography.Text>
-                <Typography.Text type="secondary">
+                </p>
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_end.date).format('MMM D, YYYY')}
-                </Typography.Text>
+                </p>
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -29,11 +29,11 @@ const Error500: NextPage = ({}) => {
         </nav>
       </div>
       <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
-        <Typography.Title level={3}>Something went wrong 🤕</Typography.Title>
-        <Typography.Text className="text-center">
+        <h4 className="text-lg">Something went wrong 🤕</h4>
+        <p className="text-center">
           Sorry about that, please try again later or feel free to reach out to us if the problem
           persists.
-        </Typography.Text>
+        </p>
       </div>
       <div className="flex items-center space-x-4">
         <Link href="/">
