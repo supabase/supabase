@@ -8,7 +8,6 @@ import {
   Button,
   Dropdown,
   Menu,
-  Typography,
   IconLoader,
   IconMoreVertical,
   Alert,
@@ -96,17 +95,17 @@ const StorageMenu: FC<Props> = () => {
           <Menu.Group title="Configuration" />
           <Link href={`/project/${projectRef}/storage/settings`}>
             <Menu.Item rounded active={page === 'settings'}>
-              <Typography.Text className="truncate">Settings</Typography.Text>
+              <p className="truncate">Settings</p>
             </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
-              <Typography.Text className="truncate">Policies</Typography.Text>
+              <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/usage`}>
             <Menu.Item rounded active={page === 'usage'}>
-              <Typography.Text className="truncate">Usage</Typography.Text>
+              <p className="truncate">Usage</p>
             </Menu.Item>
           </Link>
         </div>
@@ -129,7 +128,7 @@ const BucketRow = ({
       key={bucket.id}
       name={
         <div className="flex items-center space-x-2">
-          <Typography.Text>{bucket.name}</Typography.Text>
+          <p>{bucket.name}</p>
           {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
       }
@@ -159,13 +158,11 @@ const BucketRow = ({
               </Dropdown.Item>,
             ]}
           >
-            <Typography.Text>
-              <IconMoreVertical
-                className="opacity-0 group-hover:opacity-100"
-                size="tiny"
-                strokeWidth={2}
-              />
-            </Typography.Text>
+            <IconMoreVertical
+              className="opacity-0 group-hover:opacity-100"
+              size="tiny"
+              strokeWidth={2}
+            />
           </Dropdown>
         ) : (
           <div />

@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react'
 import useSWR from 'swr'
-import { Loading, Typography } from '@supabase/ui'
+import { Loading } from '@supabase/ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import { API_URL, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -183,9 +183,7 @@ const ProjectUsage: FC<ProjectUsageProps> = ({ projectRef, subscription_id }) =>
                       <div className="flex h-8 w-8 items-center justify-center rounded bg-white">
                         <img width={'16'} src={product.icon_src} />
                       </div>
-                      <Typography.Title level={5} className="mb-0">
-                        {product.title}
-                      </Typography.Title>
+                      <h5 className="mb-0">{product.title}</h5>
                     </div>
                   </th>
                   <th className="hidden p-3 text-left text-xs font-medium leading-4 text-gray-400 lg:table-cell">

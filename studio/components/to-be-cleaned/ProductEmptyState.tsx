@@ -1,4 +1,4 @@
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
@@ -31,7 +31,7 @@ const ProductEmptyState: FC<Props> = ({
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className="w-80 space-y-4">
-            <Typography.Title level={5}>{title}</Typography.Title>
+            <h5>{title}</h5>
             <div className="flex flex-col space-y-2">{children}</div>
             {hasAction && (
               <div className="flex items-center space-x-2">

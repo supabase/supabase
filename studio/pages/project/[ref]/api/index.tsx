@@ -1,6 +1,6 @@
 import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconKey, Typography } from '@supabase/ui'
+import { Button, Dropdown, IconKey } from '@supabase/ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
@@ -101,16 +101,16 @@ const DocView: FC<any> = observer(({}) => {
   if (error || jsonSchemaError)
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Text type="danger">
+        <p className="text-scale-1000">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
-        </Typography.Text>
+        </p>
       </div>
     )
   if (!data || !jsonSchema || !PageState.jsonSchema)
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Building docs ...</Typography.Title>
+        <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
 
