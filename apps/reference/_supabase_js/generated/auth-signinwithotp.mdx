@@ -8,10 +8,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Passwordless method for an existing user to login.
-A one-time password (OTP) can either be in the form of an email link or a numerical code.
-You can decide whether to send an email link or code or both in your email template.
-If you're using passwordless phone sign-ins, your OTP will always be in the form of a code.
+Log in a user using magiclink or a one-time password (OTP).
+If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
 
 ```js
 const { data, error } = await supabase.auth.signInWithOtp({
