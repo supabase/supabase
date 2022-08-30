@@ -675,7 +675,7 @@ Returns:
 
 ### **POST /admin/generate_link**
 
-Returns the corresponding email action link based on the type specified. Among other things, the response also contains the query params of the action link as separate JSON fields for convenience (along with the email OTP from which the corresponding token is generated).
+Returns the corresponding email action link based on the type specified. The response also contains the query params of the action link as separate JSON fields for convenience (along with the email OTP from which the corresponding token is generated).
 
 Returns:
 
