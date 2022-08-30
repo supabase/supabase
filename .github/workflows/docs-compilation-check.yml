@@ -4,10 +4,6 @@
 name: Docs Compilation Check
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'apps/reference/**'
   pull_request:
     branches: [master]
     paths:
