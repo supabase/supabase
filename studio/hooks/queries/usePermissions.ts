@@ -25,13 +25,19 @@ export function usePermissions(returning?: 'minimal') {
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
 
-export function checkPermissions(action: string, resource: string, data?: object) {
+export function checkPermissions(
+  action: string,
+  resource: string,
+  data?: object,
+  organizationId?: number
+) {
   if (!IS_PLATFORM) return true
 
   const enablePermissions = useFlag('enablePermissions')
   if (!enablePermissions) return true
 
   const { ui } = useStore()
+  const orgid = organizationId ?? ui?.selectedOrganization?.id
 
   return (ui?.permissions ?? [])
     .filter(
@@ -43,7 +49,7 @@ export function checkPermissions(action: string, resource: string, data?: object
       }) =>
         permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
         permission.resources.some((res) => resource.match(toRegexpString(res))) &&
-        permission.organization_id === ui?.selectedOrganization?.id
+        permission.organization_id === orgid
     )
     .some(
       ({ condition }: { condition: jsonLogic.RulesLogic }) =>

@@ -23,7 +23,7 @@ const { data, error } = await supabase.auth.admin.deleteUser(
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      uid
+      id
     </span>
     <span className="method-list-item-label-badge required">
       required
@@ -34,7 +34,7 @@ const { data, error } = await supabase.auth.admin.deleteUser(
   </h4>
   <div class="method-list-item-description">
 
-The user uid you want to remove.
+The user id you want to remove.
 
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
@@ -46,12 +46,11 @@ This function should only be called on a server. Never expose your `service_role
 
 ## Notes
 
-- Requires a `service_role` key.
-- This function should be called on a server. Never expose your `service_role` key in the browser.
+- The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
 
 ## Examples
 
-### Remove a user completely.
+### Removes a user
 
 ```js
 const { data, error } = await supabase.auth.admin.deleteUser(

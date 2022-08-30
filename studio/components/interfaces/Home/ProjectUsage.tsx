@@ -6,7 +6,6 @@ import {
   IconDatabase,
   IconKey,
   IconZap,
-  Typography,
 } from '@supabase/ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
@@ -219,7 +218,7 @@ const PanelHeader = (props: any) => {
           (props.href ? 'hover:text-gray-1200 cursor-pointer hover:opacity-100' : '')
         }
       >
-        <Typography.Text>{props.icon}</Typography.Text>
+        <p>{props.icon}</p>
         <span className="flex items-center space-x-1">
           <h4 className="mb-0 text-lg">{props.title}</h4>
         </span>

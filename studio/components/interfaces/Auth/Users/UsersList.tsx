@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, Loading, Typography } from '@supabase/ui'
+import { IconAlertCircle, Loading } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'
@@ -29,17 +29,6 @@ const UsersList = ({}) => {
         }
         body={
           <>
-            {PageState.usersLoading && (
-              <Table.tr>
-                {/* @ts-ignore */}
-                <Table.td
-                  colSpan={7}
-                  className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
-                >
-                  <Typography.Text type="secondary">Retrieving users</Typography.Text>
-                </Table.td>
-              </Table.tr>
-            )}
             {!PageState.usersLoading && PageState.users.length == 0 && (
               <Table.tr>
                 {/* @ts-ignore */}
@@ -49,11 +38,11 @@ const UsersList = ({}) => {
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
-                    <Typography.Text type="secondary">
+                    <p className="text-scale-1000">
                       {PageState.filterKeywords
                         ? `No users matched the search query "${PageState.filterKeywords}"`
                         : 'No users in your project yet'}
-                    </Typography.Text>
+                    </p>
                   </div>
                 </Table.td>
               </Table.tr>
