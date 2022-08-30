@@ -1,8 +1,9 @@
 import { FC } from 'react'
-import { Button } from '@supabase/ui'
+import { observer } from 'mobx-react-lite'
 import { PostgresTable } from '@supabase/postgres-meta'
-import { checkPermissions, useStore } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { checkPermissions, useStore } from 'hooks'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 interface Props {
   selectedSchema: string
@@ -12,28 +13,36 @@ interface Props {
 const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
   const { meta } = useStore()
   const tables = meta.tables.list((table: PostgresTable) => table.schema === selectedSchema)
-
-  const renderNoTablesCTA = () => {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <p className="text-sm">There are no tables available in this schema</p>
-        {selectedSchema === 'public' && <Button onClick={onAddTable}>Create a new table</Button>}
-      </div>
-    )
-  }
+  const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
+  const canCreateTables =
+    !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   return (
     <div className="w-full h-full flex items-center justify-center">
       {tables.length === 0 ? (
-        renderNoTablesCTA()
+        <ProductEmptyState
+          title="Table Editor"
+          ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
+          onClickCta={canCreateTables ? onAddTable : undefined}
+        >
+          <p className="text-sm text-scale-1100">There are no tables available in this schema.</p>
+        </ProductEmptyState>
       ) : (
         <div className="flex flex-col items-center space-y-4">
-          <p className="text-sm">Select a table or create a new one</p>
-          <Button onClick={onAddTable}>Create a new table</Button>
+          <ProductEmptyState
+            title="Table Editor"
+            ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
+            onClickCta={canCreateTables ? onAddTable : undefined}
+          >
+            <p className="text-sm text-scale-1100">
+              Select a table from the navigation panel on the left to view its data
+              {canCreateTables && ', or create a new one.'}
+            </p>
+          </ProductEmptyState>
         </div>
       )}
     </div>
   )
 }
 
-export default EmptyState
+export default observer(EmptyState)

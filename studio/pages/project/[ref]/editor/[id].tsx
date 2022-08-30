@@ -3,16 +3,16 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Dictionary } from 'components/grid'
+import { Modal } from '@supabase/ui'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { tryParseJson } from 'lib/helpers'
 import { useStore, withAuth } from 'hooks'
+import { Dictionary } from 'components/grid'
 import { TableEditorLayout } from 'components/layouts'
 import { TableGridEditor } from 'components/interfaces'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { Modal } from '@supabase/ui'
 
 const TableEditorPage: NextPage = () => {
   const router = useRouter()
