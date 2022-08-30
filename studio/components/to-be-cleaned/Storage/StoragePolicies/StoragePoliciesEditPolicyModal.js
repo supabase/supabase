@@ -14,7 +14,7 @@ import {
   PolicySelection,
   PolicyTemplates,
   POLICY_MODAL_VIEWS,
-} from 'components/interfaces/Authentication/Policies'
+} from 'components/interfaces/Auth/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
