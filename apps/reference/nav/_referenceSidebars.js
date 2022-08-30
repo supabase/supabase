@@ -3,13 +3,13 @@ const sidebars = {
     {
       type: 'category',
       label: 'Overview',
+      collapsed: true,
       items: [
         'about',
         'architecture',
         'guides/hosting/platform',
         'guides/examples',
       ],
-      collapsed: true,
     },
     {
       type: 'category',
@@ -30,6 +30,17 @@ const sidebars = {
         'guides/with-svelte',
         'guides/with-sveltekit',
         'guides/with-vue-3',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Migrate to Supabase',
+      collapsed: true,
+      items: [
+        'guides/migrations/firebase-auth',
+        'guides/migrations/firestore-data',
+        'guides/migrations/firebase-storage',
+        'guides/migrations/heroku',
       ],
     },
     {
@@ -85,6 +96,12 @@ const sidebars = {
             'guides/auth/row-level-security',
             'guides/auth/managing-user-data',
           ],
+        },
+        {
+          type: 'category',
+          label: 'Auth Helpers',
+          collapsed: true,
+          items: ['guides/auth/auth-helpers/auth-ui'],
         },
         {
           type: 'category',
@@ -152,6 +169,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Realtime',
+      collapsed: true,
+      items: [
+        'guides/realtime',
+        'guides/realtime/broadcast',
+        'guides/realtime/presence',
+        'guides/realtime/postgres-changes',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Storage',
       collapsed: true,
       items: ['guides/storage'],
@@ -166,17 +194,6 @@ const sidebars = {
         'going-into-prod',
         'guides/platform/performance',
         'guides/platform/permissions',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Realtime',
-      collapsed: true,
-      items: [
-        'guides/realtime',
-        'guides/realtime/broadcast',
-        'guides/realtime/presence',
-        'guides/realtime/postgres-changes',
       ],
     },
     {

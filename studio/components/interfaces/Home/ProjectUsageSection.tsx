@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, IconLoader } from '@supabase/ui'
+import { IconLoader } from '@supabase/ui'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useStore } from 'hooks'
@@ -20,7 +20,7 @@ const ProjectUsageSection: FC = observer(({}) => {
       : false
 
   if (usageError) {
-    return <Typography.Text type="danger">Error loading data {usageError.message}</Typography.Text>
+    return <p className="text-scale-1000 text-sm">Error loading data {usageError.message}</p>
   }
 
   return (

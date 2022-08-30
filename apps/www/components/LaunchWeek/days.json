@@ -135,9 +135,73 @@
     ]
   },
   {
-    "shipped": false,
+    "title": "Community and One more thing...",
+    "shipped": true,
     "date": "19th Aug 2022",
+    "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
     "d": 5,
-    "dd": "Friday"
+    "dd": "Friday",
+    "youtube_id": "s9UePQjLT0U",
+    "articles": [
+      {
+        "title": "Community Day",
+        "url": "/blog/launch-week-5-community-day",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "pg_jsonschema: 0.1.0",
+            "url": "/blog/launch-week-5-community-day#pg_jsonschema",
+            "description": "For our Open Source Spotlight we're hearing from Dmitry Dygalo. "
+          },
+          {
+            "title": "Postgrest v10: Native Types",
+            "url": "/blog/launch-week-5-community-day#postgrest-v10-native-types",
+            "description": "EXPLAIN, Query Planners, Improved Relationship Detection, and Computed relationships."
+          },
+          {
+            "title": "Egghead course",
+            "url": "/blog/launch-week-5-community-day#free-egghead-course-cache-supabase-data-at-the-edge-with-cloudflare-workers-and-kv-storage",
+            "description": "Cache Supabase data at the Edge with Cloudflare Workers and KV Storage."
+          }
+        ]
+      },
+      {
+        "title": "One more thing",
+        "url": "/blog/launch-week-5-one-more-thing",
+        "description": "It's never just one more thing...",
+        "products": [
+          {
+            "title": "Supabase Vault",
+            "url": "/blog/supabase-vault",
+            "description": "Postgres extension for managing secrets and encryption inside your database."
+          },
+          {
+            "title": "Auth UI",
+            "url": "/blog/launch-week-5-one-more-thing#auth-ui",
+            "description": "Customizable React UI component for Supabase Auth."
+          },
+          {
+            "title": "Dashboard permissions",
+            "url": "/blog/launch-week-5-one-more-thing#dashboard-permissions",
+            "description": "We've released granular permissions on our Supabase dashboard."
+          },
+          {
+            "title": "JSON schema validation",
+            "url": "/blog/launch-week-5-one-more-thing#json-schema-validation",
+            "description": "We've released a new Postgres extension on the Supabase platform today, pg_jsonschema."
+          },
+          {
+            "title": "pg_graphql v0.4.0",
+            "url": "/blog/launch-week-5-one-more-thing#pg_graphql-v040",
+            "description": "We've released a new version of pg_graphql, our GraphQL extension for Postgres."
+          },
+          {
+            "title": "Auth | Multi Factor Authentication",
+            "url": "/blog/launch-week-5-one-more-thing#multi-factor-authentication",
+            "description": "We've opened early-access signups for Multi-Factor Authentication (MFA)."
+          }
+        ]
+      }
+    ]
   }
 ]

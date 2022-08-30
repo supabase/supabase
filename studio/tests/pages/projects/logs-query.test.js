@@ -43,6 +43,7 @@ jest.mock('hooks')
 import { useStore, useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 useStore.mockImplementation(() => ({
+  ui: { profile: { id: 1 } },
   content: {
     addRecentLogSqlSnippet: jest.fn(),
   },

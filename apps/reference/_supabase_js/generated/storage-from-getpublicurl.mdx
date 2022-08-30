@@ -8,10 +8,11 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Retrieve URLs for assets in public buckets and encapsulates it in a return object
+Retrieves the URL for an asset in a public bucket.
+This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
 
 ```js
-const { data, error } = supabase.storage
+const { data } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```
@@ -34,7 +35,7 @@ const { data, error } = supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-The file path to be downloaded, including the path and file name. For example `folder/image.png`.
+The path and name of the file to generate the public URL for. For example `folder/image.png`.
 
   </div>
   
@@ -45,16 +46,17 @@ The file path to be downloaded, including the path and file name. For example `f
 ## Notes
 
 - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: none
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: none
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 
 ## Examples
 
 ### Returns the URL for an asset in a public bucket
 
 ```js
-const { data, error } = supabase.storage
+const { data } = supabase.storage
   .from('public-bucket')
   .getPublicUrl('folder/avatar1.png')
 ```

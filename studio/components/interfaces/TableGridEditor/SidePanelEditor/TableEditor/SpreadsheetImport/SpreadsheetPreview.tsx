@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import DataGrid from '@supabase/react-data-grid'
-import { Typography } from '@supabase/ui'
 
 interface Props {
   headers: string[]
@@ -19,7 +18,7 @@ const SpreadsheetPreview: FC<Props> = ({ headers = [], rows = [] }) => {
           resizable: true,
           headerRenderer: () => (
             <div className="flex items-center justify-center font-mono h-full">
-              <Typography.Text small>{header}</Typography.Text>
+              <p className="text-sm">{header}</p>
             </div>
           ),
           formatter: ({ row }: { row: any }) => (

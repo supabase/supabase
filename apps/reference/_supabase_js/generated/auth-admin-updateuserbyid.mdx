@@ -76,11 +76,11 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-A custom data object for app_metadata that.
+A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
 
 Only a service role can modify.
 
-Can be any JSON that includes app-specific info, such as identity providers, roles, and other
+The `app_metadata` should be a JSON object that includes app-specific info, such as identity providers, roles, and other
 access control information.
 
   </div>
@@ -101,7 +101,9 @@ access control information.
   </h4>
   <div class="method-list-item-description">
 
-A custom data object for user_metadata that a user can modify. Can be any JSON.
+A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+
+The `data` should be a JSON object that includes user-specific info, such as their first and last name.
 
   </div>
   
@@ -130,26 +132,6 @@ The user's email.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      email_change_token
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-An email change token.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
       email_confirm
     </span>
     <span className="method-list-item-label-badge false">
@@ -161,7 +143,7 @@ An email change token.
   </h4>
   <div class="method-list-item-description">
 
-Sets if a user has confirmed their email address.
+Confirms the user's email address if set to true.
 
 Only a service role can modify.
 
@@ -223,7 +205,7 @@ The user's phone.
   </h4>
   <div class="method-list-item-description">
 
-Sets if a user has confirmed their phone number.
+Confirms the user's phone number if set to true.
 
 Only a service role can modify.
 
@@ -245,13 +227,13 @@ Only a service role can modify.
   </h4>
   <div class="method-list-item-description">
 
-A custom data object for user_metadata.
-
-Can be any JSON.
+A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
 
 Only a service role can modify.
 
-Note: When using the GoTrueAdminApi and wanting to modify a user's user_metadata,
+The `user_metadata` should be a JSON object that includes user-specific info, such as their first and last name.
+
+Note: When using the GoTrueAdminApi and wanting to modify a user's metadata,
 this attribute is used instead of UserAttributes data.
 
   </div>
@@ -263,11 +245,6 @@ this attribute is used instead of UserAttributes data.
 </li>
 
 </ul>
-
-## Notes
-
-- Requires a `service_role` key.
-- This function should only be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 

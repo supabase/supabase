@@ -12,8 +12,8 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           ? [
               {
                 name: 'Logs',
-                key: 'auth-logs',
-                url: `/project/${ref}/auth/auth-logs`,
+                key: 'logs',
+                url: `/project/${ref}/auth/logs`,
                 items: [],
               },
             ]
