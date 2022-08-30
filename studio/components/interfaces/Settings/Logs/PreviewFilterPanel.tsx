@@ -40,7 +40,7 @@ interface Props {
   csvData?: unknown[]
   onFiltersChange: (filters: Filters) => void
   filters: Filters
-  tier: StripeSubscription['tier']['name'] | undefined
+  tier: StripeSubscription['tier']['key']
   showUpgradePrompt: boolean
   setShowUpgradePrompt: (showUpgradePrompt: boolean) => void
 }
