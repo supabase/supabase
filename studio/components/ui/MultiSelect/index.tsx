@@ -230,7 +230,9 @@ export default function MultiSelect({
         </Popover>
       </div>
 
-      {descriptionText && <span className="form-text text-muted">{descriptionText}</span>}
+      {descriptionText && (
+        <span className="form-text text-muted text-sm mt-2">{descriptionText}</span>
+      )}
     </div>
   )
 }

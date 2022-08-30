@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { includes, uniqBy, map as lodashMap } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Typography, Button, Input, IconSearch, IconLoader } from '@supabase/ui'
+import { Button, Input, IconSearch, IconLoader } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -29,17 +29,17 @@ const TriggersList: FC<any> = ({
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <Typography.Text>Loading triggers...</Typography.Text>
+        <p className="text-sm text-scale-1000">Loading triggers...</p>
       </div>
     )
   }
 
   if (meta.triggers.hasError) {
     return (
-      <Typography.Text className="px-6 py-4" type="danger">
+      <div className="px-6 py-4 text-scale-1000">
         <p>Error connecting to API</p>
         <p>{`${meta.triggers.error?.message ?? 'Unknown error'}`}</p>
-      </Typography.Text>
+      </div>
     )
   }
 
@@ -98,7 +98,7 @@ const TriggersList: FC<any> = ({
           </div>
           {filteredTriggers.length <= 0 && (
             <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
-              <Typography.Text>No results match your filter query</Typography.Text>
+              <p>No results match your filter query</p>
               <Button type="outline" onClick={() => setFilterString('')}>
                 Reset filter
               </Button>

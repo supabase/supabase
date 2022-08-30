@@ -17,7 +17,6 @@ import {
   Input,
   Listbox,
   Menu,
-  Typography,
 } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -314,7 +313,7 @@ const TableEditorMenu: FC<Props> = ({
               <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
                 <Menu.Item key={viewId} rounded active={isActive}>
                   <div className="flex justify-between">
-                    <Typography.Text className="truncate">{view.name}</Typography.Text>
+                    <p className="truncate">{view.name}</p>
                   </div>
                 </Menu.Item>
               </Link>
