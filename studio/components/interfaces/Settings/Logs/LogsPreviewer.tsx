@@ -12,6 +12,7 @@ import {
   LogEventChart,
   Filters,
   ensureNoTimestampConflict,
+  maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
@@ -19,8 +20,8 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import { LOGS_TABLES } from './Logs.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import UpgradePrompt from './UpgradePrompt'
 import { useProjectSubscription } from 'hooks'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 
 /**
  * Acts as a container component for the entire log display
@@ -49,7 +50,6 @@ export const LogsPreviewer: React.FC<Props> = ({
   const router = useRouter()
   const { s, ite, its, ref } = router.query
   const [showChart, setShowChart] = useState(true)
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState<boolean>(false)
   const { subscription } = useProjectSubscription(ref as string)
   const tier = subscription?.tier
 
@@ -59,6 +59,10 @@ export const LogsPreviewer: React.FC<Props> = ({
     { error, logData, params, newCount, filters, isLoading, eventChartData },
     { loadOlder, setFilters, refresh, setParams },
   ] = useLogsPreview(projectRef as string, table, filterOverride)
+
+  const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+    params.iso_timestamp_start
+  )
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, search_query: s as string }))
@@ -113,19 +117,27 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          its: from || '',
-          ite: to || '',
-        },
-      })
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
+
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      }
+
+      if (!shouldShowUpgradePrompt) {
+        setParams((prev) => ({
+          ...prev,
+          iso_timestamp_start: from || '',
+          iso_timestamp_end: to || '',
+        }))
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            its: from || '',
+            ite: to || '',
+          },
+        })
+      }
     }
   }
 
@@ -159,9 +171,6 @@ export const LogsPreviewer: React.FC<Props> = ({
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
-        tier={tier?.key}
-        showUpgradePrompt={showUpgradePrompt}
-        setShowUpgradePrompt={setShowUpgradePrompt}
       />
       <div
         className={
@@ -204,12 +213,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
-            <UpgradePrompt
-              projectRef={projectRef}
-              from={params.iso_timestamp_start || ''}
-              showUpgradePrompt={showUpgradePrompt}
-              setShowUpgradePrompt={setShowUpgradePrompt}
-            />
+            {UpgradePrompt}
           </div>
         )}
         {error && (
