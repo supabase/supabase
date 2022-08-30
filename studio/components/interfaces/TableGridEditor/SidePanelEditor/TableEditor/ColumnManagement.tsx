@@ -1,14 +1,6 @@
 import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
-import {
-  Alert,
-  Button,
-  IconEdit,
-  IconHelpCircle,
-  IconKey,
-  IconTrash,
-  Typography,
-} from '@supabase/ui'
+import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash } from '@supabase/ui'
 import {
   PostgresTable,
   PostgresColumn,
@@ -150,7 +142,7 @@ const ColumnManagement: FC<Props> = ({
     <>
       <div className="table-editor-columns w-full space-y-4">
         <div className="flex w-full items-center justify-between">
-          <Typography.Title level={5}>Columns</Typography.Title>
+          <h5>Columns</h5>
           {isNewRecord && (
             <>
               {hasImportContent ? (
@@ -173,10 +165,10 @@ const ColumnManagement: FC<Props> = ({
 
         {hasImportContent && (
           <div className="my-2 opacity-75">
-            <Typography.Text>
+            <p>
               Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and
               the following {columns.length} columns.
-            </Typography.Text>
+            </p>
           </div>
         )}
 

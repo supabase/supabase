@@ -8,7 +8,10 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Passwordless method for logging in an existing user.
+Log in a user using magiclink or a one-time password (OTP).
+If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
 
 ```js
 const { data, error } = await supabase.auth.signInWithOtp({
@@ -289,17 +292,17 @@ If set to false, this method will not create a new user. Defaults to true.
 
 ## Notes
 
-- This method is used for passwordless sign-ins where an otp is sent to the user's email or phone number.
 - Requires either an email or phone number.
-- If you're using an email, you can configure whether you want the user to receive a magiclink or an otp.
-- If you're using phone, you can configure whether you want the user to receive a magiclink or an otp.
-- The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+- This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+- If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+- If you're using phone, you can configure whether you want the user to receive a OTP.
+- The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
 
 ## Examples
 
 ### Sign in with email.
 
-The user will be sent an otp to their email. By default, a given user can only request an otp once every 60 seconds.
+The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
 
 ```js
 const { data, error } = await supabase.auth.signInWithOtp({
@@ -307,9 +310,9 @@ const { data, error } = await supabase.auth.signInWithOtp({
 })
 ```
 
-### Sign in with sms otp.
+### Sign in with SMS OTP.
 
-The user will be sent an otp to their phone number. By default, a given user can only request an otp once every 60 seconds.
+The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
 
 ```js
 const { data, error } = await supabase.auth.signInWithPassword({

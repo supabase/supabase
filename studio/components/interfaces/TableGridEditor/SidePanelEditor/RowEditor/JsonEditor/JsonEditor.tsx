@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { SidePanel, Typography } from '@supabase/ui'
+import { SidePanel } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'
@@ -51,62 +51,44 @@ const JsonEdit: FC<JsonEditProps> = ({ column, jsonString, visible, closePanel, 
   return (
     <SidePanel
       size="large"
-      header={'JSON'}
+      header={
+        <div className="flex items-center justify-between">
+          {view === 'edit' ? (
+            <p>
+              Editing JSON Field: <code>{column}</code>
+            </p>
+          ) : (
+            <p>
+              Viewing JSON Field: <code>{column}</code>
+            </p>
+          )}
+          <TwoOptionToggle
+            options={['view', 'edit']}
+            activeOption={view}
+            borderOverride="border-gray-500"
+            onClickOption={onToggleClick}
+          />
+        </div>
+      }
       visible={visible}
       onCancel={closePanel}
       customFooter={<ActionBar closePanel={closePanel} applyFunction={validateJSON} />}
     >
-      <SidePanel.Content>
-        <TwoOptionToggle
-          options={['view', 'edit']}
-          activeOption={view}
-          borderOverride="border-gray-500"
-          onClickOption={onToggleClick}
-        />
-
-        <div className="mt-4 flex flex-auto flex-col space-y-2">
-          {view === 'edit' ? (
-            <Editor column={column} value={jsonStr} onChange={onInputChange} />
-          ) : (
-            <Viewer column={column} value={jsonStr} />
-          )}
-        </div>
-      </SidePanel.Content>
+      <div className="py-4">
+        <SidePanel.Content>
+          <div className="mt-4 flex flex-auto flex-col space-y-4">
+            {view === 'edit' ? (
+              <div className="dark:border-dark h-[500px] w-full flex-grow border">
+                <JsonEditor onInputChange={onInputChange} defaultValue={jsonStr.toString()} />
+              </div>
+            ) : (
+              <DrilldownViewer jsonData={tryParseJson(jsonStr)} />
+            )}
+          </div>
+        </SidePanel.Content>
+      </div>
     </SidePanel>
   )
 }
 
 export default JsonEdit
-
-interface EditorProps {
-  column: string
-  value: string
-  onChange: (value: any) => void
-}
-
-const Editor: FC<EditorProps> = ({ column, value, onChange }) => {
-  return (
-    <>
-      <Typography.Title level={4}>Edit JSON Field: {column}</Typography.Title>
-
-      <div className="dark:border-dark h-96 w-full flex-grow border">
-        <JsonEditor onInputChange={onChange} defaultValue={value.toString()} />
-      </div>
-    </>
-  )
-}
-
-type ViewerProps = {
-  column: string
-  value: string
-}
-
-const Viewer: FC<ViewerProps> = ({ column, value }) => {
-  const json = tryParseJson(value)
-  return (
-    <>
-      <Typography.Title level={4}>Viewing JSON Field: {column}</Typography.Title>
-      <DrilldownViewer jsonData={json} />
-    </>
-  )
-}

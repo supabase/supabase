@@ -2,7 +2,6 @@ import {
   Badge,
   Button,
   IconArchive,
-  Typography,
   Dropdown,
   IconEdit,
   IconTrash,
@@ -62,32 +61,6 @@ const PolicyRow = ({
       </Panel.Content>
     </div>
   )
-  return (
-    <div className="grid grid-cols-10 p-4 px-6 group">
-      <div className="col-span-4">
-        <Typography.Text>{name}</Typography.Text>
-      </div>
-      <div className="col-span-4 flex flex-col">
-        <div>
-          <Badge color="green">{command}</Badge>
-        </div>
-      </div>
-      <div className="col-span-2 flex items-center justify-end opacity-0 transition group-hover:opacity-100">
-        <div name="flex">
-          <Button
-            type="outline"
-            className="mr-2"
-            onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-          >
-            Edit
-          </Button>
-          <Button type="outline" onClick={() => onSelectPolicyDelete(policy)}>
-            Delete
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 const StoragePoliciesBucketRow = ({
@@ -114,12 +87,10 @@ const StoragePoliciesBucketRow = ({
       title={[
         <div key={label} className="flex items-center justify-between w-full">
           <div className="flex items-center space-x-4">
-            <Typography.Text type="secondary">
-              <IconArchive size="small" />
-            </Typography.Text>
-            <Typography.Title level={4} className="m-0">
+            <IconArchive className="text-scale-1000" size="small" />
+            <h4 className="text-lg m-0">
               <span>{label}</span>
-            </Typography.Title>
+            </h4>
             {bucket.public && <Badge color="yellow">Public</Badge>}
           </div>
           <Button type="outline" onClick={() => onSelectPolicyAdd(bucket.name, table)}>

@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { Typography } from '@supabase/ui'
 import DataGrid, { Row } from '@supabase/react-data-grid'
 
 interface Props {
@@ -10,7 +9,7 @@ const ResultsPane: FC<Props> = ({ results }) => {
   if (results.length === 0) {
     return (
       <div className="p-5 flex items-center space-x-2 bg-gray-100 dark:bg-gray-700">
-        <Typography.Text>Success. No rows returned.</Typography.Text>
+        <p>Success. No rows returned.</p>
       </div>
     )
   }

@@ -87,72 +87,12 @@ No description provided.
 
 </li>
 
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      options
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      <code>object</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-<ul className="method-list-group">
-  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      captchaToken
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Verification token received when the user completes the captcha on the site.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      redirectTo
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-A URL to send the user to after they are confirmed.
-
-  </div>
-  
-</li>
-
 </ul>
 
-</li>
+## Notes
 
-</ul>
+- The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+- The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
 
 ## Examples
 

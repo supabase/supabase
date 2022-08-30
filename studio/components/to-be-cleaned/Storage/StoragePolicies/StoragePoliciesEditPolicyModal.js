@@ -1,4 +1,4 @@
-import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
+import { Modal, IconChevronLeft } from '@supabase/ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 
@@ -14,7 +14,7 @@ import {
   PolicySelection,
   PolicyTemplates,
   POLICY_MODAL_VIEWS,
-} from 'components/interfaces/Authentication/Policies'
+} from 'components/interfaces/Auth/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
@@ -50,7 +50,15 @@ const StoragePoliciesEditPolicyModal = ({
 
   /* Methods to determine which step to show */
   const onViewIntro = () => setView(POLICY_MODAL_VIEWS.SELECTION)
-  const onViewEditor = () => setView(POLICY_MODAL_VIEWS.EDITOR)
+  const onViewEditor = (state) => {
+    if (state === 'new') {
+      setPolicyFormFields({
+        ...policyFormFields,
+        definition: `bucket_id = '${bucketName}'`,
+      })
+    }
+    setView(POLICY_MODAL_VIEWS.EDITOR)
+  }
   const onViewTemplates = () => {
     setPreviousView(view)
     setView(POLICY_MODAL_VIEWS.TEMPLATES)
@@ -177,18 +185,14 @@ const StoragePoliciesEditPolicyModal = ({
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>
-            <Typography.Title level={4} className="m-0">
-              Select a template to use for your new policy
-            </Typography.Title>
+            <h4 className="textlg m-0">Select a template to use for your new policy</h4>
           </div>
         </div>
       )
     }
     return (
       <div className="flex items-center space-x-3">
-        <Typography.Title level={4} className="m-0">
-          {getTitle()}
-        </Typography.Title>
+        <h4 className="text-lg m-0">{getTitle()}</h4>
       </div>
     )
   }
@@ -215,7 +219,7 @@ const StoragePoliciesEditPolicyModal = ({
           <PolicySelection
             description="PostgreSQL policies control access to your files and folders"
             onViewTemplates={onViewTemplates}
-            onViewEditor={onViewEditor}
+            onViewEditor={() => onViewEditor('new')}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
