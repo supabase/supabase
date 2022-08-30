@@ -1,0 +1,33 @@
+---
+id: storage-listbuckets
+title: 'listBuckets()'
+slug: /storage-listbuckets
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Retrieves the details of all Storage buckets within an existing product.
+
+```dart
+final res = await supabase
+  .storage
+  .listBuckets()
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `select`
+  - `objects` permissions: none
+
+## Examples
+
+### List buckets
+
+```dart
+final res = await supabase
+  .storage
+  .listBuckets()
+```

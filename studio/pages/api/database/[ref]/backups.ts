@@ -16,5 +16,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  return res.status(200).json({ tierId: undefined, backups: [] })
+  return res.status(200).json({ tierKey: 'FREE', backups: [] })
 }

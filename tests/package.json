@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "These tests can be run with Docker.",
   "scripts": {
-    "docker:up": "cd ../docker && docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
+    "docker:up": "cd ../docker && ENABLE_EMAIL_AUTOCONFIRM=true docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
     "docker:down": "cd ../docker && docker-compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml down",
     "test": "jest",
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",
-    "@supabase/supabase-js": "^1.34.1",
+    "@supabase/supabase-js": "^1.35.6",
     "@testdeck/jest": "^0.2.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.24",

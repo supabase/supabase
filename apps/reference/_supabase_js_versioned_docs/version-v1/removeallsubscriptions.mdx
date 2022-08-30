@@ -1,0 +1,28 @@
+---
+id: removeallsubscriptions
+title: 'removeAllSubscriptions()'
+slug: removeallsubscriptions
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Closes and removes all subscriptions and returns a list of removed
+subscriptions and their errors.
+
+```js
+supabase.removeAllSubscriptions()
+```
+
+## Notes
+
+- Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+
+## Examples
+
+### Removes all subscriptions
+
+```js
+supabase.removeAllSubscriptions()
+```

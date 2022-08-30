@@ -1,34 +1,29 @@
-import {
-  Dictionary,
-  Filter,
-  QueryPagination,
-  QueryTable,
-  Sort,
-} from '../types';
+import { Dictionary, Filter, QueryPagination, QueryTable, Sort } from '../types'
 import {
   countQuery,
   deleteQuery,
   insertQuery,
   selectQuery,
+  truncateQuery,
   updateQuery,
-} from './Query.utils';
+} from './Query.utils'
 
 export interface IQueryModifier {
-  range: (from: number, to: number) => QueryModifier;
-  toSql: () => string;
+  range: (from: number, to: number) => QueryModifier
+  toSql: () => string
 }
 
 export class QueryModifier implements IQueryModifier {
-  protected pagination?: QueryPagination;
+  protected pagination?: QueryPagination
 
   constructor(
     protected table: QueryTable,
-    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update',
+    protected action: 'count' | 'delete' | 'insert' | 'select' | 'update' | 'truncate',
     protected options?: {
-      actionValue?: string[] | Dictionary<any> | Dictionary<any>[];
-      actionOptions?: { returning: boolean };
-      filters?: Filter[];
-      sorts?: Sort[];
+      actionValue?: string[] | Dictionary<any> | Dictionary<any>[]
+      actionOptions?: { returning?: boolean; cascade?: boolean }
+      filters?: Filter[]
+      sorts?: Sort[]
     }
   ) {}
 
@@ -39,8 +34,8 @@ export class QueryModifier implements IQueryModifier {
    * @param to  The last index to which to limit the result, inclusive.
    */
   range(from: number, to: number) {
-    this.pagination = { offset: from, limit: to - from + 1 };
-    return this;
+    this.pagination = { offset: from, limit: to - from + 1 }
+    return this
   }
 
   /**
@@ -48,40 +43,45 @@ export class QueryModifier implements IQueryModifier {
    */
   toSql() {
     try {
-      const { actionValue, actionOptions, filters, sorts } = this.options ?? {};
+      const { actionValue, actionOptions, filters, sorts } = this.options ?? {}
       switch (this.action) {
         case 'count': {
-          return countQuery(this.table, { filters });
+          return countQuery(this.table, { filters })
         }
         case 'delete': {
           return deleteQuery(this.table, filters, {
             returning: actionOptions?.returning,
-          });
+          })
         }
         case 'insert': {
           return insertQuery(this.table, actionValue as Dictionary<any>[], {
             returning: actionOptions?.returning,
-          });
+          })
         }
         case 'select': {
           return selectQuery(this.table, actionValue as string[] | undefined, {
             filters,
             pagination: this.pagination,
             sorts,
-          });
+          })
         }
         case 'update': {
           return updateQuery(this.table, actionValue as Dictionary<any>, {
             filters,
             returning: actionOptions?.returning,
-          });
+          })
+        }
+        case 'truncate': {
+          return truncateQuery(this.table, {
+            cascade: actionOptions?.cascade,
+          })
         }
         default: {
-          return '';
+          return ''
         }
       }
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 }

@@ -14,4 +14,5 @@ export interface StripeProduct {
   price_id?: string
   unit_amount: number
   supabase_prod_id: string
+  key: string
 }

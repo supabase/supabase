@@ -8,14 +8,13 @@ import {
   Button,
   Dropdown,
   Menu,
-  Typography,
   IconLoader,
   IconMoreVertical,
   Alert,
   IconEdit,
+  IconTrash,
 } from '@supabase/ui'
 
-import Flag from 'components/ui/Flag/Flag'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -61,7 +60,7 @@ const StorageMenu: FC<Props> = () => {
           <div>
             <Menu.Group title="All buckets" />
             {!loaded ? (
-              <div className="py-2 px-4 flex items-center space-x-2">
+              <div className="py-2 px-2 flex items-center space-x-2">
                 <IconLoader className="animate-spin" size={14} strokeWidth={2} />
                 <span className="text-sm">Loading buckets</span>
               </div>
@@ -96,17 +95,17 @@ const StorageMenu: FC<Props> = () => {
           <Menu.Group title="Configuration" />
           <Link href={`/project/${projectRef}/storage/settings`}>
             <Menu.Item rounded active={page === 'settings'}>
-              <Typography.Text className="truncate">Settings</Typography.Text>
+              <p className="truncate">Settings</p>
             </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/policies`}>
             <Menu.Item rounded active={page === 'policies'}>
-              <Typography.Text className="truncate">Policies</Typography.Text>
+              <p className="truncate">Policies</p>
             </Menu.Item>
           </Link>
           <Link href={`/project/${projectRef}/storage/usage`}>
             <Menu.Item rounded active={page === 'usage'}>
-              <Typography.Text className="truncate">Usage</Typography.Text>
+              <p className="truncate">Usage</p>
             </Menu.Item>
           </Link>
         </div>
@@ -124,23 +123,12 @@ const BucketRow = ({
   onSelectDeleteBucket = () => {},
   onSelectToggleBucketPublic = () => {},
 }: any) => {
-  const bucketOptions = [
-    {
-      name: 'Delete bucket',
-      onClick: () => onSelectDeleteBucket(bucket),
-    },
-    {
-      name: bucket.public ? 'Make private' : 'Make public',
-      onClick: () => onSelectToggleBucketPublic(bucket),
-    },
-  ]
-
   return (
     <ProductMenuItem
       key={bucket.id}
       name={
         <div className="flex items-center space-x-2">
-          <Typography.Text>{bucket.name}</Typography.Text>
+          <p>{bucket.name}</p>
           {bucket.public && <Badge color="yellow">Public</Badge>}
         </div>
       }
@@ -152,22 +140,29 @@ const BucketRow = ({
         ) : bucket.status === STORAGE_ROW_STATUS.READY ? (
           <Dropdown
             side="bottom"
-            align="end"
+            align="start"
             overlay={[
-              bucketOptions.map((option) => (
-                <Dropdown.Item key={option.name} onClick={option.onClick}>
-                  {option.name}
-                </Dropdown.Item>
-              )),
+              <Dropdown.Item
+                key="toggle-private"
+                onClick={() => onSelectToggleBucketPublic(bucket)}
+              >
+                {bucket.public ? 'Make private' : 'Make public'}
+              </Dropdown.Item>,
+              <Dropdown.Seperator key="bucket-separator" />,
+              <Dropdown.Item
+                icon={<IconTrash size="tiny" />}
+                key="delete-bucket"
+                onClick={() => onSelectDeleteBucket(bucket)}
+              >
+                Delete bucket
+              </Dropdown.Item>,
             ]}
           >
-            <Typography.Text>
-              <IconMoreVertical
-                className="opacity-0 group-hover:opacity-100"
-                size="tiny"
-                strokeWidth={2}
-              />
-            </Typography.Text>
+            <IconMoreVertical
+              className="opacity-0 group-hover:opacity-100"
+              size="tiny"
+              strokeWidth={2}
+            />
           </Dropdown>
         ) : (
           <div />

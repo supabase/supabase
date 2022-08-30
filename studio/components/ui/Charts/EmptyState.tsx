@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Typography, IconBarChart2 } from '@supabase/ui'
+import { IconBarChart2 } from '@supabase/ui'
 
 interface Props {}
 
@@ -11,10 +11,10 @@ const EmptyState: FC<Props> = () => (
       flex flex-col items-center justify-center
     "
   >
-    <Typography.Text className="mb-2">
+    <div className="mb-2">
       <IconBarChart2 />
-    </Typography.Text>
-    <Typography.Text>No data to show</Typography.Text>
+    </div>
+    <p>No data to show</p>
   </div>
 )
 

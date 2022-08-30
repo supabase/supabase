@@ -43,15 +43,15 @@ jest.mock('hooks')
 import { useStore, useFlag } from 'hooks'
 useFlag.mockReturnValue(true)
 useStore.mockImplementation(() => ({
+  ui: { profile: { id: 1 } },
   content: {
     addRecentLogSqlSnippet: jest.fn(),
   },
 }))
 
-jest.mock('hooks/queries/useProjectSubscription')
-import useProjectSubscription from 'hooks/queries/useProjectSubscription'
-useProjectSubscription = jest.fn()
-useProjectSubscription.mockImplementation((ref) => ({
+jest.mock('hooks')
+import { useProjectSubscription } from 'hooks'
+useProjectSubscription = jest.fn((ref) => ({
   subscription: {
     tier: {
       supabase_prod_id: 'tier_free',

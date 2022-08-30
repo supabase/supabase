@@ -93,17 +93,17 @@ Once you've tested your Function locally (or gone straight to production cos you
   <source src="/videos/blog/launch-week-4/logs-polish.mov" type="video/mp4" muted playsInline />
 </video>
 
-Our observability pipeline has been built [using Logflare](https://supabase.com/blog/2021/12/02/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/2021/11/30/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
+Our observability pipeline has been built [using Logflare](https://supabase.com/blog/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
 
 ![new —> deploy —> invoke —> logs](/images/blog/launch-week-4/thursday-functions/functions-new-deploy-invoke-logs.gif)
 new —> deploy —> invoke —> logs
 
-To round off the end-to-end experience, `supabase-js` now works in Deno, making it easy to interact with the rest of your Supabase project from within your Edge Functions. Your project's URLs, API keys, and database connection strings are made available as environment variables within your Function to make this even easier. And if you want to interact with third-party APIs which require a secret key, such as Stripe, you can easily and securely make these available to your Function as environment variables via the Supabase CLI. To get an idea for what is possible, check out our examples page [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+To round off the end-to-end experience, `supabase-js` now works in Deno, making it easy to interact with the rest of your Supabase project from within your Edge Functions. Your project's URLs, API keys, and database connection strings are made available as environment variables within your Function to make this even easier. And if you want to interact with third-party APIs which require a secret key, such as Stripe, you can easily and securely make these available to your Function as environment variables via the Supabase CLI. To get an idea for what is possible, check out our examples page [here](https://github.com/supabase/examples/tree/main/supabase-js-v1/edge-functions).
 
 ## Quickstart
 
 <iframe
-  className="w-full video-with-border"
+  className="video-with-border w-full"
   width="640"
   height="385"
   src="https://www.youtube-nocookie.com/embed/rzglqRdZUQE"

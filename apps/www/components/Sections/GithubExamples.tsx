@@ -42,8 +42,8 @@ function GithubExamples() {
               </Button>
             </Link>
             <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
+              href="https://github.com/supabase/examples"
+              as="https://github.com/supabase/examples"
             >
               <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
                 Official GitHub library

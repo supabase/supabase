@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import {
   Input,
   Button,
-  Typography,
   IconSearch,
   IconPlus,
   IconChevronLeft,
@@ -11,9 +10,8 @@ import {
   IconTrash,
 } from '@supabase/ui'
 
-import { useStore } from 'hooks'
-import { confirmAlert } from '../../../to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from '../../../to-be-cleaned/Table'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 
 const Header: FC<{
   filterString: string
@@ -28,7 +26,7 @@ const Header: FC<{
   leftComponents,
   rightComponents,
 }) => (
-  <div className="flex justify-between items-center">
+  <div className="flex items-center justify-between">
     <div className="flex items-center">
       <div>{leftComponents}</div>
       <div>
@@ -72,13 +70,16 @@ const ColumnList: FC<{
           filterString={filterString}
           setFilterString={setFilterString}
           leftComponents={
-            <Button
-              type="outline"
-              className="mr-4"
-              onClick={() => onSelectBack()}
-              icon={<IconChevronLeft size="small" />}
-              style={{ padding: '5px' }}
-            />
+            <div className="flex items-center mr-4">
+              <Button
+                type="outline"
+                className="mr-4"
+                onClick={() => onSelectBack()}
+                icon={<IconChevronLeft size="small" />}
+                style={{ padding: '5px' }}
+              />
+              <code>{selectedTable.name}</code>
+            </div>
           }
           rightComponents={
             <Button icon={<IconPlus />} onClick={() => onAddColumn()}>
@@ -87,59 +88,59 @@ const ColumnList: FC<{
           }
         />
       </div>
-      <div className="">
-        <Table
-          head={[
-            <Table.th key="name">Name</Table.th>,
-            <Table.th key="description" className="hidden lg:table-cell">
-              Description
-            </Table.th>,
-            <Table.th key="type" className="hidden xl:table-cell">
-              Data Type
-            </Table.th>,
-            <Table.th key="format" className="hidden xl:table-cell">
-              Format
-            </Table.th>,
-            <Table.th key="buttons"></Table.th>,
-          ]}
-          body={columns.map((x: any, i: number) => (
-            <Table.tr className="border-t" key={x.name}>
-              <Table.td className="">
-                <Typography.Text>{x.name}</Typography.Text>
-              </Table.td>
-              <Table.td className="">
-                <Typography.Text>{x.comment}</Typography.Text>
-              </Table.td>
-              <Table.td className="">
-                <Typography.Text small code>
-                  {x.data_type}
-                </Typography.Text>
-              </Table.td>
-              <Table.td className="text-xs font-mono">
-                <Typography.Text small code>
-                  {x.format}
-                </Typography.Text>
-              </Table.td>
-              <Table.td className="px-4 py-3 pr-2">
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    onClick={() => onEditColumn(x)}
-                    icon={<IconEdit3 />}
-                    style={{ padding: 5 }}
-                    type="text"
-                  />
-                  <Button
-                    onClick={() => onDeleteColumn(x)}
-                    icon={<IconTrash />}
-                    style={{ padding: 5 }}
-                    type="text"
-                  />
-                </div>
-              </Table.td>
-            </Table.tr>
-          ))}
-        />
-      </div>
+      {columns.length === 0 ? (
+        <NoSearchResults />
+      ) : (
+        <div>
+          <Table
+            head={[
+              <Table.th key="name">Name</Table.th>,
+              <Table.th key="description" className="hidden lg:table-cell">
+                Description
+              </Table.th>,
+              <Table.th key="type" className="hidden xl:table-cell">
+                Data Type
+              </Table.th>,
+              <Table.th key="format" className="hidden xl:table-cell">
+                Format
+              </Table.th>,
+              <Table.th key="buttons"></Table.th>,
+            ]}
+            body={columns.map((x: any, i: number) => (
+              <Table.tr className="border-t" key={x.name}>
+                <Table.td>
+                  <p>{x.name}</p>
+                </Table.td>
+                <Table.td>
+                  <p>{x.comment}</p>
+                </Table.td>
+                <Table.td>
+                  <code className="text-sm">{x.data_type}</code>
+                </Table.td>
+                <Table.td className="font-mono text-xs">
+                  <code className="text-sm">{x.format}</code>
+                </Table.td>
+                <Table.td className="px-4 py-3 pr-2">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      onClick={() => onEditColumn(x)}
+                      icon={<IconEdit3 />}
+                      style={{ padding: 5 }}
+                      type="text"
+                    />
+                    <Button
+                      onClick={() => onDeleteColumn(x)}
+                      icon={<IconTrash />}
+                      style={{ padding: 5 }}
+                      type="text"
+                    />
+                  </div>
+                </Table.td>
+              </Table.tr>
+            ))}
+          />
+        </div>
+      )}
     </>
   )
 }

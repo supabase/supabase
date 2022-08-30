@@ -1,0 +1,54 @@
+{
+  "name": "@supabase/generator",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "scripts": {
+    "api:gen": "npm-run-all api:gen:api",
+    "api:gen:api": "ts-node ./index.ts gen --type api --url https://api.supabase.com --input ../../spec/transforms/api_v0_openapi_deparsed.json --output  ../../apps/reference/_api/usage.mdx",
+    "cli:gen": "npm-run-all cli:gen:commands cli:gen:config",
+    "cli:gen:commands": "ts-node ./index.ts gen --type cli --input ../../spec/cli_v1_commands.yaml --output  ../../apps/reference/_cli/generated/usage.mdx ",
+    "cli:gen:config": "ts-node ./index.ts gen --type config --input ../../spec/cli_v1_config.yaml --output  ../../apps/reference/_cli/generated/config.mdx",
+    "gotrue:gen": "npm-run-all gotrue:gen:config",
+    "gotrue:gen:config": "ts-node ./index.ts gen --type config --input ../../spec/gotrue_v1_config.yaml --output ../../apps/reference/_gotrue/config.mdx",
+    "storage:gen": "npm-run-all storage:gen:api storage:gen:config",
+    "storage:gen:api": "ts-node ./index.ts gen --type api --input ../../spec/transforms/storage_v0_openapi_deparsed.json --output  ../../apps/reference/_storage/generated/usage.mdx",
+    "storage:gen:config": "ts-node ./index.ts gen --type config --input ../../spec/storage_v1_config.yaml --output  ../../apps/reference/_storage/generated/config.mdx",
+    "supabase-dart:format": "prettier --write ../../apps/reference/_supabase_dart/**/*.mdx",
+    "supabase-dart:v1": "npm-run-all supabase-dart:v1:ref supabase-dart:v1:olddocs supabase-dart:format",
+    "supabase-dart:v1:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_dart/generated ../../spec/supabase_dart_v1_legacy.yml",
+    "supabase-dart:v1:olddocs": "ts-node ./LegacyReferenceGenerator.ts -o ../../web/docs/reference/dart ../../spec/supabase_dart_v1_legacy.yml",
+    "supabase-js:format": "prettier --write ../../apps/reference/_supabase_js/**/*.mdx && prettier --write ../../apps/reference/_supabase_js_versioned_docs/**/*.mdx",
+    "supabase-js:v1": "npm-run-all supabase-js:v1:ref supabase-js:v1:olddocs supabase-js:format",
+    "supabase-js:v1:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js_versioned_docs/version-v1 ../../spec/supabase_js_v1_legacy.yml",
+    "supabase-js:v1:olddocs": "ts-node ./LegacyReferenceGenerator.ts -o ../../web/docs/reference/javascript ../../spec/supabase_dart_v1_legacy.yml",
+    "supabase-js:v2": "npm-run-all supabase-js:v2:ref supabase-js:format",
+    "supabase-js:v2:ref": "ts-node ./LegacyReferenceGenerator.ts -o ../../apps/reference/_supabase_js/generated ../../spec/supabase_js_v2_legacy.yml",
+    "tsdoc:dereference:functions": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/functions.json --output ../../spec/enrichments/tsdoc_v2/functions_dereferenced.json",
+    "tsdoc:dereference:gotrue": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/gotrue.json --output ../../spec/enrichments/tsdoc_v2/gotrue_dereferenced.json",
+    "tsdoc:dereference:postgrest": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/postgrest.json --output ../../spec/enrichments/tsdoc_v2/postgrest_dereferenced.json",
+    "tsdoc:dereference:realtime": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/realtime.json --output ../../spec/enrichments/tsdoc_v2/realtime_dereferenced.json",
+    "tsdoc:dereference:storage": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/storage.json --output ../../spec/enrichments/tsdoc_v2/storage_dereferenced.json",
+    "tsdoc:dereference:supabase": "ts-node ./tsdoc.ts dereference --input ../../spec/enrichments/tsdoc_v2/supabase.json --output ../../spec/enrichments/tsdoc_v2/supabase_dereferenced.json"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-cli": "^4.0.4",
+    "@types/json-stringify-safe": "^5.0.0",
+    "@types/lodash": "^4.14.182",
+    "ejs": "^3.1.8",
+    "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21",
+    "npm-run-all": "^4.1.5",
+    "openapi-types": "^12.0.0",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "dependencies": {
+    "json-stringify-safe": "^5.0.1"
+  }
+}

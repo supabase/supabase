@@ -94,7 +94,7 @@ export const createPayloadsForAddPolicy = (
   addSuffixToPolicyName = true
 ) => {
   const { name: policyName, definition, allowedOperations, roles } = policyFormFields
-  const formattedDefinition = definition.replace(/\s+/g, ' ').trim()
+  const formattedDefinition = definition ? definition.replace(/\s+/g, ' ').trim() : ''
 
   return allowedOperations.map((operation: any, idx: number) => {
     return createPayloadForNewPolicy(
@@ -182,7 +182,7 @@ export const createSQLPolicies = (
       idx,
       bucketName,
       policyName,
-      definition,
+      definition || '',
       operation,
       roles,
       addSuffixToPolicyName

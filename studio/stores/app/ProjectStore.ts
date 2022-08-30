@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, keyBy } from 'lodash'
 import { Project } from 'types'
 import { IRootStore } from '../RootStore'
 import { constructHeaders } from 'lib/api/apiHelpers'
@@ -24,6 +24,26 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
     super(rootStore, dataUrl, headers, options)
   }
 
+  // [Joshen] Method override here due to race condition between projects.load() and fetchDetail()
+  // There's a race condition that can happen here when these 2 methods are called, such that if
+  // fetchDetail() completes before projects.load() completes, the response from project.loads()
+  // then overrides what fetchDetail() has already populated into the store - causing parameters like
+  // connectionString to become undefined and hence causing the dashboard to stay in a Connecting state.
+  // You can reproduce this by giving a setTimeout to project.loads under withAuth.tsx
+
+  // This thus ensures that the response from project.loads() do not override projects which are already
+  // loaded in the store from a successful fetchDetail() - This should be fine as project.loads() is only
+  // called once in this whole app under withAuth.tsx
+  setDataArray(value: any[]) {
+    const formattedValue = keyBy(value, this.identifier)
+    Object.keys(this.data).forEach((projectId) => {
+      if (formattedValue[projectId] !== undefined) {
+        formattedValue[projectId] = this.data[projectId]
+      }
+    })
+    this.data = formattedValue
+  }
+
   async fetchDetail(projectRef: string) {
     const url = `${this.url}/${projectRef}`
     const headers = constructHeaders(this.headers)
@@ -42,12 +62,8 @@ export default class ProjectStore extends PostgresMetaInterface<Project> {
   }
 
   async pingPostgrest(project: Project): Promise<'ONLINE' | 'OFFLINE' | undefined> {
-    if (
-      project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-      project.restUrl &&
-      project.internalApiKey
-    ) {
-      const success = await pingPostgrest(project.restUrl, project.internalApiKey, {
+    if (project.status === PROJECT_STATUS.ACTIVE_HEALTHY && project.restUrl) {
+      const success = await pingPostgrest(project.restUrl, project.ref, {
         kpsVersion: project.kpsVersion,
       })
       return success ? 'ONLINE' : 'OFFLINE'

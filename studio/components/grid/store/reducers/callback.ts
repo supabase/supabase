@@ -1,13 +1,13 @@
-import { SupaRow } from '../../types';
+import { SupaRow } from '../../types'
 
 export interface CallbackInitialState {
-  onAddColumn: (() => void) | null;
-  onAddRow: (() => void) | null;
-  onError: ((error: any) => void) | null;
-  onEditRow: ((row: SupaRow) => void) | null;
-  onEditColumn: ((columnName: string) => void) | null;
-  onDeleteColumn: ((columnName: string) => void) | null;
-  onSqlQuery: ((query: string) => Promise<{ data?: any; error?: any }>) | null;
+  onAddColumn: (() => void) | null
+  onAddRow: (() => void) | null
+  onError: ((error: any) => void) | null
+  onEditRow: ((row: SupaRow) => void) | null
+  onEditColumn: ((columnName: string) => void) | null
+  onDeleteColumn: ((columnName: string) => void) | null
+  onSqlQuery: ((query: string) => Promise<{ data?: any; error?: any }>) | null
 }
 
 export const callbackInitialState: CallbackInitialState = {
@@ -18,27 +18,22 @@ export const callbackInitialState: CallbackInitialState = {
   onEditColumn: null,
   onDeleteColumn: null,
   onSqlQuery: null,
-};
+}
 
 type CALLBACK_ACTIONTYPE = {
-  type: 'INIT_CALLBACK';
+  type: 'INIT_CALLBACK'
   payload: {
-    onAddColumn: (() => void) | null;
-    onAddRow: (() => void) | null;
-    onError: ((error: any) => void) | null;
-    onEditRow: ((row: SupaRow) => void) | null;
-    onEditColumn: ((columnName: string) => void) | null;
-    onDeleteColumn: ((columnName: string) => void) | null;
-    onSqlQuery:
-      | ((query: string) => Promise<{ data?: any; error?: any }>)
-      | null;
-  };
-};
+    onAddColumn: (() => void) | null
+    onAddRow: (() => void) | null
+    onError: ((error: any) => void) | null
+    onEditRow: ((row: SupaRow) => void) | null
+    onEditColumn: ((columnName: string) => void) | null
+    onDeleteColumn: ((columnName: string) => void) | null
+    onSqlQuery: ((query: string) => Promise<{ data?: any; error?: any }>) | null
+  }
+}
 
-const CallbackReducer = (
-  state: CallbackInitialState,
-  action: CALLBACK_ACTIONTYPE
-) => {
+const CallbackReducer = (state: CallbackInitialState, action: CALLBACK_ACTIONTYPE) => {
   switch (action.type) {
     case 'INIT_CALLBACK': {
       return {
@@ -50,12 +45,12 @@ const CallbackReducer = (
         onEditColumn: action.payload.onEditColumn,
         onDeleteColumn: action.payload.onDeleteColumn,
         onSqlQuery: action.payload.onSqlQuery,
-      };
+      }
     }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
-export default CallbackReducer;
+export default CallbackReducer

@@ -62,12 +62,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-2">
         {customHeaderComponents && customHeaderComponents}
-        <div className="flex items-center space-x-2">
-          {IS_PLATFORM && <HelpPopover />}
-          {IS_PLATFORM && <FeedbackDropdown />}
-        </div>
+        {IS_PLATFORM && <HelpPopover />}
+        {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && <NotificationsPopover />}
       </div>
     </div>

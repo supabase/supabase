@@ -6,8 +6,11 @@ jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'
 Flag.mockImplementation(({ children }) => <>{children}</>)
 jest.mock('hooks')
-import { useFlag } from 'hooks'
+import { useFlag, useStore } from 'hooks'
 useFlag.mockReturnValue(true)
+useStore.mockImplementation(() => ({
+  ui: { profile: { id: 1 } },
+}))
 
 test.todo('templates')
 
