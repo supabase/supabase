@@ -145,7 +145,7 @@ pages:
             password: 'some-password',
           })
 
-          // After receiving an SMS with One Time Password.
+          // After receiving a SMS with a OTP.
           const { data, error } = await supabase.auth.verifyOtp({
             phone: '+13334445555',
             token: '123456',
@@ -156,14 +156,14 @@ pages:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       - Requires either an email or phone number.
-      - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
-      - If you're using phone, you can configure whether you want the user to receive an OTP.
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
       - name: Sign in with email.
         isSpotlight: true
-        description: The user will be sent an email which contains either a magiclink or an OTP or both. By default, a given user can only request an OTP once every 60 seconds.
+        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOtp({
@@ -172,7 +172,7 @@ pages:
           ```
       - name: Sign in with SMS OTP.
         isSpotlight: false
-        description: The user will be sent an SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithPassword({
@@ -227,7 +227,7 @@ pages:
     title: 'signOut()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
-      - In order to use the `signOut()` method, the user needs to be signed-in first.
+      - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
       - name: Sign out
         isSpotlight: true
@@ -287,7 +287,7 @@ pages:
     title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
-      - In order to use the `updateUser()` method, the user needs to be signed-in first.
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
       - Email updates will send an email to both the user's current and new email with a confirmation link by default.
       To only send a single confirmation link to the user's new email, you can toggle the "Secure email change" setting in [your project](https://app.supabase.com/project/_/auth/settings).
     examples:
@@ -385,9 +385,9 @@ pages:
           })
           ```
   Supabase Auth Admin Api:
-    title: 'Supabase Auth Admin Api'
+    title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace will require a `service_role` key.
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
 
   auth.admin.getUserById():
