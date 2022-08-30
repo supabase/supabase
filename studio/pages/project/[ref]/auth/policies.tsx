@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 

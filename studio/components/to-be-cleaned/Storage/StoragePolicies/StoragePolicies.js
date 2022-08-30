@@ -11,7 +11,7 @@ import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-import { PolicyEditorModal } from 'components/interfaces/Authentication/Policies'
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
