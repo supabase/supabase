@@ -42,7 +42,7 @@ const ProductEmptyState: FC<Props> = ({
                         {ctaButtonLabel}
                       </Button>
                     </Tooltip.Trigger>
-                    {disabled && disabledMessage && (
+                    {disabled && disabledMessage.length > 0 && (
                       <Tooltip.Content side="bottom">
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
