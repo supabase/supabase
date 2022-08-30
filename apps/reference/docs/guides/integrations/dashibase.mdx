@@ -1,0 +1,294 @@
+---
+id: dashibase
+title: 'Dashibase'
+description: 'Create a CRUD app with Supabase and Dashibase in 15 mins.'
+---
+
+import ThemedImage from '@theme/ThemedImage'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+
+Let’s build an app together!
+
+This guide walks you through how to build a CRM for superheroes using Supabase on the backend and Dashibase on the front.
+
+[Dashibase](https://dashibase.com/) is a lightning-fast way to build your app dashboard so that your end users can manage their data. You get a full dashboard UI right out of the box. Not boilerplate code. Not drag-and-drop. Not individual components.
+
+## Step 1. Write down your idea
+
+Let’s say we want to build a CRM for Marvel Cinematic Universe. With the multiverse, the superheroes would need a CRM to stay in touch.
+
+Here is the information we want our users to store in our app:
+
+1. Name
+2. Universe
+3. Email
+4. Last contacted date
+5. Relationship: Never met, Acquaintance, Close
+6. Can he/she fly?
+7. History
+
+## Step 2. Set up your Supabase project
+
+First, sign up for a Supabase account and create a new project. We are naming our project MultiverseCRM.
+
+<ThemedImage
+  alt="Create Supabase project"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/create-supabase-project-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/create-supabase-project-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Next, set up the table for our data. Our table is called ‘contacts'.
+
+To store the various information we want, we need to set up the following columns:
+
+1. Name (text)
+2. Universe (int4)
+3. Email (text)
+4. Last contacted date (date)
+5. Relationship: Never met, Acquaintance, Close (text)
+6. Can he/she fly? (boolean)
+7. History (text)
+
+We also need a `user` column, which is a [foreign key](https://supabase.com/docs/guides/database/tables#joining-tables-with-foreign-keys) to the auth.users table so that we can keep track of which user these contacts belong to. To do that, add another column, name it ‘user’, and click on the chainlink button to add the foreign key relation. Then, select ‘users’ and ‘id’.
+
+<ThemedImage
+  alt="Create user column in Supabase"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-user-column-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-user-column-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+This is what the columns should look like:
+
+<ThemedImage
+  alt="Columns in our table in Supabase"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-columns-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-columns-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Congrats! You have set up the backend of your app.
+
+## Step 3. Set up your frontend with Dashibase
+
+Let’s hop over to [Dashibase](https://dashibase.com/).
+
+When you log in to your new account, you will see an empty dashboard.
+
+<ThemedImage
+  alt="New Dashibase account"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-empty-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-empty-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+The first things to do are to name our app, pick a URL, and connect our Supabase project. You can find your Supabase URL and Anon Key in your Supabase project > Settings > API.
+
+<ThemedImage
+  alt="Set your dashibase settings"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-settings-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-settings-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Connecting your Supabase project to Dashibase is as simple as that.
+
+Next, let’s create a page where our users can view, add, and edit their contacts. Simply click on “Add page”.
+
+Here are the settings we use for our Contacts page:
+
+- Name: Contacts
+- Page URL: /contacts
+- Supabase table: contacts (This is automatically pulled from your Supabase project. If you have multiple tables, you can select the relevant one.)
+- Display: list (We will display our contacts in a list for now.)
+- Read-only: false (Our users should be able to edit their contacts.)
+- ID column: id (This is the ID of each contact in our database. If you are not using ‘id’ as your ID column, feel free to change this.)
+- User column: user (This is the `user` column we created earlier.)
+
+<ThemedImage
+  alt="Set your page settings"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-page-settings-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-page-settings-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Then, we will add the attributes for each contact so that our users can view or edit them:
+
+1. Name (text)
+2. Universe (text)
+3. Email (text)
+4. Last contacted date (date)
+5. Relationship: Never met, Acquaintance, Close (single select)
+6. Can he/she fly? (boolean)
+7. History (long text)
+
+<ThemedImage
+  alt="Add your attributes"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+When you use the 'Single Select' type, you will get to add the options you want.
+
+<ThemedImage
+  alt="Add your Single Select options"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-options-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-options-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Let’s customize our contacts a little. We will set Name, Universe, and Email as required fields.
+
+<ThemedImage
+  alt="Set attributes as required"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-required-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-required-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Then, we will hide History from the list because it can get too long. Our users will still be able to view a contact’s history by clicking on the contact in the dashboard.
+
+<ThemedImage
+  alt="Hide certain attributes"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-hide-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-attributes-hide-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Finally, we will try the card display (under the page settings).
+
+<ThemedImage
+  alt="Set display as card"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-display-card-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-display-card-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+The cards look pretty good in the preview. We will use that for now.
+
+**Once done, just hit “Save” and “Deploy”. Your app is now live!**
+
+One quick thing: You want to add your app URL to your Supabase project > Settings > Authentication > Additional redirect URLs. This redirects your users to your app when they sign up.
+
+<ThemedImage
+  alt="Add app URL to Supabase redirect URLs"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-redirect-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/supabase-redirect-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+## Step 4: Share your app
+
+Your app comes with signup and login pages right out of the box. You don’t have to spend time building that at all.
+
+<ThemedImage
+  alt="Your dashboard login page"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-login-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-login-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+When you are ready, share your app with your family, friends, and followers!
+
+P.S. You can check out our app at [https://multiversecrm.app.dashibase.com](https://multiversecrm.app.dashibase.com/). You can add new contacts and edit or delete existing contacts. You can also filter or sort to look for certain contacts.
+
+<ThemedImage
+  alt="Our MultiverseCRM"
+  sources={{
+    light: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-light.png'
+    ),
+    dark: useBaseUrl(
+      '/img/guides/integrations/dashibase/dashibase-dashboard-dark.png'
+    ),
+  }}
+  style={{ marginBottom: 20 }}
+/>
+
+Fun fact: Both Dashibase and apps created with Dashibase have light and dark modes out of the box. Toggle the light/dark mode for this page to see them!
+
+## Resources
+
+- [Dashibase website](https://dashibase.com/)
+- [Dashibase open-source repo](https://github.com/dashibase/dashibase)
+- [Dashibase Twitter](https://twitter.com/dashibase)

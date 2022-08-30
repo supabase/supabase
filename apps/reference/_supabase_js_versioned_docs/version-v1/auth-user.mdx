@@ -1,0 +1,29 @@
+---
+id: auth-user
+title: 'user()'
+slug: auth-user
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Inside a browser context, `user()` will return the user data, if there is a logged in user.
+
+For server-side management, you can get a user through `auth.api.getUserByCookie()`
+
+```js
+const user = supabase.auth.user()
+```
+
+## Notes
+
+This method gets the user object from memory.
+
+## Examples
+
+### Get the logged in user
+
+```js
+const user = supabase.auth.user()
+```

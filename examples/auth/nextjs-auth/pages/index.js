@@ -41,7 +41,7 @@ const Index = () => {
       return (
         <>
           <div>
-            <img src="https://app.supabase.io/img/supabase-dark.svg" width="96" />
+            <img src="https://app.supabase.com/img/supabase-dark.svg" width="96" />
             <h2>
               Supabase Auth <br />
               with NextJS SSR

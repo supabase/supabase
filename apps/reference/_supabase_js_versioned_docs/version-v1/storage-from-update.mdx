@@ -1,0 +1,123 @@
+---
+id: storage-from-update
+title: 'from.update()'
+slug: storage-from-update
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Replaces an existing file at the specified path with a new one.
+
+```js
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .update('public/avatar1.png', avatarFile, {
+    cacheControl: '3600',
+    upsert: false,
+  })
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      path
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      fileBody
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ArrayBuffer</code> | <code>ArrayBufferView</code> | <code>Blob</code> | <code>Buffer</code> | <code>File</code> | <code>FormData</code> | <code>ReadableStream</code> | <code>ReadableStream</code> | <code>URLSearchParams</code> | <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The body of the file to be stored in the bucket.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      fileOptions
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>FileOptions</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+HTTP headers.
+`cacheControl`: string, the `Cache-Control: max-age=<seconds>` seconds value.
+`contentType`: string, the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+`upsert`: boolean, whether to perform an upsert.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `update` and `select`
+- For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
+
+## Examples
+
+### Update file
+
+```js
+const avatarFile = event.target.files[0]
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .update('public/avatar1.png', avatarFile, {
+    cacheControl: '3600',
+    upsert: false,
+  })
+```
+
+### Update file using `ArrayBuffer` from base64 file data
+
+```js
+import { decode } from 'base64-arraybuffer'
+
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .update('public/avatar1.png', decode('base64FileData'), {
+    contentType: 'image/png',
+  })
+```

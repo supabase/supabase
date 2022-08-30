@@ -15,6 +15,7 @@ async function generate() {
     'pages/*/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
+    '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
     '!pages/_*.js',
@@ -33,6 +34,7 @@ async function generate() {
               .replace('pages', '')
               // add a `/` for blog posts
               .replace('_blog', '/blog')
+              .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
               // replace the paths for nested 'index' based routes
@@ -42,20 +44,25 @@ async function generate() {
 
             let route = path === '/index' ? '' : path
 
-            //
-            // blog specific urls
-            //
+            if (route === '/alternatives/[slug]') return null
+            if (route === '/partners/[slug]') return null
+
+            /**
+             * Blog based urls
+             */
             if (route.includes('/blog/')) {
-              // clean blog post route from string
+              /**
+               * remove directory from route
+               */
               const _route = route.replace('/blog/', '')
-              // splut the url
-              let split = _route.split('')
-              // target and replace the `-` between dates
-              split[4] = '/'
-              split[7] = '/'
-              split[10] = '/'
-              // reconstruct the url
-              route = '/blog/' + split.join('')
+              /**
+               * remove the date from the file name
+               */
+              const substring = _route.substring(11)
+              /**
+               * reconsruct the route
+               */
+              route = '/blog/' + substring
             }
 
             return `

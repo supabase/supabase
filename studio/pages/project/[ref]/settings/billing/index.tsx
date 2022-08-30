@@ -1,39 +1,41 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconArrowRight } from '@supabase/ui'
+import { Loading, IconArrowRight } from '@supabase/ui'
 
-import { useProjectPaygStatistics, useProjectSubscription, useStore, withAuth } from 'hooks'
+import { Project, NextPageWithLayout } from 'types'
+import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
+import ProjectUsage from 'components/ui/Usage'
 import LoadingUI from 'components/ui/Loading'
 import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
-
-import ProjectUsage from 'components/to-be-cleaned/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
 
-type ProjectBillingProps = {} & any
-const ProjectBilling: FC<ProjectBillingProps> = ({ store }) => {
+const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
   return (
-    <SettingsLayout title="Billing and Usage">
-      <div className="content w-full h-full overflow-y-auto">
-        <div className="mx-auto w-full">
-          <Settings project={project} />
-        </div>
+    <div className="content h-full w-full overflow-y-auto">
+      <div className="mx-auto w-full">
+        <Settings project={project} />
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectBilling))
+ProjectBilling.getLayout = (page) => (
+  <SettingsLayout title="Billing and Usage">{page}</SettingsLayout>
+)
 
-type SettingsProps = {
-  project: any
+export default observer(ProjectBilling)
+
+interface SettingsProps {
+  project?: Project
 }
+
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
 
@@ -64,7 +66,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
   }
 
   return (
-    <div className="p-4 container max-w-4xl space-y-8">
+    <div className="container max-w-4xl space-y-8 p-4">
       <Subscription
         loading={loading}
         project={project}
@@ -75,15 +77,15 @@ const Settings: FC<SettingsProps> = ({ project }) => {
       />
       {loading ? (
         <Loading active={loading}>
-          <div className="w-full rounded overflow-hidden border border-panel-border-light dark:border-panel-border-dark mb-8">
-            <div className="px-6 py-6 bg-panel-body-light dark:bg-panel-body-dark flex items-center justify-center">
-              <Typography.Text>Loading usage breakdown</Typography.Text>
+          <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
+            <div className="bg-panel-body-light dark:bg-panel-body-dark flex items-center justify-center px-6 py-6">
+              <p>Loading usage breakdown</p>
             </div>
           </div>
         </Loading>
       ) : subscription?.tier?.prod_id === STRIPE_PRODUCT_IDS.PAYG ? (
         <div>
-          <div className="flex space-x-3 items-center mb-4">
+          <div className="mb-4 flex items-center space-x-3">
             <DateRangePicker
               onChange={setDateRange}
               value={TIME_PERIODS_BILLING[0].key}
@@ -92,23 +94,23 @@ const Settings: FC<SettingsProps> = ({ project }) => {
               currentBillingPeriodStart={subscription?.billing.current_period_start}
             />
             {dateRange && (
-              <div className="flex space-x-2 items-center">
-                <Typography.Text type="secondary">
+              <div className="flex items-center space-x-2">
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_start.date).format('MMM D, YYYY')}
-                </Typography.Text>
-                <Typography.Text type="secondary" className="opacity-50">
+                </p>
+                <p className="text-scale-1000">
                   <IconArrowRight size={12} />
-                </Typography.Text>
-                <Typography.Text type="secondary">
+                </p>
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_end.date).format('MMM D, YYYY')}
-                </Typography.Text>
+                </p>
               </div>
             )}
           </div>
-          {paygStats && <PAYGUsage paygStats={paygStats} />}
+          {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project.ref} subscription_id={project.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>

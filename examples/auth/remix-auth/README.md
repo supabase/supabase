@@ -10,7 +10,7 @@ Authentication using `signInWithEmail` handling redirectTo.
 cp .env.example .env
 ```
 
-2. Go to https://app.supabase.io/project/{PROJECT}/api?page=auth to find your secrets
+2. Go to https://app.supabase.com/project/{PROJECT}/api?page=auth to find your secrets
 3. Add your `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE` in `.env`
 
 ```env

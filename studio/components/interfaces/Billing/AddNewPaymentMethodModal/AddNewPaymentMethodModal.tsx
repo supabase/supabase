@@ -30,6 +30,15 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
     setIntent(undefined)
     const orgSlug = ui.selectedOrganization?.slug ?? ''
     const intent = await post(`${API_URL}/organizations/${orgSlug}/payments/setup-intent`, {})
+
+    if (intent.error) {
+      return ui.setNotification({
+        category: 'error',
+        message: intent.error.message,
+        error: intent.error,
+      })
+    }
+
     setIntent(intent)
   }
 
@@ -47,13 +56,13 @@ const AddNewPaymentMethodModal: FC<Props> = ({ visible, returnUrl, onCancel }) =
       onCancel={onCancel}
       className="PAYMENT"
     >
-      <div className="py-4 space-y-4">
+      <div className="space-y-4 py-4">
         {intent !== undefined ? (
           <Elements stripe={stripePromise} options={options}>
             <AddPaymentMethodForm returnUrl={returnUrl} onCancel={onCancel} />
           </Elements>
         ) : (
-          <div className="w-full flex items-center justify-center py-20">
+          <div className="flex w-full items-center justify-center py-20">
             <IconLoader size={16} className="animate-spin" />
           </div>
         )}

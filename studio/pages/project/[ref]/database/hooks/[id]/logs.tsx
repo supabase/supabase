@@ -3,27 +3,28 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { uniqBy, map as lodashMap } from 'lodash'
 import { FC, useState, useEffect } from 'react'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, withAuth } from 'hooks'
+import { useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { DatabaseLayout } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-const FunctionsPage = () => {
+const FunctionsPage: NextPageWithLayout = () => {
   return (
-    <DatabaseLayout title="Hooks">
-      <div className="flex">
-        <div className="w-full my-4">
-          <HookLogs />
-        </div>
+    <div className="flex">
+      <div className="my-4 w-full">
+        <HookLogs />
       </div>
-    </DatabaseLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(FunctionsPage))
+FunctionsPage.getLayout = (page) => <DatabaseLayout title="Hooks">{page}</DatabaseLayout>
+
+export default observer(FunctionsPage)
 
 const HookLogs: FC<any> = observer(() => {
   const router = useRouter()
@@ -48,31 +49,31 @@ const HookLogs: FC<any> = observer(() => {
 
   if (meta.hooks.hasError) {
     return (
-      <Typography.Text type="danger">
+      <p className="text-scale-1000">
         <p>Error connecting to API</p>
         <p>{`${meta.hooks.error}`}</p>
-      </Typography.Text>
+      </p>
     )
   }
 
   if (logsError) {
     return (
-      <Typography.Text type="danger">
+      <p className="text-scale-1000">
         <p>Error connecting to API</p>
         <p>{`${logsError.error}`}</p>
-      </Typography.Text>
+      </p>
     )
   }
 
   if (meta.hooks.isLoading || !logsData) {
-    return <Typography.Text className="px-6 py-4">Loading hook logs...</Typography.Text>
+    return <p className="px-6 py-4">Loading hook logs...</p>
   }
 
   return (
     <div className="space-y-8">
       {/* <CreateHook /> */}
       <div className="px-6">
-        <Typography.Title level={4}>{hooksData.name} logs</Typography.Title>
+        <h4 className="text-lg">{hooksData.name} logs</h4>
         <div className="space-x-3">
           <Button>All</Button>
           <Button>Errors</Button>
@@ -83,25 +84,16 @@ const HookLogs: FC<any> = observer(() => {
         <div className="divide-y-2 ">
           {logsData?.map((log: any) => {
             return (
-              <div className="space-y-1 flex flex-col py-4 px-6">
-                <div className="flex justify-between items-center">
+              <div className="flex flex-col space-y-1 py-4 px-6">
+                <div className="flex items-center justify-between">
                   <div className="space-x-3">
-                    <Typography.Text className="font-mono" type="secondary">
-                      [{log.method}]
-                    </Typography.Text>
-                    <Typography.Text className="font-mono" type="default">
-                      {log.url}
-                    </Typography.Text>
+                    <p className="font-mono text-scale-1000">[{log.method}]</p>
+                    <p className="font-mono">{log.url}</p>
                   </div>
-                  <Typography.Text className="font-mono" type="secondary">
+                  <p className="font-mono text-scale-1000">
                     {dayjs(log.created_at).format('DDMMYYY')}
-                  </Typography.Text>
+                  </p>
                 </div>
-                {/* <Typography.Text className="font-mono">created at: {log.created_at}</Typography.Text>
-                <Typography.Text className="font-mono">headers: {log.headers}</Typography.Text>
-                <Typography.Text className="font-mono">args: {log.args}</Typography.Text>
-                <Typography.Text className="font-mono">method: {log.method}</Typography.Text>
-                <Typography.Text className="font-mono">status: {log.status}</Typography.Text> */}
               </div>
             )
           })}

@@ -1,8 +1,8 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Typography, Button, IconDatabase, IconKey, IconArchive } from '@supabase/ui'
-import Panel from 'components/to-be-cleaned/Panel'
+import { Button, IconDatabase, IconKey, IconArchive } from '@supabase/ui'
+import Panel from 'components/ui/Panel'
 
 interface Props {}
 

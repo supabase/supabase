@@ -8,7 +8,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
       items: [
         { name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] },
         { name: 'Policies', key: 'policies', url: `/project/${ref}/auth/policies`, items: [] },
-        { name: 'Templates', key: 'templates', url: `/project/${ref}/auth/templates`, items: [] },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Logs',
+                key: 'logs',
+                url: `/project/${ref}/auth/logs`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     ...(IS_PLATFORM
@@ -16,10 +25,20 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           {
             title: 'Configuration',
             items: [
+              ...(IS_PLATFORM
+                ? [
+                    {
+                      name: 'Settings',
+                      key: 'settings',
+                      url: `/project/${ref}/auth/settings`,
+                      items: [],
+                    },
+                  ]
+                : []),
               {
-                name: 'Settings',
-                key: 'settings',
-                url: `/project/${ref}/auth/settings`,
+                name: 'Email Templates',
+                key: 'templates',
+                url: `/project/${ref}/auth/templates`,
                 items: [],
               },
             ],

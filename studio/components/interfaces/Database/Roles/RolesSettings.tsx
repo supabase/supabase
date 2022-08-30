@@ -1,9 +1,9 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Typography, IconChevronLeft } from '@supabase/ui'
+import { Button, IconChevronLeft } from '@supabase/ui'
 import Divider from 'components/ui/Divider'
 
-import Panel from 'components/to-be-cleaned/Panel'
+import Panel from 'components/ui/Panel'
 
 interface Props {
   selectedRole: any

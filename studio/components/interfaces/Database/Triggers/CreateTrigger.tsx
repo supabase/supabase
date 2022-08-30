@@ -7,19 +7,18 @@ import {
   SidePanel,
   Checkbox,
   Listbox,
-  Typography,
   IconPlayCircle,
   IconPauseCircle,
   IconTerminal,
   Badge,
   Button,
 } from '@supabase/ui'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
 import ChooseFunctionForm from './ChooseFunctionForm'
-import FormEmptyBox from 'components/to-be-cleaned/FormBoxEmpty'
+import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 
@@ -353,7 +352,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
                     </div>
                     <SidePanel.Seperator />
                     <div className="px-6 space-y-12">
-                      <Typography.Title level={5}>Conditions to fire trigger</Typography.Title>
+                      <h5>Conditions to fire trigger</h5>
                       <ListboxTable />
                       <CheckboxEvents />
                       <ListboxActivation />
@@ -556,10 +555,8 @@ const ListboxTable: FC = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <Typography.Text>{x.name}</Typography.Text>
-              <Typography.Text type="secondary" className="text-scale-900" small>
-                {x.schema}
-              </Typography.Text>
+              <p>{x.name}</p>
+              <p className="text-scale-1000 text-sm">{x.schema}</p>
             </div>
           </Listbox.Option>
         )
@@ -676,7 +673,7 @@ const FunctionForm: FC = observer(({}) => {
   return (
     <div className="space-y-4">
       <div className="px-6 space-y-6">
-        <Typography.Title level={5}>Function to trigger</Typography.Title>
+        <h5>Function to trigger</h5>
       </div>
       <div className="px-6">
         {isEmpty(_localState!.formState.functionName.value) ? (
@@ -695,17 +692,17 @@ const FunctionEmpty: FC = observer(({}) => {
     <button
       type="button"
       onClick={() => _localState!.setChooseFunctionFormVisible(true)}
-      className="w-full relative 
+      className="w-full relative
         transition-all
-        
-        shadow-sm 
+
+        shadow-sm
                   border bg-scale-200 dark:bg-scale-400
                   border-scale-600
                   rounded
                   hover:border-scale-700
                   hover:bg-scale-300 dark:hover:bg-scale-500
-                  px-5 py-1 
-                  
+                  px-5 py-1
+
                   "
     >
       <FormEmptyBox
@@ -723,17 +720,17 @@ const FunctionWithArguments: FC = observer(({}) => {
     <>
       <div
         className="
-        
-        
+
+
               w-full
 
-              relative 
-              transition-shadow shadow-sm 
+              relative
+              transition-shadow shadow-sm
               border border-scale-200 dark:border-scale-500
               rounded
 
 
-              px-5 py-4 
+              px-5 py-4
               flex space-x-3 items-center justify-between"
       >
         <div className="flex items-center gap-2">
@@ -741,9 +738,7 @@ const FunctionWithArguments: FC = observer(({}) => {
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <Typography.Text type="secondary">
-              {_localState!.formState.functionName.value}
-            </Typography.Text>
+            <p className="text-scale-1000">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>

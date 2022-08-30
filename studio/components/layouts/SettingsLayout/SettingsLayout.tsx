@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import BaseLayout from '../'
@@ -34,4 +34,4 @@ const SettingsLayout: FC<Props> = ({ title, children }) => {
   )
 }
 
-export default observer(SettingsLayout)
+export default withAuth(observer(SettingsLayout))

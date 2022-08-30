@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import TextConfirmModal from 'components/to-be-cleaned/ModalsDeprecated/TextConfirmModal'
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 
 type DeleteHookProps = {
   hook?: any

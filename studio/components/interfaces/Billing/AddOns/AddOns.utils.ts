@@ -7,7 +7,6 @@ export const formatComputeSizes = (computeSizes: any[]) => {
   const microOption = {
     id: '',
     name: 'Micro Add-on',
-    description: 'Basic set up to get started',
     metadata: {
       default_price_id: undefined,
       supabase_prod_id: 'addon_instance_micro',
@@ -29,30 +28,23 @@ export const formatComputeSizes = (computeSizes: any[]) => {
     ],
   }
 
+  const addonsOrder = [
+    'addon_instance_small',
+    'addon_instance_medium',
+    'addon_instance_large',
+    'addon_instance_xlarge',
+    'addon_instance_xxlarge',
+    'addon_instance_4xlarge',
+    'addon_instance_8xlarge',
+    'addon_instance_12xlarge',
+    'addon_instance_16xlarge',
+  ]
+
   return [microOption]
     .concat(
-      computeSizes.filter(
-        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_small'
-      )
+      addonsOrder.map((id: string) => {
+        return computeSizes.find((option: any) => option.metadata.supabase_prod_id === id)
+      })
     )
-    .concat(
-      computeSizes.filter(
-        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_medium'
-      )
-    )
-    .concat(
-      computeSizes.filter(
-        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_large'
-      )
-    )
-    .concat(
-      computeSizes.filter(
-        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_xlarge'
-      )
-    )
-    .concat(
-      computeSizes.filter(
-        (option: any) => option.metadata.supabase_prod_id === 'addon_instance_xxlarge'
-      )
-    )
+    .filter((option) => option !== undefined)
 }

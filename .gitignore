@@ -79,6 +79,8 @@ typings/
 
 # dotenv environment variables file
 .env
+# excempt the apps/www .env
+!apps/www/.env
 .env.test
 .env.local
 .env.production

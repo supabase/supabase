@@ -1,0 +1,58 @@
+---
+id: auth-setsession
+title: 'setSession()'
+slug: /auth-setsession
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Sets the session data from refresh token and returns current session or an error if the refresh token is invalid.
+
+```js
+const { data, error } = supabase.auth.setSession(refresh_token)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      refresh_token
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+A refresh token returned by supabase auth.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- `setSession()` takes in a refresh token and uses it to get a new session.
+- The refresh token can only be used once to obtain a new session.
+- Refresh token rotation (see [`REFRESH_TOKEN_ROTATION_ENABLED`](https://supabase.com/docs/reference/auth/config#refresh_token_rotation_enabled)) is enabled by default on all projects to guard against replay attacks.
+- You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+
+## Examples
+
+### Refresh the session
+
+Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+
+```js
+const { data, error } = supabase.auth.setSession(refresh_token)
+```

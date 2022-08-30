@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
-import { Dictionary } from '@supabase/grid'
-import { SidePanel, Typography, Listbox, IconHelpCircle } from '@supabase/ui'
-import { PostgresTable, PostgresColumn, PostgresRelationship } from '@supabase/postgres-meta'
+import { Dictionary } from 'components/grid'
+import { SidePanel, Listbox, IconHelpCircle } from '@supabase/ui'
+import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
 import { ForeignKey } from './ForeignKeySelector.types'
@@ -12,17 +12,15 @@ import InformationBox from 'components/ui/InformationBox'
 interface Props {
   tables: PostgresTable[]
   column: ColumnField
-  foreignKey?: PostgresRelationship
   metadata?: any
   visible: boolean
   closePanel: () => void
-  saveChanges: (value: any) => void
+  saveChanges: (value: { table: PostgresTable; column: PostgresColumn } | undefined) => void
 }
 
 const ForeignKeySelector: FC<Props> = ({
   tables = [] as PostgresTable[],
   column,
-  foreignKey,
   visible = false,
   closePanel,
   saveChanges,
@@ -30,6 +28,7 @@ const ForeignKeySelector: FC<Props> = ({
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>()
 
+  const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
     name: selectedForeignKey?.table,
     schema: selectedForeignKey?.schema,
@@ -93,7 +92,7 @@ const ForeignKeySelector: FC<Props> = ({
     }
     setErrors(errors)
     if (isEmpty(errors)) {
-      if (!selectedTable) {
+      if (!selectedTable || !selectedColumn) {
         // Remove foreign key since no table selected
         saveChanges(undefined)
       } else {
@@ -146,6 +145,7 @@ const ForeignKeySelector: FC<Props> = ({
             <Listbox.Option key="empty" value="" label="---">
               ---
             </Listbox.Option>
+            {/* @ts-ignore */}
             {sortBy(tables, ['schema']).map((table: PostgresTable) => {
               return (
                 <Listbox.Option key={table.id} value={table.id} label={table.name}>
@@ -166,9 +166,7 @@ const ForeignKeySelector: FC<Props> = ({
               // @ts-ignore
               label={
                 <div>
-                  Select a column from{' '}
-                  <Typography.Text code>{selectedForeignKey?.table}</Typography.Text> to reference
-                  to
+                  Select a column from <code>{selectedForeignKey?.table}</code> to reference to
                 </div>
               }
               error={errors.column}

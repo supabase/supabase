@@ -2,6 +2,7 @@
 id: with-solidjs
 title: 'Quickstart: SolidJS'
 description: Learn how to use Supabase in your SolidJS App.
+sidebar_label: SolidJS
 ---
 
 import Tabs from '@theme/Tabs'
@@ -49,7 +50,7 @@ and then creating a "schema" inside the database.
 
 ### Create a project
 
-1. Go to [app.supabase.io](https://app.supabase.io).
+1. Go to [app.supabase.com](https://app.supabase.com).
 1. Click on "New Project".
 1. Enter your project details.
 1. Wait for the new database to launch.
@@ -60,25 +61,23 @@ Now we are going to set up the database schema. We can use the "User Management 
 or you can just copy/paste the SQL from below and run it yourself.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "SQL" section.
-2. Click "User Management Starter".
-3. Click "Run".
-```
+1. Go to the [SQL Editor](https://app.supabase.com/project/_/sql) page in the Dashboard.
+2. Click **User Management Starter**.
+3. Click **Run**.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/sql-user-management-starter.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 -- Create a table for public "profiles"
@@ -137,26 +136,13 @@ create policy "Anyone can upload an avatar."
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the URL and `anon` key from the API settings.
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "Settings" section.
-2. Click "API" in the sidebar.
-3. Find your API URL in this page.
-4. Find your "anon" and "service_role" keys on this page.
-```
+1. Go to the [Settings](https://app.supabase.com/project/_/settings) page in the Dashboard.
+2. Click **API** in the sidebar.
+3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
 
 ## Building the App
 
@@ -191,14 +177,14 @@ on the browser, and that's completely fine since we have [Row Level Security](/d
 ```js title="src/supabaseClient.jsx"
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/react-user-management/src/index.css).
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
 
@@ -245,7 +231,7 @@ export default function Auth() {
               value={email()}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="button block" aria-live="polite">
+            <button type="submit" className="button block" aria-live="polite">
               Send magic link
             </button>
           </form>
@@ -359,7 +345,7 @@ const Account = (props) => {
             />
           </div>
           <div>
-            <button className="button block primary" disabled={loading}>
+            <button type="submit" className="button block primary" disabled={loading()}>
               Update profile
             </button>
           </div>
@@ -426,14 +412,13 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```jsx title="src/Avatar.jsx"
 import { createEffect, createSignal } from 'solid-js'
 import { supabase } from './supabaseClient'
-// import VisuallyHidden from '@reach/visually-hidden'
 
 export default (props) => {
   const [avatarUrl, setAvatarUrl] = createSignal(null)
   const [uploading, setUploading] = createSignal(false)
 
   createEffect(() => {
-    if (props.url) downloadImage(props.url)
+    if (props.url()) downloadImage(props.url())
   })
 
   const downloadImage = async (path) => {
@@ -468,7 +453,7 @@ export default (props) => {
         throw uploadError
       }
 
-      props.onUpload(filePath)
+      props.onUpload(event, filePath)
     } catch (error) {
       alert(error.message)
     } finally {
@@ -523,9 +508,9 @@ return (
     <Avatar
       url={avatar_url}
       size={150}
-      onUpload={(url) => {
+      onUpload={(e, url) => {
         setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
+        updateProfile(e)
       }}
     />
     {/* ... */}
@@ -538,4 +523,4 @@ return (
 At this stage you have a fully functional application!
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

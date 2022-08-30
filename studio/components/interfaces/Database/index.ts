@@ -10,8 +10,9 @@ import PublicationsList from './Publications/PublicationsList'
 import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
+import PITRBackupSelection from './Backups/PITRBackupSelection'
 
-import BouncerSettings from './Pooling/BouncerSettings'
+import ConnectionPooling from './Pooling/ConnectionPooling'
 
 import CreateTrigger from './Triggers/CreateTrigger'
 import DeleteTrigger from './Triggers/DeleteTrigger'
@@ -28,7 +29,8 @@ export {
   PublicationsList,
   PublicationsTables,
   BackupsList,
-  BouncerSettings,
+  PITRBackupSelection,
+  ConnectionPooling,
   CreateTrigger,
   DeleteTrigger,
   CreateFunction,

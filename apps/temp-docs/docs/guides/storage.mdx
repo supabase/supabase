@@ -25,7 +25,6 @@ Buckets are distinct containers for files and folders. You can think of them lik
 
 This is a quick guide that shows the basic functionality of Supabase Storage. Find a full [example application in GitHub](https://github.com/supabase/supabase/edit/master/examples/nextjs-ts-user-management), which you can deploy yourself.
 
-
 <a href="https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management">
   <img src="https://vercel.com/button" alt="Deploy with Vercel" />
 </a>
@@ -41,6 +40,7 @@ TODO: Get tabs to render - @supabase/ui Tabs component fails to render)
 [Reference](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 ### Upload a file
+
 You can upload a file from the Dashboard, or within a browser using our JS libraries.
 
 <video width="99%" playsinline controls>
@@ -48,6 +48,7 @@ You can upload a file from the Dashboard, or within a browser using our JS libra
 </video>
 
 ### Download a file
+
 You can download a file from the Dashboard, or within a browser using our JS libraries.
 
 <video width="99%" playsinline controls>
@@ -66,7 +67,7 @@ To restrict access to your files you can use either the Dashboard or SQL.
 
 Supabase Storage is configured with database SQL helper functions which you can use in your database queries and policies.
 
-<hr/>
+<hr />
 
 `storage.filename()`
 
@@ -129,7 +130,9 @@ create policy "Public Access"
 on storage.objects for select
 using ( bucket_id = 'public' );
 ```
+
 #### Allow logged-in access to a bucket
+
 ```sql
 -- 1. Allow logged-in access to any files in the "restricted" bucket
 create policy "Restricted Access"
@@ -148,12 +151,15 @@ create policy "Individual user Access"
 on storage.objects for select
 using ( auth.uid() = owner );
 ```
+
 ### Tips
+
 #### Go Easy
+
 Supabase Storage is in Beta. If you're experiencing any issues, let us know on our [GitHub](https://github.com/supabase/supabase/discussions) and we will fix it as fast as we can.
 
 ## Next steps
+
 - Got a question? Ask here.
 - Read more about storage in our blog post.
-- Sign in: app.supabase.io
-
+- Sign in: app.supabase.com

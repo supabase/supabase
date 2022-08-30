@@ -29,6 +29,7 @@ const FileExplorer = ({
   onSelectCreateFolder = () => {},
   onChangeView = () => {},
   onChangeSortBy = () => {},
+  onChangeSortByOrder = () => {},
   onColumnLoadMore = () => {},
 }) => {
   const fileExplorerRef = useRef(null)
@@ -53,6 +54,7 @@ const FileExplorer = ({
         onSelectAllItems={onSelectAllItemsInColumn}
         onSelectView={onChangeView}
         onSelectSort={onChangeSortBy}
+        onSelectSortByOrder={onChangeSortByOrder}
       />
       <ItemContextMenu
         id={CONTEXT_MENU_KEYS.STORAGE_ITEM}

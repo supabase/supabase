@@ -1,6 +1,6 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Typography, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
+import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../../ActionBar'
@@ -74,6 +74,7 @@ const SpreadsheetImport: FC<Props> = ({
           error: errors,
           category: 'error',
           message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
+          duration: 4000,
         })
       }
       setErrors(errors)
@@ -98,6 +99,7 @@ const SpreadsheetImport: FC<Props> = ({
           error: errors,
           category: 'error',
           message: `Some issues have been detected on ${errors.length} rows. More details below the content preview.`,
+          duration: 4000,
         })
       }
       setErrors(errors)
@@ -160,25 +162,25 @@ const SpreadsheetImport: FC<Props> = ({
         </div>
 
         {spreadsheetData.headers.length > 0 && (
-          <div className="py-5 space-y-5">
+          <div className="space-y-5 py-5">
             <div className="space-y-2">
               <div className="flex flex-col space-y-1">
-                <Typography.Text>Content Preview</Typography.Text>
-                <Typography.Text type="secondary">
+                <p>Content Preview</p>
+                <p className="text-scale-1000">
                   Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
                   following {spreadsheetData.headers.length} columns.
-                </Typography.Text>
+                </p>
               </div>
               <SpreadsheetPreview headers={spreadsheetData.headers} />
             </div>
             {errors.length > 0 && (
               <div className="space-y-2">
                 <div className="flex flex-col space-y-1">
-                  <Typography.Text>Issues found in spreadsheet</Typography.Text>
-                  <Typography.Text type="secondary">
+                  <p>Issues found in spreadsheet</p>
+                  <p className="text-scale-1000">
                     Your table can still be created nonetheless despite issues in the following
                     rows.
-                  </Typography.Text>
+                  </p>
                 </div>
                 <div className="space-y-2">
                   {errors.map((error: any, idx: number) => {
@@ -188,20 +190,18 @@ const SpreadsheetImport: FC<Props> = ({
                       <div key={key} className="space-y-2">
                         <div className="flex items-center space-x-2">
                           <IconChevronRight
-                            className={`cursor-pointer transform ${isExpanded ? 'rotate-90' : ''}`}
+                            className={`transform cursor-pointer ${isExpanded ? 'rotate-90' : ''}`}
                             size={14}
                             onClick={() => onSelectExpandError(key)}
                           />
-                          <Typography.Text className="w-14">Row: {error.row}</Typography.Text>
-                          <Typography.Text>{error.message}</Typography.Text>
+                          <p className="w-14">Row: {error.row}</p>
+                          <p>{error.message}</p>
                           {error.data?.__parsed_extra && (
                             <>
                               <IconArrowRight size={14} />
-                              <Typography.Text>Extra field(s):</Typography.Text>
+                              <p>Extra field(s):</p>
                               {error.data?.__parsed_extra.map((value: any) => (
-                                <Typography.Text code small>
-                                  {value}
-                                </Typography.Text>
+                                <code className="text-sm">{value}</code>
                               ))}
                             </>
                           )}

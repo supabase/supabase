@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sidebar-width: 300px;
+}
+
+body {
+  @apply bg-white dark:bg-[#1c1c1c] !important;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: #6ee7b7;
+  color: #333 !important;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+article h1 {
+  margin-bottom: 3rem !important;
+  font-size: 3rem !important;
+  font-weight: 400 !important;
+}
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+}
+
+.sidebar-width {
+  width: var(--sidebar-width);
+}
+
+.docs-width {
+  max-width: calc(100% - var(--sidebar-width));
+}
+
+.table-of-contents-height {
+  max-height: calc(100vh - 3.75rem - 2rem);
+  overflow-y: auto;
+  position: sticky;
+  top: calc(3.75rem + 1rem);
+}
+
+.width-full {
+  width: 100% !important;
+  max-width: max-content !important;
+}

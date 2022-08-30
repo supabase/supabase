@@ -1,16 +1,19 @@
-import React, { createContext, useContext, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, PropsWithChildren } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
 
 import { API_URL } from 'lib/constants'
-import { withAuth, useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
-import { Users } from 'components/interfaces/Authentication'
+import { Users } from 'components/interfaces/Auth'
+import { NextPageWithLayout } from 'types'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import NoPermission from 'components/ui/NoPermission'
 
 export const PageContext = createContext(null)
 
-const Page = () => {
+const PageLayout = ({ children }: PropsWithChildren<{}>) => {
   const PageState: any = useLocalObservable(() => ({
     projectRef: undefined,
     projectKpsVersion: undefined,
@@ -71,15 +74,10 @@ const Page = () => {
   const router = useRouter()
   PageState.projectRef = router.query.ref
 
-  return (
-    <PageContext.Provider value={PageState}>
-      <PageLayout />
-    </PageContext.Provider>
-  )
+  return <PageContext.Provider value={PageState}>{children}</PageContext.Provider>
 }
-export default withAuth(observer(Page))
 
-const PageLayout = observer(() => {
+const UsersPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const PageState: any = useContext(PageContext)
   const project: any = ui.selectedProject
@@ -88,9 +86,19 @@ const PageLayout = observer(() => {
     PageState!.projectKpsVersion = project?.kpsVersion
   }, [project])
 
-  return (
-    <AuthLayout title="Auth">
-      <Users />
-    </AuthLayout>
+  const canReadUsers = checkPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
+
+  return !canReadUsers ? (
+    <NoPermission isFullPage resourceText="access your project's users" />
+  ) : (
+    <Users />
   )
-})
+}
+
+UsersPage.getLayout = (page) => (
+  <AuthLayout title="Auth">
+    <PageLayout>{page}</PageLayout>
+  </AuthLayout>
+)
+
+export default observer(UsersPage)

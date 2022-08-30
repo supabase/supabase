@@ -1,16 +1,17 @@
 import { FC, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { withAuth } from 'hooks'
-import ProjectLayout from 'components/layouts'
+import { ProjectLayoutWithAuth } from 'components/layouts'
+import { NextPageWithLayout } from 'types'
 
-const ProjectBuildingPage: FC = () => {
-  return (
-    <ProjectLayout title="Project Building">
-      <RedirectToDashboard />
-    </ProjectLayout>
-  )
+const ProjectBuildingPage: NextPageWithLayout = () => {
+  return <RedirectToDashboard />
 }
-export default withAuth(ProjectBuildingPage)
+
+ProjectBuildingPage.getLayout = (page) => (
+  <ProjectLayoutWithAuth title="Project Building">{page}</ProjectLayoutWithAuth>
+)
+
+export default ProjectBuildingPage
 
 const RedirectToDashboard: FC = () => {
   const router = useRouter()
@@ -27,5 +28,6 @@ const RedirectToDashboard: FC = () => {
     // just use normal router.push is enough
     router.push(`/project/${ref}`)
   }, [])
+
   return null
 }

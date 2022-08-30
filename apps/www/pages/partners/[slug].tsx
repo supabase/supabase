@@ -104,7 +104,7 @@ function Partner({ partner }: { partner: Partner }) {
               </Swiper>
             </div>
 
-            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0">
+            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
               <div className="lg:col-span-3">
                 <h2
                   className="text-scale-1200"
@@ -112,6 +112,22 @@ function Partner({ partner }: { partner: Partner }) {
                 >
                   Overview
                 </h2>
+
+                {partner.video && (
+                  <div
+                    className="bg-scale-1000 relative w-full rounded-b-md shadow-lg"
+                    style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
+                  >
+                    <iframe
+                      title="Demo video showcasing Supabase"
+                      className="absolute h-full w-full rounded-b-md"
+                      src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
+                      style={{ top: 0, left: 0 }}
+                      frameBorder="0"
+                      allow="autoplay; modestbranding; encrypted-media"
+                    />
+                  </div>
+                )}
 
                 <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
               </div>
@@ -125,10 +141,12 @@ function Partner({ partner }: { partner: Partner }) {
                 </h2>
 
                 <div className="text-scale-1200 divide-y">
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Developer</span>
-                    <span className="text-scale-1200">{partner.developer}</span>
-                  </div>
+                  {partner.type === 'technology' && (
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-scale-900">Developer</span>
+                      <span className="text-scale-1200">{partner.developer}</span>
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between py-2">
                     <span className="text-scale-900">Category</span>
@@ -155,20 +173,22 @@ function Partner({ partner }: { partner: Partner }) {
                     </a>
                   </div>
 
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Documentation</span>
-                    <a
-                      href={partner.docs}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
-                    >
-                      <span className="flex items-center space-x-1">
-                        <span>Learn</span>
-                        <IconExternalLink size="small" />
-                      </span>
-                    </a>
-                  </div>
+                  {partner.type === 'technology' && (
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-scale-900">Documentation</span>
+                      <a
+                        href={partner.docs}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                      >
+                        <span className="flex items-center space-x-1">
+                          <span>Learn</span>
+                          <IconExternalLink size="small" />
+                        </span>
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

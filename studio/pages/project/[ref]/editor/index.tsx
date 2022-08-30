@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NextPage } from 'next'
+import router from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresTable } from '@supabase/postgres-meta'
@@ -8,8 +9,6 @@ import { useStore, withAuth } from 'hooks'
 import { TableEditorLayout } from 'components/layouts'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import router from 'next/router'
-import { SidePanel } from '@supabase/ui'
 
 const Editor: NextPage = () => {
   const { meta, ui } = useStore()
@@ -78,7 +77,9 @@ const Editor: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         description={`Are you sure you want to delete the selected table? This action cannot be undone`}
         buttonLabel="Delete"
         buttonLoadingLabel="Deleting"

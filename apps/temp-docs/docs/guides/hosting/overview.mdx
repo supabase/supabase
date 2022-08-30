@@ -9,34 +9,32 @@ import JwtGenerator from '@site/src/components/JwtGenerator'
 
 There are several ways to use Supabase:
 
-- [Supabase Cloud](https://app.supabase.io): you don't need to deploy anything. We will manage and scale your infrastructure. 
+- [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure.
 - [Docker](/docs/guides/hosting/docker): deploy to your own infrastructure.
 - Kubernetes: coming soon.
 
 #### Before you begin
 
-The self-hosted version of Supabase does not include a UI yet. 
-We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281). 
+The self-hosted version of Supabase does not include a UI yet.
+We are working on this in stages, starting with our [UI library](https://github.com/supabase/ui) and with a [WIP PR here](https://github.com/supabase/supabase/pull/2281).
 [[more context](https://github.com/supabase/supabase/discussions/1001#discussioncomment-558696)]
 
 In the meantime, here are some suggestions for working with your Postgres Database:
 
-- `pgadmin`: https://www.pgadmin.org 
-- `dbeaver`: https://dbeaver.com 
+- `pgadmin`: https://www.pgadmin.org
+- `dbeaver`: https://dbeaver.com
 - `BeeKeeper`: https://beekeeperstudio.io
 - `HeidiSQL`: https://heidisql.com
 - `Table Plus`: https://www.tableplus.io
 
-
 ## Architecture
 
-Supabase is a combination of open source tools, each specifically chosen for Enterprise-readiness. 
+Supabase is a combination of open source tools, each specifically chosen for Enterprise-readiness.
 
-If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. 
-If the tool doesn't exist, we build and open source it ourselves. 
+If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool.
+If the tool doesn't exist, we build and open source it ourselves.
 
 ![Supabase Architecture](/docs/img/supabase-architecture.png)
-
 
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
@@ -45,7 +43,6 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
-
 
 ## Configuration
 
@@ -65,11 +62,10 @@ The "middleware" is everything except Postgres, and it should work with any Post
 
 ### Database Extensions
 
-Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the 
+Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
 [schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
 
-
-We recommend installing all extensions into an `extensions` schema. This will keep your API clean, 
+We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
 
 ```sql
@@ -83,20 +79,18 @@ create extension if not exists pgjwt with schema extensions;
 
 For UUID functions, required for PostgreSQL <13.
 
-
 ##### `pgcrypto` and `pgjwt`
-
 
 For working with JWT and Auth functions.
 
 ### Database Roles
 
-Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the 
+Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
 [schema initialization script](https://github.com/supabase/supabase/blob/master/docker/volumes/db/init/00-initial-schema.sql).
 
 ##### `postgres`
 
-The default PostgreSQL role. This has admin privileges.  
+The default PostgreSQL role. This has admin privileges.
 
 ##### `anon`
 
@@ -104,7 +98,7 @@ For "anonymous access". This is the role which the API (PostgREST) will use when
 
 ##### `authenticator`
 
-A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then 
+A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then
 "change into" another role determined by the JWT verification.
 
 ##### `authenticated`
@@ -129,22 +123,22 @@ For running commands via the Supabase UI.
 
 ##### `supabase_admin`
 
-Supabase Administrative role for maintaining your database. 
+Supabase Administrative role for maintaining your database.
 
-## API Keys 
+## API Keys
 
-The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role, 
+The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role,
 and Supabase is designed to work with 2 roles: an `ANON_KEY` for unauthenticated access and a `SERVICE_KEY` for elevated access.
 
 Use this tool to generate keys:
 
 <JwtGenerator />
 
-## Managing your secrets 
+## Managing your secrets
 
 Many components inside Supabase use secure secrets and passwords. These are listed in the self-hosting
-[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a 
-secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks. 
+[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a
+secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks.
 
 Some suggested systems include:
 

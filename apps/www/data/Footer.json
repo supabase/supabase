@@ -58,6 +58,10 @@
       {
         "text": "Privacy Policy",
         "url": "/docs/company/privacy"
+      },
+      {
+        "text": "DPA",
+        "url": "/legal/dpa"
       }
     ]
   },
@@ -70,7 +74,7 @@
       },
       {
         "text": "API Reference",
-        "url": "/docs/client/supabase-client"
+        "url": "/docs/guides/api"
       },
       {
         "text": "Guides",

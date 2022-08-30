@@ -1,5 +1,10 @@
 import LogEventChart from 'components/interfaces/Settings/Logs/LogEventChart'
-import { render, waitFor, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 jest.mock('components/ui/Flag/Flag')
 import Flag from 'components/ui/Flag/Flag'

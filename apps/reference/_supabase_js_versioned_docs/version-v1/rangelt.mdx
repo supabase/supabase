@@ -1,0 +1,54 @@
+---
+id: rangelt
+title: '.rangeLt()'
+slug: rangelt
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeLt('population_range_millions', '[150, 250]')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeLt('population_range_millions', '[150, 250]')
+```

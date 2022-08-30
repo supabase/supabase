@@ -15,17 +15,13 @@ import dayjs from 'dayjs'
 import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
 import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 
-var utc = require('dayjs/plugin/utc')
-var timezone = require('dayjs/plugin/timezone') // dependent on utc plugin
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
   to?: string
   from?: string
   triggerButtonType?: ButtonProps['type']
   triggerButtonClassName?: string
+  triggerButtonTitle?: string
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
 }
 
@@ -41,6 +37,7 @@ function _DatePicker({
   onChange,
   triggerButtonType = 'default',
   triggerButtonClassName = '',
+  triggerButtonTitle,
   renderFooter = () => null,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
@@ -118,8 +115,8 @@ function _DatePicker({
       side="bottom"
       header={
         <>
-          <div className="flex justify-between items-stretch py-2">
-            <div className="grow flex flex-col gap-1">
+          <div className="flex items-stretch justify-between py-2">
+            <div className="flex grow flex-col gap-1">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -134,16 +131,16 @@ function _DatePicker({
             </div>
             <div
               className={`
-                      w-12 
+                      text-scale-900 
                       flex 
-                      items-center 
+                      w-12 
+                      items-center
                       justify-center
-                      text-scale-900
                     `}
             >
               <IconArrowRight strokeWidth={1.5} size={14} />
             </div>
-            <div className="grow flex flex-col gap-1">
+            <div className="flex grow flex-col gap-1">
               <TimeSplitInput
                 type="end"
                 startTime={startTime}
@@ -181,7 +178,7 @@ function _DatePicker({
                 nextMonthButtonDisabled,
               }) => (
                 <div className="flex items-center justify-between px-2 py-2">
-                  <div className="flex items-center justify-between w-full">
+                  <div className="flex w-full items-center justify-between">
                     <button
                       onClick={decreaseMonth}
                       disabled={prevMonthButtonDisabled}
@@ -193,7 +190,7 @@ function _DatePicker({
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
                     </button>
-                    <span className="text-sm text-scale-1100">{format(date, 'MMMM yyyy')}</span>
+                    <span className="text-scale-1100 text-sm">{format(date, 'MMMM yyyy')}</span>
                     <button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}
@@ -215,7 +212,7 @@ function _DatePicker({
             to: endDate?.toISOString() || null,
           })}
           <Popover.Seperator />
-          <div className="flex items-center justify-end gap-2 py-2 pb-4 px-3">
+          <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             <Button type="default" onClick={() => handleClear()}>
               Clear
             </Button>
@@ -225,6 +222,7 @@ function _DatePicker({
       }
     >
       <Button
+        title={triggerButtonTitle}
         type={triggerButtonType}
         as="span"
         icon={<IconCalendar />}

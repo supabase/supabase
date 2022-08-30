@@ -1,13 +1,13 @@
-import React, { FC } from 'react'
 import Link from 'next/link'
+import { FC } from 'react'
+import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { isUndefined } from 'lodash'
-import { Button, IconHome, Dropdown, IconUser, IconSettings } from '@supabase/ui'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
 
+import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useStore } from 'hooks'
-import { generateProductRoutes, generateOtherRoutes } from './NavigationBar.utils'
+import { generateOtherRoutes, generateProductRoutes } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
 interface Props {}
@@ -18,22 +18,19 @@ const NavigationBar: FC<Props> = ({}) => {
   const projectRef = ui.selectedProjectRef as string
   const projectBaseInfo = ui.selectedProjectBaseInfo
 
+  const ongoingIncident = useFlag('ongoingIncident')
+
   const activeRoute = router.pathname.split('/')[3]
   const productRoutes = generateProductRoutes(projectRef, projectBaseInfo)
   const otherRoutes = generateOtherRoutes(projectRef, projectBaseInfo)
 
   return (
     <div
-      className="
-      h-screen w-14 
-      flex flex-col 
-      justify-between 
-      p-2 
-      overflow-y-hidden 
-      bg-sidebar-light 
-      dark:bg-sidebar-dark 
-      border-r 
-      dark:border-dark"
+      style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
+      className={[
+        'flex w-14 flex-col justify-between overflow-y-hidden p-2',
+        'bg-sidebar-light dark:bg-sidebar-dark dark:border-dark border-r',
+      ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
         <Link href={'/'}>
@@ -41,7 +38,7 @@ const NavigationBar: FC<Props> = ({}) => {
             <img
               src="/img/supabase-logo.svg"
               alt="Supabase"
-              className="rounded h-[40px] w-6 mx-auto cursor-pointer"
+              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
             />
           </a>
         </Link>
@@ -54,7 +51,7 @@ const NavigationBar: FC<Props> = ({}) => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="h-px w-full bg-scale-500"></div>
+        <div className="bg-scale-500 h-px w-full"></div>
         {productRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -62,7 +59,7 @@ const NavigationBar: FC<Props> = ({}) => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="h-px w-full bg-scale-500"></div>
+        <div className="bg-scale-500 h-px w-full"></div>
         {otherRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}

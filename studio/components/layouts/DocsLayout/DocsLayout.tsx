@@ -2,7 +2,7 @@ import { ReactElement, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
@@ -54,4 +54,4 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   )
 }
 
-export default observer(DocsLayout)
+export default withAuth(observer(DocsLayout))

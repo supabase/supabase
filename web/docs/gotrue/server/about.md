@@ -205,6 +205,10 @@ Controls the minimum amount of time that must pass before sending another signup
 
 If you do not require email confirmation, you may set this to `true`. Defaults to `false`.
 
+`MAILER_SECURE_EMAIL_CHANGE_ENABLED` - `bool`
+
+If `true`, send an email to both the user's current and new email with a confirmation link, otherwise send an email with confirmation link only to new email. Defaults to `true`.
+
 `MAILER_URLPATHS_INVITE` - `string`
 
 URL path to use in the user invite email. Defaults to `/`.

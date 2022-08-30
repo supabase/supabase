@@ -4,7 +4,6 @@ import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { get } from 'lib/common/fetch'
 
-import AWSMarketplaceSubscription from './AWSMarketplaceSubscription'
 import ProjectsSummary from './ProjectsSummary'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
@@ -93,34 +92,28 @@ const BillingSettings: FC<Props> = ({ organization, projects = [] }) => {
   }
 
   return (
-    <article className="my-4 container max-w-4xl space-y-8">
-      {organization.aws_marketplace ? (
-        <AWSMarketplaceSubscription organization={organization} />
-      ) : (
-        <>
-          <div className="space-y-8">
-            <ProjectsSummary projects={projects} />
-            <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
-            <PaymentMethods
-              loading={isLoadingCustomer || isLoadingPaymentMethods}
-              defaultPaymentMethod={defaultPaymentMethod}
-              paymentMethods={paymentMethods || []}
-              onDefaultMethodUpdated={setCustomer}
-              onPaymentMethodsDeleted={() => getPaymentMethods()}
-            />
-            <BillingAddress
-              loading={isLoadingCustomer}
-              address={customer?.address ?? {}}
-              onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
-            />
-            <TaxID
-              loading={isLoadingTaxIds}
-              taxIds={taxIds || []}
-              onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-            />
-          </div>
-        </>
-      )}
+    <article className="container my-4 max-w-4xl space-y-8">
+      <div className="space-y-8">
+        <ProjectsSummary projects={projects} />
+        <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+        <PaymentMethods
+          loading={isLoadingCustomer || isLoadingPaymentMethods}
+          defaultPaymentMethod={defaultPaymentMethod}
+          paymentMethods={paymentMethods || []}
+          onDefaultMethodUpdated={setCustomer}
+          onPaymentMethodsDeleted={() => getPaymentMethods()}
+        />
+        <BillingAddress
+          loading={isLoadingCustomer}
+          address={customer?.address ?? {}}
+          onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
+        />
+        <TaxID
+          loading={isLoadingTaxIds}
+          taxIds={taxIds || []}
+          onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
+        />
+      </div>
     </article>
   )
 }

@@ -1,18 +1,18 @@
-import { NextPage } from 'next'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { Modal } from '@supabase/ui'
 
-import { withAuth, useStore } from 'hooks'
+import { useStore } from 'hooks'
 
 import { DatabaseLayout } from 'components/layouts'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { TableList, ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { NextPageWithLayout } from 'types'
 
-const DatabaseTables: NextPage = () => {
+const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -23,6 +23,12 @@ const DatabaseTables: NextPage = () => {
 
   const [selectedColumnToDelete, setSelectedColumnToDelete] = useState<PostgresColumn>()
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
+
+  useEffect(() => {
+    if (ui.selectedProject) {
+      meta.types.load()
+    }
+  }, [ui.selectedProject])
 
   const onAddTable = () => {
     setSidePanelKey('table')
@@ -111,7 +117,7 @@ const DatabaseTables: NextPage = () => {
   }
 
   return (
-    <DatabaseLayout title="Database">
+    <>
       <div className="p-4">
         {isUndefined(selectedTable) ? (
           <TableList
@@ -133,10 +139,12 @@ const DatabaseTables: NextPage = () => {
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
-        header={`Confirm deletion of table "${selectedTableToDelete?.name}"`}
+        header={
+          <span className="break-words">{`Confirm deletion of table "${selectedTableToDelete?.name}"`}</span>
+        }
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -152,7 +160,7 @@ const DatabaseTables: NextPage = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="text-scale-1100 py-4 text-sm">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -171,8 +179,10 @@ const DatabaseTables: NextPage = () => {
         selectedColumnToEdit={selectedColumnToEdit}
         selectedTableToEdit={selectedTableToEdit}
       />
-    </DatabaseLayout>
+    </>
   )
 }
 
-export default withAuth(observer(DatabaseTables))
+DatabaseTables.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+
+export default observer(DatabaseTables)

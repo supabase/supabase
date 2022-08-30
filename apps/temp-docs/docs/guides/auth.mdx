@@ -5,7 +5,15 @@ description: 'Supabase auth'
 
 # Auth
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/6ow_jW4epf8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/6ow_jW4epf8"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
 
 ## User Management
 
@@ -57,6 +65,7 @@ let { data, error } = await supabase
 // console.log(data)
 // => { id: 'd0714948', name: 'Jane' }
 ```
+
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
 ```Javascript
@@ -67,7 +76,6 @@ let user = await supabase.from('users').select('user_id, name')
 ```
 
 ## How It Works
-
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
 2. Supabase returns a new JWT, which contains the user's `UUID`.
@@ -105,8 +113,6 @@ alter publication supabase_realtime add table posts;
 ```
 
 ## Next Steps
+
 - Read more about Auth in the [Guides](https://supabase.com/docs/guides/auth/intro).
-- Sign in: [app.supabase.io](https://app.supabase.io/)
-
-
-
+- Sign in: [app.supabase.com](https://app.supabase.com/)

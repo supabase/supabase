@@ -1,4 +1,4 @@
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 import { ColumnField } from '../SidePanelEditor.types'
 
 export interface TableField {
@@ -7,6 +7,7 @@ export interface TableField {
   comment?: string
   columns: ColumnField[]
   isRLSEnabled: boolean
+  isRealtimeEnabled: boolean
 }
 
 export interface ImportContent {

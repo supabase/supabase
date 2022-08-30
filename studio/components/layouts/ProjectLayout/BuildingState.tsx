@@ -8,7 +8,7 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useStore } from 'hooks'
-import { get, getWithTimeout } from 'lib/common/fetch'
+import { getWithTimeout } from 'lib/common/fetch'
 import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 
@@ -23,17 +23,13 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
     const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
       timeout: 2000,
     })
-
     if (projectStatus && !projectStatus.error) {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-
-        const res = await get(`${API_URL}/props/project/${project.ref}/connection-string`)
-        if (res && res.connectionString) {
-          app.onProjectConnectionStringUpdated(project.id, res.connectionString)
-        }
-        app.onProjectStatusUpdated(project.id, status)
+        // re-fetch project detail.
+        // This will also trigger UI state change to show project building completed
+        await app.projects.fetchDetail(project.ref)
       }
     }
   }

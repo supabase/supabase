@@ -86,23 +86,11 @@ In SQL this can be done with:
 ```sql
 CREATE POLICY anon_read_leaderboard ON leaderboard
     FOR SELECT
-    USING (auth.role() = 'anon');
+    TO 'anon'
+    USING (true);
 ```
 
-`anon_read_leaderboard` here is just a name that you choose for your policy. `leaderboard` is the table name. `FOR SELECT` says that we only want this policy to apply for reads (or rather "selects" in SQL). And finally the rule itself is `auth.role() = 'anon'`.
-
-`auth.role()` is referring to a SQL function `role` that Supabase injects into the `auth` schema in your database. The function actually looks like this:
-
-```sql
--- Gets the User Role from the request cookie
-create or replace function auth.role() returns text as $$
-  select nullif(current_setting('request.jwt.claims', true)::json->>'role', '')::text;
-$$ language sql stable;
-```
-
-The purpose of the function is to extract the `role` claim from any JWTs that are passed to your API via the `Authorization: Bearer` header.
-
-Other available functions for use here include: `auth.email()` and `auth.uid()` which will fetch the `email` and `sub` claims respectively.
+`anon_read_leaderboard` here is just a name that you choose for your policy. `leaderboard` is the table name. `FOR SELECT` says that we only want this policy to apply for reads (or rather "selects" in SQL). `TO` means that this policy will only apply to the `anon` Postgres role. And finally the rule itself is `true'`, which means it will _allow_ any `selects` to the `anon` user.
 
 If you'd prefer to use the dashboard to add your policy you can do so by clicking "Add Policy" in the Policies tab and making a policy like this:
 
@@ -126,4 +114,4 @@ In the next guide we will look at using Policies in combination with User Accoun
 - Watch [Part Three: Policies](/docs/learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](/docs/learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](/docs/learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [app.supabase.io](https://app.supabase.io)
+- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)

@@ -1,32 +1,30 @@
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
 import useSWR from 'swr'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { FC, useState, useRef, useEffect } from 'react'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
-import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import generator from 'generate-password'
+import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, withAuth } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from 'lib/constants'
 
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import Panel from 'components/to-be-cleaned/Panel'
-import { ProjectUsageMinimal } from 'components/to-be-cleaned/Usage'
+import Panel from 'components/ui/Panel'
+import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
+import { NextPageWithLayout } from 'types'
 
-dayjs.extend(customParseFormat)
-dayjs.extend(timezone)
-dayjs.extend(utc)
-
-const ProjectSettings = () => {
+const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -34,23 +32,26 @@ const ProjectSettings = () => {
   const project = ui.selectedProject
 
   return (
-    <SettingsLayout title="Database">
-      <div className="content w-full h-full overflow-y-auto">
-        <div className="w-full px-4 py-4 max-w-5xl">
+    <div>
+      <div className="content h-full w-full overflow-y-auto">
+        <div className="w-full max-w-5xl px-4 py-4">
           <Usage project={project} />
           <GeneralSettings projectRef={ref} />
+          <ConnectionPooling />
         </div>
       </div>
-    </SettingsLayout>
+    </div>
   )
 }
 
-export default withAuth(observer(ProjectSettings))
+ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
+
+export default observer(ProjectSettings)
 
 const Usage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
-  const { ref } = router.query
+  const ref = router.query.ref as string
 
   return (
     <>
@@ -58,13 +59,13 @@ const Usage: FC<any> = ({ project }) => {
         <section className="">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Database health
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>
-              <div className="flex space-x-3 items-center mb-4">
+              <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
                   loading={false}
                   value={'3h'}
@@ -73,16 +74,16 @@ const Usage: FC<any> = ({ project }) => {
                   onChange={setDateRange}
                 />
                 {dateRange && (
-                  <div className="flex space-x-2 items-center">
-                    <Typography.Text type="secondary">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className="opacity-50">
+                    </p>
+                    <p className="text-scale-1000">
                       <IconArrowRight size={12} />
-                    </Typography.Text>
-                    <Typography.Text type="secondary">
+                    </p>
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
+                    </p>
                   </div>
                 )}
               </div>
@@ -128,9 +129,9 @@ const Usage: FC<any> = ({ project }) => {
         <section className="mt-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Database storage
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>
@@ -150,6 +151,11 @@ const Usage: FC<any> = ({ project }) => {
 const ResetDbPassword: FC<any> = () => {
   const { ui } = useStore()
   const projectRef = ui.selectedProject?.ref
+
+  const enablePermissions = useFlag('enablePermissions')
+  const canResetDbPassword = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : ui.selectedOrganization?.is_owner
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -203,52 +209,106 @@ const ResetDbPassword: FC<any> = () => {
     }
   }
 
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+    setPassword(password)
+    delayedCheckPasswordStrength(password)
+  }
+
   return (
     <>
       <Panel>
         <Panel.Content>
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+          <div className="grid grid-cols-1 items-center lg:grid-cols-2">
             <div>
-              <Typography.Text className="block">Database password</Typography.Text>
+              <p className="block">Database password</p>
               <div style={{ maxWidth: '420px' }}>
-                <p className="opacity-50 text-sm">
+                <p className="text-sm opacity-50">
                   You can use this password to connect directly to your Postgres database.
                 </p>
               </div>
             </div>
             <div className="flex items-end justify-end">
-              <Button type="default" onClick={() => setShowResetDbPass(true)}>
-                Reset Database Password
-              </Button>
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="default"
+                    disabled={!canResetDbPassword}
+                    onClick={() => setShowResetDbPass(true)}
+                  >
+                    Reset Database Password
+                  </Button>
+                </Tooltip.Trigger>
+                {!canResetDbPassword && (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                        'border-scale-200 border ', //border
+                      ].join(' ')}
+                    >
+                      <span className="text-scale-1200 text-xs">
+                        You need additional permissions to reset the database password
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                )}
+              </Tooltip.Root>
             </div>
           </div>
         </Panel.Content>
       </Panel>
       <Modal
-        title="Reset database password"
+        hideFooter
+        header={<h5 className="text-scale-1200 text-sm">Reset database password</h5>}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingPassword}
         onCancel={() => setShowResetDbPass(false)}
-        onConfirm={() => confirmResetDbPass()}
       >
-        <div className="w-full space-y-8 mb-8">
-          <Input
-            type="password"
-            onChange={onDbPassChange}
-            error={passwordStrengthWarning}
-            // @ts-ignore
-            descriptionText={
-              <PasswordStrengthBar
-                passwordStrengthScore={passwordStrengthScore}
-                passwordStrengthMessage={passwordStrengthMessage}
-                password={password}
-              />
-            }
-          />
-        </div>
+        <Modal.Content>
+          <div className="w-full space-y-8 py-8">
+            <Input
+              type="password"
+              value={password}
+              copy={password.length > 0}
+              onChange={onDbPassChange}
+              error={passwordStrengthWarning}
+              // @ts-ignore
+              descriptionText={
+                <PasswordStrengthBar
+                  passwordStrengthScore={passwordStrengthScore}
+                  passwordStrengthMessage={passwordStrengthMessage}
+                  password={password}
+                  generateStrongPassword={generateStrongPassword}
+                />
+              }
+            />
+          </div>
+        </Modal.Content>
+        <Modal.Seperator />
+        <Modal.Content>
+          <div className="flex space-x-2 pb-2">
+            <Button type="default" onClick={() => setShowResetDbPass(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              loading={isUpdatingPassword}
+              disabled={isUpdatingPassword}
+              onClick={() => confirmResetDbPass()}
+            >
+              Reset password
+            </Button>
+          </div>
+        </Modal.Content>
       </Modal>
     </>
   )
@@ -261,12 +321,12 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
   return (
     <Panel>
       <Panel.Content>
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
+        <div className="grid grid-cols-1 items-center lg:grid-cols-2">
           <div>
-            <Typography.Text className="block">SSL Connection</Typography.Text>
+            <p className="block">SSL Connection</p>
             <div style={{ maxWidth: '420px' }}>
-              <p className="opacity-50 text-sm">
-                Use this cert when connecting to your database to prevent snooping and
+              <p className="text-sm opacity-50">
+                Use this certificate when connecting to your database to prevent snooping and
                 man-in-the-middle attacks.
               </p>
             </div>
@@ -291,22 +351,23 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
   if (data?.error || error) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
-        <Typography.Title level={3}>Error loading database settings</Typography.Title>
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+        <p className="text-scale-1000">Error loading database settings</p>
       </div>
     )
   }
 
   if (!data) {
     return (
-      <div className="p-6 mx-auto sm:w-full md:w-3/4 text-center">
-        <Typography.Title level={3}>Loading...</Typography.Title>
+      <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
+        <p className="text-scale-1000">Loading...</p>
       </div>
     )
   }
 
   const { project } = data
   const formModel = toJS(project)
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo = pluckObjectFields(formModel, DB_FIELDS)
 
@@ -326,14 +387,13 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   return (
     <>
       <div className="">
-        <section className="space-y-6 mt-6">
+        <section className="mt-6 space-y-6">
           <Panel
-            title={[
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+            title={
+              <h5 key="panel-title" className="mb-0">
                 Connection info
-              </Typography.Title>,
-              // <Title level={4}>Connection info</Title>
-            ]}
+              </h5>
+            }
           >
             <Panel.Content className="space-y-6">
               <Input
@@ -368,7 +428,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
 
               <Input
                 layout="horizontal"
-                className="input-mono text-base table-input-cell"
+                className="input-mono table-input-cell text-base"
                 readOnly
                 copy
                 disabled
@@ -391,12 +451,12 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <DownloadCertificate createdAt={connectionInfo.inserted_at} />
       </div>
       <div>
-        <section className="space-y-6 mt-6">
+        <section className="mt-6 space-y-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Connection string
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>

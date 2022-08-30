@@ -1,0 +1,51 @@
+---
+id: or
+title: '.or()'
+slug: /or
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows satisfying at least one of the filters.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+  .execute();
+```
+
+## Notes
+
+- `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+  ```dart
+  .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+  .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
+  .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
+  ```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.eq.20,id.eq.30')
+  .execute();
+```
+
+### Use `or` with `and`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+  .execute();
+```

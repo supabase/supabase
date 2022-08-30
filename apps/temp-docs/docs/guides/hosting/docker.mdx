@@ -34,7 +34,7 @@ cp .env.example .env
 
 In particular, these are required:
 
-- `POSTGRES_PASSWORD`: the password for the `postgres` role 
+- `POSTGRES_PASSWORD`: the password for the `postgres` role
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others
 - `SITE_URL`: the base URL of your site
 - `SMTP_*`: mail server credentials
@@ -45,14 +45,14 @@ Use your `JWT_SECRET` to generate a `anon` and `service` API keys using the [JWT
 
 Replace the values in these files:
 
-- `docker-compose.yml`: 
+- `docker-compose.yml`:
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_KEY` - replace with a `service` key
 - `volumes/kong.yml`
   - `anon` - replace with an `anon` key
   - `service_role` - replace with a `service` key
 
-### Start 
+### Start
 
 You can now start Supabase:
 
@@ -60,10 +60,9 @@ You can now start Supabase:
 docker-compose up
 ```
 
-Your database will be persisted in `volumes/db/data`, and your storage objects in `volumes/storage`. 
+Your database will be persisted in `volumes/db/data`, and your storage objects in `volumes/storage`.
 
 Try out the examples in `supabase/examples` to verify if it works correctly!
-
 
 ## Configuration
 
@@ -84,8 +83,7 @@ See the following guides to deploy Docker Compose setup using your preferred too
 - [AWS Fargate](https://aws.amazon.com/blogs/containers/deploy-applications-on-amazon-ecs-using-docker-compose/)
 - [Using Kompose for Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/)
 
-
 ## Next steps
 
 - Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Sign in: [app.supabase.io](https://app.supabase.io)
+- Sign in: [app.supabase.com](https://app.supabase.com)

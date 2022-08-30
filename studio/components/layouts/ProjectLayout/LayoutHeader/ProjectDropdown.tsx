@@ -40,7 +40,7 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button as="span" type="text" size="tiny">
+      <Button as="span" type="text" size="tiny" className="my-1">
         {selectedProject.name}
       </Button>
     </Dropdown>

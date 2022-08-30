@@ -5,12 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const supabaseClient = require('./sidebar_spec_supabase')
+const supabaseClient = require('./sidebar_spec_supabase_js_v1_ref')
 const supabaseCli = require('./sidebar_spec_cli')
 const dart = require('./sidebar_spec_dart')
 
 module.exports = {
   supabaseClient: [
+    'reference',
     {
       type: 'category',
       label: 'JavaScript',
@@ -35,6 +36,12 @@ module.exports = {
       collapsed: false,
       items: supabaseCli.docs,
     },
+    {
+      type: 'category',
+      label: 'Tools',
+      collapsed: false,
+      items: ['reference/tools/reference-auth'],
+    },
   ],
   docs: [
     {
@@ -47,12 +54,12 @@ module.exports = {
         'guides/local-development',
         'guides/examples',
       ],
-      collapsed: false,
+      collapsed: true,
     },
     {
       type: 'category',
       label: 'Quickstarts',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/with-angular',
         'guides/with-expo',
@@ -61,17 +68,19 @@ module.exports = {
         'guides/with-ionic-react',
         'guides/with-ionic-vue',
         'guides/with-nextjs',
+        'guides/with-nuxt-3',
         'guides/with-react',
         'guides/with-redwoodjs',
         'guides/with-solidjs',
         'guides/with-svelte',
+        'guides/with-sveltekit',
         'guides/with-vue-3',
       ],
     },
     {
       type: 'category',
       label: 'Database',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/database',
         'guides/database/connecting-to-postgres',
@@ -109,19 +118,19 @@ module.exports = {
     {
       type: 'category',
       label: 'APIs',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/api', 'guides/api/generating-types'],
     },
     {
       type: 'category',
       label: 'Functions',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/functions'],
     },
     {
       type: 'category',
       label: 'Auth',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/auth',
         {
@@ -176,42 +185,51 @@ module.exports = {
     {
       type: 'category',
       label: 'Storage',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/storage'],
     },
     {
       type: 'category',
       label: 'Platform',
-      collapsed: false,
-      items: ['guides/platform/logs', 'going-into-prod'],
+      collapsed: true,
+      items: [
+        'guides/platform/logs',
+        'guides/platform/metrics',
+        'going-into-prod',
+        'guides/platform/performance',
+        'guides/platform/permissions',
+      ],
     },
     {
       type: 'category',
       label: 'Self Hosting',
-      collapsed: false,
+      collapsed: true,
       items: ['guides/hosting/overview', 'guides/hosting/docker'],
     },
     {
       type: 'category',
       label: 'Integrations',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guides/integrations/appsmith',
         'guides/integrations/auth0',
         'guides/integrations/clerk',
+        'guides/integrations/dashibase',
+        'guides/integrations/directus',
         'guides/integrations/draftbit',
         'guides/integrations/pgmustard',
         'guides/integrations/plasmic',
         'guides/integrations/prisma',
         'guides/integrations/snaplet',
         'guides/integrations/stytch',
+        'guides/integrations/supertokens',
         'guides/integrations/vercel',
       ],
     },
     {
       type: 'category',
       label: 'See Also',
-      collapsed: false,
+      collapsed: true,
       items: [
         'faq',
         'handbook/contributing',

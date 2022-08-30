@@ -86,7 +86,7 @@ select hello_world();
 <TabItem value="JS">
 
 ```js 
-const { data, error } = supabase
+const { data, error } = await supabase
   .rpc('hello_world')
 ```
 
@@ -312,7 +312,7 @@ end;
 $$;
 ```
 
-It is best practice to use `security invoker` (which is also the default). If you ever use `security invoker`, you _must_ set the `search_path`. 
+It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`. 
 This limits the potential damage if you allow access to schemas which the user executing the function should not have.
 
 ## Resources
@@ -355,7 +355,7 @@ This limits the potential damage if you allow access to schemas which the user e
   className="w-full video-with-border"
   width="640"
   height="385"
-  src="https://www.youtube-nocookie.com/embed/I6nnp9AINJk"
+  src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
   frameBorder="1"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen

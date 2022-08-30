@@ -1,0 +1,494 @@
+---
+id: reference
+title: Reference Documentation
+sidebar_label: Overview
+description: 'Reference Docs'
+hide_table_of_contents: true
+---
+
+import Link from '@docusaurus/Link'
+
+The Supabase Reference Docs provide technical descriptions of the products and how to use them.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Examples - coming soon */}
+    {/* <div class="col col--6">
+      <Link class="card" to="/docs/guides/database" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Examples</h4>
+          <p>Code examples and snippets for Supabase products.</p>
+        </div>
+      </Link>
+    </div> */}
+    {/* CLI */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/reference/cli/about" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>CLI</h4>
+          <p>Manage your Supabase projects from the command line.</p>
+        </div>
+      </Link>
+    </div>
+    {/*  */}
+  </div>
+</div>
+
+## Tools
+
+The Supabase Reference Docs provide technical descriptions of the products and how to use them.
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Examples - coming soon */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/reference/tools/reference-auth" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Auth</h4>
+          <p>Auth reference.</p>
+        </div>
+      </Link>
+    </div>
+{/* NOT YET IMPLEMENTED
+    <div class="col col--6">
+      <Link class="card" to="/docs/reference/tools/reference-pgbouncer" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Connection Pool</h4>
+          <p>PgBouncer reference docs.</p>
+        </div>
+      </Link>
+    </div>
+ */}
+  </div>
+</div>
+
+## Client Libraries
+
+<div class="container" style={{ padding: 0 }}>
+  <div class="row is-multiline">
+    {/* Database */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/reference/javascript/installing" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>JavaScript</h4>
+          <p>JavaScript and TypeScript documentation.</p>
+        </div>
+      </Link>
+    </div>
+    {/* Auth */}
+    <div class="col col--6">
+      <Link class="card" to="/docs/reference/dart/installing" style={{ height: '100%' }}>
+        <div class="card__body">
+          <h4>Dart</h4>
+          <p>Dart and Flutter documentation.</p>
+        </div>
+      </Link>
+    </div>
+  </div>
+</div>
+
+### Library Structure
+
+Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system, maintained by Supabase or our community.
+This is one of the ways we support existing tools and open source contributors.
+
+<table style={{ tableLayout: 'fixed', whiteSpace: 'nowrap' }}>
+  <tr>
+    <th colspan="2" style={{textAlign: 'right'}}>Supabase Tool:</th>
+    <th>
+      <a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">
+        PostgREST
+      </a>
+    </th>
+    <th>
+      <a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">
+        GoTrue
+      </a>
+    </th>
+    <th>
+      <a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">
+        Realtime
+      </a>
+    </th>
+    <th>
+      <a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">
+        Storage
+      </a>
+    </th>
+    <th>
+      <a
+        href="https://github.com/supabase/functions"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Edge Functions
+      </a>
+    </th>
+  </tr>
+  <th colspan="7"></th>
+  <tr>
+    <td>JavaScript (TypeScript)</td>
+    <td>
+      <a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">
+        supabase-js
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">
+        postgrest-js
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">
+        gotrue-js
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">
+        realtime-js
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">
+        storage-js
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">
+        functions-js
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Dart</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-dart
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-dart
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-dart
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/realtime-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        realtime-dart
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/storage-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        storage-dart
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/functions-dart"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        functions-dart
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Flutter</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-flutter"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-flutter
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <th colspan="7">Community</th>
+
+  <tr>
+    <td>C#</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-csharp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-csharp
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-csharp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-csharp
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-csharp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-csharp
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/realtime-csharp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        realtime-csharp
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/storage-csharp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        storage-csharp
+      </a>
+    </td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Go</td>
+    <td>-</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-go"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-go
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/storage-go"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        storage-go
+      </a>
+    </td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Java</td>
+    <td>-</td>
+    <td>-</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-java"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-java
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Kotlin</td>
+    <td>-</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-kt"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-kt
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-kt"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-kt
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Python</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-py"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-py
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-py"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-py
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-py"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-py
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/realtime-py"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        realtime-py
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/storage-py"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        storage-py
+      </a>
+    </td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Ruby</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-rb"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-rb
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-rb"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-rb
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Rust</td>
+    <td>-</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-rs"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-rs
+      </a>
+    </td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>Swift</td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/supabase-swift"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        supabase-swift
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/postgrest-swift"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        postgrest-swift
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/gotrue-swift"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        gotrue-swift
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/realtime-swift"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        realtime-swift
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://github.com/supabase-community/storage-swift"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        storage-swift
+      </a>
+    </td>
+    <td>-</td>
+  </tr>
+</table>

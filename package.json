@@ -6,12 +6,16 @@
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/temp-community-forum",
+    "apps/temp-community-tutorials",
+    "apps/temp-docs",
+    "apps/www",
     "packages/*"
   ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "dev:reference": "turbo run dev --filter=reference --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,json}\"",
     "docker:dev": "cd docker && docker-compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
@@ -26,7 +30,7 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-typescript": "^7.16.0",
-    "@supabase/supabase-js": "^1.28.1",
+    "@supabase/supabase-js": "^1.35.3",
     "@types/jest": "^27.0.3",
     "@types/node": "^14.14.14",
     "autoprefixer": "^10.4.4",

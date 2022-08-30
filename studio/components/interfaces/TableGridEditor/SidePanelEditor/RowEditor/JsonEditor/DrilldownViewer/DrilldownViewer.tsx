@@ -2,7 +2,7 @@ import { FC, useState } from 'react'
 import { isEmpty, last } from 'lodash'
 import DrilldownPane from './DrilldownPane'
 import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
-import { Dictionary } from '@supabase/grid'
+import { Dictionary } from 'components/grid'
 
 interface Props {
   jsonData: Dictionary<any>

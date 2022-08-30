@@ -211,7 +211,7 @@ function Home() {
                       'button hero--button button--md button--primary responsive-button',
                       styles.button
                     )}
-                    to={'https://app.supabase.io'}
+                    to={'https://app.supabase.com'}
                     style={{ marginTop: 10 }}
                   >
                     Beta sign up →
@@ -598,7 +598,7 @@ function Home() {
                   'button hero--button button--md button--primary responsive-button',
                   styles.button
                 )}
-                to={'https://app.supabase.io'}
+                to={'https://app.supabase.com'}
                 style={{ margin: 5 }}
               >
                 Beta sign up →

@@ -4,7 +4,7 @@
 
 @layer utilities {
   .btn-primary {
-    @apply inline-block text-sm border border-green-500 rounded py-1 px-3 bg-green-500;
+    @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
     color: #fff !important;
     font-weight: 600;
     line-height: 20px;
@@ -27,6 +27,7 @@ body,
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   @apply bg-bg-primary-light dark:bg-bg-primary-dark;
+  @apply text-scale-1200;
 }
 
 * {
@@ -71,10 +72,10 @@ input.form-control,
   @apply focus:ring-scale-400;
 
   @apply bg-scale-200 dark:bg-scale-200;
-  @apply border border-scale-700;
+  @apply border-scale-700 border;
 
   @apply outline-none;
-  @apply focus:ring-current focus:ring-2;
+  @apply focus:ring-2 focus:ring-current;
 }
 
 .form-group input,
@@ -110,15 +111,6 @@ input.form-control,
   filter: invert(0.8);
 }
 
-select {
-  // [Joshen] Color is hard-coded - I can't figure out how to use the UI library colors
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='transparent' stroke='gray' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 11 9 16 14 11'></polyline></svg>");
-}
-
-select option {
-  @apply text-bg-primary-dark;
-}
-
 input.is-invalid {
   @apply bg-red-100;
   @apply border border-red-700;
@@ -139,7 +131,7 @@ input[type='submit']:hover {
 }
 
 .billing-input-fixed {
-  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-300 leading-tight bg-gray-700;
+  @apply w-full appearance-none rounded border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
 }
 
 a {
@@ -205,4 +197,17 @@ div.fixed.inset-0 {
   display: grid;
   grid-column: 1/-1;
   justify-content: flex-start;
+}
+
+.multi-select {
+  button {
+    display: block;
+    width: 100%;
+  }
+}
+
+.text-area-text-sm {
+  textarea {
+    @apply text-sm;
+  }
 }

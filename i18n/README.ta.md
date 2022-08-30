@@ -1,5 +1,6 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
@@ -20,13 +21,13 @@
 - [x] கோப்பு சேமிப்பகம். [ஆவணம்](https://supabase.com/docs/guides/storage)
 - [x] டாஷ்போர்டு
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/www/public/images/github/supabase-dashboard.png)
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## ஆவணப்படுத்தல்
 
 முழு ஆவணங்களுக்கு, பார்வையிடவும் [supabase.com/docs](https://supabase.com/docs)
 
-எவ்வாறு பங்களிப்பது என்பதைப் பார்க்க, பார்வையிடவும் [தொடங்குதல்](./DEVELOPERS.md)
+எவ்வாறு பங்களிப்பது என்பதைப் பார்க்க, பார்வையிடவும் [தொடங்குதல்](../DEVELOPERS.md)
 
 ## சமூகம் மற்றும் ஆதரவு
 
@@ -38,7 +39,7 @@
 ## நிலை
 
 - [x] ஆல்ஃபா: நாங்கள் வாடிக்கையாளர்களின் மூடிய தொகுப்புடன் சுபாபேஸை சோதிக்கிறோம்
-- [x] பொது ஆல்ஃபா: எவரும் [app.supabase.io](https://app.supabase.io) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
+- [x] பொது ஆல்ஃபா: எவரும் [app.supabase.com](https://app.supabase.com) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
 - [x] பொது பீட்டா: பெரும்பாலான அல்லாத நிறுவன பயன்பாட்டு-வழக்குகளுக்கு போதுமான நிலையானது
 - [ ] பொது: உற்பத்தி-தயார்
 
@@ -54,7 +55,7 @@
 
 **கட்டிடக்கலை**
 
-சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.io). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
+சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.com). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
 நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
 ![கட்டிடக்கலை](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)

@@ -15,7 +15,7 @@ This demonstrates how to use:
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Instant deploy
 
@@ -27,7 +27,7 @@ The Vercel deployment will guide you through creating a Supabase account and pro
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 

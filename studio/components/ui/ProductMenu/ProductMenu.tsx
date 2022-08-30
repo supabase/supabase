@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Badge, Menu } from '@supabase/ui'
 import ProductMenuItem from './ProductMenuItem'
-import { ProductMenuGroupItem, ProductMenuGroup } from './ProductMenu.types'
+import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
 interface Props {
   page?: string
@@ -14,15 +14,17 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
       <Menu type="pills">
         {menu.map((group: ProductMenuGroup, idx: number) => (
           <div key={group.title}>
-            <div className="space-y-8 my-6">
+            <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group
                   //@ts-ignore
                   title={
-                    <div className="flex flex-col space-y-2">
-                      <span>{group.title}</span>
-                      {group.isPreview && <Badge color="amber">Not production ready</Badge>}
-                    </div>
+                    group.title ? (
+                      <div className="flex flex-col space-y-2">
+                        <span>{group.title}</span>
+                        {group.isPreview && <Badge color="amber">Not production ready</Badge>}
+                      </div>
+                    ) : null
                   }
                 />
                 <div>
@@ -33,6 +35,7 @@ const ProductMenu: FC<Props> = ({ page, menu }) => {
                       name={item.name}
                       icon={item.icon}
                       isActive={page === item.key}
+                      isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
                     />
                   ))}

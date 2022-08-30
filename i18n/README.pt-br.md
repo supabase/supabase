@@ -1,24 +1,31 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/web/static/supabase-light-rounded-corner-background.svg"/>
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
+<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
 </p>
 
 ---
 
 # Supabase
 
-[Supabase](https://supabase.com) é uma alternativa de código aberto ao Firebase. Nós estamos construindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
+[Supabase](https://supabase.com) é uma alternativa de código aberto Firebase. Estamos construindo as características do Firebase usando ferramentas de código aberto de nível empresarial.
 
-- [x] Hospedagem Banco de dados Postgres
-- [x] Subscrições em tempo real
-- [x] Autenticação e autorização
-- [x] APIs geradas automaticamente
+- [x] Banco de dados hospedado de Postgres. [Docs](https://supabase.com/docs/guides/database)
+- [x] Autenticação e Autorização. [Docs](https://supabase.com/docs/guides/auth)
+- [x] APIs auto-geradas.
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
+  - [x] Assinaturas em tempo real. [Docs](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
+- [x] Funções.
+  - [x] Funções do Banco de Dados [Docs]https://supabase.com/docs/guides/database/functions)
+  - [x] Funções de borda [Docs](https://supabase.com/docs/guides/functions)
+- [x] Armazenamento de arquivos. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Painel de controle
-- [x] Armazenamento
-- [ ] Funções (em breve)
+
+![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentação
 
-Para documentação completa, visite [supabase.io/docs](https://supabase.com/docs)
+Para documentação completa, visite [supabase.com/docs](https://supabase.com/docs)
 
 ## Comunidade & Suporte
 
@@ -29,7 +36,7 @@ Para documentação completa, visite [supabase.io/docs](https://supabase.com/doc
 ## Status
 
 - [x] Alfa: Nós estamos testando Supabase com um grupo fechado de clientes.
-- [x] Alfa Público: Qualquer um pode se registrar em [app.supabase.io](https://app.supabase.io). Porém seja flexível com a gente, ainda existem alguns obstáculos.
+- [x] Alfa Público: Qualquer um pode se registrar em [app.supabase.com](https://app.supabase.com). Porém seja flexível com a gente, ainda existem alguns obstáculos.
 - [x] Beta Público: Estável o suficiente para a maioria dos casos não empresariais.
 - [ ] Público: Pronto para produção.
 
@@ -45,7 +52,7 @@ Supabase é uma combinação de ferramentas de código aberto. Nós estamos cons
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://app.supabase.io). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Nós ainda estamos criando a experiência de trabalho local - esse é o nosso foco principal, junto com a estabilidade da plataforma.
+Supabase é uma [plataforma hospedada](https://app.supabase.com). Você pode se cadastrar e começar a usar Supabase sem instalar nada. Nós ainda estamos criando a experiência de trabalho local - esse é o nosso foco principal, junto com a estabilidade da plataforma.
 
 ![Arquitetura](https://supabase.com/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png)
 

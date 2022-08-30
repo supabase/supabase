@@ -1,0 +1,24 @@
+---
+id: auth-getsession
+title: 'getSession()'
+slug: /auth-getsession
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Returns the session, refreshing it if necessary.
+The session returned can be null if the session is not detected which can happen in the event a user is not signed-in or has logged out.
+
+```js
+const { data, error } = await supabase.auth.getSession()
+```
+
+## Examples
+
+### Get the session data
+
+```js
+const { data, error } = await supabase.auth.getSession()
+```

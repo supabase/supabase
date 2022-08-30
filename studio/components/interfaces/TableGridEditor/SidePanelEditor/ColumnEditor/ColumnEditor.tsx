@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
-import { Dictionary } from '@supabase/grid'
-import { Checkbox, SidePanel, Space, Input, Divider } from '@supabase/ui'
+import { Dictionary } from 'components/grid'
+import { Checkbox, SidePanel, Input } from '@supabase/ui'
 import {
   PostgresColumn,
   PostgresRelationship,
@@ -23,6 +23,7 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor.utils'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 
 interface Props {
@@ -54,7 +55,7 @@ const ColumnEditor: FC<Props> = ({
 }) => {
   const isNewRecord = isUndefined(column)
   const hasPrimaryKey = (selectedTable?.primary_keys ?? []).length > 0
-  const foreignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
+  const originalForeignKey = column ? getColumnForeignKey(column, selectedTable) : undefined
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -70,7 +71,14 @@ const ColumnEditor: FC<Props> = ({
     }
   }, [visible])
 
+  if (!columnFields) return null
+
   const onUpdateField = (changes: Partial<ColumnField>) => {
+    const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
+    if (!isTextBasedColumn && changes.defaultValue === '') {
+      changes.defaultValue = null
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
@@ -82,7 +90,9 @@ const ColumnEditor: FC<Props> = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (foreignKeyConfiguration: any) => {
+  const saveColumnForeignKey = (
+    foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
+  ) => {
     onUpdateField({
       foreignKey: !isUndefined(foreignKeyConfiguration)
         ? {
@@ -98,7 +108,7 @@ const ColumnEditor: FC<Props> = ({
         : undefined,
       ...(!isUndefined(foreignKeyConfiguration) && {
         format: foreignKeyConfiguration.column.format,
-        defaultValue: '',
+        defaultValue: null,
       }),
     })
     setIsEditingRelation(false)
@@ -124,8 +134,6 @@ const ColumnEditor: FC<Props> = ({
     }
   }
 
-  if (!columnFields) return null
-
   return (
     <SidePanel
       size="large"
@@ -144,6 +152,12 @@ const ColumnEditor: FC<Props> = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <SidePanel.Content>
         <div className="space-y-10 py-6">
@@ -184,7 +198,7 @@ const ColumnEditor: FC<Props> = ({
           )}
           <ColumnForeignKey
             column={columnFields}
-            originalForeignKey={foreignKey}
+            originalForeignKey={originalForeignKey}
             onSelectEditRelation={() => setIsEditingRelation(true)}
             onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
           />
@@ -198,7 +212,7 @@ const ColumnEditor: FC<Props> = ({
             enumTypes={enumTypes}
             error={errors.format}
             disabled={!isUndefined(columnFields?.foreignKey)}
-            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: '' })}
+            onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {isUndefined(columnFields.foreignKey) && (
             <div className="grid grid-cols-12 gap-4">
@@ -263,7 +277,6 @@ const ColumnEditor: FC<Props> = ({
           <ForeignKeySelector
             tables={tables}
             column={columnFields}
-            foreignKey={foreignKey}
             visible={isEditingRelation}
             closePanel={() => setIsEditingRelation(false)}
             saveChanges={saveColumnForeignKey}

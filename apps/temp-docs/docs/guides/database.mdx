@@ -15,7 +15,7 @@ You don't have to be a database expert to start using Supabase. Our table view m
 
 ![Table view](https://supabase.com/docs/assets/images/table-view-827aa3e2958fda01517f0a47474827b0.png)
 
-### Relationships 
+### Relationships
 
 Dig into the relationships within your data.
 
@@ -23,8 +23,8 @@ Dig into the relationships within your data.
   <source src="/videos/relational-drilldown-zoom.mp4" type="video/mp4" playsInline />
 </video>
 
-
 ### Clone tables
+
 You can duplicate your tables, just like you would inside a spreadsheet.
 
 <video width="99%" playsinline controls>
@@ -32,6 +32,7 @@ You can duplicate your tables, just like you would inside a spreadsheet.
 </video>
 
 ### The SQL Editor
+
 Supabase comes with a SQL Editor. You can also save your favorite queries to run later!
 
 <video width="99%" playsinline controls>
@@ -47,8 +48,8 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 Database backups do NOT include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
 
-
 ### Extensions
+
 To expand the functionality of your Postgres database, you can use extensions. You can enable Postgres extensions with the click of a button within the Supabase dashboard.
 
 <video width="99%" playsinline controls>
@@ -68,12 +69,12 @@ You can manage the realtime system, simply by [updating](https://supabase.com/do
 For example to enable realtime only for individual tables:
 
 ```sql
-begin; 
+begin;
   -- remove the realtime publication
-  drop publication if exists supabase_realtime; 
+  drop publication if exists supabase_realtime;
 
   -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;  
+  create publication supabase_realtime;
 commit;
 
 -- add a table to the publication
@@ -82,12 +83,12 @@ alter publication supabase_realtime add table products;
 -- add other tables to the publication
 alter publication supabase_realtime add table posts;
 ```
+
 By default only "new" values are sent, but if you want to receive the old record (previous values) whenever you update or delete a record, you can update the replica identity of your tables, setting it to `full`:
 
 ```sql
 alter table your_table replica identity full;
 ```
-
 
 ### Migrating between projects#
 
@@ -100,6 +101,7 @@ If you have an existing Supabase Project and you want to migrate it into a new (
 
 **Migrate the database**
 First we want to grab the database structure only:
+
 ```bash
 pg_dump \
 -h db.PROJECT_REF.supabase.co \
@@ -119,8 +121,8 @@ psql \
 -U postgres \
 < supabase_schema.sql
 ```
-You may see some errors - the restore will attempt to drop any tables if they are present, and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
 
+You may see some errors - the restore will attempt to drop any tables if they are present, and if they aren't present then an error will be displayed. These errors are informative only and nothing to worry about.
 
 **(Optionally) Migrate the data**
 
@@ -135,7 +137,9 @@ pg_dump \
 -n auth \
 > supabase_data.sql
 ```
+
 This command creates a file on your computer called supabase_data.sql. We can use this file to restore the data in our new database:
+
 ```bash
 psql \
 -h db.NEW_PROJECT_REF.supabase.co \
@@ -152,14 +156,13 @@ If you forget your password, you can reset it from the Dashboard SQL editor:
 For example:
 
 ```sql
-alter user postgres 
+alter user postgres
 with password 'new_password';
 ```
 
 Read more in [Database Configuration](https://supabase.com/docs/guides/database/managing-passwords).
 
 ###Changing the timezone of your server.
-
 
 Your database is initialized with the UTC timezone. We recommend keeping it this way, as it is helpful for time calculations. If, however, you want to update the timezone, you can do so using any of the [database timezones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
@@ -168,9 +171,10 @@ For example:
 ```sql
 alter database postgres set timezone to 'America/New_York';
 ```
+
 Read more in [Database Configuration](https://supabase.com/docs/guides/database/managing-timezones).
 
 ## Next steps
-- Read more about [Postgres](https://supabase.com/docs/postgres/server/about)
-- Sign in: [app.supabase.io](https://app.supabase.io/)
 
+- Read more about [Postgres](https://supabase.com/docs/postgres/server/about)
+- Sign in: [app.supabase.com](https://app.supabase.com/)

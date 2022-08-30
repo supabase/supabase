@@ -1,4 +1,12 @@
-import { Button, IconX, IconLoader, IconClipboard, IconDownload, IconTrash2 } from '@supabase/ui'
+import {
+  Button,
+  IconX,
+  IconLoader,
+  IconClipboard,
+  IconDownload,
+  IconTrash2,
+  IconAlertCircle,
+} from '@supabase/ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'
@@ -129,9 +137,15 @@ const PreviewPane = ({
         <div className="w-full space-y-6">
           {/* Preview Information */}
           <div className="space-y-1">
-            <div className="flex items-center">
-              <h5 className="text-scale-1200 text-base font-bold mr-2 truncate">{file.name}</h5>
-            </div>
+            <h5 className="text-scale-1200 break-words text-base">{file.name}</h5>
+            {file.isCorrupted && (
+              <div className="flex items-center space-x-2">
+                <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
+                <p className="text-sm text-scale-1100">
+                  File is corrupted, please delete and reupload this file again
+                </p>
+              </div>
+            )}
             {mimeType && (
               <p className="text-sm text-scale-1100">
                 {mimeType}
@@ -158,6 +172,7 @@ const PreviewPane = ({
               type="default"
               icon={<IconDownload size={16} strokeWidth={2} />}
               onClick={() => onDownloadFile(file)}
+              disabled={file.isCorrupted}
             >
               Download
             </Button>
@@ -165,6 +180,7 @@ const PreviewPane = ({
               type="outline"
               icon={<IconClipboard size={16} strokeWidth={2} />}
               onClick={() => onCopyFileURL(file)}
+              disabled={file.isCorrupted}
             >
               Copy URL
             </Button>

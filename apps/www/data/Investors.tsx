@@ -1,6 +1,6 @@
 type Investor = {
   name: string
-  round: 'SEED' | 'A'
+  round: 'SEED' | 'A' | 'B'
   title: string
   img: string
   lead: boolean
@@ -32,6 +32,15 @@ const data: Investor[] = [
     round: 'A',
     title: 'Y Combinator',
     img: '/images/logos/yc--grey.png',
+    lead: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Felicis',
+    round: 'B',
+    title: 'Felicis',
+    img: '/images/logos/felicis.png',
     lead: true,
     twitter: null,
     linkedIn: null,

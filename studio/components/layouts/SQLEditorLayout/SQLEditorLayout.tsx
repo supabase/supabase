@@ -1,11 +1,11 @@
-import { FC, ReactNode, useEffect, useState } from 'react'
+import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 
-import { useStore } from 'hooks'
+import { useStore, withAuth } from 'hooks'
 import Error from 'components/ui/Error'
+import { useSqlEditorStore, SqlEditorContext } from 'localStores/sqlEditor/SqlEditorStore'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-// import SQLEditorMenu from './SQLEditorMenu'
-import SQLEditorMenuOld from './SQLEditorMenuOld'
+import SQLEditorMenu from './SQLEditorMenu'
 
 interface Props {
   title: string
@@ -13,26 +13,36 @@ interface Props {
 }
 
 const SQLEditorLayout: FC<Props> = ({ title, children }) => {
-  const { content } = useStore()
+  const { ui, content, meta } = useStore()
+  const { profile: user } = ui
+
+  const sqlEditorStore = useSqlEditorStore(ui.selectedProject?.ref, meta)
 
   useEffect(() => {
-    content.load()
-  }, [])
+    if (sqlEditorStore) {
+      // this calls content.load() for us, as well as loading tabs
+      sqlEditorStore.loadRemotePersistentData(content, user?.id)
+    }
+  }, [sqlEditorStore])
 
-  return content.error ? (
-    <ProjectLayout>
-      <Error error={content.error} />
-    </ProjectLayout>
-  ) : (
-    <ProjectLayout
-      isLoading={content.isLoading}
-      title={title || 'SQL'}
-      product="SQL Editor"
-      productMenu={<SQLEditorMenuOld />}
-    >
-      {children}
-    </ProjectLayout>
+  return (
+    <SqlEditorContext.Provider value={sqlEditorStore}>
+      {content.error ? (
+        <ProjectLayout>
+          <Error error={content.error} />
+        </ProjectLayout>
+      ) : (
+        <ProjectLayout
+          isLoading={content.isLoading || sqlEditorStore === null}
+          title={title || 'SQL'}
+          product="SQL Editor"
+          productMenu={<SQLEditorMenu />}
+        >
+          {children}
+        </ProjectLayout>
+      )}
+    </SqlEditorContext.Provider>
   )
 }
 
-export default observer(SQLEditorLayout)
+export default withAuth(observer(SQLEditorLayout))

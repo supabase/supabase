@@ -1,38 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import DataGrid from '@supabase/react-data-grid'
 import Split from 'react-split'
-import { CSVLink } from 'react-csv'
-import {
-  Button,
-  IconHeart,
-  IconChevronDown,
-  IconChevronUp,
-  Typography,
-  Dropdown,
-} from '@supabase/ui'
 import Editor from '@monaco-editor/react'
-
-import { copyToClipboard, timeout } from 'lib/helpers'
-import { IS_PLATFORM } from 'lib/constants'
-import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
-import { useProjectContentStore } from 'stores/projectContentStore'
-
-import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
-
-import Telemetry from 'lib/telemetry'
-import { useStore } from 'hooks'
+import DataGrid from '@supabase/react-data-grid'
+import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
-import { useWindowDimensions, useKeyboardShortcuts } from 'hooks'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
+import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
+import Telemetry from 'lib/telemetry'
+import { copyToClipboard, timeout } from 'lib/helpers'
+import { useSqlStore, UTILITY_TAB_TYPES } from 'localStores/sqlEditor/SqlEditorStore'
+import { SQL_SNIPPET_SCHEMA_VERSION } from './SqlEditor.constants'
+import UtilityActions from 'components/interfaces/SQLEditor/TabSqlQuery/UtilityActions'
 
 const TabSqlQuery = observer(() => {
   const sqlEditorStore = useSqlStore()
+  const { ui, content: contentStore } = useStore()
   const { height: screenHeight } = useWindowDimensions()
+
   const snapOffset = 50
   const minSize = 44
   const tabMenuHeight = 44
   const offset = 3
+
+  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
 
   useEffect(() => {
     // minus fixed tabMenu height
@@ -49,8 +45,25 @@ const TabSqlQuery = observer(() => {
     sqlEditorStore.activeTab.setSplitSizes(sizes)
   }
 
+  async function updateSqlSnippet(value) {
+    if (!canCreateSQLSnippet) return
+
+    if (sqlEditorStore.activeTab) {
+      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
+        content: {
+          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
+          content_id: sqlEditorStore.activeTab.id,
+          sql: value,
+          favorite: sqlEditorStore.activeTab.favorite,
+        },
+      })
+    } else {
+      console.warn('No active tab found while updating SQL snippet')
+    }
+  }
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <Split
         style={{ height: '100%' }}
         direction="vertical"
@@ -62,9 +75,12 @@ const TabSqlQuery = observer(() => {
         collapsed={sqlEditorStore.activeTab.utilityTabHeight == 0 ? 1 : undefined}
         onDragEnd={onDragEnd}
       >
-        <MonacoEditor error={sqlEditorStore.activeTab.sqlQueryError} />
+        <MonacoEditor
+          error={sqlEditorStore.activeTab.sqlQueryError}
+          updateSqlSnippet={updateSqlSnippet}
+        />
         <div>
-          <UtilityPanel />
+          <UtilityPanel updateSqlSnippet={updateSqlSnippet} />
         </div>
       </Split>
     </div>
@@ -72,12 +88,7 @@ const TabSqlQuery = observer(() => {
 })
 export default TabSqlQuery
 
-const MonacoEditor = ({ error }) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const contentStore = useProjectContentStore(ref)
-
+const MonacoEditor = ({ error, updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
@@ -154,6 +165,9 @@ const MonacoEditor = ({ error }) => {
     editor?.focus()
   }
 
+  // changes are stored in debouncer before running persistData()
+  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
+
   async function handleEditorChange(value) {
     // update sqlEditorStore with new value immediately
     // this is so any SQL run will be whatever is currently in monaco editor
@@ -163,29 +177,8 @@ const MonacoEditor = ({ error }) => {
     debounceUpdateSqlSnippet(value)
   }
 
-  // changes are stored in debouncer before running persistData()
-  let debounceUpdateSqlSnippet = debounce((value) => updateSqlSnippet(value), 1500)
-
-  async function updateSqlSnippet(value) {
-    //
-    // this will need to be refactored but for now
-    // we still use the old sqlEditorStore to handle db updates
-    if (sqlEditorStore.activeTab) {
-      await contentStore.updateSql(sqlEditorStore.activeTab.id, {
-        content: {
-          schema_version: SQL_SNIPPET_SCHEMA_VERSION,
-          content_id: sqlEditorStore.activeTab.id,
-          sql: value,
-          favorite: sqlEditorStore.activeTab.favorite,
-        },
-      })
-    } else {
-      console.warn('No active tab found while updating SQL snippet')
-    }
-  }
-
   return (
-    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
+    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
       <Editor
         className="monaco-editor"
         theme={'supabase'}
@@ -208,15 +201,15 @@ const MonacoEditor = ({ error }) => {
   )
 }
 
-const UtilityPanel = observer(() => {
+const UtilityPanel = observer(({ updateSqlSnippet }) => {
   const sqlEditorStore = useSqlStore()
 
   return (
     <>
       <div className="flex justify-between overflow-visible px-6 py-2">
         <ResultsDropdown />
-        <div className="inline-flex justify-end">
-          <UtilityActions />
+        <div className="inline-flex items-center justify-end">
+          <UtilityActions updateSqlSnippet={updateSqlSnippet} />
         </div>
       </div>
       <div className="p-0 pt-0 pb-0">
@@ -271,207 +264,6 @@ const ResultsDropdown = observer(() => {
   )
 })
 
-const UtilityActions = observer(() => {
-  const sqlEditorStore = useSqlStore()
-
-  useKeyboardShortcuts(
-    {
-      'Command+Enter': (event) => {
-        event.preventDefault()
-        executeQuery()
-      },
-    },
-    ['INPUT']
-  )
-
-  async function executeQuery() {
-    if (sqlEditorStore.isExecuting) return
-    await sqlEditorStore.startExecuting()
-  }
-
-  return (
-    <>
-      {IS_PLATFORM && <FavoriteButton />}
-      <SizeToggleButton />
-      <Button
-        onClick={executeQuery}
-        disabled={sqlEditorStore.isExecuting}
-        loading={sqlEditorStore.isExecuting}
-        type="text"
-        size="tiny"
-        shadow={false}
-        className="mx-2"
-      >
-        RUN
-      </Button>
-    </>
-  )
-})
-
-const SizeToggleButton = observer(() => {
-  const sqlEditorStore = useSqlStore()
-
-  function maximizeEditor() {
-    sqlEditorStore.activeTab.collapseUtilityTab()
-  }
-
-  function restorePanelSize() {
-    sqlEditorStore.activeTab.restorePanelSize()
-  }
-
-  return (
-    <>
-      {sqlEditorStore.activeTab.utilityTabHeight != 0 && (
-        <Button
-          type="text"
-          size="tiny"
-          shadow={false}
-          onClick={maximizeEditor}
-          icon={<IconChevronDown className="text-gray-1100" size="tiny" strokeWidth={2} />}
-          tooltip={{
-            title: 'Maximize editor',
-            position: 'top',
-          }}
-        />
-      )}
-      {sqlEditorStore.activeTab.utilityTabHeight == 0 && (
-        <Button
-          type="text"
-          size="tiny"
-          shadow={false}
-          onClick={restorePanelSize}
-          icon={<IconChevronUp className="text-gray-1100" size="tiny" strokeWidth={2} />}
-          tooltip={{
-            title: 'Restore panel size',
-            position: 'top',
-          }}
-        />
-      )}
-    </>
-  )
-})
-
-const FavoriteButton = observer(() => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const { ui } = useStore()
-  const { profile: user } = ui
-
-  const sqlEditorStore = useSqlStore()
-  const contentStore = useProjectContentStore(ref)
-
-  const [loading, setLoading] = useState(false)
-
-  const id = sqlEditorStore.activeTab.id
-
-  /*
-   * `content` column json structure
-   */
-  let contentPayload = {
-    schema_version: '1.0',
-    content_id: id,
-    sql: sqlEditorStore.activeTab.query,
-  }
-
-  async function addToFavorite() {
-    try {
-      setLoading(true)
-      /*
-       * remote db handling
-       */
-      await contentStore.updateSql(id, {
-        content: {
-          ...contentPayload,
-          favorite: true,
-        },
-      })
-
-      /*
-       * old localstorage handling
-       */
-      const { query, name, desc } = sqlEditorStore.activeTab || {}
-      sqlEditorStore.addToFavorite(id, query, name, desc)
-      Telemetry.sendEvent('sql_editor', 'sql_favourited', name)
-
-      /*
-       * reload sql data in store and re-select tab
-       */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
-      sqlEditorStore.selectTab(id)
-      setLoading(false)
-    } catch (error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to add to favourites: ${error.message}`,
-      })
-      setLoading(false)
-    }
-  }
-
-  async function unFavorite() {
-    const id = sqlEditorStore.activeTab.id
-    try {
-      setLoading(true)
-      /*
-       * remote db handling
-       */
-      await contentStore.updateSql(id, {
-        content: {
-          ...contentPayload,
-          favorite: false,
-        },
-      })
-
-      /*
-       * old localstorage handling
-       */
-      const { name } = sqlEditorStore.activeTab || {}
-      sqlEditorStore.unFavorite(id)
-      Telemetry.sendEvent('sql_editor', 'sql_unfavourited', name)
-
-      /*
-       * reload sql data in store and re-select tab
-       */
-      await sqlEditorStore.loadRemotePersistentData(contentStore, user.id)
-      sqlEditorStore.selectTab(id)
-      setLoading(false)
-    } catch (error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to remove from favourites: ${error.message}`,
-      })
-      setLoading(false)
-    }
-  }
-
-  return (
-    <>
-      {sqlEditorStore.activeTab.favorite ? (
-        <Button
-          type="text"
-          size="tiny"
-          shadow={false}
-          onClick={unFavorite}
-          loading={loading}
-          icon={<IconHeart size="tiny" fill="#48bb78" />}
-        />
-      ) : (
-        <Button
-          type="text"
-          size="tiny"
-          shadow={false}
-          onClick={addToFavorite}
-          loading={loading}
-          icon={<IconHeart size="tiny" fill="gray" />}
-        />
-      )}
-    </>
-  )
-})
-
 const UtilityTabResults = observer(() => {
   const sqlEditorStore = useSqlStore()
 
@@ -479,25 +271,21 @@ const UtilityTabResults = observer(() => {
   if (sqlEditorStore.activeTab.isExecuting) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 border-0 font-mono text-sm">Running...</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.errorResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text>
-          <p className="px-6 py-4 m-0 border-0 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.hasNoResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text type="secondary">
-          <p className="px-6 py-4 m-0 border-0 ">
-            Click <Typography.Text code>RUN</Typography.Text> to execute your query.
-          </p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1000">
+          Click <code>RUN</code> to execute your query.
+        </p>
       </div>
     )
   }
@@ -529,16 +317,14 @@ const Results = ({ results }) => {
   if (results?.error) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text type="danger">
-          <p className="px-6 py-4 m-0 font-mono border-0"> {`ERROR: ${results.error}`}</p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-scale-1000">ERROR: {results.error}</p>
       </div>
     )
   }
   if (!results.length) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="px-6 py-4 m-0 font-mono border-0 text-sm">Success. No rows returned</p>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
       </div>
     )
   }
@@ -547,7 +333,7 @@ const Results = ({ results }) => {
     return <span className="font-mono text-xs">{JSON.stringify(row[column])}</span>
   }
   const columnRender = (name) => {
-    return <div className="flex items-center justify-center font-mono h-full">{name}</div>
+    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
   }
   const columns = Object.keys(results[0]).map((key) => ({
     key,

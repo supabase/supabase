@@ -1,7 +1,8 @@
 import Papa from 'papaparse'
 import { makeObservable, observable } from 'mobx'
 import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
-import { Query } from '@supabase/grid'
+import { Query } from 'components/grid/query/Query'
+
 import {
   PostgresColumn,
   PostgresTable,
@@ -31,7 +32,7 @@ import {
   generateUpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore from './RolesStore'
+import RolesStore, { IRolesStore } from './RolesStore'
 import PoliciesStore from './PoliciesStore'
 import TriggersStore from './TriggersStore'
 import PublicationStore, { IPublicationStore } from './PublicationStore'
@@ -52,13 +53,15 @@ export interface IMetaStore {
   schemas: ISchemaStore
 
   hooks: IPostgresMetaInterface<any>
-  roles: IPostgresMetaInterface<any>
+  roles: IRolesStore
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
   publications: IPublicationStore
   types: IPostgresMetaInterface<any>
+
+  projectRef?: string
 
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
@@ -90,16 +93,28 @@ export interface IMetaStore {
   ) => any
   duplicateTable: (
     payload: any,
-    metadata: { duplicateTable: PostgresTable; isRLSEnabled: boolean; isDuplicateRows: boolean }
+    metadata: {
+      duplicateTable: PostgresTable
+      isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
+      isDuplicateRows: boolean
+    }
   ) => void
   createTable: (
     toastId: string,
     payload: any,
-    isRLSEnabled: boolean,
     columns: ColumnField[],
+    isRLSEnabled: boolean,
+    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) => any
-  updateTable: (toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) => any
+  updateTable: (
+    toastId: string,
+    table: PostgresTable,
+    payload: any,
+    columns: ColumnField[],
+    isRealtimeEnabled: boolean
+  ) => any
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
@@ -117,26 +132,32 @@ export default class MetaStore implements IMetaStore {
   publications: PublicationStore
   types: TypesStore
 
+  projectRef?: string
   connectionString?: string
   baseUrl: string
-  queryBaseUrl: string
+
+  // [Joshen] I'm going to treat this as a list of system schemas
   excludedSchemas = [
     'auth',
     'extensions',
     'information_schema',
     'net',
     'pg_catalog',
+    'pgsodium',
+    'pgsodium_masks',
     'pgbouncer',
     'realtime',
     'storage',
     'supabase_functions',
+    'graphql',
+    'graphql_public',
   ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString: string }) {
     const { projectRef, connectionString } = options
     this.rootStore = rootStore
-    this.baseUrl = `/api/pg-meta/${projectRef}`
-    this.queryBaseUrl = `${API_URL}/pg-meta/${projectRef}`
+    this.projectRef = projectRef
+    this.baseUrl = `${API_URL}/pg-meta/${projectRef}`
 
     const headers: any = {}
     if (IS_PLATFORM && connectionString) {
@@ -172,7 +193,7 @@ export default class MetaStore implements IMetaStore {
     try {
       const headers: any = { 'Content-Type': 'application/json' }
       if (this.connectionString) headers['x-connection-encrypted'] = this.connectionString
-      const url = `${this.queryBaseUrl}/query`
+      const url = `${this.baseUrl}/query`
       const response = await post(url, { query: value }, { headers })
       if (response.error) throw response.error
 
@@ -246,6 +267,53 @@ export default class MetaStore implements IMetaStore {
     return await this.query(query)
   }
 
+  async updateTableRealtime(table: PostgresTable, enable: boolean) {
+    const publications = this.publications.list()
+    const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
+
+    const realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
+    if (realtimePublication === undefined) {
+      return this.rootStore.ui.setNotification({
+        category: 'error',
+        message: `Unable to update realtime for ${table.name}: Missing publication`,
+      })
+    }
+
+    const { id, tables: publicationTables } = realtimePublication
+    if (publicationTables === null) {
+      // UI doesn't have support for toggling realtime for ALL tables
+      // Switch it to individual tables via an array of strings
+      // Refer to PublicationStore for more information about this
+      const realtimeTables = enable
+        ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
+        : publicTables
+            .filter((t: any) => t.id !== table.id)
+            .map((t: any) => `${t.schema}.${t.name}`)
+      await this.publications.recreate(id, realtimeTables)
+    } else {
+      const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
+
+      const realtimeTables =
+        isAlreadyEnabled && !enable
+          ? // Toggle realtime off
+            publicationTables
+              .filter((t: any) => t.id !== table.id)
+              .map((t: any) => `${t.schema}.${t.name}`)
+          : !isAlreadyEnabled && enable
+          ? // Toggle realtime on
+            [`${table.schema}.${table.name}`].concat(
+              publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+            )
+          : null
+
+      if (realtimeTables === null) return
+
+      const payload = { id, tables: realtimeTables }
+      const { error: publicationsUpdateError } = await this.publications.update(id, payload)
+      if (publicationsUpdateError) throw publicationsUpdateError
+    }
+  }
+
   async createColumn(payload: CreateColumnPayload, foreignKey?: Partial<PostgresRelationship>) {
     try {
       const column: any = await this.columns.create(payload)
@@ -293,9 +361,15 @@ export default class MetaStore implements IMetaStore {
 
   async duplicateTable(
     payload: any,
-    metadata: { duplicateTable: PostgresTable; isRLSEnabled: boolean; isDuplicateRows: boolean }
+    metadata: {
+      duplicateTable: PostgresTable
+      isRLSEnabled: boolean
+      isRealtimeEnabled: boolean
+      isDuplicateRows: boolean
+    }
   ) {
-    const sourceTableName = metadata.duplicateTable.name
+    const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
+    const sourceTableName = duplicateTable.name
     const duplicatedTableName = payload.name
 
     // The following query will copy the structure of the table along with indexes, constraints and
@@ -306,7 +380,7 @@ export default class MetaStore implements IMetaStore {
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
-    const relationships = metadata.duplicateTable.relationships
+    const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
       // @ts-ignore, but might need to investigate, sounds bad:
       // Type instantiation is excessively deep and possibly infinite
@@ -320,14 +394,15 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Duplicate rows if needed
-    if (metadata.isDuplicateRows) {
+    if (isDuplicateRows) {
       const rows = await this.rootStore.meta.query(
         `INSERT INTO "${duplicatedTableName}" SELECT * FROM ${sourceTableName};`
       )
       if (rows.error) throw rows.error
 
       // Insert into does not copy over auto increment sequences, so we manually do it next if any
-      const columns = metadata.duplicateTable.columns
+      const columns = duplicateTable.columns
+      // @ts-ignore
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
@@ -341,12 +416,14 @@ export default class MetaStore implements IMetaStore {
     const tables = this.tables.list()
     const duplicatedTable = find(tables, { name: duplicatedTableName })
 
-    if (metadata.isRLSEnabled) {
+    if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
-        rls_enabled: metadata.isRLSEnabled,
+        rls_enabled: isRLSEnabled,
       })
       if (updateTable.error) throw updateTable.error
     }
+
+    if (isRealtimeEnabled && duplicatedTable) await this.updateTableRealtime(duplicatedTable, true)
 
     return duplicatedTable
   }
@@ -354,8 +431,9 @@ export default class MetaStore implements IMetaStore {
   async createTable(
     toastId: string,
     payload: any,
-    isRLSEnabled: boolean,
     columns: ColumnField[] = [],
+    isRLSEnabled: boolean,
+    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) {
     // Create the table first
@@ -374,6 +452,9 @@ export default class MetaStore implements IMetaStore {
         })
         if (updatedTable.error) throw updatedTable.error
       }
+
+      // Toggle Realtime if configured to be
+      if (isRealtimeEnabled) await this.updateTableRealtime(table, true)
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
       // of the column order during creation. Note that we add primary key constraints separately
@@ -479,11 +560,18 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async updateTable(toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) {
+  async updateTable(
+    toastId: string,
+    table: PostgresTable,
+    payload: any,
+    columns: ColumnField[],
+    isRealtimeEnabled: boolean
+  ) {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
       .map((column) => `"${column.name}"`)
+    // @ts-ignore
     const existingPrimaryKeyColumns = table.primary_keys.map(
       (pk: PostgresPrimaryKey) => `"${pk.name}"`
     )
@@ -508,6 +596,7 @@ export default class MetaStore implements IMetaStore {
     const columnIds = columns.map((column) => column.id)
 
     // Delete any removed columns
+    // @ts-ignore
     const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
     for (const column of columnsToRemove) {
       this.rootStore.ui.setNotification({
@@ -578,6 +667,9 @@ export default class MetaStore implements IMetaStore {
       )
       if (primaryKeys.error) throw primaryKeys.error
     }
+
+    // Update table's realtime configuration
+    await this.updateTableRealtime(table, isRealtimeEnabled)
 
     return { table: await this.tables.loadById(table.id), hasError }
   }
