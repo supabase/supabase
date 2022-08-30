@@ -1,6 +1,6 @@
 import SchemaForm from './SchemaForm'
 import React, { useState } from 'react'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 export default function SchemaFormPanel({
   schema,
@@ -46,7 +46,7 @@ export default function SchemaFormPanel({
           flex overflow-hidden items-center"
       >
         <div className="flex-1 text-left">
-          <Typography.Title level={6}>{title || ''}</Typography.Title>
+          <h6>{title || ''}</h6>
         </div>
         <div
           className={`flex transition duration-150 ${

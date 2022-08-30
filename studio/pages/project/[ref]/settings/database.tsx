@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
-import { Typography, Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
@@ -59,9 +59,9 @@ const Usage: FC<any> = ({ project }) => {
         <section className="">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Database health
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>
@@ -75,15 +75,15 @@ const Usage: FC<any> = ({ project }) => {
                 />
                 {dateRange && (
                   <div className="flex items-center space-x-2">
-                    <Typography.Text type="secondary">
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className="opacity-50">
+                    </p>
+                    <p className="text-scale-1000">
                       <IconArrowRight size={12} />
-                    </Typography.Text>
-                    <Typography.Text type="secondary">
+                    </p>
+                    <p className="text-scale-1000">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </Typography.Text>
+                    </p>
                   </div>
                 )}
               </div>
@@ -129,9 +129,9 @@ const Usage: FC<any> = ({ project }) => {
         <section className="mt-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Database storage
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>
@@ -225,7 +225,7 @@ const ResetDbPassword: FC<any> = () => {
         <Panel.Content>
           <div className="grid grid-cols-1 items-center lg:grid-cols-2">
             <div>
-              <Typography.Text className="block">Database password</Typography.Text>
+              <p className="block">Database password</p>
               <div style={{ maxWidth: '420px' }}>
                 <p className="text-sm opacity-50">
                   You can use this password to connect directly to your Postgres database.
@@ -323,7 +323,7 @@ const DownloadCertificate: FC<any> = ({ createdAt }) => {
       <Panel.Content>
         <div className="grid grid-cols-1 items-center lg:grid-cols-2">
           <div>
-            <Typography.Text className="block">SSL Connection</Typography.Text>
+            <p className="block">SSL Connection</p>
             <div style={{ maxWidth: '420px' }}>
               <p className="text-sm opacity-50">
                 Use this certificate when connecting to your database to prevent snooping and
@@ -352,7 +352,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   if (data?.error || error) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Error loading database settings</Typography.Title>
+        <p className="text-scale-1000">Error loading database settings</p>
       </div>
     )
   }
@@ -360,7 +360,7 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
   if (!data) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Loading...</Typography.Title>
+        <p className="text-scale-1000">Loading...</p>
       </div>
     )
   }
@@ -390,10 +390,9 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <section className="mt-6 space-y-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Connection info
-              </Typography.Title>
-              // <Title level={4}>Connection info</Title>
+              </h5>
             }
           >
             <Panel.Content className="space-y-6">
@@ -455,9 +454,9 @@ const GeneralSettings: FC<any> = ({ projectRef }) => {
         <section className="mt-6 space-y-6">
           <Panel
             title={
-              <Typography.Title key="panel-title" level={5} className="mb-0">
+              <h5 key="panel-title" className="mb-0">
                 Connection string
-              </Typography.Title>
+              </h5>
             }
           >
             <Panel.Content>

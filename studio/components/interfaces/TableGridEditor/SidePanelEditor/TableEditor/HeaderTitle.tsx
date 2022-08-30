@@ -1,5 +1,5 @@
+import { FC } from 'react'
 import { PostgresTable } from '@supabase/postgres-meta'
-import { Typography } from '@supabase/ui'
 
 interface Props {
   schema: string
@@ -7,7 +7,7 @@ interface Props {
   isDuplicating: boolean
 }
 
-const HeaderTitle: React.FC<Props> = ({ schema, table, isDuplicating }) => {
+const HeaderTitle: FC<Props> = ({ schema, table, isDuplicating }) => {
   if (!table) {
     return (
       <>
@@ -18,13 +18,13 @@ const HeaderTitle: React.FC<Props> = ({ schema, table, isDuplicating }) => {
   if (isDuplicating) {
     return (
       <>
-        Duplicate table <Typography.Text code>{table.name}</Typography.Text>
+        Duplicate table <code>{table.name}</code>
       </>
     )
   }
   return (
     <>
-      Update table <Typography.Text code>{table.name}</Typography.Text>
+      Update table <code>{table.name}</code>
     </>
   )
 }

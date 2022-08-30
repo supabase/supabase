@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconLoader, Typography } from '@supabase/ui'
+import { IconLoader } from '@supabase/ui'
 import { find, get, isEmpty, filter } from 'lodash'
 
 import { useStore } from 'hooks'
@@ -179,10 +179,10 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <Typography.Text className="opacity-50">
+          <p className="text-scale-1000">
             You may also write policies for the tables under the storage schema directly for greater
             control
-          </Typography.Text>
+          </p>
 
           {/* Section for policies under storage.objects that are not tied to any buckets */}
           <StoragePoliciesBucketRow
