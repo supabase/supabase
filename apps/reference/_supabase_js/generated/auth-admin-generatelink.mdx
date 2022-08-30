@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Generates links to be sent via email or other.
+Generates email links and OTPs to be sent via a custom email provider.
 
 ```js
 const { data, error } = await supabase.auth.admin.generateLink(
@@ -27,178 +27,13 @@ const { data, error } = await supabase.auth.admin.generateLink(
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      GenerateLinkType
+      GenerateLinkParams
     </span>
     <span className="method-list-item-label-badge required">
       required
     </span>
     <span className="method-list-item-validation">
-      <code>signup</code> | <code>invite</code> | <code>magiclink</code> | <code>recovery</code> | <code>email_change_current</code> | <code>email_change_new</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The link type
-
-  </div>
-  
-<ul className="method-list-group">
-  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      email_change_new
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      email_change_current
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      recovery
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      magiclink
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      invite
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      signup
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      literal
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-No description provided.
-
-  </div>
-  
-</li>
-
-</ul>
-
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      email
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-The user's email.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      options
-    </span>
-    <span className="method-list-item-label-badge required">
-      required
-    </span>
-    <span className="method-list-item-validation">
-      <code>object</code>
+      <code>GenerateSignupLinkParams</code> | <code>GenerateInviteOrMagiclinkParams</code> | <code>GenerateRecoveryLinkParams</code> | <code>GenerateEmailChangeLinkParams</code>
     </span>
   </h4>
   <div class="method-list-item-description">
@@ -213,10 +48,10 @@ No description provided.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      data
+      GenerateSignupLinkParams
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
       <code>object</code>
@@ -224,7 +59,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-Optional user metadata. For signup only.
+No description provided.
 
   </div>
   
@@ -233,18 +68,18 @@ Optional user metadata. For signup only.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      password
+      GenerateRecoveryLinkParams
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
-      <code>string</code>
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-User password. For signup only.
+No description provided.
 
   </div>
   
@@ -253,18 +88,38 @@ User password. For signup only.
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
-      redirectTo
+      GenerateInviteOrMagiclinkParams
     </span>
-    <span className="method-list-item-label-badge false">
-      optional
+    <span className="method-list-item-label-badge required">
+      required
     </span>
     <span className="method-list-item-validation">
-      <code>string</code>
+      <code>object</code>
     </span>
   </h4>
   <div class="method-list-item-description">
 
-The redirect url which should be appended to the generated link
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateEmailChangeLinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
 
   </div>
   
@@ -275,11 +130,6 @@ The redirect url which should be appended to the generated link
 </li>
 
 </ul>
-
-## Notes
-
-- Requires a `service_role` key.
-- This function should only be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 

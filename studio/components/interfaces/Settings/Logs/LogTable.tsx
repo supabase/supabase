@@ -1,20 +1,19 @@
-import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
-import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
-// column renders
+import CSVButton from 'components/ui/CSVButton'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
-import CSVButton from 'components/ui/CSVButton'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import { LogQueryError } from '.'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -100,88 +99,10 @@ const LogTable = ({
         break
 
       case 'fn_edge':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-          },
-          {
-            key: 'status_code',
-            headerRenderer: () => <HeaderFormmater value={'Status'} />,
-            name: 'status_code',
-            formatter: (data: any) => (
-              <ResponseCodeFormatter row={data} value={data.row.status_code} />
-            ),
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'method',
-            headerRenderer: () => <HeaderFormmater value={'method'} />,
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'id',
-            headerRenderer: () => <HeaderFormmater value={'id'} />,
-            name: 'id',
-            resizable: true,
-          },
-        ]
+        columns = FunctionsEdgeColumnRender
         break
       case 'functions':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-            resizable: true,
-          },
-          {
-            key: 'level',
-            headerRenderer: () => <HeaderFormmater value={'Level'} />,
-            name: 'level',
-            formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
-            width: 24,
-            resizable: true,
-          },
-          {
-            key: 'event_message',
-            headerRenderer: () => <HeaderFormmater value={'Event message'} />,
-            resizable: true,
-          },
-        ]
+        columns = FunctionsLogsColumnRender
         break
 
       default:

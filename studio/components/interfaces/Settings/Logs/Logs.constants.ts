@@ -266,8 +266,6 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
 }
 
-export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
-
 export const genQueryParams = (params: { [k: string]: string }) => {
   // remove keys which are empty strings, null, or undefined
   for (const k in params) {

@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Get user by id.
 
 ```js
-const { user, error } = await supabase.auth.admin.getUserById(1)
+const { data, error } = await supabase.auth.admin.getUserById(1)
 ```
 
 ## Parameters
@@ -44,14 +44,13 @@ This function should only be called on a server. Never expose your `service_role
 
 ## Notes
 
-- Fetches the user object from the database instead of local storage.
-- Note that user() fetches the user object from local storage which might not be the most updated.
-- Requires the user's access_token.
+- Fetches the user object from the database based on the user's id.
+- The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
 
 ## Examples
 
 ### Fetch the user object using the access_token jwt.
 
 ```js
-const { user, error } = await supabase.auth.admin.getUserById(1)
+const { data, error } = await supabase.auth.admin.getUserById(1)
 ```

@@ -1,17 +1,21 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Tabs } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { DatabaseLayout } from 'components/layouts'
 import { PITRBackupSelection } from 'components/interfaces/Database'
 import { NextPageWithLayout } from 'types'
+import NoPermission from 'components/ui/NoPermission'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
 
   const ref = ui.selectedProject?.ref ?? 'default'
+
+  const canReadPhysicalBackups = checkPermissions(PermissionAction.READ, 'physical_backups')
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-5 pt-12 pb-20">
@@ -32,7 +36,11 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
         <p className="text-scale-1100 text-sm">
           Restore your project from a specific date and time.
         </p>
-        <PITRBackupSelection />
+        {canReadPhysicalBackups ? (
+          <PITRBackupSelection />
+        ) : (
+          <NoPermission resourceText="view PITR backups" />
+        )}
       </div>
     </div>
   )

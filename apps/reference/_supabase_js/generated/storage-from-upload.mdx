@@ -38,7 +38,7 @@ const { data, error } = await supabase.storage
   </h4>
   <div class="method-list-item-description">
 
-The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
 
   </div>
   
@@ -304,7 +304,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-the `Cache-Control: max-age=<seconds>` seconds value.
+The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
 
   </div>
   
@@ -344,7 +344,7 @@ the `Content-Type` header value. Should be specified if using a `fileBody` that 
   </h4>
   <div class="method-list-item-description">
 
-whether to perform an upsert
+When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
 
   </div>
   
@@ -358,9 +358,10 @@ whether to perform an upsert
 
 ## Notes
 
-- Policy permissions required:
-  - `buckets` permissions: none
-  - `objects` permissions: `insert`
+- RLS policy permissions required:
+  - `buckets` table permissions: none
+  - `objects` table permissions: `insert`
+- Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
 - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
 
 ## Examples

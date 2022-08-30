@@ -19,6 +19,7 @@ interface Props {
   searchPlaceholder?: string
   descriptionText?: string | ReactNode
   emptyMessage?: string | ReactNode
+  disabled?: boolean
   onChange?(x: string[]): void
 }
 
@@ -35,6 +36,7 @@ export default function MultiSelect({
   placeholder,
   searchPlaceholder = 'Search for option',
   emptyMessage,
+  disabled,
   onChange = () => {},
 }: Props) {
   const ref = useRef(null)
@@ -94,7 +96,7 @@ export default function MultiSelect({
   }
 
   return (
-    <div className="form-group">
+    <div className={`form-group ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
       {label && <label>{label}</label>}
       <div
         className={[
@@ -228,7 +230,9 @@ export default function MultiSelect({
         </Popover>
       </div>
 
-      {descriptionText && <span className="form-text text-muted">{descriptionText}</span>}
+      {descriptionText && (
+        <span className="form-text text-muted text-sm mt-2">{descriptionText}</span>
+      )}
     </div>
   )
 }

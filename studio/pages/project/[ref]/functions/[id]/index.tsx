@@ -1,20 +1,19 @@
-import { observer } from 'mobx-react-lite'
-
 import useSWR from 'swr'
 import dayjs from 'dayjs'
-
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from '@supabase/ui'
+import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import Panel from 'components/ui/Panel'
-import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-
+import { checkPermissions } from 'hooks'
+import { ChartIntervals, NextPageWithLayout } from 'types'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT } from 'lib/constants'
-
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
-import { ChartIntervals, NextPageWithLayout } from 'types'
+import Panel from 'components/ui/Panel'
+import NoPermission from 'components/ui/NoPermission'
+import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -33,8 +32,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
 function calculateHighlightedValue(array: any, attribute: string, options?: { sum: boolean }) {
   if (!array) return ''
 
-  var total = 0
-  var count = 0
+  let total = 0
+  let count = 0
 
   array.forEach(function (item: any, index: number) {
     const _item = item[attribute]
@@ -50,12 +49,12 @@ function calculateHighlightedValue(array: any, attribute: string, options?: { su
 }
 
 const PageLayout: NextPageWithLayout = () => {
-  const [interval, setInterval] = useState<string>('15min')
   const router = useRouter()
   const { ref, id } = router.query
 
-  const url = `${API_URL}/projects/${ref}/analytics/endpoints/functions.inv-stats`
+  const [interval, setInterval] = useState<string>('15min')
 
+  const url = `${API_URL}/projects/${ref}/analytics/endpoints/functions.inv-stats`
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
   const { data, error }: any = useSWR(
@@ -66,11 +65,9 @@ const PageLayout: NextPageWithLayout = () => {
   const startDate = dayjs()
     .subtract(selectedInterval.startValue, selectedInterval.startUnit)
     .format(DATE_FORMAT)
-
   const endDate = dayjs().format(DATE_FORMAT)
 
   const charts: any = {}
-
   charts.data = data?.result
 
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
@@ -88,6 +85,11 @@ const PageLayout: NextPageWithLayout = () => {
     } else {
       router.push(`/project/${ref}/functions/${id}/logs?te=${timestamp}`)
     }
+  }
+
+  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, id as string)
+  if (!canReadFunction) {
+    return <NoPermission isFullPage resourceText="access this edge function" />
   }
 
   return (

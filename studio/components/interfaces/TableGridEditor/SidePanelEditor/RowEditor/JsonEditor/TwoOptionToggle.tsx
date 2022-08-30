@@ -38,14 +38,14 @@ const TwoOptionToggle: FC<Props> = ({
           key={`toggle_${index}`}
           style={{ width: 51 }}
           className={`
-              ${activeOption === option ? 'text-gray-200' : 'text-gray-400'} 
+              ${activeOption === option ? 'text-scale-1200' : 'text-scale-1000'} 
               ${index === 0 ? 'right-0' : 'left-0'} 
               ${buttonStyle(activeOption === option)}
               cursor-pointer
             `}
           onClick={() => onClickOption(option)}
         >
-          <span className="text-color-inherit uppercase">{option}</span>
+          <span className="text-color-inherit capitalize">{option}</span>
         </span>
       ))}
     </div>
