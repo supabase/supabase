@@ -174,14 +174,9 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  * it will set that to mean yesterday at midnight.
  * So the max possible time from that midnight to the upcoming midnight is 2880
  */
-export const maybeShowUpgradePrompt = (from: string) => {
-  const toTime = dayjs()
-  const fromTime = dayjs(from)
-  const hours = toTime.diff(fromTime, 'minutes')
-
-  if (hours > 2880) {
-    return true
-  }
+export const maybeShowUpgradePrompt = (from: string | null | undefined) => {
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+  return day > 1
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
