@@ -438,37 +438,36 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
     default: true,
   },
   {
     text: 'Last 3 hours',
     calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
   },
   {
-    text: 'Last day',
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
-    text: 'Last day',
-    //calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
     default: true,
   },
   {
     text: 'Last 3 days',
     calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
   },
   {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => dayjs().toISOString(),
+    calcTo: () => '',
   },
 ]
 
