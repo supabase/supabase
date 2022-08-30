@@ -249,7 +249,8 @@ const TableEditorMenu: FC<Props> = ({
                   hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
-                    isActive && (
+                    isActive &&
+                    !isLocked && (
                       <Dropdown
                         size="small"
                         side="bottom"
