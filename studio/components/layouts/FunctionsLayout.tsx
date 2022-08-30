@@ -1,24 +1,40 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
+import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import { IconCode } from '@supabase/ui'
 
-import { useStore, withAuth } from 'hooks'
+import { checkPermissions, useStore, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import BaseLayout from 'components/layouts'
+import NoPermission from 'components/ui/NoPermission'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
+interface Props {
+  title?: string
+  children?: ReactNode
+}
+
+const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const { functions, ui } = useStore()
   const router = useRouter()
 
   const { id, ref } = router.query
 
   useEffect(() => {
-    if (ui.selectedProjectRef) {
-      functions.load()
-    }
+    if (ui.selectedProjectRef) functions.load()
   }, [ui.selectedProjectRef])
+
+  const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  if (!canReadFunctions) {
+    return (
+      <BaseLayout title={title || 'Edge Functions'} product="Edge Functions">
+        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+          <NoPermission isFullPage resourceText="access your project's edge functions" />
+        </main>
+      </BaseLayout>
+    )
+  }
 
   const item = id ? functions.byId(id) : null
   const name = item?.name || ''
@@ -27,7 +43,11 @@ const FunctionsLayout = ({ children }: { children?: React.ReactNode }) => {
   const centered = !hasFunctions
 
   return (
-    <BaseLayout isLoading={!functions.isLoaded}>
+    <BaseLayout
+      isLoading={!functions.isLoaded}
+      title={title || 'Edge Functions'}
+      product="Edge Functions"
+    >
       {centered ? (
         <>
           <div className="mx-auto max-w-5xl py-24 px-5">

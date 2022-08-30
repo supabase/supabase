@@ -52,6 +52,7 @@ const sidebars = {
       type: 'category',
       label: 'Auth (Server Only)',
       items: [
+        'generated/supabase-auth-admin-api',
         'generated/auth-admin-listusers',
         'generated/auth-admin-createuser',
         'generated/auth-admin-deleteuser',

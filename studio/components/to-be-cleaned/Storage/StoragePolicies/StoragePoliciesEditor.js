@@ -4,7 +4,7 @@ import { get } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
 import SqlEditor from 'components/ui/SqlEditor'
-import { PolicyName, PolicyRoles } from 'components/interfaces/Authentication/Policies/PolicyEditor'
+import { PolicyName, PolicyRoles } from 'components/interfaces/Auth/Policies/PolicyEditor'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
