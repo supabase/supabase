@@ -85,7 +85,7 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     }
   }
 
-  if (!canAccessStorage) {
+  if (!isLoading && !canAccessStorage) {
     return (
       <BaseLayout>
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
