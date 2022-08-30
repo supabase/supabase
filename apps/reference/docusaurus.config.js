@@ -102,11 +102,14 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
-        lastVersion: 'current',
+        lastVersion: 'v1',
         versions: {
           current: {
             label: '2.0 RC',
-            path: 'next',
+            path: '/next',
+          },
+          v1: {
+            label: 'v1',
           },
         },
       },
