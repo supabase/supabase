@@ -143,8 +143,8 @@ const StoragePolicies = () => {
 
   return (
     <div className="flex min-h-full w-full flex-col">
-      <h4 className="text-xl">Storage policies</h4>
-      <p className="text-scale-1100">
+      <h3 className="text-xl">Storage policies</h3>
+      <p className="text-scale-1100 text-sm mt-2">
         Safeguard your files with policies that define the operations allowed for your users at the
         bucket level.
       </p>
@@ -179,7 +179,7 @@ const StoragePolicies = () => {
           })}
 
           <div className="!mb-4 w-full border-b border-gray-600" />
-          <p className="text-scale-1000">
+          <p className="text-scale-1000 text-sm">
             You may also write policies for the tables under the storage schema directly for greater
             control
           </p>
