@@ -1,12 +1,14 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconChevronLeft, IconSearch } from '@supabase/ui'
+import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from '@supabase/ui'
 import { PostgresPublication } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import PublicationsTableItem from './PublicationsTableItem'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   selectedPublication: PostgresPublication
@@ -16,6 +18,11 @@ interface Props {
 const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
+
+  const canUpdatePublications = checkPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
+  )
 
   const tables =
     filterString.length === 0
@@ -73,7 +80,14 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
               />
             </div>
           </div>
-          <div className=""></div>
+          {!canUpdatePublications && (
+            <div className="w-[500px]">
+              <InformationBox
+                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                title="You need additional permissions to update database replications"
+              />
+            </div>
+          )}
         </div>
       </div>
       {tables.length === 0 ? (

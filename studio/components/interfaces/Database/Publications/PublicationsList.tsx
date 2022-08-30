@@ -1,11 +1,13 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, Toggle, IconSearch } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Button, Input, Toggle, IconSearch, IconAlertCircle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import InformationBox from 'components/ui/InformationBox'
 
 interface Props {
   onSelectPublication: (id: number) => void
@@ -15,6 +17,17 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
   const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 
+  const canUpdatePublications = checkPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'publications'
+  )
+
+  const publicationEvents = [
+    { event: 'Insert', key: 'publish_insert' },
+    { event: 'Update', key: 'publish_update' },
+    { event: 'Delete', key: 'publish_delete' },
+    { event: 'Truncate', key: 'publish_truncate' },
+  ]
   const publications =
     filterString.length === 0
       ? meta.publications.list()
@@ -51,17 +64,22 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div>
-              <Input
-                size="small"
-                icon={<IconSearch size="tiny" />}
-                placeholder={'Filter'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
+            <Input
+              size="small"
+              icon={<IconSearch size="tiny" />}
+              placeholder={'Filter'}
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+          </div>
+          {!canUpdatePublications && (
+            <div className="w-[500px]">
+              <InformationBox
+                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                title="You need additional permissions to update database replications"
               />
             </div>
-          </div>
-          <div className=""></div>
+          )}
         </div>
       </div>
       {publications.length === 0 ? (
@@ -98,42 +116,20 @@ const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
                 <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
                   {x.id}
                 </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_insert}
-                      onChange={() => toggleListenEvent(x, 'insert', x.publish_insert)}
-                    />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_update}
-                      onChange={() => toggleListenEvent(x, 'update', x.publish_update)}
-                    />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_delete}
-                      onChange={() => toggleListenEvent(x, 'delete', x.publish_delete)}
-                    />
-                  </div>
-                </Table.td>
-                <Table.td>
-                  <div className="flex justify-center">
-                    <Toggle
-                      size="tiny"
-                      checked={x.publish_truncate}
-                      onChange={() => toggleListenEvent(x, 'truncate', x.publish_truncate)}
-                    />
-                  </div>
-                </Table.td>
+                {publicationEvents.map((event) => (
+                  <Table.td key={event.key}>
+                    <div className="flex justify-center">
+                      <Toggle
+                        size="tiny"
+                        checked={x[event.key]}
+                        disabled={!canUpdatePublications}
+                        onChange={() =>
+                          toggleListenEvent(x, event.event.toLowerCase(), x[event.key])
+                        }
+                      />
+                    </div>
+                  </Table.td>
+                ))}
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">
                     <Button

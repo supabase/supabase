@@ -31,12 +31,17 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
 }: PropsWithChildren<Props>) => {
+  const { ui } = useStore()
   const ongoingIncident = useFlag('ongoingIncident')
+
+  const projectName = ui.selectedProject?.name
 
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>
+          {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
+        </title>
         <meta name="description" content="Supabase Studio" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
