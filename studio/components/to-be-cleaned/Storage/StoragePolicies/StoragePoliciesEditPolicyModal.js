@@ -1,4 +1,4 @@
-import { Modal, Typography, IconChevronLeft } from '@supabase/ui'
+import { Modal, IconChevronLeft } from '@supabase/ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 
@@ -177,18 +177,14 @@ const StoragePoliciesEditPolicyModal = ({
             >
               <IconChevronLeft strokeWidth={2} size={14} />
             </span>
-            <Typography.Title level={4} className="m-0">
-              Select a template to use for your new policy
-            </Typography.Title>
+            <h4 className="textlg m-0">Select a template to use for your new policy</h4>
           </div>
         </div>
       )
     }
     return (
       <div className="flex items-center space-x-3">
-        <Typography.Title level={4} className="m-0">
-          {getTitle()}
-        </Typography.Title>
+        <h4 className="text-lg m-0">{getTitle()}</h4>
       </div>
     )
   }

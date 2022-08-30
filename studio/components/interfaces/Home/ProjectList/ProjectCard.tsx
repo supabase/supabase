@@ -27,10 +27,9 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
             <span className="flex-shrink truncate">{name}</span>
           </div>
         }
-        description={''}
         footer={
           <div className="flex items-end justify-between">
-            <span className="text-scale-900 text-sm lowercase">{desc}</span>
+            <span className="text-scale-1000 text-sm lowercase">{desc}</span>
             {isRestoring ? (
               <div className="grow text-right">
                 <Badge color="brand">
@@ -63,7 +62,7 @@ const ProjectCard: FC<Props> = ({ project, rewriteHref }) => {
             )}
           </div>
         }
-      ></CardButton>
+      />
     </li>
   )
 }
