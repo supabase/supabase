@@ -1,0 +1,103 @@
+---
+id: auth-linkedin
+title: 'Login with LinkedIn'
+description: Add LinkedIn OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up LinkedIn logins for your application consists of 3 parts:
+
+- Create and configure a LinkedIn Project and App on the [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
+- Add your LinkedIn `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+
+## Steps
+
+### Access your LinkedIn Developer account
+
+- Go to [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
+- Log in (if necessary.)
+
+![LinkedIn Developer Portal](/img/guides/auth-linkedin/linkedin_developers_page.png)
+
+### Find your callback URL
+
+The next step requires a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Create a LinkedIn OAuth app
+
+- Go to [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
+- Click on `Create App` at the top right
+- Enter your `LinkedIn Page` and `App Logo`
+- Save your app
+- Click `Auth` from the top menu
+- Add your `Redirect URL` to the `Authorized Redirect URLs for your app` section
+- Copy and save your newly-generated `Client ID`
+- Copy and save your newly-generated `Client Secret`
+
+### Enter your LinkedIn credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- In the left sidebar, click the `Authentication` icon (near the top).
+- Click `Settings` from the list to go to the `Authentication Settings` page.
+- Enter the final (hosted) URL of your app under `Site URL` (this is important).
+- Under `External OAuth Providers` turn `LinkedIn Enabled` to ON.
+- Enter your `API Key` (`client_id`) and `API Secret Key` (`client_secret`) saved in the previous step.
+- Click `Save`.
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers).
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'LinkedIn',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithLinkedIn() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'LinkedIn',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)

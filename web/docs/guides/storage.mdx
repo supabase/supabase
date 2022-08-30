@@ -2,6 +2,7 @@
 id: storage
 title: Storage
 description: Use Supabase to store and serve files.
+sidebar_label: Overview
 ---
 
 import Tabs from '@theme/Tabs'
@@ -35,7 +36,7 @@ which you can deploy yourself.
 
 **Note before begin** : File, Folder, and Bucket names **must follow** [AWS Safe Characters naming guideline](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html) and avoid use of any other characters 
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management)
 
 ### Create a bucket
 
@@ -44,28 +45,26 @@ Since the storage is interoperable with your Postgres database, you can also use
 client libraries. Here we create a bucket called "avatars":
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-  {label: 'JavaScript', value: 'JS'},
-  {label: 'Dart', value: 'DART'},
-]}>
-<TabItem value="UI">
+  groupId="storage-tabs"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Dart', value: 'dart'},
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "Storage" section.
-2. Click "Create Bucket".
-3. Enter the bucket name.
-4. Click "Create Bucket".
-```
+1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
+2. Click **New Bucket** and enter a name for the bucket.
+3. Click **Create Bucket**.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/storage/create.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 -- Use Postgres to create a bucket.
@@ -75,7 +74,7 @@ values ('avatars', 'avatars');
 ```
 
 </TabItem>
-<TabItem value="JS">
+<TabItem value="javascript">
 
 ```js
 // Use the JS library to create a bucket.
@@ -86,7 +85,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 [Reference.](/docs/reference/javascript/storage-createbucket)
 
 </TabItem>
-<TabItem value="DART">
+<TabItem value="dart">
 
 ```dart
 void main() async {
@@ -108,27 +107,26 @@ void main() async {
 You can upload a file from the Dashboard, or within a browser using our JS libraries.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'JavaScript', value: 'JS'},
-  {label: 'Dart', value: 'DART'},
-]}>
-<TabItem value="UI">
+  groupId="storage-tabs"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Dart', value: 'dart'},
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "Storage" section.
-2. Select the bucket you want to upload the file into.
-3. Click "Upload File".
-4. Select the file you want to upload in the dialog that appears.
-```
+1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
+2. Select the bucket you want to upload the file to.
+3. Click **Upload File**.
+4. Select the file you want to upload.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/storage/upload.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="JS">
+<TabItem value="javascript">
 
 ```js
 const avatarFile = event.target.files[0]
@@ -140,7 +138,7 @@ const { data, error } = await supabase.storage
 [Reference.](/docs/reference/javascript/storage-from-upload)
 
 </TabItem>
-<TabItem value="DART">
+<TabItem value="dart">
 
 ```dart
 void main() async {
@@ -164,27 +162,26 @@ void main() async {
 You can download a file from the Dashboard, or within a browser using our JS libraries.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'JavaScript', value: 'JS'},
-  {label: 'Dart', value: 'DART'},
-]}>
-<TabItem value="UI">
+  groupId="storage-tabs"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'Dart', value: 'dart'},
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "Storage" section.
+1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket that contains the file.
 3. Select the file that you want to download.
-4. Click the "Download" button.
-```
+4. Click **Download**.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/storage/download.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="JS">
+<TabItem value="javascript">
 
 ```js
 // Use the JS library to create a bucket.
@@ -195,7 +192,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 [Reference.](/docs/reference/javascript/storage-from-download)
 
 </TabItem>
-<TabItem value="DART">
+<TabItem value="dart">
 
 ```dart
 void main() async {
@@ -216,31 +213,30 @@ void main() async {
 To restrict access to your files you can use either the Dashboard or SQL.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'}
-]}>
-<TabItem value="UI">
+  groupId="storage-tabs"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'}
+  ]}>
+<TabItem value="dashboard">
 
-```sh
-1. Go to the "Storage" section.
-2. Click "Policies" in the sidebar.
-3. Click "Add Policies" in the "OBJECTS" table to add policies for Files. You can also create Policies for Buckets.
+1. Go to the [Storage](https://app.supabase.com/project/_/storage/buckets) page in the Dashboard.
+2. Click **Policies** in the sidebar.
+3. Click **Add Policies** in the `OBJECTS` table to add policies for Files. You can also create policies for Buckets.
 4. Choose whether you want the policy to apply to downloads (SELECT), uploads (INSERT), updates (UPDATE), or deletes (DELETE).
 5. Give your policy a unique name.
-6. Write the Policy using SQL.
-```
+6. Write the policy using SQL.
 
 <video width="99%" muted playsInline controls="true">
   <source src="/docs/videos/storage/policies.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
--- Use the SQL to create a policy.
+-- Use SQL to create a policy.
 
 create policy "Public Access"
   on storage.objects for select
@@ -369,15 +365,10 @@ on storage.objects for select
 using ( auth.uid() = owner );
 ```
 
-## Resources
+## See also
 
-- Find the API server on GitHub: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
-- Find the Swagger API Docs online: [supabase.github.io/storage-api](https://supabase.github.io/storage-api)
-- Official client libraries documentation: [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket).
-- Community libraries: [github.com/supabase-community](https://github.com/supabase-community)
-
-## Next steps
-
-- Got a question? [Ask here](https://github.com/supabase/supabase/discussions).
-- Read more about storage in our [blog post](https://supabase.com/blog/2021/03/30/supabase-storage).
-- Sign in: [app.supabase.com](https://app.supabase.com)
+- Read more about Supabase Storage in the [blog post](https://supabase.com/blog/supabase-storage)
+- [Supabase Storage on GitHub](https://github.com/supabase/storage-api)
+- [Swagger API documentation](https://supabase.github.io/storage-api)
+- Official [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket) documentation
+- [Community libraries](https://github.com/supabase-community)

@@ -22,7 +22,7 @@ export default class PublicationStore extends PostgresMetaInterface<any> {
    * Will recreate a publication.
    * This is required if switching from "ALL TABLES" to individual tables.
    */
-  async recreate(id: any) {
+  async recreate(id: any, tables: string[] = []) {
     let currentPublication = this.byId(id)
     let payload: any = {
       name: currentPublication.name,
@@ -31,9 +31,9 @@ export default class PublicationStore extends PostgresMetaInterface<any> {
       publish_delete: currentPublication.publish_delete,
       publish_truncate: currentPublication.publish_truncate,
     }
-    if (currentPublication.tables == null) {
+    if (currentPublication.tables === null) {
       // Previously was "ALL TABLES"
-      payload.tables = []
+      payload.tables = tables
     }
     const deleted: any = await this.del(id)
     if (deleted.error) {

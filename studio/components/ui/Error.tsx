@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Button, Typography } from '@supabase/ui'
+import { Button } from '@supabase/ui'
 
 export default function EmptyPageState({ error }: any) {
   useEffect(() => {
@@ -8,13 +8,13 @@ export default function EmptyPageState({ error }: any) {
   }, [])
 
   return (
-    <div className="w-full h-full flex flex-col space-y-6 items-center justify-center mx-auto">
-      <div className="w-[320px] flex flex-col items-center justify-center space-y-3">
-        <Typography.Title level={3}>Something went wrong 🤕</Typography.Title>
-        <Typography.Text className="text-center">
+    <div className="mx-auto flex h-full w-full flex-col items-center justify-center space-y-6">
+      <div className="flex w-[320px] flex-col items-center justify-center space-y-3">
+        <h4 className="text-lg">Something went wrong 🤕</h4>
+        <p className="text-scale-1100 text-center text-sm">
           Sorry about that, please try again later or feel free to reach out to us if the problem
           persists.
-        </Typography.Text>
+        </p>
       </div>
       <div className="flex items-center space-x-4">
         <Link href="/">
@@ -28,9 +28,9 @@ export default function EmptyPageState({ error }: any) {
           </a>
         </Link>
       </div>
-      <Typography.Text type="secondary" small>
+      <p className="text-scale-1100 text-sm">
         Error: [{error?.code}] {error?.message}
-      </Typography.Text>
+      </p>
     </div>
   )
 }

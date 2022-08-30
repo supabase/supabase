@@ -1,12 +1,14 @@
 import { FC, ReactNode, useState, useEffect } from 'react'
+import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { PostgresTable } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import Error from 'components/ui/Error'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
-import { isUndefined } from 'lodash'
+import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
   selectedSchema?: string
@@ -31,12 +33,14 @@ const TableEditorLayout: FC<Props> = ({
   const { isInitialized, isLoading, error } = meta.tables
 
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
+  const canReadTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   useEffect(() => {
     if (ui.selectedProject) {
       meta.schemas.load()
       meta.tables.load()
       meta.types.load()
+      meta.policies.load()
       meta.publications.load()
     }
   }, [ui.selectedProject])
@@ -50,6 +54,14 @@ const TableEditorLayout: FC<Props> = ({
       cancel = true
     }
   }, [isLoading])
+
+  if (!canReadTables) {
+    return (
+      <ProjectLayout>
+        <NoPermission isFullPage resourceText="view tables from this project" />
+      </ProjectLayout>
+    )
+  }
 
   if (error) {
     return (

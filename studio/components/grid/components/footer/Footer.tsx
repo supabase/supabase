@@ -1,7 +1,7 @@
-import * as React from 'react';
-import Pagination from './pagination';
+import * as React from 'react'
+import Pagination from './pagination'
 
-type FooterProps = {};
+type FooterProps = {}
 
 const Footer: React.FC<FooterProps> = () => {
   return (
@@ -10,6 +10,6 @@ const Footer: React.FC<FooterProps> = () => {
         <Pagination />
       </div>
     </div>
-  );
-};
-export default Footer;
+  )
+}
+export default Footer

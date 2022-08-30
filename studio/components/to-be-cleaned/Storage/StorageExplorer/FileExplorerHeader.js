@@ -15,7 +15,7 @@ import {
   IconX,
   IconEdit2,
   IconLoader,
-  Typography, IconChevronsUp,
+  IconChevronsUp,
 } from '@supabase/ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
@@ -28,18 +28,12 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
     >
       {loading.isLoading ? (
         <div className="ml-2 flex items-center">
-          <Typography.Text>
-            <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-          </Typography.Text>
-          <Typography.Text>
-            <p className="ml-3 text-sm">{loading.message}</p>
-          </Typography.Text>
+          <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+          <p className="ml-3 text-sm">{loading.message}</p>
         </div>
       ) : (
         <div className="flex cursor-pointer items-center">
-          <Typography.Text>
-            <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
-          </Typography.Text>
+          <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
             <Button type="text" icon={<IconEdit2 />}>
               Navigate
@@ -74,32 +68,22 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
 
   return loading.isLoading ? (
     <div className="ml-2 flex items-center">
-      <Typography.Text>
-        <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-      </Typography.Text>
-      <Typography.Text>
-        <p className="ml-3 text-sm">{loading.message}</p>
-      </Typography.Text>
+      <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+      <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
     <div className="ml-3 flex items-center">
       {formattedBreadcrumbs.map((crumb, idx) => (
         <div className="flex items-center" key={crumb.name}>
-          {idx !== 0 && (
-            <Typography.Text>
-              <IconChevronRight size={10} strokeWidth={2} className="mx-3" />
-            </Typography.Text>
-          )}
-          <Typography.Text>
-            <p
-              key={crumb.name}
-              className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
-              style={{ maxWidth: '6rem' }}
-              onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
-            >
-              {crumb.name}
-            </p>
-          </Typography.Text>
+          {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
+          <p
+            key={crumb.name}
+            className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
+            style={{ maxWidth: '6rem' }}
+            onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
+          >
+            {crumb.name}
+          </p>
         </div>
       ))}
     </div>
@@ -310,15 +294,11 @@ const FileExplorerHeader = ({
           <Dropdown
             overlay={[
               <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={onChangeSortBy}>
-                <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Sort by name</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>
-                  Sort by last created
-                </Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>
-                  Sort by last modified
-                </Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Name</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>Time created</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>Time modified</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
-                  Sort by last accessed
+                  Time last accessed
                 </Dropdown.Radio>
               </Dropdown.RadioGroup>,
             ]}
@@ -329,12 +309,16 @@ const FileExplorerHeader = ({
               type="text"
               disabled={breadcrumbs.length === 0}
             >
-              Sort
+              Sort by
             </Button>
           </Dropdown>
           <Dropdown
             overlay={[
-              <Dropdown.RadioGroup key="sortOrderOptions" value={sortByOrder} onChange={onChangeSortByOrder}>
+              <Dropdown.RadioGroup
+                key="sortOrderOptions"
+                value={sortByOrder}
+                onChange={onChangeSortByOrder}
+              >
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Asc</Dropdown.Radio>
                 <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Desc</Dropdown.Radio>
               </Dropdown.RadioGroup>,
@@ -342,7 +326,13 @@ const FileExplorerHeader = ({
           >
             <Button
               as="span"
-              icon={sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? <IconChevronsDown size={16} strokeWidth={2} />  : <IconChevronsUp size={16} strokeWidth={2} />}
+              icon={
+                sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
+                  <IconChevronsDown size={16} strokeWidth={2} />
+                ) : (
+                  <IconChevronsUp size={16} strokeWidth={2} />
+                )
+              }
               type="text"
               disabled={breadcrumbs.length === 0}
             >
@@ -361,7 +351,7 @@ const FileExplorerHeader = ({
             disabled={breadcrumbs.length === 0}
             onClick={onSelectUpload}
           >
-            Upload file
+            Upload files
           </Button>
           <Button
             icon={<IconFolderPlus size={16} strokeWidth={2} />}

@@ -26,10 +26,14 @@ const useLogsQuery = (
 ): [Data, Handlers] => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
-    sql: '',
+    sql: initialParams?.sql || '',
     project: projectRef,
-    iso_timestamp_start: initialParams.iso_timestamp_start ? initialParams.iso_timestamp_start :  defaultHelper.calcFrom(),
-    iso_timestamp_end: initialParams.iso_timestamp_end ? initialParams.iso_timestamp_end :  defaultHelper.calcTo(),
+    iso_timestamp_start: initialParams.iso_timestamp_start
+      ? initialParams.iso_timestamp_start
+      : defaultHelper.calcFrom(),
+    iso_timestamp_end: initialParams.iso_timestamp_end
+      ? initialParams.iso_timestamp_end
+      : defaultHelper.calcTo(),
   })
 
   const queryParams = genQueryParams(params as any)

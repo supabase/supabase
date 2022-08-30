@@ -1,13 +1,13 @@
-import React, { FC } from 'react'
 import Link from 'next/link'
+import { FC } from 'react'
+import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { isUndefined } from 'lodash'
-import { Button, IconHome, Dropdown, IconUser, IconSettings } from '@supabase/ui'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
 
+import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { useStore, useFlag } from 'hooks'
-import { generateProductRoutes, generateOtherRoutes } from './NavigationBar.utils'
+import { generateOtherRoutes, generateProductRoutes } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
 interface Props {}

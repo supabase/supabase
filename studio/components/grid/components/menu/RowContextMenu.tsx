@@ -1,71 +1,69 @@
-import * as React from 'react';
-import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify';
-import { IconTrash, IconClipboard, IconEdit } from '@supabase/ui';
-import { useDispatch, useTrackedState } from '../../store';
-import { formatClipboardValue, copyToClipboard } from '../../utils';
-import { showConfirmAlert } from '../common';
+import * as React from 'react'
+import { Menu, Item, ItemParams, PredicateParams } from 'react-contexify'
+import { IconTrash, IconClipboard, IconEdit } from '@supabase/ui'
+import { useDispatch, useTrackedState } from '../../store'
+import { formatClipboardValue, copyToClipboard } from '../../utils'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 
-export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id';
+export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
-type RowContextMenuProps = {};
+type RowContextMenuProps = {}
 
 const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
-  const state = useTrackedState();
-  const dispatch = useDispatch();
+  const state = useTrackedState()
+  const dispatch = useDispatch()
 
   function onDeleteRow(p: ItemParams) {
-    showConfirmAlert({
+    confirmAlert({
       title: 'Confirm to delete',
-      message:
-        'Are you sure you want to delete this row? This action cannot be undone.',
+      message: 'Are you sure you want to delete this row? This action cannot be undone.',
       onConfirm: async () => {
-        const { props } = p;
-        const { rowIdx } = props;
-        const row = state.rows[rowIdx];
-        const { error } = state.rowService!.delete([row]);
+        const { props } = p
+        const { rowIdx } = props
+        const row = state.rows[rowIdx]
+        const { error } = state.rowService!.delete([row])
         if (error) {
-          if (state.onError) state.onError(error);
+          if (state.onError) state.onError(error)
         } else {
-          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } });
+          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
           dispatch({
             type: 'SELECTED_ROWS_CHANGE',
             payload: { selectedRows: new Set() },
-          });
+          })
         }
       },
-    });
+    })
   }
 
   function onEditRowClick(p: ItemParams) {
-    const { props } = p;
-    const { rowIdx } = props;
-    const row = state.rows[rowIdx];
-    if (state.onEditRow) state.onEditRow(row);
+    const { props } = p
+    const { rowIdx } = props
+    const row = state.rows[rowIdx]
+    if (state.onEditRow) state.onEditRow(row)
   }
 
   function isItemHidden({ data }: PredicateParams) {
-    if (data === 'edit') return state.onEditRow == undefined;
-    if (data === 'delete') return !state.editable;
-    return false;
+    if (data === 'edit') return state.onEditRow == undefined
+    if (data === 'delete') return !state.editable
+    return false
   }
 
   function onCopyCellContent(p: ItemParams) {
-    const { props } = p;
+    const { props } = p
 
     if (!state.selectedCellPosition || !props) {
-      return;
+      return
     }
 
-    const { rowIdx } = props;
-    const row = state.rows[rowIdx];
+    const { rowIdx } = props
+    const row = state.rows[rowIdx]
 
-    const columnKey =
-      state.gridColumns[state.selectedCellPosition?.idx as number].key;
+    const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
-    const value = row[columnKey];
-    const text = formatClipboardValue(value);
+    const value = row[columnKey]
+    const text = formatClipboardValue(value)
 
-    copyToClipboard(text);
+    copyToClipboard(text)
   }
 
   return (
@@ -85,6 +83,6 @@ const RowContextMenu: React.FC<RowContextMenuProps> = ({}) => {
         </Item>
       </Menu>
     </>
-  );
-};
-export default RowContextMenu;
+  )
+}
+export default RowContextMenu

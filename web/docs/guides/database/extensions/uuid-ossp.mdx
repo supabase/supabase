@@ -17,40 +17,42 @@ This makes them particularly well suited as Primary Keys. It is occasionally ref
 
 ## Usage
 
-### Enabling
+### Enable the extension
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the Database page.
-2. Click on "Extensions" in the sidebar.
-3. Search for "uuid-ossp".
-4. Click the toggle.
-```
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "uuid-ossp" and enable the extension.
+
+**Note**:
+Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
-```sql 
-
+```sql
 -- Example: enable the "uuid-ossp" extension 
 create extension "uuid-ossp" with schema extensions;
 
 -- Example: disable the "uuid-ossp" extension 
 drop extension if exists "uuid-ossp";
-
 ```
 
 Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". 
-To disable an extension you can call `drop extension`.
+To disable an extension, call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep your database clean.
+
+**Note**:
+Currently `uuid-ossp` extension is enabled by default and cannot be disabled.
 
 </TabItem>
 
@@ -93,4 +95,4 @@ create table contacts (
 
 ## Resources 
 
-- [The Basics Of PostgreSQL `UUID` Data Type](https://www.postgresqltutorial.com/postgresql-uuid/).
+- [The Basics Of PostgreSQL `UUID` Data Type](https://www.postgresqltutorial.com/postgresql-uuid/)

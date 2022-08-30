@@ -1,0 +1,62 @@
+---
+id: upsert
+title: 'Upsert data: upsert()'
+slug: /upsert
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Performs an UPSERT into the table.
+
+```dart
+final res = await supabase
+  .from('messages')
+  .upsert({ 'id': 3, 'message': 'foo', 'username': 'supabot' })
+  .execute();
+```
+
+## Notes
+
+- Primary keys should be included in the data payload in order for an update to work correctly.
+- Primary keys must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
+
+## Examples
+
+### Upsert your data
+
+```dart
+final res = await supabase
+  .from('messages')
+  .upsert({ 'id': 3, 'message': 'foo', 'username': 'supabot' })
+  .execute();
+```
+
+### Upserting into tables with constraints
+
+Running the following will cause supabase to upsert data into the `users` table.
+If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+based on the column passed into `onConflict`.
+
+```dart
+final res = await supabase
+  .from('users')
+  .upsert({ 'username': 'supabot' }, { 'onConflict': 'username' })
+  .execute();
+```
+
+### Return the exact number of rows
+
+Allowed values for count option are `exact`, `planned` and `estimated`.
+
+```dart
+final res = await supabase
+  .from('users')
+  .upsert({
+      'id': 3,
+      'message': 'foo',
+      'username': 'supabot'
+  })
+  .execute(count: CountOption.exact);
+```

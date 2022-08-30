@@ -24,7 +24,7 @@ const BlogListItem = ({ post }: Props) => {
 
   return (
     <div>
-      <a href={`/blog/${post.url}`}>
+      <a href={`${post.path}`}>
         <div className="group inline-block min-w-full">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
@@ -42,6 +42,7 @@ const BlogListItem = ({ post }: Props) => {
                   }
                   objectFit="cover"
                   className="scale-100 transform duration-100 ease-in group-hover:scale-105"
+                  alt="case study thumbnail"
                 />
               </div>
 

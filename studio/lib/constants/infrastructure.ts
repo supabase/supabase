@@ -18,7 +18,8 @@ export const REGIONS = {
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
 }
 
-export const REGIONS_DEFAULT = REGIONS.EAST_US
+export const REGIONS_DEFAULT =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? REGIONS.SOUTHEAST_ASIA : REGIONS.EAST_US
 
 export const PRICING_TIER_LABELS = {
   FREE: 'Free',
@@ -139,7 +140,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 }
 
 export const DEFAULT_FREE_PROJECTS_LIMIT = 2
-
-export const STORAGE_FILE_SIZE_LIMIT_MAX_BYTES = 5 * 1024 * 1024 * 1024 // 5 GB
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1

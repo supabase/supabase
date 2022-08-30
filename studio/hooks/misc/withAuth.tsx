@@ -1,8 +1,8 @@
-import { useProfile, useStore } from 'hooks'
-import { ComponentType, useEffect, useState } from 'react'
+import { ComponentType, useEffect } from 'react'
 import { NextRouter, useRouter } from 'next/router'
+
 import { IS_PLATFORM } from 'lib/constants'
-import Connecting from 'components/ui/Loading'
+import { useProfile, useStore, usePermissions } from 'hooks'
 
 const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
 
@@ -16,7 +16,6 @@ export function withAuth<T>(
   return (props: any) => {
     const router = useRouter()
     const rootStore = useStore()
-    const [isConnecting, setConnecting] = useState(true)
 
     const { ref, slug } = router.query
     const { app, ui } = rootStore
@@ -28,6 +27,7 @@ export function withAuth<T>(
     const returning =
       app.projects.isInitialized && app.organizations.isInitialized ? 'minimal' : undefined
     const { profile, isLoading } = useProfile(returning)
+    const { permissions, isLoading: isPermissionLoading } = usePermissions(returning)
 
     const isAccessingBlockedPage = !IS_PLATFORM && PLATFORM_ONLY_PAGES.includes(page)
     const isRedirecting =
@@ -35,7 +35,7 @@ export function withAuth<T>(
       checkRedirectTo(isLoading, router, profile, redirectTo, redirectIfFound)
 
     useEffect(() => {
-      // this should run before redirecting
+      // This should run before redirecting
       if (!isLoading) {
         if (!profile) {
           ui.setProfile(undefined)
@@ -51,11 +51,15 @@ export function withAuth<T>(
         }
       }
 
-      // this should run after setting store data
+      if (!isPermissionLoading) {
+        ui.setPermissions(permissions)
+      }
+
+      // This should run after setting store data
       if (isRedirecting) {
         router.push(redirectTo)
       }
-    }, [isLoading, isRedirecting, profile])
+    }, [isLoading, isPermissionLoading, isRedirecting, profile, permissions])
 
     useEffect(() => {
       if (!isLoading && router.isReady) {
@@ -63,14 +67,6 @@ export function withAuth<T>(
         rootStore.setOrganizationSlug(slug ? String(slug) : undefined)
       }
     }, [isLoading, router.isReady, ref, slug])
-
-    useEffect(() => {
-      if (!isLoading && !isRedirecting && router.isReady) {
-        setConnecting(false)
-      }
-    }, [isLoading, isRedirecting, router.isReady])
-
-    if (isConnecting) return <Connecting />
 
     return <WrappedComponent {...props} />
   }

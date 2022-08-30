@@ -1,0 +1,105 @@
+---
+id: invoke
+title: 'invoke()'
+slug: invoke
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Invokes a Supabase Function.
+
+```js
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  body: JSON.stringify({ foo: 'bar' }),
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      functionName
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+the name of the function to invoke
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      invokeOptions
+    </span>
+    <span className="method-list-item-label-badge false">
+      optional
+    </span>
+    <span className="method-list-item-validation">
+      <code>FunctionInvokeOptions</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+object with the following properties
+`headers`: object representing the headers to send with the request
+`body`: the body of the request
+`responseType`: how the response should be parsed. The default is `json`
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Requires an Authorization header.
+- Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+
+## Examples
+
+### Basic invocation.
+
+```js
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  body: JSON.stringify({ foo: 'bar' }),
+})
+```
+
+### Specifying response type.
+
+By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+
+```js
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  responseType: 'text',
+  body: JSON.stringify({ foo: 'bar' }),
+})
+```
+
+### Parsing custom headers.
+
+You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+
+```js
+const { data: user, error } = await supabase.functions.invoke('hello', {
+  headers: {
+    'my-custom-header': 'my-custom-header-value',
+  },
+  body: JSON.stringify({ foo: 'bar' }),
+})
+```

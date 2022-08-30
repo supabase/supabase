@@ -15,6 +15,7 @@ interface IGrid extends GridProps {
   rows: any[]
 }
 
+// [Joshen] Just for visibility this is causing some hook errors in the browser
 export const Grid = memo(
   forwardRef<DataGridHandle, IGrid>(
     (

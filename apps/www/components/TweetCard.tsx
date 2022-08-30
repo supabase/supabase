@@ -23,7 +23,13 @@ function TweetCard(props: TweetCard) {
       <div className="relative">
         <div className="flex items-center gap-2">
           <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
-            <Image src={props.img_url} layout="responsive" width="64" height="64" />
+            <Image
+              src={props.img_url}
+              layout="responsive"
+              width="64"
+              height="64"
+              alt={`${props.handle} twitter image`}
+            />
           </div>
           <p className="text-scale-1200 mt-3 text-sm font-medium">{props.handle}</p>
           <div
