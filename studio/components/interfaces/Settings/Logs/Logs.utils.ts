@@ -168,13 +168,13 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
   `select id, timestamp, event_message, metadata from ${table} where id = '${id}' limit 1`
 
 /**
- * Determine if we should show the user an updgrade prompt while browsing logs
+ * Determine if we should show the user an upgrade prompt while browsing logs
  *
  * There's only 1440 minutes in a day, but when we select "Last day" from the dropdown,
  * it will set that to mean yesterday at midnight.
  * So the max possible time from that midnight to the upcoming midnight is 2880
  */
-export const maybeShowUpgradePrompt = (from: any) => {
+export const maybeShowUpgradePrompt = (from: string) => {
   const toTime = dayjs()
   const fromTime = dayjs(from)
   const hours = toTime.diff(fromTime, 'minutes')
