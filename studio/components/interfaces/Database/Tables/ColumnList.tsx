@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import {
   Input,
   Button,
-  Typography,
   IconSearch,
   IconPlus,
   IconChevronLeft,
@@ -110,20 +109,16 @@ const ColumnList: FC<{
             body={columns.map((x: any, i: number) => (
               <Table.tr className="border-t" key={x.name}>
                 <Table.td>
-                  <Typography.Text>{x.name}</Typography.Text>
+                  <p>{x.name}</p>
                 </Table.td>
                 <Table.td>
-                  <Typography.Text>{x.comment}</Typography.Text>
+                  <p>{x.comment}</p>
                 </Table.td>
                 <Table.td>
-                  <Typography.Text small code>
-                    {x.data_type}
-                  </Typography.Text>
+                  <code className="text-sm">{x.data_type}</code>
                 </Table.td>
                 <Table.td className="font-mono text-xs">
-                  <Typography.Text small code>
-                    {x.format}
-                  </Typography.Text>
+                  <code className="text-sm">{x.format}</code>
                 </Table.td>
                 <Table.td className="px-4 py-3 pr-2">
                   <div className="flex justify-end gap-2">

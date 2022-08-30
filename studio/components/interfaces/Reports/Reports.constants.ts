@@ -2,6 +2,8 @@ import dayjs from 'dayjs'
 import { DatetimeHelper } from '../Settings/Logs'
 import { Presets } from './Reports.types'
 
+export const LAYOUT_COLUMN_COUNT = 24
+
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
     text: 'Last 7 days',

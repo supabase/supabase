@@ -6,6 +6,8 @@ name: Docs Compilation Check
 on:
   push:
     branches: [master]
+    paths:
+      - 'apps/reference/**'
   pull_request:
     branches: [master]
     paths:
@@ -38,10 +40,6 @@ jobs:
       - name: Install Deps
         run: npm ci
         working-directory: ./apps/reference
-
-      - name: Pull Specs
-        run: make
-        working-directory: ./spec
 
       - name: Build
         run: npm run build

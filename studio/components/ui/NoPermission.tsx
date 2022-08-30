@@ -36,7 +36,7 @@ const NoPermission: FC<Props> = ({ resourceText, isFullPage = false }) => {
   if (isFullPage) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="w-[500px]">
+        <div className="w-[550px]">
           <NoPermissionMessage />
         </div>
       </div>
