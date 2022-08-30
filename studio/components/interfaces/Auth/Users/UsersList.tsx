@@ -29,17 +29,6 @@ const UsersList = ({}) => {
         }
         body={
           <>
-            {PageState.usersLoading && (
-              <Table.tr>
-                {/* @ts-ignore */}
-                <Table.td
-                  colSpan={7}
-                  className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
-                >
-                  <p className="text-scale-1000">Retrieving users</p>
-                </Table.td>
-              </Table.tr>
-            )}
             {!PageState.usersLoading && PageState.users.length == 0 && (
               <Table.tr>
                 {/* @ts-ignore */}
