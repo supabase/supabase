@@ -105,7 +105,7 @@ const config = {
         lastVersion: 'v1',
         versions: {
           current: {
-            label: '2.0 RC',
+            label: 'v2 RC',
             path: '/next',
           },
           v1: {
