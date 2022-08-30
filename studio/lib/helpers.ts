@@ -168,6 +168,10 @@ export async function passwordStrength(value: string) {
   let strength = 0
 
   if (value && value !== '') {
+    if(value.length > 99){
+      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
+      warning = `Password should be less than 100 characters`
+    } else {
     const response = await post(`${API_URL}/profile/password-check`, { password: value })
     if (!response.error) {
       const { result } = response
@@ -188,6 +192,7 @@ export async function passwordStrength(value: string) {
       }
     }
   }
+}
 
   return {
     message,
