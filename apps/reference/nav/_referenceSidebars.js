@@ -249,7 +249,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
-          href: '/reference/javascript',
+          href: '/reference/javascript/next',
         },
         {
           type: 'link',
