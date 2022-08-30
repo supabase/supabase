@@ -247,10 +247,10 @@ export const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({
   )
   const { subscription, isLoading: loading, error } = useProjectSubscription(projectRef)
   const stats: UsageStats = {
-    authUsers: Number(apiStats?.authUsers),
-    bucketSize: Number(apiStats?.bucketSize),
-    dbSize: Number(apiStats?.dbSize),
-    dbTables: Number(apiStats?.dbTables),
+    authUsers: Number(apiStats?.authUsers ?? 0),
+    bucketSize: Number(apiStats?.bucketSize ?? 0),
+    dbSize: Number(apiStats?.dbSize ?? 0),
+    dbTables: Number(apiStats?.dbTables ?? 0),
   }
 
   if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG) {
