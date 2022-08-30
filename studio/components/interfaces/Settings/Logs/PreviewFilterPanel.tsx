@@ -8,18 +8,11 @@ import {
   IconEye,
   IconEyeOff,
 } from '@supabase/ui'
-import {
-  Filters,
-  LogSearchCallback,
-  LogTemplate,
-  maybeShowUpgradePrompt,
-  PREVIEWER_DATEPICKER_HELPERS,
-} from '.'
+import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
 import DatePickers from './Logs.DatePickers'
 import CSVButton from 'components/ui/CSVButton'
-import { StripeSubscription } from 'components/interfaces/Billing'
 
 interface Props {
   defaultSearchValue?: string
@@ -39,9 +32,6 @@ interface Props {
   csvData?: unknown[]
   onFiltersChange: (filters: Filters) => void
   filters: Filters
-  tier: StripeSubscription['tier']['key']
-  showUpgradePrompt: boolean
-  setShowUpgradePrompt: (showUpgradePrompt: boolean) => void
 }
 
 /**
@@ -63,9 +53,6 @@ const PreviewFilterPanel: FC<Props> = ({
   onFiltersChange,
   filters,
   table,
-  tier,
-  showUpgradePrompt,
-  setShowUpgradePrompt,
 }) => {
   const [search, setSearch] = useState('')
 
