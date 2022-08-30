@@ -50,7 +50,15 @@ const StoragePoliciesEditPolicyModal = ({
 
   /* Methods to determine which step to show */
   const onViewIntro = () => setView(POLICY_MODAL_VIEWS.SELECTION)
-  const onViewEditor = () => setView(POLICY_MODAL_VIEWS.EDITOR)
+  const onViewEditor = (state) => {
+    if (state === 'new') {
+      setPolicyFormFields({
+        ...policyFormFields,
+        definition: `bucket_id = '${bucketName}'`,
+      })
+    }
+    setView(POLICY_MODAL_VIEWS.EDITOR)
+  }
   const onViewTemplates = () => {
     setPreviousView(view)
     setView(POLICY_MODAL_VIEWS.TEMPLATES)
@@ -211,7 +219,7 @@ const StoragePoliciesEditPolicyModal = ({
           <PolicySelection
             description="PostgreSQL policies control access to your files and folders"
             onViewTemplates={onViewTemplates}
-            onViewEditor={onViewEditor}
+            onViewEditor={() => onViewEditor('new')}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
