@@ -24,8 +24,8 @@ import {
   maybeShowUpgradePrompt,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useProjectSubscription } from 'hooks'
+
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -34,17 +34,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>('')
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState<boolean>(false)
-
   const { content } = useStore()
-  const { subscription } = useProjectSubscription(ref as string)
-  const tier = subscription?.tier
-
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
       iso_timestamp_end: ite ? (ite as string) : undefined,
     })
+
+  const { UpgradePrompt, showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
+    params.iso_timestamp_start
+  )
 
   useEffect(() => {
     // on mount, set initial values
@@ -115,7 +114,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
     const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
 
-    if (shouldShowUpgradePrompt && tier?.key === 'FREE') {
+    if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
     }
 
@@ -167,14 +166,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
-          <div className="mt-2 flex flex-row justify-end">
-            <UpgradePrompt
-              projectRef={ref as string}
-              from={params.iso_timestamp_start || ''}
-              showUpgradePrompt={showUpgradePrompt}
-              setShowUpgradePrompt={setShowUpgradePrompt}
-            />
-          </div>
+          <div className="mt-2 flex flex-row justify-end">{UpgradePrompt}</div>
         </div>
       </div>
       <Modal
