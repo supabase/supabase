@@ -486,8 +486,8 @@ pages:
         .update({ password: new_password })
       ```
     examples:
-      - name: Reset Password (React)
-        isSpotlight: false
+      - name: Reset password (React)
+        isSpotlight: true
         js: |
           ```js
           /**
