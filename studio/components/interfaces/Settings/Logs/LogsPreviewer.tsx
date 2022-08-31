@@ -117,7 +117,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
