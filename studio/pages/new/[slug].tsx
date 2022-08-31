@@ -41,6 +41,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const enablePermissions = useFlag('enablePermissions')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const kpsDisabled = useFlag('initWithoutKps')
   const subscriptionStats = useSubscriptionStats()
 
   const [projectName, setProjectName] = useState('')
@@ -163,6 +164,7 @@ const Wizard: NextPageWithLayout = () => {
       db_pass: dbPass,
       db_region: dbRegion,
       db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbPricingTierKey],
+      kps_disabled: kpsDisabled,
     }
     const response = await post(`${API_URL}/projects`, data)
     if (response.error) {
