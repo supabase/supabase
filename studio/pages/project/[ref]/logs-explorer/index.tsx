@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useProjectSubscription, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { NextPageWithLayout, UserContent } from 'types'
 import { uuidv4 } from 'lib/helpers'
@@ -24,7 +24,6 @@ import {
   maybeShowUpgradePrompt,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
-
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
@@ -35,6 +34,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const { content } = useStore()
+  const { subscription } = useProjectSubscription(ref as string)
+  const tier = subscription?.tier
+
   const [{ params, logData, error, isLoading }, { changeQuery, runQuery, setParams }] =
     useLogsQuery(ref as string, {
       iso_timestamp_start: its ? (its as string) : undefined,
@@ -112,7 +114,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)

@@ -1,6 +1,7 @@
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
+import { StripeSubscription } from 'components/interfaces/Billing'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -169,14 +170,14 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
 
 /**
  * Determine if we should show the user an upgrade prompt while browsing logs
- *
- * There's only 1440 minutes in a day, but when we select "Last day" from the dropdown,
- * it will set that to mean yesterday at midnight.
- * So the max possible time from that midnight to the upcoming midnight is 2880
  */
-export const maybeShowUpgradePrompt = (from: string | null | undefined) => {
+export const maybeShowUpgradePrompt = (
+  from: string | null | undefined,
+  tier: StripeSubscription['tier'] | undefined
+) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
-  return day > 1
+
+  return day > 1 && tier?.key === 'FREE'
 }
 
 export const genCountQuery = (table: string): string => `SELECT count(*) as count FROM ${table}`
