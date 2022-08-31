@@ -209,18 +209,19 @@ const FileExplorerRow = ({
       }}
     >
       <div
-        className={`
-        storage-row px-2.5 flex items-center justify-between hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark
-        ${isOpened ? 'bg-scale-400' : ''} ${
-          isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''
-        } ${view === STORAGE_VIEWS.LIST ? 'min-w-min' : ''}
-        ${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}
-      `}
+        className={[
+          'storage-row px-2.5 flex items-center justify-between group',
+          'hover:bg-panel-footer-light dark:hover:bg-panel-footer-dark',
+          `${isOpened ? 'bg-scale-400' : ''}`,
+          `${isPreviewed ? 'bg-green-500 hover:bg-green-500 dark:hover:bg-green-500' : ''}`,
+          `${view === STORAGE_VIEWS.LIST ? 'min-w-min' : ''}`,
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
+        ].join(' ')}
       >
         <div className="w-full flex flex-grow items-center">
           {/* Row Checkbox / Row Icon */}
           <div
-            className="relative group"
+            className="relative"
             style={{ minWidth: view === STORAGE_VIEWS.COLUMNS ? '10%' : 'auto' }}
             onClick={(event) => event.stopPropagation()}
           >
