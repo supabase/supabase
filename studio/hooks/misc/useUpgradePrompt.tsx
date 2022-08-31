@@ -12,7 +12,7 @@ export const useUpgradePrompt = (from: any) => {
   const tier = subscription?.tier
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from)
+  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

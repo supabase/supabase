@@ -197,22 +197,24 @@ test('custom sql querying', async () => {
   // should not see chronological features
   await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
-test('datepicker interaction updates query params', async () => {
+test.only('datepicker interaction updates query params', async () => {
   render(<LogsExplorerPage />)
   clickDropdown(await screen.findByText(/Last 24 hours/))
   userEvent.click(await screen.findByText(/Last 3 days/))
 
-  // [Terry] — need to figure out how to fix this test.
-  // If these datepickers show the upgrade prompt, the url won't change
-  //const router = useRouter()
-  //expect(router.push).toBeCalled()
-  // expect(router.push).not.toBeCalledWith(
-  //   expect.objectContaining({
-  //     query: expect.objectContaining({
-  //       its: expect.any(String),
-  //     }),
-  //   })
-  // )
+  // Not sure how to mock this
+  const tier = 'FREE'
+  if (tier !== 'FREE') {
+    const router = useRouter()
+    expect(router.push).toBeCalled()
+    expect(router.push).not.toBeCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          its: expect.any(String),
+        }),
+      })
+    )
+  }
 })
 
 test('query warnings', async () => {
