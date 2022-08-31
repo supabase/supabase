@@ -28,11 +28,11 @@ export const UserReportPage: NextPageWithLayout = () => {
     subject: { id: ui.profile?.id },
   })
 
-  const kpsDisabled = useFlag('initWithoutKps')
+  const kpsEnabled = useFlag('initWithKps')
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_disabled: kpsDisabled })
+      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
   }, [project])
 
