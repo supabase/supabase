@@ -67,7 +67,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   if (hasValidKeywords && hasVerifiedValue) {
     if (verified === 'verified') {
       queryCount = SqlString.format(
-        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) email ilike ?;',
+        'SELECT count(*)  from auth.users WHERE (email_confirmed_at IS NOT NULL or phone_confirmed_at IS NOT NULL) AND email ilike ?;',
         [`%${keywords}%`]
       )
       queryUsers = SqlString.format(
