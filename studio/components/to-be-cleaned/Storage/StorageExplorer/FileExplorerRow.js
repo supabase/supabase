@@ -220,11 +220,7 @@ const FileExplorerRow = ({
       >
         <div className="w-full flex flex-grow items-center">
           {/* Row Checkbox / Row Icon */}
-          <div
-            className="relative"
-            style={{ minWidth: view === STORAGE_VIEWS.COLUMNS ? '10%' : 'auto' }}
-            onClick={(event) => event.stopPropagation()}
-          >
+          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
             {!isSelected && (
               <div
                 className={`absolute ${
@@ -252,7 +248,7 @@ const FileExplorerRow = ({
 
           {/* Row Text */}
           <div
-            className="flex items-center h-full py-2"
+            className="flex items-center h-full py-2 flex-grow"
             style={{ width: view === STORAGE_VIEWS.COLUMNS ? '80%' : '100%' }}
             onClick={(event) => {
               event.stopPropagation()
@@ -273,8 +269,8 @@ const FileExplorerRow = ({
               </div>
             ) : (
               <>
-                <p className="text-sm truncate w-[30%] min-w-[250px]">{item.name}</p>
-                <p className="text-sm truncate w-[15%] min-w-[100px]">{size}</p>
+                <p className="text-sm truncate w-[33%] min-w-[250px]">{item.name}</p>
+                <p className="text-sm truncate w-[12%] min-w-[100px]">{size}</p>
                 <p className="text-sm truncate w-[15%] min-w-[100px]">{mimeType}</p>
                 <p className="text-sm truncate w-[20%] min-w-[180px]">{createdAt}</p>
                 <p className="text-sm truncate w-[20%] min-w-[175px]">{updatedAt}</p>

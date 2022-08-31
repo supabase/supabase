@@ -177,10 +177,10 @@ const FileExplorerColumn = ({
         "
         >
           <SelectAllCheckbox />
-          <p className="text-sm" style={{ width: '30%', minWidth: '250px' }}>
+          <p className="text-sm" style={{ width: '33%', minWidth: '250px' }}>
             Name
           </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
+          <p className="text-sm" style={{ width: '12%', minWidth: '100px' }}>
             Size
           </p>
           <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
