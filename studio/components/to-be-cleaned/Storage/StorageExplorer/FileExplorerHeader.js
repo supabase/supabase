@@ -200,13 +200,13 @@ const FileExplorerHeader = ({
       className="
     bg-panel-header-light dark:bg-panel-header-dark
     border-panel-border-light dark:border-panel-border-dark
-    flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
+    flex h-[40px] items-center justify-between rounded-t-md border-b px-2"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
         {breadcrumbs.length > 0 && (
           <Button
-            icon={<IconChevronLeft size={16} strokeWidth={1} />}
+            icon={<IconChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
             className={breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'}
@@ -377,8 +377,8 @@ const FileExplorerHeader = ({
                   actions={[
                     <IconX
                       key="close"
-                      className="mx-2 cursor-pointer text-white"
-                      size={'tiny'}
+                      className="mx-2 cursor-pointer text-scale-1200"
+                      size="tiny"
                       strokeWidth={2}
                       onClick={onCancelSearch}
                     />,
