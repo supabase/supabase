@@ -121,6 +121,7 @@ const FileExplorerColumn = ({
   const SelectAllCheckbox = () => (
     <Checkbox
       label=""
+      className="-mt-0.5"
       checked={columnFiles.length !== 0 && selectedFilesFromColumn.length === columnFiles.length}
       disabled={columnFiles.length === 0}
       onChange={() => onSelectAllItemsInColumn(index)}
@@ -176,23 +177,14 @@ const FileExplorerColumn = ({
           border-b border-panel-border-light dark:border-panel-border-dark
         "
         >
-          <SelectAllCheckbox />
-          <p className="text-sm" style={{ width: '33%', minWidth: '250px' }}>
-            Name
-          </p>
-          <p className="text-sm" style={{ width: '12%', minWidth: '100px' }}>
-            Size
-          </p>
-          <p className="text-sm" style={{ width: '15%', minWidth: '100px' }}>
-            Type
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Created at
-          </p>
-          <p className="text-sm" style={{ width: '20%', minWidth: '180px' }}>
-            Last modified at
-          </p>
-          <div className="w-3" />
+          <div className="flex items-center w-[40%] min-w-[250px]">
+            <SelectAllCheckbox />
+            <p className="text-sm">Name</p>
+          </div>
+          <p className="text-sm w-[11%] min-w-[100px]">Size</p>
+          <p className="text-sm w-[14%] min-w-[100px]">Type</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Created at</p>
+          <p className="text-sm w-[15%] min-w-[160px]">Last modified at</p>
         </div>
       )}
 
