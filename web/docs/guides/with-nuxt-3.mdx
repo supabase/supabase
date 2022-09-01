@@ -219,14 +219,6 @@ const handleLogin = async () => {
 </script>
 ```
 
-### User state
-
-To access the user information in other places, will create a user state. Create a new file called `states.ts` and utilize `useState` method of Nuxt 3.
-
-```typescript title="composables/states.ts"
-export const useUser = () => useState('user', () => null)
-```
-
 ### Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
@@ -271,7 +263,7 @@ const avatar_path = ref('')
 
 
 loading.value = true
-const user = useUser();
+const user = useSupabaseUser();
 let { data } = await supabase
     .from('profiles')
     .select(`username, website, avatar_url`)
@@ -287,7 +279,7 @@ loading.value = false
 async function updateProfile() {
     try {
         loading.value = true
-        const user = useUser();
+        const user = useSupabaseUser();
         const updates = {
             id: user.value.id,
             username: username.value,
@@ -326,35 +318,17 @@ Now that we have all the components in place, let's update `app.vue`:
 
 ```html title="app.vue"
 <template>
-  <div>
-    <NuxtPage />
+  <div class="container" style="padding: 50px 0 100px 0">
+      <Account v-if="user" />
+      <Auth v-else />
   </div>
-</template>
-```
-
-We now need to create an index page called `pages/index.vue`:
-
-```html title="pages/index.vue"
-<template>
-    <div class="container" style="padding: 50px 0 100px 0">
-        <Account v-if="user" />
-        <Auth v-else />
-    </div>
 </template>
 
 <script setup>
-
-const supabase = useSupabaseClient()
-
-const user = useUser();
-
-user.value = useSupabaseUser()
-supabase.auth.onAuthStateChange((_, session) => {
-    user.value = session?.user
-})
-
+const user = useSupabaseUser()
 </script>
 ```
+
 
 Once that's done, run this in a terminal window:
 
@@ -491,7 +465,7 @@ const avatar_path = ref('')
 
 
 loading.value = true
-const user = useUser();
+const user = useSupabaseUser();
 let { data } = await supabase
     .from('profiles')
     .select(`username, website, avatar_url`)
@@ -507,7 +481,7 @@ loading.value = false
 async function updateProfile() {
     try {
         loading.value = true
-        const user = useUser();
+        const user = useSupabaseUser();
         const updates = {
             id: user.value.id,
             username: username.value,
