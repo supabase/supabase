@@ -16,10 +16,12 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
+import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { AppPropsWithLayout } from 'types'
 
-import { useEffect, useState } from 'react'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
 import { GOTRUE_ERRORS } from 'lib/constants'
@@ -34,6 +36,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const [queryClient] = useState(() => new QueryClient())
   const [rootStore] = useState(() => new RootStore())
 
   useEffect(() => {
@@ -55,21 +58,27 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
-    <StoreProvider rootStore={rootStore}>
-      <FlagProvider>
-        <Head>
-          <title>Supabase</title>
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
-        </Head>
-        <PageTelemetry>
-          <RouteValidationWrapper>
-            <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
-          </RouteValidationWrapper>
-        </PageTelemetry>
-        <PortalToast />
-      </FlagProvider>
-    </StoreProvider>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <StoreProvider rootStore={rootStore}>
+          <FlagProvider>
+            <Head>
+              <title>Supabase</title>
+              <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
+            </Head>
+            <PageTelemetry>
+              <RouteValidationWrapper>
+                <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+              </RouteValidationWrapper>
+            </PageTelemetry>
+            <PortalToast />
+          </FlagProvider>
+        </StoreProvider>
+
+        <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+      </Hydrate>
+    </QueryClientProvider>
   )
 }
 export default MyApp

@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { FC, ReactNode, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useStore, withAuth, useFlag } from 'hooks'
+import { useStore, withAuth, useFlag, useParams } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
 import Connecting from 'components/ui/Loading'
@@ -12,6 +12,7 @@ import LayoutHeader from './LayoutHeader'
 import ConnectingState from './ConnectingState'
 import PausingState from './PausingState'
 import BuildingState from './BuildingState'
+import { ProjectContextProvider } from './ProjectContext'
 
 interface Props {
   title?: string
@@ -31,13 +32,14 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
 }: PropsWithChildren<Props>) => {
+  const { ref: projectRef } = useParams()
   const { ui } = useStore()
   const ongoingIncident = useFlag('ongoingIncident')
 
   const projectName = ui.selectedProject?.name
 
   return (
-    <>
+    <ProjectContextProvider projectRef={projectRef}>
       <Head>
         <title>
           {title ? `${title} | Supabase` : projectName ? `${projectName} | Supabase` : 'Supabase'}
@@ -62,7 +64,7 @@ const ProjectLayout = ({
           <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
         </main>
       </div>
-    </>
+    </ProjectContextProvider>
   )
 }
 
