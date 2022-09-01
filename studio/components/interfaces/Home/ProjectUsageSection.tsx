@@ -12,20 +12,6 @@ const ProjectUsageSection: FC = observer(({}) => {
   const { ref } = router.query
   const { usage, error: usageError, isLoading } = useProjectUsage(ref as string)
 
-  // [Joshen TODO] After API is ready need to update to include dbEgress, storageEgress
-  // And also to highlight in this chart which components are "approaching" and "over"
-  const mockUsage: any = {
-    dbSize: { usage: 20773283, limit: 524288000 },
-    dbEgress: { usage: 400000000, limit: 524288000 },
-    storageSize: { usage: 624288000, limit: 524288000 },
-    storageEgress: { usage: 2048, limit: 524288000 },
-  }
-
-  const hasProjectData =
-    usage && (usage?.bucketSize || (usage?.authUsers ?? '0') !== '0' || usage?.dbTables)
-      ? true
-      : false
-
   if (usageError) {
     return (
       <InformationBox
@@ -37,6 +23,12 @@ const ProjectUsageSection: FC = observer(({}) => {
     )
   }
 
+  const hasProjectData = usage
+    ? Object.keys(usage)
+        .map((key) => usage[key].usage)
+        .some((usage) => usage > 0)
+    : false
+
   return (
     <>
       {isLoading ? (
@@ -44,7 +36,7 @@ const ProjectUsageSection: FC = observer(({}) => {
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>
-      ) : !usage.error && hasProjectData ? (
+      ) : hasProjectData ? (
         <ProjectUsage />
       ) : (
         <NewProjectPanel />

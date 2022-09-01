@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { UsageStats } from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars.types'
 
 export function useProjectUsage(ref?: string) {
   const url = `${API_URL}/projects/${ref}/usage`
@@ -8,7 +9,7 @@ export function useProjectUsage(ref?: string) {
   const anyError = data?.error || error
 
   return {
-    usage: anyError ? undefined : data,
+    usage: anyError ? undefined : (data as UsageStats),
     error: anyError,
     isLoading: !anyError && !data,
     isError: !!anyError,
