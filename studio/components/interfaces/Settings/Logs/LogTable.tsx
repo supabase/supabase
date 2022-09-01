@@ -1,27 +1,31 @@
-import dayjs from 'dayjs'
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff, Input } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
 import DataGrid from '@supabase/react-data-grid'
 
-import LogSelection from './LogSelection'
+import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
-import { SeverityFormatter, ResponseCodeFormatter, HeaderFormmater } from './LogsFormatters'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
-// column renders
+import CSVButton from 'components/ui/CSVButton'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
-import CSVButton from 'components/ui/CSVButton'
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
+import { LogQueryError } from '.'
+import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
+import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 
 interface Props {
   data?: Array<LogData | Object>
-  queryType?: QueryType
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
-  error?: any
+  error?: LogQueryError | null
   showDownload?: boolean
+  // TODO: move all common params to a context to avoid prop drilling
+  queryType?: QueryType
   projectRef: string
+  params: LogSelectionProps['params']
 }
 type LogMap = { [id: string]: LogData }
 
@@ -57,6 +61,7 @@ const LogTable = ({
   showDownload,
   error,
   projectRef,
+  params,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -94,88 +99,10 @@ const LogTable = ({
         break
 
       case 'fn_edge':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-          },
-          {
-            key: 'status_code',
-            headerRenderer: () => <HeaderFormmater value={'Status'} />,
-            name: 'status_code',
-            formatter: (data: any) => (
-              <ResponseCodeFormatter row={data} value={data.row.status_code} />
-            ),
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'method',
-            headerRenderer: () => <HeaderFormmater value={'method'} />,
-            width: 0,
-            resizable: true,
-          },
-          {
-            key: 'id',
-            headerRenderer: () => <HeaderFormmater value={'id'} />,
-            name: 'id',
-            resizable: true,
-          },
-        ]
+        columns = FunctionsEdgeColumnRender
         break
       case 'functions':
-        columns = [
-          {
-            key: 'timestamp',
-            headerRenderer: () => (
-              <div className="flex w-full justify-end h-full">
-                <HeaderFormmater value={'timestamp'} />
-              </div>
-            ),
-            name: 'timestamp',
-            formatter: (data: any) => (
-              <span className="flex w-full h-full items-center gap-1">
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('DD MMM')}
-                </span>
-                <span className="text-xs !text-scale-1100">
-                  {dayjs(data?.row?.timestamp / 1000).format('HH:mm:ss')}
-                </span>
-              </span>
-            ),
-            width: 128,
-            resizable: true,
-          },
-          {
-            key: 'level',
-            headerRenderer: () => <HeaderFormmater value={'Level'} />,
-            name: 'level',
-            formatter: (data: any) => <SeverityFormatter value={data.row.level} />,
-            width: 24,
-            resizable: true,
-          },
-          {
-            key: 'event_message',
-            headerRenderer: () => <HeaderFormmater value={'Event message'} />,
-            resizable: true,
-          },
-        ]
+        columns = FunctionsLogsColumnRender
         break
 
       default:
@@ -223,6 +150,34 @@ const LogTable = ({
       return dedupedData
     }
   }, [stringData])
+
+  const renderErrorAlert = () => {
+    if (!error) return null
+    const childProps = {
+      isCustomQuery: queryType ? false : true,
+      error: error!,
+    }
+    let Renderer = DefaultErrorRenderer
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+    ) {
+      Renderer = ResourcesExceededErrorRenderer
+    }
+
+    return (
+      <div className="flex justify-center px-5">
+        <Alert
+          variant="danger"
+          title="Sorry! An error occured when fetching data."
+          withIcon
+          className="w-1/2"
+        >
+          <Renderer {...childProps} />
+        </Alert>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -335,27 +290,7 @@ const LogTable = ({
                         </>
                       </div>
                     )}
-                    {error && (
-                      <div className="flex justify-center px-5">
-                        <Alert
-                          variant="danger"
-                          title="Sorry! An error occured when fetching data."
-                          withIcon
-                          className="w-1/2"
-                        >
-                          <Input.TextArea
-                            size="tiny"
-                            value={
-                              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
-                            }
-                            borderless
-                            className="font-mono w-full mt-4"
-                            copy
-                            rows={12}
-                          />
-                        </Alert>
-                      </div>
-                    )}
+                    {error && renderErrorAlert()}
                   </div>
                 </>
               ) : null
@@ -396,6 +331,7 @@ const LogTable = ({
                 onClose={() => setFocusedLog(null)}
                 log={focusedLog}
                 queryType={queryType}
+                params={params}
               />
             </div>
           ) : null}

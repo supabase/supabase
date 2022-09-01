@@ -9,21 +9,16 @@ export const getRolesManagementPermissions = (
   const rolesRemovable: Number[] = []
   if (!roles) return { rolesAddable, rolesRemovable }
 
-  const availableRoles = ['Owner', 'Administrator', 'Developer']
-
-  availableRoles.forEach((role: string) => {
-    const selectedRole = roles.find((r) => r.name === role)
-    if (!selectedRole) return
-
-    const canAdd = checkPermissions(PermissionAction.SQL_INSERT, 'postgres.auth.subject_roles', {
-      resource: { role_id: selectedRole!.id },
+  roles.forEach((role: Role) => {
+    const canAdd = checkPermissions(PermissionAction.CREATE, 'auth.subject_roles', {
+      resource: { role_id: role.id },
     })
-    if (canAdd) rolesAddable.push(selectedRole.id)
+    if (canAdd) rolesAddable.push(role.id)
 
-    const canRemove = checkPermissions(PermissionAction.SQL_DELETE, 'postgres.auth.subject_roles', {
-      resource: { role_id: selectedRole!.id },
+    const canRemove = checkPermissions(PermissionAction.DELETE, 'auth.subject_roles', {
+      resource: { role_id: role.id },
     })
-    if (canRemove) rolesRemovable.push(selectedRole.id)
+    if (canRemove) rolesRemovable.push(role.id)
   })
 
   return { rolesAddable, rolesRemovable }

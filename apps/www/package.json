@@ -1,6 +1,6 @@
 {
   "name": "www",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Supabase main website",
   "private": true,
   "scripts": {
@@ -17,10 +17,12 @@
     "@mdx-js/loader": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "@next/mdx": "^10.0.7",
+    "@supabase/auth-ui-react": "^0.1.6",
     "@supabase/supabase-js": "^1.6.0",
-    "@supabase/ui": "v0.37.0-alpha.50",
+    "@supabase/ui": "v0.37.0-alpha.80",
     "classnames": "^2.3.1",
     "date-fns": "2.10.0",
+    "dayjs": "^1.11.4",
     "globby": "^12.0.2",
     "gray-matter": "^4.0.2",
     "markdown-toc": "^1.2.0",
@@ -65,7 +67,7 @@
     "postcss": "^8.4.7",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
-    "tailwindcss": "^3.0.23"
+    "tailwindcss": "^3.1.0"
   },
   "license": "MIT"
 }

@@ -123,8 +123,6 @@ function generateCssVariables() {
 
 const variables = generateCssVariables()
 
-// console.log(variables)
-
 const uiConfig = {
   theme: {
     variables: {
@@ -289,6 +287,32 @@ const uiConfig = {
           border: '1px solid hsla(0, 0%, 39.2%, 0.2)',
           borderRadius: '3px',
         },
+        '.no-scrollbar': {
+          /* Hide scrollbar for IE, Edge*/
+          '-ms-overflow-style': 'none',
+
+          /* Firefox */
+          'scrollbar-width': 'none' /* Firefox */,
+
+          /* Hide scrollbar for Chrome, Safari and Opera */
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+        /* Add fadeout effect */
+        '.mask-fadeout-right': {
+          '-webkit-mask-image': 'linear-gradient(to right, white 98%, transparent 100%)',
+          'mask-image': 'linear-gradient(to right, white 98%, transparent 100%)',
+        },
+        '.mask-fadeout-left': {
+          '-webkit-mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
+          'mask-image': 'linear-gradient(to left, white 98%, transparent 100%)',
+        },
+        'input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button':
+          {
+            '-webkit-appearance': 'none',
+            margin: '0',
+          },
       })
       addVariant('data-open-parent', '[data-state="open"] &')
       addVariant('data-closed-parent', '[data-state="closed"] &')
@@ -324,12 +348,12 @@ const uiConfig = {
             bordershadow: (value) => {
               return {
                 boxShadow: `
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka8) 0px 1px 1px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px, 
+                var(--colors-blackA8) 0px 1px 1px 0px, 
                 ${value} 0px 0px 0px 1px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
-                var(--colors-blacka1) 0px 0px 0px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px, 
+                var(--colors-blackA1) 0px 0px 0px 0px, 
                 rgb(64 68 82 / 8%) 0px 2px 5px 0px;
                 `,
               }

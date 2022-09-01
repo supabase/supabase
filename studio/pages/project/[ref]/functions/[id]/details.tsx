@@ -1,13 +1,15 @@
-import { observer } from 'mobx-react-lite'
-import { useProjectSettings, useStore } from 'hooks'
-
-import FunctionsLayout from 'components/interfaces/Functions/FunctionsLayout'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { IconGlobe, IconTerminal } from '@supabase/ui'
 import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { IconGlobe, IconTerminal } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { NextPageWithLayout } from 'types'
+import { checkPermissions, useProjectSettings, useStore } from 'hooks'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import CommandRender from 'components/interfaces/Functions/CommandRender'
+import NoPermission from 'components/ui/NoPermission'
 
 const PageLayout: NextPageWithLayout = () => {
   const router = useRouter()
@@ -98,6 +100,14 @@ const PageLayout: NextPageWithLayout = () => {
   const apiKeys = apiService?.service_api_keys ?? []
   const anonKey = apiKeys.find((x: any) => x.name === 'anon key')?.api_key
 
+  const endpoint = apiService?.app_config.endpoint ?? ''
+  const endpointSections = endpoint.split('.')
+  const functionsEndpoint = [
+    ...endpointSections.slice(0, 1),
+    'functions',
+    ...endpointSections.slice(1),
+  ].join('.')
+
   const invokeCommands: any = [
     {
       command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
@@ -107,15 +117,20 @@ const PageLayout: NextPageWithLayout = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">curl</span> -L -X POST 'https://{ref}
-            .functions.supabase.co/{selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON
-            KEY]' {`--data '{"name":"Functions"}'`}
+            <span className="text-brand-1100">curl</span> -L -X POST 'https://{functionsEndpoint}/
+            {selectedFunction?.slug}' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            {`--data '{"name":"Functions"}'`}
           </>
         )
       },
       comment: 'Invoke your function',
     },
   ]
+
+  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, id as string)
+  if (!canReadFunction) {
+    return <NoPermission isFullPage resourceText="access this edge function's details" />
+  }
 
   return (
     <div className="grid gap-y-4 lg:grid-cols-2 lg:gap-x-8">
@@ -129,7 +144,7 @@ const PageLayout: NextPageWithLayout = () => {
           <div className="space-y-4 w-full">
             <div className="grid grid-cols-3">
               <span className="block text-scale-1000 text-sm mb-1">Function Name</span>
-              <div className="text-base text-scale-1200">{selectedFunction?.name}</div>
+              <div className="text-sm text-scale-1200">{selectedFunction?.name}</div>
             </div>
 
             <div className="grid grid-cols-3">
@@ -158,13 +173,13 @@ const PageLayout: NextPageWithLayout = () => {
           <div className="grid grid-cols-3">
             <span className="block text-scale-1000 text-sm mb-1 cols-span-1">Endpoint URL</span>
             <div className="col-span-2">
-              <span className="text-scale-1200 break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
+              <span className="text-sm text-scale-1200 break-words w-full">{`https://${ref}.functions.supabase.co/${selectedFunction?.slug}`}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-3">
             <span className="block text-scale-1000 text-sm mb-1">Created At</span>
-            <div className="text-base text-scale-1200 col-span-2">
+            <div className="text-sm text-scale-1200 col-span-2">
               {selectedFunction?.created_at &&
                 dayjs(selectedFunction.created_at).format('dddd, MMMM D, YYYY h:mm A')}
             </div>
@@ -172,7 +187,7 @@ const PageLayout: NextPageWithLayout = () => {
 
           <div className="grid grid-cols-3">
             <span className="block text-scale-1000 text-sm mb-1">Updated At</span>
-            <div className="text-base text-scale-1200 col-span-2">
+            <div className="text-sm text-scale-1200 col-span-2">
               {selectedFunction?.updated_at &&
                 dayjs(selectedFunction.updated_at).format('dddd, MMMM D, YYYY h:mm A')}
             </div>
@@ -180,13 +195,13 @@ const PageLayout: NextPageWithLayout = () => {
 
           <div className="grid grid-cols-3">
             <span className="block text-scale-1000 text-sm mb-1">Version</span>
-            <div className="text-base text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
+            <div className="text-sm text-scale-1200 col-span-2">v{selectedFunction?.version}</div>
           </div>
 
           <div className="grid grid-cols-3">
             <span className="block text-scale-1000 text-sm mb-1">Regions</span>
             <div className="flex flex-col gap-1 col-span-2">
-              <div className="text-base text-scale-1200 flex items-center gap-2">
+              <div className="text-sm text-scale-1200 flex items-center gap-2">
                 <IconGlobe />
                 <span>Earth</span>
               </div>
