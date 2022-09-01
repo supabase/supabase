@@ -6,15 +6,15 @@ import { useMonaco } from '@monaco-editor/react'
 import { DataGridHandle } from '@supabase/react-data-grid'
 
 import { useUrlState } from 'hooks'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
+import { useTableRowsQuery } from 'data/tables/table-rows-query'
+import { Dictionary, SupabaseGridProps, SupabaseGridRef, SupaTable } from './types'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { fetchCount, fetchPage, refreshPageDebounced } from './utils'
-import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from './constants'
 import { Shortcuts } from './components/common'
 import { Grid } from './components/grid'
 import Header from './components/header'
 import Footer from './components/footer'
 import { RowContextMenu } from './components/menu'
+import { useProjectContext } from '../layouts/ProjectLayout/ProjectContext'
 import {
   cleanupProps,
   initTable,
@@ -71,6 +71,22 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   const sorts = formatSortURLParams(sort as string[])
   const filters = formatFilterURLParams(filter as string[])
 
+  const table = props.table as SupaTable
+  const { project } = useProjectContext()
+  const { data } = useTableRowsQuery(
+    {
+      queryKey: [table.schema, table.name],
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      table,
+      sorts,
+      filters,
+      page: state.page,
+      limit: state.rowsPerPage,
+    },
+    { keepPreviousData: true }
+  )
+
   useImperativeHandle(ref, () => ({
     rowAdded(row: Dictionary<any>) {
       dispatch({
@@ -89,20 +105,6 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (state.refreshPageFlag == REFRESH_PAGE_IMMEDIATELY) {
-      fetchPage(state, dispatch, sorts, filters)
-    } else if (state.refreshPageFlag !== 0) {
-      refreshPageDebounced(state, dispatch, sorts, filters)
-    }
-  }, [state.refreshPageFlag])
-
-  useEffect(() => {
-    if (state.totalRows === TOTAL_ROWS_RESET) {
-      fetchCount(state, dispatch, filters)
-    }
-  }, [state.totalRows])
 
   useEffect(() => {
     if (mounted) {
@@ -175,7 +177,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         onAddColumn={editable ? props.onAddColumn : undefined}
         headerActions={headerActions}
       />
-      <Grid ref={gridRef} {...gridProps} rows={state.rows} />
+      <Grid ref={gridRef} {...gridProps} rows={data?.rows ?? []} />
       <Footer />
       <Shortcuts gridRef={gridRef} />
       {mounted && createPortal(<RowContextMenu />, document.body)}

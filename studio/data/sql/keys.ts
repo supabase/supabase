@@ -1,4 +1,6 @@
+import { QueryKey } from '@tanstack/react-query'
+
 export const sqlKeys = {
-  query: (projectRef: string | undefined, query: string | undefined) =>
-    ['projects', projectRef, 'query', query] as const,
+  query: (projectRef: string | undefined, queryKey: QueryKey) =>
+    ['projects', projectRef, 'query', ...queryKey] as const,
 }

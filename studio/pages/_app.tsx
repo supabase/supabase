@@ -16,12 +16,13 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 
-import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { AppPropsWithLayout } from 'types'
 
+import { useRootQueryClient } from 'data/query-client'
 import { RootStore } from 'stores'
 import { StoreProvider } from 'hooks'
 import { GOTRUE_ERRORS } from 'lib/constants'
@@ -36,7 +37,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const [queryClient] = useState(() => new QueryClient())
+  const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())
 
   useEffect(() => {
