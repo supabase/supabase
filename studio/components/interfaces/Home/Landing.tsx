@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Head from 'next/head'
 import { observer } from 'mobx-react-lite'
-import { Button, IconGitHub, Typography } from '@supabase/ui'
+import { Button, IconGitHub } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'

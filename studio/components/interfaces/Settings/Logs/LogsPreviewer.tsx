@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Typography, IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
+import { IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
 
 import {
   LogTable,
@@ -205,9 +205,7 @@ export const LogsPreviewer: React.FC<Props> = ({
             <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
               <div className="flex flex-row gap-x-2 py-2">
                 <IconAlertCircle size={16} />
-                <Typography.Text type="secondary">
-                  Sorry! An error occured when fetching data.
-                </Typography.Text>
+                <p className="text-scale-1000">Sorry! An error occured when fetching data.</p>
               </div>
               <Input.TextArea
                 label="Error Messages"
