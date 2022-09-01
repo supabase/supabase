@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { StorageLayout } from 'components/layouts'
 import { StorageSettings } from 'components/to-be-cleaned/Storage'
@@ -19,11 +19,9 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const kpsEnabled = useFlag('initWithKps')
-
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
+      post(`${API_URL}/projects/${ref}/restore`, {})
     }
   }, [project])
 
