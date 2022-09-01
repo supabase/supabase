@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Input } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import {
   FormHeader,
