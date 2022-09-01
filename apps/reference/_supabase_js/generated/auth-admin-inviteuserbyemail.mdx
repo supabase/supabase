@@ -95,7 +95,7 @@ Optional user metadata
   </h4>
   <div class="method-list-item-description">
 
-A URL or mobile address to send the user to after they are confirmed.
+A URL or mobile deeplink to send the user to after they are confirmed.
 
   </div>
   
@@ -109,12 +109,11 @@ A URL or mobile address to send the user to after they are confirmed.
 
 ## Notes
 
-- Requires a `service_role` key.
-- This function should only be called on a server. Never expose your `service_role` key in the browser.
+- Sends an invite link to the user's email address.
 
 ## Examples
 
-### Basic example.
+### Invite a user
 
 ```js
 const { data, error } = await supabase.auth.admin.inviteUserByEmail(

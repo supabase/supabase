@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { Typography } from '@supabase/ui'
 
 interface Props {
   isNewRecord: boolean

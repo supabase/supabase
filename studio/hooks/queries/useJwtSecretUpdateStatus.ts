@@ -13,6 +13,7 @@ export function useJwtSecretUpdateStatus(projectRef: string | string[] | undefin
   const meta = data?.jwtSecretUpdateStatus?.meta
   return {
     changeTrackingId: meta?.change_tracking_id,
+    error,
     isError: !!anyError,
     isLoading: !anyError && !data,
     jwtSecretUpdateError: meta?.error,

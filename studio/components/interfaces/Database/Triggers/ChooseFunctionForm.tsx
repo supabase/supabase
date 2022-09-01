@@ -1,16 +1,9 @@
-import * as React from 'react'
+import { FC, createContext, useContext, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { uniqBy, map as lodashMap } from 'lodash'
 import { Transition } from '@headlessui/react'
-import {
-  Button,
-  IconChevronDown,
-  IconHelpCircle,
-  IconTerminal,
-  SidePanel,
-  Typography,
-} from '@supabase/ui'
+import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import SqlEditor from 'components/ui/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -29,7 +22,7 @@ class ChooseFunctionFormStore implements IChooseFunctionFormStore {
   }
 }
 
-const ChooseFunctionFormContext = React.createContext<IChooseFunctionFormStore | null>(null)
+const ChooseFunctionFormContext = createContext<IChooseFunctionFormStore | null>(null)
 
 type ChooseFunctionFormProps = {
   triggerFunctions: Dictionary<any>[]
@@ -38,7 +31,7 @@ type ChooseFunctionFormProps = {
   setVisible: (value: boolean) => void
 }
 
-const ChooseFunctionForm: React.FC<ChooseFunctionFormProps> = ({
+const ChooseFunctionForm: FC<ChooseFunctionFormProps> = ({
   triggerFunctions,
   visible,
   onChange,
@@ -80,7 +73,7 @@ const ChooseFunctionForm: React.FC<ChooseFunctionFormProps> = ({
 
 export default observer(ChooseFunctionForm)
 
-const NoticeBox: React.FC = ({}) => {
+const NoticeBox: FC = ({}) => {
   const router = useRouter()
   const { ref } = router.query
   return (
@@ -104,7 +97,7 @@ const NoticeBox: React.FC = ({}) => {
   )
 }
 
-const NoFunctionsState: React.FC = ({}) => {
+const NoFunctionsState: FC = ({}) => {
   // for the empty 'no tables' state link
   const router = useRouter()
   const { ref } = router.query
@@ -129,33 +122,29 @@ type SchemaFunctionGroupProps = {
   selectFunction: (id: number) => void
 }
 
-const SchemaFunctionGroup: React.FC<SchemaFunctionGroupProps> = observer(
-  ({ schema, selectFunction }) => {
-    const _pageState = React.useContext(ChooseFunctionFormContext)
-    const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
-    return (
-      <div className="space-y-4">
-        <div className="sticky top-0 backdrop-filter backdrop-blur px-6 flex items-center space-x-1">
-          <Typography.Title level={5} className="opacity-50">
-            schema
-          </Typography.Title>
-          <Typography.Title level={5}>{schema}</Typography.Title>
-        </div>
-        <div className="space-y-0 divide-y dark:divide-dark border-t border-b dark:border-dark">
-          {_functions.map((x) => (
-            <Function
-              id={x.id}
-              key={x.id}
-              completeStatement={x.complete_statement}
-              name={x.name}
-              onClick={selectFunction}
-            />
-          ))}
-        </div>
+const SchemaFunctionGroup: FC<SchemaFunctionGroupProps> = observer(({ schema, selectFunction }) => {
+  const _pageState = useContext(ChooseFunctionFormContext)
+  const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
+  return (
+    <div className="space-y-4">
+      <div className="sticky top-0 backdrop-filter backdrop-blur px-6 flex items-center space-x-1">
+        <h5 className="text-scale-1000">schema</h5>
+        <h5>{schema}</h5>
       </div>
-    )
-  }
-)
+      <div className="space-y-0 divide-y dark:divide-dark border-t border-b dark:border-dark">
+        {_functions.map((x) => (
+          <Function
+            id={x.id}
+            key={x.id}
+            completeStatement={x.complete_statement}
+            name={x.name}
+            onClick={selectFunction}
+          />
+        ))}
+      </div>
+    </div>
+  )
+})
 
 type FunctionProps = {
   id: number
@@ -164,8 +153,8 @@ type FunctionProps = {
   onClick: (id: number) => void
 }
 
-const Function: React.FC<FunctionProps> = ({ id, completeStatement, name, onClick }) => {
-  const [visible, setVisible] = React.useState(false)
+const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) => {
+  const [visible, setVisible] = useState(false)
   return (
     <div
       className="hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark rounded p-3 px-6 cursor-pointer"
@@ -176,9 +165,7 @@ const Function: React.FC<FunctionProps> = ({ id, completeStatement, name, onClic
           <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
             <IconTerminal strokeWidth={2} size={14} />
           </div>
-          <Typography.Title level={5} className="mb-0">
-            {name}
-          </Typography.Title>
+          <h5 className="mb-0">{name}</h5>
         </div>
         <Button
           type="text"

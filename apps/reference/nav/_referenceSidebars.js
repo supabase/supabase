@@ -3,13 +3,13 @@ const sidebars = {
     {
       type: 'category',
       label: 'Overview',
+      collapsed: true,
       items: [
         'about',
         'architecture',
         'guides/hosting/platform',
         'guides/examples',
       ],
-      collapsed: true,
     },
     {
       type: 'category',
@@ -30,6 +30,17 @@ const sidebars = {
         'guides/with-svelte',
         'guides/with-sveltekit',
         'guides/with-vue-3',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Migrate to Supabase',
+      collapsed: true,
+      items: [
+        'guides/migrations/firebase-auth',
+        'guides/migrations/firestore-data',
+        'guides/migrations/firebase-storage',
+        'guides/migrations/heroku',
       ],
     },
     {
@@ -238,7 +249,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Supabase JavaScript Library',
-          href: '/reference/javascript',
+          href: '/reference/javascript/',
         },
         {
           type: 'link',
