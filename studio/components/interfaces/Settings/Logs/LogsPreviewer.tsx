@@ -22,6 +22,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import { useProjectSubscription } from 'hooks'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { StripeProduct } from 'components/interfaces/Billing'
 
 /**
  * Acts as a container component for the entire log display
@@ -117,7 +118,7 @@ export const LogsPreviewer: React.FC<Props> = ({
         },
       })
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier as StripeProduct)
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
