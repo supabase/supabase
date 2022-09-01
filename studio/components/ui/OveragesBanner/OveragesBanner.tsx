@@ -15,14 +15,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
   const { ui } = useStore()
   const ref = ui.selectedProject?.ref
 
-  // [Joshen TODO] After API is ready, to do up proper logic here
-  // const { usageStatus } = useProjectUsageStatus(ui.selectedProject?.ref)
-  const usage = {
-    dbSize: { usage: 10773283, limit: 524288000 },
-    dbEgress: { usage: 400000000, limit: 524288000 },
-    storageSize: { usage: 624288000, limit: 524288000 },
-    storageEgress: { usage: 0, limit: 524288000 },
-  }
+  const { usage, error, isLoading } = useProjectUsage(ref as string)
 
   const resourcesApproachingLimits = getResourcesApproachingLimits(usage)
   const isApproachingUsageLimits = resourcesApproachingLimits.length > 0
@@ -31,6 +24,8 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
   const isOverUsageLimits = resourcesExceededLimits.length > 0
 
   if (
+    isLoading ||
+    error ||
     (!isApproachingUsageLimits && !isOverUsageLimits) ||
     tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   ) {

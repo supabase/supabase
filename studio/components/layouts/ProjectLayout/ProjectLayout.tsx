@@ -33,7 +33,6 @@ const ProjectLayout = ({
 }: PropsWithChildren<Props>) => {
   const { ui } = useStore()
   const ongoingIncident = useFlag('ongoingIncident')
-
   const projectName = ui.selectedProject?.name
 
   return (
@@ -66,7 +65,7 @@ const ProjectLayout = ({
   )
 }
 
-export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
+export const ProjectLayoutWithAuth = withAuth(observer(ProjectLayout))
 
 export default ProjectLayout
 

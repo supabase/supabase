@@ -35,7 +35,7 @@ const ProjectSettings: NextPageWithLayout = () => {
     <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full max-w-5xl px-4 py-4">
-          <Usage project={project} />
+          <DatabaseUsage project={project} />
           <GeneralSettings projectRef={ref} />
           <ConnectionPooling />
         </div>
@@ -48,7 +48,7 @@ ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</S
 
 export default observer(ProjectSettings)
 
-const Usage: FC<any> = ({ project }) => {
+const DatabaseUsage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
   const ref = router.query.ref as string
@@ -130,7 +130,7 @@ const Usage: FC<any> = ({ project }) => {
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
-                Database storage
+                Database usage
               </h5>
             }
           >

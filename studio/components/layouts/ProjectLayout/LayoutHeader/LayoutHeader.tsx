@@ -19,15 +19,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   const router = useRouter()
   const { ref } = router.query
-  // const { usageStatus } = useProjectUsageStatus(ref as string)
 
-  // [Joshen TODO] After API is ready, to do up proper logic here
-  const usage: any = {
-    dbSize: { usage: 10773283, limit: 524288000 },
-    dbEgress: { usage: 400000000, limit: 524288000 },
-    storageSize: { usage: 624288000, limit: 524288000 },
-    storageEgress: { usage: 0, limit: 524288000 },
-  }
+  const { usage } = useProjectUsage(ref as string)
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const isOverUsageLimits = resourcesExceededLimits.length > 0
 
