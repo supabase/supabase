@@ -21,7 +21,6 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   const freeProjectsLimit = ui.profile?.free_project_limit ?? DEFAULT_FREE_PROJECTS_LIMIT
 
   const enablePermissions = useFlag('enablePermissions')
-  const kpsEnabled = useFlag('initWithKps')
   const isOwner = ui.selectedOrganization?.is_owner
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -42,7 +41,7 @@ const ProjectPausedState: FC<Props> = ({ project }) => {
   }
 
   const onConfirmRestore = async () => {
-    await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
+    await post(`${API_URL}/projects/${project.ref}/restore`, {})
     app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
     ui.setNotification({ category: 'success', message: 'Restoring project' })
   }
