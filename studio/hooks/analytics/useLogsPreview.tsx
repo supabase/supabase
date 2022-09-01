@@ -56,7 +56,7 @@ function useLogsPreview(
   })
 
   useEffect(() => {
-    if (filters !== {}) {
+    if (JSON.stringify(filters) !== '{}') {
       refresh()
     }
   }, [JSON.stringify(filters)])
