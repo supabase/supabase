@@ -1,9 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
+import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { Input, Modal, Form, Button } from '@supabase/ui'
+
 import { useStore } from 'hooks'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { NextPageWithLayout, UserContent } from 'types'
+import { uuidv4 } from 'lib/helpers'
+import { LogsExplorerLayout } from 'components/layouts'
 import CodeEditor from 'components/ui/CodeEditor'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
 import {
   DatePickerToFrom,
   LogsQueryPanel,
@@ -14,14 +23,6 @@ import {
   LogTemplate,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
-import { uuidv4 } from 'lib/helpers'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { LogsExplorerLayout } from 'components/layouts'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import { NextPageWithLayout, UserContent } from 'types'
-import toast from 'react-hot-toast'
-import dayjs from 'dayjs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
@@ -150,7 +151,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <div className="relative flex flex-grow flex-col">
           <LoadingOpacity active={isLoading}>
             <div className="flex h-full flex-grow">
-              <LogTable data={logData} error={error} projectRef={ref as string} />
+              <LogTable params={params} data={logData} error={error} projectRef={ref as string} />
             </div>
           </LoadingOpacity>
           <div className="mt-2 flex flex-row justify-end">

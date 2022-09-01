@@ -2,6 +2,7 @@
 id: api
 title: APIs
 description: Auto-generating and Realtime APIs.
+sidebar_label: Overview
 ---
 
 import Tabs from '@theme/Tabs';
@@ -13,7 +14,7 @@ Supabase generates three types of API directly from your database schema.
 
 - REST - interact with your database through a restful interface.
 - Realtime - listen to database changes.
-- GraphQL - [in beta](https://supabase.com/blog/2021/12/03/pg-graphql).
+- GraphQL - [in beta](https://supabase.com/blog/pg-graphql).
 
 The APIs are:
 
@@ -24,7 +25,7 @@ The APIs are:
 - **Scalable.** <br />The API can serve thousands of simultaneous requests, and works well for Serverless workloads.
 
 
-### REST API 
+### REST API {#rest-api-overview}
 
 Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres. 
 It provides everything you need from a CRUD API:
@@ -45,7 +46,7 @@ It provides everything you need from a CRUD API:
   allowFullScreen
 ></iframe>
 
-### GraphQL API
+### GraphQL API {#graphql-api-overview}
 
 :::note
 
@@ -53,9 +54,9 @@ GraphQL is in Beta, and may have breaking changes. It is only available on self-
 
 :::
 
-GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/2021/12/03/pg-graphql), an open source PostgreSQL extension for GraphQL. 
+GraphQL in Supabase works through [pg_graphql](https://supabase.com/blog/pg-graphql), an open source PostgreSQL extension for GraphQL. 
 
-### Realtime API
+### Realtime API {#realtime-api-overview}
 
 Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets. 
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
@@ -69,33 +70,31 @@ All APIs are auto-created from Database tables. After you have added tables or f
 API routes are automatically created when you create Postgres Tables, Views, or Functions. 
 
 Let's create our first 
-API route by creating a table called `todos` (which will store some public user information). 
-This will create a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
+API route by creating a table called `todos` to store tasks. 
+This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  groupId="dashboard-or-sql"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the "Table editor" section.
-2. Click "New Table".
-3. Enter the table name "todos".
-4. Click "Save".
-5. Click "New Column".
-6. Enter the column name "task" and make the type "text".
-7. Click "Save".
-```
+<TabItem value="dashboard">
+
+1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Click **New Table** and create a table with the name `todos`.
+1. Click **Save**.
+1. Click **New Column** and create a column with the name `task` and type `text`.
+1. Click **Save**.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-create-table-sm.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 -- Create a table called "todos" with a column to store tasks.
@@ -113,13 +112,9 @@ create table todos (
 
 Every Supabase project has a unique API URL. Your API is secured behind an API gateway which requires an API Key for every request.
 
-
-```sh
-1. Go to the "Settings" section.
-2. Click "API" in the sidebar.
-3. Find your API URL in this page.
-4. Find your "anon" and "service_role" keys on this page.
-```
+1. Go to the [Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard.
+2. Click **API** in the sidebar.
+3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-url-and-key.mp4" type="video/mp4" muted playsInline />
@@ -134,41 +129,26 @@ Both of these routes require the `anon` key to be passed through an `apikey` hea
 
 #### API Keys
 
-
-You can find the Keys inside the Dashboard in the same location as the URL above.
-
 You are provided with two keys:
 
 - an `anon` key, which is safe to be used in a browser context.
 - a `service_role` key, which should only be used on a server. This key can bypass Row Level Security. NEVER use this key in a browser.
 
 
-### Accessing the Docs
+### Accessing the docs in the Dashboard
 
-#### REST API
+#### REST API {#rest-api-dashboard-docs}
 
-Supabase generates documentation in the Dashboard which updates as you make database changes. 
+Supabase generates documentation in the [Dashboard](https://app.supabase.com) which updates as you make database changes. 
 Let's view the documentation for a `countries` table which we created in our database.
 
-<Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'}
-]}>
-<TabItem value="UI">
-
-```sh
-1. Go to the "API" section.
-2. Find "todos" in the "Tables and Views" section.
+1. Go to the [API](https://app.supabase.com/project/_/api) page in the Dashboard.
+2. Find the `countries` table under **Tables and Views** in the sidebar.
 3. Switch between the JavaScript and the cURL docs using the tabs.
-```
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-docs.mp4" type="video/mp4" muted playsInline />
 </video>
-
-</TabItem>
-</Tabs>
 
 #### GraphQL 
 
@@ -192,12 +172,14 @@ using the API URL (`SUPABASE_URL`) and Key (`SUPABASE_ANON_KEY`) we provided:
 
 
 <Tabs
-defaultValue="JavaScript"
-values={[
-  {label: 'JavaScript', value: 'JavaScript'},
-  {label: 'cURL', value: 'cURL'},
-]}>
-<TabItem value="JavaScript">
+  groupId="language"
+  defaultValue="javascript"
+  values={[
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'cURL', value: 'curl'},
+  ]}>
+
+<TabItem value="javascript">
 
 ```javascript
 // Initialize the JS client
@@ -211,7 +193,7 @@ const { data: todos, error } = await supabase
 ```
 
 </TabItem>
-<TabItem value="cURL">
+<TabItem value="curl">
 
 ```bash
 # Append /rest/v1/ to your URL, and then use the table name as the route
@@ -243,12 +225,14 @@ Be sure to rebuild the GraphQL schema after altering the SQL schema.
 You can use any GraphQL client with the Supabase GraphQL API. For our GraphQL example we will use [urql](https://formidable.com/open-source/urql/docs/). 
 
 <Tabs
-defaultValue="Javascript"
-values={[
-  {label: 'Javascript', value: 'Javascript'},
-  {label: 'cURL', value: 'cURL'},
-]}>
-<TabItem value="Javascript">
+  groupId="language"
+  defaultValue="javascript"
+  values={[
+    {label: 'JavaScript', value: 'javascript'},
+    {label: 'cURL', value: 'curl'},
+  ]}>
+
+<TabItem value="javascript">
 
 ```javascript
 import { createClient, useQuery } from 'urql'
@@ -292,7 +276,7 @@ const { data, fetching, error } = result
 ```
 
 </TabItem>
-<TabItem value="cURL">
+<TabItem value="curl">
 
 ```bash
 # Append /graphql/v1/ to your URL, and then use the table name as the route
@@ -311,26 +295,26 @@ curl --request POST '<SUPABASE_URL>/graphql/v1' \
 By default Realtime is disabled on your database. Let's turn on Realtime for the `todos` table.
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  groupId="dashboard-or-sql"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the "Database" section.
-2. Click on "Replication" in the sidebar.
-3. Control which database events are sent by toggling the Insert/Update/Delete toggles.
-4. Control which tables broadcast changes by clicking into the "Source" and toggling the tables.
-```
+<TabItem value="dashboard">
+
+1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+2. Click on **Replication** in the sidebar.
+3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
+4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
 <video width="99%" muted playsInline controls="true">
 <source src="/docs/videos/api/api-realtime.mp4" type="video/mp4" muted playsInline />
 </video>
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 alter publication supabase_realtime add table todos;
@@ -339,14 +323,7 @@ alter publication supabase_realtime add table todos;
 </TabItem>
 </Tabs>
 
-Now we can listen to any new data that is inserted into the `todos` table:
-
-<Tabs
-defaultValue="Javascript"
-values={[
-  {label: 'Javascript', value: 'Javascript'}
-]}>
-<TabItem value="Javascript">
+From the client, we can listen to any new data that is inserted into the `todos` table:
 
 ```javascript
 // Initialize the JS client
@@ -365,9 +342,6 @@ const { data: todos, error } = await supabase
   .subscribe()
 ```
 
-</TabItem>
-</Tabs>
-
 Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes. 
 The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
 called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
@@ -378,26 +352,26 @@ called `supabase_realtime`, and by managing this publication you can control whi
 ### Securing your Routes 
 
 
-Your API is designed to work with Postgres Row Level Security. If you use Supabase [Auth](/docs/guides/auth), you can restrict data based on the logged-in user.
+Your API is designed to work with Postgres Row Level Security (RLS). If you use Supabase [Auth](/docs/guides/auth), you can restrict data based on the logged-in user.
 To control access to your data, you can use [Policies](/docs/guides/auth#policies).
-When you create a table in Postgres, Row Level Security is disabled by default. Make sure you secure it by [enabling RLS](/docs/guides/api#securing-your-routes).
+When you create a table in Postgres, Row Level Security is disabled by default. To enable RLS:
 
 <Tabs
-defaultValue="UI"
-values={[
-  {label: 'UI', value: 'UI'},
-  {label: 'SQL', value: 'SQL'},
-]}>
-<TabItem value="UI">
+  groupId="dashboard-or-sql"
+  defaultValue="dashboard"
+  values={[
+    {label: 'Dashboard', value: 'dashboard'},
+    {label: 'SQL', value: 'sql'},
+  ]}>
 
-```sh
-1. Go to the "Authentication" section.
-2. Click on "Policies" in the sidebar.
-3. Click "Enable RLS" to enable Row Level Security.
-```
+<TabItem value="dashboard">
+
+1. Go to the [Authentication](https://app.supabase.com/project/_/auth/users) page in the Dashboard.
+2. Click on **Policies** in the sidebar.
+3. Select **Enable RLS** to enable Row Level Security.
 
 </TabItem>
-<TabItem value="SQL">
+<TabItem value="sql">
 
 ```sql
 alter table todos enable row level security;
@@ -408,10 +382,9 @@ alter table todos enable row level security;
 
 ### The `service_role` key 
 
+Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key is designed to bypass Row Level Security - so it should only be used on a private server.
 
-Never expose the `service_role` key in a browser or anywhere where a user can see it. This Key can is designed to bypass Row Level Security - so it should only be used on a private server.
-
-We have [partnered with GitHub](https://supabase.com/blog/2022/03/28/community-day#supabase-is-now-a-github-secret-scanning-partner) to scan for Supabase `service_role` keys pushed to public repositories.
+We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.
 
 ### Safeguards towards accidental deletes and updates

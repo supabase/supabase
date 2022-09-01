@@ -1,0 +1,83 @@
+---
+id: auth-api-createuser
+title: 'createUser()'
+slug: auth-api-createuser
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Creates a new user.
+
+This function should only be called on a server. Never expose your `service_role` key in the browser.
+
+```js
+const { data: user, error } = await supabase.auth.api.createUser({
+  email: 'user@email.com',
+  password: 'password',
+  user_metadata: { name: 'Yoda' },
+})
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      attributes
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>AdminUserAttributes</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The data you want to create the user with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Notes
+
+- Requires a `service_role` key.
+- This function should be called on a server. Never expose your `service_role` key in the browser.
+- If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
+
+## Examples
+
+### Create a new user.
+
+```js
+const { data: user, error } = await supabase.auth.api.createUser({
+  email: 'user@email.com',
+  password: 'password',
+  user_metadata: { name: 'Yoda' },
+})
+```
+
+### Auto-confirm email.
+
+```js
+const { data: user, error } = await supabase.auth.api.createUser({
+  email: 'user@email.com',
+  email_confirm: true,
+})
+```
+
+### Auto-confirm phone.
+
+```js
+const { data: user, error } = await supabase.auth.api.createUser({
+  phone: '1234567890',
+  phone_confirm: true,
+})
+```

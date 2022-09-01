@@ -1,0 +1,66 @@
+---
+id: contains
+title: '.contains()'
+slug: contains
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .contains('main_exports', ['oil'])
+```
+
+## Notes
+
+- `.contains()` can work on array columns or range columns.
+  It is very useful for finding rows where a tag array contains all the values in the filter array.
+
+  ```js
+  .contains('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .contains('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .contains('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .contains('rangecol',`(${arr}]`) // You can insert an array into a string.
+  ```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .contains('main_exports', ['oil'])
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .contains('main_exports', ['oil'])
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .contains('main_exports', ['oil'])
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .contains('main_exports', ['oil'])
+```

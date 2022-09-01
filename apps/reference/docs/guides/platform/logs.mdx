@@ -1,0 +1,81 @@
+---
+id: logs
+title: Logging
+description: Getting started with Supabase Platform Log Browser
+---
+
+The Supabase Platform provides a log explorer that allows log tracing and debugging. Currently, PostgreSQL and Cloudflare edge logs are available.
+
+:::note
+
+The features discussed in this article are only available through the Supabase Platform and are not available on self-hosted.
+
+:::
+
+## Product Logs
+
+As well as a Log Explorer, Supabase provides a logging interface specific to each product.
+
+### API Logs
+
+![API Logs](/img/guides/platform/logs/logs-api.png)
+
+The API Logs can be found under `Database > API Logs`. These show all network requests for the REST and GraphQL [API](../../guides/api).
+
+### Postgres Logs
+
+![Postgres Logs](/img/guides/platform/logs/logs-database.png)
+
+The Postgres Logs can be found under `Database > Postgres Logs`. These show all queries and activity for your [Database](../../guides/database).
+
+## Log Explorer
+
+![Sidebar navigation steps](/img/guides/platform/logs/sidebar-navigation.png)
+
+The log browser can be accessed in the sidebar under **Logs Explorer**. The **Logs Explorer** is for querying and aggregating project logs across products using SQL `SELECT` queries.
+
+### Example
+
+For example, you may enter the following into the SQL editor to query for each user's IP address:
+
+```sql
+SELECT timestamp, h.x_real_ip
+FROM edge_logs
+  LEFT JOIN UNNEST(metadata) as m ON TRUE
+  LEFT JOIN UNNEST(m.request) AS r ON TRUE
+  LEFT JOIN UNNEST(r.headers) AS h ON TRUE
+WHERE h.x_real_ip IS NOT NULL
+```
+
+![SELECT query example](/img/guides/platform/logs/select-query.png)
+
+The list of supported product sources can be found under the **Sources** dropdown.
+
+### Unnesting Arrays
+
+To query the metadata in the above example, you can unnest the field and "join" the unnested data. Clicking on the log row shows that log metadata is stored as an array of objects.
+
+In order to query any value that is an array, we would need to `UNNEST()` that field and add it to the query as a join, thereby allowing us to reference the nested fields within the array.
+
+:::caution
+
+Large projects may run into a `Resources Exceeded` memory limit error when selecting large objects with many nested keys. To avoid this error, select individual keys separately or reduce the queried date range.
+:::
+
+### Functions
+
+You may have also noticed from the above examples that we are able to use certain SQL functions within our queries. The querying engine currently supported is BigQuery, hence you may use [any valid BigQuery function](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators) within your query.
+
+#### Timestamp Behavior
+
+Each log entry is stored with a `timestamp`. In order to utilize the `timestamp` field in a query, you can use the appropriate [timestamp functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp).
+
+:::note
+
+In the Log Explorer, timestamps are rendered as unix microsecond timestamps. SQL queries, however, should always use the `TIMESTAMP` data type. If you are using a unix timestamp value in a query, cast the value to a `TIMESTAMP` data type.
+
+:::
+
+## Templates
+
+Templates are available to help craft you log queries. Templates are available under the **Templates** tab, or under the **Templates** Dropdown in the **Query** tab.

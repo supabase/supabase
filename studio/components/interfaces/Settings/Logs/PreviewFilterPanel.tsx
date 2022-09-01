@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react'
 import {
   Button,
   Input,
-  Typography,
   IconRefreshCw,
   IconSearch,
   IconExternalLink,
@@ -79,9 +78,9 @@ const PreviewFilterPanel: FC<Props> = ({
               ].join(' ')}
             >
               <div className="absolute z-20">
-                <Typography.Text style={{ fontSize: '0.6rem' }} className="opacity-80">
+                <p style={{ fontSize: '0.6rem' }} className="text-scale-1000">
                   {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                </Typography.Text>
+                </p>
               </div>
               <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
               <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
@@ -97,8 +96,10 @@ const PreviewFilterPanel: FC<Props> = ({
       Refresh
     </Button>
   )
-  const handleSearch = (partial: Partial<Parameters<LogSearchCallback>[0]>) =>
-    onSearch({ query: search, to: partial?.to || null, from: partial?.from || null })
+  const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
+    onSearch('datepicker-change', { to, from })
+  }
+  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
     <div
@@ -110,7 +111,7 @@ const PreviewFilterPanel: FC<Props> = ({
           onSubmit={(e) => {
             // prevent redirection
             e.preventDefault()
-            handleSearch({})
+            handleInputSearch(search)
           }}
         >
           <Input
@@ -120,7 +121,7 @@ const PreviewFilterPanel: FC<Props> = ({
             onChange={(e) => setSearch(e.target.value)}
             onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
               setSearch(e.target.value)
-              handleSearch({ query: e.target.value })
+              handleInputSearch(e.target.value)
             }}
             icon={
               <div className="text-scale-900">
@@ -131,7 +132,7 @@ const PreviewFilterPanel: FC<Props> = ({
             actions={
               hasEdits && (
                 <button
-                  onClick={() => handleSearch({})}
+                  onClick={() => handleInputSearch(search)}
                   className="text-scale-1100 hover:text-scale-1200 mx-2"
                 >
                   {'↲'}
@@ -142,7 +143,7 @@ const PreviewFilterPanel: FC<Props> = ({
         </form>
 
         <DatePickers
-          onChange={handleSearch}
+          onChange={handleDatepickerChange}
           to={defaultToValue}
           from={defaultFromValue}
           helpers={PREVIEWER_DATEPICKER_HELPERS}

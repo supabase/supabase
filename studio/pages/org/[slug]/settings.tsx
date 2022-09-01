@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import { Member, NextPageWithLayout, Organization, Project, Role, User } from 'types'
-import { useOrganizationDetail, useOrganizationRoles, useStore, withAuth } from 'hooks'
+import { useFlag, useOrganizationDetail, useOrganizationRoles, useStore, withAuth } from 'hooks'
 import { AccountLayoutWithoutAuth } from 'components/layouts'
 import {
   GeneralSettings,
@@ -21,7 +21,14 @@ const OrgSettingsLayout = withAuth(
     const router = useRouter()
 
     const slug = ui.selectedOrganization?.slug || ''
-    const { roles } = useOrganizationRoles(slug)
+
+    const { roles: allRoles } = useOrganizationRoles(slug)
+    const enableBillingOnlyReadOnly = useFlag('enableBillingOnlyReadOnlyRoles')
+    const roles = enableBillingOnlyReadOnly
+      ? allRoles
+      : (allRoles ?? []).filter((role) =>
+          ['Owner', 'Administrator', 'Developer'].includes(role.name)
+        )
 
     // [Refactor] Eventually move away from useLocalObservable
     const PageState: any = useLocalObservable(() => ({

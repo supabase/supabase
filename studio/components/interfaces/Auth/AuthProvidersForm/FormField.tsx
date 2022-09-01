@@ -7,9 +7,10 @@ interface Props {
   name: string
   properties: any
   formValues: any
+  disabled?: boolean
 }
 
-const FormField: FC<Props> = ({ name, properties, formValues }) => {
+const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
   if (properties.show && formValues[properties.show.key] !== properties.show.matches) return <></>
 
   const [hidden, setHidden] = useState(!!properties.isSecret)
@@ -22,6 +23,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           layout="vertical"
           id={name}
           name={name}
+          disabled={disabled}
           type={hidden ? 'password' : 'text'}
           label={properties.title}
           labelOptional={
@@ -64,6 +66,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           layout="vertical"
           id={name}
           name={name}
+          disabled={disabled}
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
@@ -97,6 +100,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
           size="small"
           id={name}
           name={name}
+          disabled={disabled}
           label={properties.title}
           descriptionText={properties.description}
         />
@@ -107,6 +111,7 @@ const FormField: FC<Props> = ({ name, properties, formValues }) => {
         <Listbox
           size="small"
           name={name}
+          disabled={disabled}
           label={properties.title}
           descriptionText={properties.description}
           defaultValue={properties.enum[0]}

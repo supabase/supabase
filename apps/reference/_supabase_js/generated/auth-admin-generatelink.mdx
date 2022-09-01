@@ -1,0 +1,155 @@
+---
+id: auth-admin-generatelink
+title: 'generateLink()'
+slug: /auth-admin-generatelink
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Generates email links and OTPs to be sent via a custom email provider.
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
+)
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateLinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>GenerateSignupLinkParams</code> | <code>GenerateInviteOrMagiclinkParams</code> | <code>GenerateRecoveryLinkParams</code> | <code>GenerateEmailChangeLinkParams</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateSignupLinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateRecoveryLinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateInviteOrMagiclinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      GenerateEmailChangeLinkParams
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Examples
+
+### Generate a signup link.
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'signup',
+  {
+    'password': 'secret'
+  }
+)
+```
+
+### Generate an invite link.
+
+```js
+const { data, error } = await supabase.auth.admin.generateLink(
+  'email@example.com'
+  'invite',
+)
+```

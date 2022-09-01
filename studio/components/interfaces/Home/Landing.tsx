@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Head from 'next/head'
 import { observer } from 'mobx-react-lite'
-import { Button, IconGitHub, Typography } from '@supabase/ui'
+import { Button, IconGitHub } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
@@ -13,14 +13,12 @@ const Landing = () => {
 
   async function handleGithubSignIn() {
     try {
-      const { error } = await auth.signIn(
-        {
-          provider: 'github',
+      const { error } = await auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}?auth=true`,
         },
-        {
-          redirectTo: process.env.NEXT_PUBLIC_SITE_URL,
-        }
-      )
+      })
       if (error) throw error
     } catch (error) {
       console.error(error)

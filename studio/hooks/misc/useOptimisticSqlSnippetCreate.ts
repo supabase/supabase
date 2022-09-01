@@ -3,7 +3,7 @@ import { useSqlStore } from 'localStores/sqlEditor/SqlEditorStore'
 import { useCallback } from 'react'
 import { useStore } from './useStore'
 
-export function useOptimisticSqlSnippetCreate() {
+export function useOptimisticSqlSnippetCreate(canCreateSQLSnippet: boolean) {
   const { ui, content: contentStore } = useStore()
   const { profile: user } = ui
 
@@ -27,11 +27,18 @@ export function useOptimisticSqlSnippetCreate() {
       sqlEditorStore.selectTab(data.id)
 
       // save the new query to the server in the background
-      const { error } = await contentStore.save(data)
-      if (error) {
+      if (canCreateSQLSnippet) {
+        const { error } = await contentStore.save(data)
+        if (error) {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to create new query: ${error.message}`,
+          })
+        }
+      } else {
         ui.setNotification({
-          category: 'error',
-          message: `Failed to create new query: ${error.message}`,
+          category: 'info',
+          message: 'Your queries will not be saved as you do not have sufficient permissions',
         })
       }
     },

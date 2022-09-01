@@ -1,0 +1,159 @@
+---
+id: overlaps
+title: '.overlaps()'
+slug: /overlaps
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose array or range value on the stated `column` overlaps
+(has a value in common) with the specified `value`.
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ColumnName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      value
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>string</code> | <code>array</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The value to filter with.
+
+  </div>
+  
+<ul className="method-list-group">
+  <h5 class="method-list-title method-list-title-isChild expanded">Properties</h5>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      <code>object</code>
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      string
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+No description provided.
+
+  </div>
+  
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+
+## Notes
+
+- `.overlaps()` can work on array columns or range columns.
+
+  ```js
+  .overlaps('arraycol',["a","b"]) // You can use a javascript array for an array column
+  .overlaps('arraycol','{"a","b"}') // You can use a string with Postgres array {} for array column.
+  .overlaps('rangecol','(1,2]') // Use Postgres range syntax for range column.
+  .overlaps('rangecol',`(${arr}]`)  // You can insert an array into a string.
+  ```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+### With `update()`
+
+```js
+let countries = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .overlaps('main_exports', ['computers', 'minerals'])
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .overlaps('main_exports', ['computers', 'minerals'])
+```

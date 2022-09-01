@@ -1,0 +1,33 @@
+---
+id: storage-updatebucket
+title: 'updateBucket()'
+slug: /storage-updatebucket
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Updates a new Storage bucket
+
+```dart
+final res = await supabase
+  .storage
+  .updateBucket('avatars', { public: false });
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: `update`
+  - `objects` permissions: none
+
+## Examples
+
+### Update bucket
+
+```dart
+final res = await supabase
+  .storage
+  .updateBucket('avatars', { public: false });
+```

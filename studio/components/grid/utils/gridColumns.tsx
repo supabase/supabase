@@ -30,6 +30,8 @@ import { AddColumn, ColumnHeader, SelectColumn } from '../components/grid'
 import { COLUMN_MIN_WIDTH } from '../constants'
 import { BooleanFormatter, DefaultFormatter, ForeignKeyFormatter } from '../components/formatter'
 
+const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
+
 export function getGridColumns(
   table: SupaTable,
   options?: {
@@ -40,13 +42,23 @@ export function getGridColumns(
 ): any[] {
   const columns = table.columns.map((x, idx) => {
     const columnType = getColumnType(x)
+
+    const columnDefaultWidth = getColumnDefaultWidth(x)
+    const columnWidthBasedOnName =
+      (x.name.length + x.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
+    const columnWidth = options?.defaultWidth
+      ? options.defaultWidth
+      : columnDefaultWidth < columnWidthBasedOnName
+      ? columnWidthBasedOnName
+      : columnDefaultWidth
+
     const columnDefinition: CalculatedColumn<SupaRow> = {
       key: x.name,
       name: x.name,
       idx: idx + 1,
       resizable: true,
       sortable: true,
-      width: options?.defaultWidth || getColumnWidth(x),
+      width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
       frozen: x.isPrimaryKey || false,
       isLastFrozenColumn: false,
@@ -156,7 +168,7 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
   } else return 'unknown'
 }
 
-function getColumnWidth(columnDef: SupaColumn): string | number | undefined {
+function getColumnDefaultWidth(columnDef: SupaColumn): number {
   if (isNumericalColumn(columnDef.dataType)) {
     return 120
   } else if (

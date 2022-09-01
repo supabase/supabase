@@ -30,7 +30,7 @@ const Header: FC<HeaderProps> = ({ sorts, filters, onAddColumn, onAddRow, header
   const { selectedRows } = state
 
   return (
-    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5">
+    <div className="bg-scale-100 dark:bg-scale-300 flex h-10 items-center justify-between px-5 py-1.5">
       {selectedRows.size > 0 ? (
         <RowHeader sorts={sorts} filters={filters} />
       ) : (
@@ -77,7 +77,7 @@ const DefaultHeader: FC<DefaultHeaderProps> = ({ sorts, filters, onAddColumn, on
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <RefreshButton filters={filters} sorts={sorts} />
         <FilterDropdown />
         <SortPopover />
@@ -114,7 +114,10 @@ const RowHeader: FC<RowHeaderProps> = ({ sorts, filters }) => {
   const onRowsDelete = () => {
     confirmAlert({
       title: 'Confirm to delete',
-      message: 'Are you sure you want to delete the selected rows? This action cannot be undone.',
+      message: `Are you sure you want to delete the selected ${selectedRows.size} row${
+        selectedRows.size > 1 ? 's' : ''
+      }? This action cannot be undone.`,
+      confirmText: `Delete ${selectedRows.size} rows`,
       onAsyncConfirm: async () => {
         if (allRowsSelected) {
           const { error } =

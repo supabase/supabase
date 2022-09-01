@@ -17,15 +17,15 @@ import {
   Input,
   Listbox,
   Menu,
-  Typography,
 } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
 import { checkPermissions, useStore } from 'hooks'
 import { SchemaView } from './TableEditorLayout.types'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 interface Props {
   selectedSchema?: string
@@ -56,14 +56,11 @@ const TableEditorMenu: FC<Props> = ({
 
   // @ts-ignore
   const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const [searchText, setSearchText] = useState<string>('')
   const [schemaViews, setSchemaViews] = useState<SchemaView[]>([])
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-  const canCreateTables = checkPermissions(
-    PermissionAction.TENANT_SQL_CREATE_TABLE,
-    'postgres.public.*'
-  )
 
   // We may need to shift this to the schema store and do something like meta.schema.loadViews()
   // I don't need we need a separate store for views
@@ -126,11 +123,11 @@ const TableEditorMenu: FC<Props> = ({
             <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
               <p className="text-sm">Schemas</p>
             </Listbox.Option>
+            {/* @ts-ignore */}
             {openSchemas.map((schema) => (
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
-                // @ts-ignore
                 label={schema.name}
                 addOnBefore={() => <span className="text-scale-900">schema</span>}
               >
@@ -149,7 +146,6 @@ const TableEditorMenu: FC<Props> = ({
               <Listbox.Option
                 key={schema.id}
                 value={schema.name}
-                // @ts-ignore
                 label={schema.name}
                 addOnBefore={() => <span className="text-scale-900">schema</span>}
               >
@@ -164,20 +160,41 @@ const TableEditorMenu: FC<Props> = ({
         {!isLocked && (
           <div className="px-3">
             {/* Add new table button */}
-            <Button
-              block
-              size="tiny"
-              icon={
-                <div className="text-scale-900">
-                  <IconEdit size={14} strokeWidth={1.5} />
-                </div>
-              }
-              type="default"
-              style={{ justifyContent: 'start' }}
-              onClick={onAddTable}
-            >
-              New table
-            </Button>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger className="w-full">
+                <Button
+                  block
+                  as="span"
+                  disabled={!canCreateTables}
+                  size="tiny"
+                  icon={
+                    <div className="text-scale-900">
+                      <IconEdit size={14} strokeWidth={1.5} />
+                    </div>
+                  }
+                  type="default"
+                  style={{ justifyContent: 'start' }}
+                  onClick={onAddTable}
+                >
+                  New table
+                </Button>
+              </Tooltip.Trigger>
+              {!canCreateTables && (
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                      'border-scale-200 border',
+                    ].join(' ')}
+                  >
+                    <span className="text-scale-1200 text-xs">
+                      You need additional permissions to create tables
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              )}
+            </Tooltip.Root>
           </div>
         )}
         {/* Table search input */}
@@ -229,9 +246,11 @@ const TableEditorMenu: FC<Props> = ({
                   key={table.name}
                   url={`/project/${projectRef}/editor/${table.id}`}
                   name={table.name}
+                  hoverText={table.comment ? table.comment : table.name}
                   isActive={isActive}
                   action={
-                    isActive && (
+                    isActive &&
+                    !isLocked && (
                       <Dropdown
                         size="small"
                         side="bottom"
@@ -295,7 +314,7 @@ const TableEditorMenu: FC<Props> = ({
               <Link key={viewId} href={`/project/${projectRef}/editor/${viewId}`}>
                 <Menu.Item key={viewId} rounded active={isActive}>
                   <div className="flex justify-between">
-                    <Typography.Text className="truncate">{view.name}</Typography.Text>
+                    <p className="truncate">{view.name}</p>
                   </div>
                 </Menu.Item>
               </Link>

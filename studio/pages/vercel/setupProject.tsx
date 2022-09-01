@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
-import { Button, Input, Listbox, Typography } from '@supabase/ui'
+import { Button, Input, Listbox } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import generator from 'generate-password'
 
@@ -141,9 +141,7 @@ const Connecting = () => (
     <div className="flex w-32 items-center justify-center">
       <Loading />
     </div>
-    <Typography.Text>
-      <p>Connecting...</p>
-    </Typography.Text>
+    <p>Connecting...</p>
   </div>
 )
 
@@ -214,7 +212,8 @@ const CreateProject = observer(() => {
       auth_site_url: _store.selectedVercelProjectUrl,
       vercel_configuration_id: _store.configurationId,
     }
-    return await post(`${API_URL}/projects`, data)
+    const project = await post(`${API_URL}/projects`, data)
+    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
   }
 
   async function onCreateProject() {
