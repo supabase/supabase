@@ -61,7 +61,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/hello-world' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.net/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
