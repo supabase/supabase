@@ -31,7 +31,7 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
       </Table.td>
       <Table.td className="">
         <div className="text-xs text-scale-900 flex gap-2 items-center truncate">
-          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.co/${item.slug}`}</span>
+          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.net/${item.slug}`}</span>
           <span className="font-mono truncate md:hidden">{`/${item.name}`}</span>
         </div>
       </Table.td>

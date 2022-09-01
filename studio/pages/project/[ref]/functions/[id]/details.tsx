@@ -110,7 +110,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   const invokeCommands: any = [
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.co/${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.net/${
         selectedFunction?.slug
       }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello function',
