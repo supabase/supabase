@@ -173,7 +173,7 @@ export const genSingleLogQuery = (table: LogsTableName, id: string) =>
  */
 export const maybeShowUpgradePrompt = (
   from: string | null | undefined,
-  tier: StripeSubscription['tier'] | undefined
+  tier: StripeSubscription['tier']
 ) => {
   const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
 

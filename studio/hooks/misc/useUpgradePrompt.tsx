@@ -4,6 +4,7 @@ import { useProjectSubscription } from 'hooks'
 import { useRouter } from 'next/router'
 import { maybeShowUpgradePrompt, TIER_QUERY_LIMITS } from 'components/interfaces/Settings/Logs'
 import Link from 'next/link'
+import { StripeProduct } from 'components/interfaces/Billing'
 
 export const useUpgradePrompt = (from: any) => {
   const router = useRouter()
@@ -12,7 +13,7 @@ export const useUpgradePrompt = (from: any) => {
   const tier = subscription?.tier
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
-  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
+  const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier as StripeProduct)
 
   useEffect(() => {
     if (shouldShowUpgradePrompt) {

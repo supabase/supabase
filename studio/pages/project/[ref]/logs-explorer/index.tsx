@@ -25,6 +25,7 @@ import {
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { StripeProduct } from 'components/interfaces/Billing'
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -114,7 +115,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, tier as StripeProduct)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
