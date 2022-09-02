@@ -42,7 +42,7 @@ import ExtensionsStore from './ExtensionsStore'
 import TypesStore from './TypesStore'
 
 const BATCH_SIZE = 1000
-const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
+const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
   excludedSchemas: string[]
