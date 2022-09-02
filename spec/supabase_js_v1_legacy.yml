@@ -599,6 +599,13 @@ pages:
         .update({ password: new_password })
       ```
     examples:
+      - name: Reset password
+        isSpotlight: true
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.api
+            .resetPasswordForEmail('user@email.com')
+          ```
       - name: Reset password (React)
         isSpotlight: true
         js: |
