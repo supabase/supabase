@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -28,9 +28,11 @@ export const UserReportPage: NextPageWithLayout = () => {
     subject: { id: ui.profile?.id },
   })
 
+  const kpsEnabled = useFlag('initWithKps')
+
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
+      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
   }, [project])
 
