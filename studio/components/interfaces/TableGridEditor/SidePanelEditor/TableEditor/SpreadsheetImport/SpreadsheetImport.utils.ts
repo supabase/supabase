@@ -7,10 +7,11 @@ const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export const parseSpreadsheetText: any = (text: string) => {
   const columnTypeMap: any = {}
+  let previewRows: any[] = []
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false,
       skipEmptyLines: true,
       complete: (results) => {
         const headers = results.meta.fields || []
@@ -26,7 +27,8 @@ export const parseSpreadsheetText: any = (text: string) => {
           }
         })
 
-        resolve({ headers, rows, columnTypeMap, errors })
+        previewRows = results.data.slice(0, 20)
+        resolve({ headers, rows, previewRows, columnTypeMap, errors })
       },
     })
   })
