@@ -161,7 +161,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                     ) : (
                       <div />
                     )}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
                       <Button
                         type="default"
                         htmlType="reset"
@@ -179,7 +179,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                         loading={isSubmitting}
                         disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
                       >
-                        Save changes
+                        Save
                       </Button>
                     </div>
                   </Panel.Content>

@@ -158,7 +158,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                 ) : (
                   <div />
                 )}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
                   <Button
                     type="default"
                     htmlType="reset"
@@ -174,7 +174,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
                     disabled={!hasChanges || isSaving}
                     onClick={() => onSaveTaxIds()}
                   >
-                    Save changes
+                    Save
                   </Button>
                 </div>
               </div>
