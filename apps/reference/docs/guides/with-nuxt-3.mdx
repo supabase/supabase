@@ -232,14 +232,6 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 </script>
 ```
 
-### User state
-
-To access the user information in other places, will create a user state. Create a new file called `states.ts` and utilize `useState` method of Nuxt 3.
-
-```typescript title="composables/states.ts"
-export const useUser = () => useState('user', () => null)
-```
-
 ### Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
@@ -288,7 +280,7 @@ Let's create a new component for that called `Account.vue`.
 
 
   loading.value = true
-  const user = useUser();
+  const user = useSupabaseUser();
   let { data } = await supabase
       .from('profiles')
       .select(`username, website, avatar_url`)
@@ -304,7 +296,7 @@ Let's create a new component for that called `Account.vue`.
   async function updateProfile() {
       try {
           loading.value = true
-          const user = useUser();
+          const user = useSupabaseUser();
           const updates = {
               id: user.value.id,
               username: username.value,
@@ -343,16 +335,6 @@ Now that we have all the components in place, let's update `app.vue`:
 
 ```html title="app.vue"
 <template>
-  <div>
-    <NuxtPage />
-  </div>
-</template>
-```
-
-We now need to create an index page called `pages/index.vue`:
-
-```html title="pages/index.vue"
-<template>
   <div class="container" style="padding: 50px 0 100px 0">
     <Account v-if="user" />
     <Auth v-else />
@@ -360,14 +342,7 @@ We now need to create an index page called `pages/index.vue`:
 </template>
 
 <script setup>
-  const supabase = useSupabaseClient()
-
-  const user = useUser()
-
-  user.value = useSupabaseUser()
-  supabase.auth.onAuthStateChange((_, session) => {
-    user.value = session?.user
-  })
+const user = useSupabaseUser()
 </script>
 ```
 
@@ -526,7 +501,7 @@ And then we can add the widget to the Account page:
 
 
   loading.value = true
-  const user = useUser();
+  const user = useSupabaseUser();
   let { data } = await supabase
       .from('profiles')
       .select(`username, website, avatar_url`)
@@ -542,7 +517,7 @@ And then we can add the widget to the Account page:
   async function updateProfile() {
       try {
           loading.value = true
-          const user = useUser();
+          const user = useSupabaseUser();
           const updates = {
               id: user.value.id,
               username: username.value,

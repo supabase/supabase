@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Input } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, useFlag } from 'hooks'
+import { useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import {
   FormHeader,
@@ -18,7 +18,6 @@ interface Props {}
 
 const Infrastructure: FC<Props> = ({}) => {
   const { ui } = useStore()
-  const isProjectPauseEnabled = useFlag('projectPausing')
 
   const project = ui.selectedProject
   const isFreeProject = project?.subscription_tier === PRICING_TIER_PRODUCT_IDS.FREE
@@ -41,7 +40,7 @@ const Infrastructure: FC<Props> = ({}) => {
               {project && <RestartServerButton project={project} />}
             </div>
 
-            {isProjectPauseEnabled && isFreeProject && (
+            {isFreeProject && (
               <>
                 <div className="border-t border-scale-400" />
                 <div className="flex w-full items-center justify-between px-8 py-4">

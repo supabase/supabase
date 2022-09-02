@@ -52,7 +52,7 @@ export const parseSpreadsheet = (
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
-      dynamicTyping: true,
+      dynamicTyping: false,
       skipEmptyLines: true,
       worker: true,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
@@ -128,7 +128,7 @@ export const inferColumnType = (column: string, rows: object[]) => {
       else return includes(['true', 'false'], item.toString().toLowerCase())
     })
     if (isAllBoolean) {
-      return 'boolean'
+      return 'bool'
     }
   }
 
@@ -141,8 +141,14 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   // Infer datetime type
-  if (dayjs(columnData, 'YYYY-MM-DD hh:mm:ss').isValid() && Date.parse(columnData)) {
-    return 'timestamptz'
+  if (Date.parse(columnData)) {
+    const isAllTimestamptz = columnDataAcrossRows.every((item) =>
+      dayjs(item, 'YYYY-MM-DD hh:mm:ss').isValid()
+    )
+
+    if (isAllTimestamptz) {
+      return 'timestamptz'
+    }
   }
 
   return 'text'
