@@ -23,6 +23,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { usage } = useProjectUsage(ref as string)
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
   const isOverUsageLimits =
+    selectedProject?.subscription_tier !== undefined &&
     selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE &&
     resourcesExceededLimits.length > 0
 
