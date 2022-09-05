@@ -1,5 +1,5 @@
-import { useFlag, useStore } from 'hooks'
 import jsonLogic from 'json-logic-js'
+import { useFlag, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import useSWR from 'swr'

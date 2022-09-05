@@ -7,11 +7,12 @@ import { Project, NextPageWithLayout } from 'types'
 import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
-import ProjectUsage from 'components/ui/Usage'
 import LoadingUI from 'components/ui/Loading'
-import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
+import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
+import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -38,6 +39,9 @@ interface SettingsProps {
 
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
+  const projectTier = ui.selectedProject?.subscription_tier
+
+  const [dateRange, setDateRange] = useState<any>()
 
   const {
     subscription,
@@ -49,8 +53,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     ui.selectedProject?.ref,
     subscription?.tier?.supabase_prod_id
   )
-
-  const [dateRange, setDateRange] = useState<any>()
 
   useEffect(() => {
     if (error) {
@@ -67,6 +69,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
+      {projectTier !== undefined && <OveragesBanner tier={projectTier} />}
       <Subscription
         loading={loading}
         project={project}
@@ -110,7 +113,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
           {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>
