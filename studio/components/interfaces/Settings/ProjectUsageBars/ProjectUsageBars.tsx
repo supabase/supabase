@@ -17,7 +17,9 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { usage, error, isLoading } = useProjectUsage(projectRef)
 
-  const isEnterprise = ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const showUsageExceedMessage =
+    ui.selectedProject?.subscription_tier !== undefined &&
+    ui.selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE
 
   useEffect(() => {
     if (error) {
@@ -45,7 +47,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
         <div>
           {usageBasedItems.map((product) => {
             const isExceededUsage =
-              !isEnterprise &&
+              showUsageExceedMessage &&
               product.features
                 .map((feature) => {
                   const featureUsage = usage[feature.key]
@@ -97,7 +99,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         const featureUsage = usage[feature.key]
                         const usageRatio = featureUsage.usage / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
-                        const isExceeded = !isEnterprise && usageRatio >= 1
+                        const isExceeded = showUsageExceedMessage && usageRatio >= 1
 
                         return (
                           <tr
@@ -107,31 +109,35 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             <td className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200">
                               {feature.title}
                             </td>
-                            {!isEnterprise && (
-                              <td className="w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell hidden text-scale-1200">
-                                {(usageRatio * 100).toFixed(2)} %
-                              </td>
+                            {ui.selectedProject?.subscription_tier !== undefined && (
+                              <>
+                                {showUsageExceedMessage && (
+                                  <td className="w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell hidden text-scale-1200">
+                                    {(usageRatio * 100).toFixed(2)} %
+                                  </td>
+                                )}
+                                <td className="px-6 py-3 text-sm text-scale-1200">
+                                  {showUsageExceedMessage ? (
+                                    <SparkBar
+                                      type="horizontal"
+                                      barClass={`${
+                                        isExceeded
+                                          ? 'bg-red-900'
+                                          : isApproaching
+                                          ? 'bg-yellow-900'
+                                          : 'bg-brand-900'
+                                      }`}
+                                      value={featureUsage.usage}
+                                      max={featureUsage.limit}
+                                      labelBottom={formatBytes(featureUsage.usage)}
+                                      labelTop={formatBytes(featureUsage.limit)}
+                                    />
+                                  ) : (
+                                    <span>{formatBytes(featureUsage.usage)}</span>
+                                  )}
+                                </td>
+                              </>
                             )}
-                            <td className="px-6 py-3 text-sm text-scale-1200">
-                              {!isEnterprise ? (
-                                <SparkBar
-                                  type="horizontal"
-                                  barClass={`${
-                                    isExceeded
-                                      ? 'bg-red-900'
-                                      : isApproaching
-                                      ? 'bg-yellow-900'
-                                      : 'bg-brand-900'
-                                  }`}
-                                  value={featureUsage.usage}
-                                  max={featureUsage.limit}
-                                  labelBottom={formatBytes(featureUsage.usage)}
-                                  labelTop={formatBytes(featureUsage.limit)}
-                                />
-                              ) : (
-                                <span>{formatBytes(featureUsage.usage)}</span>
-                              )}
-                            </td>
                           </tr>
                         )
                       })}
