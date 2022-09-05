@@ -141,11 +141,11 @@ Once you get the hang of policies you can start to get a little bit fancy. Let's
 create policy "Only Blizzard staff can update leaderboard"
   on my_scores
   for update using (
-    right(auth.email(), 13) = '@blizzard.com'
+    right(auth.jwt()->>'email', 13) = '@blizzard.com'
   );
 ```
 
-Supabase comes with three built-in helper functions: `auth.email()`, `auth.uid()` and `auth.role()`.
+Supabase comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`.
 
 See the full PostgreSQL policy docs here: [https://www.postgresql.org/docs/12/sql-createpolicy.html](https://www.postgresql.org/docs/12/sql-createpolicy.html)
 
