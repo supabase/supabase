@@ -99,3 +99,11 @@
 .react-datepicker__day--range-end {
   @apply bg-brand-900 text-white hover:text-scale-700 hover:bg-white;
 }
+
+.react-datepicker__day--highlighted {
+  background: linear-gradient(135deg, #34B27B 0% 20%, transparent 20%);
+}
+
+.react-datepicker__day--selected.react-datepicker__day--highlighted {
+  background: linear-gradient(135deg, #34B27B 0% 20%, hsla(153, 60%, 28%, 1) 20%);
+}

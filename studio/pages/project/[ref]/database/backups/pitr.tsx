@@ -8,6 +8,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { PITRBackupSelection } from 'components/interfaces/Database'
 import { NextPageWithLayout } from 'types'
 import NoPermission from 'components/ui/NoPermission'
+import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -28,16 +29,17 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
         }}
       >
-        <Tabs.Panel id="scheduled" label="Scheduled" />
+        <Tabs.Panel id="scheduled" label="Scheduled backups" />
         <Tabs.Panel id="pitr" label="Point in Time" />
       </Tabs>
 
-      <div className="space-y-4">
-        <p className="text-scale-1100 text-sm">
-          Restore your project from a specific date and time.
-        </p>
+      <div className="space-y-8">
         {canReadPhysicalBackups ? (
-          <PITRBackupSelection />
+          <>
+            <PITRNotice />
+            <PITRSelection />
+            {/* <PITRBackupSelection /> */}
+          </>
         ) : (
           <NoPermission resourceText="view PITR backups" />
         )}
