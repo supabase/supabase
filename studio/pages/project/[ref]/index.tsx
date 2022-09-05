@@ -8,10 +8,13 @@ import { ExampleProject, ClientLibrary } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
+import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 
 const Home: NextPageWithLayout = () => {
   const { ui } = useStore()
+
   const project = ui.selectedProject
+  const projectTier = ui.selectedProject?.subscription_tier
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -24,9 +27,15 @@ const Home: NextPageWithLayout = () => {
         <h1 className="text-3xl">{projectName}</h1>
       </div>
 
+      <div className="mx-6">
+        {projectTier !== undefined && <OveragesBanner minimal tier={projectTier} />}
+      </div>
+
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState project={project} />}
 
-      {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+      <div className="mx-6">
+        {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+      </div>
 
       <div className="space-y-8">
         <div className="mx-6">
@@ -52,6 +61,12 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+Home.getLayout = (page) => (
+  <ProjectLayoutWithAuth>
+    <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
+      {page}
+    </main>
+  </ProjectLayoutWithAuth>
+)
 
 export default observer(Home)
