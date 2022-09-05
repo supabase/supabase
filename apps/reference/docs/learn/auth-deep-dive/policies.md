@@ -138,10 +138,6 @@ There are some more notes here on how to structure your schema to best integrate
 Once you get the hang of policies you can start to get a little bit fancy. Let's say I work at Blizzard and I only want Blizzard staff members to be able to update people's high scores, I can write something like:
 
 ```sql
-create or replace function auth.email() returns text as $$
-  select nullif(current_setting('request.jwt.claims', true)::json->>'email', '')::text;
-$$ language sql;
-
 create policy "Only Blizzard staff can update leaderboard"
   on my_scores
   for update using (
