@@ -16,7 +16,10 @@ const ProjectUsageMinimal: FC<ProjectUsageMinimalProps> = ({ projectRef, filter 
   const { usage, error: usageError, isLoading } = useProjectUsage(projectRef)
   const { subscription, error: subscriptionError } = useProjectSubscription(projectRef)
 
-  if (subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG) {
+  if (
+    subscription?.tier?.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    subscription?.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  ) {
     return <></>
   }
 

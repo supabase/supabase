@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { useStore, useProjectUsage } from 'hooks'
 import BreadcrumbsView from './BreadcrumbsView'
 import OrgDropdown from './OrgDropdown'
@@ -22,7 +22,9 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   const { usage } = useProjectUsage(ref as string)
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
-  const isOverUsageLimits = resourcesExceededLimits.length > 0
+  const isOverUsageLimits =
+    selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE &&
+    resourcesExceededLimits.length > 0
 
   return (
     <div
