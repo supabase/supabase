@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { FC, ReactNode, PropsWithChildren } from 'react'
+import { FC, ReactNode, PropsWithChildren, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useStore, withAuth, useFlag } from 'hooks'
@@ -33,7 +33,6 @@ const ProjectLayout = ({
 }: PropsWithChildren<Props>) => {
   const { ui } = useStore()
   const ongoingIncident = useFlag('ongoingIncident')
-
   const projectName = ui.selectedProject?.name
 
   return (
@@ -66,7 +65,7 @@ const ProjectLayout = ({
   )
 }
 
-export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
+export const ProjectLayoutWithAuth = withAuth(observer(ProjectLayout))
 
 export default ProjectLayout
 
@@ -130,7 +129,7 @@ const ContentWrapper: FC<ContentWrapperProps> = observer(({ isLoading, children 
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={ui.selectedProject} />
       ) : (
-        <>{children}</>
+        <Fragment key={ui.selectedProject.ref}>{children}</Fragment>
       )}
     </>
   )
