@@ -29,6 +29,7 @@ import {
   convertTimeStringtoUnixS,
 } from './PITRBackupSelection.utils'
 import InformationBox from 'components/ui/InformationBox'
+import { FormHeader } from 'components/ui/Forms'
 
 interface Props {}
 
@@ -159,153 +160,161 @@ const PITRBackupSelection: FC<Props> = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {!canTriggerPhysicalBackups && (
-        <InformationBox
-          icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
-          title="You need additional permissions to trigger a scheduled backup"
-        />
-      )}
-      <form onSubmit={onSubmit}>
-        <div className="space-y-4">
-          <div className="space-y-4 rounded border border-gray-400 border-opacity-50 bg-gray-300 py-3">
-            <div className="space-y-4 py-2">
-              <div className="flex justify-between space-x-8">
-                <p className="w-2/5 pl-4 text-sm">Select timezone</p>
-                <div className="w-3/5 px-4">
-                  <Listbox
-                    value={selectedTimezone.text}
-                    onChange={(text) => {
-                      const selectedTimezone = ALL_TIMEZONES.find((option) => option.text === text)
-                      setSelectedTimezone(selectedTimezone)
-                    }}
-                    onBlur={() => setSearchString('')}
-                  >
-                    <div
-                      className={[
-                        'fixed top-0 flex w-full items-center',
-                        'rounded-t-md border-b border-gray-600 bg-gray-500',
-                        'mb-4 space-x-2 px-4 py-2',
-                      ].join(' ')}
-                      style={{ zIndex: 1 }}
+    <>
+      <FormHeader
+        title="Restore from a point in time"
+        description="Database changes are watched and recorded, so that you cna restore your database to any point in time"
+      />
+      <div className="space-y-6">
+        {!canTriggerPhysicalBackups && (
+          <InformationBox
+            icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+            title="You need additional permissions to trigger a scheduled backup"
+          />
+        )}
+        <form onSubmit={onSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-4 rounded border border-gray-400 border-opacity-50 bg-gray-300 py-3">
+              <div className="space-y-4 py-2">
+                <div className="flex justify-between space-x-8">
+                  <p className="w-2/5 pl-4 text-sm">Select timezone</p>
+                  <div className="w-3/5 px-4">
+                    <Listbox
+                      value={selectedTimezone.text}
+                      onChange={(text) => {
+                        const selectedTimezone = ALL_TIMEZONES.find(
+                          (option) => option.text === text
+                        )
+                        setSelectedTimezone(selectedTimezone)
+                      }}
+                      onBlur={() => setSearchString('')}
                     >
-                      <IconSearch size={14} />
-                      <input
-                        autoFocus
-                        className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
-                        value={searchString}
-                        placeholder={''}
-                        onChange={(e: FormEvent<HTMLInputElement>) =>
-                          setSearchString(e.currentTarget.value)
-                        }
-                      />
-                    </div>
-                    {/* Whitespace to shift listbox options down for searchfield */}
-                    <div className="h-8" />
-                    {timezoneOptions.map((option) => {
-                      return (
-                        <Listbox.Option key={option} label={option} value={option}>
-                          <div>{option}</div>
+                      <div
+                        className={[
+                          'fixed top-0 flex w-full items-center',
+                          'rounded-t-md border-b border-gray-600 bg-gray-500',
+                          'mb-4 space-x-2 px-4 py-2',
+                        ].join(' ')}
+                        style={{ zIndex: 1 }}
+                      >
+                        <IconSearch size={14} />
+                        <input
+                          autoFocus
+                          className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
+                          value={searchString}
+                          placeholder={''}
+                          onChange={(e: FormEvent<HTMLInputElement>) =>
+                            setSearchString(e.currentTarget.value)
+                          }
+                        />
+                      </div>
+                      {/* Whitespace to shift listbox options down for searchfield */}
+                      <div className="h-8" />
+                      {timezoneOptions.map((option) => {
+                        return (
+                          <Listbox.Option key={option} label={option} value={option}>
+                            <div>{option}</div>
+                          </Listbox.Option>
+                        )
+                      })}
+                      {timezoneOptions.length === 0 && (
+                        <Listbox.Option disabled key="no-results" label="" value="">
+                          No timezones found
                         </Listbox.Option>
-                      )
-                    })}
-                    {timezoneOptions.length === 0 && (
-                      <Listbox.Option disabled key="no-results" label="" value="">
-                        No timezones found
-                      </Listbox.Option>
-                    )}
-                  </Listbox>
+                      )}
+                    </Listbox>
+                  </div>
+                </div>
+                <div className="flex justify-between space-x-8">
+                  <div className="w-2/5 space-y-2 pl-4">
+                    <p className="text-sm">Earliest point of recovery</p>
+                  </div>
+                  <div className="w-3/5">
+                    <Input
+                      readOnly
+                      disabled
+                      step={1}
+                      type="datetime-local"
+                      className="px-4"
+                      value={earliestAvailableBackup}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between space-x-8">
+                  <div className="w-2/5 space-y-2 pl-4">
+                    <p className="text-sm">Latest point of recovery</p>
+                  </div>
+                  <div className="w-3/5">
+                    <Input
+                      readOnly
+                      disabled
+                      step={1}
+                      type="datetime-local"
+                      className="px-4"
+                      value={latestAvailableBackup}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between space-x-8">
+              <Popover.Seperator />
+              <div className="flex justify-between space-x-8 py-2">
                 <div className="w-2/5 space-y-2 pl-4">
-                  <p className="text-sm">Earliest point of recovery</p>
+                  <p className="text-sm">Recovery point</p>
+                  <p className="text-scale-1100 text-sm">
+                    Select a date and time that you would like to restore your project to
+                  </p>
                 </div>
                 <div className="w-3/5">
                   <Input
-                    readOnly
-                    disabled
                     step={1}
                     type="datetime-local"
+                    error={errors?.recoveryPoint}
                     className="px-4"
-                    value={earliestAvailableBackup}
+                    onChange={(e) => {
+                      setErrors(undefined)
+                      setRecoveryPoint(e.target.value)
+                    }}
                   />
                 </div>
               </div>
-              <div className="flex justify-between space-x-8">
-                <div className="w-2/5 space-y-2 pl-4">
-                  <p className="text-sm">Latest point of recovery</p>
-                </div>
-                <div className="w-3/5">
-                  <Input
-                    readOnly
-                    disabled
-                    step={1}
-                    type="datetime-local"
-                    className="px-4"
-                    value={latestAvailableBackup}
-                  />
-                </div>
+              <Popover.Seperator />
+              <div className="flex items-center justify-end px-4">
+                <Button type="default" htmlType="submit">
+                  Restore
+                </Button>
               </div>
-            </div>
-            <Popover.Seperator />
-            <div className="flex justify-between space-x-8 py-2">
-              <div className="w-2/5 space-y-2 pl-4">
-                <p className="text-sm">Recovery point</p>
-                <p className="text-scale-1100 text-sm">
-                  Select a date and time that you would like to restore your project to
-                </p>
-              </div>
-              <div className="w-3/5">
-                <Input
-                  step={1}
-                  type="datetime-local"
-                  error={errors?.recoveryPoint}
-                  className="px-4"
-                  onChange={(e) => {
-                    setErrors(undefined)
-                    setRecoveryPoint(e.target.value)
-                  }}
-                />
-              </div>
-            </div>
-            <Popover.Seperator />
-            <div className="flex items-center justify-end px-4">
-              <Button type="default" htmlType="submit">
-                Restore
-              </Button>
             </div>
           </div>
-        </div>
-      </form>
-      <ConfirmationModal
-        visible={showConfirmation}
-        size="medium"
-        header="Confirm to restore"
-        children={
-          <Modal.Content>
-            <div className="space-y-2 py-4">
-              <div className="space-y-1">
+        </form>
+        <ConfirmationModal
+          visible={showConfirmation}
+          size="medium"
+          header="Confirm to restore"
+          children={
+            <Modal.Content>
+              <div className="space-y-2 py-4">
+                <div className="space-y-1">
+                  <p className="text-scale-1100 text-sm">
+                    Are you sure you want to restore your database from:
+                  </p>
+                  <p className="text-scale-1200 text-sm">
+                    {dayjs(recoveryPoint).format('DD MMM YYYY, HH:mm:ss')} (
+                    {getTimezoneOffsetText(selectedTimezone)})?
+                  </p>
+                </div>
                 <p className="text-scale-1100 text-sm">
-                  Are you sure you want to restore your database from:
-                </p>
-                <p className="text-scale-1200 text-sm">
-                  {dayjs(recoveryPoint).format('DD MMM YYYY, HH:mm:ss')} (
-                  {getTimezoneOffsetText(selectedTimezone)})?
+                  This will destroy any new data written since this backup was made.
                 </p>
               </div>
-              <p className="text-scale-1100 text-sm">
-                This will destroy any new data written since this backup was made.
-              </p>
-            </div>
-          </Modal.Content>
-        }
-        buttonLabel="Restore"
-        buttonLoadingLabel="Restoring"
-        onSelectCancel={() => setShowConfirmation(false)}
-        onSelectConfirm={onConfirmRestore}
-      />
-    </div>
+            </Modal.Content>
+          }
+          buttonLabel="Restore"
+          buttonLoadingLabel="Restoring"
+          onSelectCancel={() => setShowConfirmation(false)}
+          onSelectConfirm={onConfirmRestore}
+        />
+      </div>
+    </>
   )
 }
 

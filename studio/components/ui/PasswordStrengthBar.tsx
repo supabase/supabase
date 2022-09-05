@@ -40,6 +40,7 @@ const PasswordStrengthBar = ({
       )}
       <p
         className={
+          // [Joshen TODO] Is this correct?
           passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH ? 'text-green-600' : ''
         }
       >
