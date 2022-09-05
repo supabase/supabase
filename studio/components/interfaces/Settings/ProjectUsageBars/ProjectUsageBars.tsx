@@ -3,7 +3,7 @@ import { Badge, IconAlertCircle, Loading } from '@supabase/ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { formatBytes } from 'lib/helpers'
-import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import SparkBar from 'components/ui/SparkBar'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usageBasedItems } from './ProjectUsageBars.constants'
@@ -17,6 +17,10 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { usage, error, isLoading } = useProjectUsage(projectRef)
 
+  const showUsageExceedMessage =
+    ui.selectedProject?.subscription_tier !== undefined &&
+    ui.selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   useEffect(() => {
     if (error) {
       ui.setNotification({
@@ -27,12 +31,14 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   }, [error])
 
   if (!isLoading && error) {
-    ;<InformationBox
-      hideCollapse
-      defaultVisibility
-      icon={<IconAlertCircle strokeWidth={2} />}
-      title="There was an issue loading the usage details of your project"
-    />
+    return (
+      <InformationBox
+        hideCollapse
+        defaultVisibility
+        icon={<IconAlertCircle strokeWidth={2} />}
+        title="There was an issue loading the usage details of your project"
+      />
+    )
   }
 
   return (
@@ -40,12 +46,14 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
       {usage && (
         <div>
           {usageBasedItems.map((product) => {
-            const isExceededUsage = product.features
-              .map((feature) => {
-                const featureUsage = usage[feature.key]
-                return featureUsage.usage / featureUsage.limit > 1
-              })
-              .some((x) => x === true)
+            const isExceededUsage =
+              showUsageExceedMessage &&
+              product.features
+                .map((feature) => {
+                  const featureUsage = usage[feature.key]
+                  return featureUsage.usage / featureUsage.limit > 1
+                })
+                .some((x) => x === true)
             return (
               <div
                 key={product.title}
@@ -91,7 +99,7 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                         const featureUsage = usage[feature.key]
                         const usageRatio = featureUsage.usage / featureUsage.limit
                         const isApproaching = usageRatio >= USAGE_APPROACHING_THRESHOLD
-                        const isExceeded = usageRatio >= 1
+                        const isExceeded = showUsageExceedMessage && usageRatio >= 1
 
                         return (
                           <tr
@@ -101,25 +109,35 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                             <td className="whitespace-nowrap px-6 py-3 text-sm text-scale-1200">
                               {feature.title}
                             </td>
-                            <td className="w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell hidden text-scale-1200">
-                              {(usageRatio * 100).toFixed(2)} %
-                            </td>
-                            <td className="px-6 py-3 text-sm text-scale-1200">
-                              <SparkBar
-                                type="horizontal"
-                                barClass={`${
-                                  isExceeded
-                                    ? 'bg-red-900'
-                                    : isApproaching
-                                    ? 'bg-yellow-900'
-                                    : 'bg-brand-900'
-                                }`}
-                                value={featureUsage.usage}
-                                max={featureUsage.limit}
-                                labelBottom={formatBytes(featureUsage.usage)}
-                                labelTop={formatBytes(featureUsage.limit)}
-                              />
-                            </td>
+                            {ui.selectedProject?.subscription_tier !== undefined && (
+                              <>
+                                {showUsageExceedMessage && (
+                                  <td className="w-1/5 whitespace-nowrap p-3 text-sm lg:table-cell hidden text-scale-1200">
+                                    {(usageRatio * 100).toFixed(2)} %
+                                  </td>
+                                )}
+                                <td className="px-6 py-3 text-sm text-scale-1200">
+                                  {showUsageExceedMessage ? (
+                                    <SparkBar
+                                      type="horizontal"
+                                      barClass={`${
+                                        isExceeded
+                                          ? 'bg-red-900'
+                                          : isApproaching
+                                          ? 'bg-yellow-900'
+                                          : 'bg-brand-900'
+                                      }`}
+                                      value={featureUsage.usage}
+                                      max={featureUsage.limit}
+                                      labelBottom={formatBytes(featureUsage.usage)}
+                                      labelTop={formatBytes(featureUsage.limit)}
+                                    />
+                                  ) : (
+                                    <span>{formatBytes(featureUsage.usage)}</span>
+                                  )}
+                                </td>
+                              </>
+                            )}
                           </tr>
                         )
                       })}
