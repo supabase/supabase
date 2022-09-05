@@ -29,6 +29,7 @@ import InformationBox from 'components/ui/InformationBox'
 // - Highlight available dates in the calendar and add a legend
 // - Just need to check in thereafter with Jonny if the changes are okay
 // - Deprecate old PITR components
+// - Be sure to go through any other [Joshen TODO] mentions
 
 const PITRSelection = ({}) => {
   const { backups } = useStore()
@@ -116,6 +117,10 @@ const PITRSelection = ({}) => {
     updatedDate.setMinutes(Number(time.m))
     updatedDate.setSeconds(Number(time.s))
     setSelectedDate(updatedDate)
+  }
+
+  const onConfirmRestore = async () => {
+    // Refer to PITRBackupSelection.tsx for logic here
   }
 
   return (
@@ -257,7 +262,7 @@ const PITRSelection = ({}) => {
             <Button type="default" onClick={() => setShowConfirmation(false)}>
               Cancel
             </Button>
-            <Button type="warning" onClick={() => setShowConfirmation(false)}>
+            <Button type="warning" onClick={onConfirmRestore}>
               I understand, begin restore
             </Button>
           </div>
