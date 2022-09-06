@@ -14,9 +14,8 @@ That's a fancy way of saying that you can put some logic into your database then
 It's especially useful when the logic rarely changes - like password resets and updates.
 
 ```dart
-final res = await supabase
-  .rpc('hello_world')
-  .execute();
+final data = await supabase
+  .rpc('hello_world');
 ```
 
 ## Examples
@@ -26,17 +25,15 @@ final res = await supabase
 This is an example invoking a stored procedure.
 
 ```dart
-final res = await supabase
-  .rpc('hello_world')
-  .execute();
+final data = await supabase
+  .rpc('hello_world');
 ```
 
 ### With Parameters
 
 ```dart
-final res = await supabase
-  .rpc('echo_city', params: { 'name': 'The Shire' })
-  .execute();
+final data = await supabase
+  .rpc('echo_city', params: { 'name': 'The Shire' });
 ```
 
 ### With count option
@@ -45,7 +42,7 @@ You can specify a count option to get the row count along with your data.
 Allowed values for count option are `exact`, `planned` and `estimated`.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .rpc('hello_world')
   .execute(count: CountOption.exact);
 ```
