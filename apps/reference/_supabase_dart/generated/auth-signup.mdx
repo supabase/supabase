@@ -32,13 +32,9 @@ try {
 ### Sign up.
 
 ```dart
-try {
-  final res = await supabase.auth.signUp('example@email.com', 'example-password');
+final res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-  final user = res.user;
-} catch (error) {
-  // handle error
-}
+final user = res.user;
 ```
 
 ### Sign up with third-party providers.

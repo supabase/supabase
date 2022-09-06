@@ -41,14 +41,10 @@ Specify the redirect link to bring back the user via deeplink.
 Note that `redirectTo` should be null for Flutter Web.
 
 ```dart
-try {
-  await supabase.auth.signInWithProvider(Provider.github,
-      options: const AuthOptions(
-          redirectTo:
-              kIsWeb ? null : 'io.supabase.flutter://reset-callback/'));
-} catch (error) {
-  // handle error
-}
+await supabase.auth.signInWithProvider(Provider.github,
+    options: const AuthOptions(
+        redirectTo:
+            kIsWeb ? null : 'io.supabase.flutter://reset-callback/'));
 ```
 
 ### With scopes
@@ -57,13 +53,8 @@ If you need additional data from an OAuth provider, you can include a space-sepa
 You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
 
 ```dart
-try {
-  await supabase.auth.signInWithProvider(Provider.github,
-      options: const AuthOptions(scopes: 'repo gist notifications'));
-} catch (error) {
-  // handle error
-}
-
+await supabase.auth.signInWithProvider(Provider.github,
+    options: const AuthOptions(scopes: 'repo gist notifications'));
 ...
 // after user comes back from signin flow
 
