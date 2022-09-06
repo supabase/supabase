@@ -8,7 +8,7 @@ import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetPreview from './SpreadsheetPreview'
 import { SpreadsheetData } from './SpreadsheetImport.types'
-import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import { acceptedFileExtension, parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 
 interface Props {
@@ -58,7 +58,7 @@ const SpreadsheetImport: FC<Props> = ({
     setParseProgress(0)
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type)) {
+    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
       ui.setNotification({
         category: 'info',
         message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
