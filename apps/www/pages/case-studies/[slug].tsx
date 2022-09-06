@@ -1,35 +1,27 @@
 import {
   Badge,
+  Button,
   Card,
-  Divider,
-  IconFile,
+  IconChevronLeft,
+  IconChevronRight,
+  IconExternalLink,
   Space,
   Typography,
-  Button,
-  IconChevronRight,
-  IconChevronLeft,
-  IconGlobe,
-  IconLink,
-  IconExternalLink,
 } from '@supabase/ui'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import hydrate from 'next-mdx-remote/hydrate'
 import renderToString from 'next-mdx-remote/render-to-string'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
-import ReactMarkdown from 'react-markdown'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import CTABanner from '~/components/CTABanner'
+import ImageGrid from '~/components/ImageGrid'
 import DefaultLayout from '~/components/Layouts/Default'
 import Quote from '~/components/Quote'
-import ImageGrid from '~/components/ImageGrid'
-import { generateReadingTime } from '~/lib/helpers'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import blogStyles from './[slug].module.css'
-import Image from 'next/image'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -165,37 +157,33 @@ function BlogPostPage(props: any) {
       <DefaultLayout>
         <div
           className="
-          bg-white dark:bg-dark-800
-            container px-8 sm:px-16 xl:px-20 mx-auto
-            py-16
+          dark:bg-scale-200 bg-scale-200
+            container mx-auto px-8 py-16 sm:px-16
+            xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-2">
               {/* Back button */}
-              <Typography.Text type="secondary">
-                <span className="hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center">
-                  <IconChevronLeft />
-                  Back
-                </span>
-              </Typography.Text>
+              <button className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center">
+                <IconChevronLeft />
+                Back
+              </button>
             </div>
             <div className="col-span-12 lg:col-span-10">
               {/* Title and description */}
-              <div className="mb-16">
-                <Typography.Text type="success">Case study</Typography.Text>
-                <Typography.Title>{props.blog.title}</Typography.Title>
-              </div>
               {/* Quote can go here */}
-              <div className="grid grid-cols-12 gap-8">
+              <div className="prose grid max-w-none grid-cols-12 gap-8">
                 {/* Content */}
                 <div className="col-span-12 lg:col-span-7 xl:col-span-6">
-                  <article className={blogStyles['article']}>
-                    <Typography>{content}</Typography>
+                  <article>
+                    <p className="text-brand-900 mb-2">Case study</p>
+                    <h1 className="text-scale-1200 text-5xl">{props.blog.title}</h1>
+                    {content}
                   </article>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 lg:col-span-5 xl:col-span-3 xl:col-start-8 space-y-8">
+                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-8">
                   {/* Logo */}
                   <div className={`relative h-16 w-32`}>
                     <Image
@@ -207,9 +195,9 @@ function BlogPostPage(props: any) {
                       className="
                       bg-no-repeat
                       
-                      dark:filter 
+                      dark:brightness-200 
                       dark:contrast-0
-                      dark:brightness-200
+                      dark:filter
                     "
                     />
                   </div>
@@ -217,10 +205,13 @@ function BlogPostPage(props: any) {
                   <div className="flex flex-col space-y-2">
                     <Typography.Text type="secondary">About</Typography.Text>
                     <Typography.Text>{props.blog.about}</Typography.Text>
-                    <Typography.Text className="flex items-center space-x-1 transition-opacity cursor-pointer opacity-50 hover:opacity-100">
+                    <a
+                      href={props.blog.company_url}
+                      className="not-prose flex cursor-pointer items-center space-x-1 opacity-50 transition-opacity hover:opacity-100"
+                    >
                       <span>{props.blog.company_url}</span>
                       <IconExternalLink size={14} />
-                    </Typography.Text>
+                    </a>
                   </div>
                   {props.blog.misc.map((x: any) => {
                     return (
@@ -234,7 +225,7 @@ function BlogPostPage(props: any) {
                     {props.blog.stats.map((x: any) => {
                       return (
                         <div className="flex space-x-3">
-                          <div className="h-8 w-0.5 bg-brand-600 mt-0.5"></div>
+                          <div className="bg-brand-600 mt-0.5 h-8 w-0.5"></div>
                           <div className="flex flex-col">
                             <Typography.Text>
                               <span className="text-3xl font-semibold leading-none">{x.stat}</span>
