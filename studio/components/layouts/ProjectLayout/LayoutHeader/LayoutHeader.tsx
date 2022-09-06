@@ -22,9 +22,12 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   const { usage } = useProjectUsage(ref as string)
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
-  const isOverUsageLimits =
+  const projectHasNoLimits =
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+  const showOverUsageBadge =
     selectedProject?.subscription_tier !== undefined &&
-    selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE &&
+    !projectHasNoLimits &&
     resourcesExceededLimits.length > 0
 
   return (
@@ -60,7 +63,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 </span>
                 {/* Project Dropdown */}
                 <ProjectDropdown />
-                {isOverUsageLimits && (
+                {showOverUsageBadge && (
                   <div className="ml-2">
                     <Link href={`/project/${ref}/settings/billing`}>
                       <a>
