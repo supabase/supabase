@@ -141,7 +141,7 @@ Once you get the hang of policies you can start to get a little bit fancy. Let's
 create policy "Only Blizzard staff can update leaderboard"
   on my_scores
   for update using (
-    right(auth.jwt()->>'email', 13) = '@blizzard.com'
+    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
   );
 ```
 
