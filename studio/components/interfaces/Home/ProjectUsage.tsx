@@ -66,7 +66,7 @@ const ProjectUsage: FC<Props> = ({}) => {
   }
 
   return (
-    <div className="mx-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
         <Dropdown
           side="bottom"
