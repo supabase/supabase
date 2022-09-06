@@ -1,0 +1,59 @@
+---
+id: rangeadjacent
+title: '.rangeAdjacent()'
+slug: /rangeadjacent
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```dart
+final res = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .update({ 'name': 'Mordor' })
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .delete()
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_countries')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+  .execute();
+```
