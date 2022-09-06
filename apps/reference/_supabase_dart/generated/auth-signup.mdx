@@ -11,10 +11,13 @@ import TabItem from '@theme/TabItem'
 Creates a new user.
 
 ```dart
-final res = await supabase.auth.signUp('example@email.com',　'example-password');
+try {
+  final res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-final user = res.data?.user;
-final error = res.error;
+  final user = res.user;
+} catch (error) {
+  // handle error
+}
 ```
 
 ## Notes
@@ -29,10 +32,13 @@ final error = res.error;
 ### Sign up.
 
 ```dart
-final res = await supabase.auth.signUp('example@email.com',　'example-password');
+try {
+  final res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-final user = res.data?.user;
-final error = res.error;
+  final user = res.user;
+} catch (error) {
+  // handle error
+}
 ```
 
 ### Sign up with third-party providers.
