@@ -23,7 +23,7 @@
 
 সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
 
-কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](./DEVELOPERS.md)
+কিভাবে অবদান রাখতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
 
 ## কমিউনিটি ও সাপোর্ট
 

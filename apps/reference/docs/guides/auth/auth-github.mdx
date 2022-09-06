@@ -1,0 +1,117 @@
+---
+id: auth-github
+title: 'Login with GitHub'
+description: Add GitHub OAuth to your Supabase project
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up GitHub logins for your application consists of 3 parts:
+
+- Create and configure a GitHub OAuth App on [GitHub](https://github.com)
+- Add your GitHub OAuth keys to your [Supabase Project](https://app.supabase.com)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Steps
+
+### Access your GitHub account
+
+- Go to [github.com](https://github.com).
+- Click on `Sign In` at the top right to log in.
+
+![GitHub Developer Portal.](/img/guides/auth-github/github-portal.png)
+
+### Create a GitHub Oauth App
+
+Go to the [GitHub Developer Settings](https://github.com/settings/developers) page:
+
+- Click on your profile photo at the top right
+- Click Settings near the bottom of the menu
+- In the left sidebar, click `Developer settings` (near the bottom)
+- In the left sidebar, click `OAuth Apps`
+
+### Find your callback URL
+
+The next step requires a callback URL, which looks like this:
+
+`https://<project-ref>.supabase.co/auth/v1/callback`
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com).
+- Click on the `Settings` icon at the bottom of the left sidebar.
+- Click on `API` in the list.
+- Under Config / URL you'll find your API URL, you can click `Copy` to copy it to the clipboard.
+- Now just add `/auth/v1/callback` to the end of that to get your full `OAuth Redirect URI`.
+
+<video width="99%" muted playsInline controls="true">
+  <source
+    src="/docs/videos/api/api-url-and-key.mp4"
+    type="video/mp4"
+    muted
+    playsInline
+  />
+</video>
+
+### Register a new OAuth application
+
+- Click `Register a new application`. If you've created an app before, click `New OAuth App` here.
+- In `Application name`, type the name of your app.
+- In `Homepage URL`, type the full URL to your app's website.
+- In `Authorization callback URL`, type the callback URL of your app.
+- Enter the URL in the `Valid OAuth Redirect URIs` box.
+- Click `Save Changes` at the bottom right.
+- Click `Register Application`.
+
+Copy your new OAuth credentials
+
+- Copy and save your `Client ID`.
+- Click `Generate a new client secret`.
+- Copy and save your `Client secret`.
+
+### Enter your GitHub credentials into your Supabase Project
+
+- Go to your [Supabase Project Dashboard](https://app.supabase.com)
+- In the left sidebar, click the `Authentication` icon (near the top)
+- Click `Settings` from the list to go to the `Authentication Settings` page
+- Enter the final (hosted) URL of your app under `Site URL` (this is important)
+- Under `External OAuth Providers` turn `GitHub Enabled` to ON
+- Enter your `GitHub Client ID` and `GitHub Client Secret` saved in the previous step
+- Click `Save`
+
+### Add login code to your client app
+
+The JavaScript client code is documented here: [Supabase OAuth Client Code](/docs/reference/javascript/auth-signin#sign-in-using-third-party-providers)
+
+```js
+const { user, session, error } = await supabase.auth.signIn({
+  provider: 'github',
+})
+```
+
+Add this function which you can call from a button, link, or UI element.
+
+```js
+async function signInWithGithub() {
+  const { user, session, error } = await supabase.auth.signIn({
+    provider: 'github',
+  })
+}
+```
+
+To log out:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [GitHub Developer Settings](https://github.com/settings/developers)

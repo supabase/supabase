@@ -1,19 +1,18 @@
 import dayjs from 'dayjs'
 import { FC, useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Typography, Loading, IconArrowRight } from '@supabase/ui'
+import { Loading, IconArrowRight } from '@supabase/ui'
 
+import { Project, NextPageWithLayout } from 'types'
 import { useProjectPaygStatistics, useProjectSubscription, useStore } from 'hooks'
 import { STRIPE_PRODUCT_IDS, TIME_PERIODS_REPORTS, TIME_PERIODS_BILLING } from 'lib/constants'
 import { SettingsLayout } from 'components/layouts'
 import LoadingUI from 'components/ui/Loading'
-import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
-
-import ProjectUsage from 'components/ui/Usage'
+import OveragesBanner from 'components/ui/OveragesBanner/OveragesBanner'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { PAYGUsage, Subscription, Invoices } from 'components/interfaces/Billing'
 import { PaygStats } from 'components/interfaces/Billing/PAYGUsage/PAYGUsage.types'
-import { Project } from '../../../../../types'
-import { NextPageWithLayout } from 'types'
+import ProjectUsage from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageBars'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const { ui } = useStore()
@@ -34,11 +33,15 @@ ProjectBilling.getLayout = (page) => (
 
 export default observer(ProjectBilling)
 
-type SettingsProps = {
+interface SettingsProps {
   project?: Project
 }
+
 const Settings: FC<SettingsProps> = ({ project }) => {
   const { ui } = useStore()
+  const projectTier = ui.selectedProject?.subscription_tier
+
+  const [dateRange, setDateRange] = useState<any>()
 
   const {
     subscription,
@@ -50,8 +53,6 @@ const Settings: FC<SettingsProps> = ({ project }) => {
     ui.selectedProject?.ref,
     subscription?.tier?.supabase_prod_id
   )
-
-  const [dateRange, setDateRange] = useState<any>()
 
   useEffect(() => {
     if (error) {
@@ -68,6 +69,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
 
   return (
     <div className="container max-w-4xl space-y-8 p-4">
+      {projectTier !== undefined && <OveragesBanner tier={projectTier} />}
       <Subscription
         loading={loading}
         project={project}
@@ -80,7 +82,7 @@ const Settings: FC<SettingsProps> = ({ project }) => {
         <Loading active={loading}>
           <div className="border-panel-border-light dark:border-panel-border-dark mb-8 w-full overflow-hidden rounded border">
             <div className="bg-panel-body-light dark:bg-panel-body-dark flex items-center justify-center px-6 py-6">
-              <Typography.Text>Loading usage breakdown</Typography.Text>
+              <p>Loading usage breakdown</p>
             </div>
           </div>
         </Loading>
@@ -96,22 +98,22 @@ const Settings: FC<SettingsProps> = ({ project }) => {
             />
             {dateRange && (
               <div className="flex items-center space-x-2">
-                <Typography.Text type="secondary">
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_start.date).format('MMM D, YYYY')}
-                </Typography.Text>
-                <Typography.Text type="secondary" className="opacity-50">
+                </p>
+                <p className="text-scale-1000">
                   <IconArrowRight size={12} />
-                </Typography.Text>
-                <Typography.Text type="secondary">
+                </p>
+                <p className="text-scale-1000">
                   {dayjs(dateRange.period_end.date).format('MMM D, YYYY')}
-                </Typography.Text>
+                </p>
               </div>
             )}
           </div>
           {paygStats && dateRange && <PAYGUsage paygStats={paygStats} dateRange={dateRange} />}
         </div>
       ) : (
-        <ProjectUsage projectRef={project?.ref} subscription_id={project?.subscription_id} />
+        <ProjectUsage projectRef={project?.ref} />
       )}
       <div className="space-y-2">
         <h4 className="text-lg">Invoices</h4>

@@ -1,0 +1,54 @@
+---
+id: rangeadjacent
+title: '.rangeAdjacent()'
+slug: rangeadjacent
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .select('name, id, population_range_millions')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .update({ name: 'Mordor' })
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('countries')
+  .delete()
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_countries')
+  .rangeAdjacent('population_range_millions', '[70, 185]')
+```

@@ -21,8 +21,8 @@ const BuiltExamples = () => {
             </Button>
           </Link>
           <Link
-            href="https://github.com/supabase/supabase/tree/master/examples"
-            as="https://github.com/supabase/supabase/tree/master/examples"
+            href="https://github.com/supabase/examples"
+            as="https://github.com/supabase/examples"
             passHref
           >
             <Button as="a" type="default" icon={<IconGitHub />} size="small">

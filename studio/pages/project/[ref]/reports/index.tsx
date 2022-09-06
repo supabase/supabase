@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { API_URL } from 'lib/constants'
-import { useStore, withAuth } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { PROJECT_STATUS } from 'lib/constants'
-import { ProjectLayoutWithAuth } from 'components/layouts'
-import Loading from 'components/ui/Loading'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-
-import { useProjectContentStore } from 'stores/projectContentStore'
-import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import { NextPageWithLayout } from 'types'
+import { checkPermissions, useFlag, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProjectContentStore } from 'stores/projectContentStore'
+import Loading from 'components/ui/Loading'
+import { ProjectLayoutWithAuth } from 'components/layouts'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 
-const PageLayout: NextPageWithLayout = () => {
+export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
@@ -24,10 +23,16 @@ const PageLayout: NextPageWithLayout = () => {
   const project = ui.selectedProject
 
   const contentStore = useProjectContentStore(ref)
+  const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
+
+  const kpsEnabled = useFlag('initWithKps')
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
+      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
   }, [project])
 
@@ -54,8 +59,6 @@ const PageLayout: NextPageWithLayout = () => {
         <ProductEmptyState
           title="Reports"
           ctaButtonLabel="Create report"
-          // infoButtonLabel="About reports"
-          // infoButtonUrl="https://supabase.com/docs/guides/storage"
           onClickCta={() => {
             try {
               createReport({ router })
@@ -66,6 +69,8 @@ const PageLayout: NextPageWithLayout = () => {
               })
             }
           }}
+          disabled={!canCreateReport}
+          disabledMessage="You need additional permissions to create a report"
         >
           <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
           <p className="text-scale-1100 text-sm">
@@ -78,6 +83,6 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+UserReportPage.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
-export default observer(PageLayout)
+export default observer(UserReportPage)

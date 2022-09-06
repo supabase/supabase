@@ -21,7 +21,6 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
 
   function handleOnChange(e: any) {
     const temp = e.target.value
-    console.log('DateTimeINput', temp)
     if (temp.length === 0) return
     onChange(temp)
   }

@@ -10,12 +10,32 @@ const ItemContextMenu = ({
   onSelectItemDelete = () => {},
 }) => {
   return (
-    <Menu id={id} animation="fade">
-      <Item onClick={({ props }) => onCopyFileURL(props.item)}>Copy URL</Item>
-      <Item onClick={({ props }) => onSelectItemRename(props.item)}>Rename</Item>
-      <Item onClick={({ props }) => onSelectItemMove(props.item)}>Move</Item>
-      <Item onClick={({ props }) => onDownloadFile(props.item)}>Download</Item>
-      <Item onClick={({ props }) => onSelectItemDelete(props.item)}>Delete</Item>
+    <Menu id={id} animation="fade" className="!bg-scale-300 border border-scale-500">
+      <Item
+        onClick={({ props }) => (!props.item.isCorrupted ? onCopyFileURL(props.item) : () => {})}
+      >
+        <span className="text-xs">Copy URL</span>
+      </Item>
+      <Item
+        onClick={({ props }) =>
+          !props.item.isCorrupted ? onSelectItemRename(props.item) : () => {}
+        }
+      >
+        <span className="text-xs">Rename</span>
+      </Item>
+      <Item
+        onClick={({ props }) => (!props.item.isCorrupted ? onSelectItemMove(props.item) : () => {})}
+      >
+        <span className="text-xs">Move</span>
+      </Item>
+      <Item
+        onClick={({ props }) => (!props.item.isCorrupted ? onDownloadFile(props.item) : () => {})}
+      >
+        <span className="text-xs">Download</span>
+      </Item>
+      <Item onClick={({ props }) => onSelectItemDelete(props.item)}>
+        <span className="text-xs">Delete</span>
+      </Item>
     </Menu>
   )
 }

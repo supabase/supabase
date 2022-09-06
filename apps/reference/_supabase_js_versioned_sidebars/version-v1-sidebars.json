@@ -1,0 +1,131 @@
+{
+  "sidebar": [
+    {
+      "type": "category",
+      "label": "Getting Started",
+      "items": ["intro", "installing", "initializing", "generating-types"],
+      "collapsed": false
+    },
+    {
+      "type": "category",
+      "label": "Auth",
+      "items": [
+        "auth-signup",
+        "auth-signin",
+        "auth-signout",
+        "auth-session",
+        "auth-user",
+        "auth-update",
+        "auth-setauth",
+        "auth-onauthstatechange",
+        "auth-api-getuser",
+        "auth-api-resetpasswordforemail"
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Auth (Server Only)",
+      "items": [
+        "auth-api-listusers",
+        "auth-api-createuser",
+        "auth-api-deleteuser",
+        "auth-api-generatelink",
+        "auth-api-inviteuserbyemail",
+        "auth-api-sendmobileotp",
+        "auth-api-updateuserbyid"
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Functions",
+      "items": ["invoke"],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Database",
+      "items": ["select", "insert", "update", "upsert", "delete", "rpc"],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Realtime",
+      "items": [
+        "subscribe",
+        "removesubscription",
+        "removeallsubscriptions",
+        "getsubscriptions"
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Storage",
+      "items": [
+        "storage-createbucket",
+        "storage-getbucket",
+        "storage-listbuckets",
+        "storage-updatebucket",
+        "storage-deletebucket",
+        "storage-emptybucket",
+        "storage-from-upload",
+        "storage-from-download",
+        "storage-from-list",
+        "storage-from-update",
+        "storage-from-move",
+        "storage-from-copy",
+        "storage-from-remove",
+        "storage-from-createsignedurl",
+        "storage-from-createsignedurls",
+        "storage-from-getpublicurl"
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Modifiers",
+      "items": [
+        "using-modifiers",
+        "limit",
+        "order",
+        "range",
+        "single",
+        "maybesingle"
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
+      "label": "Filters",
+      "items": [
+        "using-filters",
+        "or",
+        "not",
+        "match",
+        "eq",
+        "neq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "like",
+        "ilike",
+        "is",
+        "in",
+        "contains",
+        "containedby",
+        "rangelt",
+        "rangegt",
+        "rangegte",
+        "rangelte",
+        "rangeadjacent",
+        "overlaps",
+        "textsearch",
+        "filter"
+      ],
+      "collapsed": true
+    }
+  ]
+}

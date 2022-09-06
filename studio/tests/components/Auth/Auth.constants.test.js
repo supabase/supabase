@@ -18,6 +18,15 @@ describe('Auth.constants: domainRegex', () => {
     const output4 = domainRegex.test(mockInput4)
     expect(output4).toBe(true)
   })
+  test('should validate app-based domains', () => {
+    const mockInput1 = 'exp://exp.host/some-app'
+    const output1 = domainRegex.test(mockInput1)
+    expect(output1).toBe(true)
+
+    const mockInput2 = 'exp://exp.host/some-app?release-channel=default'
+    const output2 = domainRegex.test(mockInput2)
+    expect(output2).toBe(true)
+  })
   test('should validate subdomains', () => {
     const mockInput1 = 'https://app.supabase.com'
     const output1 = domainRegex.test(mockInput1)
@@ -45,6 +54,18 @@ describe('Auth.constants: domainRegex', () => {
     const mockInput2 = 'https://supabase.com/*'
     const output2 = domainRegex.test(mockInput2)
     expect(output2).toBe(true)
+
+    const mockInput3 = 'https://new-*-domain.com/*'
+    const output3 = domainRegex.test(mockInput3)
+    expect(output3).toBe(true)
+
+    const mockInput4 = 'https://new-*-domain.com/*/*/*'
+    const output4 = domainRegex.test(mockInput4)
+    expect(output4).toBe(true)
+
+    const mockInput5 = 'https://sub-*-domain.new-*-domain.com/*/*/*'
+    const output5 = domainRegex.test(mockInput5)
+    expect(output5).toBe(true)
   })
   test('should invalidate invalid URLs', () => {
     const mockInput1 = 'supabase'

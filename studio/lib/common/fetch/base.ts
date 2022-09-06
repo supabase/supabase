@@ -1,4 +1,4 @@
-import { tryParseJson } from 'lib/helpers'
+import { auth } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
@@ -83,40 +83,18 @@ export async function handleResponseError<T = unknown>(
   }
 }
 
-export function getAccessToken() {
+export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
 
-  const tokenData = window?.localStorage['supabase.auth.token']
-  if (!tokenData) {
-    // try to get from url fragment
-    const access_token = getParameterByName('access_token')
-    if (access_token) return access_token
-    else return undefined
-  }
-  const tokenObj = tryParseJson(tokenData)
-  if (tokenObj === false) {
-    return ''
-  }
-  return tokenObj.currentSession.access_token
+  const {
+    data: { session },
+  } = await auth.getSession()
+
+  return session?.access_token
 }
 
-// get param from URL fragment
-export function getParameterByName(name: string, url?: string) {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  if (!url) url = window?.location?.href || ''
-  // eslint-disable-next-line no-useless-escape
-  name = name.replace(/[\[\]]/g, '\\$&')
-  const regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url)
-  if (!results) return null
-  if (!results[2]) return ''
-  return decodeURIComponent(results[2].replace(/\+/g, ' '))
-}
-
-export function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
+export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
   let headers: { [prop: string]: any } = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -126,7 +104,7 @@ export function constructHeaders(requestId: string, optionHeaders?: { [prop: str
 
   const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
   if (!hasAuthHeader) {
-    const accessToken = getAccessToken()
+    const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
   }
 

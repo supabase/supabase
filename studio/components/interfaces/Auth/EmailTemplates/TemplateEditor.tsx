@@ -2,8 +2,9 @@ import ReactMarkdown from 'react-markdown'
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Input, Form } from '@supabase/ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { FormSchema } from 'types'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import CodeEditor from 'components/ui/CodeEditor'
@@ -22,6 +23,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
 
   const formId = `auth-config-email-templates-${id}`
   const INITIAL_VALUES: { [x: string]: string } = {}
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded) {
@@ -42,20 +44,21 @@ const TemplateEditor: FC<Props> = ({ template }) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    try {
-      setSubmitting(true)
-      await authConfig.update(payload)
+    setSubmitting(true)
+    const { error } = await authConfig.update(payload)
+
+    if (!error) {
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
       resetForm({
         values: values,
         initialValues: values,
       })
       setBodyValue(authConfig?.config?.[messageSlug])
-    } catch (error) {
+    } else {
       ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-    } finally {
-      setSubmitting(false)
     }
+
+    setSubmitting(false)
   }
 
   return (
@@ -76,71 +79,69 @@ const TemplateEditor: FC<Props> = ({ template }) => {
 
         return (
           <>
-            <FormSection
-              className="!border-t-0"
-              header={
-                <FormSectionLabel>
-                  <span>SMTP Provider Settings</span>
-                  <p className="text-scale-900 my-4">
-                    Your SMTP Credentials will always be encrypted in our database.
-                  </p>
-                </FormSectionLabel>
-              }
-            >
+            <FormSection className="!border-t-0 pb-8 pt-4">
               <FormSectionContent loading={!isLoaded}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]
                   if (property.type === 'string') {
                     return (
-                      <Input
-                        size="small"
-                        layout="vertical"
-                        id={x}
-                        key={x}
-                        name={x}
-                        label={property.title}
-                        descriptionText={
-                          property.description ? (
-                            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                              {property.description}
-                            </ReactMarkdown>
-                          ) : null
-                        }
-                        labelOptional={
-                          property.descriptionOptional ? (
-                            <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                              {property.descriptionOptional}
-                            </ReactMarkdown>
-                          ) : null
-                        }
-                      />
+                      <div className="space-y-3">
+                        <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">
+                          {property.title}
+                        </label>
+                        <Input
+                          size="small"
+                          layout="vertical"
+                          id={x}
+                          key={x}
+                          name={x}
+                          descriptionText={
+                            property.description ? (
+                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                {property.description}
+                              </ReactMarkdown>
+                            ) : null
+                          }
+                          labelOptional={
+                            property.descriptionOptional ? (
+                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                                {property.descriptionOptional}
+                              </ReactMarkdown>
+                            ) : null
+                          }
+                          disabled={!canUpdateConfig}
+                        />
+                      </div>
                     )
                   }
                 })}
               </FormSectionContent>
             </FormSection>
             <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
-              <FormSectionContent loading={!isLoaded} fullWidth>
+              <FormSectionContent fullWidth loading={!isLoaded}>
                 {messageProperty && (
                   <>
-                    <FormSectionLabel>
-                      <span>{messageProperty.title}</span>
-                    </FormSectionLabel>
-                    <InformationBox
-                      title={'Message variables'}
-                      hideCollapse={false}
-                      defaultVisibility={true}
-                      description={
-                        messageProperty.description && (
-                          <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
-                        )
-                      }
-                    />
+                    <div className="space-y-3">
+                      <FormSectionLabel>
+                        <span>{messageProperty.title}</span>
+                      </FormSectionLabel>
+                      <InformationBox
+                        defaultVisibility
+                        title="Message variables"
+                        hideCollapse={false}
+                        description={
+                          messageProperty.description && (
+                            <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
+                          )
+                        }
+                      />
+                    </div>
                     <div className="relative h-96">
                       <CodeEditor
                         id="code-id"
                         loading={!isLoaded}
                         language="html"
+                        isReadOnly={!canUpdateConfig}
                         className="!mb-0 h-96 overflow-hidden rounded border"
                         onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
                         options={{ wordWrap: 'off', contextmenu: false }}
@@ -149,7 +150,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     </div>
                   </>
                 )}
-                <div className="col-span-12 flex w-full justify-between">
+                <div className="col-span-12 flex w-full">
                   <FormActions
                     handleReset={() => {
                       resetForm({
@@ -161,6 +162,12 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
                   />
                 </div>
               </FormSectionContent>

@@ -41,10 +41,9 @@ const Error404 = () => {
         </div>
         <div className="absolute">
           <h1
-            className={`select-none opacity-[5%] filter transition duration-200 ${
+            className={`text-scale-1200 select-none text-[14rem] opacity-[5%] filter transition duration-200 sm:text-[18rem] lg:text-[28rem] ${
               show404 ? 'blur-sm' : 'blur-none'
             }`}
-            style={{ fontSize: '28rem' }}
           >
             404
           </h1>

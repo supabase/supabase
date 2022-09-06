@@ -90,7 +90,9 @@ const ColumnEditor: FC<Props> = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (foreignKeyConfiguration: any) => {
+  const saveColumnForeignKey = (
+    foreignKeyConfiguration: { table: PostgresTable; column: PostgresColumn } | undefined
+  ) => {
     onUpdateField({
       foreignKey: !isUndefined(foreignKeyConfiguration)
         ? {
@@ -150,6 +152,12 @@ const ColumnEditor: FC<Props> = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
+      onInteractOutside={(event) => {
+        const isToast = (event.target as Element)?.closest('#toast')
+        if (isToast) {
+          event.preventDefault()
+        }
+      }}
     >
       <SidePanel.Content>
         <div className="space-y-10 py-6">

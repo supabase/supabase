@@ -36,7 +36,7 @@ const ConfirmDeleteModal = ({
     <Modal
       visible={visible}
       header={<span className="break-words">{title}</span>}
-      size="small"
+      size="medium"
       onCancel={onSelectCancel}
       customFooter={
         <div className="flex items-center gap-2">
