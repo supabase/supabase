@@ -65,7 +65,7 @@ const SpreadsheetImport: FC<Props> = ({
       })
     } else {
       setUploadedFile(file)
-      const { headers, rowCount, columnTypeMap, errors } = await parseSpreadsheet(
+      const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
@@ -77,8 +77,9 @@ const SpreadsheetImport: FC<Props> = ({
           duration: 4000,
         })
       }
+
       setErrors(errors)
-      setSpreadsheetData({ headers, rows: [], rowCount, columnTypeMap })
+      setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
   }
@@ -170,8 +171,11 @@ const SpreadsheetImport: FC<Props> = ({
                   Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
                   following {spreadsheetData.headers.length} columns.
                 </p>
+                <p className="text-scale-1000">
+                  Here is a preview of your table (up to the first 20 columns and first 20 rows).
+                </p>
               </div>
-              <SpreadsheetPreview headers={spreadsheetData.headers} />
+              <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
             </div>
             {errors.length > 0 && (
               <div className="space-y-2">
