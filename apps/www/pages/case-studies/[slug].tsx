@@ -1,3 +1,4 @@
+import { ChevronLeftIcon } from '@heroicons/react/outline'
 import {
   Badge,
   Button,
@@ -162,99 +163,109 @@ function BlogPostPage(props: any) {
             xl:px-20
           "
         >
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 lg:col-span-2">
-              {/* Back button */}
-              <button className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center">
-                <IconChevronLeft />
-                Back
+          <div className="grid grid-cols-12 gap-8">
+            {/* Back button */}
+            <div className="col-span-12 xl:col-span-2">
+              <button className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center gap-1 text-sm transition">
+                <ChevronLeftIcon width={12} />
+                All case studies
               </button>
             </div>
-            <div className="col-span-12 lg:col-span-10">
+            <div className="col-span-12 xl:col-span-10">
               {/* Title and description */}
               {/* Quote can go here */}
-              <div className="prose grid max-w-none grid-cols-12 gap-8">
-                {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-6">
-                  <article>
-                    <p className="text-brand-900 mb-2">Case study</p>
-                    <h1 className="text-scale-1200 text-5xl">{props.blog.title}</h1>
-                    {content}
-                  </article>
+
+              {/* Content */}
+              <article className="prose col-span-12 max-w-none">
+                <div className="">
+                  <p className="text-brand-900 mb-2 mt-0">Case study</p>
+                  <h1 className="text-scale-1200 text-5xl lg:mb-0">{props.blog.title}</h1>
                 </div>
-                {/* Sidebar */}
-                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-8">
-                  {/* Logo */}
-                  <div className={`relative h-16 w-32`}>
-                    <Image
-                      layout="fill"
-                      src={`${props.blog.logo}`}
-                      alt={`${props.blog.title} logo`}
-                      objectFit="scale-down"
-                      // objectPosition="center"
-                      className="
+                <div className="grid max-w-none grid-cols-12 lg:gap-16">
+                  <div className="xm:col-span-7 col-span-12 lg:col-span-7 ">{content}</div>
+                  {/* Sidebar */}
+                  <div className="col-span-12 hidden lg:col-span-5 lg:block xl:col-span-4 xl:col-start-9">
+                    <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
+                      {/* Logo */}
+                      <div className={`relative h-16 w-32`}>
+                        <p className="flex flex-row ">
+                          <Image
+                            layout="fill"
+                            src={`${props.blog.logo}`}
+                            alt={`${props.blog.title} logo`}
+                            objectFit="scale-down"
+                            objectPosition="left"
+                            className="
                       bg-no-repeat
                       
                       dark:brightness-200 
                       dark:contrast-0
                       dark:filter
                     "
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-2">
-                    <Typography.Text type="secondary">About</Typography.Text>
-                    <Typography.Text>{props.blog.about}</Typography.Text>
-                    <a
-                      href={props.blog.company_url}
-                      className="not-prose flex cursor-pointer items-center space-x-1 opacity-50 transition-opacity hover:opacity-100"
-                    >
-                      <span>{props.blog.company_url}</span>
-                      <IconExternalLink size={14} />
-                    </a>
-                  </div>
-                  {props.blog.misc.map((x: any) => {
-                    return (
-                      <div className="flex flex-col space-y-2">
-                        <Typography.Text type="secondary">{x.label}</Typography.Text>
-                        <Typography.Text>{x.text}</Typography.Text>
+                          />
+                        </p>
                       </div>
-                    )
-                  })}
-                  <div className="space-y-2">
-                    {props.blog.stats.map((x: any) => {
-                      return (
-                        <div className="flex space-x-3">
-                          <div className="bg-brand-600 mt-0.5 h-8 w-0.5"></div>
-                          <div className="flex flex-col">
-                            <Typography.Text>
-                              <span className="text-3xl font-semibold leading-none">{x.stat}</span>
-                            </Typography.Text>
-                            <Typography.Text type="secondary">{x.label}</Typography.Text>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
 
-                  <div className="flex flex-col space-y-2">
-                    <Typography.Text type="secondary">Ready to get started?</Typography.Text>
-                    <Button type="default" iconRight={<IconChevronRight />}>
-                      Contact sales
-                    </Button>
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-scale-900">About</span>
+                        <p>{props.blog.about}</p>
+                        <span className="not-prose ">
+                          <a
+                            href={props.blog.company_url}
+                            className=" flex cursor-pointer items-center space-x-1 opacity-50 transition-opacity hover:opacity-100"
+                          >
+                            <span>{props.blog.company_url}</span>
+                            <IconExternalLink size={14} />
+                          </a>
+                        </span>
+                      </div>
+                      {props.blog.misc.map((x: any) => {
+                        return (
+                          <div className="flex flex-col gap-0">
+                            <span className="text-scale-900">{x.label}</span>
+                            <span className="text-scale-1100">{x.text}</span>
+                          </div>
+                        )
+                      })}
+                      <div className="space-y-2">
+                        {props.blog.stats.map((x: any) => {
+                          return (
+                            <div className="flex space-x-3">
+                              <div className="bg-brand-900 mt-0.5 h-8 w-0.5"></div>
+                              <div className="flex flex-col">
+                                <span className="text-scale-1200 text-3xl font-semibold leading-none">
+                                  {x.stat}
+                                </span>
+                                <span>{x.label}</span>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      <div className="">
+                        <p>Ready to get started?</p>
+                        <div>
+                          <Button type="default" iconRight={<IconChevronRight />}>
+                            Contact sales
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
-            <div>
-              {props.nextPost && (
-                <NextCard post={props.nextPost} label="Next post" className="text-right" />
-              )}
+              </article>
             </div>
           </div>
+
+          <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
+          <div>
+            {props.nextPost && (
+              <NextCard post={props.nextPost} label="Next post" className="text-right" />
+            )}
+          </div>
         </div>
+
         <CTABanner />
       </DefaultLayout>
     </>
