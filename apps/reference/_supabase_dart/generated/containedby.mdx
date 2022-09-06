@@ -48,8 +48,7 @@ final data = await supabase
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_countries')
-  .containedBy('main_exports', ['cars', 'food', 'machine'])
-  .execute();
+  .containedBy('main_exports', ['cars', 'food', 'machine']);
 ```

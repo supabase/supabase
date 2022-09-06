@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Limits the result to rows within the specified range, inclusive.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .range(0,3)
-  .execute();
+  .range(0,3);
 ```
 
 ## Examples
@@ -23,9 +22,8 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .range(0,3)
-  .execute();
+  .range(0,3);
 ```
