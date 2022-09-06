@@ -11,6 +11,8 @@ interface Props {
   minimal?: boolean
 }
 
+// Banner will not be shown for PAYG or Enterprise projects
+
 const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
   const { ui } = useStore()
   const ref = ui.selectedProject?.ref
@@ -27,6 +29,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
     isLoading ||
     error ||
     (!isApproachingUsageLimits && !isOverUsageLimits) ||
+    tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
     tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
   ) {
     return <></>

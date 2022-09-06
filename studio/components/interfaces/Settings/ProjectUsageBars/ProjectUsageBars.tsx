@@ -17,9 +17,12 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
   const { ui } = useStore()
   const { usage, error, isLoading } = useProjectUsage(projectRef)
 
+  const projectHasNoLimits =
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
+    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+
   const showUsageExceedMessage =
-    ui.selectedProject?.subscription_tier !== undefined &&
-    ui.selectedProject?.subscription_tier !== PRICING_TIER_PRODUCT_IDS.ENTERPRISE
+    ui.selectedProject?.subscription_tier !== undefined && !projectHasNoLimits
 
   useEffect(() => {
     if (error) {
