@@ -75,19 +75,17 @@ function Blog(props: any) {
       </Head>
       <NextSeo title="Case studies" description="Latest customers using Supabase" />
       <DefaultLayout>
-        <div className="bg-white dark:bg-dark-800 overflow-hidden">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20 mt-32">
+        <div className="dark:bg-scale-200 bg-scale-100 overflow-hidden">
+          <div className="container mx-auto mt-32 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto max-w-7xl">
-              <div className="max-w-3xl mx-auto text-center">
-                <Typography.Title level={1}>Case studies</Typography.Title>
-                <Typography.Text>
-                  <p className="text-xl">
-                    Learn how teams behind everyone’s favorite products use Radix to save time,
-                    boost quality, and set the bar for accessibility.
-                  </p>
-                </Typography.Text>
+              <div className="mx-auto max-w-3xl text-center">
+                <h1 className="text-scale-1200 mb-3 text-3xl">Case studies</h1>
+                <h2 className="text-scale-1100 text-xl">
+                  Learn how teams behind everyone’s favorite products use Radix to save time, boost
+                  quality, and set the bar for accessibility.
+                </h2>
               </div>
-              <div className="mt-12 max-w-lg mx-auto grid lg:grid-cols-1 lg:max-w-none">
+              <div className="mx-auto mt-12 grid max-w-lg lg:max-w-none lg:grid-cols-1">
                 <ImageGrid images={caseStudyThumbs} lgCols={4} padding={6} className="h-32" />
               </div>
             </div>
