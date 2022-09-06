@@ -11,11 +11,11 @@ import TabItem from '@theme/TabItem'
 Updates user data, if there is a logged in user.
 
 ```dart
-final res = await supabase.auth.update(
-  UserAttributes(data: {'hello': 'world'})
-);
-
-final error = res.error;
+try {
+  final res = await supabase.auth.update(UserAttributes(data: {'hello': 'world'}));
+} catch (error) {
+  // handle error
+}
 ```
 
 ## Notes
@@ -28,9 +28,9 @@ Use the `update()` method if you have data which rarely changes or is specific o
 ### Update a user's metadata.
 
 ```dart
-final res = await supabase.auth.update(
-  UserAttributes(data: {'hello': 'world'})
-);
-
-final error = res.error;
+try {
+  final res = await supabase.auth.update(UserAttributes(data: {'hello': 'world'}));
+} catch (error) {
+  // handle error
+}
 ```
