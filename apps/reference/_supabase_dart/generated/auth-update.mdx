@@ -28,9 +28,5 @@ Use the `update()` method if you have data which rarely changes or is specific o
 ### Update a user's metadata.
 
 ```dart
-try {
-  final res = await supabase.auth.update(UserAttributes(data: {'hello': 'world'}));
-} catch (error) {
-  // handle error
-}
+final res = await supabase.auth.update(UserAttributes(data: {'hello': 'world'}));
 ```

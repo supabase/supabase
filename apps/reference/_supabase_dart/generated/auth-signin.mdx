@@ -47,11 +47,7 @@ try {
 If email is provided, but no password is provided, the user will be sent a "magic link" to their email address, which they can click to open your application with a valid session. By default, a given user can only request a Magic Link once every 60 seconds.
 
 ```dart
-try {
-  final res = await supabase.auth.signIn(email: 'example@email.com');
-} catch (error) {
-  // handle error
-}
+final res = await supabase.auth.signIn(email: 'example@email.com');
 ```
 
 ### Get OAuth sign in URL.
@@ -60,11 +56,7 @@ Passing provider parameter to `signIn()` will return a URL to sign your user in 
 If you are looking to sign in a user via OAuth on Flutter app, go to [`signInWithProvider()`](/docs/reference/dart/auth-signinwithprovider).
 
 ```dart
-try {
-  final res = await supabase.auth.signIn(provider: Provider.github);
+final res = await supabase.auth.signIn(provider: Provider.github);
 
-  final user = res.user;
-} catch (error) {
-  // handle error
-}
+final user = res.user;
 ```

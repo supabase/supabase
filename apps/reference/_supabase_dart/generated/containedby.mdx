@@ -9,11 +9,10 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .select('name, id, main_exports')
-  .containedBy('main_exports', ['cars', 'food', 'machine'])
-  .execute();
+  .containedBy('main_exports', ['cars', 'food', 'machine']);
 ```
 
 ## Examples
@@ -21,31 +20,28 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .select('name, id, main_exports')
-  .containedBy('main_exports', ['cars', 'food', 'machine'])
-  .execute();
+  .containedBy('main_exports', ['cars', 'food', 'machine']);
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .update({ 'name': 'Mordor' })
-  .containedBy('main_exports', ['orks', 'surveillance', 'evil'])
-  .execute();
+  .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .delete()
-  .containedBy('main_exports', ['cars', 'food', 'machine'])
-  .execute();
+  .containedBy('main_exports', ['cars', 'food', 'machine']);
 ```
 
 ### With `rpc()`
