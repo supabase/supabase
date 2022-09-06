@@ -1,12 +1,8 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
-<<<<<<< HEAD
 import { Form, Input, Button, Listbox } from '@supabase/ui'
-=======
-import { Form, Input, Button, Select } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
->>>>>>> master
 
 import { checkPermissions, useStore, useFlag } from 'hooks'
 import { patch } from 'lib/common/fetch'
@@ -114,12 +110,22 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                       disabled={!canUpdateBillingAddress}
                     />
                     <div className="flex items-center space-x-2">
-                      <Listbox className="w-full" id="country" name="country" placeholder="Country" disabled={!canUpdateBillingAddress}>
+                      <Listbox
+                        className="w-full"
+                        id="country"
+                        name="country"
+                        placeholder="Country"
+                        disabled={!canUpdateBillingAddress}
+                      >
                         <Listbox.Option label="---" key="empty" value="">
                           ---
                         </Listbox.Option>
                         {COUNTRIES.map((country) => (
-                          <Listbox.Option label={country.name} key={country.code} value={country.code}>
+                          <Listbox.Option
+                            label={country.name}
+                            key={country.code}
+                            value={country.code}
+                          >
                             {country.name}
                           </Listbox.Option>
                         ))}
