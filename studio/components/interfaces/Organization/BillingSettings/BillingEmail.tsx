@@ -100,11 +100,12 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection header={<FormSectionLabel>Email</FormSectionLabel>}>
+                <FormSection className="-mx-2">
                   <FormSectionContent loading={false}>
                     <Input
                       id="billing_email"
                       size="small"
+                      label="Email address"
                       type={canReadBillingEmail ? 'text' : 'password'}
                       disabled={!canUpdateOrganization}
                     />
