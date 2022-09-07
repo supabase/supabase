@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { IconClock } from '@supabase/ui'
 
 import { Time } from './PITR.types'
-import { formatNumberToTwoDigits } from './PITR.utils'
+import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 // [Joshen] This is trying to do the same thing as TimeSplitInput.tsx
 // so can we please look to try to combine these 2 components together if possible
@@ -25,33 +25,37 @@ interface Props {
 const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange = () => {} }) => {
   const [isFocused, setIsFocused] = useState(false)
   const [error, setError] = useState<string>()
-  const [time, setTime] = useState<Time>({ h: '00', m: '00', s: '00' })
+  const [time, setTime] = useState<Time>(defaultTime || { h: 0, m: 0, s: 0 })
+
+  const formattedMinimumTime = minimumTime
+    ? dayjs(formatTimeToTimeString(minimumTime), 'HH:mm:ss', true)
+    : undefined
+
+  const formattedMaximumTime = maximumTime
+    ? dayjs(formatTimeToTimeString(maximumTime), 'HH:mm:ss', true)
+    : undefined
 
   useEffect(() => {
-    if (defaultTime) setTime(defaultTime)
-  }, [])
-
-  useEffect(() => {
-    validate(defaultTime ?? time)
+    if (minimumTime || maximumTime) validate(time)
   }, [JSON.stringify(minimumTime), JSON.stringify(maximumTime)])
+
+  useEffect(() => {
+    if (defaultTime) {
+      setTime(defaultTime)
+      validate(defaultTime)
+    }
+  }, [defaultTime])
 
   const validate = (time: Time) => {
     let error = undefined
 
-    const formattedTime = dayjs(`${time.h}:${time.m}:${time.s}`, 'HH:mm:ss', true)
-    if (!formattedTime.isValid()) error = 'Please enter a valid time'
+    const formattedTime = dayjs(formatTimeToTimeString(time), 'HH:mm:ss', true)
 
-    const formattedMinimumTime = minimumTime
-      ? dayjs(`${minimumTime.h}:${minimumTime.m}:${minimumTime.s}`, 'HH:mm:ss', true)
-      : undefined
-    if (formattedMinimumTime && formattedTime.isBefore(formattedMinimumTime)) {
+    if (!formattedTime.isValid()) {
+      error = 'Please enter a valid time'
+    } else if (formattedMinimumTime && formattedTime.isBefore(formattedMinimumTime)) {
       error = 'Selected time is before the minimum time allowed'
-    }
-
-    const formattedMaximumTime = maximumTime
-      ? dayjs(`${maximumTime.h}:${maximumTime.m}:${maximumTime.s}`, 'HH:mm:ss', true)
-      : undefined
-    if (formattedMaximumTime && formattedTime.isAfter(formattedMaximumTime)) {
+    } else if (formattedMaximumTime && formattedTime.isAfter(formattedMaximumTime)) {
       error = 'Selected time is after the maximum time allowed'
     }
 
@@ -67,13 +71,12 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
   }
 
   const onInputBlur = (event: ChangeEvent<HTMLInputElement>, unit: 'h' | 'm' | 's') => {
-    const formattedInput = formatNumberToTwoDigits(Number(event.target.value))
+    const formattedInput = Number(event.target.value)
     const updatedTime = { ...time, [unit]: formattedInput }
     setTime(updatedTime)
 
-    const isValid = validate(updatedTime)
-    if (isValid) onChange(updatedTime)
-
+    validate(updatedTime)
+    onChange(updatedTime)
     setIsFocused(false)
   }
 
@@ -100,7 +103,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               maxLength={2}
               pattern="[0-9]*"
               placeholder="HH"
-              value={time.h}
+              value={formatNumberToTwoDigits(time.h)}
               onFocus={onFocus}
               aria-label="Hours"
               onBlur={(event) => onInputBlur(event, 'h')}
@@ -128,7 +131,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               maxLength={2}
               pattern="[0-9]*"
               placeholder="MM"
-              value={time.m}
+              value={formatNumberToTwoDigits(time.m)}
               onFocus={onFocus}
               aria-label="Minutes"
               onBlur={(event) => onInputBlur(event, 'm')}
@@ -156,7 +159,7 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
               maxLength={2}
               pattern="[0-9]*"
               placeholder="SS"
-              value={time.s}
+              value={formatNumberToTwoDigits(time.s)}
               onFocus={onFocus}
               aria-label="Seconds"
               onBlur={(event) => onInputBlur(event, 's')}

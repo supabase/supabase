@@ -8,7 +8,7 @@ export interface Timezone {
 }
 
 export interface Time {
-  h: string
-  m: string
-  s: string
+  h: number
+  m: number
+  s: number
 }
