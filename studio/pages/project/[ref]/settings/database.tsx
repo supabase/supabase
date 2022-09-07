@@ -10,6 +10,7 @@ import generator from 'generate-password'
 import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { NextPageWithLayout } from 'types'
 import { checkPermissions, useFlag, useStore } from 'hooks'
 import { get, patch } from 'lib/common/fetch'
 import { pluckObjectFields, passwordStrength } from 'lib/helpers'
@@ -18,11 +19,10 @@ import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, TIME_PERIODS_INFRA } from '
 import { SettingsLayout } from 'components/layouts'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import Panel from 'components/ui/Panel'
-import { ProjectUsageMinimal } from 'components/ui/Usage'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import ConnectionPooling from 'components/interfaces/Database/Pooling/ConnectionPooling'
-import { NextPageWithLayout } from 'types'
+import ProjectUsageMinimal from 'components/interfaces/Settings/ProjectUsageBars/ProjectUsageMinimal'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const router = useRouter()
@@ -35,7 +35,7 @@ const ProjectSettings: NextPageWithLayout = () => {
     <div>
       <div className="content h-full w-full overflow-y-auto">
         <div className="w-full max-w-5xl px-4 py-4">
-          <Usage project={project} />
+          <DatabaseUsage project={project} />
           <GeneralSettings projectRef={ref} />
           <ConnectionPooling />
         </div>
@@ -48,7 +48,7 @@ ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</S
 
 export default observer(ProjectSettings)
 
-const Usage: FC<any> = ({ project }) => {
+const DatabaseUsage: FC<any> = ({ project }) => {
   const [dateRange, setDateRange] = useState<any>(undefined)
   const router = useRouter()
   const ref = router.query.ref as string
@@ -130,16 +130,12 @@ const Usage: FC<any> = ({ project }) => {
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
-                Database storage
+                Database usage
               </h5>
             }
           >
             <Panel.Content>
-              <ProjectUsageMinimal
-                projectRef={ref}
-                subscription_id={project.subscription_id}
-                filter={'Database'}
-              />
+              <ProjectUsageMinimal projectRef={ref} filter={'Database'} />
             </Panel.Content>
           </Panel>
         </section>
