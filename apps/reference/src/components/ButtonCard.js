@@ -3,7 +3,6 @@ import Link from '@docusaurus/Link'
 
 export default function ButtonCard({
   children,
-  color,
   icon,
   title,
   description,
