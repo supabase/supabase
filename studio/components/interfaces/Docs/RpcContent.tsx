@@ -65,9 +65,9 @@ const RpcContent = ({
       {rpcParams.length > 0 && (
         <div>
           <h3 className="text-scale-1200 mt-0 px-6 capitalize">Function Arguments</h3>
-          {rpcParams.map((x) => {
+          {rpcParams.map((x, i) => {
             return (
-              <div className="doc-section">
+              <div key={i} className="doc-section">
                 <article className="text ">
                   <Param
                     key={x.name}
