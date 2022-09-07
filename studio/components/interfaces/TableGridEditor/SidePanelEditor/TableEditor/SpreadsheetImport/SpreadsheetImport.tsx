@@ -204,8 +204,8 @@ const SpreadsheetImport: FC<Props> = ({
                             <>
                               <IconArrowRight size={14} />
                               <p>Extra field(s):</p>
-                              {error.data?.__parsed_extra.map((value: any) => (
-                                <code className="text-sm">{value}</code>
+                              {error.data?.__parsed_extra.map((value: any, i: number) => (
+                                <code key={i} className="text-sm">{value}</code>
                               ))}
                             </>
                           )}
