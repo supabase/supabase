@@ -110,22 +110,23 @@ function BlogPostPage(props: any) {
     return (
       <Link href={`/blog/${post.url}`} as={`/blog/${post.url}`}>
         <div className={className}>
-          <Card className="cursor-pointer" hoverable>
-            <Space direction="vertical">
-              <div>
-                <Typography.Text>{label}</Typography.Text>
-              </div>
-              <div>
-                <Typography.Title level={4}>{post.title}</Typography.Title>
-                <Typography.Text>{post.date}</Typography.Text>
-              </div>
-              <div>
-                {post.tags.map((tag: string) => {
-                  return <Badge key={`categroy-badge-${tag}`}>{tag}</Badge>
-                })}
-              </div>
-            </Space>
-          </Card>
+          <div className="bg-scale-100 hover:bg-scale-200 dark:bg-scale-200 dark:hover:bg-scale-300 flex cursor-pointer items-center justify-center rounded-lg border p-3 drop-shadow-none transition-all hover:drop-shadow-lg ">
+            <div className="relative flex h-40 w-40">
+              <Image
+                layout="fill"
+                src={`${post.logo}`}
+                alt={`${post.title} logo`}
+                objectFit="scale-down"
+                objectPosition="centre"
+                className="
+                      bg-no-repeat
+                      dark:brightness-200 
+                      dark:contrast-0
+                      dark:filter
+                    "
+              />
+            </div>
+          </div>
         </div>
       </Link>
     )
@@ -163,28 +164,33 @@ function BlogPostPage(props: any) {
             xl:px-20
           "
         >
-          <div className="grid grid-cols-12 gap-8">
+          <div className="grid grid-cols-12 gap-8 xl:gap-16">
+            <div className="col-span-12 flex flex-col gap-8 lg:col-span-10 xl:col-span-8">
+              <p className="text-brand-900 mb-2 mt-0">Case study</p>
+              <h1 className="text-scale-1200 text-2xl font-semibold xl:text-5xl">
+                {props.blog.title}
+              </h1>
+              <h2 className="text-scale-1200 text-xl xl:text-2xl">{props.blog.description}</h2>
+            </div>
             {/* Back button */}
-            <div className="col-span-12 xl:col-span-2">
+            {/* <div className="col-span-12 xl:col-span-2">
               <button className="text-scale-900 hover:text-scale-1200 flex cursor-pointer items-center gap-1 text-sm transition">
                 <ChevronLeftIcon width={12} />
                 All case studies
               </button>
-            </div>
-            <div className="col-span-12 xl:col-span-10">
+            </div> */}
+            <div className="col-span-12 xl:col-span-11">
               {/* Title and description */}
               {/* Quote can go here */}
 
               {/* Content */}
               <article className="prose col-span-12 max-w-none">
-                <div className="">
+                {/* <div className="">
                   <p className="text-brand-900 mb-2 mt-0">Case study</p>
                   <h1 className="text-scale-1200 text-5xl lg:mb-0">{props.blog.title}</h1>
-                </div>
-                <div className="grid max-w-none grid-cols-12 lg:gap-16">
-                  <div className="xm:col-span-7 col-span-12 lg:col-span-7 ">{content}</div>
-                  {/* Sidebar */}
-                  <div className="col-span-12 hidden lg:col-span-5 lg:block xl:col-span-4 xl:col-start-9">
+                </div> */}
+                <div className="xl:gap-21 grid max-w-none grid-cols-12 lg:gap-16">
+                  <div className="col-span-12 lg:col-span-5 lg:block xl:col-span-4">
                     <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                       {/* Logo */}
                       <div className={`relative h-16 w-32`}>
@@ -227,13 +233,13 @@ function BlogPostPage(props: any) {
                           </div>
                         )
                       })}
-                      <div className="space-y-2">
+                      <div className="flex flex-col gap-8">
                         {props.blog.stats.map((x: any) => {
                           return (
                             <div className="flex space-x-3">
                               <div className="bg-brand-900 mt-0.5 h-8 w-0.5"></div>
-                              <div className="flex flex-col">
-                                <span className="text-scale-1200 text-3xl font-semibold leading-none">
+                              <div className="flex flex-col gap-2">
+                                <span className="text-scale-1200 text-2xl leading-none">
                                   {x.stat}
                                 </span>
                                 <span>{x.label}</span>
@@ -253,16 +259,20 @@ function BlogPostPage(props: any) {
                       </div>
                     </div>
                   </div>
+                  <div className="xm:col-span-7 col-span-12 lg:col-span-8 ">{content}</div>
+                  {/* Sidebar */}
                 </div>
               </article>
             </div>
           </div>
 
-          <div>{props.prevPost && <NextCard post={props.prevPost} label="Last post" />}</div>
-          <div>
-            {props.nextPost && (
-              <NextCard post={props.nextPost} label="Next post" className="text-right" />
-            )}
+          <div className="mt-32">
+            <h3 className="text-2xl">Read more case studies</h3>
+            <div className="grid grid-cols-3 gap-8">
+              {props.relatedPosts.map((post) => {
+                return <NextCard post={post} />
+              })}
+            </div>
           </div>
         </div>
 

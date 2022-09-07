@@ -9,9 +9,9 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/case-studies/xendit</guid>
-  <title>Xendit</title>
+  <title>Xendit use Supabase and create a full solution shipped to production in less than one week.</title>
   <link>https://supabase.com/case-studies/xendit</link>
-  <description>Two months of building</description>
+  <description>As a payment processor, Xendit are responsible for verifying that all transactions are legal.</description>
   <pubDate>Invalid Date</pubDate>
 </item>
 <item>
@@ -23,16 +23,16 @@
 </item>
 <item>
   <guid>https://supabase.com/case-studies/mobbin</guid>
-  <title>Mobbin</title>
+  <title>How Mobbin migrated 200,000 users from Firebase for a better authentication experience.</title>
   <link>https://supabase.com/case-studies/mobbin</link>
-  <description>Two months of building</description>
+  <description>Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.</description>
   <pubDate>Invalid Date</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/case-studies/epsilon3</guid>
-  <title>Epsilon3</title>
+  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
   <link>https://supabase.com/case-studies/epsilon3</link>
-  <description>Two months of building</description>
+  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
   <pubDate>Invalid Date</pubDate>
 </item>
 
