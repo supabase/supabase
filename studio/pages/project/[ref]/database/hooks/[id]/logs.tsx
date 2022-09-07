@@ -82,9 +82,9 @@ const HookLogs: FC<any> = observer(() => {
 
       <div className="bg-bg-alt-light border-t border-b">
         <div className="divide-y-2 ">
-          {logsData?.map((log: any) => {
+          {logsData?.map((log: any, i: number) => {
             return (
-              <div className="flex flex-col space-y-1 py-4 px-6">
+              <div key={i} className="flex flex-col space-y-1 py-4 px-6">
                 <div className="flex items-center justify-between">
                   <div className="space-x-3">
                     <p className="font-mono text-scale-1000">[{log.method}]</p>
