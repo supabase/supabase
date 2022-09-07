@@ -79,7 +79,7 @@ format:
 # Generate the docs
 ###############################################################################
 
-generate: generate.api generate.cli generate.gotrue generate.storage generate.dart generate.js.v1 generate.js.v2
+generate: generate.api generate.cli generate.storage generate.dart generate.js.v1 generate.js.v2
 
 generate.api: 
 	cd $(REPO_DIR)/generator && npm run api:gen
