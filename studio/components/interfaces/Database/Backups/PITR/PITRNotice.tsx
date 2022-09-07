@@ -1,18 +1,27 @@
-import { Button, IconCalendar, IconClock } from '@supabase/ui'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Button, IconCalendar } from '@supabase/ui'
 import { FormPanel } from 'components/ui/Forms'
 
 const PITRNotice = ({}) => {
+  const router = useRouter()
+  const { ref } = router.query
+
   return (
     <FormPanel
       disabled={true}
       footer={
         <div className="flex items-center justify-between p-6">
           <span className="text-scale-1000 text-sm">
-            Recovery retention period can be increase by upgrading
+            Recovery retention period can be increased - reach out to us!
           </span>
-          <Button type="default" icon={<IconClock strokeWidth={2} />}>
-            Increase backup retention
-          </Button>
+          <Link href={`/support/new?ref=${ref}&category=sales`}>
+            <a>
+              <Button as="span" type="default">
+                Contact support
+              </Button>
+            </a>
+          </Link>
         </div>
       }
     >
