@@ -11,52 +11,47 @@ import TabItem from '@theme/TabItem'
 Subscribe to realtime changes in your database.
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.all, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('*').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: '*', schema: '*'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ## Notes
 
-- Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/api#managing-realtime).
-- If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+- Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by managing replication.
+Row level security is not applied to delete statements.
+- If you want to receive the "previous" data for updates and deletes, you will need to set REPLICA IDENTITY to FULL, like this: ALTER TABLE your_table REPLICA IDENTITY FULL;
+- When a delete occurs, the contents of old_record will be broadcast to all subscribers to that table so ensure that each table's replica identity only contains information that is safe to expose publicly.
+- The channel name must exactly match the schema/table/filter you want to listen to separated by colons. See below examples for additional context.
 
 ## Examples
 
 ### Listen to all database changes
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.all, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('*').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: '*', schema: '*'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to a specific table
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.all, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: '*', schema: 'public', table: 'countries'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to inserts
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.insert, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to updates
@@ -69,12 +64,10 @@ alter table "your_table" replica identity full;
 ```
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.update, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: 'UPDATE', schema: 'public', table: 'countries'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to deletes
@@ -87,12 +80,10 @@ alter table "your_table" replica identity full;
 ```
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.delete, (payload) {
-    // Handle realtime payload
-  })
-  .subscribe();
+supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'), (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to multiple events
@@ -100,11 +91,15 @@ final mySubscription = supabase
 You can chain listeners if you want to listen to multiple events for each table.
 
 ```dart
-final mySubscription = supabase
-  .from('countries')
-  .on(SupabaseEventTypes.insert, handleInsert)
-  .on(SupabaseEventTypes.delete, handleDelete)
-  .subscribe();
+supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
+    (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).on(RealtimeListenTypes.postgresChanges,
+    ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
+    (payload, [ref]) {
+  print('Change received: ${payload.toString()}');
+}).subscribe();
 ```
 
 ### Listening to row level changes
@@ -112,8 +107,14 @@ final mySubscription = supabase
 You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
 
 ```dart
-final mySubscription = supabase
-  .from('countries:id=eq.200')
-  .on(SupabaseEventTypes.update, handleRecordUpdated)
-  .subscribe();
+    supabase.channel('public:countries:id=eq.200').on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'countries',
+          filter: 'id=eq.200',
+        ), (payload, [ref]) {
+      print('Change received: ${payload.toString()}');
+    }).subscribe();
 ```
