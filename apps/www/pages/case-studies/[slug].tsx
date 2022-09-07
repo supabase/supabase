@@ -166,7 +166,9 @@ function BlogPostPage(props: any) {
         >
           <div className="grid grid-cols-12 gap-8 xl:gap-16">
             <div className="col-span-12 flex flex-col gap-8 lg:col-span-10 xl:col-span-8">
-              <p className="text-brand-900 mb-2 mt-0">Case study</p>
+              <p className="text-brand-900 mb-2 mt-0">
+                Case Studies / <a>{props.blog.name}</a>
+              </p>
               <h1 className="text-scale-1200 text-2xl font-semibold xl:text-5xl">
                 {props.blog.title}
               </h1>
