@@ -11,13 +11,9 @@ import TabItem from '@theme/TabItem'
 Log in an existing user, or login via a third-party provider.
 
 ```dart
-try {
-  final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
 
-  final user = res.user;
-} catch (error) {
-  // handle error
-}
+final user = res.user;
 ```
 
 ## Notes
@@ -33,13 +29,9 @@ try {
 ### Sign in with email.
 
 ```dart
-try {
-  final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
+final res = await supabase.auth.signIn(email: 'example@email.com', password: 'example-password');
 
-  final user = res.user;
-} catch (error) {
-  // handle error
-}
+final user = res.user;
 ```
 
 ### Sign in with magic link.
