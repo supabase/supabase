@@ -2,32 +2,10 @@ REPO_DIR=$(shell pwd)
 
 run: download transform format
 
-# Format everything - easier for git to track changes
-format:
-	npx prettier --write .
 
-# Transform docs into working files
-transform:
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
-
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:functions
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:gotrue
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:postgrest
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:realtime
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:storage
-	cd $(REPO_DIR)/../packages/generator && npm run tsdoc:dereference:supabase
-
-	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
-	$(REPO_DIR)/enrichments/tsdoc_v2/supabase_dereferenced.json \
-	$(REPO_DIR)/enrichments/tsdoc_v2/gotrue_dereferenced.json \
-	$(REPO_DIR)/enrichments/tsdoc_v2/postgrest_dereferenced.json \
-	$(REPO_DIR)/enrichments/tsdoc_v2/realtime_dereferenced.json \
-	$(REPO_DIR)/enrichments/tsdoc_v2/storage_dereferenced.json \
-	$(REPO_DIR)/enrichments/tsdoc_v2/functions_dereferenced.json \
-	> $(REPO_DIR)/enrichments/tsdoc_v2/combined.json
-
+###############################################################################
 # Download all the specs
+###############################################################################
 download: download.api.v1 download.storage.v1 download.tsdoc.v1
 
 download.api.v1:
@@ -52,3 +30,43 @@ download.tsdoc.v1:
 	$(REPO_DIR)/enrichments/tsdoc_v1/storage.json \
 	$(REPO_DIR)/enrichments/tsdoc_v1/functions.json \
 	> $(REPO_DIR)/enrichments/tsdoc_v1/combined.json
+
+###############################################################################
+# Transform docs into working files
+###############################################################################
+transform: dereference.api.v0 dereference.storage.v0 dereference.tsdoc combine.tsdoc
+
+dereference.api.v0:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+
+dereference.storage.v0:
+	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+
+dereference.tsdoc:
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:functions
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:gotrue
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:postgrest
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:realtime
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:storage
+	cd $(REPO_DIR)/generator && npm run tsdoc:dereference:supabase
+
+combine.tsdoc:
+	jq -s '{ name: "Combined Specs", children: [.[0], .[1], .[2], .[3], .[4], .[5]] }' \
+	$(REPO_DIR)/enrichments/tsdoc_v2/supabase_dereferenced.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/gotrue_dereferenced.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/postgrest_dereferenced.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/realtime_dereferenced.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/storage_dereferenced.json \
+	$(REPO_DIR)/enrichments/tsdoc_v2/functions_dereferenced.json \
+	> $(REPO_DIR)/enrichments/tsdoc_v2/combined.json
+
+###############################################################################
+# Format everything - easier for git to track changes
+###############################################################################
+format:
+	npx prettier --write .
+
+###############################################################################
+# Generate the docs
+###############################################################################
+
