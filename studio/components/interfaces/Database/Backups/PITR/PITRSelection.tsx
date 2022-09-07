@@ -252,7 +252,6 @@ const PITRSelection = ({}) => {
                   </div>
                 )}
               />
-              {/* Legend */}
               <div className="flex items-center space-x-2">
                 <div
                   className="border w-4 h-4 border-scale-800"
@@ -333,7 +332,11 @@ const PITRSelection = ({}) => {
         onCancel={() => setShowConfirmation(false)}
         customFooter={
           <div className="flex items-center justify-end space-x-2">
-            <Button type="default" onClick={() => setShowConfirmation(false)}>
+            <Button
+              type="default"
+              disabled={isRestoring}
+              onClick={() => setShowConfirmation(false)}
+            >
               Cancel
             </Button>
             <Button
