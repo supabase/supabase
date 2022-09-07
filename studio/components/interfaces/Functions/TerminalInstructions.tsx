@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
 import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from '@supabase/ui'
-
 import { useProjectSettings } from 'hooks'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { FC, useState } from 'react'
+import { useStore } from 'hooks'
 
 interface Props {
   closable?: boolean
@@ -14,6 +14,7 @@ interface Props {
 const TerminalInstructions: FC<Props> = ({ closable = false }) => {
   const router = useRouter()
   const { ref } = router.query
+  const { ui } = useStore()
 
   const { tokens } = useAccessTokens()
   const { services } = useProjectSettings(ref as string | undefined)
@@ -33,6 +34,10 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
     'functions',
     ...endpointSections.slice(1),
   ].join('.')
+
+  // get the .co or .net TLD from the restUrl
+  const restUrl = ui.selectedProject?.restUrl
+  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const commands: Commands[] = [
     {
@@ -61,7 +66,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.net/hello-world' -H 'Authorization: Bearer ${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.${restUrlTld}/hello-world' -H 'Authorization: Bearer ${
         anonKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',

@@ -23,6 +23,10 @@ const PageLayout: NextPageWithLayout = () => {
     setSelectedFunction(functions.byId(id))
   }, [functions.isLoaded, ui.selectedProject])
 
+  // get the .co or .net TLD from the restUrl
+  const restUrl = ui.selectedProject?.restUrl
+  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+
   const managementCommands: any = [
     {
       command: `supabase functions deploy ${selectedFunction?.slug}`,
@@ -110,7 +114,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   const invokeCommands: any = [
     {
-      command: `curl -L -X POST 'https://${ref}.functions.supabase.net/${
+      command: `curl -L -X POST 'https://${ref}.functions.supabase.${restUrlTld}/${
         selectedFunction?.slug
       }' -H 'Authorization: Bearer ${anonKey ?? '[YOUR ANON KEY]'}' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello function',
