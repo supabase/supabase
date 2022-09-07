@@ -1,3 +1,4 @@
+import jsonLogic from 'json-logic-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export interface Organization {
@@ -70,7 +71,7 @@ export interface Role {
 
 export interface Permission {
   actions: PermissionAction[]
-  condition: string | null
+  condition: jsonLogic.RulesLogic
   organization_id: number
   resources: string[]
 }
