@@ -4,13 +4,11 @@ title: Usage
 description: An SWT based API for managing users and issuing SWT tokens
 ---
 
-## Endpoints
-
 GoTrue exposes the following endpoints:
 
-### **GET /settings**
+## **GET /settings**
 
-Returns the publicly available settings for this gotrue instance.
+Returns the publicly available settings for this GoTrue instance.
 
 ```json
 {
@@ -25,7 +23,7 @@ Returns the publicly available settings for this gotrue instance.
 }
 ```
 
-### **POST /signup**
+## **POST /signup**
 
 Register a new user with an email and password.
 
@@ -48,7 +46,7 @@ Returns:
 }
 ```
 
-### **POST /invite**
+## **POST /invite**
 
 Invites a new user with an email.
 This endpoint requires the `service_role` or `supabase_admin` JWT set as an Auth Bearer header:
@@ -80,7 +78,7 @@ Returns:
 }
 ```
 
-### **POST /verify**
+## **POST /verify**
 
 Verify a registration or a password recovery. Type can be `signup` or `recovery` or `invite`
 and the `token` is a token returned from either `/signup` or `/recover`.
@@ -106,7 +104,7 @@ Returns:
 }
 ```
 
-### **GET /verify**
+## **GET /verify**
 
 Verify a registration or a password recovery. Type can be `signup` or `recovery` or `magiclink` or `invite`
 and the `token` is a token returned from either `/signup` or `/recover` or `/magiclink`.
@@ -131,7 +129,7 @@ Your app should detect the query params in the fragment and use them to set the 
 You can use the `type` param to redirect the user to a password set form in the case of `invite` or `recovery`,
 or show an account confirmed/welcome message in the case of `signup`, or direct them to some additional onboarding flow
 
-### **POST /magiclink**
+## **POST /magiclink**
 
 Magic Link. Will deliver a link (e.g. `/verify?type=magiclink&token=fgtyuf68ddqdaDd`) to the user based on
 email address which they can use to redeem an access_token.
@@ -152,7 +150,7 @@ Returns:
 
 when clicked the magic link will redirect the user to `<SITE_URL>#access_token=x&refresh_token=y&expires_in=z&token_type=bearer&type=magiclink` (see `/verify` above)
 
-### **POST /recover**
+## **POST /recover**
 
 Password recovery. Will deliver a password recovery mail to the user based on
 email address.
@@ -171,7 +169,7 @@ Returns:
 {}
 ```
 
-### **POST /token**
+## **POST /token**
 
 This is an OAuth2 endpoint that currently implements
 the password and refresh_token grant types
@@ -221,7 +219,7 @@ Returns:
 }
 ```
 
-### **GET /user**
+## **GET /user**
 
 Get the JSON object for the logged in user (requires authentication)
 
@@ -237,7 +235,7 @@ Returns:
 }
 ```
 
-### **PUT /user**
+## **PUT /user**
 
 Update a user (Requires authentication). Apart from changing email/password, this
 method can be used to set custom user data.
@@ -266,7 +264,7 @@ Returns:
 }
 ```
 
-### **POST /admin/users**
+## **POST /admin/users**
 
 Creates a new user. Requires your `service_role` API key and thus should only be
 used in secure server-side environments.
@@ -300,7 +298,7 @@ Returns:
 }
 ```
 
-### **GET /admin/users/{user_id}**
+## **GET /admin/users/{user_id}**
 
 Gets a user. Requires your `service_role` API key and thus should only be used
 in secure server-side environments.
@@ -322,7 +320,7 @@ Returns:
 }
 ```
 
-### **PUT /admin/users/{user_id}**
+## **PUT /admin/users/{user_id}**
 
 Updates a user. Requires your `service_role` API key and thus should only be
 used in secure server-side environments.
@@ -356,7 +354,7 @@ Returns:
 }
 ```
 
-### **POST /admin/generate_link**
+## **POST /admin/generate_link**
 
 Returns the corresponding email action link based on the type specified. The response also contains the query params of the action link as separate JSON fields for convenience (along with the email OTP from which the corresponding token is generated).
 
@@ -373,19 +371,19 @@ Returns:
 }
 ```
 
-### **DELETE /admin/users/{user_id}**
+## **DELETE /admin/users/{user_id}**
 
 Deletes a user. Requires your `service_role` API key and thus should only be
 used in secure server-side environments.
 
-### **POST /logout**
+## **POST /logout**
 
 Logout a user (Requires authentication).
 
 This will revoke all refresh tokens for the user. Remember that the JWT tokens
 will still be valid for stateless auth until they expires.
 
-### **GET /authorize**
+## **GET /authorize**
 
 Get access_token from external oauth provider
 
@@ -397,7 +395,7 @@ provider=google | bitbucket | github | gitlab
 
 Redirects to provider and then to `/callback`
 
-### **GET /callback**
+## **GET /callback**
 
 External provider should redirect to here
 
