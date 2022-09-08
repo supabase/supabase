@@ -13,7 +13,7 @@ Notifies of data at the queried table.
 ```dart
 supabase.from('countries')
   .stream(['id'])
-  .listen((data) {
+  .listen((List<Map<String, dynamic>> data) {
   // Do something awesome with the data
 });
 ```
@@ -30,7 +30,7 @@ supabase.from('countries')
 ```dart
 supabase.from('countries')
   .stream(['id'])
-  .listen((data) {
+  .listen((List<Map<String, dynamic>> data) {
   // Do something awesome with the data
 });
 ```
@@ -43,7 +43,7 @@ You can add up to one `eq` filter to your `stream()` query.
 supabase.from('countries')
   .stream(['id'])
   .eq('id', '120')
-  .listen((data) {
+  .listen((List<Map<String, dynamic>> data) {
   // Do something awesome with the data
 });
 ```
@@ -56,7 +56,7 @@ Allows you to order the queried data by the value of the specified column.
 supabase.from('countries')
   .stream(['id'])
   .order('name', ascending: true)
-  .listen((data) {
+  .listen((List<Map<String, dynamic>> data) {
   // Do something awesome with the data
 });
 ```
@@ -70,7 +70,7 @@ supabase.from('countries')
   .stream(['id'])
   .order('name', ascending: true)
   .limit(10)
-  .listen((data) {
+  .listen((List<Map<String, dynamic>> data) {
   // Do something awesome with the data
 });
 ```
