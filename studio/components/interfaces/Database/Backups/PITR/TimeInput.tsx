@@ -48,7 +48,6 @@ const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange 
 
   const validate = (time: Time) => {
     let error = undefined
-
     const formattedTime = dayjs(formatTimeToTimeString(time), 'HH:mm:ss', true)
 
     if (!formattedTime.isValid()) {

@@ -1,23 +1,23 @@
 import dayjs from 'dayjs'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from '@supabase/ui'
 
 import { useStore } from 'hooks'
-import { getClientTimezone } from './PITR.utils'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { Timezone } from './PITR.types'
+import { FormPanel } from 'components/ui/Forms'
 import TimezoneSelection from './TimezoneSelection'
 
 interface Props {
+  selectedTimezone: Timezone
+  onUpdateTimezone: (timezone: Timezone) => void
   onSetConfiguration: () => void
 }
 
-const PITRStatus: FC<Props> = ({ onSetConfiguration }) => {
+const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfiguration }) => {
   const { backups } = useStore()
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.configuration?.physicalBackupData ?? {}
-
-  const [selectedTimezone, setSelectedTimezone] = useState<any>(getClientTimezone())
 
   const earliestAvailableBackup = dayjs
     .unix(earliestPhysicalBackupDateUnix)
@@ -50,7 +50,7 @@ const PITRStatus: FC<Props> = ({ onSetConfiguration }) => {
             <TimezoneSelection
               hideLabel
               selectedTimezone={selectedTimezone}
-              onSelectTimezone={setSelectedTimezone}
+              onSelectTimezone={onUpdateTimezone}
             />
           </div>
           <div className="flex items-center space-x-20">
