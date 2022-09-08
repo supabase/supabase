@@ -8,7 +8,12 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows which doesn't satisfy the filter.
+Match only rows which doesn't satisfy the filter.
+
+Unlike most filters, `opearator` and `value` are used as-is and need to
+follow [PostgREST
+syntax](https://postgrest.org/en/stable/api.html#operators). You also need
+to make sure they are properly sanitized.
 
 ```js
 const { data, error } = await supabase
@@ -35,7 +40,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The column to filter on
 
   </div>
   
@@ -55,7 +60,8 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The operator to filter with.
+The operator to be negated to filter with, following
+PostgREST syntax
 
   </div>
   
@@ -75,7 +81,7 @@ The operator to filter with.
   </h4>
   <div class="method-list-item-description">
 
-The value to filter with.
+The value to filter with, following PostgREST syntax
 
   </div>
   

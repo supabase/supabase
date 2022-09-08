@@ -8,8 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose array or range value on the stated `column` overlaps
-(has a value in common) with the specified `value`.
+Only relevant for array and range columns. Match only rows where
+`column` and `value` have an element in common.
 
 ```js
 const { data, error } = await supabase
@@ -36,7 +36,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The array or range column to filter on
 
   </div>
   
@@ -56,7 +56,7 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The value to filter with.
+The array or range value to filter with
 
   </div>
   

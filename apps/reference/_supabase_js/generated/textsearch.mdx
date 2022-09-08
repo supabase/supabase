@@ -8,8 +8,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose text or tsvector value on the stated `column` matches
-the tsquery in `query`.
+Only relevant for text and tsvector columns. Match only rows where
+`column` matches the query string in `query`.
 
 ## Parameters
 
@@ -29,7 +29,7 @@ the tsquery in `query`.
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The text or tsvector column to filter on
 
   </div>
   
@@ -49,7 +49,7 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The Postgres tsquery string to filter with.
+The query text to match with
 
   </div>
   
@@ -69,7 +69,7 @@ The Postgres tsquery string to filter with.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Named parameters
 
   </div>
   
@@ -90,7 +90,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+The text search configuration to use
 
   </div>
   
@@ -110,7 +110,7 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-No description provided.
+Change how the `query` text is interpreted
 
   </div>
   
