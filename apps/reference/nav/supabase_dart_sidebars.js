@@ -86,7 +86,6 @@ const sidebars = {
         },
       ],
       collapsed: true,
-      
     },
     {
       type: 'category',
