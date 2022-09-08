@@ -8,7 +8,13 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows satisfying at least one of the filters.
+Match only rows which satisfy at least one of the filters.
+
+Unlike most filters, `filters` is used as-is and needs to follow [PostgREST
+syntax](https://postgrest.org/en/stable/api.html#operators). You also need
+to make sure it's properly sanitized.
+
+It's currently not possible to do an `.or()` filter across multiple tables.
 
 ```js
 const { data, error } = await supabase
@@ -35,7 +41,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The filters to use, separated by commas.
+The filters to use, following PostgREST syntax
 
   </div>
   
@@ -55,7 +61,8 @@ The filters to use, separated by commas.
   </h4>
   <div class="method-list-item-description">
 
-The foreign table to use (if `column` is a foreign column).
+Set this to filter on foreign tables instead of the
+current table
 
   </div>
   

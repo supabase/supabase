@@ -41,7 +41,7 @@ const { data, error } = await supabase.rpc('hello_world')
   </h4>
   <div class="method-list-item-description">
 
-The function name to call.
+The function name to call
 
   </div>
   
@@ -61,7 +61,7 @@ The function name to call.
   </h4>
   <div class="method-list-item-description">
 
-The parameters to pass to the function call.
+The arguments to pass to the function call
 
   </div>
   
@@ -81,7 +81,7 @@ The parameters to pass to the function call.
   </h4>
   <div class="method-list-item-description">
 
-Named parameters.
+Named parameters
 
   </div>
   
@@ -102,7 +102,18 @@ Named parameters.
   </h4>
   <div class="method-list-item-description">
 
-Count algorithm to use to count rows in a table.
+Count algorithm to use to count rows returned by the
+function. Only applicable for [set-returning
+functions](https://www.postgresql.org/docs/current/functions-srf.html).
+
+`"exact"`: Exact but slow count algorithm. Performs a `COUNT(*)` under the
+hood.
+
+`"planned"`: Approximated but fast count algorithm. Uses the Postgres
+statistics under the hood.
+
+`"estimated"`: Uses exact count for low numbers and planned count for high
+numbers.
 
   </div>
   
@@ -187,27 +198,8 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-When set to true, no data will be returned.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      rollback
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>boolean</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-Rollback the operation
+When set to `true`, `data` will not be returned.
+Useful if you only need the count.
 
   </div>
   

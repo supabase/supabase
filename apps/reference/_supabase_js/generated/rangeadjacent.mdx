@@ -8,8 +8,9 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Finds all rows whose range value on the stated `column` is adjacent to
-the specified `range`.
+Only relevant for range columns. Match only rows where `column` is
+mutually exclusive to `range` and there can be no element between the two
+ranges.
 
 ```js
 const { data, error } = await supabase
@@ -36,7 +37,7 @@ const { data, error } = await supabase
   </h4>
   <div class="method-list-item-description">
 
-The column to filter on.
+The range column to filter on
 
   </div>
   
@@ -56,7 +57,7 @@ The column to filter on.
   </h4>
   <div class="method-list-item-description">
 
-The range to filter with.
+The range to filter with
 
   </div>
   
