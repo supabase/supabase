@@ -10,7 +10,6 @@ import PublicationsList from './Publications/PublicationsList'
 import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
-import PITRBackupSelection from './Backups/PITRBackupSelection'
 
 import ConnectionPooling from './Pooling/ConnectionPooling'
 
@@ -29,7 +28,6 @@ export {
   PublicationsList,
   PublicationsTables,
   BackupsList,
-  PITRBackupSelection,
   ConnectionPooling,
   CreateTrigger,
   DeleteTrigger,
