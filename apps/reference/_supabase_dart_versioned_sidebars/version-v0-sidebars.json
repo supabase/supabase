@@ -3,11 +3,7 @@
     {
       "type": "category",
       "label": "Getting Started",
-      "items": [
-        "intro",
-        "generated/installing",
-        "generated/initializing"
-      ],
+      "items": ["intro", "generated/installing", "generated/initializing"],
       "collapsed": true
     },
     {
@@ -29,9 +25,7 @@
     {
       "type": "category",
       "label": "Functions",
-      "items": [
-        "generated/invoke"
-      ],
+      "items": ["generated/invoke"],
       "collapsed": true
     },
     {
