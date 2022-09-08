@@ -11,10 +11,9 @@ import TabItem from '@theme/TabItem'
 Creates a new user.
 
 ```dart
+final GotrueSessionResponse res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-final res = await supabase.auth.signUp('example@email.com', 'example-password');
-
-final user = res.user;
+final User? user = res.user;
 ```
 
 ## Notes
@@ -29,9 +28,9 @@ final user = res.user;
 ### Sign up.
 
 ```dart
-final res = await supabase.auth.signUp('example@email.com', 'example-password');
+final GotrueSessionResponse res = await supabase.auth.signUp('example@email.com', 'example-password');
 
-final user = res.user;
+final User? user = res.user;
 ```
 
 ### Sign up with third-party providers.
