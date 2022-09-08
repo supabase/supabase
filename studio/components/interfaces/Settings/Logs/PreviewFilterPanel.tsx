@@ -78,7 +78,7 @@ const PreviewFilterPanel: FC<Props> = ({
               ].join(' ')}
             >
               <div className="absolute z-20">
-                <p style={{ fontSize: '0.6rem' }} className="text-scale-1000">
+                <p style={{ fontSize: '0.6rem' }} className="text-white">
                   {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
                 </p>
               </div>
