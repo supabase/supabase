@@ -384,7 +384,7 @@ SELECT COUNT(idkit_ksuid_generate()) FROM generate_series(1, 1000000);
 
 Running all of the ID generation mechanisms on a *single core* of my machine (which happens to be an [Oryx Pro](https://system76.com/laptops/oryx)), the lowest of 5 runs for each ID looks like this:
 
-!(Generation speed test)[/images/blog/primary-keys/generation-speed-chart.jpg]
+![Generation speed test](/images/blog/primary-keys/generation-speed-chart.jpg)
 
 To be fair, **generation speed shouldn’t be a deal breaker** as it’s unlikely to be the bottle neck for most applications. That said, it is nice to have some data on where each ID generation mechanism lands.
 
