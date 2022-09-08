@@ -50,6 +50,6 @@ await supabase.auth.signInWithProvider(Provider.github,
 ...
 // after user comes back from signin flow
 
-final session = supabase.auth.currentSession;
-final oAuthToken = session?.providerToken;
+final Session? session = supabase.auth.currentSession;
+final String? oAuthToken = session?.providerToken;
 ```
