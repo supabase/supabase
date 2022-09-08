@@ -7,7 +7,7 @@ const now = new Date()
 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 const fiveYears = new Date(now.getFullYear() + 5, now.getMonth(), now.getDate())
 const anonToken = `
-{  
+{
     "role": "anon",
     "iss": "supabase",
     "iat": ${Math.floor(today / 1000)},
@@ -16,7 +16,7 @@ const anonToken = `
 `.trim()
 
 const serviceToken = `
-{  
+{
     "role": "service_role",
     "iss": "supabase",
     "iat": ${Math.floor(today / 1000)},
@@ -25,8 +25,8 @@ const serviceToken = `
 `.trim()
 
 export default function JwtGenerator({}) {
-  const secret = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-    .map((x) => x.toString(16).padStart(2, '0'))
+  const secret = [...Array(40)]
+    .map(() => Math.random().toString(36)[2])
     .join('')
 
   const [jwtSecret, setJwtSecret] = useState(secret)
@@ -38,7 +38,6 @@ export default function JwtGenerator({}) {
     if (val == 'service') setToken(serviceToken)
     else setToken(anonToken)
   }
-
   const generate = () => {
     const signedJWT = KJUR.jws.JWS.sign(null, JWT_HEADER, token, jwtSecret)
     setSignedToken(signedJWT)
