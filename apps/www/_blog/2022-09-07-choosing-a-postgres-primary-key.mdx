@@ -2,8 +2,8 @@
 title: Choosing a Postgres Primary Key
 description: Turns out the question of which identifier to use as a Primary Key is complicated -- we're going to dive into some of the complexity and inherent trade-offs, and figure things out
 author: victor
-image: seen-by/seen-by-postgresql-thumb.png
-thumb: seen-by/seen-by-postgresql-thumb.png
+image: primary-keys/choosing-a-postgres-primary-key-og.jpg
+thumb: primary-keys/choosing-a-postgres-primary-key-og.jpg
 tags:
   - postgres
 date: '2022-09-07'
@@ -59,15 +59,7 @@ SELECT COUNT(*) + 1, 'new@example.com', 'new_user' FROM users;
 
 After running that query, we can double check our results:
 
-```sql
-SELECT * FROM users;
-
- id |      email       |   name
-----+------------------+----------
-  1 | new@example.com  | new_user
-  2 | new2@example.com | new_user
-(2 rows)
-```
+![Result from the query](/images/blog/primary-keys/results-from-a-query.jpg)
 
 Using `COUNT(*)` in our query is not the most efficient (or even easiest) solution though, and hopefully it's clear why -- **counting a sequence of numbers for primary keys is a feature built in to Postgres**!
 
@@ -94,17 +86,7 @@ CREATE TABLE users (
 
 OK, now let's try inserting into it - we shouldn't have to specify `id`:
 
-```sql
-INSERT INTO users_serial (email, name) VALUES ('user@example.com', 'new user');
-
-SELECT * FROM users;
-
- id |      email       |   name
-----+------------------+----------
-  1 | user@example.com | new user
-(1 row)
-INSERT 0 1
-```
+![Insert into query](/images/blog/primary-keys/query-and-result.jpg)
 
 It works, as you might expect - now the application doesn't have to *somehow magically know* the right ID to use when inserting.
 
@@ -369,21 +351,7 @@ SELECT COUNT(idkit_ksuid_generate()) FROM generate_series(1, 1000000);
 
 Running all of the ID generation mechanisms on a *single core* of my machine (which happens to be an [Oryx Pro](https://system76.com/laptops/oryx)), the lowest of 5 runs for each ID looks like this:
 
-```
-| ID type                           | Runtime (ms) | Notes (if present)         |
-|-----------------------------------|--------------|----------------------------|
-| `serial` (baseline)               | `511.925`    |                            |
-| `xid`                             | `1017.814`   |                            |
-| `ulid`                            | `2816.970`   |                            |
-| `timeflake`                       | `2835.145`   |                            |
-| `uuid_v6`                         | `3117.796`   |                            |
-| `uuid_v7`                         | `3374.221`   |                            |
-| `gen_random_uuid` (UUID baseline) | `3886.347`   |                            |
-| `ksuid`                           | `4386.010`   | CPU fans go whirr          |
-| `cuid`                            | `8446.882`   | CPU fans go whirr          |
-| `nanoid`                          | `19718.094`  | CPU fans go whirr          |
-| `pushid`                          | `45757.820`  | suboptimal implementation? |
-```
+!(Generation speed test)[/images/blog/primary-keys/generation-speed-chart.jpg]
 
 To be fair, **generation speed shouldn’t be a deal breaker** as it’s unlikely to be the bottle neck for most applications. That said, it is nice to have some data on where each ID generation mechanism lands.
 
@@ -410,20 +378,7 @@ ORDER BY pg_total_relation_size(relid) DESC;
 
 Here are the sizes in tabular form:
 
-```
-| Table name          | Table size (mb) | Index size (mb) | Total size (mb) |
-|---------------------|-----------------|-----------------|-----------------|
-| baseline            | `89`            | `39`            | `110`           |
-| benchmark_xid       | `104`           | `39`            | `143`           |
-| benchmark_nanoid    | `104`           | `39`            | `143`           |
-| benchmark_pushid    | `104`           | `39`            | `143`           |
-| benchmark_ulid      | `112`           | `47`            | `159`           |
-| benchmark_cuid      | `112`           | `47`            | `159`           |
-| benchmark_uuidv7    | `120`           | `56`            | `177`           |
-| benchmark_uuidv6    | `120`           | `56`            | `177`           |
-| benchmark_timeflake | `120`           | `56`            | `177`           |
-| benchmark_ksuid     | `128`           | `65`            | `177`           |
-```
+![Sizes in tabular form](/images/blog/primary-keys/table-and-index-size-chart.jpg)
 
 These numbers are *mostly* a reflection of the *length* of the default settings of `pg_idkit` but probably worth having in front of you anyway.
 
