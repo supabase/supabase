@@ -12,9 +12,12 @@ import { getWithTimeout } from 'lib/common/fetch'
 import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 
-type ProjectBuildingState = { project: Project }
-const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
-  const { app } = useStore()
+interface Props {
+  project: Project
+}
+
+const BuildingState: FC<Props> = ({ project }) => {
+  const { ui, app } = useStore()
   const checkServerInterval = useRef<number>()
 
   async function checkServer() {
@@ -150,7 +153,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
     </div>
   )
 }
-export default observer(ProjectBuildingState)
+export default observer(BuildingState)
 
 const ChecklistItem = ({ description }: any) => {
   return (

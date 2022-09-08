@@ -2,7 +2,14 @@ import dayjs from 'dayjs'
 import { format } from 'date-fns'
 import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
-import { Button, Modal, IconChevronLeft, IconChevronRight, IconHelpCircle } from '@supabase/ui'
+import {
+  Button,
+  Modal,
+  IconChevronLeft,
+  IconChevronRight,
+  IconHelpCircle,
+  Alert,
+} from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore } from 'hooks'
@@ -21,7 +28,6 @@ import {
   formatTimeToTimeString,
   getClientTimezone,
   getDatesBetweenRange,
-  getTimezoneOffsetText,
 } from './PITR.utils'
 import { useRouter } from 'next/router'
 
@@ -115,6 +121,7 @@ const PITRSelection = ({}) => {
   const recoveryTimeString = dayjs(recoveryTimeTargetUnix * 1000)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY HH:mm:ss')
+
   const isSelectedOutOfRange =
     selectedDate &&
     (recoveryTimeTargetUnix < earliestPhysicalBackupDateUnix ||
@@ -142,19 +149,13 @@ const PITRSelection = ({}) => {
       ui.setNotification({
         error,
         category: 'error',
-        message: `Point in time recovery for project failed`,
+        message: `Failed to being restoration: ${error.message}`,
       })
       setIsRestoring(false)
     } else {
       setTimeout(() => {
         setShowConfirmation(false)
         app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
-        ui.setNotification({
-          category: 'success',
-          message: `Restoring database back to ${recoveryTimeString} (${getTimezoneOffsetText(
-            selectedTimezone
-          )})`,
-        })
         router.push(`/project/${projectRef}`)
       }, 3000)
     }
@@ -167,7 +168,11 @@ const PITRSelection = ({}) => {
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
       {!showConfiguration ? (
-        <PITRStatus onSetConfiguration={() => setShowConfiguration(true)} />
+        <PITRStatus
+          selectedTimezone={selectedTimezone}
+          onUpdateTimezone={setSelectedTimezone}
+          onSetConfiguration={() => setShowConfiguration(true)}
+        />
       ) : (
         <FormPanel
           disabled={true}
@@ -253,12 +258,7 @@ const PITRSelection = ({}) => {
                 )}
               />
               <div className="flex items-center space-x-2">
-                <div
-                  className="border w-4 h-4 border-scale-800"
-                  style={{
-                    background: 'linear-gradient(135deg, #34B27B 0% 30%, transparent 30%)',
-                  }}
-                />
+                <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
                 <p className="text-xs text-scale-1000">Point in time back up available</p>
               </div>
             </div>
@@ -300,8 +300,8 @@ const PITRSelection = ({}) => {
                     </div>
                     <TimeInput
                       defaultTime={selectedTime}
-                      minimumTime={earliestAvailableBackupTime}
-                      maximumTime={latestAvailableBackupTime}
+                      minimumTime={isSelectedOnEarliest ? earliestAvailableBackupTime : undefined}
+                      maximumTime={isSelectedOnLatest ? latestAvailableBackupTime : undefined}
                       onChange={setSelectedTime}
                     />
                     <div className="!mt-4 space-y-1">
@@ -364,16 +364,21 @@ const PITRSelection = ({}) => {
           </Modal.Content>
           <Modal.Seperator />
           <Modal.Content>
-            <div className="py-2 space-y-3">
-              <p className="text-sm text-scale-1100">
-                Any changes made to your database up to this point of time will be lost. This
-                includes any changes involving storage and authentication.
-              </p>
-              <p className="text-sm text-scale-1100">
-                The restoration process will incur some downtime to your project and cannot be
-                undone.
-              </p>
-            </div>
+            <Alert withIcon variant="warning" title="Warning: This action cannot be undone">
+              <div className="space-y-3">
+                <p>
+                  Any changes made to your database after this point in time will be lost. This
+                  includes any changes to your project's storage and authentication.
+                </p>
+              </div>
+            </Alert>
+          </Modal.Content>
+          <Modal.Seperator />
+          <Modal.Content>
+            <p className="text-sm">
+              Restores may take from a few minutes up to several hours depending on the size of your
+              database. During this period, your project will not be available.
+            </p>
           </Modal.Content>
         </div>
       </Modal>

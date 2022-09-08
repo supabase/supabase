@@ -58,6 +58,6 @@ export const convertDatetimetoUnixS = (date: Date, time: Time, timezone: Timezon
   const dateString = dayjs(date).format('YYYY-MM-DD')
   const timeString = formatTimeToTimeString(time)
   const timezoneOffset = getTimezoneOffset(timezone)
-  const datetimestringWithTimezone = `${dateString}T${timeString}${timezoneOffset}`
+  const datetimestringWithTimezone = `${dateString}T${timeString}${timezoneOffset || '+00:00'}`
   return dayjs(datetimestringWithTimezone).unix()
 }
