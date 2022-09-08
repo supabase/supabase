@@ -14,8 +14,9 @@ import { RowEditor, ColumnEditor, TableEditor } from '.'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useTableRowCreateMutation } from 'data/tables/table-row-create-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableRowCreateMutation } from 'data/tables/table-row-create-mutation'
+import { useTableRowUpdateMutation } from 'data/tables/table-row-update-mutation'
 
 interface Props {
   selectedSchema: string
@@ -61,6 +62,7 @@ const SidePanelEditor: FC<Props> = ({
 
   const { project } = useProjectContext()
   const { mutateAsync: createTableRow } = useTableRowCreateMutation()
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation()
 
   const saveRow = async (
     payload: any,
@@ -75,35 +77,36 @@ const SidePanelEditor: FC<Props> = ({
 
     let saveRowError = false
     if (isNewRecord) {
-      const result = await createTableRow({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        table: selectedTable as any,
-        payload,
-      })
+      try {
+        const result = await createTableRow({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table: selectedTable as any,
+          payload,
+        })
 
-      if (result.error) {
-        saveRowError = true
-        ui.setNotification({ category: 'error', message: result.error?.message })
-      } else {
         onRowCreated(result[0])
+      } catch (error: any) {
+        saveRowError = true
+        ui.setNotification({ category: 'error', message: error?.message })
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable!.primary_keys.length > 0) {
-          const updateQuery = new Query()
-            .from(selectedTable!.name, selectedTable!.schema)
-            .update(payload, { returning: true })
-            .match(configuration.identifiers)
-            .toSql()
+          try {
+            const result = await updateTableRow({
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              table: selectedTable as any,
+              configuration,
+              payload,
+            })
 
-          const res: any = await meta.query(updateQuery)
-          if (res.error) {
+            onRowUpdated(result[0], configuration.rowIdx)
+          } catch (error: any) {
             saveRowError = true
-            ui.setNotification({ category: 'error', message: res.error?.message })
-          } else {
-            onRowUpdated(res[0], configuration.rowIdx)
+            ui.setNotification({ category: 'error', message: error?.message })
           }
         } else {
           saveRowError = true
