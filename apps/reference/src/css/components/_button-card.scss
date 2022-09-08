@@ -20,6 +20,10 @@
     flex-direction: row;
     gap: var(--ifm-spacing-horizontal);
     align-items: center;
+
+    h3 {
+      margin-bottom: 0;
+    }
   }
 
   .button-card__inner {

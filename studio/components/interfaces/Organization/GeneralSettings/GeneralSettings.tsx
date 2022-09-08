@@ -38,8 +38,6 @@ const GeneralSettings = observer(() => {
     ? checkPermissions(PermissionAction.UPDATE, 'organizations')
     : ui.selectedOrganization?.is_owner
 
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
-
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
@@ -103,21 +101,9 @@ const GeneralSettings = observer(() => {
                 </div>
               }
             >
-              <FormSection header={<FormSectionLabel>General settings</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>Organization name</FormSectionLabel>}>
                 <FormSectionContent loading={false}>
-                  <Input
-                    id="name"
-                    size="small"
-                    label="Organization name"
-                    disabled={!canUpdateOrganization}
-                  />
-                  <Input
-                    id="billing_email"
-                    size="small"
-                    label="Billing email"
-                    type={canReadBillingEmail ? 'text' : 'password'}
-                    disabled={!canUpdateOrganization}
-                  />
+                  <Input id="name" size="small" disabled={!canUpdateOrganization} />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

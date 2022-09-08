@@ -25,9 +25,11 @@ const serviceToken = `
 `.trim()
 
 export default function JwtGenerator({}) {
-  const [jwtSecret, setJwtSecret] = useState(
-    'your-super-secret-jwt-secret-with-at-least-32-characters-long'
-  )
+  const secret = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map((x) => x.toString(16).padStart(2, '0'))
+    .join('')
+
+  const [jwtSecret, setJwtSecret] = useState(secret)
   const [token, setToken] = useState(anonToken)
   const [signedToken, setSignedToken] = useState('')
 
