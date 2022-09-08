@@ -59,18 +59,15 @@ SELECT COUNT(*) + 1, 'new@example.com', 'new_user' FROM users;
 
 After running that query, we can double check our results:
 
-```sql
 SELECT * FROM users;
-```
 
 | id | email            | name     |
 |----|------------------|----------|
 | 1  | new@example.com  | new user |
 | 2  | new2@example.com | new user |
 
-```sql
+
 (2 rows)
-```
 
 Using `COUNT(*)` in our query is not the most efficient (or even easiest) solution though, and hopefully it's clear why -- **counting a sequence of numbers for primary keys is a feature built in to Postgres**!
 
@@ -101,20 +98,15 @@ OK, now let's try inserting into it - we shouldn't have to specify `id`:
 INSERT INTO users_serial (email, name) VALUES ('user@example.com', 'new user');
 ```
 
-```sql 
 SELECT * FROM users;
-```
 
 
 | id | email            | name     |
 |----|------------------|----------|
 | 1  | user@example.com | new user |
 
-
-```sql
 (1 row) 
 INSERT 0 1
-```
 
 It works, as you might expect - now the application doesn't have to *somehow magically know* the right ID to use when inserting.
 
