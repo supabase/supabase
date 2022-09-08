@@ -65,12 +65,9 @@ SELECT * FROM users;
 
 | id | email            | name     |
 |----|------------------|----------|
-| 1  | new@example.com  | new user |
-| 2  | new2@example.com | new user |
+| `1`  | `new@example.com`  | `new user` |
+| `2`  | `new2@example.com` | `new user` |
 
-```sql
-(2 rows)
-```
 
 Using `COUNT(*)` in our query is not the most efficient (or even easiest) solution though, and hopefully it's clear why -- **counting a sequence of numbers for primary keys is a feature built in to Postgres**!
 
@@ -98,7 +95,8 @@ CREATE TABLE users (
 OK, now let's try inserting into it - we shouldn't have to specify `id`:
 
 ```sql
-INSERT INTO users_serial (email, name) VALUES ('user@example.com', 'new user');
+INSERT INTO users_serial (email, name) 
+VALUES ('user@example.com', 'new user');
 ```
 
 ```sql 
@@ -108,7 +106,7 @@ SELECT * FROM users;
 
 | id | email            | name     |
 |----|------------------|----------|
-| 1  | user@example.com | new user |
+| `1`  | `user@example.com` | `new user` |
 
 
 ```sql
@@ -146,7 +144,7 @@ Even the last point about `serial` not being standards compliant is solved in Po
 
 ### `integer`/`biginteger` (again!)
 
-[Postgres 10 added support for the `IDENTITY` column](https://www.postgresql.org/docs/10/release-10.html#id-1.11.6.26.5.7) syntax in `CREATE TABLE` ([EDB has a great writeup on the addition](https://www.enterprisedb.com/blog/postgresql-10-identity-columns-explained)).
+Postgres 10 [added support](https://www.postgresql.org/docs/10/release-10.html#id-1.11.6.26.5.7) for the `IDENTITY` column syntax in `CREATE TABLE` (EDB has a great writeup on the [addition](https://www.enterprisedb.com/blog/postgresql-10-identity-columns-explained)).
 
 This means we can happily go back to using `integer`/`biginteger`:
 
@@ -245,9 +243,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION
 
 SELECT uuid_generate_v1mc();
+
           uuid_generate_v1mc
 --------------------------------------
  dd1bbf10-0b47-11ed-80de-db48f6faaf86
+ 
 (1 row)
 ```
 
@@ -265,11 +265,13 @@ These don't have a time component, but  they don't have in time they make up for
 
 We can generate them in Postgres like this (with `uuid-ossp`):
 
-```bash
-postgres=# SELECT uuid_generate_v4();
+```sql
+SELECT uuid_generate_v4();
+
            uuid_generate_v4
 --------------------------------------
  6ca93dde-81d4-4ea0-bfe1-92ecb4d81ee4
+ 
 (1 row)
 ```
 
@@ -290,7 +292,7 @@ UUIDv1 and v4 were a start, but weren't enough for *many* companies out there. T
 
 Many of the world's biggest companies generated UUIDs at speeds that made all of these deficiencies a problem.
 
-A cambrian explosion of UUIDs resulted, as noticed by the IETF -- this resulted in [the new UUID formats (v6,v7,v8) being published in 2021](https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-01.html).
+A cambrian explosion of UUIDs resulted, as noticed by the IETF -- this resulted in the [new UUID formats](https://www.ietf.org/archive/id/draft-peabody-dispatch-new-uuid-format-01.html) (v6,v7,v8) being published in 2021.
 
 Here's a quick list (from that IETF document):
 
@@ -364,6 +366,7 @@ For each type of UUID, we can test the following:
 - **Table & Index size:** How much larger do tables and associated indices get?
 
 <aside>
+
 ⚠️ Grain of salt required for these tests - we haven't audited the implementations of all the underlying crates!
 
 </aside>
@@ -450,7 +453,7 @@ FROM users
 WHERE id = '0F755149A55730412B0AEC0E3B5B089C14B5B58D';
 ```
 
-Ideally we could use [the `GENERATED ALWAYS AS ( ... )` syntax for generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) while creating the table, but as the time of this post *Postgres does not yet support virtual generated columns (only stored ones)*.
+Ideally we could use the `GENERATED ALWAYS AS ( ... )` syntax for [generated columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html) while creating the table, but as the time of this post *Postgres does not yet support virtual generated columns (only stored ones)*.
 
 ### Benchmarking: Measuring index fragmentation
 
