@@ -144,7 +144,11 @@ const ProjectUsage: FC<Props> = ({ projectRef }) => {
                                       }
                                     />
                                   ) : (
-                                    <span>{formatBytes(featureUsage.usage)}</span>
+                                    <span>
+                                      {feature.units === 'bytes'
+                                        ? formatBytes(featureUsage.usage)
+                                        : ''}
+                                    </span>
                                   )}
                                 </td>
                               </>
