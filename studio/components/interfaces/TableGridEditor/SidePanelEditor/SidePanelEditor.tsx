@@ -80,7 +80,6 @@ const SidePanelEditor: FC<Props> = ({
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable!.primary_keys.length > 0) {
-          // seems like here is where the data is being updated
           const updateQuery = new Query()
             .from(selectedTable!.name, selectedTable!.schema)
             .update(payload, { returning: true })
