@@ -90,7 +90,7 @@ class MyWidget extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<MyWidget> {
-  // Persisting the stream as local variable to prevent refetching upon rebuilds.
+  // Persist the stream in a local variable to prevent refetching upon rebuilds
   final _stream = supabase.from('countries').stream(['id']);
 
   @override
@@ -98,7 +98,7 @@ class _MyWidgetState extends State<MyWidget> {
     return StreamBuilder(
       stream: _stream,
       builder: (context, snapshot) {
-        // return your widget with the data from snapshot
+        // Return your widget with the data from the snapshot
       },
     );
   }
