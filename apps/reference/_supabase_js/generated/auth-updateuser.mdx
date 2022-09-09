@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Updates user data, if there is a logged in user.
 
 ```js
-const { user, error } = await supabase.auth.updateUser({
+const { data, error } = await supabase.auth.updateUser({
   data: { hello: 'world' },
 })
 ```
@@ -55,7 +55,9 @@ No description provided.
   </h4>
   <div class="method-list-item-description">
 
-A custom data object for user_metadata that a user can modify. Can be any JSON.
+A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+
+The `data` should be a JSON object that includes user-specific info, such as their first and last name.
 
   </div>
   
@@ -76,26 +78,6 @@ A custom data object for user_metadata that a user can modify. Can be any JSON.
   <div class="method-list-item-description">
 
 The user's email.
-
-  </div>
-  
-</li>
-
-<li className="method-list-item">
-  <h4 className="method-list-item-label">
-    <span className="method-list-item-label-name">
-      email_change_token
-    </span>
-    <span className="method-list-item-label-badge false">
-      optional
-    </span>
-    <span className="method-list-item-validation">
-      <code>string</code>
-    </span>
-  </h4>
-  <div class="method-list-item-description">
-
-An email change token.
 
   </div>
   
@@ -149,15 +131,13 @@ The user's phone.
 
 ## Notes
 
-User email: Email updates will send an email to both the user's current and new email with a confirmation link by default.
-To toggle this behavior off and only send a single confirmation link to the new email, toggle "Double confirm email changes" under "Authentication" -> "Settings" off.
-
-User metadata: It's generally better to store user data in a table inside your public schema (i.e. `public.users`).
-Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
+- In order to use the `updateUser()` method, the user needs to be signed in first.
+- Email updates will send an email to both the user's current and new email with a confirmation link by default.
+  To only send a single confirmation link to the user's new email, you can toggle the "Secure email change" setting in [your project](https://app.supabase.com/project/_/auth/settings).
 
 ## Examples
 
-### Update email for authenticated user.
+### Update the email of an authenticated user
 
 Sends a "Confirm Email Change" email to the new email address.
 
@@ -167,7 +147,7 @@ const { data, error } = await supabase.auth.updateUser({
 })
 ```
 
-### Update password for authenticated user.
+### Update the password of an authenticated user
 
 ```js
 const { data, error } = await supabase.auth.updateUser({
@@ -175,10 +155,10 @@ const { data, error } = await supabase.auth.updateUser({
 })
 ```
 
-### Update a user's metadata.
+### Update the user's metadata.
 
 ```js
-const { user, error } = await supabase.auth.updateUser({
+const { data, error } = await supabase.auth.updateUser({
   data: { hello: 'world' },
 })
 ```

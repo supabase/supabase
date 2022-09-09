@@ -1,10 +1,9 @@
 import { FC, ReactNode, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { find, filter, get as _get } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { checkPermissions, useStore, withAuth } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { useProjectSettings, useStore, withAuth } from 'hooks'
 import BaseLayout from 'components/layouts'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
@@ -13,7 +12,6 @@ import { formatPoliciesForStorage } from 'components/to-be-cleaned/Storage/Stora
 import CreateBucketModal from 'components/to-be-cleaned/Storage/CreateBucketModal'
 import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import ToggleBucketPublicModal from 'components/to-be-cleaned/Storage/ToggleBucketPublicModal'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import NoPermission from 'components/ui/NoPermission'
 
 interface Props {
@@ -23,7 +21,8 @@ interface Props {
 
 const StorageLayout: FC<Props> = ({ title, children }) => {
   const { ui, meta } = useStore()
-  const ref = ui.selectedProject?.ref
+  const router = useRouter()
+  const { ref } = router.query
 
   const storageExplorerStore = useStorageStore()
   const {
@@ -39,40 +38,24 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     toggleBucketPublic,
   } = storageExplorerStore || {}
 
+  const { services, isLoading } = useProjectSettings(ref as string | undefined)
+  const apiService = find(services ?? [], (service) => service.app.id === 1)
+  const projectUrl = apiService?.app_config?.endpoint ?? ''
+  const serviceKey = find(apiService?.service_api_keys ?? [], (key) => key.tags === 'service_role')
+  const canAccessStorage = !isLoading && services && serviceKey
+
   useEffect(() => {
-    if (ref) {
-      initializeStorageStore(ref)
-    }
-  }, [ref])
+    if (!isLoading && services) initializeStorageStore()
+  }, [isLoading])
 
-  const getProjectConfig = async () => {
-    const { services } = await get(`${API_URL}/props/project/${ref}/settings`)
-    const apiService = find(services, (service) => service.app.id === 1)
-    if (apiService) {
-      const projectUrl = apiService?.app_config?.endpoint ?? ''
-      const serviceKey = find(apiService.service_api_keys, (key) => key.tags === 'service_role')
-      const projectApiKey = serviceKey?.api_key ?? ''
-      return { projectUrl, projectApiKey }
-    } else {
-      console.error('Storage layout: Unable to find apiService')
-      return {}
-    }
-  }
-
-  const initializeStorageStore = async (projectRef: any) => {
-    try {
-      const { projectUrl, projectApiKey } = await getProjectConfig()
-      if (projectUrl && projectApiKey) {
-        storageExplorerStore.initStore(projectRef, projectUrl, projectApiKey)
+  const initializeStorageStore = async () => {
+    if (projectUrl) {
+      if (serviceKey) {
+        storageExplorerStore.initStore(ref, projectUrl, serviceKey.api_key)
         await storageExplorerStore.fetchBuckets()
-      } else {
-        throw new Error(
-          `StorageLayout: Failed to getProjectConfig - ${projectUrl} ${projectApiKey}`
-        )
       }
-    } catch (error: any) {
+    } else {
       ui.setNotification({
-        error,
         category: 'error',
         message:
           'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io',
@@ -102,10 +85,9 @@ const StorageLayout: FC<Props> = ({ title, children }) => {
     }
   }
 
-  const canAccessStorage = checkPermissions(PermissionAction.READ, 'service_api_keys')
-  if (!canAccessStorage) {
+  if (!isLoading && !canAccessStorage) {
     return (
-      <BaseLayout title={title || 'Storage'} product="Storage">
+      <BaseLayout>
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
           <NoPermission isFullPage resourceText="access your project's storage" />
         </main>

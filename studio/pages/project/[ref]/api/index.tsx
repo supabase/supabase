@@ -1,16 +1,17 @@
 import useSWR, { mutate } from 'swr'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconKey, Typography } from '@supabase/ui'
+import { Button, Dropdown, IconKey } from '@supabase/ui'
 import { FC, createContext, useContext, useEffect, useState } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 
 import { NextPageWithLayout } from 'types'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { snakeToCamel } from 'lib/helpers'
 import { DocsLayout } from 'components/layouts'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const PageContext = createContext(null)
 
@@ -70,9 +71,15 @@ const DocView: FC<any> = observer(({}) => {
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
   const { data, error }: any = useSWR(`${API_URL}/props/project/${PageState.projectRef}/api`, get)
-  const API_KEY = data?.autoApiService?.serviceApiKey
+  const API_KEY = data?.autoApiService?.defaultApiKey
   const swaggerUrl = data?.autoApiService?.restUrl
   const headers: any = { apikey: API_KEY }
+
+  const canReadServiceKey = checkPermissions(
+    PermissionAction.READ,
+    'service_api_keys.service_role_key'
+  )
+  console.log('canReadServiceKey', canReadServiceKey)
 
   if (API_KEY?.length > 40) headers['Authorization'] = `Bearer ${API_KEY}`
 
@@ -94,16 +101,16 @@ const DocView: FC<any> = observer(({}) => {
   if (error || jsonSchemaError)
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Text type="danger">
+        <p className="text-scale-1000">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
-        </Typography.Text>
+        </p>
       </div>
     )
   if (!data || !jsonSchema || !PageState.jsonSchema)
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <Typography.Title level={3}>Building docs ...</Typography.Title>
+        <h3 className="text-xl">Building docs ...</h3>
       </div>
     )
 
@@ -161,10 +168,11 @@ const DocView: FC<any> = observer(({}) => {
                     className="text-scale-900 cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm"
                     overlay={
                       <>
-                        <Dropdown.Item onClick={() => setShowApiKey(DEFAULT_KEY)}>
+                        <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                           hide
                         </Dropdown.Item>
                         <Dropdown.Item
+                          key="anon"
                           onClick={() =>
                             setShowApiKey({
                               key: autoApiService?.defaultApiKey,
@@ -174,16 +182,19 @@ const DocView: FC<any> = observer(({}) => {
                         >
                           anon (public)
                         </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={() =>
-                            setShowApiKey({
-                              key: autoApiService?.serviceApiKey,
-                              name: 'service_role (secret)',
-                            })
-                          }
-                        >
-                          service_role (secret)
-                        </Dropdown.Item>
+                        {canReadServiceKey && (
+                          <Dropdown.Item
+                            key="service"
+                            onClick={() =>
+                              setShowApiKey({
+                                key: autoApiService?.serviceApiKey,
+                                name: 'service_role (secret)',
+                              })
+                            }
+                          >
+                            service_role (secret)
+                          </Dropdown.Item>
+                        )}
                       </>
                     }
                   >

@@ -60,10 +60,12 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 - Supabase extends Postgres with realtime functionality using our [Realtime Server](https://github.com/supabase/realtime).
 - Every project is a full Postgres database, with `postgres` level access.
-- Managed backups - Supabase handles all your database backups.[^backups]
-- Data imports - import directly from a CSV or excel spreadsheet.
+- Supabase manages your database backups.
+- Import data directly from a CSV or excel spreadsheet.
 
-[^backups] Database backups do _NOT_ include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup will not restore objects that have been deleted since then.
+:::info
+Database backups **do not** include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
+:::
 
 ### Extensions
 

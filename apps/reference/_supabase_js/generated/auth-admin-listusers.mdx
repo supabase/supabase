@@ -13,18 +13,19 @@ Get a list of users.
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
 ```js
-const { data: user, error } = await supabase.auth.admin.listUsers()
+const {
+  data: { users },
+  error,
+} = await supabase.auth.admin.listUsers()
 ```
-
-## Notes
-
-- Requires a `service_role` key.
-- This function should be called on a server. Never expose your `service_role` key in the browser.
 
 ## Examples
 
 ### Get a full list of users.
 
 ```js
-const { data: user, error } = await supabase.auth.admin.listUsers()
+const {
+  data: { users },
+  error,
+} = await supabase.auth.admin.listUsers()
 ```

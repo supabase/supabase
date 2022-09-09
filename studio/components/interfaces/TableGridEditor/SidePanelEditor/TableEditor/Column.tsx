@@ -3,7 +3,6 @@ import { isUndefined } from 'lodash'
 import {
   Checkbox,
   Input,
-  Typography,
   IconX,
   IconMenu,
   Popover,
@@ -71,9 +70,7 @@ const Column: FC<Props> = ({
     <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
-          <Typography>
-            <IconMenu strokeWidth={1} size={15} />
-          </Typography>
+          <IconMenu strokeWidth={1} size={15} />
         </div>
       </div>
       <div className="w-[20%]">
@@ -235,9 +232,7 @@ const Column: FC<Props> = ({
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
           <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <Typography>
-              <IconX strokeWidth={1} />
-            </Typography>
+            <IconX strokeWidth={1} />
           </div>
         </div>
       )}
