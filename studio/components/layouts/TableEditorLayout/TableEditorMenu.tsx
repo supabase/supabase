@@ -201,11 +201,7 @@ const TableEditorMenu: FC<Props> = ({
         <div className="mb-2 block px-3">
           <Input
             className="border-none"
-            icon={
-              <div className="text-scale-900">
-                <IconSearch size={12} strokeWidth={1.5} />
-              </div>
-            }
+            icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
             placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
@@ -324,14 +320,18 @@ const TableEditorMenu: FC<Props> = ({
       )}
 
       {searchText.length > 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables or views found">This schema has no tables or views</Alert>
+        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+          <p className="text-xs">No results found</p>
+          <p className="text-scale-1100 text-xs">
+            There are no tables or views that match your search
+          </p>
         </div>
       )}
 
       {searchText.length === 0 && schemaTables.length === 0 && filteredSchemaViews.length === 0 && (
-        <div className="px-3">
-          <Alert title="No tables available">There are no tables in this schema</Alert>
+        <div className="mx-3 py-3 px-4 bg-scale-300 border border-scale-400 rounded-md space-y-1">
+          <p className="text-xs">No tables available</p>
+          <p className="text-scale-1100 text-xs">This schema has no tables available yet</p>
         </div>
       )}
     </div>
