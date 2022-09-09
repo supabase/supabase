@@ -200,7 +200,7 @@ const TableEditorMenu: FC<Props> = ({
         {/* Table search input */}
         <div className="mb-2 block px-3">
           <Input
-            className="border-none"
+            className="border-none table-editor-search"
             icon={<IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />}
             placeholder="Search tables"
             onChange={(e) => setSearchText(e.target.value)}
