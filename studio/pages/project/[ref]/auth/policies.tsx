@@ -2,20 +2,18 @@ import React, { useState, PropsWithChildren, FC } from 'react'
 import { isEmpty } from 'lodash'
 import { Button, IconSearch, Input } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Authentication/Policies'
+import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoTableState from 'components/ui/States/NoTableState'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-
-const AuthPoliciesLayout = ({ children }: PropsWithChildren<{}>) => {
-  return <div className="p-4">{children}</div>
-}
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import NoPermission from 'components/ui/NoPermission'
 
 /**
  * Filter tables by table name and policy name
@@ -57,6 +55,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const policies = meta.policies.list()
   const filteredTables = onFilterTables(publicTables, policies, policiesFilter)
 
+  const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
+
+  if (!canReadPolicies) {
+    return <NoPermission isFullPage resourceText="view this project's RLS policies" />
+  }
+
   return (
     <>
       <div className="mb-4">
@@ -88,7 +92,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <AuthLayout title="Auth">
-    <AuthPoliciesLayout>{page}</AuthPoliciesLayout>
+    <div className="p-4 h-full">{page}</div>
   </AuthLayout>
 )
 
@@ -200,13 +204,9 @@ const AuthPoliciesTables: FC<AuthPoliciesTablesProps> = observer(({ tables, hasP
           <section key={table.id}>
             <PolicyTableRow
               table={table}
-              // @ts-ignore
               onSelectToggleRLS={onSelectToggleRLS}
-              // @ts-ignore
               onSelectCreatePolicy={onSelectCreatePolicy}
-              // @ts-ignore
               onSelectEditPolicy={onSelectEditPolicy}
-              // @ts-ignore
               onSelectDeletePolicy={onSelectDeletePolicy}
             />
           </section>

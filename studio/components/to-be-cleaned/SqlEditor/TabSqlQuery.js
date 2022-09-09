@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, Typography } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -277,19 +277,15 @@ const UtilityTabResults = observer(() => {
   } else if (sqlEditorStore.activeTab.errorResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text>
-          <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 font-mono">{sqlEditorStore.activeTab.errorResult}</p>
       </div>
     )
   } else if (sqlEditorStore.activeTab.hasNoResult) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text type="secondary">
-          <p className="m-0 border-0 px-6 py-4 ">
-            Click <Typography.Text code>RUN</Typography.Text> to execute your query.
-          </p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1000">
+          Click <code>RUN</code> to execute your query.
+        </p>
       </div>
     )
   }
@@ -321,9 +317,7 @@ const Results = ({ results }) => {
   if (results?.error) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <Typography.Text type="danger">
-          <p className="m-0 border-0 px-6 py-4 font-mono"> {`ERROR: ${results.error}`}</p>
-        </Typography.Text>
+        <p className="m-0 border-0 px-6 py-4 font-mono text-scale-1000">ERROR: {results.error}</p>
       </div>
     )
   }

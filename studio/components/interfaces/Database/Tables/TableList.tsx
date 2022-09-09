@@ -8,7 +8,6 @@ import {
   IconTrash,
   IconEdit3,
   IconColumns,
-  Typography,
 } from '@supabase/ui'
 
 import { useStore } from 'hooks'
@@ -102,23 +101,19 @@ const TableList: FC<{
               body={tables.map((x: any, i: any) => (
                 <Table.tr key={x.id} hoverable>
                   <Table.td>
-                    <Typography.Text>{x.name}</Typography.Text>
+                    <p>{x.name}</p>
                   </Table.td>
                   <Table.td>
-                    <Typography.Text>{x.schema}</Typography.Text>
+                    <p>{x.schema}</p>
                   </Table.td>
                   <Table.td className=" hidden max-w-sm truncate lg:table-cell">
-                    <Typography.Text>{x.comment}</Typography.Text>
+                    <p>{x.comment}</p>
                   </Table.td>
                   <Table.td className=" hidden xl:table-cell">
-                    <Typography.Text small code>
-                      {x.live_rows_estimate ?? x.live_row_count}
-                    </Typography.Text>
+                    <code className="text-sm">{x.live_rows_estimate ?? x.live_row_count}</code>
                   </Table.td>
                   <Table.td className=" hidden xl:table-cell">
-                    <Typography.Text small code>
-                      {x.size}
-                    </Typography.Text>
+                    <code className="text-sm">{x.size}</code>
                   </Table.td>
                   <Table.td>
                     <div className="flex justify-end gap-2">

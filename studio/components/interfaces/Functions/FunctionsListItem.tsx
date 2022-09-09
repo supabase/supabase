@@ -17,6 +17,10 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
   const router = useRouter()
   const ref = ui?.selectedProject?.ref
 
+  // get the .co or .net TLD from the restUrl
+  const restUrl = ui.selectedProject?.restUrl
+  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+
   return (
     <Table.tr
       key={item.id}
@@ -31,7 +35,7 @@ const FunctionsListItem: FC<Props> = ({ function: item }) => {
       </Table.td>
       <Table.td className="">
         <div className="text-xs text-scale-900 flex gap-2 items-center truncate">
-          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.co/${item.slug}`}</span>
+          <span className="font-mono truncate hidden md:inline">{`https://${ref}.functions.supabase.${restUrlTld}/${item.slug}`}</span>
           <span className="font-mono truncate md:hidden">{`/${item.name}`}</span>
         </div>
       </Table.td>

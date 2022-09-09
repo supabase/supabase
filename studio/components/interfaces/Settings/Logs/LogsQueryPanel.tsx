@@ -1,13 +1,4 @@
-import {
-  Button,
-  Dropdown,
-  Typography,
-  IconChevronDown,
-  IconPlay,
-  Badge,
-  Popover,
-  Alert,
-} from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -96,7 +87,7 @@ const LogsQueryPanel: React.FC<Props> = ({
                 .sort((a, b) => a.label!.localeCompare(b.label!))
                 .map((template: LogTemplate) => (
                   <Dropdown.Item key={template.label} onClick={() => onSelectTemplate(template)}>
-                    <Typography.Text>{template.label}</Typography.Text>
+                    <p>{template.label}</p>
                   </Dropdown.Item>
                 ))}
             >

@@ -15,7 +15,6 @@ import {
   IconX,
   IconEdit2,
   IconLoader,
-  Typography,
   IconChevronsUp,
 } from '@supabase/ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -29,18 +28,12 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }) => {
     >
       {loading.isLoading ? (
         <div className="ml-2 flex items-center">
-          <Typography.Text>
-            <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-          </Typography.Text>
-          <Typography.Text>
-            <p className="ml-3 text-sm">{loading.message}</p>
-          </Typography.Text>
+          <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+          <p className="ml-3 text-sm">{loading.message}</p>
         </div>
       ) : (
         <div className="flex cursor-pointer items-center">
-          <Typography.Text>
-            <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
-          </Typography.Text>
+          <p className="ml-3 text-sm">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
           <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
             <Button type="text" icon={<IconEdit2 />}>
               Navigate
@@ -75,32 +68,22 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }) => {
 
   return loading.isLoading ? (
     <div className="ml-2 flex items-center">
-      <Typography.Text>
-        <IconLoader size={16} strokeWidth={2} className="animate-spin" />
-      </Typography.Text>
-      <Typography.Text>
-        <p className="ml-3 text-sm">{loading.message}</p>
-      </Typography.Text>
+      <IconLoader size={16} strokeWidth={2} className="animate-spin" />
+      <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
     <div className="ml-3 flex items-center">
       {formattedBreadcrumbs.map((crumb, idx) => (
         <div className="flex items-center" key={crumb.name}>
-          {idx !== 0 && (
-            <Typography.Text>
-              <IconChevronRight size={10} strokeWidth={2} className="mx-3" />
-            </Typography.Text>
-          )}
-          <Typography.Text>
-            <p
-              key={crumb.name}
-              className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
-              style={{ maxWidth: '6rem' }}
-              onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
-            >
-              {crumb.name}
-            </p>
-          </Typography.Text>
+          {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
+          <p
+            key={crumb.name}
+            className={`truncate text-sm ${crumb.name !== ellipsis ? 'cursor-pointer' : ''}`}
+            style={{ maxWidth: '6rem' }}
+            onClick={() => (crumb.name !== ellipsis ? selectBreadcrumb(crumb.index) : {})}
+          >
+            {crumb.name}
+          </p>
         </div>
       ))}
     </div>
@@ -217,13 +200,13 @@ const FileExplorerHeader = ({
       className="
     bg-panel-header-light dark:bg-panel-header-dark
     border-panel-border-light dark:border-panel-border-dark
-    flex h-[40px] items-center justify-between rounded-t-md border-b px-3"
+    flex h-[40px] items-center justify-between rounded-t-md border-b px-2"
     >
       {/* Navigation */}
       <div className={`flex items-center ${isEditingPath ? 'w-1/2' : ''}`}>
         {breadcrumbs.length > 0 && (
           <Button
-            icon={<IconChevronLeft size={16} strokeWidth={1} />}
+            icon={<IconChevronLeft size={16} strokeWidth={2} />}
             size="tiny"
             type="text"
             className={breadcrumbs.length > 1 ? 'opacity-100' : 'opacity-25'}
@@ -394,8 +377,8 @@ const FileExplorerHeader = ({
                   actions={[
                     <IconX
                       key="close"
-                      className="mx-2 cursor-pointer text-white"
-                      size={'tiny'}
+                      className="mx-2 cursor-pointer text-scale-1200"
+                      size="tiny"
                       strokeWidth={2}
                       onClick={onCancelSearch}
                     />,

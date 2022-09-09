@@ -1,0 +1,14 @@
+---
+id: supabase-auth-admin-api
+title: 'Overview'
+slug: /supabase-auth-admin-api
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Notes
+
+- Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+- These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
