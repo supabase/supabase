@@ -62,7 +62,6 @@ const SidePanelEditor: FC<Props> = ({
     configuration: { identifiers: any; rowIdx: number },
     onComplete: Function
   ) => {
-    console.log({ payload })
     let saveRowError = false
     if (isNewRecord) {
       const insertQuery = new Query()
@@ -81,7 +80,6 @@ const SidePanelEditor: FC<Props> = ({
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable!.primary_keys.length > 0) {
-          console.log('and it is also right in the payload here', { payload })
           // seems like here is where the data is being updated
           const updateQuery = new Query()
             .from(selectedTable!.name, selectedTable!.schema)
