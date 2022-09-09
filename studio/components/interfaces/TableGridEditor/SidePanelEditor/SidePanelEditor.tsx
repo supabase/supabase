@@ -48,6 +48,7 @@ const SidePanelEditor: FC<Props> = ({
   onColumnSaved = () => {},
 }) => {
   const { meta, ui } = useStore()
+
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
