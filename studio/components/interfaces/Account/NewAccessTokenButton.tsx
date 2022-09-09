@@ -10,12 +10,19 @@ const NewAccessTokenButton = observer(() => {
   const { ui } = useStore()
   const { mutateNewToken } = useAccessTokens()
   const [isOpen, setIsOpen] = useState(false)
-  const [name, setName] = useState('')
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>(undefined)
+
+  const validate = (values: any) => {
+    const errors: any = {}
+    if (!values.tokenName) {
+      errors.tokenName = 'Please enter a name for the token'
+    }
+    return errors
+  }
 
   async function onFormSubmit(values: any, { setSubmitting }: any) {
     setSubmitting(true)
-    const response = await post(`${API_URL}/profile/access-tokens`, { name })
+    const response = await post(`${API_URL}/profile/access-tokens`, { name: values.tokenName })
     if (response.error) {
       ui.setNotification({
         category: 'error',
@@ -35,7 +42,6 @@ const NewAccessTokenButton = observer(() => {
     <>
       <Button
         onClick={() => {
-          setName('')
           setNewToken(undefined)
           setIsOpen(!isOpen)
         }}
@@ -44,6 +50,9 @@ const NewAccessTokenButton = observer(() => {
       </Button>
       {newToken && <NewTokenItem data={newToken} />}
       <Modal
+        closable
+        hideFooter
+        size="small"
         visible={isOpen}
         onCancel={() => setIsOpen(!isOpen)}
         header={
@@ -51,21 +60,12 @@ const NewAccessTokenButton = observer(() => {
             <h5 className="text-sm text-scale-1200">Generate New Token</h5>
           </div>
         }
-        size="small"
-        hideFooter
-        closable
       >
         <Form
-          initialValues={{ tokenName: '' }}
           validateOnBlur
+          initialValues={{ tokenName: '' }}
           onSubmit={onFormSubmit}
-          validate={(values: any) => {
-            const errors: any = {}
-            if (!values.tokenName) {
-              errors.tokenName = 'Enter the name of the token.'
-            }
-            return errors
-          }}
+          validate={validate}
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <div className="space-y-4 py-3">
@@ -73,8 +73,6 @@ const NewAccessTokenButton = observer(() => {
                 <Input
                   id="tokenName"
                   label="Name"
-                  onChange={(e) => setName(e.target.value)}
-                  value={name}
                   placeholder="Type in the token name"
                   className="w-full"
                 />
@@ -108,9 +106,9 @@ const NewTokenItem: FC<NewTokenItemProps> = observer(({ data }) => {
           again.
         </p>
         <Input
+          copy
           readOnly
           size="small"
-          copy={true}
           className="input-mono max-w-xl"
           value={data.token}
           onChange={() => {}}
