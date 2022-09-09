@@ -17,19 +17,27 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
     projectKpsVersion: undefined,
     filterInputValue: '',
     filterKeywords: '',
-    filterVerified: '',
+    filterVerified: undefined,
     users: [],
     totalUsers: 0,
     usersLoading: true,
     page: 1,
     pageLimit: 10,
     get fetchQuery() {
-      return {
-        limit: this.pageLimit,
-        offset: (this.page - 1) * this.pageLimit,
-        keywords: this.filterKeywords,
-        verified: this.filterVerified
-      }
+      if (!this.filterVerified)
+        return {
+          limit: this.pageLimit,
+          offset: (this.page - 1) * this.pageLimit,
+          keywords: this.filterKeywords,
+        }
+
+      if (this.filterVerified)
+        return {
+          limit: this.pageLimit,
+          offset: (this.page - 1) * this.pageLimit,
+          keywords: this.filterKeywords,
+          verified: this.filterVerified,
+        }
     },
     get fromRow() {
       const value = this.pageLimit * (this.page - 1) + 1
