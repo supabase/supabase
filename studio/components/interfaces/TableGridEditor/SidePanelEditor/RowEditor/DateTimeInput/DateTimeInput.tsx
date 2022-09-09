@@ -20,6 +20,7 @@ const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }
   const inputType = getColumnType(format)
 
   function handleOnChange(e: any) {
+    console.log('the actual value is right', e.target.value)
     const temp = e.target.value
     if (temp.length === 0 && temp !== '') return
     onChange(temp)
