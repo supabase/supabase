@@ -24,20 +24,12 @@ const PageLayout = ({ children }: PropsWithChildren<{}>) => {
     page: 1,
     pageLimit: 10,
     get fetchQuery() {
-      if (!this.filterVerified)
-        return {
-          limit: this.pageLimit,
-          offset: (this.page - 1) * this.pageLimit,
-          keywords: this.filterKeywords,
-        }
-
-      if (this.filterVerified)
-        return {
-          limit: this.pageLimit,
-          offset: (this.page - 1) * this.pageLimit,
-          keywords: this.filterKeywords,
-          verified: this.filterVerified,
-        }
+      let queryObj = {
+        limit: this.pageLimit,
+        offset: (this.page - 1) * this.pageLimit,
+        keywords: this.filterKeywords,
+      }
+      return this.filterVerified ? { ...queryObj, verified: this.filterVerified } : queryObj
     },
     get fromRow() {
       const value = this.pageLimit * (this.page - 1) + 1
