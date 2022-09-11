@@ -18,7 +18,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
       SUPABASE_URL: http://kong:8000
-      SUPABASE_REST_URL: ${PUBLIC_REST_URL}
+      SUPABASE_REST_URL: ${SUPABASE_PUBLIC_URL}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
@@ -112,8 +112,7 @@ services:
       SLOT_NAME: supabase_realtime_rls
       TEMPORARY_SLOT: "true"
     command: >
-      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate
-      && ./prod/rel/realtime/bin/realtime start"
+      bash -c "./prod/rel/realtime/bin/realtime eval Realtime.Release.migrate && ./prod/rel/realtime/bin/realtime start"
 
   storage:
     container_name: supabase-storage

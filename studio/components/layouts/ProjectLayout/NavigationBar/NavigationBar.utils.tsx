@@ -39,16 +39,14 @@ export const generateProductRoutes = (ref: string, project?: ProjectBase): Route
       icon: <IconUsers size={18} strokeWidth={2} />,
       link: isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`,
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'storage',
-            label: 'Storage',
-            icon: <IconArchive size={18} strokeWidth={2} />,
-            link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
-          },
-        ]
-      : []),
+
+    {
+      key: 'storage',
+      label: 'Storage',
+      icon: <IconArchive size={18} strokeWidth={2} />,
+      link: isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`,
+    },
+
     {
       key: 'sql',
       label: 'SQL Editor',

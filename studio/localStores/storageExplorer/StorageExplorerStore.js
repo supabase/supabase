@@ -112,7 +112,7 @@ class StorageExplorerStore {
   /* Methods which are commonly used + For better readability */
 
   initializeSupabaseClient = (serviceKey, serviceEndpoint) => {
-    this.supabaseClient = createClient(`https://${serviceEndpoint}`, serviceKey, {
+    this.supabaseClient = createClient(`${serviceEndpoint}`, serviceKey, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
@@ -469,6 +469,7 @@ class StorageExplorerStore {
 
   fetchBuckets = async () => {
     const { data: buckets, error } = await this.supabaseClient.storage.listBuckets()
+
     if (error) return this.ui.setNotification({ message: error.message, category: 'error' })
 
     const formattedBuckets = buckets.map((bucket) => {

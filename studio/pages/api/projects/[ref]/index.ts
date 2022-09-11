@@ -34,7 +34,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
       db_ssl: false,
     }),
     kpsVersion: 'kps-v1.0.0',
-    restUrl: process.env.SUPABASE_REST_URL || 'http://localhost:8000/rest/v1/',
+    restUrl: `${process.env.SUPABASE_REST_URL}/rest/v1/` || 'http://localhost:8000/rest/v1/',
   }
 
   return res.status(200).json(response)
