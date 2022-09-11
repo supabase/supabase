@@ -6,7 +6,11 @@ sidebar_label: With SvelteKit
 
 # Supabase Auth with SvelteKit
 
-This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications.
+This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications. 
+
+Note that this guide is outdated and won't work on a new sveltekit proyect.
+Refer to [#230](https://github.com/supabase/auth-helpers/issues/230) for a workaround. 
+Refer to [Sveltekit discussion #5883](https://github.com/sveltejs/kit/discussions/5883#discussion-4302953) for more info.
 
 ## Installation
 
