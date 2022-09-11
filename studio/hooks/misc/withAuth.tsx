@@ -4,7 +4,7 @@ import { NextRouter, useRouter } from 'next/router'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile, useStore, usePermissions } from 'hooks'
 
-const PLATFORM_ONLY_PAGES = ['storage', 'reports', 'settings']
+const PLATFORM_ONLY_PAGES = ['reports', 'settings']
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T>,
