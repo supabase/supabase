@@ -319,8 +319,8 @@ const FileExplorerHeader = ({
                 value={sortByOrder}
                 onChange={onChangeSortByOrder}
               >
-                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Asc</Dropdown.Radio>
-                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Desc</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Ascending</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Descending</Dropdown.Radio>
               </Dropdown.RadioGroup>,
             ]}
           >

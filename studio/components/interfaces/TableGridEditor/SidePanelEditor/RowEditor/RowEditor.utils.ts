@@ -177,10 +177,11 @@ const nowDateTimeValue = (format: string) => {
 }
 
 const convertPostgresDatetimeToInputDatetime = (format: string, value: string) => {
-  if (!value || value.length == 0) return ''
+  const valueWithSlashes = value.replaceAll('-', '/')
 
+  if (!value || value.length == 0) return ''
   if (TIMESTAMP_TYPES.includes(format)) {
-    return dayjs(value).format('YYYY-MM-DDTHH:mm:ss')
+    return dayjs(valueWithSlashes).format('YYYY-MM-DDTHH:mm:ss')
   } else if (TIME_TYPES.includes(format)) {
     const serverTimeFormat = value && value.includes('+') ? 'HH:mm:ssZZ' : 'HH:mm:ss'
     return dayjs(value, serverTimeFormat).format('HH:mm:ss')

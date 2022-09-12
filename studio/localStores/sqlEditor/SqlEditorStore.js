@@ -255,7 +255,7 @@ class SqlEditorStore {
   async loadKeywords() {
     const query = 'select * from pg_get_keywords();'
     const response = await this.meta.query(query)
-    if (!response.error) {
+    if (response && !response.error) {
       this.keywordCache = response.map((x) => x.word.toLocaleLowerCase())
     }
   }
