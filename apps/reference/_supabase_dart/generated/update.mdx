@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Performs an UPDATE on the table.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Middle Earth' })
-  .match({ 'name': 'Auckland' })
-  .execute();
+  .match({ 'name': 'Auckland' });
 ```
 
 ## Notes
@@ -27,11 +26,10 @@ final res = await supabase
 ### Updating your data
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Middle Earth' })
-  .match({ 'name': 'Auckland' })
-  .execute();
+  .match({ 'name': 'Auckland' });
 ```
 
 ### Updating JSON data
@@ -42,7 +40,7 @@ for working with JSON data. Right now it is only possible to update an entire JS
 but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('users')
   .update({
     'address': {
@@ -50,6 +48,5 @@ final res = await supabase
       'postcode': 90210
     }
   })
-  .eq('address->postcode', 90210)
-  .execute();
+  .eq('address->postcode', 90210);
 ```

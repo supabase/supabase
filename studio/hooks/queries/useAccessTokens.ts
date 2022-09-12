@@ -19,7 +19,7 @@ export function useAccessTokens() {
   const anyError = data?.error || error
 
   function mutateNewToken(newToken: AccessToken, revalidate?: boolean) {
-    mutate(url, (data: AccessToken[]) => [...data, newToken], revalidate ?? true)
+    mutate(url, (data: AccessToken[]) => [...(data || []), newToken], revalidate ?? true)
   }
 
   function mutateDeleteToken(tokenId: number, revalidate?: boolean) {

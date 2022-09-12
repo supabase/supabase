@@ -13,11 +13,10 @@ Finds all rows whose value on the stated `column` is found on the specified `val
 `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .in_('name', ['Rio de Janeiro', 'San Francisco'])
-  .execute();
+  .in_('name', ['Rio de Janeiro', 'San Francisco']);
 ```
 
 ## Examples
@@ -25,39 +24,35 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .in_('name', ['Rio de Janeiro', 'San Francisco'])
-  .execute();
+  .in_('name', ['Rio de Janeiro', 'San Francisco']);
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Mordor' })
-  .in_('name', ['Rio de Janeiro', 'San Francisco'])
-  .execute();
+  .in_('name', ['Rio de Janeiro', 'San Francisco']);
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .in_('name', ['Rio de Janeiro', 'San Francisco'])
-  .execute();
+  .in_('name', ['Rio de Janeiro', 'San Francisco']);
 ```
 
 ### With `rpc()`
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_cities')
-  .in_('name', ['Rio de Janeiro', 'San Francisco'])
-  .execute();
+  .in_('name', ['Rio de Janeiro', 'San Francisco']);
 ```
