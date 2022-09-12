@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Finds all rows which doesn't satisfy the filter.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .not('name', 'eq', 'Paris')
-  .execute();
+  .not('name', 'eq', 'Paris');
 ```
 
 ## Notes
@@ -35,39 +34,35 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .not('name', 'eq', 'Paris')
-  .execute();
+  .not('name', 'eq', 'Paris');
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Mordor' })
-  .not('name', 'eq', 'Paris')
-  .execute();
+  .not('name', 'eq', 'Paris');
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .not('name', 'eq', 'Paris')
-  .execute();
+  .not('name', 'eq', 'Paris');
 ```
 
 ### With `rpc()`
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_cities)
-  .not('name', 'eq', 'Paris')
-  .execute();
+  .not('name', 'eq', 'Paris');
 ```

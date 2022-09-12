@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Lists all the files within a bucket.
 
 ```dart
-final res = await supabase
+final List<FileObject> objects = await supabase
   .storage
   .from('avatars')
   .list();
@@ -28,7 +28,7 @@ final res = await supabase
 ### List files in a bucket
 
 ```dart
-final res = await supabase
+final List<FileObject> objects = await supabase
   .storage
   .from('avatars')
   .list();

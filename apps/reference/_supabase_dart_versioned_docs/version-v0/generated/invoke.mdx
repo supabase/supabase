@@ -1,0 +1,60 @@
+---
+id: invoke
+title: 'invoke()'
+slug: /invoke
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+
+```dart
+final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'});
+final data = res.data;
+final error = res.error;
+```
+
+## Notes
+
+- Requires an Authorization header.
+- Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+
+## Examples
+
+### Basic invocation.
+
+```dart
+final res = await supabaseClient.functions.invoke('hello', body: {'foo': 'baa'});
+final data = res.data;
+final error = res.error;
+```
+
+### Specifying response type.
+
+By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+
+```dart
+final res = await supabaseClient.functions.invoke(
+  'hello',
+  body: {'foo': 'baa'},
+  responseType: ResponseType.text,
+);
+final data = res.data;
+final error = res.error;
+```
+
+### Parsing custom headers.
+
+Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+
+```dart
+final res = await supabaseClient.functions.invoke(
+  'hello',
+  body: {'foo': 'baa'},
+  headers: {
+    'Authorization': 'Bearer ${supabase.auth.session()?.access_token}'
+  },
+);
+```
