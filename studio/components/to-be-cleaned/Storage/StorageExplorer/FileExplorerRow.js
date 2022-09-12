@@ -85,6 +85,7 @@ const FileExplorerRow = ({
   onSelectItemRename = () => {},
   onSelectItemMove = () => {},
 }) => {
+  const itemWithColumnIndex = { ...item, columnIndex }
   const isSelected = find(selectedItems, item) !== undefined
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
@@ -102,10 +103,11 @@ const FileExplorerRow = ({
 
     const onSetItemName = (event) => {
       event.preventDefault()
+      event.stopPropagation()
       if (item.type === STORAGE_ROW_TYPES.FILE) {
         onRenameFile(item, itemName, columnIndex)
       } else if (has(item, 'id')) {
-        onRenameFolder(item, itemName, columnIndex)
+        onRenameFolder(itemWithColumnIndex, itemName, columnIndex)
       } else {
         onCreateFolder(itemName, columnIndex)
       }
@@ -139,7 +141,6 @@ const FileExplorerRow = ({
     )
   }
 
-  const itemWithColumnIndex = { ...item, columnIndex }
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.BUCKET
       ? [{ name: 'Delete', onClick: () => onSelectItemDelete(itemWithColumnIndex) }]

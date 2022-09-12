@@ -11,14 +11,13 @@ import TabItem from '@theme/TabItem'
 Replaces an existing file at the specified path with a new one.
 
 ```dart
-final avatarFile = File('path/to/file');
-final res = await supabase
-  .storage
-  .from('avatars')
-  .update('public/avatar1.png', avatarFile, fileOptions: FileOptions(
-    cacheControl: '3600',
-    upsert: false
-  ));
+final avatarFile = File('path/to/local/file');
+final String path = await supabase.storage.from('avatars').update(
+      'public/avatar1.png',
+      avatarFile,
+      fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+    );
+
 ```
 
 ## Notes
@@ -32,12 +31,10 @@ final res = await supabase
 ### Update file
 
 ```dart
-final avatarFile = File('path/to/file');
-final res = await supabase
-  .storage
-  .from('avatars')
-  .update('public/avatar1.png', avatarFile, fileOptions: FileOptions(
-    cacheControl: '3600',
-    upsert: false
-  ));
+final avatarFile = File('path/to/local/file');
+final String path = await supabase.storage.from('avatars').update(
+      'public/avatar1.png',
+      avatarFile,
+      fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+    );
 ```

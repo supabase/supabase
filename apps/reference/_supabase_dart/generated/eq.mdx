@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Finds all rows whose value on the stated `column` exactly matches the specified `value`.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .eq('name', 'The shire')
-  .execute();
+  .eq('name', 'The shire');
 ```
 
 ## Examples
@@ -23,39 +22,35 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .eq('name', 'The shire')
-  .execute();
+  .eq('name', 'The shire');
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Mordor' })
-  .eq('name', 'San Francisco')
-  .execute();
+  .eq('name', 'San Francisco');
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .eq('name', 'Mordor')
-  .execute();
+  .eq('name', 'Mordor');
 ```
 
 ### With `rpc()`
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_cities')
-  .eq('name', 'San Francisco')
-  .execute();
+  .eq('name', 'San Francisco');
 ```

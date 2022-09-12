@@ -13,7 +13,7 @@ Updates a new Storage bucket
 ```dart
 final res = await supabase
   .storage
-  .updateBucket('avatars', { public: false });
+  .updateBucket('avatars', const BucketOptions(public: false));
 ```
 
 ## Notes
@@ -29,5 +29,5 @@ final res = await supabase
 ```dart
 final res = await supabase
   .storage
-  .updateBucket('avatars', { public: false });
+  .updateBucket('avatars', const BucketOptions(public: false));
 ```
