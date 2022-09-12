@@ -64,7 +64,7 @@ const Landing = () => {
           </h1>
           <p className="text-scale-1100 mb-10 text-base sm:mx-auto sm:max-w-2xl md:mt-5">
             Create a backend in less than 2 minutes. Start your project with a Postgres database,
-            Authentication, instant APIs, Realtime subscriptions, and Storage.
+            Authentication, instant APIs, Edge Functions, Realtime subscriptions, and Storage.
           </p>
 
           <div className="flex items-center space-x-2 sm:justify-center">
