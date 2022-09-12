@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from '@supabase/ui'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -82,6 +82,7 @@ const Users = () => {
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
+            icon={<IconUsers size="tiny"/> }
           >
             <Listbox.Option label="All Users" value="">
               All Users
