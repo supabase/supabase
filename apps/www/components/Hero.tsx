@@ -33,8 +33,8 @@ const Hero = () => {
                       <div>
                         <p className="p mt-1.5 text-sm sm:mt-5 sm:text-base lg:text-lg ">
                           Supabase is an open source Firebase alternative. Start your project with a
-                          Postgres database, Authentication, instant APIs, Edge Functions,
-                          Realtime subscriptions, and Storage.
+                          Postgres database, Authentication, instant APIs, Edge Functions, Realtime
+                          subscriptions, and Storage.
                         </p>
                       </div>
                     </div>
