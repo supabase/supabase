@@ -132,6 +132,12 @@ test('error message handling', async () => {
   await screen.findByText(/my_error/)
 })
 
+test('no results message handling', async () => {
+  render(<LogTable data={[]} />)
+  await screen.findByText(/No results/)
+  await screen.findByText(/Try another search/)
+})
+
 test('custom error message: Resources exceeded during query execution', async () => {
   const errorFromLogflare = {
     error: {
