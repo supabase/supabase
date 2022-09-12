@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Finds all rows whose `column` satisfies the filter.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .filter('name', 'in', '("Paris","Tokyo")')
-  .execute();
+  .filter('name', 'in', '("Paris","Tokyo")');
 ```
 
 ## Notes
@@ -33,38 +32,35 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, country_id')
-  .filter('name', 'in', '("Paris","Tokyo")')
-  .execute();
+  .filter('name', 'in', '("Paris","Tokyo")');
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .update({ 'name': 'Mordor' })
-  .filter('name', 'in', '("Paris","Tokyo")')
-  .execute();
+  .filter('name', 'in', '("Paris","Tokyo")');
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .filter('name', 'in', '("Paris","Tokyo")')
-  .execute();
+  .filter('name', 'in', '("Paris","Tokyo")');
 ```
 
 ### With `rpc()`
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_cities')
   .filter('name', 'in', '("Paris","Tokyo")')
 ```
@@ -72,9 +68,8 @@ final res = await supabase
 ### Filter embedded resources
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .select('name, countries ( name )')
-  .filter('countries.name', 'in', '("France","Japan")')
-  .execute();
+  .filter('countries.name', 'in', '("France","Japan")');
 ```

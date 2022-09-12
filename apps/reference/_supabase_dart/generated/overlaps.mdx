@@ -9,11 +9,10 @@ import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .select('name, id, main_exports')
-  .overlaps('main_exports', ['computers', 'minerals'])
-  .execute();
+  .overlaps('main_exports', ['computers', 'minerals']);
 ```
 
 ## Examples
@@ -21,39 +20,35 @@ final res = await supabase
 ### With `select()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .select('name, id, main_exports')
-  .overlaps('main_exports', ['computers', 'minerals'])
-  .execute();
+  .overlaps('main_exports', ['computers', 'minerals']);
 ```
 
 ### With `update()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .update({ 'name': 'Mordor' })
-  .overlaps('main_exports', ['computers', 'minerals'])
-  .execute();
+  .overlaps('main_exports', ['computers', 'minerals']);
 ```
 
 ### With `delete()`
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('countries')
   .delete()
-  .overlaps('main_exports', ['computers', 'minerals'])
-  .execute();
+  .overlaps('main_exports', ['computers', 'minerals']);
 ```
 
 ### With `rpc()`
 
 ```dart
 // Only valid if the Stored Procedure returns a table type.
-final res = await supabase
+final data = await supabase
   .rpc('echo_all_countries')
-  .overlaps('main_exports', ['computers', 'minerals'])
-  .execute();
+  .overlaps('main_exports', ['computers', 'minerals']);
 ```
