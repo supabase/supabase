@@ -11,9 +11,9 @@ import TabItem from '@theme/TabItem'
 Retrieves the details of all Storage buckets within an existing product.
 
 ```dart
-final res = await supabase
+final List<Bucket> buckets = await supabase
   .storage
-  .listBuckets()
+  .listBuckets();
 ```
 
 ## Notes
@@ -27,7 +27,7 @@ final res = await supabase
 ### List buckets
 
 ```dart
-final res = await supabase
+final List<Bucket> buckets = await supabase
   .storage
-  .listBuckets()
+  .listBuckets();
 ```
