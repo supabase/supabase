@@ -197,9 +197,9 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    'severity.error': `metadataParsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.noError': `metadataParsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
-    'severity.log': `metadataParsed.error_severity = 'LOG'`,
+    'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
+    'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
