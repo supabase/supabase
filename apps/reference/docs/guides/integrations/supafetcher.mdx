@@ -1,0 +1,55 @@
+---
+id: supafetcher
+title: 'Supa Fetcher'
+description: Easily import data into any Supabase table from any API.
+---
+
+This guide steps through using Supa Fetcher integrated with Supabase.
+
+If you don’t have a Supa Fetcher account, create one [here](https://supafetcher.com/sign-up).
+
+## Step 1: Create a Supabase project
+
+If you already have your desired project you can skip this step.
+
+From the [Supabase dashboard](https://app.supabase.com/), click `New project` and select an organization.
+
+Fill in the required fields with your desired inputs and create.
+
+Supabase will take a couple of minutes to configure the infrastructure.
+
+## Step 2: Authorize Access
+
+From your [Supa Fetcher account](https://supafetcher.com/app).
+
+Add your `Project URL` to the `Authorize Supa Fetcher` section.
+
+Add your `Project Service Role Key` to the `Authorize Supa Fetcher` section.
+
+> This info can be found in your `Project Settings` in your Supabase Org.
+
+![supa-fetcher-auth](/img/guides/integrations/supafetcher/supa-fetcher-auth.png)
+
+> These credentials can be manually entered on each request or saved on our Supabase cloud hosted table.
+
+## Step 3: Create an API Request
+
+Build your request to any API endpoint you wish to pull data from.
+
+![supa-fetcher-request](/img/guides/integrations/supafetcher/supa-fetcher-request.png)
+
+## Step 4: Select Table
+
+Select which Supabase table you want to insert into.
+
+Run your request.
+
+## Step 5: Map Fields and Insert
+
+Map the data returned from your request to the correct fields of the table it is being inserted into.
+
+![supa-fetcher-map](/img/guides/integrations/supafetcher/supa-fetcher-map.png)
+
+> Make sure the field types for each column are compatible or you'll get errors.
+
+Insert your data.
