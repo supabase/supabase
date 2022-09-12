@@ -1158,7 +1158,9 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    console.log('deleteFolder', folder, this.openedFolders)
+    this.popColumnAtIndex(folder.columnIndex)
+    this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
+
     const parentFolderPrefix = this.openedFolders.map((folder) => folder.name).join('/')
     if (parentFolderPrefix.length > 0) {
       await this.validateParentFolderEmpty(parentFolderPrefix)
@@ -1166,9 +1168,10 @@ class StorageExplorerStore {
 
     await this.refetchAllOpenedFolders()
     this.clearSelectedItemsToDelete()
+
     this.ui.setNotification({
+      category: 'success',
       message: `Successfully deleted ${folder.name}`,
-      type: 'success',
     })
   }
 
@@ -1222,8 +1225,8 @@ class StorageExplorerStore {
           if (error) {
             hasErrors = true
             this.ui.setNotification({
-              message: `Failed to move ${fromPath} to the new folder`,
               category: 'error',
+              message: `Failed to move ${fromPath} to the new folder`,
             })
           }
           resolve()
