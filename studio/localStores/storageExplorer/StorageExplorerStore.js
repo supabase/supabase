@@ -868,6 +868,11 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
+    const toastId = this.ui.setNotification({
+      category: 'loading',
+      message: `Deleting ${prefixes.length} file(s)`,
+    })
+
     // batch BATCH_SIZE prefixes per request
     const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
       return this.supabaseClient.storage.from(this.selectedBucket.name).remove(batch)
@@ -898,12 +903,16 @@ class StorageExplorerStore {
         parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
       )
       this.ui.setNotification({
-        message: `Successfully deleted ${prefixes.length} file(s)`,
+        id: toastId,
         category: 'success',
+        message: `Successfully deleted ${prefixes.length} file(s)`,
       })
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
+    } else {
+      toast.dismiss(toastId)
     }
+
     toast.dismiss(infoToastId)
   }
 
@@ -1158,8 +1167,11 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    this.popColumnAtIndex(folder.columnIndex)
-    this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
+    const isFolderOpen = this.openedFolders[this.openedFolders.length - 1].name === folder.name
+    if (isFolderOpen) {
+      this.popColumnAtIndex(folder.columnIndex)
+      this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
+    }
 
     const parentFolderPrefix = this.openedFolders.map((folder) => folder.name).join('/')
     if (parentFolderPrefix.length > 0) {
