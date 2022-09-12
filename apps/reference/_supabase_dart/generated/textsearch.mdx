@@ -15,13 +15,12 @@ Finds all rows whose tsvector value on the stated `column` matches to_tsquery(qu
 ### Text search
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('quotes')
   .select('catchphrase')
   .textSearch('catchphrase', "'fat' & 'cat'",
     config: 'english'
-  )
-  .execute();
+  );
 ```
 
 ### Basic normalization
@@ -29,14 +28,13 @@ final res = await supabase
 Uses PostgreSQL's `plainto_tsquery` function.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('quotes')
   .select('catchphrase')
   .textSearch('catchphrase', "'fat' & 'cat'",
     type: TextSearchType.plain,
     config: 'english'
-  )
-  .execute();
+  );
 ```
 
 ### Full normalization
@@ -44,14 +42,13 @@ final res = await supabase
 Uses PostgreSQL's `phraseto_tsquery` function.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('quotes')
   .select('catchphrase')
   .textSearch('catchphrase', "'fat' & 'cat'",
     type: TextSearchType.phrase,
     config: 'english'
-  )
-  .execute();
+  );
 ```
 
 ### Full normalization
@@ -66,12 +63,11 @@ with advanced operators.
 - `-`: a dash will be converted to the ! operator.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('quotes')
   .select('catchphrase')
   .textSearch('catchphrase', "'fat or cat'",
     type: TextSearchType.websearch,
     config: 'english'
-  )
-  .execute();
+  );
 ```

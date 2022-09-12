@@ -1,0 +1,59 @@
+---
+id: overlaps
+title: '.overlaps()'
+slug: /overlaps
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+```dart
+final res = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .overlaps('main_exports', ['computers', 'minerals'])
+  .execute();
+```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .select('name, id, main_exports')
+  .overlaps('main_exports', ['computers', 'minerals'])
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .update({ 'name': 'Mordor' })
+  .overlaps('main_exports', ['computers', 'minerals'])
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('countries')
+  .delete()
+  .overlaps('main_exports', ['computers', 'minerals'])
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_countries')
+  .overlaps('main_exports', ['computers', 'minerals'])
+  .execute();
+```
