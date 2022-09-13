@@ -34,7 +34,7 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
     - Type: `chore | fix | feature`
     - The branch name is arbitrary—just make sure it summarizes the work.
 - When you send a PR to `master`, it will automatically tag members of the frontend team for review.
-- Review the [contributing checklists](contributing/contributing-checklists.md) to help you test your feature before you send a PR.
+- Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
 
 ### Developer Quickstart
 

@@ -1,18 +1,18 @@
-# Checklist for contrubuting to the Supabase Dashboard
+# Checklists for contrubuting to the Supabase Dashboard
 
 First, we appreciate the time you've taken to contribute to Supabase! Thank you!
 
-The following is a set of checklists to help make sure the code we contribute to the Dashboard is well tested. If you've made changes to any specific tools, please take a couple of minutes and go through the relevant checklist.
+The following is a set of checklists to help make sure the code we contribute to the Dashboard is well tested. If you've made changes to any specific tools, please take a couple of minutes and go through the relevant checklist below.
 
-These checklists should help remind you of the important things to test after you've made changes to a feature.
+You don't need to go through all of these for every PR you contribute. These checklists should help remind you of the important things to test after you've made changes to a feature. For example, if you make changes to the Table Editor, just run through that checklist below.
 
-## Tools / by feature
+## Tools and features
 
 ### Table Editor
 
-- [ ] Go to **Table editor**:
+- [ ] Go to **Table editor**
   - [ ] Create a **new table**
-    - [ ] Set different fields and types: at least one nullable, one with default generated value (like `now()`), at least one date field
+    - [ ] Add different fields and types: at least one nullable, one with default generated value (like `now()`), at least one date field
     - [ ] Insert a few rows into the table
     - [ ] Edit the row with the default spreadsheet view
     - [ ] Edit the row with the Side Panel editor (the expand button to the left of the ID column for each row)
@@ -25,11 +25,11 @@ These checklists should help remind you of the important things to test after yo
 - [ ] Go to **Authentication**
   - [ ] Invite a new user
   - [ ] Search the list of users
-  - [ ] Go to policies and create a new policy for a table
+  - [ ] Go to Policies and create a new policy for a table
   - [ ] Check logs view
   - [ ] Go to settings and check that any changes you make get saved
     - [ ] General
-    - [ ] Add redirect URL
+    - [ ] Add a redirect URL
     - [ ] Enable a couple of Auth providers
 
 ### Storage
@@ -52,7 +52,7 @@ These checklists should help remind you of the important things to test after yo
 - [ ] Go to **SQL editor**
   - [ ] Create **new query**
     - [ ] Run a query (ex: `select * from extensions.pg_stat_statements`) and check that it returns results
-    - [ ] Download a csv of the results (via results dropdown above the preview table)
+    - [ ] Download a csv of the results (via the Results dropdown above the preview table)
   - [ ] Go to **Welcome** and choose and run a template (ex: "Create table")
   - [ ] Switch between queries, rename one of your queries, refresh page, delete one of your queries
 
@@ -69,7 +69,7 @@ These checklists should help remind you of the important things to test after yo
 - [ ] Go to **Logs Explorer**
   - [ ] Switch to **Templates** and select one
   - [ ] Check that query results are displaying properly
-  - [ ] Make a change to the query from the template and Save this query
+  - [ ] Make a change to the query from the template, save this query
   - [ ] Switch to **Saved** - you should see your new query, run it and check the results
   - [ ] Switch to **Recent** - you should be able to see recent queries you've run
 
@@ -77,12 +77,12 @@ These checklists should help remind you of the important things to test after yo
 
 - [ ] Go to **Database**
   - [ ] You should see any tables you have created
-    - [ ] click on a table column, try and edit it
-  - [ ] Go to **Roles** - check if it is displaying roles
+    - [ ] Click on a table column, try and edit it
+  - [ ] Go to **Roles** - check if roles are displayed
   - [ ] Go to **Extensions** - filter the extensions, try enabling and disabling an extension
   - [ ] Go to **Replication** — enable, disable few event types for `supabase_realtime` add some tables to replication
   - [ ] Go to **API Logs**, **Postgres Logs**, **Realtime Logs**
-    - [ ] check filtering: time range, product, status, method
+    - [ ] Check filtering: time range, product, status, method
 
 ### Org settings
 
