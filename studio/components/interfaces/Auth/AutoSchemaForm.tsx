@@ -1,9 +1,10 @@
-import { Form, Input, InputNumber, Toggle } from '@supabase/ui'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { boolean, number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -18,11 +19,15 @@ const AutoSchemaForm = observer(() => {
   const { isLoaded } = authConfig
 
   const formId = 'auth-config-general-form'
+  const [hidden, setHidden] = useState(true)
+
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
     JWT_EXP: authConfig.config.JWT_EXP,
     SITE_URL: authConfig.config.SITE_URL,
+    REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
@@ -34,6 +39,7 @@ const AutoSchemaForm = observer(() => {
     JWT_EXP: number()
       .max(604800, 'Must be less than 604800')
       .required('Must have a JWT expiry value'),
+    REFRESH_TOKEN_ROTATION_ENABLED: boolean().required(),
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
       .min(0, 'Must be a value more than 0')
       .required('Must have a Reuse Interval value'),
@@ -44,33 +50,32 @@ const AutoSchemaForm = observer(() => {
     }),
   })
 
+  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+    const payload = { ...values }
+    payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
+    payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
+
+    setSubmitting(true)
+    const { error } = await authConfig.update(payload)
+
+    if (!error) {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated settings`,
+      })
+      resetForm({ values: values, initialValues: values })
+    } else {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to update settings`,
+      })
+    }
+
+    setSubmitting(false)
+  }
+
   return (
-    <Form
-      id={formId}
-      initialValues={INITIAL_VALUES}
-      onSubmit={async (values: any, { setSubmitting, resetForm }: any) => {
-        const payload = { ...values }
-        payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-        payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
-        try {
-          setSubmitting(true)
-          await authConfig.update(payload)
-          setSubmitting(false)
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
-          resetForm({ values: values, initialValues: values })
-        } catch (error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
-          setSubmitting(false)
-        }
-      }}
-      validationSchema={schema}
-    >
+    <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
       {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -88,12 +93,18 @@ const AutoSchemaForm = observer(() => {
             <FormPanel
               disabled={true}
               footer={
-                <div className="flex justify-between py-4 px-8">
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
                   />
                 </div>
               }
@@ -106,6 +117,7 @@ const AutoSchemaForm = observer(() => {
                     label="Allow new users to sign up"
                     layout="flex"
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>
@@ -119,6 +131,7 @@ const AutoSchemaForm = observer(() => {
                     size="small"
                     label="Site URL"
                     descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     id="JWT_EXP"
@@ -126,14 +139,7 @@ const AutoSchemaForm = observer(() => {
                     label="JWT expiry limit"
                     descriptionText="How long tokens are valid for. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week)."
                     actions={<span className="text-scale-900 mr-3">seconds</span>}
-                  />
-                  <InputNumber
-                    id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
-                    size="small"
-                    min={0}
-                    label="Reuse Interval"
-                    descriptionText="Time interval where the same refresh token can be used to request for an access token."
-                    actions={<span className="text-scale-900 mr-3">seconds</span>}
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>
@@ -142,16 +148,44 @@ const AutoSchemaForm = observer(() => {
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"
                     size="small"
-                    label="hCaptcha protection"
+                    label="Enable hCaptcha protection"
                     layout="flex"
-                    descriptionText="If enabled, protects auth endpoints from abuse."
+                    descriptionText="Protect authentication endpoints from abuse."
+                    disabled={!canUpdateConfig}
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <Input
                       id="SECURITY_CAPTCHA_SECRET"
+                      type={hidden ? 'password' : 'text'}
                       size="small"
-                      label="hCaptcha sitekey"
-                      descriptionText="hCaptcha secret (sitekey)"
+                      label="hCaptcha secret"
+                      disabled={!canUpdateConfig}
+                      actions={
+                        <Button
+                          icon={hidden ? <IconEye /> : <IconEyeOff />}
+                          type="default"
+                          onClick={() => setHidden(!hidden)}
+                        />
+                      }
+                    />
+                  )}
+                  <Toggle
+                    id="REFRESH_TOKEN_ROTATION_ENABLED"
+                    size="small"
+                    label="Enable automatic reuse detection"
+                    layout="flex"
+                    descriptionText="Prevent replay attacks from compromised refresh tokens."
+                    disabled={!canUpdateConfig}
+                  />
+                  {values.REFRESH_TOKEN_ROTATION_ENABLED && (
+                    <InputNumber
+                      id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
+                      size="small"
+                      min={0}
+                      label="Reuse Interval"
+                      descriptionText="Time interval where the same refresh token can be used to request for an access token."
+                      actions={<span className="text-scale-900 mr-3">seconds</span>}
+                      disabled={!canUpdateConfig}
                     />
                   )}
                 </FormSectionContent>

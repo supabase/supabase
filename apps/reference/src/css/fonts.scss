@@ -1,0 +1,29 @@
+@font-face {
+  font-family: 'custom-font';
+  src: url(/fonts/custom/CustomFont-Book.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'custom-font';
+  src: url(/fonts/custom/CustomFont-Medium.woff2) format('woff2'),
+    url(/fonts/custom/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* mono font */
+
+@font-face {
+  font-family: 'office code pro';
+  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.eot');
+  src: url('/fonts/office-code-pro/OfficeCodePro-Regular.woff2') format('woff2'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.woff') format('woff'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.ttf') format('truetype'),
+    url('/fonts/office-code-pro/OfficeCodePro-Regular.otf') format('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

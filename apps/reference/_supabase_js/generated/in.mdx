@@ -1,0 +1,103 @@
+---
+id: in
+title: '.in()'
+slug: /in
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows whose value on the stated `column` is found on the
+specified `values`.
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+## Parameters
+
+<ul className="method-list-group">
+  
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      column
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>ColumnName</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The column to filter on.
+
+  </div>
+  
+</li>
+
+<li className="method-list-item">
+  <h4 className="method-list-item-label">
+    <span className="method-list-item-label-name">
+      values
+    </span>
+    <span className="method-list-item-label-badge required">
+      required
+    </span>
+    <span className="method-list-item-validation">
+      <code>object</code>
+    </span>
+  </h4>
+  <div class="method-list-item-description">
+
+The values to filter with.
+
+  </div>
+  
+</li>
+
+</ul>
+
+## Examples
+
+### With `select()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+### With `update()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .update({ name: 'Mordor' })
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+### With `delete()`
+
+```js
+const { data, error } = await supabase
+  .from('cities')
+  .delete()
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```
+
+### With `rpc()`
+
+```js
+// Only valid if the Postgres function returns a table type.
+const { data, error } = await supabase
+  .rpc('echo_all_cities')
+  .in('name', ['Rio de Janeiro', 'San Francisco'])
+```

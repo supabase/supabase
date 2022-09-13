@@ -1,39 +1,26 @@
 ---
 id: auth-api-createuser
-title: "createUser()"
+title: 'createUser()'
 slug: auth-api-createuser
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Creates a new user.
 
 This function should only be called on a server. Never expose your `service_role` key in the browser.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   email: 'user@email.com',
   password: 'password',
-  user_metadata: { name: 'Yoda' }
+  user_metadata: { name: 'Yoda' },
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -59,90 +46,38 @@ The data you want to create the user with.
 
 </ul>
 
-
 ## Notes
 
 - Requires a `service_role` key.
 - This function should be called on a server. Never expose your `service_role` key in the browser.
 - If you do not provide the `email_confirm` and `phone_confirm` options to this function, both will default to false.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Create a new user.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   email: 'user@email.com',
   password: 'password',
-  user_metadata: { name: 'Yoda' }
+  user_metadata: { name: 'Yoda' },
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Auto-confirm email.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   email: 'user@email.com',
-  email_confirm: true
+  email_confirm: true,
 })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### Auto-confirm phone.
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 const { data: user, error } = await supabase.auth.api.createUser({
   phone: '1234567890',
-  phone_confirm: true
+  phone_confirm: true,
 })
 ```
-
-
-</TabItem>
-
-</Tabs>

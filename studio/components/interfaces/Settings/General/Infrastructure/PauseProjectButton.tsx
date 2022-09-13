@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, IconPause } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useStore, useFlag } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -21,13 +21,15 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const enablePermissions = useFlag('enablePermissions')
+  const isOwner = ui.selectedOrganization?.is_owner
+
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  const canPauseProject = checkPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.pause'
-  )
+  const canPauseProject = enablePermissions
+    ? checkPermissions(PermissionAction.INFRA_EXECUTE, 'queue_jobs.projects.pause')
+    : isOwner
 
   const requestPauseProject = async () => {
     if (!canPauseProject) {

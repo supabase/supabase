@@ -1,6 +1,6 @@
 import { useCallback, useState, FC, useEffect } from 'react'
 import { debounce, includes } from 'lodash'
-import { SidePanel, Typography, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
+import { SidePanel, Tabs, IconArrowRight, IconChevronRight } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../../ActionBar'
@@ -8,7 +8,7 @@ import SpreadSheetTextInput from './SpreadSheetTextInput'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetPreview from './SpreadsheetPreview'
 import { SpreadsheetData } from './SpreadsheetImport.types'
-import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
+import { acceptedFileExtension, parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
 import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
 
 interface Props {
@@ -58,14 +58,14 @@ const SpreadsheetImport: FC<Props> = ({
     setParseProgress(0)
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type)) {
+    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
       ui.setNotification({
         category: 'info',
         message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',
       })
     } else {
       setUploadedFile(file)
-      const { headers, rowCount, columnTypeMap, errors } = await parseSpreadsheet(
+      const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
         file,
         onProgressUpdate
       )
@@ -77,8 +77,9 @@ const SpreadsheetImport: FC<Props> = ({
           duration: 4000,
         })
       }
+
       setErrors(errors)
-      setSpreadsheetData({ headers, rows: [], rowCount, columnTypeMap })
+      setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
   }
@@ -165,22 +166,25 @@ const SpreadsheetImport: FC<Props> = ({
           <div className="space-y-5 py-5">
             <div className="space-y-2">
               <div className="flex flex-col space-y-1">
-                <Typography.Text>Content Preview</Typography.Text>
-                <Typography.Text type="secondary">
+                <p>Content Preview</p>
+                <p className="text-scale-1000">
                   Your table will have {spreadsheetData.rowCount.toLocaleString()} rows and the
                   following {spreadsheetData.headers.length} columns.
-                </Typography.Text>
+                </p>
+                <p className="text-scale-1000">
+                  Here is a preview of your table (up to the first 20 columns and first 20 rows).
+                </p>
               </div>
-              <SpreadsheetPreview headers={spreadsheetData.headers} />
+              <SpreadsheetPreview headers={spreadsheetData.headers} rows={spreadsheetData.rows} />
             </div>
             {errors.length > 0 && (
               <div className="space-y-2">
                 <div className="flex flex-col space-y-1">
-                  <Typography.Text>Issues found in spreadsheet</Typography.Text>
-                  <Typography.Text type="secondary">
+                  <p>Issues found in spreadsheet</p>
+                  <p className="text-scale-1000">
                     Your table can still be created nonetheless despite issues in the following
                     rows.
-                  </Typography.Text>
+                  </p>
                 </div>
                 <div className="space-y-2">
                   {errors.map((error: any, idx: number) => {
@@ -194,16 +198,14 @@ const SpreadsheetImport: FC<Props> = ({
                             size={14}
                             onClick={() => onSelectExpandError(key)}
                           />
-                          <Typography.Text className="w-14">Row: {error.row}</Typography.Text>
-                          <Typography.Text>{error.message}</Typography.Text>
+                          <p className="w-14">Row: {error.row}</p>
+                          <p>{error.message}</p>
                           {error.data?.__parsed_extra && (
                             <>
                               <IconArrowRight size={14} />
-                              <Typography.Text>Extra field(s):</Typography.Text>
+                              <p>Extra field(s):</p>
                               {error.data?.__parsed_extra.map((value: any) => (
-                                <Typography.Text code small>
-                                  {value}
-                                </Typography.Text>
+                                <code className="text-sm">{value}</code>
                               ))}
                             </>
                           )}

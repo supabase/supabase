@@ -77,6 +77,13 @@
     "author_image_url": "https://github.com/kiwicopple.png"
   },
   {
+    "author_id": "qiao",
+    "author": "Qiao Han",
+    "position": "Engineering",
+    "author_url": "https://github.com/sweatybridge",
+    "author_image_url": "https://github.com/sweatybridge.png"
+  },
+  {
     "author_id": "rory_wilding",
     "author": "Rory Wilding",
     "position": "Head of Growth",
@@ -102,7 +109,7 @@
     "author_id": "thor_schaeff",
     "author": "Thor Schaeff",
     "position": "DevRel & DX",
-    "author_url": "https://github.com/thorwebdev",
+    "author_url": "https://twitter.com/thorwebdev",
     "author_image_url": "https://github.com/thorwebdev.png"
   },
   {
@@ -160,5 +167,51 @@
     "position": "DevRel & DX",
     "author_url": "https://github.com/silentworks",
     "author_image_url": "https://github.com/silentworks.png"
+  },
+  {
+    "author_id": "rodrigo_mansueli",
+    "author": "Rodrigo Mansueli Nunes",
+    "username": "mansueli",
+    "position": "Support Engineer",
+    "author_url": "https://github.com/mansueli",
+    "author_image_url": "https://github.com/mansueli.png"
+  },
+  {
+    "author_id": "stas",
+    "author": "Stanislav Muzhyk",
+    "username": "abc3",
+    "position": "Engineering",
+    "author_url": "https://github.com/abc3",
+    "author_image_url": "https://github.com/abc3.png"
+  },
+  {
+    "author_id": "jonmeyers_io",
+    "author": "Jon Meyers",
+    "position": "Developer Advocate",
+    "author_url": "https://twitter.com/jonmeyers_io",
+    "author_image_url": "https://github.com/dijonmusters.png"
+  },
+  {
+    "author_id": "michel",
+    "author": "Michel Pelletier",
+    "position": "Engineering",
+    "author_url": "https://github.com/michelp",
+    "author_image_url": "https://github.com/michelp.png"
+  },
+  {
+    "author_id": "joel",
+    "author": "Joel Lee",
+    "username": "j0",
+    "position": "Engineering",
+    "author_url": "https://github.com/j0",
+    "author_image_url": "https://github.com/j0.png"
+  },
+  {
+    "author_id": "simon_grimm",
+    "author": "Simon Grimm",
+    "username": "schlimmson",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/schlimmson",
+    "author_image_url": "https://github.com/saimon24.png"
   }
 ]

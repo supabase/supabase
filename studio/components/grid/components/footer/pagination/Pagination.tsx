@@ -149,7 +149,9 @@ const Pagination: FC<PaginationProps> = () => {
               style={{ padding: '3px 10px' }}
             >{`${state.rowsPerPage} rows`}</Button>
           </DropdownControl>
-          <p className="text-scale-1100 text-sm">{`${state.totalRows.toLocaleString()} records`}</p>
+          <p className="text-scale-1100 text-sm">{`${state.totalRows.toLocaleString()} ${
+            state.totalRows === 0 || state.totalRows > 1 ? `records` : 'record'
+          }`}</p>
           {state.isLoading && <IconLoader size={14} className="animate-spin" />}
         </>
       )}

@@ -24,8 +24,6 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const selectedHelper = helpers.find((helper) => {
     if (to === helper.calcTo() && from === helper.calcFrom()) {
       return true
-    } else if (helper.text === helperValue) {
-      return true
     } else {
       return false
     }
@@ -33,8 +31,10 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   useEffect(() => {
     if (selectedHelper && helperValue !== selectedHelper.text) {
       setHelperValue(selectedHelper.text)
+    } else if (!selectedHelper && (to || from)) {
+      setHelperValue('')
     }
-  }, [selectedHelper])
+  }, [selectedHelper, to, from])
 
   return (
     <div className="flex items-center">
@@ -66,6 +66,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}
+        triggerButtonTitle="Custom"
         onChange={(value) => {
           setHelperValue('')
           if (onChange) onChange(value)

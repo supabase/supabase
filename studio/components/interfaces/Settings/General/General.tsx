@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { Form, Input } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, checkPermissions, useFlag } from 'hooks'
 import { API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
 import {
@@ -20,9 +20,14 @@ const General: FC<Props> = ({}) => {
   const { app, ui } = useStore()
   const project = ui.selectedProject
 
+  const enablePermissions = useFlag('enablePermissions')
+  const isOwner = ui.selectedOrganization?.is_owner
+
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = checkPermissions(PermissionAction.SQL_UPDATE, 'postgres.public.projects')
+  const canUpdateProject = enablePermissions
+    ? checkPermissions(PermissionAction.UPDATE, 'projects')
+    : isOwner
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const response = await post(`${API_URL}/projects/${project?.ref}/update`, { name: values.name })
@@ -54,21 +59,17 @@ const General: FC<Props> = ({}) => {
             <FormPanel
               disabled={!canUpdateProject}
               footer={
-                <div
-                  className={`flex py-4 px-8 ${
-                    canUpdateProject ? 'justify-end' : 'justify-between'
-                  }`}
-                >
-                  {!canUpdateProject && (
-                    <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this project's settings
-                    </p>
-                  )}
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
+                    helper={
+                      !canUpdateProject
+                        ? "You need additional permissions to manage this project's settings"
+                        : undefined
+                    }
                   />
                 </div>
               }

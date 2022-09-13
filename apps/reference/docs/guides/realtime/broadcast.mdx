@@ -1,0 +1,70 @@
+---
+id: broadcast
+title: Broadcast
+description: Getting started with Realtime's Broadcast feature
+---
+
+Supabase Broadcast allows a client to send messages, and multiple receivers to receive the messages. 
+
+The broadcasted messages are ephemeral. They are not persisted to the database and are directly relayed through the Realtime server. This is ideal for sending information like mouse moments where latency is important, but need not be persisted.
+
+The broadcast JS client methods are supported from supabase-js v2 release candidate.
+
+To broadcast a message:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+// The name of the channel can be set to any string.
+// Set the same name across both the broadcasting and receiving clients.
+const channel = supabase.channel('user1-location', {
+  configs: {
+    broadcast: { ack: true },
+  },
+})
+
+// subscribe registers your client with the server
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    // now you can start broadcasting messages
+    // sending a new message every second
+    setInterval(async () => {
+      const status = await channel.send({
+        type: 'broadcast',
+        event: 'location',
+        payload: { x: Math.random(), y: Math.random() },
+      })
+      console.log(status)
+    }, 1000)
+  }
+})
+```
+
+To receive the broadcasted message, run this script in another tab:
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+// use the same channel name as the client broadcasting the message is using
+const channel = supabase.channel('user1-location')
+
+// listen to broadcasts
+channel
+  .on('broadcast', { event: 'location' }, (payload) => console.log(payload))
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      console.log(status)
+      // your callback function will now be called with the received messages
+    }
+  })
+```

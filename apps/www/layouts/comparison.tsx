@@ -64,7 +64,7 @@ const LayoutComparison = ({ components, props, gfm, slug }: Props) => {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.com/blog/${props.blog.slug}`,
+          url: `https://supabase.com/alternatives/${props.blog.slug}`,
           type: 'article',
           article: {
             //

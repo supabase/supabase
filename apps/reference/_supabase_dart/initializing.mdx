@@ -1,75 +1,33 @@
 ---
 id: initializing
-title: "Initializing"
-slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/dart.yml
+title: 'Initializing'
+slug: /initializing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 ## Dart
+
 You can initialize a new Supabase client using the `SupabaseClient()` method.
 
 The Supabase client is your entrypoint to the rest of the Supabase functionality
 and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
-
 ## Flutter
 
 For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
-### Dart SupabaseClient()
-
-
-
-<Tabs
-  defaultValue="dart"
-  groupId="reference/dart"
-  values={[{ label: 'Dart', value: 'dart' }]}>
-
-<TabItem value="dart">
+### Dart `SupabaseClient()`
 
 ```dart
 final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
 ```
 
-
-</TabItem>
-
-</Tabs>
-
-### Flutter initialize()
-
-
-
-<Tabs
-  defaultValue="dart"
-  groupId="reference/dart"
-  values={[{ label: 'Dart', value: 'dart' }]}>
-
-<TabItem value="dart">
+### Flutter `initialize()`
 
 ```dart title="main.dart"
 Future<void> main() async {
@@ -77,8 +35,3 @@ Future<void> main() async {
   runApp(MyApp());
 }
 ```
-
-
-</TabItem>
-
-</Tabs>

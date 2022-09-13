@@ -1,40 +1,26 @@
 ---
 id: storage-from-update
-title: "from.update()"
+title: 'from.update()'
 slug: storage-from-update
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Replaces an existing file at the specified path with a new one.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const avatarFile = event.target.files[0]
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .update('public/avatar1.png', avatarFile, {
     cacheControl: '3600',
-    upsert: false
+    upsert: false,
   })
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -58,7 +44,6 @@ The relative file path. Should be of the format `folder/subfolder/filename.png`.
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -78,7 +63,6 @@ The body of the file to be stored in the bucket.
   </div>
   
 </li>
-
 
 <li className="method-list-item">
   <h4 className="method-list-item-label">
@@ -105,75 +89,35 @@ HTTP headers.
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
+  - `buckets` permissions: none
   - `objects` permissions: `update` and `select`
 - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
-
-
-
-
-
-
-
-
-
 
 ## Examples
 
 ### Update file
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 const avatarFile = event.target.files[0]
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .update('public/avatar1.png', avatarFile, {
     cacheControl: '3600',
-    upsert: false
+    upsert: false,
   })
 ```
-
-
-</TabItem>
-
-</Tabs>
 
 ### Update file using `ArrayBuffer` from base64 file data
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-import {decode} from 'base64-arraybuffer'
+import { decode } from 'base64-arraybuffer'
 
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .update('public/avatar1.png', decode('base64FileData'), {
-    contentType: 'image/png'
+    contentType: 'image/png',
   })
 ```
-
-
-</TabItem>
-
-</Tabs>

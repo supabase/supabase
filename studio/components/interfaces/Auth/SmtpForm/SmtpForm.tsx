@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { number, object, string } from 'yup'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from '@supabase/ui'
 
 import {
@@ -11,7 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { domainRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -25,6 +26,7 @@ const SmtpForm = () => {
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig.config)
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded && isSmtpEnabled(config)) {
@@ -102,19 +104,19 @@ const SmtpForm = () => {
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
-    try {
-      setSubmitting(true)
-      await authConfig.update(payload)
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+    setSubmitting(true)
+    const { error } = await authConfig.update(payload)
 
+    if (!error) {
       setHidden(true)
       const updatedFormValues = generateFormValues(payload)
       resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-    } catch (error) {
+      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+    } else {
       ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
-    } finally {
-      setSubmitting(false)
     }
+
+    setSubmitting(false)
   }
 
   return (
@@ -143,12 +145,18 @@ const SmtpForm = () => {
             />
             <FormPanel
               footer={
-                <div className="flex justify-between py-4 px-8">
+                <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isSubmitting}
                     hasChanges={hasChanges}
                     handleReset={onResetForm}
+                    disabled={!canUpdateConfig}
+                    helper={
+                      !canUpdateConfig
+                        ? 'You need additional permissions to update authentication settings'
+                        : undefined
+                    }
                   />
                 </div>
               }
@@ -161,6 +169,7 @@ const SmtpForm = () => {
                     label="Enable Custom SMTP"
                     layout="flex"
                     checked={enableSmtp}
+                    disabled={!canUpdateConfig}
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
                     descriptionText="Emails will be sent using your custom SMTP provider"
@@ -188,6 +197,7 @@ const SmtpForm = () => {
                     label="Sender email"
                     descriptionText="This is the email address the emails are sent from"
                     placeholder="noreply@yourdomain.com"
+                    disabled={!canUpdateConfig}
                   />
                   <Input
                     name="SMTP_SENDER_NAME"
@@ -195,6 +205,7 @@ const SmtpForm = () => {
                     label="Sender name"
                     descriptionText="Name displayed in the recipient's inbox"
                     placeholder="The name shown on the email"
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>
@@ -218,6 +229,7 @@ const SmtpForm = () => {
                     id="SMTP_HOST"
                     label="Host"
                     descriptionText="Hostname or IP address of your SMTP server."
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     name="SMTP_PORT"
@@ -236,6 +248,7 @@ const SmtpForm = () => {
                         </span>
                       </>
                     }
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     id="SMTP_MAX_FREQUENCY"
@@ -243,13 +256,7 @@ const SmtpForm = () => {
                     label="Minimum interval between emails being sent"
                     descriptionText="How long between each email can a new email be sent via your SMTP server."
                     actions={<span className="text-scale-900 mr-3">seconds</span>}
-                  />
-                  <InputNumber
-                    id="RATE_LIMIT_EMAIL_SENT"
-                    name="RATE_LIMIT_EMAIL_SENT"
-                    label="Rate limit for sending emails"
-                    descriptionText="How many emails can be sent per hour."
-                    actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                    disabled={!canUpdateConfig}
                   />
                   <InputNumber
                     name="RATE_LIMIT_EMAIL_SENT"
@@ -258,12 +265,14 @@ const SmtpForm = () => {
                     label="Rate limit for sending emails"
                     descriptionText="How many emails can be sent per hour."
                     actions={<span className="text-scale-900 mr-3">emails per hour</span>}
+                    disabled={!canUpdateConfig}
                   />
                   <Input
                     name="SMTP_USER"
                     id="SMTP_USER"
                     label="Username"
                     placeholder="SMTP Username"
+                    disabled={!canUpdateConfig}
                   />
                   <Input
                     name="SMTP_PASS"
@@ -278,6 +287,7 @@ const SmtpForm = () => {
                         onClick={() => setHidden(!hidden)}
                       />
                     }
+                    disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
               </FormSection>

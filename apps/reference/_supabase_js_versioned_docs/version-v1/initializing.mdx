@@ -1,23 +1,19 @@
 ---
 id: initializing
-title: "Initializing"
+title: 'Initializing'
 slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 You can initialize a new Supabase client using the `createClient()` method.
 
 The Supabase client is your entrypoint to the rest of the Supabase functionality
 and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
-
-
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -41,7 +37,6 @@ The unique Supabase URL which is supplied when you create a new project in your 
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -62,7 +57,6 @@ The unique Supabase Key which is supplied when you create a new project in your 
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -77,7 +71,7 @@ The unique Supabase Key which is supplied when you create a new project in your 
   </h4>
   <div class="method-list-item-description">
 
-No description provided. 
+No description provided.
 
   </div>
   
@@ -85,54 +79,21 @@ No description provided.
 
 </ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### createClient()
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database 
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+// Create a single supabase client for interacting with your database
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key'
+)
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### With additional parameters
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -142,70 +103,49 @@ const options = {
   headers: { 'x-my-custom-header': 'my-app-name' },
   autoRefreshToken: true,
   persistSession: true,
-  detectSessionInUrl: true
+  detectSessionInUrl: true,
 }
-const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  options
+)
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ### API schemas
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
 // Provide a custom schema. Defaults to "public".
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
-  schema: 'other_schema' 
-})
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  {
+    schema: 'other_schema',
+  }
+)
 ```
 
-By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard. 
+By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
 Go to `Settings > API > Schema` and add the schema which you want to expose to the API.
 
 Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
 
-
-</TabItem>
-
-</Tabs>
-
 ### Custom `fetch` implementation
-
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', { 
-  fetch: fetch.bind(globalThis) 
-})
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+  {
+    fetch: fetch.bind(globalThis),
+  }
+)
 ```
 
-`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests, 
-but an alternative `fetch` implementation can be provided as an option. 
+`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
+but an alternative `fetch` implementation can be provided as an option.
 This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
-
-
-</TabItem>
-
-</Tabs>

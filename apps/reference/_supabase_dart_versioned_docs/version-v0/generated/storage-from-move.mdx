@@ -1,0 +1,35 @@
+---
+id: storage-from-move
+title: 'from.move()'
+slug: /storage-from-move
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Moves an existing file, optionally renaming it at the same time.
+
+```dart
+final res = await supabase
+  .storage
+  .from('avatars')
+  .move('public/avatar1.png', 'private/avatar2.png');
+```
+
+## Notes
+
+- Policy permissions required:
+  - `buckets` permissions: none
+  - `objects` permissions: `update` and `select`
+
+## Examples
+
+### Move file
+
+```dart
+final res = await supabase
+  .storage
+  .from('avatars')
+  .move('public/avatar1.png', 'private/avatar2.png');
+```

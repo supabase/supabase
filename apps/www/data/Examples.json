@@ -21,7 +21,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "nextjs-slack-clone",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/slack-clone/nextjs-slack-clone",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
@@ -86,7 +86,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "javascript-auth",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/auth/javascript-auth",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth",
     "vercel_deploy_url": "",
     "demo_url": "https://auth-vanilla-js.vercel.app/"
   },
@@ -99,7 +99,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "expo-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/expo-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-native-ts-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
@@ -112,7 +112,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "nextjs-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/nextjs-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/nextjs-todo-list",
     "vercel_deploy_url": "",
     "demo_url": "https://supabase-nextjs-todo-list.vercel.app/"
   },
@@ -125,7 +125,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "react-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/react-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
@@ -138,7 +138,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "sveltejs-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/sveltejs-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
@@ -151,7 +151,7 @@
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",
     "repo_name": "vue3-ts-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/vue3-ts-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   },
@@ -164,7 +164,7 @@
     "author_url": "https://github.com/geromegrignon",
     "author_img": "https://avatars.githubusercontent.com/u/32737308",
     "repo_name": "angular-todo-list",
-    "repo_url": "https://github.com/supabase/supabase/tree/master/examples/todo-list/angular-todo-list",
+    "repo_url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/angular-todo-list",
     "vercel_deploy_url": "",
     "demo_url": ""
   }

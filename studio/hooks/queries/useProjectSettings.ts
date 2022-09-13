@@ -4,7 +4,7 @@ import useSWR from 'swr'
 
 export function useProjectSettings(ref?: string) {
   const url = `${API_URL}/props/project/${ref}/settings`
-  const { data, error } = useSWR<any>(ref ? url : null, get, {
+  const { data, error, mutate } = useSWR<any>(ref ? url : null, get, {
     /**
      * on project creation, the service_api_keys will be populated with a delay
      * check for data.services.service_api_keys, return a valid refresh interval if it's empty
@@ -21,6 +21,7 @@ export function useProjectSettings(ref?: string) {
   const anyError = data?.error || error
 
   return {
+    mutateSettings: mutate,
     project: anyError ? undefined : data?.project,
     services: anyError ? undefined : data?.services,
     error: anyError,
