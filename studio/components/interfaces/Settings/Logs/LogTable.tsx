@@ -301,9 +301,7 @@ const LogTable = ({
 
               let classes = []
               classes.push(
-                `${
-                  row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focussed' : 'cursor-pointer'
-                }`
+                `${row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'}`
               )
 
               return classes.join(' ')
