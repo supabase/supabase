@@ -505,7 +505,7 @@ pages:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
-      - name: Generate a signups link.
+      - name: Generate a signup link.
         isSpotlight: true
         js: |
           ```js
