@@ -348,9 +348,9 @@ Let's create a new component for that called `Profile.svelte`.
 
 ### Launch!
 
-Now that we have all the components in place, let's update `src/routes/index.svelte`:
+Now that we have all the components in place, let's update `src/routes/+page.svelte`:
 
-```html title="src/routes/index.svelte"
+```html title="src/routes/+page.svelte"
 <script>
   import { user } from '$lib/sessionStore'
   import { supabase } from '$lib/supabaseClient'
