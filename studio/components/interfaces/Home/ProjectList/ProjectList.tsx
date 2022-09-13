@@ -16,9 +16,11 @@ interface Props {
 
 const ProjectList: FC<Props> = ({ rewriteHref }) => {
   const router = useRouter()
-  const { app } = useStore()
+  const { app, ui } = useStore()
   const { organizations, projects } = app
   const { isLoading: isLoadingProjects } = projects
+
+  const isLoadingPermissions = (ui?.permissions ?? []).length === 0
 
   return (
     <>
@@ -33,7 +35,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
         return (
           <div className="space-y-3" key={makeRandomString(5)}>
             <h4 className="text-lg">{name}</h4>
-            {isLoadingProjects ? (
+            {isLoadingPermissions || isLoadingProjects ? (
               <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 ">
                 <ShimmeringCard />
                 <ShimmeringCard />
