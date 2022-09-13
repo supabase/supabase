@@ -11,10 +11,11 @@ import TabItem from '@theme/TabItem'
 Notifies of data at the queried table.
 
 ```dart
-supabase
-  .from('countries')
+supabase.from('countries')
   .stream(['id'])
-  .execute();
+  .listen((List<Map<String, dynamic>> data) {
+  // Do something awesome with the data
+});
 ```
 
 ## Notes
@@ -27,41 +28,79 @@ supabase
 ### Listening to a specific table
 
 ```dart
-supabase
-  .from('countries')
+supabase.from('countries')
   .stream(['id'])
-  .execute();
+  .listen((List<Map<String, dynamic>> data) {
+  // Do something awesome with the data
+});
 ```
 
 ### Listening to a specific rows within a table
 
-You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-This syntax is the as how you can filter data in Realtime
+You can add up to one `eq` filter to your `stream()` query.
 
 ```dart
-supabase
-  .from('countries:id=eq.120')
+supabase.from('countries')
   .stream(['id'])
-  .execute();
+  .eq('id', '120')
+  .listen((List<Map<String, dynamic>> data) {
+  // Do something awesome with the data
+});
 ```
 
 ### With `order()`
 
+Allows you to order the queried data by the value of the specified column.
+
 ```dart
-supabase
-  .from('countries')
+supabase.from('countries')
   .stream(['id'])
-  .order('name', ascending: false)
-  .execute();
+  .order('name', ascending: true)
+  .listen((List<Map<String, dynamic>> data) {
+  // Do something awesome with the data
+});
 ```
 
 ### With `limit()`
 
+Allows you to limit the number of rows returned.
+
 ```dart
-supabase
-  .from('countries')
+supabase.from('countries')
   .stream(['id'])
-  .order('name', ascending: false)
+  .order('name', ascending: true)
   .limit(10)
-  .execute();
+  .listen((List<Map<String, dynamic>> data) {
+  // Do something awesome with the data
+});
+```
+
+### Using `stream()` with `StreamBuilder`
+
+When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
+
+```dart
+final supabase = Supabase.instance.client;
+
+class MyWidget extends StatefulWidget {
+  const MyWidget({Key? key}) : super(key: key);
+
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<MyWidget> {
+  // Persist the stream in a local variable to prevent refetching upon rebuilds
+  final _stream = supabase.from('countries').stream(['id']);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: _stream,
+      builder: (context, snapshot) {
+        // Return your widget with the data from the snapshot
+      },
+    );
+  }
+}
 ```

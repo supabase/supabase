@@ -16,6 +16,10 @@ info:
     A `config.toml` file is generated after running `supabase init`.
 
     This file is located in the `supabase` folder under `supabase/config.toml`.
+  tags:
+    - id: general
+      title: General
+      description: General settings.
 
 # This section is an array of public functions which a user might need to execute.
 parameters:

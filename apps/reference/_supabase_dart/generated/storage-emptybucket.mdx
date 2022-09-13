@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem'
 Removes all objects inside a single bucket.
 
 ```dart
-final res = await supabase
+final String result = await supabase
   .storage
   .emptyBucket('avatars');
 ```
@@ -27,7 +27,7 @@ final res = await supabase
 ### Empty bucket
 
 ```dart
-final res = await supabase
+final String result = await supabase
   .storage
   .emptyBucket('avatars');
 ```

@@ -11,11 +11,10 @@ import TabItem from '@theme/TabItem'
 Performs a DELETE on the table.
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .match({ 'id': 666 })
-  .execute();
+  .match({ 'id': 666 });
 ```
 
 ## Notes
@@ -27,9 +26,8 @@ final res = await supabase
 ### Delete records
 
 ```dart
-final res = await supabase
+final data = await supabase
   .from('cities')
   .delete()
-  .match({ 'id': 666 })
-  .execute();
+  .match({ 'id': 666 });
 ```

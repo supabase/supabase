@@ -1,3 +1,8 @@
+import useSWR from 'swr'
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { FC, useState } from 'react'
+import { useRouter } from 'next/router'
 import {
   Button,
   Dropdown,
@@ -9,13 +14,8 @@ import {
 } from '@supabase/ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL, DATE_FORMAT, METRICS } from 'lib/constants'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
-import useSWR from 'swr'
 import { ChartIntervals } from 'types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
@@ -29,14 +29,13 @@ const CHART_INTERVALS: ChartIntervals[] = [
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
-interface Props {
-  project: any
-}
+interface Props {}
 
-const ProjectUsage: FC<Props> = ({ project }) => {
-  const [interval, setInterval] = useState<string>('hourly')
+const ProjectUsage: FC<Props> = ({}) => {
   const router = useRouter()
   const { ref } = router.query
+
+  const [interval, setInterval] = useState<string>('hourly')
 
   const { data, error }: any = useSWR(
     `${API_URL}/projects/${ref}/log-stats?interval=${interval}`,
@@ -67,7 +66,7 @@ const ProjectUsage: FC<Props> = ({ project }) => {
   }
 
   return (
-    <div className="mx-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
         <Dropdown
           side="bottom"

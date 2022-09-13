@@ -1,10 +1,10 @@
-import { useFlag, useStore } from 'hooks'
 import jsonLogic from 'json-logic-js'
+import { useFlag, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import useSWR from 'swr'
 
-export function usePermissions(returning?: 'minimal') {
+export function usePermissions(profile?: any, returning?: 'minimal') {
   let url = `${API_URL}/profile/permissions`
 
   if (returning) {
@@ -12,13 +12,18 @@ export function usePermissions(returning?: 'minimal') {
     url = `${url}?${query}`
   }
 
-  const { data: data, error } = useSWR<any>(url, get, { loadingTimeout: 10000 })
+  const {
+    data: data,
+    error,
+    mutate,
+  } = useSWR<any>(profile !== undefined ? url : null, get, { loadingTimeout: 10000 })
   const anyError = data?.error || error
 
   return {
     permissions: anyError ? undefined : data,
     isLoading: !anyError && !data,
     isError: !!anyError,
+    mutate,
   }
 }
 

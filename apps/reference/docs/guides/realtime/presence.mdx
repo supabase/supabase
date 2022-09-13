@@ -31,11 +31,11 @@ channel
   .on('presence', { event: 'sync' }, () => {
     console.log('currently online users', channel.presenceState())
   })
-  .on('presence', { event: 'join' }, ({ newUser }) => {
-    console.log('a new user has joined', newUser)
+  .on('presence', { event: 'join' }, ({ newPresences }) => {
+    console.log('new users have joined', newPresences)
   })
-  .on('presence', { event: 'leave' }, ({ leftUser }) =>
-    console.log('a user has left', leftUser)
+  .on('presence', { event: 'leave' }, ({ leftPresences }) =>
+    console.log('users have left', leftPresences)
   )
   .subscribe(async (status) => {
     if (status === 'SUBSCRIBED') {

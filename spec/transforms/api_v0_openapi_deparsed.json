@@ -33,22 +33,14 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "id",
-                      "organization_id",
-                      "name",
-                      "region",
-                      "created_at"
-                    ]
+                    "required": ["id", "organization_id", "name", "region", "created_at"]
                   }
                 }
               }
             }
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "bearer": []
@@ -77,10 +69,7 @@
                   },
                   "plan": {
                     "type": "string",
-                    "enum": [
-                      "free",
-                      "pro"
-                    ]
+                    "enum": ["free", "pro"]
                   },
                   "region": {
                     "type": "string",
@@ -98,15 +87,12 @@
                       "ap-south-1",
                       "sa-east-1"
                     ]
+                  },
+                  "kps_enabled": {
+                    "type": "boolean"
                   }
                 },
-                "required": [
-                  "db_pass",
-                  "name",
-                  "organization_id",
-                  "plan",
-                  "region"
-                ]
+                "required": ["db_pass", "name", "organization_id", "plan", "region"]
               }
             }
           }
@@ -135,21 +121,13 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "organization_id",
-                    "name",
-                    "region",
-                    "created_at"
-                  ]
+                  "required": ["id", "organization_id", "name", "region", "created_at"]
                 }
               }
             }
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "bearer": []
@@ -180,10 +158,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "id",
-                      "name"
-                    ]
+                    "required": ["id", "name"]
                   }
                 }
               }
@@ -193,9 +168,7 @@
             "description": "Unexpected error listing organizations"
           }
         },
-        "tags": [
-          "organizations"
-        ],
+        "tags": ["organizations"],
         "security": [
           {
             "bearer": []
@@ -217,9 +190,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ]
+                "required": ["name"]
               }
             }
           }
@@ -239,10 +210,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name"
-                  ]
+                  "required": ["id", "name"]
                 }
               }
             }
@@ -251,9 +219,7 @@
             "description": "Unexpected error creating an organization"
           }
         },
-        "tags": [
-          "organizations"
-        ],
+        "tags": ["organizations"],
         "security": [
           {
             "bearer": []
@@ -299,11 +265,7 @@
                         "type": "string"
                       },
                       "status": {
-                        "enum": [
-                          "ACTIVE",
-                          "REMOVED",
-                          "THROTTLED"
-                        ],
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                         "type": "string"
                       },
                       "version": {
@@ -333,14 +295,19 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's functions"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -372,7 +339,7 @@
                 "properties": {
                   "slug": {
                     "type": "string",
-                    "pattern": {}
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
                   },
                   "name": {
                     "type": "string"
@@ -384,11 +351,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "slug",
-                  "name",
-                  "body"
-                ]
+                "required": ["slug", "name", "body"]
               }
             }
           }
@@ -411,11 +374,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -444,14 +403,19 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to create project's function"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -489,7 +453,7 @@
             "in": "path",
             "description": "Function slug",
             "schema": {
-              "pattern": {},
+              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -512,11 +476,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -548,14 +508,19 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve function with given slug"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -583,7 +548,7 @@
             "in": "path",
             "description": "Function slug",
             "schema": {
-              "pattern": {},
+              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -627,11 +592,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -660,14 +621,19 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to update function with given slug"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -695,7 +661,7 @@
             "in": "path",
             "description": "Function slug",
             "schema": {
-              "pattern": {},
+              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -704,14 +670,19 @@
           "200": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to delete function with given slug"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -753,23 +724,25 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name",
-                      "value"
-                    ]
+                    "required": ["name", "value"]
                   }
                 }
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's secrets"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -806,13 +779,10 @@
                     },
                     "value": {
                       "type": "string",
-                      "pattern": {}
+                      "pattern": "/^(?!SUPABASE_).*/"
                     }
                   },
-                  "required": [
-                    "name",
-                    "value"
-                  ]
+                  "required": ["name", "value"]
                 }
               }
             }
@@ -822,14 +792,19 @@
           "201": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to create project's secrets"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -876,14 +851,19 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to delete secrets with given names"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
           {
             "bearer": []
           }
@@ -925,9 +905,7 @@
             "description": "Failed to retrieve project's pgsodium config"
           }
         },
-        "tags": [
-          "pgsodium (beta)"
-        ],
+        "tags": ["pgsodium (beta)"],
         "security": [
           {
             "bearer": []
@@ -961,9 +939,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "root_key"
-                ]
+                "required": ["root_key"]
               }
             }
           }
@@ -986,9 +962,7 @@
             "description": "Failed to update project's pgsodium config"
           }
         },
-        "tags": [
-          "pgsodium (beta)"
-        ],
+        "tags": ["pgsodium (beta)"],
         "security": [
           {
             "bearer": []
@@ -1042,13 +1016,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "organization_id",
-          "name",
-          "region",
-          "created_at"
-        ]
+        "required": ["id", "organization_id", "name", "region", "created_at"]
       },
       "CreateProjectBody": {
         "type": "object",
@@ -1064,10 +1032,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "pro"
-            ]
+            "enum": ["free", "pro"]
           },
           "region": {
             "type": "string",
@@ -1085,15 +1050,12 @@
               "ap-south-1",
               "sa-east-1"
             ]
+          },
+          "kps_enabled": {
+            "type": "boolean"
           }
         },
-        "required": [
-          "db_pass",
-          "name",
-          "organization_id",
-          "plan",
-          "region"
-        ]
+        "required": ["db_pass", "name", "organization_id", "plan", "region"]
       },
       "OrganizationResponse": {
         "type": "object",
@@ -1105,10 +1067,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "CreateOrganizationBody": {
         "type": "object",
@@ -1117,9 +1076,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -1134,11 +1091,7 @@
             "type": "string"
           },
           "status": {
-            "enum": [
-              "ACTIVE",
-              "REMOVED",
-              "THROTTLED"
-            ],
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
           "version": {
@@ -1154,22 +1107,14 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "status",
-          "version",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "CreateFunctionBody": {
         "type": "object",
         "properties": {
           "slug": {
             "type": "string",
-            "pattern": {}
+            "pattern": "/^[A-Za-z0-9_-]+$/"
           },
           "name": {
             "type": "string"
@@ -1181,11 +1126,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "slug",
-          "name",
-          "body"
-        ]
+        "required": ["slug", "name", "body"]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -1200,11 +1141,7 @@
             "type": "string"
           },
           "status": {
-            "enum": [
-              "ACTIVE",
-              "REMOVED",
-              "THROTTLED"
-            ],
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
           "version": {
@@ -1223,15 +1160,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "status",
-          "version",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "UpdateFunctionBody": {
         "type": "object",
@@ -1257,10 +1186,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "value"
-        ]
+        "required": ["name", "value"]
       },
       "CreateSecretBody": {
         "type": "object",
@@ -1270,13 +1196,10 @@
           },
           "value": {
             "type": "string",
-            "pattern": {}
+            "pattern": "/^(?!SUPABASE_).*/"
           }
         },
-        "required": [
-          "name",
-          "value"
-        ]
+        "required": ["name", "value"]
       },
       "UpdatePgsodiumConfigBody": {
         "type": "object",
@@ -1285,9 +1208,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "root_key"
-        ]
+        "required": ["root_key"]
       }
     }
   }
