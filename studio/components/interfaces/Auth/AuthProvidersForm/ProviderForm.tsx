@@ -1,8 +1,10 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from '@supabase/ui'
 
-import { useStore } from 'hooks'
+import { useStore, checkPermissions } from 'hooks'
 import { Provider } from './AuthProvidersForm.types'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import FormField from './FormField'
@@ -15,50 +17,47 @@ const ProviderForm: FC<Props> = ({ provider }) => {
   const [open, setOpen] = useState(false)
   const { authConfig, ui } = useStore()
 
-  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
-  const INITIAL_VALUES: { [x: string]: string } = {}
-
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
+  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  useEffect(() => {
-    /**
-     * Construct values for INITIAL_VALUES
-     * Return empty string `""` rather than `null`
-     * as it breaks form. null is not a valid value.
-     */
+  const generateInitialValues = () => {
+    const initialValues: { [x: string]: string } = {}
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
-
-      INITIAL_VALUES[key] = isDoubleNegative
-        ? !authConfig.config[key]
-        : authConfig.config[key] ?? ''
+      initialValues[key] = isDoubleNegative ? !authConfig.config[key] : authConfig.config[key] ?? ''
     })
-  }, [provider])
+    return initialValues
+  }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    try {
-      const payload = { ...values }
+  const isActive = authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+  const INITIAL_VALUES = generateInitialValues()
 
-      // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
-      Object.keys(values).map((x: string) => {
-        if (doubleNegativeKeys.includes(x)) {
-          payload[x] = !values[x]
-        }
-      })
+  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+    const payload = { ...values }
 
-      await authConfig.update(payload)
+    // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
+    Object.keys(values).map((x: string) => {
+      if (doubleNegativeKeys.includes(x)) {
+        payload[x] = !values[x]
+      }
+    })
 
-      setSubmitting(false)
+    const { error } = await authConfig.update(payload)
+
+    if (!error) {
+      resetForm({ values: payload, initialValues: payload })
       setOpen(false)
       ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } catch (error: any) {
+    } else {
       ui.setNotification({
         error,
         category: 'error',
         message: `Failed to update settings:  ${error?.message}`,
       })
     }
+
+    setSubmitting(false)
   }
 
   return (
@@ -107,8 +106,8 @@ const ProviderForm: FC<Props> = ({ provider }) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, handleReset, values }: any) => {
-          const noChanges = JSON.stringify(INITIAL_VALUES) === JSON.stringify(values)
+        {({ isSubmitting, handleReset, initialValues, values }: any) => {
+          const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
               <div
@@ -117,13 +116,14 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300
                 "
               >
-                <div className="mx-auto my-6 max-w-md space-y-6">
+                <div className="mx-auto my-6 max-w-lg space-y-6">
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
                       name={x}
                       properties={provider.properties[x]}
                       formValues={values}
+                      disabled={!canUpdateConfig}
                     />
                   ))}
                   {provider?.misc?.alert && (
@@ -153,12 +153,36 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         handleReset()
                         setOpen(false)
                       }}
+                      disabled={isSubmitting}
                     >
                       Cancel
                     </Button>
-                    <Button htmlType="submit" loading={isSubmitting} disabled={noChanges}>
-                      Save
-                    </Button>
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger type="button">
+                        <Button
+                          htmlType="submit"
+                          loading={isSubmitting}
+                          disabled={!canUpdateConfig || noChanges}
+                        >
+                          Save
+                        </Button>
+                      </Tooltip.Trigger>
+                      {!canUpdateConfig && (
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'bg-scale-100 rounded py-1 px-2 leading-none shadow',
+                              'border-scale-200 border',
+                            ].join(' ')}
+                          >
+                            <span className="text-scale-1200 text-xs">
+                              You need additional permissions to update provider settings
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      )}
+                    </Tooltip.Root>
                   </div>
                 </div>
               </div>

@@ -62,6 +62,47 @@ test('can display standard preview table columns', async () => {
   await expect(screen.findByText(/12345/)).rejects.toThrow()
   await expect(screen.findByText(fakeMicroTimestamp)).rejects.toThrow()
 })
+
+test.each([
+  {
+    queryType: 'functions',
+    data: [
+      {
+        event_message: 'This is a error log\n',
+        event_type: 'log',
+        function_id: '001b0b08-331c-403e-810c-a2004b03a019',
+        level: 'error',
+        timestamp: 1659545029083869,
+        id: '3475cf6f-2929-4296-ab44-ce2c17069937',
+      },
+    ],
+    includes: [/ERROR/],
+    excludes: ['undefined', 'null'],
+  },
+  {
+    queryType: 'functions',
+    data: [
+      {
+        event_message: 'This is a uncaughtExceptop\n',
+        event_type: 'uncaughtException',
+        function_id: '001b0b08-331c-403e-810c-a2004b03a019',
+        timestamp: 1659545029083869,
+        id: '4475cf6f-2929-4296-ab44-ce2c17069937',
+        level: null,
+      },
+    ],
+    includes: [/uncaughtException/],
+    excludes: [/ERROR/],
+  },
+])('table col renderer for $queryType', async ({ queryType, data, includes, excludes }) => {
+  render(<LogTable queryType={queryType} data={data} />)
+
+  await Promise.all([
+    ...includes.map((text) => screen.findByText(text)),
+    ...excludes.map((text) => expect(screen.findByText(text)).rejects.toThrow()),
+  ])
+})
+
 test('can display custom columns and headers based on data input', async () => {
   render(<LogTable data={[{ some_header: 'some_data', kinda: 123456 }]} />)
   await waitFor(() => screen.getByText(/some_header/))
@@ -89,4 +130,38 @@ test('error message handling', async () => {
   await screen.findByText(/some/)
   await screen.findByText(/string/)
   await screen.findByText(/my_error/)
+})
+
+test('custom error message: Resources exceeded during query execution', async () => {
+  const errorFromLogflare = {
+    error: {
+      code: 400,
+      errors: [
+        {
+          domain: 'global',
+          message:
+            'Resources exceeded during query execution: The query could not be executed in the allotted memory. Peak usage: 122% of limit.\nTop memory consumer(s):\n  ORDER BY operations: 99%\n  other/unattributed: 1%\n',
+          reason: 'resourcesExceeded',
+        },
+      ],
+      message:
+        'Resources exceeded during query execution: The query could not be executed in the allotted memory. Peak usage: 122% of limit.\nTop memory consumer(s):\n  ORDER BY operations: 99%\n  other/unattributed: 1%\n',
+      status: 'INVALID_ARGUMENT',
+    },
+  }
+
+  // logs explorer, custom query
+  const { rerender } = render(<LogTable error={errorFromLogflare} />)
+
+  // prompt user to reduce selected tables
+  await screen.findByText(/This query requires too much memory to be executed/)
+  await screen.findByText(
+    /Avoid selecting entire objects and instead select specific keys using dot notation/
+  )
+
+  // previewer, prompt to reduce time range
+  rerender(<LogTable queryType="api" error={errorFromLogflare} />)
+  await screen.findByText(/This query requires too much memory to be executed/)
+  await screen.findByText(/Avoid querying across a large datetime range/)
+  await screen.findByText(/Please contact support if this error persists/)
 })

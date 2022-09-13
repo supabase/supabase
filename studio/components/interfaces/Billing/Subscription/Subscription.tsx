@@ -3,6 +3,7 @@ import { FC } from 'react'
 import { sum } from 'lodash'
 import { useRouter } from 'next/router'
 import { Button, Loading } from '@supabase/ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useFlag } from 'hooks'
@@ -38,18 +39,14 @@ const Subscription: FC<Props> = ({
 }) => {
   const { ui } = useStore()
   const router = useRouter()
-  const isOrgOwner = ui.selectedOrganization?.is_owner
 
   const enablePermissions = useFlag('enablePermissions')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canReadSubscription = checkPermissions(
-    PermissionAction.SQL_SELECT,
-    'postgres.public.subscriptions'
-  )
+  const canReadSubscription = checkPermissions(PermissionAction.READ, 'subscriptions')
   const canUpdateSubscription = enablePermissions
     ? checkPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
-    : isOrgOwner
+    : ui.selectedOrganization?.is_owner
 
   const isPayg = subscription?.tier.prod_id === STRIPE_PRODUCT_IDS.PAYG
   const isEnterprise = subscription.tier.supabase_prod_id === PRICING_TIER_PRODUCT_IDS.ENTERPRISE
@@ -78,46 +75,51 @@ const Subscription: FC<Props> = ({
               <h3 className="mb-0 text-xl">{subscription?.tier.name ?? '-'}</h3>
             </div>
             <div className="flex flex-col items-end space-y-2">
-              {isEnterprise ? (
-                <Button
-                  disabled={!canUpdateSubscription || projectUpdateDisabled}
-                  onClick={() =>
-                    router.push(`/project/${project.ref}/settings/billing/update/enterprise`)
-                  }
-                  type="primary"
-                >
-                  Change add-ons
-                </Button>
-              ) : (
-                <Button
-                  disabled={!canUpdateSubscription || projectUpdateDisabled}
-                  onClick={() => router.push(`/project/${project.ref}/settings/billing/update`)}
-                  type="primary"
-                >
-                  Change subscription
-                </Button>
-              )}
-              {!canUpdateSubscription ? (
-                <>
-                  {enablePermissions ? (
-                    <p className="text-scale-1100 text-xs">
-                      You need additional permissions to amend subscriptions
-                    </p>
-                  ) : (
-                    <p className="text-scale-1100 text-xs">
-                      Only the organization owner can amend subscriptions
-                    </p>
-                  )}
-                </>
-              ) : projectUpdateDisabled ? (
-                <p className="text-scale-1100 text-right text-xs">
-                  Subscription changes are currently disabled
-                  <br />
-                  Our engineers are working on a fix
-                </p>
-              ) : (
-                <div />
-              )}
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    disabled={!canUpdateSubscription || projectUpdateDisabled}
+                    onClick={() => {
+                      const url = isEnterprise
+                        ? `/project/${project.ref}/settings/billing/update/enterprise`
+                        : `/project/${project.ref}/settings/billing/update`
+                      router.push(url)
+                    }}
+                    type="primary"
+                  >
+                    {isEnterprise ? 'Change add-ons' : 'Change subscription'}
+                  </Button>
+                </Tooltip.Trigger>
+                {!canUpdateSubscription || projectUpdateDisabled ? (
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'border-scale-200 border text-center', //border
+                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
+                      ].join(' ')}
+                    >
+                      <span className="text-scale-1200 text-xs">
+                        {projectUpdateDisabled ? (
+                          <>
+                            Subscription changes are currently disabled.
+                            <br />
+                            Our engineers are working on a fix.
+                          </>
+                        ) : !canUpdateSubscription && enablePermissions ? (
+                          'You need additional permissions to amend subscriptions'
+                        ) : !canUpdateSubscription && !enablePermissions ? (
+                          'Only the organization owner can amend subscriptions'
+                        ) : (
+                          ''
+                        )}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                ) : (
+                  <></>
+                )}
+              </Tooltip.Root>
             </div>
           </div>
           {paid && (

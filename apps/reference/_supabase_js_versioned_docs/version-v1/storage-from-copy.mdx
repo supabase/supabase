@@ -1,36 +1,22 @@
 ---
 id: storage-from-copy
-title: "from.copy()"
+title: 'from.copy()'
 slug: storage-from-copy
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1_legacy.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 Copies an existing file.
 
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .copy('public/avatar1.png', 'private/avatar2.png')
 ```
 
-
-</TabItem>
-
-</Tabs>
-
 ## Parameters
-
 
 <ul className="method-list-group">
   
@@ -54,7 +40,6 @@ The original file path, including the current file name. For example `folder/ima
   
 </li>
 
-
 <li className="method-list-item">
   <h4 className="method-list-item-label">
     <span className="method-list-item-label-name">
@@ -77,43 +62,18 @@ The new file path, including the new file name. For example `folder/image-copy.p
 
 </ul>
 
-
 ## Notes
 
 - Policy permissions required:
-  - `buckets` permissions: none 
-  - `objects` permissions: `update` and `select`
-
-
-
-
-
-
-
-
-
+  - `buckets` permissions: none
+  - `objects` permissions: `insert` and `select`
 
 ## Examples
 
 ### Copy file
 
-
-
-<Tabs
-  defaultValue="js"
-  groupId="reference/supabase-js"
-  values={[{ label: 'JavaScript', value: 'js' }]}>
-
-<TabItem value="js">
-
 ```js
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .copy('public/avatar1.png', 'private/avatar2.png')
 ```
-
-
-</TabItem>
-
-</Tabs>

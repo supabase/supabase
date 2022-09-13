@@ -1,57 +1,43 @@
 import { Button } from '@supabase/ui'
-import { ButtonHTMLAttributes } from 'react'
 
 interface Props {
-  /**
-   * Handling a submitting/loading state
-   */
-  isSubmitting?: boolean
-  /**
-   * Handling a reset/cancel of the form
-   */
-  handleReset: () => void
-  /**
-   * Disables submit button if false
-   */
-  hasChanges: boolean | undefined
-  /**
-   * Helper text to show alongside actions
-   */
-  helper?: React.ReactNode
   form: React.HTMLProps<HTMLButtonElement>['form']
+  hasChanges: boolean | undefined // Disables submit button if false
+  handleReset: () => void // Handling a reset/cancel of the form
+  helper?: React.ReactNode // Helper text to show alongside actions
+  disabled?: boolean
+  isSubmitting?: boolean
 }
 
 const FormActions = ({
-  isSubmitting,
-  handleReset,
-  hasChanges = undefined,
-  helper,
   form,
+  hasChanges = undefined,
+  handleReset,
+  helper,
+  disabled = false,
+  isSubmitting,
 }: Props) => {
+  const isDisabled = isSubmitting || disabled || (!hasChanges && hasChanges !== undefined)
+
   return (
     <div
       className={[
-        'flex items-center gap-2',
+        'flex items-center gap-2 w-full',
         // justify actions to right if no helper text
         helper ? 'justify-between' : 'justify-end',
       ].join(' ')}
     >
-      {helper && <span className="text-scale-900 text-xs">{helper}</span>}
-      <div className="flex gap-2">
-        <Button
-          disabled={!hasChanges && hasChanges !== undefined}
-          type="default"
-          htmlType="reset"
-          onClick={() => handleReset()}
-        >
+      {helper && <span className="text-scale-900 text-sm">{helper}</span>}
+      <div className="flex items-center gap-2">
+        <Button disabled={isDisabled} type="default" htmlType="reset" onClick={() => handleReset()}>
           Cancel
         </Button>
         <Button
-          disabled={!hasChanges && hasChanges !== undefined}
-          loading={isSubmitting}
+          form={form}
           type="primary"
           htmlType="submit"
-          form={form}
+          disabled={isDisabled}
+          loading={isSubmitting}
         >
           Save
         </Button>

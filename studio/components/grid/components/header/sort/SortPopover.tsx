@@ -17,10 +17,10 @@ const SortPopover: FC = () => {
   return (
     <Popover size="large" align="start" className="sb-grid-sort-popover" overlay={<Sort />}>
       <Button
-        as={'span'}
-        type="text"
+        as="span"
+        type={(sorts || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-900">
+          <div className="text-scale-1000">
             <IconList strokeWidth={1.5} />
           </div>
         }

@@ -1,26 +1,33 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.3",
   "info": {
     "title": "Supabase Storage API",
     "description": "API documentation for Supabase Storage",
     "version": "0.0.1"
   },
-  "definitions": {
-    "def-0": {
-      "type": "object",
-      "properties": { "authorization": { "type": "string" } },
-      "required": ["authorization"],
-      "title": "authSchema"
-    },
-    "def-1": {
-      "type": "object",
-      "properties": {
-        "statusCode": { "type": "string" },
-        "error": { "type": "string" },
-        "message": { "type": "string" }
+  "components": {
+    "schemas": {
+      "def-0": {
+        "type": "object",
+        "properties": {
+          "authorization": {
+            "type": "string",
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        },
+        "required": ["authorization"],
+        "title": "authSchema"
       },
-      "required": ["statusCode", "error", "message"],
-      "title": "errorSchema"
+      "def-1": {
+        "type": "object",
+        "properties": {
+          "statusCode": { "type": "string" },
+          "error": { "type": "string" },
+          "message": { "type": "string" }
+        },
+        "required": ["statusCode", "error", "message"],
+        "title": "errorSchema"
+      }
     }
   },
   "paths": {
@@ -28,71 +35,107 @@
       "post": {
         "summary": "Create a bucket",
         "tags": ["bucket"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": { "type": "string", "examples": ["avatars"] },
-                "id": { "type": "string", "examples": ["avatars"] },
-                "public": { "type": "boolean", "examples": [false] }
-              },
-              "required": ["name"]
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "avatars" },
+                  "id": { "type": "string", "example": "avatars" },
+                  "public": { "type": "boolean", "example": false }
+                },
+                "required": ["name"]
+              }
             }
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": { "name": { "type": "string", "examples": ["avatars"] } },
-              "required": ["name"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": { "name": { "type": "string", "example": "avatars" } },
+                  "required": ["name"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "get": {
         "summary": "Gets all buckets",
         "tags": ["bucket"],
         "parameters": [
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$id": "bucketSchema",
-                "type": "object",
-                "properties": {
-                  "id": { "type": "string" },
-                  "name": { "type": "string" },
-                  "owner": { "type": "string" },
-                  "public": { "type": "boolean" },
-                  "created_at": { "type": "string" },
-                  "updated_at": { "type": "string" }
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "name": { "type": "string" },
+                      "owner": { "type": "string" },
+                      "public": { "type": "boolean" },
+                      "created_at": { "type": "string" },
+                      "updated_at": { "type": "string" }
+                    },
+                    "required": ["id", "name"],
+                    "additionalProperties": false,
+                    "title": "bucketSchema",
+                    "example": {
+                      "id": "bucket2",
+                      "name": "bucket2",
+                      "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                      "created_at": "2021-02-17T04:43:32.770206+00:00",
+                      "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                    }
+                  },
+                  "example": [
+                    {
+                      "id": "bucket2",
+                      "name": "bucket2",
+                      "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                      "created_at": "2021-02-17T04:43:32.770206+00:00",
+                      "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                    }
+                  ]
                 },
-                "required": ["id", "name"],
-                "additionalProperties": false,
-                "examples": [
-                  {
-                    "id": "bucket2",
-                    "name": "bucket2",
-                    "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
-                    "created_at": "2021-02-17T04:43:32.770206+00:00",
-                    "updated_at": "2021-02-17T04:43:32.770206+00:00"
-                  }
-                ],
-                "title": "bucketSchema"
-              },
-              "examples": [
-                [
+                "example": [
                   {
                     "id": "bucket2",
                     "name": "bucket2",
@@ -101,10 +144,17 @@
                     "updated_at": "2021-02-17T04:43:32.770206+00:00"
                   }
                 ]
-              ]
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -114,25 +164,43 @@
         "tags": ["bucket"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketId"
+            "name": "bucketId",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": { "type": "string", "examples": ["Successfully emptied"] }
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Successfully emptied" }
+                  }
+                }
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -142,70 +210,112 @@
         "tags": ["bucket"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketId"
+            "name": "bucketId",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "$id": "todo.com",
-              "type": "object",
-              "properties": {
-                "id": { "type": "string" },
-                "name": { "type": "string" },
-                "owner": { "type": "string" },
-                "public": { "type": "boolean" },
-                "created_at": { "type": "string" },
-                "updated_at": { "type": "string" }
-              },
-              "required": ["id", "name"],
-              "additionalProperties": false,
-              "examples": [
-                {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "owner": { "type": "string" },
+                    "public": { "type": "boolean" },
+                    "created_at": { "type": "string" },
+                    "updated_at": { "type": "string" }
+                  },
+                  "required": ["id", "name"],
+                  "additionalProperties": false,
+                  "example": {
+                    "id": "bucket2",
+                    "name": "bucket2",
+                    "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                    "created_at": "2021-02-17T04:43:32.770206+00:00",
+                    "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                  }
+                },
+                "example": {
                   "id": "bucket2",
                   "name": "bucket2",
                   "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                   "created_at": "2021-02-17T04:43:32.770206+00:00",
                   "updated_at": "2021-02-17T04:43:32.770206+00:00"
                 }
-              ]
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "put": {
         "summary": "Update properties of a bucket",
         "tags": ["bucket"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "public": { "type": "boolean", "example": false } }
+              }
+            }
+          }
+        },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": { "public": { "type": "boolean", "examples": [false] } }
-            }
-          },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": { "type": "string", "examples": ["Successfully updated"] }
-              },
-              "required": ["message"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Successfully updated" }
+                  },
+                  "required": ["message"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "delete": {
@@ -213,25 +323,43 @@
         "tags": ["bucket"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketId"
+            "name": "bucketId",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": { "type": "string", "examples": ["Successfully deleted"] }
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Successfully deleted" }
+                  }
+                }
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -241,56 +369,86 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": { "type": "string", "examples": ["Successfully deleted"] }
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Successfully deleted" }
+                  }
+                }
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "get": {
-        "summary": "Deprecated (use GET /object/authenticated/{bucketName} instead): Retrieve an object",
-        "tags": ["object"],
+        "summary": "Get object",
+        "tags": ["deprecated"],
+        "description": "use GET /object/authenticated/{bucketName} instead",
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Default Response",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/def-1" } }
+            }
+          }
         }
       },
       "put": {
@@ -298,33 +456,51 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "Key": { "type": "string", "examples": ["projectref/avatars/folder/cat.png"] }
-              },
-              "required": ["Key"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": { "type": "string", "example": "projectref/avatars/folder/cat.png" }
+                  },
+                  "required": ["Key"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "post": {
@@ -332,31 +508,51 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": { "Key": { "type": "string", "examples": ["avatars/folder/cat.png"] } },
-              "required": ["Key"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": { "type": "string", "example": "avatars/folder/cat.png" }
+                  },
+                  "required": ["Key"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -364,97 +560,112 @@
       "delete": {
         "summary": "Delete multiple objects",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "prefixes": {
-                  "type": "array",
-                  "items": { "type": "string" },
-                  "minItems": 1,
-                  "examples": [["folder/cat.png", "folder/morecats.png"]]
-                }
-              },
-              "required": ["prefixes"]
-            }
-          },
-          {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
-            "in": "path",
-            "name": "bucketName"
-          },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$id": "objectSchema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "bucket_id": { "type": "string" },
-                  "owner": { "type": "string" },
-                  "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "created_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "last_accessed_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "metadata": {
-                    "anyOf": [
-                      { "type": "object", "additionalProperties": true },
-                      { "type": "null" }
-                    ]
-                  },
-                  "buckets": {
-                    "$id": "bucketSchema",
-                    "type": "object",
-                    "properties": {
-                      "id": { "type": "string" },
-                      "name": { "type": "string" },
-                      "owner": { "type": "string" },
-                      "public": { "type": "boolean" },
-                      "created_at": { "type": "string" },
-                      "updated_at": { "type": "string" }
-                    },
-                    "required": ["id", "name"],
-                    "additionalProperties": false,
-                    "examples": [
-                      {
-                        "id": "bucket2",
-                        "name": "bucket2",
-                        "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
-                        "created_at": "2021-02-17T04:43:32.770206+00:00",
-                        "updated_at": "2021-02-17T04:43:32.770206+00:00"
-                      }
-                    ]
+                  "prefixes": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "example": ["folder/cat.png", "folder/morecats.png"]
                   }
                 },
-                "required": ["name"],
-                "additionalProperties": false,
-                "examples": [
-                  {
-                    "name": "folder/cat.png",
-                    "bucket_id": "avatars",
-                    "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
-                    "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
-                    "updated_at": "2021-04-06T16:30:35.394674+00:00",
-                    "created_at": "2021-04-06T16:30:35.394674+00:00",
-                    "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
-                    "metadata": { "size": 1234 }
-                  }
-                ],
-                "title": "objectSchema"
+                "required": ["prefixes"]
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" },
+                      "bucket_id": { "type": "string" },
+                      "owner": { "type": "string" },
+                      "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "created_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "last_accessed_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "metadata": {
+                        "anyOf": [
+                          { "type": "object", "additionalProperties": true },
+                          { "type": "null" }
+                        ]
+                      },
+                      "buckets": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "owner": { "type": "string" },
+                          "public": { "type": "boolean" },
+                          "created_at": { "type": "string" },
+                          "updated_at": { "type": "string" }
+                        },
+                        "required": ["id", "name"],
+                        "additionalProperties": false,
+                        "example": {
+                          "id": "bucket2",
+                          "name": "bucket2",
+                          "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                          "created_at": "2021-02-17T04:43:32.770206+00:00",
+                          "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                        }
+                      }
+                    },
+                    "required": ["name"],
+                    "additionalProperties": false,
+                    "title": "objectSchema",
+                    "example": {
+                      "name": "folder/cat.png",
+                      "bucket_id": "avatars",
+                      "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
+                      "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
+                      "updated_at": "2021-04-06T16:30:35.394674+00:00",
+                      "created_at": "2021-04-06T16:30:35.394674+00:00",
+                      "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
+                      "metadata": { "size": 1234 }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -464,23 +675,36 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
+            }
+          }
         }
       }
     },
@@ -488,51 +712,70 @@
       "post": {
         "summary": "Generate a presigned url to retrieve an object",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "expiresIn": { "type": "integer", "minimum": 1, "examples": [60000] }
-              },
-              "required": ["expiresIn"]
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expiresIn": { "type": "integer", "minimum": 1, "example": 60000 }
+                },
+                "required": ["expiresIn"]
+              }
             }
           },
+          "required": true
+        },
+        "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "signedURL": {
-                  "type": "string",
-                  "examples": [
-                    "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
-                  ]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "signedURL": {
+                      "type": "string",
+                      "example": "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+                    }
+                  },
+                  "required": ["signedURL"]
                 }
-              },
-              "required": ["signedURL"]
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       },
       "get": {
@@ -540,31 +783,39 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": [
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk"
-            ],
-            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk"
+            },
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJidWNrZXQyL3B1YmxpYy9zYWRjYXQtdXBsb2FkMjMucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.uBQcXzuvXxfw-9WgzWMBfE_nR3VOgpvfZe032sfLSSk",
             "in": "query",
-            "name": "token"
+            "name": "token",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           }
         ],
         "responses": {
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
+            }
+          }
         }
       }
     },
@@ -572,58 +823,77 @@
       "post": {
         "summary": "Generate presigned urls to retrieve objects",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "expiresIn": { "type": "integer", "minimum": 1, "examples": [60000] },
-                "paths": {
-                  "type": "array",
-                  "items": { "type": "string" },
-                  "minItems": 1,
-                  "examples": [["folder/cat.png", "folder/morecats.png"]]
-                }
-              },
-              "required": ["expiresIn", "paths"]
-            }
-          },
-          {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
-            "in": "path",
-            "name": "bucketName"
-          },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "array",
-              "items": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
-                  "error": {
-                    "error": ["string", "null"],
-                    "examples": ["Either the object does not exist or you do not have access to it"]
-                  },
-                  "path": { "type": "string", "examples": ["folder/cat.png"] },
-                  "signedURL": {
-                    "type": ["string", "null"],
-                    "examples": [
-                      "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
-                    ]
+                  "expiresIn": { "type": "integer", "minimum": 1, "example": 60000 },
+                  "paths": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "example": ["folder/cat.png", "folder/morecats.png"]
                   }
                 },
-                "required": ["error", "path", "signedURL"]
+                "required": ["expiresIn", "paths"]
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "required": true
+        },
+        "parameters": [
+          {
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
+            "in": "path",
+            "name": "bucketName",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "error": ["string", "null"],
+                        "example": "Either the object does not exist or you do not have access to it"
+                      },
+                      "path": { "type": "string", "example": "folder/cat.png" },
+                      "signedURL": {
+                        "type": ["string", "null"],
+                        "example": "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+                      }
+                    },
+                    "required": ["error", "path", "signedURL"]
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -631,32 +901,55 @@
       "post": {
         "summary": "Moves an object",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "bucketId": { "type": "string", "examples": ["avatars"] },
-                "sourceKey": { "type": "string", "examples": ["folder/cat.png"] },
-                "destinationKey": { "type": "string", "examples": ["folder/newcat.png"] }
-              },
-              "required": ["bucketId", "sourceKey", "destinationKey"]
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bucketId": { "type": "string", "example": "avatars" },
+                  "sourceKey": { "type": "string", "example": "folder/cat.png" },
+                  "destinationKey": { "type": "string", "example": "folder/newcat.png" }
+                },
+                "required": ["bucketId", "sourceKey", "destinationKey"]
+              }
             }
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": { "message": { "type": "string", "examples": ["Successfully moved"] } },
-              "required": ["message"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Successfully moved" }
+                  },
+                  "required": ["message"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -664,99 +957,114 @@
       "post": {
         "summary": "Search for objects under a prefix",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "prefix": { "type": "string", "examples": ["folder/subfolder"] },
-                "limit": { "type": "integer", "minimum": 1, "examples": [10] },
-                "offset": { "type": "integer", "minimum": 0, "examples": [0] },
-                "sortBy": {
-                  "type": "object",
-                  "properties": {
-                    "column": {
-                      "type": "string",
-                      "enum": ["name", "updated_at", "created_at", "last_accessed_at"]
-                    },
-                    "order": { "type": "string", "enum": ["asc", "desc"] }
-                  },
-                  "required": ["column"]
-                },
-                "search": { "type": "string" }
-              },
-              "required": ["prefix"]
-            }
-          },
-          { "type": "string", "required": true, "in": "path", "name": "bucketName" },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
-        ],
-        "responses": {
-          "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$id": "objectSchema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "bucket_id": { "type": "string" },
-                  "owner": { "type": "string" },
-                  "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "created_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "last_accessed_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
-                  "metadata": {
-                    "anyOf": [
-                      { "type": "object", "additionalProperties": true },
-                      { "type": "null" }
-                    ]
-                  },
-                  "buckets": {
-                    "$id": "bucketSchema",
+                  "prefix": { "type": "string", "example": "folder/subfolder" },
+                  "limit": { "type": "integer", "minimum": 1, "example": 10 },
+                  "offset": { "type": "integer", "minimum": 0, "example": 0 },
+                  "sortBy": {
                     "type": "object",
                     "properties": {
-                      "id": { "type": "string" },
-                      "name": { "type": "string" },
-                      "owner": { "type": "string" },
-                      "public": { "type": "boolean" },
-                      "created_at": { "type": "string" },
-                      "updated_at": { "type": "string" }
+                      "column": {
+                        "type": "string",
+                        "enum": ["name", "updated_at", "created_at", "last_accessed_at"]
+                      },
+                      "order": { "type": "string", "enum": ["asc", "desc"] }
                     },
-                    "required": ["id", "name"],
-                    "additionalProperties": false,
-                    "examples": [
-                      {
-                        "id": "bucket2",
-                        "name": "bucket2",
-                        "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
-                        "created_at": "2021-02-17T04:43:32.770206+00:00",
-                        "updated_at": "2021-02-17T04:43:32.770206+00:00"
-                      }
-                    ]
-                  }
+                    "required": ["column"]
+                  },
+                  "search": { "type": "string" }
                 },
-                "required": ["name"],
-                "additionalProperties": false,
-                "examples": [
-                  {
-                    "name": "folder/cat.png",
-                    "bucket_id": "avatars",
-                    "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
-                    "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
-                    "updated_at": "2021-04-06T16:30:35.394674+00:00",
-                    "created_at": "2021-04-06T16:30:35.394674+00:00",
-                    "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
-                    "metadata": { "size": 1234 }
-                  }
-                ]
+                "required": ["prefix"]
               }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "required": true
+        },
+        "parameters": [
+          { "schema": { "type": "string" }, "in": "path", "name": "bucketName", "required": true },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" },
+                      "bucket_id": { "type": "string" },
+                      "owner": { "type": "string" },
+                      "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "created_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "last_accessed_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                      "metadata": {
+                        "anyOf": [
+                          { "type": "object", "additionalProperties": true },
+                          { "type": "null" }
+                        ]
+                      },
+                      "buckets": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "owner": { "type": "string" },
+                          "public": { "type": "boolean" },
+                          "created_at": { "type": "string" },
+                          "updated_at": { "type": "string" }
+                        },
+                        "required": ["id", "name"],
+                        "additionalProperties": false,
+                        "example": {
+                          "id": "bucket2",
+                          "name": "bucket2",
+                          "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                          "created_at": "2021-02-17T04:43:32.770206+00:00",
+                          "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                        }
+                      }
+                    },
+                    "required": ["name"],
+                    "additionalProperties": false,
+                    "example": {
+                      "name": "folder/cat.png",
+                      "bucket_id": "avatars",
+                      "owner": "317eadce-631a-4429-a0bb-f19a7a517b4a",
+                      "id": "eaa8bdb5-2e00-4767-b5a9-d2502efe2196",
+                      "updated_at": "2021-04-06T16:30:35.394674+00:00",
+                      "created_at": "2021-04-06T16:30:35.394674+00:00",
+                      "last_accessed_at": "2021-04-06T16:30:35.394674+00:00",
+                      "metadata": { "size": 1234 }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -764,32 +1072,55 @@
       "post": {
         "summary": "Copies an object",
         "tags": ["object"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "sourceKey": { "type": "string", "examples": ["folder/source.png"] },
-                "bucketId": { "type": "string", "examples": ["avatars"] },
-                "destinationKey": { "type": "string", "examples": ["folder/destination.png"] }
-              },
-              "required": ["sourceKey", "bucketId", "destinationKey"]
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sourceKey": { "type": "string", "example": "folder/source.png" },
+                  "bucketId": { "type": "string", "example": "avatars" },
+                  "destinationKey": { "type": "string", "example": "folder/destination.png" }
+                },
+                "required": ["sourceKey", "bucketId", "destinationKey"]
+              }
             }
           },
-          { "in": "header", "name": "authorization", "required": true, "type": "string" }
+          "required": true
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Default Response",
-            "schema": {
-              "type": "object",
-              "properties": { "Key": { "type": "string", "examples": ["folder/destination.png"] } },
-              "required": ["Key"]
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Successful response",
+                  "type": "object",
+                  "properties": {
+                    "Key": { "type": "string", "example": "folder/destination.png" }
+                  },
+                  "required": ["Key"]
+                }
+              }
             }
           },
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "description": "Error response", "$ref": "#/components/schemas/def-1" }
+              }
+            }
+          }
         }
       }
     },
@@ -799,28 +1130,36 @@
         "tags": ["object"],
         "parameters": [
           {
-            "type": "string",
-            "examples": ["avatars"],
-            "required": true,
+            "schema": { "type": "string", "example": "avatars" },
+            "example": "avatars",
             "in": "path",
-            "name": "bucketName"
+            "name": "bucketName",
+            "required": true
           },
           {
-            "type": "string",
-            "examples": ["folder/cat.png"],
-            "required": true,
+            "schema": { "type": "string", "example": "folder/cat.png" },
+            "example": "folder/cat.png",
             "in": "path",
-            "name": "*"
+            "name": "*",
+            "required": true
           }
         ],
         "responses": {
-          "400": { "description": "Default Response", "schema": { "$ref": "#/definitions/def-1" } }
+          "4XX": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/def-1", "description": "Error response" }
+              }
+            }
+          }
         }
       }
     }
   },
   "tags": [
     { "name": "object", "description": "Object end-points" },
-    { "name": "bucket", "description": "Bucket end-points" }
+    { "name": "bucket", "description": "Bucket end-points" },
+    { "name": "deprecated", "description": "Deprecated end-points" }
   ]
 }

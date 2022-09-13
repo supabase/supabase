@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
+import { checkPermissions, useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -13,7 +13,7 @@ import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 
-const PageLayout: NextPageWithLayout = () => {
+export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
@@ -22,16 +22,17 @@ const PageLayout: NextPageWithLayout = () => {
   const { ui } = useStore()
   const project = ui.selectedProject
 
-  const canCreateReport = checkPermissions(
-    PermissionAction.SQL_INSERT,
-    'postgres.public.user_content',
-    { resource: { type: 'report' } }
-  )
   const contentStore = useProjectContentStore(ref)
+  const canCreateReport = checkPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'report', owner_id: ui.profile?.id },
+    subject: { id: ui.profile?.id },
+  })
+
+  const kpsEnabled = useFlag('initWithKps')
 
   useEffect(() => {
     if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, {})
+      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
     }
   }, [project])
 
@@ -68,6 +69,8 @@ const PageLayout: NextPageWithLayout = () => {
               })
             }
           }}
+          disabled={!canCreateReport}
+          disabledMessage="You need additional permissions to create a report"
         >
           <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
           <p className="text-scale-1100 text-sm">
@@ -80,6 +83,6 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+UserReportPage.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
-export default observer(PageLayout)
+export default observer(UserReportPage)

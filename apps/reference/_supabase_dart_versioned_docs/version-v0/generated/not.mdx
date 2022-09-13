@@ -1,0 +1,73 @@
+---
+id: not
+title: '.not()'
+slug: /not
+custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v1_legacy.yml
+---
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+Finds all rows which doesn't satisfy the filter.
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .not('name', 'eq', 'Paris')
+  .execute();
+```
+
+## Notes
+
+- `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+  ```dart
+  .not('name','eq','Paris')
+  .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+  .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+  .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+  .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+  ```
+
+## Examples
+
+### With `select()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .select('name, country_id')
+  .not('name', 'eq', 'Paris')
+  .execute();
+```
+
+### With `update()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .update({ 'name': 'Mordor' })
+  .not('name', 'eq', 'Paris')
+  .execute();
+```
+
+### With `delete()`
+
+```dart
+final res = await supabase
+  .from('cities')
+  .delete()
+  .not('name', 'eq', 'Paris')
+  .execute();
+```
+
+### With `rpc()`
+
+```dart
+// Only valid if the Stored Procedure returns a table type.
+final res = await supabase
+  .rpc('echo_all_cities)
+  .not('name', 'eq', 'Paris')
+  .execute();
+```

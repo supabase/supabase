@@ -3,7 +3,6 @@ import { isUndefined } from 'lodash'
 import {
   Checkbox,
   Input,
-  Typography,
   IconX,
   IconMenu,
   Popover,
@@ -71,31 +70,32 @@ const Column: FC<Props> = ({
     <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
-          <Typography>
-            <IconMenu strokeWidth={1} size={15} />
-          </Typography>
+          <IconMenu strokeWidth={1} size={15} />
         </div>
       </div>
-      <div className="w-[25%]">
+      <div className="w-[20%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
             size="small"
+            placeholder="column name"
+            title={column.name}
             disabled={hasImportContent}
             className={`table-editor-columns-input bg-white dark:bg-transparent lg:gap-0 ${
               hasImportContent ? 'opacity-50' : ''
             } rounded-md`}
-            actions={
-              <Button
-                type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
-                onClick={() => onEditRelation(column)}
-              >
-                <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
-              </Button>
-            }
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
         </div>
+      </div>
+      <div className="w-[5%]  pl-0.5">
+        <Button
+          type={!isUndefined(column.foreignKey) ? 'secondary' : 'default'}
+          onClick={() => onEditRelation(column)}
+          className="px-1 py-2"
+        >
+          <IconLink size={14} strokeWidth={!isUndefined(column.foreignKey) ? 2 : 1} />
+        </Button>
       </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
@@ -232,9 +232,7 @@ const Column: FC<Props> = ({
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
           <div className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <Typography>
-              <IconX strokeWidth={1} />
-            </Typography>
+            <IconX strokeWidth={1} />
           </div>
         </div>
       )}
