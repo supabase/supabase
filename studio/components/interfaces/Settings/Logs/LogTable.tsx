@@ -286,16 +286,9 @@ const LogTable = ({
               ) : null
             }
             columns={columns as any}
-            rowClass={(r) => {
-              const row = r as LogData
-
-              let classes = []
-              classes.push(
-                `${row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'}`
-              )
-
-              return classes.join(' ')
-            }}
+            rowClass={(row: LogData) =>
+              row.id === focusedLog?.id ? '!bg-scale-400 rdg-row--focused' : 'cursor-pointer'
+            }
             rows={logDataRows}
             rowKeyGetter={(r) => {
               if (!hasId) return Object.keys(r)[0]
