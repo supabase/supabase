@@ -11,9 +11,9 @@ import TabItem from '@theme/TabItem'
 Retrieves the details of an existing Storage bucket.
 
 ```dart
-final res = await supabase
+final Bucket bucket = await supabase
   .storage
-  .getBucket('avatars')
+  .getBucket('avatars');
 ```
 
 ## Parameters
@@ -53,7 +53,7 @@ The unique identifier of the bucket you would like to retrieve.
 ### Get bucket
 
 ```dart
-final res = await supabase
+final Bucket bucket = await supabase
   .storage
-  .getBucket('avatars')
+  .getBucket('avatars');
 ```

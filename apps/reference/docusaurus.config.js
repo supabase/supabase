@@ -90,6 +90,16 @@ const config = {
         breadcrumbs: false,
         editUrl:
           'https://github.com/supabase/supabase/edit/master/apps/reference/',
+        lastVersion: 'v0',
+        versions: {
+          current: {
+            label: 'v1-dev',
+            path: '/next',
+          },
+          v0: {
+            label: 'v0',
+          },
+        },
       },
     ],
     [

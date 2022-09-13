@@ -45,7 +45,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 
 We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
 
-<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -204,6 +204,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
+- [Finnish / Suomalainen](/i18n/README.fi.md)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
 - [Greek / Ελληνικά](/i18n/README.gr.md)

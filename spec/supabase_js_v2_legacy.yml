@@ -490,7 +490,7 @@ pages:
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase.auth.resetPasswordForEmail(email, options: {
+          const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: 'https://example.com/update-password',
           })
           ```
