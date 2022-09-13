@@ -7,76 +7,76 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+[Supabase](https://supabase.com) on avoimen lähdekoodin Firebase-vaihtoehto. Rakennamme Firebasen ominaisuuksia yritystason avoimen lähdekoodin työkaluilla.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api)
-  - [x] GraphQL (Beta). [Docs](https://supabase.com/docs/guides/api#graphql-api)
-- [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
+- [x] Isännöity Postgres-tietokanta [Docs](https://supabase.com/docs/guides/database)
+- [x] Autentikointi ja valtuutus [Docs](https://supabase.com/docs/guides/auth)
+- [x] Automaattisesti luodut rajapinnat
+  - [x] REST [Docs](https://supabase.com/docs/guides/api#rest-api)
+  - [x] Reaaliaikaiset tilaukset [Docs](https://supabase.com/docs/guides/api#realtime-api)
+  - [x] GraphQL (Beta) [Docs](https://supabase.com/docs/guides/api#graphql-api)
+- [x] Funktiot
+  - [x] Tietokantatoiminnot [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
+- [x] Tiedostojen säilytys [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![Supabase hallintapaneeli](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-## Documentation
+## Dokumentaatio
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+Katso täydelliset dokumentaatiot osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
+Katso ohjeet osallistumiseen vierailemalla [Aloitus](./DEVELOPERS.md)
 
-## Community & Support
+## Yhteisö ja tuki
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
-- [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
+- [Yhteisön keskustelufoorumi](https://github.com/supabase/supabase/discussions): Apua rakentamisessa, keskustelu tietokannan parhaista käytännöistä.
+- [GitHub ongelmat](https://github.com/supabase/supabase/issues): Bugit ja virheet, joita kohtaat Supabasea käytettäessä.
+- [Email Support](https://supabase.com/docs/support#business-support): Tietokantaan tai infrastruktuuriin liittyvät ongelmat.
+- [Discord](https://discord.supabase.com): Jaa sovelluksiasi ja vietä aikaa yhteisön kanssa.
 
 ## Status
 
-- [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.com](https://app.supabase.com). But go easy on us, there are a few kinks
-- [x] Public Beta: Stable enough for most non-enterprise use-cases
-- [ ] Public: Production-ready
+- [x] Alpha: Testaamme Supabasea suljetun asiakasjoukon kanssa
+- [x] Julkinen alfa: Kuka tahansa voi rekisteröityä osoitteessa [app.supabase.com](https://app.supabase.com). Mutta rauhassa, siinä on muutamia mutkia
+- [x] Julkinen beta: Riittävän vakaa useimpiin ei-yrityskäyttötapauksiin
+- [ ] Julkinen: Valmistettu tuotantoon
 
-We are currently in Public Beta. Watch "releases" of this repo to get notified of major updates.
+Olemme tällä hetkellä julkisessa betaversiossa. Katso tämän repon "julkaisut", niin saat ilmoituksen tärkeimmistä päivityksistä.
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+<kbd><img src="https://gitcdn.link/repo/supabase/supabase/master/web/static/watch-repo.gif" alt="Katso tämä repo"/></kbd>
 
 ---
 
-## How it works
+## Kuinka se toimii
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+Supabase on yhdistelmä avoimen lähdekoodin työkaluja. Rakennamme Firebasen ominaisuuksia käyttämällä yritystason avoimen lähdekoodin tuotteita. Jos työkalut ja yhteisöt ovat olemassa, ja niillä on MIT, Apache 2 tai vastaava avoin lisenssi, käytämme ja tuemme kyseistä työkalua. Jos työkalua ei ole olemassa, rakennamme ja avaamme sen itse. Supabase ei ole Firebasen 1-1-kartoitus. Tavoitteemme on tarjota kehittäjille Firebasen kaltainen kehittäjäkokemus käyttämällä avoimen lähdekoodin työkaluja.
 
-**Architecture**
+**Arkkitehtuuri**
 
-Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
+Supabase on [isännöity alusta](https://app.supabase.com). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
+Voit myös [isännöidä itse](https://supabase.com/docs/guides/hosting/overview) ja [kehittää paikallisesti](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Arkkitehtuuri](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [PostgreSQL](https://www.postgresql.org/) on oliorelaatiotietokantajärjestelmä, jota on kehitetty aktiivisesti yli 30 vuoden ajan ja joka on ansainnut sille vahvan maineen luotettavuudestaan, ominaisuuksien kestävyydestään ja suorituskyvystään.
+- [Realtime](https://github.com/supabase/realtime) on Elixir-palvelin, jonka avulla voit kuunnella PostgreSQL-lisäyksiä, päivityksiä ja poistoja websockettien avulla. Reaaliaikaiset kyselyt Postgresin sisäänrakennetuista replikointitoiminnoista tietokannan muutoksille, muuntaa muutokset JSON-muotoon ja lähettää sitten JSONin verkkoliitäntöjen kautta valtuutetuille asiakkaille.
+- [PostgREST](http://postgrest.org/) on verkkopalvelin, joka muuttaa PostgreSQL-tietokantaasi suoraan RESTful API:ksi
+- [Storage](https://github.com/supabase/storage-api) tarjoaa RESTful-käyttöliittymän S3:een tallennettujen tiedostojen hallintaan käyttämällä Postgresia käyttöoikeuksien hallintaan.
+- [postgres-meta](https://github.com/supabase/postgres-meta) on RESTful-sovellusliittymä Postgresin hallintaan. Sen avulla voit noutaa taulukoita, lisätä rooleja ja suorittaa kyselyitä jne.
+- [GoTrue](https://github.com/netlify/gotrue) on SWT-pohjainen sovellusliittymä käyttäjien hallintaan ja SWT-tunnuksien myöntämiseen.
+- [Kong](https://github.com/Kong/kong) on ​​pilvipohjainen API-yhdyskäytävä.
 
-#### Client libraries
+#### Asiakaskirjastot
 
-Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
+Lähestymistapamme asiakaskirjastoissa on modulaarinen. Jokainen alikirjasto on erillinen toteutus yhdelle ulkoiselle järjestelmälle. Tämä on yksi tavoista tukea olemassa olevia työkaluja.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Language</th>
+    <th>Kieli</th>
     <th>Client</th>
-    <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
+    <th colspan="5">Feature-Clients (yhdistettynä Supabase-asiakkaaseen)</th>
   </tr>
   <tr>
     <th></th>
@@ -87,8 +87,8 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
     <th>Functions</th>
   </tr>
-  <!-- TEMPLATE FOR NEW ROW -->
-  <!-- START ROW
+  <!-- MALLI UUDELLE RIVILLE -->
+  <!-- ALOITA NYT
   <tr>
     <td>lang</td>
     <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
@@ -97,8 +97,8 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
-  END ROW -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  LOPETA RIVI -->
+  <th colspan="7">⚡️ Virallinen ⚡️</th>
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -108,7 +108,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
     <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
-  <th colspan="7">💚 Community 💚</th>
+  <th colspan="7">💚 Yhteisö 💚</th>
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -192,10 +192,10 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
   </tr>
 </table>
 
-<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
+<!--- Poista tämä luettelo, jos käännät toiselle kielelle, sillä useiden tiedostojen päivitys on vaikeaa-->
+<!--- Säilytä vain linkki käännöstiedostojen luetteloon-->
 
-## Translations
+## Käännökset
 
 - [Arabic | العربية](/i18n/README.ar.md)
 - [Albanian / Shqip](/i18n/README.sq.md)
@@ -204,7 +204,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
 - [English](https://github.com/supabase/supabase)
-- [Finnish / Suomalainen](/i18n/README.fi.md)
+- [Finnish / Suomi](/i18n/README.fi.md)
 - [French / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)
 - [Greek / Ελληνικά](/i18n/README.gr.md)
@@ -237,6 +237,6 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 
 ---
 
-## Sponsors
+## Sponsorit
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Uudet sponsorit](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
