@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { isUndefined } from 'lodash'
 import { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'ui'
 
 import { useStore } from 'hooks'
 

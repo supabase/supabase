@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconMoreVertical } from '@supabase/ui'
+import { Button, Dropdown, IconMoreVertical } from 'ui'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'

@@ -1,4 +1,4 @@
-import { Button, IconDownloadCloud } from '@supabase/ui'
+import { Button, IconDownloadCloud } from 'ui'
 import { ButtonProps } from '@supabase/ui/dist/cjs/components/Button/Button'
 import { flattenDeep } from 'lodash'
 import React, { useMemo, useRef } from 'react'
