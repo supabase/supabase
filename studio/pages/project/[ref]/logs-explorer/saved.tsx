@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { IconSave, Loading } from '@supabase/ui'
 import { useStore } from 'hooks'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
-import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
+import LogsExplorerLayout from 'components/layouts'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
@@ -15,6 +15,9 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
 
+  useEffect(() => {
+    content.load()
+  }, [])
   if (content.isLoading) {
     return <Loading active={true}>{null}</Loading>
   }
