@@ -19,6 +19,7 @@ export const getToggleByText = (
   } else {
     textNode = screen.getByText(text)
   }
+
   if (textNode && textNode.parentElement) {
     return textNode.parentElement.querySelector('button')
   } else {
