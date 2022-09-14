@@ -1,0 +1,15 @@
+.form-input:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+.form-input--small {
+  @apply text-sm py-1;
+}
+
+.form-input--medium {
+  @apply text-base;
+}
+
+.form-input--error {
+  @apply border-red-500;
+}
