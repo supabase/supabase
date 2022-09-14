@@ -505,19 +505,19 @@ pages:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
-      - name: Generate a signup link.
+      - name: Generate a signup link
         isSpotlight: true
         js: |
           ```js
           const { data, error } = await supabase.auth.admin.generateLink({
             type: 'signup',
-            email: 'email@example.com'
+            email: 'email@example.com',
             options: {
               'password': 'secret'
             }
           })
           ```
-      - name: Generate an invite link.
+      - name: Generate an invite link
         isSpotlight: false
         js: |
           ```js
@@ -526,7 +526,7 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate an Magic link.
+      - name: Generate an Magic link
         isSpotlight: false
         js: |
           ```js
@@ -535,7 +535,7 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate an recovery link.
+      - name: Generate an recovery link
         isSpotlight: false
         js: |
           ```js
@@ -544,7 +544,7 @@ pages:
             email: 'email@example.com'
           })
           ``` 
-      - name: Generate link to change email address.
+      - name: Generate link to change email address
         isSpotlight: false
         js: |
           ```js
