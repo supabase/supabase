@@ -151,6 +151,33 @@ const LogTable = ({
     }
   }, [stringData])
 
+  const LogsExplorerTableHeader = () => (
+    <div className="w-full bg-scale-100 dark:bg-scale-300 rounded-tl rounded-tr border-t border-l border-r flex items-center justify-between px-5 py-2">
+      <div className="flex items-center gap-2">
+        {data && data.length ? (
+          <>
+            <span className="text-sm text-scale-1200">Query results</span>
+            <span className="text-sm text-scale-1100">{data && data.length}</span>
+          </>
+        ) : (
+          <span className="text-xs text-scale-1200">Results will be shown below</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {onHistogramToggle && (
+          <Button
+            type="default"
+            icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
+            onClick={onHistogramToggle}
+          >
+            Histogram
+          </Button>
+        )}
+        <CSVButton data={data}>Download</CSVButton>
+      </div>
+    </div>
+  )
+
   const renderErrorAlert = () => {
     if (!error) return null
     const childProps = {
@@ -185,44 +212,7 @@ const LogTable = ({
         className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
-        {!queryType && (
-          <div>
-            <div
-              className="
-            w-full bg-scale-100 dark:bg-scale-300 
-            rounded-tl rounded-tr
-            border-t
-            border-l
-            border-r
-            flex items-center justify-between
-            px-5 py-2
-      "
-            >
-              <div className="flex items-center gap-2">
-                {data && data.length ? (
-                  <>
-                    <span className="text-sm text-scale-1200">Query results</span>
-                    <span className="text-sm text-scale-1100">{data && data.length}</span>
-                  </>
-                ) : (
-                  <span className="text-xs text-scale-1200">Results will be shown below</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {onHistogramToggle && (
-                  <Button
-                    type="default"
-                    icon={isHistogramShowing ? <IconEye /> : <IconEyeOff />}
-                    onClick={onHistogramToggle}
-                  >
-                    Histogram
-                  </Button>
-                )}
-                {showDownload && <CSVButton data={data}>Download</CSVButton>}
-              </div>
-            </div>
-          </div>
-        )}
+        {!queryType && <LogsExplorerTableHeader />}
         <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
