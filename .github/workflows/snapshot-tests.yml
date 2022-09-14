@@ -9,7 +9,7 @@ on:
 
 jobs:
   snapshot-tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: studio
@@ -32,11 +32,12 @@ jobs:
         run: |
           npm ci
           npm run build
-          (npm run start &)
           npx playwright install --with-deps
 
       - name: Run tests
-        run: npm run test:snapshots:ci
+        run: |
+          (npm run start &) 
+          npm run test:snapshots:ci
 
       - uses: actions/upload-artifact@v1
         if: ${{ always() }}
