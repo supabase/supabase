@@ -24,13 +24,13 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
   const { slug } = router.query
 
   const enablePermissions = useFlag('enablePermissions')
-  const isOwner = ui.selectedOrganization?.is_owner
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
-  // [Joshen] The check against user_invites and auth.subject_roles are the same
-  const canAddMembers = enablePermissions ? rolesAddable.length > 0 : isOwner
+  const canAddMembers = roles.some(({ id: role_id }) =>
+    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+  )
 
   const initialValues = { email: '', role: '' }
 
