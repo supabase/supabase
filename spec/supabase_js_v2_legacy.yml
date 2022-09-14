@@ -526,7 +526,7 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate an Magic link
+      - name: Generate a magic link
         isSpotlight: false
         js: |
           ```js
@@ -535,7 +535,7 @@ pages:
             email: 'email@example.com'
           })
           ```
-      - name: Generate an recovery link
+      - name: Generate a recovery link
         isSpotlight: false
         js: |
           ```js
@@ -544,7 +544,7 @@ pages:
             email: 'email@example.com'
           })
           ``` 
-      - name: Generate link to change email address
+      - name: Generate a link to change email addresses
         isSpotlight: false
         js: |
           ```js
