@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { FC, useState } from 'react'
-import { Button, Form, Input, Listbox } from '@supabase/ui'
+import { Button, Form, Input, Listbox } from 'ui'
 
 import { useStore } from 'hooks'
 import { patch, get } from 'lib/common/fetch'

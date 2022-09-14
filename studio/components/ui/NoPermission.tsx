@@ -1,4 +1,4 @@
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 import { FC } from 'react'
 
 interface Props {

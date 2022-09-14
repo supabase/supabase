@@ -7,7 +7,7 @@ import {
   IconExternalLink,
   IconEye,
   IconEyeOff,
-} from '@supabase/ui'
+} from 'ui'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'

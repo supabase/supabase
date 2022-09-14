@@ -1,5 +1,5 @@
 import { DragEvent, useRef, useState, FC } from 'react'
-import { Button, IconLoader, IconFileText } from '@supabase/ui'
+import { Button, IconLoader, IconFileText } from 'ui'
 import SparkBar from 'components/ui/SparkBar'
 
 interface Props {

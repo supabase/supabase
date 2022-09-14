@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Toggle, Modal } from '@supabase/ui'
+import { Button, IconHelpCircle, Toggle, Modal } from 'ui'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'

@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Input, IconAlertCircle, IconLoader } from '@supabase/ui'
+import { Input, IconAlertCircle, IconLoader } from 'ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'

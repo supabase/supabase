@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 interface ActionBarProps {
   loading?: boolean

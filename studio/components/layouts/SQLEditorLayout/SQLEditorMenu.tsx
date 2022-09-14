@@ -13,7 +13,7 @@ import {
   IconChevronDown,
   Modal,
   IconEdit2,
-} from '@supabase/ui'
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from 'ui'
 
 import { Project } from 'types'
 import { useStore, checkPermissions } from 'hooks'

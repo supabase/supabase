@@ -6,7 +6,7 @@ import {
   IconDownload,
   IconTrash2,
   IconAlertCircle,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 import { formatBytes } from 'lib/helpers'
 import { Transition } from '@headlessui/react'

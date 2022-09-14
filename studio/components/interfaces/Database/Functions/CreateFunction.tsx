@@ -11,7 +11,7 @@ import {
   IconPlus,
   Toggle,
   Modal,
-} from '@supabase/ui'
+} from 'ui'
 import { Dictionary } from 'components/grid'
 import { makeAutoObservable } from 'mobx'
 

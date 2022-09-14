@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, IconDatabase, IconKey, IconArchive } from '@supabase/ui'
+import { Button, IconDatabase, IconKey, IconArchive } from 'ui'
 import Panel from 'components/ui/Panel'
 
 interface Props {}

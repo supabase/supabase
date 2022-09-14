@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Input, Button, Modal, Form, Alert } from '@supabase/ui'
+import { Input, Button, Modal, Form, Alert } from 'ui'
 import { useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'

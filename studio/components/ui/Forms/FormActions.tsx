@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 interface Props {
   form: React.HTMLProps<HTMLButtonElement>['form']

@@ -1,6 +1,6 @@
 import { FC, useEffect, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconList, Loading } from '@supabase/ui'
+import { Badge, IconList, Loading } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, withAuth } from 'hooks'

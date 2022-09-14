@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { IconChevronRight } from '@supabase/ui'
+import { IconChevronRight } from 'ui'
 import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
 

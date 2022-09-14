@@ -1,4 +1,4 @@
-import { Input } from '@supabase/ui'
+import { Input } from 'ui'
 import { LogQueryError } from '..'
 
 export interface ErrorRendererProps {

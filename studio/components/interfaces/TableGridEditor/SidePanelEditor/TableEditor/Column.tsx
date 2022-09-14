@@ -9,7 +9,7 @@ import {
   IconLink,
   IconSettings,
   Button,
-} from '@supabase/ui'
+} from 'ui'
 import { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'

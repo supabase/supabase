@@ -3,7 +3,7 @@ import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { Button, Dropdown, IconHome, IconSettings, IconUser } from '@supabase/ui'
+import { Button, Dropdown, IconHome, IconSettings, IconUser } from 'ui'
 
 import { useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

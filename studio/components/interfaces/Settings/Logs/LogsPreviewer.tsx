@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
+import { IconAlertCircle, IconRewind, Button, Card, Input } from 'ui'
 
 import {
   LogTable,

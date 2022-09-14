@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState } from 'react'
-import { IconMaximize2, IconMinimize2 } from '@supabase/ui'
+import { IconMaximize2, IconMinimize2 } from 'ui'
 
 interface Props {
   icon?: ReactNode

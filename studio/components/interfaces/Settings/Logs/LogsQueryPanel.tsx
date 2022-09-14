@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
