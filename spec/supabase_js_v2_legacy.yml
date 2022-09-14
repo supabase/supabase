@@ -505,27 +505,55 @@ pages:
     title: 'generateLink()'
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     examples:
-      - name: Generate a signup link.
+      - name: Generate a signup link
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase.auth.admin.generateLink(
-            'email@example.com'
-            'signup',
-            {
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'signup',
+            email: 'email@example.com',
+            options: {
               'password': 'secret'
             }
-          )
+          })
           ```
-      - name: Generate an invite link.
+      - name: Generate an invite link
         isSpotlight: false
         js: |
           ```js
-          const { data, error } = await supabase.auth.admin.generateLink(
-            'email@example.com'
-            'invite',
-          )
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'invite',
+            email: 'email@example.com'
+          })
           ```
+      - name: Generate a magic link
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'magiclink',
+            email: 'email@example.com'
+          })
+          ```
+      - name: Generate a recovery link
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: 'email@example.com'
+          })
+          ``` 
+      - name: Generate a link to change email addresses
+        isSpotlight: false
+        js: |
+          ```js
+          const { data, error } = await supabase.auth.admin.generateLink({
+            type: 'email_change_current',
+            email: 'old.email@example.com',
+            newEmail: 'new.email@example.com'
+          })
+          ```           
 
   auth.admin.updateUserById():
     title: 'updateUserById()'
