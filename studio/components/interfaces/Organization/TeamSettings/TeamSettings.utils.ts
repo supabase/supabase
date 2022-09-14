@@ -23,17 +23,3 @@ export const getRolesManagementPermissions = (
 
   return { rolesAddable, rolesRemovable }
 }
-
-export const getRolesInvitablePermissions = (roles: Role[]): { rolesInvitable: Number[] } => {
-  const rolesInvitable: Number[] = []
-  if (!roles) return { rolesInvitable }
-
-  roles.forEach((role: Role) => {
-    const canInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
-      resource: { role_id: role.id },
-    })
-    if (canInvite) rolesInvitable.push(role.id)
-  })
-
-  return { rolesInvitable }
-}
