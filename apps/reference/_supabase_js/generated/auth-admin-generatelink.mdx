@@ -8,7 +8,7 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-Generates email links and OTPs to be sent via a custom email provider.
+Generates email links and OTPs to send via a custom email provider.
 
 ```js
 const { data, error } = await supabase.auth.admin.generateLink(
@@ -133,7 +133,7 @@ No description provided.
 
 ## Examples
 
-### Generate a signup link.
+### Generate a signup link
 
 ```js
 const { data, error } = await supabase.auth.admin.generateLink(
@@ -145,7 +145,7 @@ const { data, error } = await supabase.auth.admin.generateLink(
 )
 ```
 
-### Generate an invite link.
+### Generate an invite link
 
 ```js
 const { data, error } = await supabase.auth.admin.generateLink(
