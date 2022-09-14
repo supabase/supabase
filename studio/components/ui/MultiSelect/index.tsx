@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
 import { orderBy, filter, without } from 'lodash'
-import { Popover, IconCheck, IconAlertCircle, IconSearch } from '@supabase/ui'
+import { Popover, IconCheck, IconAlertCircle, IconSearch } from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
 

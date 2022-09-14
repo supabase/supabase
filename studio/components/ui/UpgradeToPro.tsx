@@ -1,4 +1,4 @@
-import { Button, IconClock } from '@supabase/ui'
+import { Button, IconClock } from 'ui'
 import Link from 'next/link'
 import { FC } from 'react'
 

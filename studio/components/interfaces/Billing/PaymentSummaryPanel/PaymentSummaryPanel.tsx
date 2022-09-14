@@ -8,7 +8,7 @@ import {
   IconCreditCard,
   Modal,
   Alert,
-} from '@supabase/ui'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

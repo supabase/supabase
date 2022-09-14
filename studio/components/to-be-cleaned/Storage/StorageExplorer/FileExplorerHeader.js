@@ -16,7 +16,7 @@ import {
   IconEdit2,
   IconLoader,
   IconChevronsUp,
-} from '@supabase/ui'
+} from 'ui'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants.ts'
 

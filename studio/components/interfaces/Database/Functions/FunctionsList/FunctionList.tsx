@@ -8,7 +8,7 @@ import {
   IconFileText,
   IconMoreVertical,
   IconTrash,
-} from '@supabase/ui'
+} from 'ui'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'

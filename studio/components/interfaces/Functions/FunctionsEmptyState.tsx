@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconBookOpen } from '@supabase/ui'
+import { Button, IconBookOpen } from 'ui'
 import TerminalInstructions from './TerminalInstructions'
 
 const FunctionsEmptyState = () => {

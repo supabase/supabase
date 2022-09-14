@@ -6,7 +6,7 @@ import {
   IconDownload,
   IconChevronLeft,
   IconChevronRight,
-} from '@supabase/ui'
+} from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

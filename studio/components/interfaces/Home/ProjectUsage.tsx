@@ -11,7 +11,7 @@ import {
   IconDatabase,
   IconKey,
   IconZap,
-} from '@supabase/ui'
+} from 'ui'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { get } from 'lib/common/fetch'

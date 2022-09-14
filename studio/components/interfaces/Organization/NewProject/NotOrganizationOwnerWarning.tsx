@@ -1,4 +1,4 @@
-import { IconAlertCircle } from '@supabase/ui'
+import { IconAlertCircle } from 'ui'
 
 import { useFlag } from 'hooks'
 import InformationBox from 'components/ui/InformationBox'

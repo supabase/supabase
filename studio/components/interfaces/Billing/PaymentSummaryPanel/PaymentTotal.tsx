@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Loading, IconHelpCircle, Button } from '@supabase/ui'
+import { Loading, IconHelpCircle, Button } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { SubscriptionPreview } from '../Billing.types'
 import CostBreakdownModal from './CostBreakdownModal'

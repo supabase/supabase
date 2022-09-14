@@ -1,4 +1,4 @@
-import { IconDatabase } from '@supabase/ui'
+import { IconDatabase } from 'ui'
 import SVG from 'react-inlinesvg'
 
 export const vercelIcon = (

@@ -17,7 +17,7 @@ import {
   Input,
   Listbox,
   Menu,
-} from '@supabase/ui'
+} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'

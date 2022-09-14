@@ -1,7 +1,7 @@
 import { forwardRef } from 'react'
 import { memo } from 'react-tracked'
 import DataGrid, { DataGridHandle, RowsChangeData } from '@supabase/react-data-grid'
-import { IconLoader } from '@supabase/ui'
+import { IconLoader } from 'ui'
 import { GridProps, SupaRow } from '../../types'
 import { useDispatch, useTrackedState } from '../../store'
 import RowRenderer from './RowRenderer'

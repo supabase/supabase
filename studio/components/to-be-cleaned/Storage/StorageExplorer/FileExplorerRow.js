@@ -15,7 +15,7 @@ import {
   IconCopy,
   IconEdit,
   IconMove,
-} from '@supabase/ui'
+} from 'ui'
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useContextMenu } from 'react-contexify'

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button } from '@supabase/ui'
+import { Button } from 'ui'
 
 interface Props {
   showTemplates: boolean
