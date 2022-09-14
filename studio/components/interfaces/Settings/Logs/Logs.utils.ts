@@ -174,12 +174,12 @@ export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, str
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   const its = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
   let trunc = 'minute'
-  let extendValue = 60 * 1
+  let extendValue = 60 * 6
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
-  if (minuteDiff > (60 * 8)) {
+  if (minuteDiff > (60 * 12)) {
     trunc = 'hour'
-    extendValue = 24 * 3
+    extendValue = 24 * 5
   } else if (hourDiff > 24 * 3) {
     trunc = 'day'
     extendValue = 7
