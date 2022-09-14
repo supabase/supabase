@@ -1,11 +1,11 @@
+import Image from 'next/image'
+import { useState } from 'react'
 import { PlayIcon, TruckIcon, XIcon } from '@heroicons/react/outline'
 import { Badge, Modal } from '@supabase/ui'
 
-import { useState } from 'react'
 import { Article, Product, WeekDayProps } from '../types'
 import _days from './../days.json'
 import ArticleButtonListItem from './ArticleButtonListItem'
-import ProductButton from './ProductButton'
 import ProductButtonListItem from './ProductButtonListItem'
 
 const days = _days as WeekDayProps[]
@@ -48,13 +48,6 @@ export const LaunchSection = (props: WeekDayProps) => {
         {props.shipped ? props.title : props.dd + ' 08:00 PT | 11:00 ET'}
       </h4>
 
-      {/* {props.shipped && props.announcements && (
-      <div>
-        {props.announcements.map((announcement: Announcement) => (
-          <Announcement {...announcement} />
-        ))}
-      </div>
-    )} */}
       {props.shipped && <p className="text-scale-1100 text-base">{props.description}</p>}
     </div>
   )
@@ -98,23 +91,16 @@ export const LaunchSection = (props: WeekDayProps) => {
           ) : (
             <>
               <div className="group relative cursor-pointer">
-                <img
+                <Image
+                  alt="Supabase"
+                  width={528}
+                  height={352}
                   className="rounded-xl border drop-shadow-lg"
                   src={`/images/launchweek/day${props.d}/thumb.jpg`}
-                  alt="Supabase"
                 />
                 <div
                   onClick={() => setVideoVisible(true)}
-                  className="
-                    absolute    
-                    top-0
-                    left-0
-                    flex
-                    h-full
-                    w-full
-                    items-center
-                    justify-center
-                  "
+                  className="absolute top-0 left-0 flex h-full w-full items-center justify-center"
                 >
                   <PlayIcon
                     strokeWidth={1.5}

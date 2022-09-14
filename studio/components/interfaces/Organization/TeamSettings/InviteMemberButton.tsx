@@ -27,7 +27,10 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
-  const canInviteMembers = checkPermissions(PermissionAction.CREATE, 'user_invites')
+
+  const canInviteMembers = roles.some(({ id: role_id }) =>
+    checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
+  )
 
   const initialValues = { email: '', role: '' }
 
@@ -54,11 +57,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
       }
     }
 
-    setSubmitting(true)
-
     const roleId = enablePermissions
       ? Number(values.role)
       : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+
+    setSubmitting(true)
 
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
