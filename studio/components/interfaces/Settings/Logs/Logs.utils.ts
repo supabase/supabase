@@ -174,13 +174,13 @@ export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, str
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   const its = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
   let trunc = 'minute'
-  let extendValue = 60 * 6
+  let extendValue = 60 * 1
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
-  if (minuteDiff > (60 * 12)) {
+  if (minuteDiff > (60 * 8)) {
     trunc = 'hour'
     extendValue = 24 * 3
-  } else if (hourDiff > 24 * 5) {
+  } else if (hourDiff > 24 * 3) {
     trunc = 'day'
     extendValue = 7
   }
@@ -198,13 +198,15 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = _genWhereStatement(table, filters)
+  console.log('where', where)
   return `
 SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(timestamp) as count
+  count(t.timestamp) as count
 FROM
   ${table} t
-${where ? where + ` and t.timestamp > '${startOffset.toISOString()}'` : ""}
+  cross join unnest(t.metadata) as metadata
+  ${where ? where + ` and t.timestamp > '${startOffset.toISOString()}'` : `where t.timestamp > '${startOffset.toISOString()}'`}
 GROUP BY
 timestamp
 ORDER BY
