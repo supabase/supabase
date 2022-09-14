@@ -24,10 +24,13 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
   const { slug } = router.query
 
   const enablePermissions = useFlag('enablePermissions')
+  const isOwner = ui.selectedOrganization?.is_owner
 
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
-  const canInviteMembers = checkPermissions(PermissionAction.CREATE, 'user_invites')
+
+  // [Joshen] The check against user_invites and auth.subject_roles are the same
+  const canAddMembers = enablePermissions ? rolesAddable.length > 0 : isOwner
 
   const initialValues = { email: '', role: '' }
 
@@ -54,11 +57,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
       }
     }
 
-    setSubmitting(true)
-
     const roleId = enablePermissions
       ? Number(values.role)
       : roles.find((role) => role.name === 'Developer')?.id ?? roles[0].id
+
+    setSubmitting(true)
 
     const response = await post(`${API_URL}/organizations/${slug}/members/invite`, {
       invited_email: values.email.toLowerCase(),
@@ -96,11 +99,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
+          <Button disabled={!canAddMembers} onClick={() => setIsOpen(true)}>
             Invite
           </Button>
         </Tooltip.Trigger>
-        {!canInviteMembers && (
+        {!canAddMembers && (
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
