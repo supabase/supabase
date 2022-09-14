@@ -28,7 +28,7 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
   const [isOpen, setIsOpen] = useState(false)
   const { mutateOrgMembers } = useOrganizationDetail((slug as string) || '')
 
-  const canAddMembers = roles.some(({ id: role_id }) =>
+  const canInviteMembers = roles.some(({ id: role_id }) =>
     checkPermissions(PermissionAction.CREATE, 'user_invites', { resource: { role_id } })
   )
 
@@ -99,11 +99,11 @@ const InviteMemberButton: FC<Props> = ({ user, members = [], roles = [], rolesAd
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button disabled={!canAddMembers} onClick={() => setIsOpen(true)}>
+          <Button disabled={!canInviteMembers} onClick={() => setIsOpen(true)}>
             Invite
           </Button>
         </Tooltip.Trigger>
-        {!canAddMembers && (
+        {!canInviteMembers && (
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
