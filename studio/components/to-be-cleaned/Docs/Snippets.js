@@ -684,7 +684,7 @@ const { user, error } = await supabase.auth.update({
 curl -X POST '${endpoint}/auth/v1/logout' \\
 -H "apikey: ${apiKey}" \\
 -H "Content-Type: application/json" \\
--H "Authorization: Bearer USER_TOKEN"'
+-H "Authorization: Bearer USER_TOKEN"
 `,
     },
     js: {
