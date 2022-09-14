@@ -1,6 +1,10 @@
 import { screen, getByText, fireEvent } from '@testing-library/react'
-import React from 'react'
+import React, { useState } from 'react'
 import { SWRConfig } from 'swr'
+
+import { render as originalRender } from '@testing-library/react'
+import { RootStore } from 'stores'
+import { StoreProvider } from 'hooks'
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -39,16 +43,65 @@ export const clickDropdown = (elem: HTMLElement) => {
 }
 
 /**
- * Wraps a component with a test SWR config, to reset the cache between tests.
+ * A custom render function for react testing library
+ * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
-export const wrapWithSwrTestConfig = (Component: React.FC<unknown>) => (props: any) =>
-  (
-    <SWRConfig
-      value={{
-        provider: () => new Map(),
-        shouldRetryOnError: false,
-      }}
-    >
-      <Component {...props} />
-    </SWRConfig>
+const SwrTestConfig: React.FC = ({ children }) => {
+  const [rootStore] = useState(() => new RootStore())
+
+  return (
+    <StoreProvider rootStore={rootStore}>
+      <SWRConfig
+        value={{
+          provider: () => new Map(),
+          shouldRetryOnError: false,
+        }}
+      >
+        {children}
+      </SWRConfig>
+    </StoreProvider>
   )
+}
+type renderParams = Parameters<typeof originalRender>
+export const render = ((ui: renderParams[0], options: renderParams[1]) =>
+  originalRender(ui, { wrapper: SwrTestConfig, ...options })) as typeof originalRender
+
+// function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+//   const [rootStore] = useState(() => new RootStore())
+
+//   useEffect(() => {
+//     async function handleEmailVerificationError() {
+//       const { error } = await auth.initialize()
+
+//       if (error?.message === GOTRUE_ERRORS.UNVERIFIED_GITHUB_USER) {
+//         rootStore.ui.setNotification({
+//           category: 'error',
+//           message:
+//             'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
+//         })
+//       }
+//     }
+
+//     handleEmailVerificationError()
+//   }, [])
+
+//   const getLayout = Component.getLayout ?? ((page) => page)
+
+//   return (
+//     <StoreProvider rootStore={rootStore}>
+//       <FlagProvider>
+//         <Head>
+//           <title>Supabase</title>
+//           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+//           <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
+//         </Head>
+//         <PageTelemetry>
+//           <RouteValidationWrapper>
+//             <AppBannerWrapper>{getLayout(<Component {...pageProps} />)}</AppBannerWrapper>
+//           </RouteValidationWrapper>
+//         </PageTelemetry>
+//         <PortalToast />
+//       </FlagProvider>
+//     </StoreProvider>
+//   )
+// }
