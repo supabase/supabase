@@ -10,6 +10,7 @@
     "apps/temp-community-tutorials",
     "apps/temp-docs",
     "apps/www",
+    "studio",
     "packages/*"
   ],
   "scripts": {
