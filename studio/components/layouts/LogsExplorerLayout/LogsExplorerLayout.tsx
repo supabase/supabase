@@ -14,12 +14,6 @@ interface Props {
 }
 
 const PageLayout: FC<Props> = ({ subtitle, children }) => {
-  const { content, ui } = useStore()
-
-  useEffect(() => {
-    content.load()
-  }, [ui.selectedProject])
-
   const canUseLogsExplorer = checkPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
   if (!canUseLogsExplorer) {
@@ -28,14 +22,6 @@ const PageLayout: FC<Props> = ({ subtitle, children }) => {
         <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
           <NoPermission isFullPage resourceText="access your project's logs explorer" />
         </main>
-      </BaseLayout>
-    )
-  }
-
-  if (!content.isLoaded) {
-    return (
-      <BaseLayout>
-        <Loading active={true}>{null}</Loading>
       </BaseLayout>
     )
   }
