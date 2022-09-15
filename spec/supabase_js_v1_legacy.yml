@@ -595,16 +595,18 @@ pages:
       When the user clicks the reset link in the email they are redirected back to your application.
       Prompt the user for a new password and call `auth.update()`:
       ```js
-      const { data, error } = await supabase.auth
-        .update({ password: new_password })
+      const { data, error } = await supabase.auth.update({
+        password: new_password,
+      })
       ```
     examples:
       - name: Reset password
         isSpotlight: true
         js: |
           ```js
-          const { data, error } = await supabase.auth.api
-            .resetPasswordForEmail('user@email.com')
+          const { data, error } = await supabase.auth.api.resetPasswordForEmail(
+            'user@email.com'
+          )
           ```
       - name: Reset password (React)
         isSpotlight: true
@@ -614,25 +616,27 @@ pages:
            * Step 1: Send the user an email to get a password reset token.
            * This email contains a link which sends the user back to your application.
            */
-          const { data, error } = await supabase.auth
-            .resetPasswordForEmail('user@email.com')
+          const { data, error } = await supabase.auth.api.resetPasswordForEmail(
+            'user@email.com'
+          )
             
           /**
            * Step 2: Once the user is redirected back to your application, 
            * ask the user to reset their password.
            */
-           useEffect(() => {
-             supabase.auth.onAuthStateChange(async (event, session) => {
-               if (event == "PASSWORD_RECOVERY") {
-                 const newPassword = prompt("What would you like your new password to be?");
-                 const { data, error } = await supabase.auth
-                   .update({ password: newPassword })
-                   
-                 if (data) alert("Password updated successfully!")
-                 if (error) alert("There was an error updating your password.")
-               } 
-             })
-           }, [])
+          useEffect(() => {
+            supabase.auth.onAuthStateChange(async (event, session) => {
+              if (event == "PASSWORD_RECOVERY") {
+                const newPassword = prompt("What would you like your new password to be?");
+                const { data, error } = await supabase.auth.update({
+                  password: newPassword,
+                })
+                  
+                if (data) alert("Password updated successfully!")
+                if (error) alert("There was an error updating your password.")
+              } 
+            })
+          }, [])
           ```
 
   auth.api.generateLink():
