@@ -3851,7 +3851,7 @@
                         "isExternal": true
                       },
                       "comment": {
-                        "shortText": "Sends a reset request to an email address."
+                        "shortText": "Sends a password reset request to an email address."
                       },
                       "parameters": [
                         {
