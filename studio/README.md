@@ -32,9 +32,9 @@ Project settings are managed outside of the Dashboard. If you use docker-compose
 - Branch from `master` and name your branches with the following structure
   - `{type}/{branch_name}`
     - Type: `chore | fix | feature`
-    - Branch Name: Arbitrary, just make sure it summarizes the work
-- Send a PR to `master` and tag the following members in your PR as reviewers
-  - [MildTomato](https://github.com/mildtomato), [phamhieu](https://github.com/phamhieu), [joshenlim](https://github.com/joshenlim)
+    - The branch name is arbitrary — just make sure it summarizes the work.
+- When you send a PR to `master`, it will automatically tag members of the frontend team for review.
+- Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
 
 ### Developer Quickstart
 
