@@ -29,7 +29,7 @@
 
 За да видите как да допринасяте, посетете [Getting Started](./DEVELOPERS.md)
 
-## Общност & поддръжка 
+## Общност & поддръжка
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Най-добър за: помощ при изграждането, дискусии за най-добри практики за бази данни, и прочие въпроси.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Най-добър за: бъгове и грешки, които срещате при използване на Supabase.
