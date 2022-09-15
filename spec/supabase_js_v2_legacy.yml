@@ -478,12 +478,12 @@ pages:
     title: 'resetPasswordForEmail()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
     notes: |
-      Sends a reset request to an email address.
+      Sends a password reset request to an email address.
       When the user clicks the reset link in the email they are redirected back to your application.
-      Prompt the user for a new password and call `auth.update()`:
+      Prompt the user for a new password and call `auth.updateUser()`:
       ```js
       const { data, error } = await supabase.auth
-        .update({ password: new_password })
+        .updateUser({ password: new_password })
       ```
     examples:
       - name: Reset password
@@ -500,22 +500,21 @@ pages:
           ```js
           /**
            * Step 1: Send the user an email to get a password reset token.
-           *   This email contains a link which sends the user back to your application.
+           * This email contains a link which sends the user back to your application.
            */
           const { data, error } = await supabase.auth
             .resetPasswordForEmail('user@email.com')
             
           /**
            * Step 2: Once the user is redirected back to your application, 
-           *   ask the user to reset their password.
+           * ask the user to reset their password.
            */
            useEffect(() => {
              supabase.auth.onAuthStateChange(async (event, session) => {
                if (event == "PASSWORD_RECOVERY") {
                  const newPassword = prompt("What would you like your new password to be?");
-                 const { data, error } = await supabase
-                   .auth
-                   .update({ password: newPassword })
+                 const { data, error } = await supabase.auth
+                   .updateUser({ password: newPassword })
                    
                  if (data) alert("Password updated successfully!")
                  if (error) alert("There was an error updating your password.")
