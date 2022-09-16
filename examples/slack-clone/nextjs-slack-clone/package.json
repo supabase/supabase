@@ -1,0 +1,19 @@
+{
+  "name": "supabase-slack-clone-basic",
+  "version": "0.1.1",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next",
+    "export": "next export",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^1.35.3",
+    "next": "latest",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "sass": "^1.26.2",
+    "tailwindcss": "^1.1.4"
+  }
+}
