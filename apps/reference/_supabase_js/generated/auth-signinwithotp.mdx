@@ -315,7 +315,7 @@ const { data, error } = await supabase.auth.signInWithOtp({
 The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
 
 ```js
-const { data, error } = await supabase.auth.signInWithPassword({
+const { data, error } = await supabase.auth.signInWithOtp({
   phone: '+13334445555',
 })
 ```
