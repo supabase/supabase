@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
+import { IconChevronRight, IconLoader } from '@supabase/ui'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/ui/Panel'

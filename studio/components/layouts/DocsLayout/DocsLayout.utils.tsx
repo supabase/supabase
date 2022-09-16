@@ -1,5 +1,5 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IconBook, IconBookOpen } from 'ui'
+import { IconBook, IconBookOpen } from '@supabase/ui'
 
 export const generateDocsMenu = (
   ref: string,

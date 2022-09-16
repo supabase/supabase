@@ -12,7 +12,7 @@ import {
   Button,
   Modal,
   IconAlertCircle,
-} from 'ui'
+} from '@supabase/ui'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'

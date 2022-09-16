@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { Alert, Button } from 'ui'
+import { Alert, Button } from '@supabase/ui'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'

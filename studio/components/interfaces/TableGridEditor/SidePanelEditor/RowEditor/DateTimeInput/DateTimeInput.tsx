@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Input } from 'ui'
+import { Input } from '@supabase/ui'
 import { getColumnType } from './DateTimeInput.utils'
 import dayjs from 'dayjs'
 

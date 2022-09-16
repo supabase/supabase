@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input } from 'ui'
+import { Input } from '@supabase/ui'
 import { CreateHookContext } from '../'
 
 const InputServiceUrl: FC = observer(({}) => {

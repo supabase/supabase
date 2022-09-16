@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import { useFlag } from 'hooks'
-import { IconExternalLink } from 'ui'
+import { IconExternalLink } from '@supabase/ui'
 
 const AppBannerWrapper: FC = ({ children }) => {
   const ongoingIncident = useFlag('ongoingIncident')

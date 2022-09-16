@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'ui'
+import { IconChevronRight } from '@supabase/ui'
 import { isNull } from 'lodash'
 import { Dictionary } from 'components/grid'
 

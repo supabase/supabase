@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Menu, IconLogOut, IconArrowUpRight } from 'ui'
+import { Menu, IconLogOut, IconArrowUpRight } from '@supabase/ui'
 
 interface Props {
   id: any

@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
+import { IconChevronRight, IconLoader } from '@supabase/ui'
 import { SQLTemplate } from '../SQLEditor.types'
 
 interface Props {

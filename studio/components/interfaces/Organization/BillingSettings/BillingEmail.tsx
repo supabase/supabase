@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react'
-import { Form, Input } from 'ui'
+import { Form, Input } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useStore, checkPermissions } from 'hooks'
 import { API_URL } from 'lib/constants'

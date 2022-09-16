@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconCheck } from 'ui'
+import { IconCheck } from '@supabase/ui'
 
 import { STRIPE_PRODUCT_IDS } from 'lib/constants'
 import { StripeProduct } from 'components/interfaces/Billing'

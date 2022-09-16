@@ -1,4 +1,4 @@
-import { Modal, IconChevronLeft } from 'ui'
+import { Modal, IconChevronLeft } from '@supabase/ui'
 import { pull } from 'lodash'
 import { useState, useEffect } from 'react'
 

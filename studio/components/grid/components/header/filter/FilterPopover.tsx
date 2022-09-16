@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus, IconFilter, Popover } from 'ui'
+import { Button, IconPlus, IconFilter, Popover } from '@supabase/ui'
 
 import { useUrlState } from 'hooks'
 import FilterRow from './FilterRow'

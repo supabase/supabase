@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { IconLoader, Modal } from 'ui'
+import { IconLoader, Modal } from '@supabase/ui'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 

@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Form } from 'ui'
+import { Input, Form } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'

@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react'
-import { SidePanel } from 'ui'
+import { SidePanel } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import JsonEditor from './JsonCodeEditor'

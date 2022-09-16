@@ -2,7 +2,7 @@ import { NextPage } from 'next'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 

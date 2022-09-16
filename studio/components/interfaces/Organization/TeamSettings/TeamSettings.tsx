@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch } from 'ui'
+import { Button, Input, IconSearch } from '@supabase/ui'
 
 import { useFlag, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'

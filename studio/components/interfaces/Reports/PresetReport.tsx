@@ -1,4 +1,4 @@
-import { Button, IconRefreshCw } from 'ui'
+import { Button, IconRefreshCw } from '@supabase/ui'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { DatePickerToFrom } from '../Settings/Logs'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'

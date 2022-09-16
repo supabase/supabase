@@ -1,5 +1,5 @@
 import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, Modal } from 'ui'
+import { IconCheck, IconHelpCircle, Modal } from '@supabase/ui'
 import { useFlag } from 'hooks'
 import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 

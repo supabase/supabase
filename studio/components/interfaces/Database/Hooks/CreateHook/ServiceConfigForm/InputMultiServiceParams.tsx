@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconPlus } from 'ui'
+import { Button, IconPlus } from '@supabase/ui'
 
 import { CreateHookContext } from '../'
 import InputServiceParam from './InputServiceParam'

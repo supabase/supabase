@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconBarChart2 } from 'ui'
+import { IconBarChart2 } from '@supabase/ui'
 
 interface Props {
   title?: string

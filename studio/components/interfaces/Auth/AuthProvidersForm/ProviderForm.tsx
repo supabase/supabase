@@ -2,7 +2,7 @@ import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from '@supabase/ui'
 
 import { useStore, checkPermissions } from 'hooks'
 import { Provider } from './AuthProvidersForm.types'

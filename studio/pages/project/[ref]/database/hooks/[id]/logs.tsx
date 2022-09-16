@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { uniqBy, map as lodashMap } from 'lodash'
 import { FC, useState, useEffect } from 'react'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'

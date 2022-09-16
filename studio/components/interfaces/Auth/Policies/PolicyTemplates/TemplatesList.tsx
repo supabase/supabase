@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Menu } from 'ui'
+import { Menu } from '@supabase/ui'
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
 interface Props {

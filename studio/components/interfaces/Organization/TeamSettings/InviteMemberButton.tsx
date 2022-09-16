@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { object, string } from 'yup'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, IconMail, Input, Modal, Select } from 'ui'
+import { Button, Form, IconMail, Input, Modal, Select } from '@supabase/ui'
 
 import { Member, User, Role } from 'types'
 import { checkPermissions, useFlag, useOrganizationDetail, useStore } from 'hooks'

@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { includes, uniqBy, map as lodashMap } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Input, IconSearch, IconLoader } from 'ui'
+import { Button, Input, IconSearch, IconLoader } from '@supabase/ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'

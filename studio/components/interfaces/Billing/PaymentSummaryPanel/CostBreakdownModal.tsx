@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { groupBy } from 'lodash'
-import { Modal } from 'ui'
+import { Modal } from '@supabase/ui'
 
 interface Props {
   visible: boolean

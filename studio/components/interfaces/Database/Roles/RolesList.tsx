@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconChevronRight } from 'ui'
+import { IconChevronRight } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'

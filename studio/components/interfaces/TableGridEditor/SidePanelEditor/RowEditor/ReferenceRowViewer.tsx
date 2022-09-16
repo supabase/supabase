@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react'
-import { SidePanel, IconLoader, IconXCircle } from 'ui'
+import { SidePanel, IconLoader, IconXCircle } from '@supabase/ui'
 import { PostgresRelationship } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'
