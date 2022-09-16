@@ -6,7 +6,7 @@ import {
   IconEdit,
   IconTrash,
   IconMoreVertical,
-} from 'ui'
+} from '@supabase/ui'
 import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
 

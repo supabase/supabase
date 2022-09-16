@@ -5,7 +5,7 @@ import {
   GroupFormatterProps,
   useRowSelection,
 } from '@supabase/react-data-grid'
-import { Button, IconMaximize2 } from 'ui'
+import { Button, IconMaximize2 } from '@supabase/ui'
 import { SupaRow } from '../../types'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useFocusRef } from '../../utils'

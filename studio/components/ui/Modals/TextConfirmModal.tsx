@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react'
-import { Modal, Button, Input, Alert, Form } from 'ui'
+import { Modal, Button, Input, Alert, Form } from '@supabase/ui'
 
 interface Props {
   loading: boolean

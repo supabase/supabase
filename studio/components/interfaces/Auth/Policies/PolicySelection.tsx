@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconEdit, IconGrid, Modal } from 'ui'
+import { IconEdit, IconGrid, Modal } from '@supabase/ui'
 import CardButton from 'components/ui/CardButton'
 
 interface Props {

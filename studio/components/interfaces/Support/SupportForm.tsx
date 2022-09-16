@@ -2,7 +2,7 @@ import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { useEffect, useReducer, useState, FC, ChangeEvent, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconMail, IconPlus, IconX, Input, Listbox } from 'ui'
+import { Button, IconMail, IconPlus, IconX, Input, Listbox } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { Project } from 'types'

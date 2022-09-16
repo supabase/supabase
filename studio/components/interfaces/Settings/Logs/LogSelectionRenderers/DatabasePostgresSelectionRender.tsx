@@ -1,4 +1,4 @@
-import { Alert } from 'ui'
+import { Alert } from '@supabase/ui'
 import React from 'react'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'

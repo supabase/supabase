@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconHeart } from 'ui'
+import { Button, IconHeart } from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'

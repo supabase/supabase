@@ -11,7 +11,7 @@ import BackupsError from './BackupsError'
 import BackupsEmpty from './BackupsEmpty'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import InformationBox from 'components/ui/InformationBox'
-import { IconAlertCircle } from 'ui'
+import { IconAlertCircle } from '@supabase/ui'
 
 interface Props {}
 

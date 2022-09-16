@@ -8,7 +8,7 @@ import {
   IconTrash,
   IconEdit3,
   IconColumns,
-} from 'ui'
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'

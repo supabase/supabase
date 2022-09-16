@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { debounce } from 'lodash'
-import { Button, Input, Listbox } from 'ui'
+import { Button, Input, Listbox } from '@supabase/ui'
 import { Dictionary } from 'components/grid'
 import generator from 'generate-password'
 

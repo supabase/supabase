@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { get, sum } from 'lodash'
-import { Checkbox, IconUpload } from 'ui'
+import { Checkbox, IconUpload } from '@supabase/ui'
 import { Transition } from '@headlessui/react'
 import { useContextMenu } from 'react-contexify'
 

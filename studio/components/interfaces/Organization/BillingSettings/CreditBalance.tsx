@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Badge } from 'ui'
+import { Badge } from '@supabase/ui'
 
 interface Props {
   balance: string | number

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { find, isEmpty, isUndefined } from 'lodash'
 import { Query, Dictionary } from 'components/grid'
-import { Modal } from 'ui'
+import { Modal } from '@supabase/ui'
 import {
   PostgresRelationship,
   PostgresTable,

@@ -2,7 +2,7 @@ import { FC, useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Dropdown, IconTrash, IconMoreHorizontal } from 'ui'
+import { Button, Dropdown, IconTrash, IconMoreHorizontal } from '@supabase/ui'
 
 import { Member, Role } from 'types'
 import { useStore, useOrganizationDetail, useFlag, checkPermissions } from 'hooks'

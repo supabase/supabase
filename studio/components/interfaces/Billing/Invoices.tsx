@@ -6,7 +6,7 @@ import {
   IconDownload,
   IconChevronLeft,
   IconChevronRight,
-} from 'ui'
+} from '@supabase/ui'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'

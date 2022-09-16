@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { last } from 'lodash'
-import { IconHome, IconChevronRight } from 'ui'
+import { IconHome, IconChevronRight } from '@supabase/ui'
 
 interface Props {
   breadcrumbs: string[]

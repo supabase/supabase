@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Menu } from 'ui'
+import { Menu } from '@supabase/ui'
 import { Dictionary } from '../../../types'
 
 interface RowItemProps {

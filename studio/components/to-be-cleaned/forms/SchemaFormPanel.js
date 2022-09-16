@@ -1,6 +1,6 @@
 import SchemaForm from './SchemaForm'
 import React, { useState } from 'react'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 
 export default function SchemaFormPanel({
   schema,

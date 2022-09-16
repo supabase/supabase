@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Select } from 'ui'
+import { Select } from '@supabase/ui'
 import { CreateHookContext } from '../'
 
 const SelectServiceMethod: FC = observer(({}) => {

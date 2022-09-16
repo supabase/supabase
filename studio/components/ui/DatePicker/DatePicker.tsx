@@ -7,7 +7,7 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from 'ui'
+} from '@supabase/ui'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'

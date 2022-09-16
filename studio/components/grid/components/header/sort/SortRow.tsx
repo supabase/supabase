@@ -1,6 +1,6 @@
 import update from 'immutability-helper'
 import { FC, useRef, memo } from 'react'
-import { Button, IconMenu, Toggle, IconX } from 'ui'
+import { Button, IconMenu, Toggle, IconX } from '@supabase/ui'
 import { XYCoord } from 'dnd-core'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 

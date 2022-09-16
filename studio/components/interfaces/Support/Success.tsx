@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconCheckCircle } from 'ui'
+import { Button, IconCheckCircle } from '@supabase/ui'
 
 const Success = () => {
   return (

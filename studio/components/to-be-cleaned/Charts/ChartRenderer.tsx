@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Loading } from 'ui'
+import { Loading } from '@supabase/ui'
 import { useState } from 'react'
 import {
   BarChart as RechartBarChart,

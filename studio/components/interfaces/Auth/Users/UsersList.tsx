@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, Loading } from 'ui'
+import { IconAlertCircle, Loading } from '@supabase/ui'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'

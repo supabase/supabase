@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
+import { IconAlertCircle, IconLoader, Input } from '@supabase/ui'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

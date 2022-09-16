@@ -15,7 +15,7 @@ import {
   IconRefreshCw,
   IconPenTool,
   IconAlertCircle,
-} from 'ui'
+} from '@supabase/ui'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,

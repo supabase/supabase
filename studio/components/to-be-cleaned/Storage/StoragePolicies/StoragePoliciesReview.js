@@ -1,4 +1,4 @@
-import { Button, Modal } from 'ui'
+import { Button, Modal } from '@supabase/ui'
 import { useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
 

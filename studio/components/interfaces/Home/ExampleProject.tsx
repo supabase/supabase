@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronRight } from 'ui'
+import { IconChevronRight } from '@supabase/ui'
 import { useStore } from 'hooks'
 import Link from 'next/link'
 

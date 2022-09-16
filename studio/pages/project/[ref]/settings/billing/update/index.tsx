@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Modal } from 'ui'
+import { Button, Modal } from '@supabase/ui'
 
 import { useStore, useSubscriptionStats } from 'hooks'
 import { get } from 'lib/common/fetch'

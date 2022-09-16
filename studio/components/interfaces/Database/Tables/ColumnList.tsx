@@ -8,7 +8,7 @@ import {
   IconChevronLeft,
   IconEdit3,
   IconTrash,
-} from 'ui'
+} from '@supabase/ui'
 
 import Table from '../../../to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'

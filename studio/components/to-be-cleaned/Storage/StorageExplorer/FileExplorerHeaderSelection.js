@@ -1,4 +1,4 @@
-import { Button, IconDownload, IconTrash2, IconMove, IconX } from 'ui'
+import { Button, IconDownload, IconTrash2, IconMove, IconX } from '@supabase/ui'
 
 const FileExplorerHeaderSelection = ({
   selectedItems = [],

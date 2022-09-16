@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button, Input, Space } from 'ui'
+import { Modal, Button, Input, Space } from '@supabase/ui'
 
 const MoveItemsModal = ({
   bucketName = '',

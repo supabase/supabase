@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from 'ui'
+import { Button } from '@supabase/ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { useStore, checkPermissions, useFlag } from 'hooks'

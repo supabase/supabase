@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Button, IconHelpCircle, IconLoader, Modal } from 'ui'
+import { Button, IconHelpCircle, IconLoader, Modal } from '@supabase/ui'
 
 import { TIER_QUERY_LIMITS } from '.'
 import { useProjectSubscription } from 'hooks'

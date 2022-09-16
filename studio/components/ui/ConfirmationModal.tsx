@@ -1,4 +1,4 @@
-import { Modal, Button, Space } from 'ui'
+import { Modal, Button, Space } from '@supabase/ui'
 import { MouseEventHandler } from 'react'
 import { FC, useState, useEffect } from 'react'
 

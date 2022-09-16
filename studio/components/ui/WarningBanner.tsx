@@ -1,4 +1,4 @@
-import { IconAlertCircle } from 'ui'
+import { IconAlertCircle } from '@supabase/ui'
 
 const WarningBanner = ({ title, description }: { title: string; description?: string }) => {
   return (

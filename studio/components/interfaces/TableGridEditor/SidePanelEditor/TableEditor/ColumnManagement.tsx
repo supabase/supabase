@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react'
 import { partition, isEmpty, isUndefined } from 'lodash'
-import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash } from 'ui'
+import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash } from '@supabase/ui'
 import {
   PostgresTable,
   PostgresColumn,

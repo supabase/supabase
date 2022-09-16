@@ -4,7 +4,7 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from 'ui'
+import { IconAlertCircle, IconInfo } from '@supabase/ui'
 import dayjs from 'dayjs'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 
