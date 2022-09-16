@@ -1,4 +1,4 @@
-# Checklists for contrubuting to the Supabase Dashboard
+# Checklists for contributing to the Supabase Dashboard
 
 First, we appreciate the time you've taken to contribute to Supabase! Thank you!
 
