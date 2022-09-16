@@ -1,10 +1,10 @@
 # Supabase Specs
 
-These spec files are used to generate our documentation.
+These spec files are used to generate the [reference documentation](https://supabase.com/docs/reference).
 
 ## Preparation
 
-To get started, run `make init`. This will install all dependencies.
+To get started, run `make init`. This installs all dependencies.
 
 ## Usage
 
