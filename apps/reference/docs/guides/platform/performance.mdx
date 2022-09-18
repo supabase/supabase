@@ -38,6 +38,13 @@ In such a scenario, you can consider:
 
 ### Configuring clients to use fewer connections
 
+:::note
+
+`pg_stat_activity` only exposes information on direct connections to the database. Information on the number of connections to pgbouncer is currently available [via the metrics endpoint](../platform/metrics).
+
+:::
+
+
 You can use the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view to debug which clients are holding open connections on your DB.
 
 Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [pgbouncer](/docs/guides/database/connecting-to-postgres#connection-pool) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
