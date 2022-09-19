@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Button, IconRefreshCw } from '@supabase/ui'
+import { Button, IconRefreshCw } from 'common2'
 import { Filter, Sort } from 'components/grid/types'
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { fetchCount, fetchPage } from 'components/grid/utils'

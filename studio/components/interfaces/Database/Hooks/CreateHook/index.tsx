@@ -3,7 +3,7 @@ import { FC, useEffect, createContext } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { isEmpty, mapValues, has, filter, keyBy, isUndefined } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Badge, Input, SidePanel } from '@supabase/ui'
+import { Badge, Input, SidePanel } from 'common2'
 import { useStore } from 'hooks'
 
 import InputName from './InputName'
@@ -415,7 +415,7 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
                   <SidePanel.Seperator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
-                      <h5 className="text-scale-1200 text-base">HTTP Headers</h5>
+                      <h5 className="text-base text-scale-1200">HTTP Headers</h5>
                       <Badge color="gray">Read only</Badge>
                     </div>
                     <div className="space-y-2">
@@ -450,7 +450,7 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
                   <SidePanel.Seperator />
                   <div className="space-y-2 px-6">
                     <div className="flex items-center space-x-2">
-                      <h5 className="text-scale-1200 text-base">HTTP Parameters</h5>
+                      <h5 className="text-base text-scale-1200">HTTP Parameters</h5>
                       <Badge color="gray">Read only</Badge>
                     </div>
                     <div className="space-y-2">
@@ -487,13 +487,13 @@ const CreateHook: FC<CreateHookProps> = ({ hook, visible = true, setVisible }) =
               </div>
               <SidePanel.Seperator />
               <div className="space-y-6 px-6">
-                <h5 className="text-scale-1200 text-base">Conditions to fire hook</h5>
+                <h5 className="text-base text-scale-1200">Conditions to fire hook</h5>
                 <TableSelection />
                 <CheckboxEvents />
               </div>
               <SidePanel.Seperator />
               <div className="space-y-6 px-6">
-                <h5 className="text-scale-1200 text-base">Type of hook</h5>
+                <h5 className="text-base text-scale-1200">Type of hook</h5>
                 <RadioGroupHookService />
               </div>
               <ServiceConfigForm />

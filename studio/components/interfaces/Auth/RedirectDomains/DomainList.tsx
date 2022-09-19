@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconGlobe, IconTrash } from '@supabase/ui'
+import { Button, IconGlobe, IconTrash } from 'common2'
 
 import { useStore } from 'hooks'
 import ValueContainer from './ValueContainer'
@@ -55,7 +55,7 @@ const DomainList: FC<Props> = ({ canUpdate, onSelectDomainToDelete }) => {
       ) : (
         <div
           className={[
-            'bg-scale-200 border-scale-400 text-scale-1200 flex items-center',
+            'flex items-center border-scale-400 bg-scale-200 text-scale-1200',
             'justify-center gap-2 rounded border px-6 py-8 text-sm',
           ].join(' ')}
         >

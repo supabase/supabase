@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckSquare, Loading } from '@supabase/ui'
+import { Button, IconCheckSquare, Loading } from 'common2'
 
 import { useProfile, useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
@@ -132,7 +132,7 @@ const JoinOrganizationPage = () => {
         <p className="text-scale-900">
           To accept this invitation, you will need to{' '}
           <a
-            className="text-brand-900 cursor-pointer"
+            className="cursor-pointer text-brand-900"
             onClick={async () => {
               await auth.signOut()
               router.reload()
@@ -160,27 +160,27 @@ const JoinOrganizationPage = () => {
     <>
       <div className="flex flex-col gap-2 px-6 py-8">
         <>
-          <p className="text-scale-1200 text-sm">You have been invited to join </p>
+          <p className="text-sm text-scale-1200">You have been invited to join </p>
           {organization_name ? (
             <>
-              <p className="text-scale-1200 text-3xl">
+              <p className="text-3xl text-scale-1200">
                 {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
-                <p className="text-scale-900 text-sm">an organization on Supabase</p>
+                <p className="text-sm text-scale-900">an organization on Supabase</p>
               )}
             </>
           ) : (
             <>
-              <p className="text-scale-1200 text-3xl">{'an organization'}</p>
+              <p className="text-3xl text-scale-1200">{'an organization'}</p>
             </>
           )}
-          {slug && <p className="text-scale-900 text-xs">{`organization slug: ${slug}`}</p>}
+          {slug && <p className="text-xs text-scale-900">{`organization slug: ${slug}`}</p>}
         </>
       </div>
 
       <div
-        className={['border-scale-400 border-t', isError ? 'bg-sand-100' : 'bg-transparent'].join(
+        className={['border-t border-scale-400', isError ? 'bg-sand-100' : 'bg-transparent'].join(
           ' '
         )}
       >
@@ -206,7 +206,7 @@ const JoinOrganizationPage = () => {
 
           {!profile && (
             <div className="flex flex-col gap-3">
-              <p className="text-scale-900 text-xs">
+              <p className="text-xs text-scale-900">
                 You will need to sign in to accept this invitation
               </p>
               <div className="flex justify-center gap-3">
@@ -231,7 +231,7 @@ const JoinOrganizationPage = () => {
   return (
     <div
       className={[
-        'bg-scale-200 flex h-full min-h-screen',
+        'flex h-full min-h-screen bg-scale-200',
         'w-full flex-col place-items-center',
         'items-center justify-center gap-8 px-5',
       ].join(' ')}
@@ -247,8 +247,8 @@ const JoinOrganizationPage = () => {
       </Link>
       <div
         className="
-          bg-scale-100 border-scale-400 mx-auto overflow-hidden
-          rounded-md border text-center shadow
+          mx-auto overflow-hidden rounded-md border
+          border-scale-400 bg-scale-100 text-center shadow
           md:w-[400px]
           "
       >

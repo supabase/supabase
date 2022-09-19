@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Badge, Button, Radio } from '@supabase/ui'
+import { Badge, Button, Radio } from 'common2'
 
 import { useStore, useFlag } from 'hooks'
 import { getProductPrice } from '../Billing.utils'
@@ -30,7 +30,7 @@ const ComputeSizeSelection: FC<Props> = ({
           <h4 className="text-lg">Database add-ons</h4>
           <Badge color="green">Optional</Badge>
         </div>
-        <p className="text-scale-1100 text-sm">
+        <p className="text-sm text-scale-1100">
           Choose the database instance size that best fits your needs
         </p>
       </div>

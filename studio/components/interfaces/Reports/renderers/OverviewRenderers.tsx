@@ -1,4 +1,4 @@
-import { Button, IconChevronRight } from '@supabase/ui'
+import { Button, IconChevronRight } from 'common2'
 import { jsonSyntaxHighlight } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import { BarChart } from 'components/to-be-cleaned/Charts/ChartRenderer'
 import Table from 'components/to-be-cleaned/Table'
@@ -32,7 +32,7 @@ export const renderStatusCodesChart = (props: ReportWidgetProps<StatusCodesDatum
 )
 export const renderErrorRateChart = (props: ReportWidgetProps) => {
   return (
-    <div className="w-full flex flex-col">
+    <div className="flex w-full flex-col">
       <BarChart
         data={props.data}
         attribute="count"
@@ -77,7 +77,7 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
           : percentage > 10
           ? 'bg-yellow-200'
           : 'bg-green-100'
-      } text-xs align-top`}
+      } align-top text-xs`}
     >
       <span className="text-scale-1100">{Number(value).toFixed(1)}</span>
     </Table.td>
@@ -85,7 +85,7 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
   return (
     <Table
       containerClassName="max-h-72 w-full overflow-y-auto"
-      className="border border-scale-600 relative rounded"
+      className="relative rounded border border-scale-600"
       head={
         <>
           <Table.th className="sticky top-0 z-10">Path</Table.th>
@@ -113,30 +113,30 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
                     <Button
                       onClick={() => setShow(!show)}
                       type="text"
-                      className="w-full text-scale-1200 justify-start space-x-1 flex"
+                      className="flex w-full justify-start space-x-1 text-scale-1200"
                       icon={
                         <span className={`transition ${show ? 'rotate-90' : 'rotate-0'}`}>
                           <IconChevronRight size="tiny" />
                         </span>
                       }
                     >
-                      <div className="flex space-x-2 items-center overflow-x-none">
-                        <p className="text-scale-1200 font-mono text-xs">{row.method}</p>
-                        <p className="font-mono text-scale-1200 text-xs truncate max-w-xs ">
+                      <div className="overflow-x-none flex items-center space-x-2">
+                        <p className="font-mono text-xs text-scale-1200">{row.method}</p>
+                        <p className="max-w-xs truncate font-mono text-xs text-scale-1200 ">
                           {row.path}
                           <span className="text-scale-1000">{row.query_params}</span>
                         </p>
                       </div>
                     </Button>
                   </Table.td>
-                  <Table.td style={{ padding: '0.5rem' }} className="text-xs align-top">
+                  <Table.td style={{ padding: '0.5rem' }} className="align-top text-xs">
                     {row.count}
                   </Table.td>
                   {renderNumericCellWithColorScale(row.avg_origin_time, avgTimePercentage)}
                   {renderNumericCellWithColorScale(row.p99_time, p99TimePercentage)}
-                  <Table.td className="align-top py-1">
+                  <Table.td className="py-1 align-top">
                     <div
-                      className={`mt-1 h-2 rounded w-full bg-green-1100`}
+                      className={`mt-1 h-2 w-full rounded bg-green-1100`}
                       style={{
                         width: `${totalQueryTimePercentage}%`,
                       }}
@@ -146,13 +146,13 @@ export const renderRequestsPathsTable = (props: ReportWidgetProps<PathsDatum>) =
                 <Table.tr className="transition-all duration-500">
                   <Table.td
                     colSpan={4}
-                    className={`w-full overflow-none ${
+                    className={`overflow-none w-full ${
                       show ? 'h-auto opacity-100' : 'table-cell !h-0 !p-0 opacity-0'
                     }`}
                   >
                     <pre
-                      className={`max-w-lg text-xs syntax-highlight overflow-auto bg-scale-300 p-2 rounded  ${
-                        show ? '' : '!p-0 h-0'
+                      className={`syntax-highlight max-w-lg overflow-auto rounded bg-scale-300 p-2 text-xs  ${
+                        show ? '' : 'h-0 !p-0'
                       }`}
                     >
                       <div

@@ -1,4 +1,4 @@
-import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from '@supabase/ui'
+import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'common2'
 
 export const METRIC_CATEGORIES = {
   API: {

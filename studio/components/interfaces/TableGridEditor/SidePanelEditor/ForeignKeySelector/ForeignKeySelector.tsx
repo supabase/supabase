@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { get, find, isEmpty, sortBy } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Listbox, IconHelpCircle } from '@supabase/ui'
+import { SidePanel, Listbox, IconHelpCircle } from 'common2'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import ActionBar from '../ActionBar'

@@ -1,14 +1,6 @@
 import { FC, ReactNode, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  Input,
-  Button,
-  IconSearch,
-  IconPlus,
-  IconChevronLeft,
-  IconEdit3,
-  IconTrash,
-} from '@supabase/ui'
+import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'common2'
 
 import Table from '../../../to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -70,7 +62,7 @@ const ColumnList: FC<{
           filterString={filterString}
           setFilterString={setFilterString}
           leftComponents={
-            <div className="flex items-center mr-4">
+            <div className="mr-4 flex items-center">
               <Button
                 type="outline"
                 className="mr-4"

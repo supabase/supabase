@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { FC } from 'react'
-import { Alert, Button } from '@supabase/ui'
+import { Alert, Button } from 'common2'
 
 import { useStore, useProjectUsage } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
@@ -84,7 +84,7 @@ const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
         }
         actions={
           minimal ? (
-            <div className="h-full flex items-center">
+            <div className="flex h-full items-center">
               <Link href={`/project/${ref}/settings/billing`}>
                 <a>
                   <Button type="default">Explore usage details</Button>

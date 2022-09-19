@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge } from '@supabase/ui'
+import { Badge } from 'common2'
 
 import Table from 'components/to-be-cleaned/Table'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
@@ -29,7 +29,7 @@ const UserListItem: FC<Props> = ({ user, canRemoveUser }) => {
         <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="hidden 2xl:table-cell">
-        <span className="text-scale-1200 capitalize">
+        <span className="capitalize text-scale-1200">
           {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
         </span>
       </Table.td>

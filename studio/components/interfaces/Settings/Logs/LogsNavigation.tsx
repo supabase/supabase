@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'common2'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
 

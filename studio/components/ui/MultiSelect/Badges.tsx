@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconX } from '@supabase/ui'
+import { IconX } from 'common2'
 
 export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
   <div

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import DefaultErrorRenderer from './DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './ResourcesExceededErrorRenderer'
-import { Alert } from '@supabase/ui'
+import { Alert } from 'common2'
 
 export default {
   title: 'Logs',

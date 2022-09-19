@@ -1,4 +1,4 @@
-import { IconArchive, IconDatabase, IconKey } from '@supabase/ui'
+import { IconArchive, IconDatabase, IconKey } from 'common2'
 
 export const usageBasedItems = [
   {

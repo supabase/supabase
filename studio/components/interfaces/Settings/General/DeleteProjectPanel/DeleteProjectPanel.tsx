@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Alert } from '@supabase/ui'
+import { Alert } from 'common2'
 
 import { useStore } from 'hooks'
 import Panel from 'components/ui/Panel'

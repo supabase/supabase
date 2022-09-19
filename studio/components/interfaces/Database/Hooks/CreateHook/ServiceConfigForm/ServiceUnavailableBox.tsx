@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Alert, Button } from '@supabase/ui'
+import { Alert, Button } from 'common2'
 import { CreateHookContext } from '../'
 
 const ServiceUnavailableBox: FC = observer(({}) => {

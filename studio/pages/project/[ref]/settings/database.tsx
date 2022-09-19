@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { debounce } from 'lodash'
 import generator from 'generate-password'
-import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from '@supabase/ui'
+import { Input, Button, IconDownload, IconArrowRight, Tabs, Modal } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -244,11 +244,11 @@ const ResetDbPassword: FC<any> = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                        'border-scale-200 border ', //border
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                        'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to reset the database password
                       </span>
                     </div>
@@ -261,7 +261,7 @@ const ResetDbPassword: FC<any> = () => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-scale-1200 text-sm">Reset database password</h5>}
+        header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
         confirmText="Reset password"
         alignFooter="right"
         size="medium"

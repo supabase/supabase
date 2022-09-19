@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus } from '@supabase/ui'
+import { Button, IconPlus } from 'common2'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 
@@ -46,7 +46,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                   <div className="col-span-4 max-w-4xl space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
                     <div className="space-y-1">
                       <p>You need additional permissions to view projects from this organization</p>
-                      <p className="text-scale-1100 text-sm">
+                      <p className="text-sm text-scale-1100">
                         Contact your organization owner or adminstrator for assistance.
                       </p>
                     </div>
@@ -55,7 +55,7 @@ const ProjectList: FC<Props> = ({ rewriteHref }) => {
                   <div className="col-span-4 max-w-4xl space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
-                      <p className="text-scale-1100 text-sm">
+                      <p className="text-sm text-scale-1100">
                         Get started by creating a new project.
                       </p>
                     </div>

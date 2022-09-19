@@ -1,7 +1,7 @@
 import semver from 'semver'
 import { useEffect, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from '@supabase/ui'
+import { Button, Input, IconSearch, IconX, IconRefreshCw, Listbox, IconUsers } from 'common2'
 
 import { IS_PLATFORM } from 'lib/constants'
 import { PageContext } from 'pages/project/[ref]/auth/users'
@@ -108,9 +108,9 @@ const Users = () => {
           {inviteEnabled && <InviteUserModal />}
         </div>
       </div>
-      <section className="overflow-visible mt-4 px-6">
-        <div className="relative section-block--body rounded">
-          <div className="align-middle inline-block min-w-full">
+      <section className="mt-4 overflow-visible px-6">
+        <div className="section-block--body relative rounded">
+          <div className="inline-block min-w-full align-middle">
             <UsersList />
           </div>
         </div>

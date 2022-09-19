@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { IconChevronRight, IconLoader } from '@supabase/ui'
+import { IconChevronRight, IconLoader } from 'common2'
 import { SQLTemplate } from '../SQLEditor.types'
 
 interface Props {
@@ -12,12 +12,12 @@ const SQLCard: FC<Props> = ({ template }) => {
 
   return (
     <div
-      className="rounded bg-panel-header-light dark:bg-panel-header-dark transition-colors 
-      border border-panel-border-light dark:border-panel-border-dark 
-      hover:border-panel-border-hover-light dark:hover:border-panel-border-hover-dark 
-      cursor-pointer w-full"
+      className="w-full cursor-pointer rounded border 
+      border-panel-border-light bg-panel-header-light transition-colors 
+      hover:border-panel-border-hover-light dark:border-panel-border-dark 
+      dark:bg-panel-header-dark dark:hover:border-panel-border-hover-dark"
     >
-      <div className="px-6 py-3 border-b dark:border-dark flex items-center justify-between">
+      <div className="flex items-center justify-between border-b px-6 py-3 dark:border-dark">
         <h5 className="m-0">{title}</h5>
         {loading ? (
           <div className="animate-spin">
@@ -29,7 +29,7 @@ const SQLCard: FC<Props> = ({ template }) => {
           </p>
         )}
       </div>
-      <p className="px-6 py-4 capitalize-first">
+      <p className="capitalize-first px-6 py-4">
         <p className="text-scale-1000">{description}</p>
       </p>
     </div>

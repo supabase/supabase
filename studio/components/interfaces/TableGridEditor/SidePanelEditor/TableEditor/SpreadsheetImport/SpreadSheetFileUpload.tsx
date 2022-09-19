@@ -1,5 +1,5 @@
 import { DragEvent, useRef, useState, FC } from 'react'
-import { Button, IconLoader, IconFileText } from '@supabase/ui'
+import { Button, IconLoader, IconFileText } from 'common2'
 import SparkBar from 'components/ui/SparkBar'
 
 interface Props {
@@ -36,13 +36,13 @@ const SpreadSheetFileUpload: FC<Props> = ({
   return (
     <div className="space-y-10">
       <div>
-        <p className="text-scale-1100 mb-2 text-sm">
+        <p className="mb-2 text-sm text-scale-1100">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
           headers should not include any special characters other than hyphens (
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-scale-900 text-xs">
+        <p className="text-xs text-scale-900">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>
@@ -64,7 +64,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
         <div className="flex h-32 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-500">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
-            <h3 className="text-scale-1200 text-base">{uploadedFile.name}</h3>
+            <h3 className="text-base text-scale-1200">{uploadedFile.name}</h3>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>

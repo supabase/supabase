@@ -5,7 +5,7 @@ import { CSVLink } from 'react-csv'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useKeyboardShortcuts, useStore, useWindowDimensions, checkPermissions } from 'hooks'
@@ -178,7 +178,7 @@ const MonacoEditor = ({ error, updateSqlSnippet }) => {
   }
 
   return (
-    <div className="dark:border-dark flex-grow overflow-y-auto border-b">
+    <div className="flex-grow overflow-y-auto border-b dark:border-dark">
       <Editor
         className="monaco-editor"
         theme={'supabase'}

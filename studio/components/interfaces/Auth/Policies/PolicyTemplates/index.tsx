@@ -1,4 +1,4 @@
-import { Button } from '@supabase/ui'
+import { Button } from 'common2'
 import { FC, useState } from 'react'
 import { isEmpty } from 'lodash'
 
@@ -20,7 +20,7 @@ const PolicyTemplates: FC<Props> = ({
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
   return (
     <div>
-      <div className="dark:border-dark flex justify-between border-t">
+      <div className="flex justify-between border-t dark:border-dark">
         <TemplatesList
           templatesNote={templatesNote}
           templates={templates}
@@ -29,8 +29,8 @@ const PolicyTemplates: FC<Props> = ({
         />
         <TemplatePreview selectedTemplate={selectedTemplate} />
       </div>
-      <div className="dark:border-dark flex w-full items-center justify-end gap-3 border-t px-6 py-4">
-        <span className="text-scale-900 text-sm">
+      <div className="flex w-full items-center justify-end gap-3 border-t px-6 py-4 dark:border-dark">
+        <span className="text-sm text-scale-900">
           This will override any existing code you've written
         </span>
         <Button

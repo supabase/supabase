@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input } from '@supabase/ui'
+import { Input } from 'common2'
 import { CreateHookContext } from './'
 
 const InputName: FC = observer(({}) => {

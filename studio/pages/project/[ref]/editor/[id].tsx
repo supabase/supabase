@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { isUndefined, isNaN } from 'lodash'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'common2'
 import { PostgresTable, PostgresColumn } from '@supabase/postgres-meta'
 
 import Base64 from 'lib/base64'
@@ -177,7 +177,7 @@ const TableEditorPage: NextPage = () => {
         header={`Confirm deletion of column "${selectedColumnToDelete?.name}"`}
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
           </Modal.Content>
@@ -195,7 +195,7 @@ const TableEditorPage: NextPage = () => {
         }
         children={
           <Modal.Content>
-            <p className="text-scale-1100 py-4 text-sm">
+            <p className="py-4 text-sm text-scale-1100">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
           </Modal.Content>

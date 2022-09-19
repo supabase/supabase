@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from '@supabase/ui'
+import { IconCalendar, IconType, IconHash, Listbox, IconToggleRight, Input } from 'common2'
 import { PostgresType } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES, POSTGRES_DATA_TYPE_OPTIONS } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
@@ -105,7 +105,7 @@ const ColumnType: FC<Props> = ({
             value={enumType.name}
             label={enumType.name}
             addOnBefore={() => {
-              return <div className="bg-scale-1200 mx-1 h-2 w-2 rounded-full" />
+              return <div className="mx-1 h-2 w-2 rounded-full bg-scale-1200" />
             }}
           >
             <div className="flex items-center space-x-4">

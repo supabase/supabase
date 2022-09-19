@@ -3,7 +3,7 @@ import * as React from 'react'
 import { EditorProps } from '@supabase/react-data-grid'
 import { useTrackedState } from '../../store'
 import { BlockKeys, MonacoEditor, NullValue } from '../common'
-import { Popover } from '@supabase/ui'
+import { Popover } from 'common2'
 
 export function JsonEditor<TRow, TSummaryRow = unknown>({
   row,

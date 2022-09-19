@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { SidePanel } from '@supabase/ui'
+import { SidePanel } from 'common2'
 
 import { CreateHookContext } from '../'
 import SelectServiceMethod from './SelectServiceMethod'

@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, Loading } from '@supabase/ui'
+import { IconAlertCircle, Loading } from 'common2'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'
@@ -34,7 +34,7 @@ const UsersList = ({}) => {
                 {/* @ts-ignore */}
                 <Table.td
                   colSpan={7}
-                  className="h-14 p-4 whitespace-nowrap border-t leading-5 text-gray-300 text-sm"
+                  className="h-14 whitespace-nowrap border-t p-4 text-sm leading-5 text-gray-300"
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />

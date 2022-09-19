@@ -1,4 +1,4 @@
-import { IconCheck, IconClipboard } from '@supabase/ui'
+import { IconCheck, IconClipboard } from 'common2'
 import { useState } from 'react'
 
 const CommandRender = ({ commands }: any) => {
@@ -10,7 +10,7 @@ const CommandRender = ({ commands }: any) => {
           <div key={`command-${idx}`} className="space-y-1">
             <span className="font-mono text-sm text-scale-900">{`> ${item.comment}`}</span>
             <div className="flex items-center gap-2">
-              <div className="flex gap-2 text-scale-1200 font-mono text-sm font-normal">
+              <div className="flex gap-2 font-mono text-sm font-normal text-scale-1200">
                 <span className="text-scale-900">$</span>
                 <span>
                   <span className="">{item.jsx ? item.jsx() : null} </span>

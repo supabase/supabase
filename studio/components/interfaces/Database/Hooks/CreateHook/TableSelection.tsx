@@ -2,7 +2,7 @@ import Link from 'next/link'
 import SVG from 'react-inlinesvg'
 import { FC, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Listbox } from '@supabase/ui'
+import { Input, Listbox } from 'common2'
 
 import { CreateHookContext } from './'
 import { useStore } from 'hooks'
@@ -71,7 +71,7 @@ const TableSelection: FC = observer(({}) => {
             value={x.id}
             label={x.name}
             addOnBefore={() => (
-              <div className="bg-scale-1200 text-scale-100 flex items-center justify-center rounded p-1 ">
+              <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
                 <SVG
                   src={'/img/table-editor.svg'}
                   style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}

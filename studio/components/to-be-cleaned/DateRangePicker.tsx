@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown } from 'common2'
 import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
 

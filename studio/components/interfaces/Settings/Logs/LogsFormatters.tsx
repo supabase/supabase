@@ -4,7 +4,7 @@
  * for http response codes
  */
 
-import { IconAlertCircle, IconInfo } from '@supabase/ui'
+import { IconAlertCircle, IconInfo } from 'common2'
 import dayjs from 'dayjs'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
 
@@ -24,10 +24,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '1':
     case '2':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-500 dark:bg-scale-400 border
+            className="relative flex h-6 items-center justify-center rounded border bg-scale-500 px-2
+            py-1 text-center dark:bg-scale-400
             "
           >
             <label className="block font-mono text-sm text-scale-900">{value}</label>
@@ -38,10 +38,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // 5XX responses
     case '5':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-red-400
+            className="relative flex h-6 items-center justify-center rounded bg-red-400 px-2 py-1
+            text-center
 
             "
           >
@@ -54,10 +54,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     case '4':
     case '3':
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-amber-400
+            className="relative flex h-6 items-center justify-center rounded bg-amber-400 px-2 py-1
+            text-center
 
             "
           >
@@ -71,10 +71,10 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
+        <div className="flex h-full items-center">
           <div
-            className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center
-            bg-scale-300
+            className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1
+            text-center
 
             "
           >
@@ -116,11 +116,11 @@ export const SeverityFormatter = ({
     case 'FATAL':
     case 'ERROR':
       return (
-        <div className="flex items-center h-full gap-1">
-          <div className=" p-0.5 rounded !text-red-900">
+        <div className="flex h-full items-center gap-1">
+          <div className=" rounded p-0.5 !text-red-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-red-900 !block titlecase">{text}</span>
+          <span className="titlecase !block !text-red-900">{text}</span>
         </div>
       )
       break
@@ -129,33 +129,33 @@ export const SeverityFormatter = ({
 
     case 'DEBUG':
       return (
-        <div className="flex items-center h-full gap-1">
-          <div className=" p-0.5 rounded !text-blue-900">
+        <div className="flex h-full items-center gap-1">
+          <div className=" rounded p-0.5 !text-blue-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{text}</span>
+          <span className="titlecase !block !text-blue-900">{text}</span>
         </div>
       )
       break
 
     case 'LOG':
       return (
-        <div className="flex items-center h-full gap-1">
-          <div className=" p-0.5 rounded !text-blue-900">
+        <div className="flex h-full items-center gap-1">
+          <div className=" rounded p-0.5 !text-blue-900">
             <IconInfo size={14} strokeWidth={2} />
           </div>
-          <span className="!text-blue-900 !block titlecase">{text}</span>
+          <span className="titlecase !block !text-blue-900">{text}</span>
         </div>
       )
       break
 
     case 'WARNING':
       return (
-        <div className="flex items-center h-full gap-1">
-          <div className=" p-0.5 rounded !text-amber-900">
+        <div className="flex h-full items-center gap-1">
+          <div className=" rounded p-0.5 !text-amber-900">
             <IconAlertCircle size={14} strokeWidth={2} />
           </div>
-          <span className="!text-amber-900 !block titlecase">{text}</span>
+          <span className="titlecase !block !text-amber-900">{text}</span>
         </div>
       )
       break
@@ -163,8 +163,8 @@ export const SeverityFormatter = ({
     // All other responses
     default:
       return (
-        <div className="flex items-center h-full">
-          <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
+        <div className="flex h-full items-center">
+          <div className="relative flex h-6 items-center justify-center rounded bg-scale-300 px-2 py-1 text-center">
             <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
         </div>
@@ -198,7 +198,7 @@ export const TimestampLocalFormatter = ({
  */
 
 export const HeaderFormmater = ({ value }: any) => {
-  return <div className="text-scale-900 font-normal flex items-center text-xs h-full">{value}</div>
+  return <div className="flex h-full items-center text-xs font-normal text-scale-900">{value}</div>
 }
 
 /*

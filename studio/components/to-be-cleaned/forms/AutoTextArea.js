@@ -1,4 +1,4 @@
-import { Input } from '@supabase/ui'
+import { Input } from 'common2'
 import React, { useState, useEffect, useRef } from 'react'
 
 const AutoTextArea = (props) => {

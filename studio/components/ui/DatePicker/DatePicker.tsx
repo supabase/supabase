@@ -7,7 +7,7 @@ import {
   IconChevronRight,
   IconArrowRight,
   IconCalendar,
-} from '@supabase/ui'
+} from 'common2'
 
 import { format } from 'date-fns'
 import TimeSplitInput from './TimeSplitInput'
@@ -131,11 +131,11 @@ function _DatePicker({
             </div>
             <div
               className={`
-                      text-scale-900 
                       flex 
                       w-12 
-                      items-center
+                      items-center 
                       justify-center
+                      text-scale-900
                     `}
             >
               <IconArrowRight strokeWidth={1.5} size={14} />
@@ -190,7 +190,7 @@ function _DatePicker({
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
                     </button>
-                    <span className="text-scale-1100 text-sm">{format(date, 'MMMM yyyy')}</span>
+                    <span className="text-sm text-scale-1100">{format(date, 'MMMM yyyy')}</span>
                     <button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}

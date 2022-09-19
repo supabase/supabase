@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import Link from 'next/link'
-import { Menu, IconLogOut, IconArrowUpRight } from '@supabase/ui'
+import { Menu, IconLogOut, IconArrowUpRight } from 'common2'
 
 interface Props {
   id: any
@@ -47,20 +47,20 @@ const SidebarItem: FC<Props> = ({
       <a className="block" target={isExternal ? '_blank' : '_self'}>
         <button
           className={[
-            'ring-scale-1200 border-scale-500 group-hover:border-scale-900 group',
+            'group border-scale-500 ring-scale-1200 group-hover:border-scale-900',
             'flex max-w-full cursor-pointer items-center space-x-2 py-1 font-normal',
             'outline-none focus-visible:z-10 focus-visible:ring-1',
           ].join(' ')}
           onClick={onClick}
         >
           {isExternal && (
-            <span className="text-scale-900 group-hover:text-scale-1100 truncate text-sm transition">
+            <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size="tiny" />
             </span>
           )}
           <span
             title={label}
-            className="text-scale-1100 group-hover:text-scale-1200 w-full truncate text-sm transition"
+            className="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>

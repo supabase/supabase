@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
-import { IconSave, Loading } from '@supabase/ui'
+import { IconSave, Loading } from 'common2'
 import { useStore } from 'hooks'
 import { LogsSavedQueriesItem } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
@@ -43,8 +43,8 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       {saved.length === 0 && (
         <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
           <IconSave className="animate-bounce" />
-          <h3 className="text-scale-1200 text-lg">No Saved Queries Yet</h3>
-          <p className="text-scale-900 text-sm">
+          <h3 className="text-lg text-scale-1200">No Saved Queries Yet</h3>
+          <p className="text-sm text-scale-900">
             Saved queries will appear here. Queries can be saved from the{' '}
             <Link href={`/project/${ref}/logs-explorer`}>
               <span className="cursor-pointer font-bold underline">Query</span>

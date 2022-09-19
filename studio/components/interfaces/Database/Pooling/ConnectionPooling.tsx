@@ -10,7 +10,7 @@ import { API_URL } from 'lib/constants'
 import { patch } from 'lib/common/fetch'
 import ToggleField from 'components/to-be-cleaned/forms/ToggleField'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
-import { Input } from '@supabase/ui'
+import { Input } from 'common2'
 
 interface Props {}
 
@@ -184,7 +184,7 @@ export const PgbouncerConfig: FC<ConfigProps> = observer(
                 showInlineError
                 errorMessage="You must select one of the three options"
               />
-              <div className="flex !mt-1" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
+              <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
                 <p className="text-sm text-scale-900">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}

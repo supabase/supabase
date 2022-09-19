@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer, useStaticRendering } from 'mobx-react-lite'
-import { IconCode, Badge, Collapsible, Button, Popover } from '@supabase/ui'
+import { IconCode, Badge, Collapsible, Button, Popover } from 'common2'
 import { TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsExplorerLayout from 'components/layouts/LogsExplorerLayout/LogsExplorerLayout'
 import CardButton from 'components/ui/CardButton'
@@ -21,12 +21,12 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
               title={template.label}
               icon={
                 <div
-                  className="text-scale-100 bg-scale-1200 duration-400 group-hover:bg-brand-900 group-hover:text-brand-1200 flex h-6
-                    w-6
-                    items-center
-                    justify-center
-                    rounded
+                  className="duration-400 flex h-6 w-6 items-center justify-center rounded
+                    bg-scale-1200
+                    text-scale-100
                     transition-colors
+                    group-hover:bg-brand-900
+                    group-hover:text-brand-1200
                   "
                 >
                   <div className="scale-100 group-hover:scale-110">
@@ -42,10 +42,10 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
                   <Popover
                     onOpenChange={setShowPreview}
                     open={showPreview}
-                    className="bg-scale-100 rounded-lg"
+                    className="rounded-lg bg-scale-100"
                     size="content"
                     overlay={
-                      <pre className="bg-scale-100 whitespace-pre-line break-words rounded-lg p-4 text-sm">
+                      <pre className="whitespace-pre-line break-words rounded-lg bg-scale-100 p-4 text-sm">
                         {template.searchString}
                       </pre>
                     }

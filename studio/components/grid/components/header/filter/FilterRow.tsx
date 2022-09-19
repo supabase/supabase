@@ -1,6 +1,6 @@
 import { debounce } from 'lodash'
 import { FC, memo, useState, useEffect, ChangeEvent, useCallback } from 'react'
-import { Button, Input, IconChevronDown, IconX } from '@supabase/ui'
+import { Button, Input, IconChevronDown, IconX } from 'common2'
 
 import { useUrlState } from 'hooks'
 import { Filter } from 'components/grid/types'

@@ -2,7 +2,7 @@ import { FC, useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Dropdown, IconTrash, IconMoreHorizontal } from '@supabase/ui'
+import { Button, Dropdown, IconTrash, IconMoreHorizontal } from 'common2'
 
 import { Member, Role } from 'types'
 import { useStore, useOrganizationDetail, useFlag, checkPermissions } from 'hooks'
@@ -168,11 +168,11 @@ const MemberActions: FC<Props> = ({ members, member, roles }) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                'border-scale-200 border ', //border
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                'border border-scale-200 ', //border
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">
+              <span className="text-xs text-scale-1200">
                 You need additional permissions to manage this team member
               </span>
             </div>

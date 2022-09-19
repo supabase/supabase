@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from '@supabase/ui'
+import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'common2'
 import { Enum } from './AuthProvidersForm.types'
 
 interface Props {
@@ -48,7 +48,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
                 onClick={() => setHidden(!hidden)}
               />
             ) : (
-              <span className="text-scale-900 mr-3">
+              <span className="mr-3 text-scale-900">
                 {properties.units ? (
                   <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                     {properties.units}
@@ -83,7 +83,7 @@ const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }
             ) : null
           }
           actions={
-            <span className="text-scale-900 mr-3">
+            <span className="mr-3 text-scale-900">
               {properties.units ? (
                 <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                   {properties.units}

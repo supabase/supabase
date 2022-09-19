@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconDownload } from '@supabase/ui'
+import { Badge, Button, IconDownload } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -121,10 +121,10 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   return (
     <div
       className={`flex h-12 items-center justify-between px-6 ${
-        index ? 'dark:border-dark border-t' : ''
+        index ? 'border-t dark:border-dark' : ''
       }`}
     >
-      <p className="text-scale-1200 text-sm ">
+      <p className="text-sm text-scale-1200 ">
         {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
       </p>
       <div className="">{generateSideButtons(backup)}</div>

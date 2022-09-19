@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { FC, useEffect } from 'react'
-import { IconChevronRight, IconLoader } from '@supabase/ui'
+import { IconChevronRight, IconLoader } from 'common2'
 
 import { useProjectSubscription, useStore } from 'hooks'
 import Panel from 'components/ui/Panel'
@@ -88,7 +88,7 @@ const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
         ))}
         {projects.length === 0 && (
           <Panel.Content>
-            <p className="text-scale-1100 text-sm">No projects created yet</p>
+            <p className="text-sm text-scale-1100">No projects created yet</p>
           </Panel.Content>
         )}
       </Panel>

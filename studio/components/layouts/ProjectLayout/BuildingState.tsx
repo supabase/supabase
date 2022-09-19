@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconArrowRight, IconLoader, Button } from '@supabase/ui'
+import { Badge, IconArrowRight, IconLoader, Button } from 'common2'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
@@ -47,7 +47,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
       <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
-            <h1 className="text-scale-1200 text-3xl">{project?.name}</h1>
+            <h1 className="text-3xl text-scale-1200">{project?.name}</h1>
             <Badge color="brand">
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
@@ -60,26 +60,26 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
             </Badge>
           </div>
           <div>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               {' '}
               We are provisioning your database and API endpoints
             </p>
-            <p className="text-scale-1100 text-sm"> This may take a few minutes</p>
+            <p className="text-sm text-scale-1100"> This may take a few minutes</p>
           </div>
         </div>
         <div>
           <div className=" grid grid-cols-12 gap-12">
             <div className="col-span-12 space-y-12 lg:col-span-4">
               <div>
-                <h4 className="text-scale-1200 text-base">While you wait</h4>
+                <h4 className="text-base text-scale-1200">While you wait</h4>
 
                 <ChecklistItem
                   description={
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-sm text-scale-1100">
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="text-brand-900 hover:text-brand-1200 mb-0 transition-colors"
+                          className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
                           target="_blank"
                         >
                           documentation
@@ -91,10 +91,10 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
                 />
               </div>
               <div>
-                <h4 className="text-scale-1200 text-base">Not working?</h4>
+                <h4 className="text-base text-scale-1200">Not working?</h4>
                 <ChecklistItem
                   description={
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-sm text-scale-1100">
                       Try refreshing after a couple of minutes.
                     </p>
                   }
@@ -103,7 +103,7 @@ const ProjectBuildingState: FC<ProjectBuildingState> = ({ project }) => {
                   <ChecklistItem
                     description={
                       <>
-                        <p className="text-scale-1100 mb-4 text-sm">
+                        <p className="mb-4 text-sm text-scale-1100">
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>

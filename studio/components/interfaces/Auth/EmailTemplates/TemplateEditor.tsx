@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import { FC, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Input, Form } from '@supabase/ui'
+import { Input, Form } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -86,7 +86,7 @@ const TemplateEditor: FC<Props> = ({ template }) => {
                   if (property.type === 'string') {
                     return (
                       <div className="space-y-3">
-                        <label className="text-scale-1200 col-span-12 text-sm lg:col-span-5">
+                        <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
                           {property.title}
                         </label>
                         <Input

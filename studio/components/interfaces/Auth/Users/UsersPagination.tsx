@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button } from '@supabase/ui'
+import { Button } from 'common2'
 
 import { PageContext } from 'pages/project/[ref]/auth/users'
 
@@ -28,7 +28,7 @@ const UsersPagination = () => {
           results
         </p>
       </div>
-      <div className="flex-1 flex justify-between sm:justify-end">
+      <div className="flex flex-1 justify-between sm:justify-end">
         {PageState.hasPrevious && (
           <Button type="secondary" disabled={!PageState.hasPrevious} onClick={onPrevious}>
             Previous

@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from '@supabase/ui'
+import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'common2'
 import { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 

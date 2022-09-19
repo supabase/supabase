@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { groupBy } from 'lodash'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'common2'
 
 interface Props {
   visible: boolean
@@ -27,7 +27,7 @@ const CostBreakdownModal: FC<Props> = ({
       header="Cost breakdown details"
       onCancel={onCancel}
     >
-      <div className="py-4 space-y-2">
+      <div className="space-y-2 py-4">
         <Modal.Content>
           <p className="text-sm">
             The following shows the cost breakdown of the invoice that will be billed on{' '}
@@ -40,11 +40,11 @@ const CostBreakdownModal: FC<Props> = ({
           </p>
         </Modal.Content>
         <Modal.Content>
-          <div className="bg-scale-500 border border-scale-600 rounded">
-            <div className="flex items-center py-2 px-4 border-b border-scale-600">
-              <div className="text-xs w-[75%]">Description</div>
-              <div className="text-xs w-[10%] text-right">Qty</div>
-              <div className="text-xs w-[15%] text-right">Amount</div>
+          <div className="rounded border border-scale-600 bg-scale-500">
+            <div className="flex items-center border-b border-scale-600 py-2 px-4">
+              <div className="w-[75%] text-xs">Description</div>
+              <div className="w-[10%] text-right text-xs">Qty</div>
+              <div className="w-[15%] text-right text-xs">Amount</div>
             </div>
             {Object.keys(groupedBreakdown).map((startPeriod: any, idx: number) => {
               const start = new Date(Number(startPeriod) * 1000).toLocaleDateString('en-US', {
@@ -62,16 +62,16 @@ const CostBreakdownModal: FC<Props> = ({
               return (
                 <div key={`breakdown-${idx}`} className="border-b border-scale-600">
                   <div className="flex items-center py-2 px-4 ">
-                    <div className="text-xs w-full text-scale-1100">
+                    <div className="w-full text-xs text-scale-1100">
                       {start} - {end}
                     </div>
                   </div>
                   {groupedBreakdown[startPeriod].map((item: any, index: number) => {
                     return (
                       <div key={`breakdown-row-${index}`} className="flex items-center py-2 px-4">
-                        <div className="text-sm w-[75%]">{item.description}</div>
-                        <div className="text-sm w-[10%] text-right">{item.quantity}</div>
-                        <div className="text-sm w-[15%] text-right">
+                        <div className="w-[75%] text-sm">{item.description}</div>
+                        <div className="w-[10%] text-right text-sm">{item.quantity}</div>
+                        <div className="w-[15%] text-right text-sm">
                           ${(item.amount / 100).toFixed(2)}
                         </div>
                       </div>
@@ -80,21 +80,21 @@ const CostBreakdownModal: FC<Props> = ({
                 </div>
               )
             })}
-            <div className="flex flex-col py-2 px-4 space-y-1">
+            <div className="flex flex-col space-y-1 py-2 px-4">
               <div className="flex items-center">
-                <div className="text-sm w-[75%]">Total amount</div>
-                <div className="text-sm w-[10%] text-right"></div>
-                <div className="text-xl w-[15%] text-right">
+                <div className="w-[75%] text-sm">Total amount</div>
+                <div className="w-[10%] text-right text-sm"></div>
+                <div className="w-[15%] text-right text-xl">
                   ${totalDue < 0 ? 0 : totalDue.toFixed(2)}
                 </div>
               </div>
               {totalDue < 0 && (
                 <div className="flex items-center text-scale-1100">
-                  <div className="text-sm w-[75%]">
+                  <div className="w-[75%] text-sm">
                     Amount returned as credits for unused resources
                   </div>
-                  <div className="text-sm w-[10%] text-right"></div>
-                  <div className="text-sm w-[15%] text-right">${Math.abs(totalDue).toFixed(2)}</div>
+                  <div className="w-[10%] text-right text-sm"></div>
+                  <div className="w-[15%] text-right text-sm">${Math.abs(totalDue).toFixed(2)}</div>
                 </div>
               )}
             </div>
