@@ -1,8 +1,7 @@
 const { withSentryConfig } = require('@sentry/nextjs')
 const withPlugins = require('next-compose-plugins')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: true, //process.env.ANALYZE === 'true',
-  openAnalyzer: true,
+  enabled: process.env.ANALYZE === 'true',
 })
 
 // this is required to use shared packages in the packages directory
