@@ -1,8 +1,8 @@
 import React, { forwardRef, useRef, useImperativeHandle } from 'react'
-import { IconContext } from '../Icon/IconContext'
-import { IconLoader } from '../Icon/icons/IconLoader'
+// import { IconContext } from './../Icon/IconContext'
+// import { IconLoader } from './../Icon/icons/IconLoader'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import styleHandler from './../../lib/theme/styleHandler'
 
 export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   block?: boolean
@@ -40,7 +40,7 @@ export interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   form?: string
 }
 
-interface CustomButtonProps extends React.HTMLAttributes<HTMLOrSVGElement> {}
+interface CustomButtonProps extends React.HTMLAttributes<HTMLButtonElement> {}
 
 export interface RefHandle {
   // container: () => HTMLElement | null
@@ -126,16 +126,16 @@ const Button = forwardRef<RefHandle, ButtonProps>(
 
     const buttonContent = (
       <>
-        {showIcon &&
+        {/* {showIcon &&
           (loading ? (
             <IconLoader size={size} className={iconLoaderClasses.join(' ')} />
           ) : icon ? (
             <IconContext.Provider value={{ contextSize: size }}>{icon}</IconContext.Provider>
-          ) : null)}
+          ) : null)} */}
         {children && <span className={__styles.label}>{children}</span>}
-        {iconRight && !loading && (
+        {/* {iconRight && !loading && (
           <IconContext.Provider value={{ contextSize: size }}>{iconRight}</IconContext.Provider>
-        )}
+        )} */}
       </>
     )
 
