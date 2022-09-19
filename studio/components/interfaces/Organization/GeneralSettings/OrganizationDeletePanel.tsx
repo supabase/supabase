@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Alert } from '@supabase/ui'
+import { Alert } from 'common2'
 
 import Panel from 'components/ui/Panel'
 import DeleteOrganizationButton from './DeleteOrganizationButton'

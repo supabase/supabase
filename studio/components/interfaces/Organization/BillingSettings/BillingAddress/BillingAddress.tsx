@@ -1,7 +1,7 @@
 import { FC, useState } from 'react'
 import { isEqual } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Listbox } from '@supabase/ui'
+import { Form, Input, Button, Listbox } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useFlag } from 'hooks'
@@ -80,9 +80,9 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
       <Panel loading={loading}>
         {loading ? (
           <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-            <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-            <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-            <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+            <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+            <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+            <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
           </div>
         ) : !canReadBillingAddress ? (
           <NoPermission resourceText="view this organization's billing address" />

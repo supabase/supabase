@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { last } from 'lodash'
-import { IconHome, IconChevronRight } from '@supabase/ui'
+import { IconHome, IconChevronRight } from 'common2'
 
 interface Props {
   breadcrumbs: string[]
@@ -16,9 +16,9 @@ const DrilldownBreadCrumbs: FC<Props> = ({ breadcrumbs = [], onSelectBreadcrumb 
           <div className="flex items-center space-x-2" key={crumb}>
             <IconChevronRight size={16} strokeWidth={2} />
             {crumb === last(breadcrumbs) ? (
-              <p className="text-xs font-mono">{crumb}</p>
+              <p className="font-mono text-xs">{crumb}</p>
             ) : (
-              <p className="text-xs font-mono">
+              <p className="font-mono text-xs">
                 <div
                   className="cursor-pointer"
                   onClick={() =>

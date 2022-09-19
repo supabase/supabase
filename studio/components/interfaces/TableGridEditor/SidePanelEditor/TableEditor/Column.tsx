@@ -1,15 +1,6 @@
 import { FC } from 'react'
 import { isUndefined } from 'lodash'
-import {
-  Checkbox,
-  Input,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
-  Button,
-} from '@supabase/ui'
+import { Checkbox, Input, IconX, IconMenu, Popover, IconLink, IconSettings, Button } from 'common2'
 import { PostgresType } from '@supabase/postgres-meta'
 
 import { ColumnField } from '../SidePanelEditor.types'
@@ -152,7 +143,7 @@ const Column: FC<Props> = ({
               className="pointer-events-auto"
               header={
                 <div className="flex items-center justify-center">
-                  <h5 className="text-scale-1200 text-sm">Extra options</h5>
+                  <h5 className="text-sm text-scale-1200">Extra options</h5>
                 </div>
               }
               overlay={[
@@ -217,11 +208,11 @@ const Column: FC<Props> = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="bg-scale-1200 dark:bg-scale-100 text-scale-100 dark:text-scale-1100 rounded-full py-0.5 px-2 text-xs">
+                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-scale-1100">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 group-hover:text-scale-1200 transition-colors">
+                <div className="text-scale-1100 transition-colors group-hover:text-scale-1200">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>

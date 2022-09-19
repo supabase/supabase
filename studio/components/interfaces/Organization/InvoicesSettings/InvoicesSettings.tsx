@@ -6,7 +6,7 @@ import {
   IconDownload,
   IconChevronLeft,
   IconChevronRight,
-} from '@supabase/ui'
+} from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -101,7 +101,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
   }
 
   return (
-    <div className="my-4 container max-w-4xl space-y-1">
+    <div className="container my-4 max-w-4xl space-y-1">
       <Loading active={loading}>
         <Table
           head={[
@@ -138,7 +138,7 @@ const InvoicesSettings: FC<Props> = ({ organization }) => {
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td className="align-right">
-                        <div className="flex items-center space-x-2 justify-end">
+                        <div className="flex items-center justify-end space-x-2">
                           <Button
                             type="outline"
                             icon={<IconDownload />}

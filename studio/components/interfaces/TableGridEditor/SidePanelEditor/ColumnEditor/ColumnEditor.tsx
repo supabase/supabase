@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { isUndefined, isEmpty } from 'lodash'
 import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input } from '@supabase/ui'
+import { Checkbox, SidePanel, Input } from 'common2'
 import {
   PostgresColumn,
   PostgresRelationship,

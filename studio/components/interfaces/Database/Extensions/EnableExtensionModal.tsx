@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from '@supabase/ui'
+import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from 'common2'
 import { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
 
 import { useStore } from 'hooks'
@@ -102,7 +102,7 @@ const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
       onCancel={onCancel}
       size="small"
       header={
-        <div className="flex gap-2 items-baseline">
+        <div className="flex items-baseline gap-2">
           <h5 className="text-sm text-scale-1200">Confirm to enable</h5>
           <code className="text-xs">{extension.name}</code>
         </div>

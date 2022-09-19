@@ -1,4 +1,4 @@
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'common2'
 import { useRouter } from 'next/router'
 
 // @ts-ignore

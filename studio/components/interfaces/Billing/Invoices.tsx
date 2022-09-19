@@ -6,7 +6,7 @@ import {
   IconDownload,
   IconChevronLeft,
   IconChevronRight,
-} from '@supabase/ui'
+} from 'common2'
 
 import { useStore } from 'hooks'
 import { API_URL } from 'lib/constants'
@@ -84,7 +84,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
   }
 
   return (
-    <div className="my-4 container max-w-4xl space-y-1">
+    <div className="container my-4 max-w-4xl space-y-1">
       <Loading active={loading}>
         <Table
           head={[
@@ -125,7 +125,7 @@ const Invoices: FC<Props> = ({ projectRef }) => {
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td className="align-right">
-                        <div className="flex items-center space-x-2 justify-end">
+                        <div className="flex items-center justify-end space-x-2">
                           <Button
                             type="outline"
                             icon={<IconDownload />}

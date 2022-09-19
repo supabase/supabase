@@ -2,7 +2,7 @@ import Image from 'next/image'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState, useContext, Fragment } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Loading, Listbox, IconUser, Modal } from '@supabase/ui'
+import { Badge, Button, Loading, Listbox, IconUser, Modal } from 'common2'
 
 import { Member, Role } from 'types'
 import { useStore, useFlag, useOrganizationDetail } from 'hooks'
@@ -127,7 +127,7 @@ const MembersView = () => {
                         <div className="flex items-center space-x-4">
                           <div>
                             {x.invited_id ? (
-                              <span className="border-border-secondary-light dark:border-border-secondary-dark flex rounded-full border-2 p-2">
+                              <span className="flex rounded-full border-2 border-border-secondary-light p-2 dark:border-border-secondary-dark">
                                 <IconUser size={20} strokeWidth={2} />
                               </span>
                             ) : (
@@ -188,11 +188,11 @@ const MembersView = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                                        'border-scale-200 border ', //border
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                        'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-scale-1200 text-xs">
+                                      <span className="text-xs text-scale-1200">
                                         Role can only be changed after the user has accepted the
                                         invite
                                       </span>
@@ -203,11 +203,11 @@ const MembersView = () => {
                                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                                     <div
                                       className={[
-                                        'bg-scale-100 rounded py-1 px-2 leading-none shadow', // background
-                                        'border-scale-200 border ', //border
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                                        'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-scale-1200 text-xs">
+                                      <span className="text-xs text-scale-1200">
                                         You need additional permissions to manage this team member
                                       </span>
                                     </div>
@@ -262,7 +262,7 @@ const MembersView = () => {
               to{' '}
               <span className="text-scale-1200">{getRoleNameById(selectedMember?.newRoleId)}</span>
             </p>
-            <p className="text-sm text-scale-1200 mt-3">
+            <p className="mt-3 text-sm text-scale-1200">
               By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>

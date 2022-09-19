@@ -3,7 +3,7 @@ import { includes } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from '@supabase/ui'
+import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'common2'
 
 import { checkPermissions, useStore } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
@@ -89,11 +89,11 @@ const HookList: FC<Props> = ({
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                        'border-scale-200 border',
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to update webhooks
                       </span>
                     </div>

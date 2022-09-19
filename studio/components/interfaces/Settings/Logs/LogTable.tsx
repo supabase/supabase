@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Alert, Button, IconEye, IconEyeOff } from '@supabase/ui'
+import { Alert, Button, IconEye, IconEyeOff } from 'common2'
 import DataGrid from '@supabase/react-data-grid'
 
 import LogSelection, { LogSelectionProps } from './LogSelection'
@@ -182,20 +182,20 @@ const LogTable = ({
   return (
     <>
       <section
-        className={'flex flex-col w-full ' + (!queryType ? 'shadow-lg' : '')}
+        className={'flex w-full flex-col ' + (!queryType ? 'shadow-lg' : '')}
         style={{ maxHeight }}
       >
         {!queryType && (
           <div>
             <div
               className="
-            w-full bg-scale-100 dark:bg-scale-300 
-            rounded-tl rounded-tr
+            flex w-full items-center 
+            justify-between rounded-tl
+            rounded-tr
             border-t
             border-l
-            border-r
-            flex items-center justify-between
-            px-5 py-2
+            border-r bg-scale-100 px-5
+            py-2 dark:bg-scale-300
       "
             >
               <div className="flex items-center gap-2">
@@ -223,11 +223,11 @@ const LogTable = ({
             </div>
           </div>
         )}
-        <div className={`flex flex-row h-full ${!queryType ? 'border-l border-r' : ''}`}>
+        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
-            flex-grow flex-1
+            flex-1 flex-grow
             ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'} 
           `}
             rowHeight={40}
@@ -239,30 +239,30 @@ const LogTable = ({
             noRowsFallback={
               !isLoading ? (
                 <>
-                  <div className="py-4 w-full h-full flex-col space-y-12">
+                  <div className="h-full w-full flex-col space-y-12 py-4">
                     {!error && (
                       <div
-                        className={`transition-all
-                      duration-500
-                      delay-200
-                      
+                        className={`mt-16
                       flex
+                      scale-100
+                      
                       flex-col
                       items-center
+                      justify-center
                   
                       gap-6
                       text-center
-                      mt-16
-                      opacity-100 
-                      scale-100
+                      opacity-100
+                      transition-all 
+                      delay-200
                       
-                      justify-center
+                      duration-500
                     `}
                       >
                         <>
                           <div className="flex flex-col gap-1">
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center"></div>
-                            <div className="relative border border-scale-600 border-dashed dark:border-scale-900 w-32 h-4 rounded px-2 flex items-center">
+                            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
+                            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
                               <div className="absolute right-1 -bottom-4">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -320,10 +320,10 @@ const LogTable = ({
             <div
               className={
                 queryType
-                  ? 'w-1/2 flex flex-col'
+                  ? 'flex w-1/2 flex-col'
                   : focusedLog
-                  ? 'w-1/2 flex flex-col'
-                  : 'w-0 hidden'
+                  ? 'flex w-1/2 flex-col'
+                  : 'hidden w-0'
               }
             >
               <LogSelection

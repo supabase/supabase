@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { uniqBy, map as lodashMap } from 'lodash'
 import { FC, useState, useEffect } from 'react'
-import { Button } from '@supabase/ui'
+import { Button } from 'common2'
 import { observer } from 'mobx-react-lite'
 
 import { useStore } from 'hooks'
@@ -80,7 +80,7 @@ const HookLogs: FC<any> = observer(() => {
         </div>
       </div>
 
-      <div className="bg-bg-alt-light border-t border-b">
+      <div className="border-t border-b bg-bg-alt-light">
         <div className="divide-y-2 ">
           {logsData?.map((log: any) => {
             return (

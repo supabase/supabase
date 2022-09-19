@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, IconMessageCircle, Popover } from '@supabase/ui'
+import { Button, IconMessageCircle, Popover } from 'common2'
 import FeedbackWidget from './FeedbackWidget'
 
 const FeedbackDropdown = () => {

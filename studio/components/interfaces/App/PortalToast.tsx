@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
-import { Button, IconX } from '@supabase/ui'
+import { Button, IconX } from 'common2'
 
 const PortalRootWithNoSSR = dynamic(
   // @ts-ignore

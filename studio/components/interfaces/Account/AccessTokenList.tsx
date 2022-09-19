@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Modal, IconTrash } from '@supabase/ui'
+import { Button, Modal, IconTrash } from 'common2'
 import { useStore } from 'hooks'
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'

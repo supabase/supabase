@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { Loading, IconHelpCircle, Button } from '@supabase/ui'
+import { Loading, IconHelpCircle, Button } from 'common2'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { SubscriptionPreview } from '../Billing.types'
 import CostBreakdownModal from './CostBreakdownModal'
@@ -48,7 +48,7 @@ const PaymentTotal: FC<Props> = ({
                       <IconHelpCircle
                         size={16}
                         strokeWidth={1.5}
-                        className="cursor-pointer opacity-50 hover:opacity-100 transition"
+                        className="cursor-pointer opacity-50 transition hover:opacity-100"
                         onClick={() => setShowCostBreakdown(true)}
                       />
                     </Tooltip.Trigger>
@@ -56,11 +56,11 @@ const PaymentTotal: FC<Props> = ({
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
                       <div
                         className={[
-                          'bg-scale-100 shadow py-1 px-2 rounded leading-none', // background
+                          'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                           'border border-scale-200 ', //border
                         ].join(' ')}
                       >
-                        <span className="text-scale-1200 text-xs">How is this calculated?</span>
+                        <span className="text-xs text-scale-1200">How is this calculated?</span>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Root>
@@ -106,8 +106,8 @@ const PaymentTotal: FC<Props> = ({
                 <p className="text-sm text-scale-1100">No changes to current subscription</p>
               )}
             </div>
-            <div className="flex justify-end items-end relative -top-[8px]">
-              <p className="text-scale-1100 relative -top-[1px]">$</p>
+            <div className="relative -top-[8px] flex items-end justify-end">
+              <p className="relative -top-[1px] text-scale-1100">$</p>
               <p className="text-2xl">
                 {!hasChanges
                   ? '0.00'

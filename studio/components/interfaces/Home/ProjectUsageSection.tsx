@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { IconLoader, IconAlertCircle } from '@supabase/ui'
+import { IconLoader, IconAlertCircle } from 'common2'
 
 import { useProjectUsage } from 'hooks'
 import { ProjectUsage, NewProjectPanel } from 'components/interfaces/Home'
@@ -32,7 +32,7 @@ const ProjectUsageSection: FC = observer(({}) => {
   return (
     <>
       {isLoading ? (
-        <div className="w-full flex justify-center items-center space-x-2">
+        <div className="flex w-full items-center justify-center space-x-2">
           <IconLoader className="animate-spin" size={14} />
           <p className="text-sm">Retrieving project usage statistics</p>
         </div>

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from '@supabase/ui'
+import { Button, IconTerminal, IconMaximize2, IconMinimize2 } from 'common2'
 import { useProjectSettings } from 'hooks'
 import { useAccessTokens } from 'hooks/queries/useAccessTokens'
 import { Commands } from './Functions.types'
@@ -85,13 +85,13 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
 
   return (
     <div
-      className="col-span-7 bg-scale-100 dark:bg-scale-300 shadow border rounded overflow-hidden transition-all"
+      className="col-span-7 overflow-hidden rounded border bg-scale-100 shadow transition-all dark:bg-scale-300"
       style={{ maxHeight: showInstructions ? 500 : 80 }}
     >
-      <div className="px-8 py-6 space-y-6">
+      <div className="space-y-6 px-8 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="border p-2 flex items-center justify-center w-8 h-8 bg-scale-100 rounded">
+            <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-100 p-2">
               <IconTerminal strokeWidth={2} />
             </div>
             <h4>Terminal instructions</h4>
@@ -111,7 +111,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false }) => {
         </div>
       </div>
       {tokens && tokens.length === 0 ? (
-        <div className="px-8 border-t py-6 space-y-3">
+        <div className="space-y-3 border-t px-8 py-6">
           <div>
             <h3 className="text-base text-scale-1200">You may need to create an access token</h3>
             <p className="text-sm text-scale-1100">

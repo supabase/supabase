@@ -13,7 +13,7 @@ import {
   Alert,
   IconEdit,
   IconTrash,
-} from '@supabase/ui'
+} from 'common2'
 
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
@@ -39,8 +39,8 @@ const StorageMenu: FC<Props> = () => {
   } = storageExplorerStore || {}
 
   return (
-    <Menu type="pills" className="my-6 flex flex-col flex-grow px-5">
-      <div className="px-2 mb-6">
+    <Menu type="pills" className="my-6 flex flex-grow flex-col px-5">
+      <div className="mb-6 px-2">
         <Button
           block
           type="default"
@@ -60,7 +60,7 @@ const StorageMenu: FC<Props> = () => {
           <div>
             <Menu.Group title="All buckets" />
             {!loaded ? (
-              <div className="py-2 px-2 flex items-center space-x-2">
+              <div className="flex items-center space-x-2 py-2 px-2">
                 <IconLoader className="animate-spin" size={14} strokeWidth={2} />
                 <span className="text-sm">Loading buckets</span>
               </div>

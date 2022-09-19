@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IconClock } from '@supabase/ui'
+import { IconClock } from 'common2'
 
 import { format } from 'date-fns'
 
@@ -173,12 +173,12 @@ const TimeSplitInput = ({
   return (
     <div
       className={`
-        flex items-center justify-center gap-0
-        text-xs text-scale-1100 bg-scale-100 dark:bg-scaleA-300 border border-scale-700 h-7 rounded
-        ${focus && ' outline outline-2 outline-scale-500 border-scale-800'}
+        flex h-7 items-center justify-center
+        gap-0 rounded border border-scale-700 bg-scale-100 text-xs text-scale-1100 dark:bg-scaleA-300
+        ${focus && ' border-scale-800 outline outline-2 outline-scale-500'}
     `}
     >
-      <div className="text-scale-900 mr-1">
+      <div className="mr-1 text-scale-900">
         <IconClock size={14} strokeWidth={1.5} />
       </div>
 
@@ -191,13 +191,13 @@ const TimeSplitInput = ({
         onChange={(e) => handleOnChange(e.target.value, 'HH')}
         aria-label="Hours"
         className="
-            w-4
-            text-center
-            text-xs
-            p-0
-            text-scale-1200 bg-transparent outline-none
-            border-none
             ring-none
+            w-4
+            border-none
+            bg-transparent
+            p-0 text-center text-xs
+            text-scale-1200
+            outline-none
             ring-0
             focus:ring-0
         "
@@ -213,13 +213,13 @@ const TimeSplitInput = ({
         onChange={(e) => handleOnChange(e.target.value, 'mm')}
         aria-label="Minutes"
         className="
-            w-4
-            text-center
-            text-xs
-            p-0
-            text-scale-1200 bg-transparent outline-none
-            border-none
             ring-none
+            w-4
+            border-none
+            bg-transparent
+            p-0 text-center text-xs
+            text-scale-1200
+            outline-none
             ring-0
             focus:ring-0
         "
@@ -235,13 +235,13 @@ const TimeSplitInput = ({
         onChange={(e) => handleOnChange(e.target.value, 'ss')}
         aria-label="Seconds"
         className="
-            w-4
-            text-center
-            text-xs
-            p-0
-            text-scale-1200 bg-transparent outline-none
-            border-none
             ring-none
+            w-4
+            border-none
+            bg-transparent
+            p-0 text-center text-xs
+            text-scale-1200
+            outline-none
             ring-0
             focus:ring-0
         "

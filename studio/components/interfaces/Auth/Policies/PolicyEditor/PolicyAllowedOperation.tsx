@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Radio } from '@supabase/ui'
+import { Radio } from 'common2'
 
 interface Props {
   operation: string
@@ -10,10 +10,10 @@ const PolicyAllowedOperation: FC<Props> = ({ operation = '', onSelectOperation }
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-scale-1100 text-base" htmlFor="allowed-operation">
+        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-scale-900 text-sm">Select an operation for this policy</p>
+        <p className="text-sm text-scale-900">Select an operation for this policy</p>
       </div>
       <div className="w-2/3">
         <div className="flex items-center space-x-8">

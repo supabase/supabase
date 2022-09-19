@@ -1,6 +1,6 @@
 import React, { useState, PropsWithChildren, FC } from 'react'
 import { isEmpty } from 'lodash'
-import { Button, IconSearch, Input } from '@supabase/ui'
+import { Button, IconSearch, Input } from 'common2'
 import { observer } from 'mobx-react-lite'
 import { checkPermissions, useStore } from 'hooks'
 import { AuthLayout } from 'components/layouts'
@@ -92,7 +92,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <AuthLayout title="Auth">
-    <div className="p-4 h-full">{page}</div>
+    <div className="h-full p-4">{page}</div>
   </AuthLayout>
 )
 

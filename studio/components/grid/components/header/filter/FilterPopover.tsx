@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Button, IconPlus, IconFilter, Popover } from '@supabase/ui'
+import { Button, IconPlus, IconFilter, Popover } from 'common2'
 
 import { useUrlState } from 'hooks'
 import FilterRow from './FilterRow'
@@ -60,8 +60,8 @@ const Filter: FC = () => {
         ))}
         {formattedFilters.length == 0 && (
           <div className="space-y-1 px-3">
-            <h5 className="text-scale-1100 text-sm">No filters applied to this view</h5>
-            <p className="text-scale-900 text-xs">Add a column below to filter the view</p>
+            <h5 className="text-sm text-scale-1100">No filters applied to this view</h5>
+            <p className="text-xs text-scale-900">Add a column below to filter the view</p>
           </div>
         )}
       </div>

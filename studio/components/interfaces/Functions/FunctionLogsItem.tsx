@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, IconClipboard, IconExternalLink, IconGlobe } from '@supabase/ui'
+import { Badge, IconClipboard, IconExternalLink, IconGlobe } from 'common2'
 import Table from 'components/to-be-cleaned/Table'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
@@ -23,14 +23,14 @@ const FunctionLogsItem: FC<Props> = ({ log, onClick }) => {
     <Table.tr key={log.id} onClick={onClick}>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <div className="bg-scale-500 px-2 rounded">{log.function_status}</div>
+          <div className="rounded bg-scale-500 px-2">{log.function_status}</div>
         </div>
       </Table.td>
       <Table.td className="">
         <span className="text-xs text-scale-1100">{log.method}</span>
       </Table.td>
       <Table.td className="">
-        <span className="text-xs text-scale-1100 font-mono">{log.url}</span>
+        <span className="font-mono text-xs text-scale-1100">{log.url}</span>
       </Table.td>
       <Table.td className="">
         <span className="text-scale-1100">

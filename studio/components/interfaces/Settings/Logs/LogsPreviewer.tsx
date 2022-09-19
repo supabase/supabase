@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { IconAlertCircle, IconRewind, Button, Card, Input } from '@supabase/ui'
+import { IconAlertCircle, IconRewind, Button, Card, Input } from 'common2'
 
 import {
   LogTable,
@@ -126,7 +126,7 @@ export const LogsPreviewer: React.FC<Props> = ({
   }
 
   return (
-    <div className="h-full flex flex-col flex-grow">
+    <div className="flex h-full flex-grow flex-col">
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -160,8 +160,8 @@ export const LogsPreviewer: React.FC<Props> = ({
         className={
           'transition-all duration-500 ' +
           (showChart && !isLoading && logData.length > 0
-            ? 'opacity-100 h-24 pt-4 mb-4'
-            : 'opacity-0 h-0')
+            ? 'mb-4 h-24 pt-4 opacity-100'
+            : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-4' : ''}>
@@ -179,7 +179,7 @@ export const LogsPreviewer: React.FC<Props> = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col flex-grow relative pt-4">
+      <div className="relative flex flex-grow flex-col pt-4">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -193,7 +193,7 @@ export const LogsPreviewer: React.FC<Props> = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="p-2 flex flex-row justify-between">
+          <div className="flex flex-row justify-between p-2">
             <Button onClick={loadOlder} icon={<IconRewind />} type="default">
               Load older
             </Button>
@@ -201,8 +201,8 @@ export const LogsPreviewer: React.FC<Props> = ({
           </div>
         )}
         {error && (
-          <div className="flex w-full h-full justify-center items-center mx-auto">
-            <Card className="flex flex-col gap-y-2  w-2/5 bg-scale-400">
+          <div className="mx-auto flex h-full w-full items-center justify-center">
+            <Card className="flex w-2/5 flex-col  gap-y-2 bg-scale-400">
               <div className="flex flex-row gap-x-2 py-2">
                 <IconAlertCircle size={16} />
                 <p className="text-scale-1000">Sorry! An error occured when fetching data.</p>

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, Divider, IconPlus } from '@supabase/ui'
+import { Button, Dropdown, Divider, IconPlus } from 'common2'
 
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

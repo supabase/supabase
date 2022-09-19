@@ -1,4 +1,4 @@
-import { Alert, Button, Dropdown, IconClock } from '@supabase/ui'
+import { Alert, Button, Dropdown, IconClock } from 'common2'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'

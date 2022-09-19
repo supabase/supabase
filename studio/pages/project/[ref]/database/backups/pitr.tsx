@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Tabs } from '@supabase/ui'
+import { Tabs } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useStore, checkPermissions } from 'hooks'
@@ -19,7 +19,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-5 pt-12 pb-20">
-      <h3 className="text-scale-1200 text-xl">Backups</h3>
+      <h3 className="text-xl text-scale-1200">Backups</h3>
 
       <Tabs
         type="underlined"
@@ -33,7 +33,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       </Tabs>
 
       <div className="space-y-4">
-        <p className="text-scale-1100 text-sm">
+        <p className="text-sm text-scale-1100">
           Restore your project from a specific date and time.
         </p>
         {canReadPhysicalBackups ? (

@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconMoreVertical } from '@supabase/ui'
+import { Button, Dropdown, IconMoreVertical } from 'common2'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import Panel from 'components/ui/Panel'
 import { useRouter } from 'next/router'
@@ -20,7 +20,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
   return (
     <Panel className={'pb-0 ' + props.className} bodyClassName="h-full" wrapWithLoading={false}>
       <Panel.Content className="space-y-4">
-        <div className="flex flex-row justify-between items-start">
+        <div className="flex flex-row items-start justify-between">
           <div className="gap-2">
             <h3>{props.title}</h3>
             <p className="text-sm text-scale-1100">{props.description}</p>

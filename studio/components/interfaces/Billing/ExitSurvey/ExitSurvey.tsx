@@ -2,7 +2,7 @@ import { FC, useReducer, useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { includes, without } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, Form, Input, Modal, IconArrowLeft, Alert } from '@supabase/ui'
+import { Button, Form, Input, Modal, IconArrowLeft, Alert } from 'common2'
 
 import { useStore } from 'hooks'
 import { post, patch } from 'lib/common/fetch'
@@ -174,7 +174,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         enterFrom="transform opacity-0 translate-x-10"
         enterTo="transform opacity-100 translate-x-0"
       >
-        <div className="space-y-8 w-4/5">
+        <div className="w-4/5 space-y-8">
           <div ref={formRef} className="relative">
             <div className="absolute top-[2px] -left-24">
               <Button type="text" icon={<IconArrowLeft />} onClick={onSelectBack}>
@@ -198,13 +198,13 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
                         <label
                           key={option}
                           className={`
-                              text-center rounded-md py-1 pl-2 pr-3 shadow-sm 
-                              transition-all flex items-center space-x-2
-                              duration-100 cursor-pointer text-sm
+                              flex cursor-pointer items-center space-x-2 rounded-md py-1 
+                              pl-2 pr-3 text-center text-sm
+                              shadow-sm transition-all duration-100
                               ${
                                 active
-                                  ? ` opacity-100 bg-scale-1200 text-scale-100 hover:bg-opacity-75`
-                                  : ` bg-scale-700 opacity-25 hover:opacity-50 text-scale-1200`
+                                  ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
+                                  : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
                               }
                           `}
                         >
@@ -259,7 +259,7 @@ const ExitSurvey: FC<Props> = ({ freeTier, subscription, onSelectBack }) => {
         header="Downgrading project to free"
         onCancel={() => setShowConfirmModal(false)}
       >
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           <Modal.Content>
             <Alert
               withIcon

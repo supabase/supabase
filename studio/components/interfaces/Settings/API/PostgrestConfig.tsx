@@ -2,7 +2,7 @@ import { useContext, FC, useEffect } from 'react'
 import { indexOf } from 'lodash'
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Input, Form, IconAlertCircle, InputNumber } from '@supabase/ui'
+import { Input, Form, IconAlertCircle, InputNumber } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore, useProjectPostgrestConfig } from 'hooks'
@@ -119,7 +119,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
               }
             >
               {isError ? (
-                <div className="py-8 flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 py-8">
                   <IconAlertCircle size={16} strokeWidth={1.5} />
                   <p className="text-sm text-scale-1100">Failed to retrieve API settings</p>
                 </div>
@@ -143,7 +143,7 @@ const PostgrestConfig: FC<Props> = ({}) => {
                             <>
                               <IconAlertCircle strokeWidth={2} />
                               <div className="mt-2 flex flex-col text-center">
-                                <p className="text-sm align-center">
+                                <p className="align-center text-sm">
                                   No schema available to choose
                                 </p>
                                 <p className="text-xs opacity-50">

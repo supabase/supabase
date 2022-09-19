@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { isEqual } from 'lodash'
-import { Input, Button, IconPlus, Select, IconX } from '@supabase/ui'
+import { Input, Button, IconPlus, Select, IconX } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useFlag, useStore } from 'hooks'
@@ -150,7 +150,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
           loading={loading}
           footer={
             !loading && (
-              <div className="flex justify-between w-full">
+              <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
                   <p className="text-sm text-scale-1000">
                     You need additional permissions to update this organization's tax IDs
@@ -183,9 +183,9 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
         >
           {loading && taxIdValues.length === 0 ? (
             <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/2" />
-              <div className="shimmering-loader rounded py-3 mx-1 w-1/3" />
+              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
+              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
             </div>
           ) : (
             <Panel.Content className="w-3/5 space-y-4">
@@ -230,7 +230,7 @@ const TaxID: FC<Props> = ({ loading, taxIds, onTaxIdsUpdated }) => {
               )}
               {canUpdateTaxIds && (
                 <div
-                  className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition cursor-pointer"
+                  className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
                   onClick={() => onAddNewTaxId()}
                 >
                   <IconPlus size={14} />

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { get, sum } from 'lodash'
-import { Checkbox, IconUpload } from '@supabase/ui'
+import { Checkbox, IconUpload } from 'common2'
 import { Transition } from '@headlessui/react'
 import { useContextMenu } from 'react-contexify'
 
@@ -29,16 +29,16 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }) => {
       <div
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className="absolute w-full h-full top-0 flex items-center justify-center"
+        className="absolute top-0 flex h-full w-full items-center justify-center"
         style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
       >
         {!folderIsEmpty && (
           <div
-            className="w-3/4 h-32 border-2 border-dashed border-gray-400 rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+            className="pointer-events-none flex h-32 w-3/4 flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-400 p-6"
             style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
           >
-            <IconUpload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-            <p className="text-center text-sm mt-2 pointer-events-none">
+            <IconUpload className="pointer-events-none text-white" size={20} strokeWidth={2} />
+            <p className="pointer-events-none mt-2 text-center text-sm">
               Drop your files to upload to this folder
             </p>
           </div>
@@ -138,7 +138,7 @@ const FileExplorerColumn = ({
             : 'w-64 border-r border-panel-border-light dark:border-panel-border-dark'
         }
         ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
-        relative flex-shrink-0 overflow-auto flex flex-col hide-scrollbar
+        hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
       `}
       onContextMenu={displayMenu}
       onDragOver={onDragOver}
@@ -152,8 +152,8 @@ const FileExplorerColumn = ({
       {/* Checkbox selection for select all */}
       {view === STORAGE_VIEWS.COLUMNS && (
         <div
-          className={`bg-table-header-light dark:bg-table-header-dark sticky top-0 z-10 flex items-center px-2.5 mb-0 ${
-            haveSelectedItems > 0 ? 'opacity-100 py-3 h-10' : 'opacity-0 py-0 h-0'
+          className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 dark:bg-table-header-dark ${
+            haveSelectedItems > 0 ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
           } transition-all duration-200`}
           onClick={(event) => event.stopPropagation()}
         >
@@ -172,19 +172,19 @@ const FileExplorerColumn = ({
       {view === STORAGE_VIEWS.LIST && (
         <div
           className="
-          bg-panel-footer-light dark:bg-panel-footer-dark
-          px-2.5 py-2 flex items-center min-w-min sticky top-0 z-10
-          border-b border-panel-border-light dark:border-panel-border-dark
+          sticky top-0
+          z-10 flex min-w-min items-center border-b border-panel-border-light bg-panel-footer-light px-2.5
+          py-2 dark:border-panel-border-dark dark:bg-panel-footer-dark
         "
         >
-          <div className="flex items-center w-[40%] min-w-[250px]">
+          <div className="flex w-[40%] min-w-[250px] items-center">
             <SelectAllCheckbox />
             <p className="text-sm">Name</p>
           </div>
-          <p className="text-sm w-[11%] min-w-[100px]">Size</p>
-          <p className="text-sm w-[14%] min-w-[100px]">Type</p>
-          <p className="text-sm w-[15%] min-w-[160px]">Created at</p>
-          <p className="text-sm w-[15%] min-w-[160px]">Last modified at</p>
+          <p className="w-[11%] min-w-[100px] text-sm">Size</p>
+          <p className="w-[14%] min-w-[100px] text-sm">Type</p>
+          <p className="w-[15%] min-w-[160px] text-sm">Created at</p>
+          <p className="w-[15%] min-w-[160px] text-sm">Last modified at</p>
         </div>
       )}
 
@@ -193,7 +193,7 @@ const FileExplorerColumn = ({
         <div
           className={`
             ${fullWidth ? 'w-full' : 'w-64 border-r border-gray-500'}
-            flex-shrink-0 overflow-auto flex flex-col space-y-1 my-1
+            my-1 flex flex-shrink-0 flex-col space-y-1 overflow-auto
           `}
         >
           <ShimmeringLoader />
@@ -232,10 +232,10 @@ const FileExplorerColumn = ({
 
       {/* Drag drop upload CTA for when column is empty */}
       {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
-        <div className="h-full w-full flex flex-col items-center justify-center">
+        <div className="flex h-full w-full flex-col items-center justify-center">
           <img src="/img/storage-placeholder.svg" className="opacity-75" />
           <p className="my-3 opacity-75">Drop your files here</p>
-          <p className="text-sm text-center w-40 text-scale-1100">
+          <p className="w-40 text-center text-sm text-scale-1100">
             Or upload them via the "Upload file" button above
           </p>
         </div>
@@ -255,8 +255,8 @@ const FileExplorerColumn = ({
       {view === STORAGE_VIEWS.LIST && (
         <div
           className="
-          bg-panel-footer-light dark:bg-panel-footer-dark
-          px-2.5 py-2 flex items-center min-w-min sticky bottom-0 z-10
+          sticky bottom-0
+          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 dark:bg-panel-footer-dark
         "
         >
           <p className="text-sm">

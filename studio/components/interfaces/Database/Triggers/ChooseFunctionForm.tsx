@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { uniqBy, map as lodashMap } from 'lodash'
 import { Transition } from '@headlessui/react'
-import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from '@supabase/ui'
+import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'common2'
 import { Dictionary } from 'components/grid'
 import SqlEditor from 'components/ui/SqlEditor'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -127,11 +127,11 @@ const SchemaFunctionGroup: FC<SchemaFunctionGroupProps> = observer(({ schema, se
   const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 backdrop-filter backdrop-blur px-6 flex items-center space-x-1">
+      <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
         <h5 className="text-scale-1000">schema</h5>
         <h5>{schema}</h5>
       </div>
-      <div className="space-y-0 divide-y dark:divide-dark border-t border-b dark:border-dark">
+      <div className="space-y-0 divide-y border-t border-b dark:divide-dark dark:border-dark">
         {_functions.map((x) => (
           <Function
             id={x.id}
@@ -157,12 +157,12 @@ const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) =
   const [visible, setVisible] = useState(false)
   return (
     <div
-      className="hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark rounded p-3 px-6 cursor-pointer"
+      className="cursor-pointer rounded p-3 px-6 hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark"
       onClick={() => onClick(id)}
     >
-      <div className="flex items-center space-x-3 justify-between">
+      <div className="flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
-          <div className="bg-scale-1200 p-1 flex items-center justify-center rounded text-scale-100 ">
+          <div className="flex items-center justify-center rounded bg-scale-1200 p-1 text-scale-100 ">
             <IconTerminal strokeWidth={2} size={14} />
           </div>
           <h5 className="mb-0">{name}</h5>
@@ -174,7 +174,7 @@ const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) =
             setVisible(!visible)
           }}
           icon={
-            <IconChevronDown className={visible ? 'transform rotate-0' : 'transform rotate-180'} />
+            <IconChevronDown className={visible ? 'rotate-0 transform' : 'rotate-180 transform'} />
           }
         >
           {visible ? 'Hide definition' : 'View definition'}
@@ -189,7 +189,7 @@ const Function: FC<FunctionProps> = ({ id, completeStatement, name, onClick }) =
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
-        <div className="h-64 mt-4 border dark:border-dark">
+        <div className="mt-4 h-64 border dark:border-dark">
           <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
         </div>
       </Transition>

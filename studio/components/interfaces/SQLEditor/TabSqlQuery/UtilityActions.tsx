@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from '@supabase/ui'
+import { Button, IconAlertCircle } from 'common2'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -51,11 +51,11 @@ const UtilityActions: FC<Props> = ({ updateSqlSnippet }) => {
             <Tooltip.Arrow className="radix-tooltip-arrow" />
             <div
               className={[
-                'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                'border-scale-200 border w-48',
+                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                'w-48 border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">
+              <span className="text-xs text-scale-1200">
                 Queries are not saved as you do not have sufficient permissions
               </span>
             </div>

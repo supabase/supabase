@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { isUndefined, includes } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from '@supabase/ui'
+import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2 } from 'common2'
 
 import { RowField } from './RowEditor.types'
 import DateTimeInput from './DateTimeInput'

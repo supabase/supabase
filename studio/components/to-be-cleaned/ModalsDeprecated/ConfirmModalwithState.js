@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal } from '@supabase/ui'
+import { Modal } from 'common2'
 
 export default function ConfirmModal({
   title,

@@ -12,7 +12,7 @@ import {
   Button,
   Modal,
   IconAlertCircle,
-} from '@supabase/ui'
+} from 'common2'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
@@ -192,7 +192,7 @@ const PITRBackupSelection: FC<Props> = () => {
                       <IconSearch size={14} />
                       <input
                         autoFocus
-                        className="placeholder-scale-1000 w-72 bg-transparent text-sm outline-none"
+                        className="w-72 bg-transparent text-sm placeholder-scale-1000 outline-none"
                         value={searchString}
                         placeholder={''}
                         onChange={(e: FormEvent<HTMLInputElement>) =>
@@ -252,7 +252,7 @@ const PITRBackupSelection: FC<Props> = () => {
             <div className="flex justify-between space-x-8 py-2">
               <div className="w-2/5 space-y-2 pl-4">
                 <p className="text-sm">Recovery point</p>
-                <p className="text-scale-1100 text-sm">
+                <p className="text-sm text-scale-1100">
                   Select a date and time that you would like to restore your project to
                 </p>
               </div>
@@ -286,15 +286,15 @@ const PITRBackupSelection: FC<Props> = () => {
           <Modal.Content>
             <div className="space-y-2 py-4">
               <div className="space-y-1">
-                <p className="text-scale-1100 text-sm">
+                <p className="text-sm text-scale-1100">
                   Are you sure you want to restore your database from:
                 </p>
-                <p className="text-scale-1200 text-sm">
+                <p className="text-sm text-scale-1200">
                   {dayjs(recoveryPoint).format('DD MMM YYYY, HH:mm:ss')} (
                   {getTimezoneOffsetText(selectedTimezone)})?
                 </p>
               </div>
-              <p className="text-scale-1100 text-sm">
+              <p className="text-sm text-scale-1100">
                 This will destroy any new data written since this backup was made.
               </p>
             </div>

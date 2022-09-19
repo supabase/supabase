@@ -1,4 +1,4 @@
-import { Button, IconRefreshCw } from '@supabase/ui'
+import { Button, IconRefreshCw } from 'common2'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { DatePickerToFrom } from '../Settings/Logs'
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
@@ -52,7 +52,7 @@ const PresetReport: React.FC<Props> = ({ projectRef, preset }) => {
   const isLoading = statusCodes.isLoading || requestPaths.isLoading
 
   return (
-    <div className="mx-auto flex flex-col gap-4 px-5 lg:px-16 xl:px-24 1xl:px-28 2xl:px-32 py-6">
+    <div className="1xl:px-28 mx-auto flex flex-col gap-4 px-5 py-6 lg:px-16 xl:px-24 2xl:px-32">
       <h1 className="text-2xl text-scale-1200">{config.title}</h1>
       <div className="flex flex-row justify-between">
         <DatePickers

@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button } from '@supabase/ui'
+import { Button } from 'common2'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -120,7 +120,7 @@ const PageLayout: NextPageWithLayout = () => {
           })}
         </div>
 
-        <span className="text-scale-1000 text-xs">
+        <span className="text-xs text-scale-1000">
           Statistics for past {selectedInterval.label}
         </span>
       </div>

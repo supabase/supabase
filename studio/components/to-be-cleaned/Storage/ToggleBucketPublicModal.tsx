@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { Modal, Alert, Button } from '@supabase/ui'
+import { Modal, Alert, Button } from 'common2'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 interface Props {

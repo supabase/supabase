@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from '@supabase/ui'
+import { Button, IconAlertCircle } from 'common2'
 
 import { useStore } from 'hooks'
 import { getURL } from 'lib/helpers'

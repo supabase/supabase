@@ -1,6 +1,6 @@
 import update from 'immutability-helper'
 import { FC, useRef, memo } from 'react'
-import { Button, IconMenu, Toggle, IconX } from '@supabase/ui'
+import { Button, IconMenu, Toggle, IconX } from 'common2'
 import { XYCoord } from 'dnd-core'
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
 
@@ -151,13 +151,13 @@ const SortRow: FC<SortRowProps> = ({ index, columnName, sort }) => {
         onClick={onRemoveSort}
       />
       <div className="grow">
-        <span className="text-scale-1200 flex grow items-center gap-1 truncate text-sm">
-          <span className="text-scale-900 text-xs">{index > 0 ? 'then by' : 'sort by'}</span>
+        <span className="flex grow items-center gap-1 truncate text-sm text-scale-1200">
+          <span className="text-xs text-scale-900">{index > 0 ? 'then by' : 'sort by'}</span>
           {column.name}
         </span>
       </div>
       <div className="flex items-center gap-1">
-        <label className="text-scale-900 text-xs">ascending:</label>
+        <label className="text-xs text-scale-900">ascending:</label>
         <Toggle
           size="tiny"
           layout="flex"

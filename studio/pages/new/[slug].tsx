@@ -4,7 +4,7 @@ import { debounce, isUndefined, values } from 'lodash'
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import generator from 'generate-password'
-import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from '@supabase/ui'
+import { Button, Listbox, IconUsers, Input, IconLoader, Alert } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { NextPageWithLayout } from 'types'
@@ -215,7 +215,7 @@ const Wizard: NextPageWithLayout = () => {
           </Button>
           <div className="items-center space-x-3">
             {!projectCreationDisabled && (
-              <span className="text-scale-900 text-xs">You can rename your project later</span>
+              <span className="text-xs text-scale-900">You can rename your project later</span>
             )}
             <Button
               onClick={onClickNext}
@@ -230,7 +230,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <>
         <Panel.Content className="pt-0 pb-6">
-          <p className="text-scale-900 text-sm">
+          <p className="text-sm text-scale-900">
             Your project will have its own dedicated instance and full postgres database.
             <br />
             An API will be set up so you can easily interact with your new database.
@@ -238,12 +238,12 @@ const Wizard: NextPageWithLayout = () => {
           </p>
         </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark border-t pb-8">
+          <Panel.Content className="border-t border-panel-border-interior-light pb-8 dark:border-panel-border-interior-dark">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
           <>
-            <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-4 border-t border-b">
+            <Panel.Content className="Form section-block--body has-inputs-centered space-y-4 border-t border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
               {organizations.length > 0 && (
                 <Listbox
                   label="Organization"
@@ -268,7 +268,7 @@ const Wizard: NextPageWithLayout = () => {
             </Panel.Content>
             {canCreateProject && (
               <>
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-t border-b">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-t border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -281,7 +281,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -303,7 +303,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="Form section-block--body has-inputs-centered border-panel-border-interior-light dark:border-panel-border-interior-dark border-b">
+                <Panel.Content className="Form section-block--body has-inputs-centered border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <Listbox
                     layout="horizontal"
                     label="Region"

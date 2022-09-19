@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from '@supabase/ui'
+import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from 'common2'
 
 import { Project } from 'types'
 import { useStore } from 'hooks'
@@ -61,7 +61,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
               </Badge>
             </div>
           </div>
-          <div className="bg-scale-300 border-scale-400 flex h-[500px] items-center justify-center rounded border p-8">
+          <div className="flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
             <div className="w-[420px] space-y-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <IconMonitor className="text-scale-1100" size={50} strokeWidth={1.5} />
@@ -72,7 +72,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
               <div className="space-y-1">
                 <p className="text-center">Connecting to {project.name}</p>
                 <p
-                  className="text-scale-1100 cursor-pointer text-center text-sm opacity-60 transition hover:opacity-100"
+                  className="cursor-pointer text-center text-sm text-scale-1100 opacity-60 transition hover:opacity-100"
                   onClick={() => setShowModal(true)}
                 >
                   This may take a few minutes
@@ -95,7 +95,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
         onCancel={() => setShowModal(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-scale-1200 text-sm">Checking the health of your database</h5>
+            <h5 className="text-sm text-scale-1200">Checking the health of your database</h5>
           </div>
         }
         size="medium"
@@ -105,7 +105,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
         <div className="py-4">
           <Modal.Content>
             <div className="space-y-4">
-              <p className="text-scale-1200 text-sm">
+              <p className="text-sm text-scale-1200">
                 Your project might be facing resource constraints and hence is having trouble
                 connecting. You can verify this by checking your{' '}
                 <span className="text-brand-1000">
@@ -121,7 +121,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
                 </span>
                 .
               </p>
-              <p className="text-scale-1200 text-sm">
+              <p className="text-sm text-scale-1200">
                 If your project is facing resource constraints, you can{' '}
                 <span className="text-brand-1000">
                   <Link href={`/project/${project.ref}/reports`}>
@@ -130,7 +130,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
                 </span>{' '}
                 your project's subscription to a Pro for access to larger compute sizes.
               </p>
-              <p className="text-scale-1200 text-sm">
+              <p className="text-sm text-scale-1200">
                 However, if your project still fails to connect thereafter, you can open a support
                 ticket{' '}
                 <span className="text-brand-1000">

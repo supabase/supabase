@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Input, IconAlertCircle, IconLoader } from '@supabase/ui'
+import { Input, IconAlertCircle, IconLoader } from 'common2'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useJwtSecretUpdateStatus, useProjectSettings } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
@@ -31,7 +31,7 @@ const DisplayConfigSettings = () => {
   return (
     <ConfigContentWrapper>
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 py-8">
           <IconAlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsError
@@ -40,7 +40,7 @@ const DisplayConfigSettings = () => {
           </p>
         </div>
       ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
-        <div className="py-8 flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-2 py-8">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}

@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from '@supabase/ui'
+import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'common2'
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -23,19 +23,19 @@ const PolicyRow: FC<Props> = ({
   return (
     <Panel.Content
       className={[
-        'border-panel-border-light dark:border-panel-border-dark flex',
+        'flex border-panel-border-light dark:border-panel-border-dark',
         'w-full space-x-4 border-b py-4 lg:items-center',
       ].join(' ')}
     >
-      <div className="flex grow flex-col truncate space-y-1">
+      <div className="flex grow flex-col space-y-1 truncate">
         <div className="flex items-center space-x-4">
-          <p className="text-scale-1000 font-mono text-xs">{policy.command}</p>
-          <p className="text-scale-1200 max-w-xs truncate text-sm">{policy.name}</p>
+          <p className="font-mono text-xs text-scale-1000">{policy.command}</p>
+          <p className="max-w-xs truncate text-sm text-scale-1200">{policy.name}</p>
         </div>
         <div className="flex items-center space-x-2">
-          <p className="text-scale-1000 text-sm">Applied to:</p>
+          <p className="text-sm text-scale-1000">Applied to:</p>
           {policy.roles.map((role) => (
-            <code className="text-scale-1000 text-xs">{role}</code>
+            <code className="text-xs text-scale-1000">{role}</code>
           ))}
         </div>
       </div>
@@ -84,11 +84,11 @@ const PolicyRow: FC<Props> = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                    'border-scale-200 border',
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-scale-1200 text-xs">
+                  <span className="text-xs text-scale-1200">
                     You need additional permissions to edit RLS policies
                   </span>
                 </div>

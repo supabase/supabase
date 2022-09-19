@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { IconChevronLeft } from '@supabase/ui'
+import { IconChevronLeft } from 'common2'
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
 
 interface Props {
@@ -31,7 +31,7 @@ const PolicyEditorModalTitle: FC<Props> = ({
         <div className="flex items-center space-x-3">
           <span
             onClick={onSelectBackFromTemplates}
-            className="text-scale-900 hover:text-scale-1200 cursor-pointer transition-colors"
+            className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
           >
             <IconChevronLeft strokeWidth={2} size={14} />
           </span>
@@ -42,7 +42,7 @@ const PolicyEditorModalTitle: FC<Props> = ({
   }
   return (
     <div className="flex items-center space-x-3">
-      <h4 className="m-0 text-lg truncate">{getTitle()}</h4>
+      <h4 className="m-0 truncate text-lg">{getTitle()}</h4>
     </div>
   )
 }

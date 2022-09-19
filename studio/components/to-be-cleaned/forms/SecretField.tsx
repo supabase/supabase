@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { IconEye, IconEyeOff } from '@supabase/ui'
+import { IconEye, IconEyeOff } from 'common2'
 import { connectField, filterDOMProps } from 'uniforms'
 
 const SecretField: React.FC = (props: any) => {

@@ -6,7 +6,7 @@
 // the component over to the UI library
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from '@supabase/ui'
+import { Button, Dropdown, IconList, Input } from 'common2'
 import { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
@@ -95,7 +95,7 @@ const InputWithSuggestions: FC<Props> = ({
                       onClick={() => onSelectSuggestion(suggestion)}
                     >
                       <div className="text-sm">{suggestion.name}</div>
-                      <div className="text-scale-900 text-xs">{suggestion.description}</div>
+                      <div className="text-xs text-scale-900">{suggestion.description}</div>
                     </Dropdown.Item>
                   ))}
                 </>

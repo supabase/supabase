@@ -15,7 +15,7 @@ import {
   IconRefreshCw,
   IconPenTool,
   IconAlertCircle,
-} from '@supabase/ui'
+} from 'common2'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
@@ -109,9 +109,9 @@ const JWTSettings: FC<Props> = ({}) => {
   return (
     <>
       <Panel title={<h5 className="mb-0">JWT Settings</h5>}>
-        <Panel.Content className="border-panel-border-interior-light dark:border-panel-border-interior-dark space-y-6 border-t">
+        <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isError ? (
-            <div className="py-8 flex items-center justify-center space-x-2">
+            <div className="flex items-center justify-center space-x-2 py-8">
               <IconAlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-scale-1100">Failed to retrieve JWT settings</p>
             </div>
@@ -139,7 +139,7 @@ const JWTSettings: FC<Props> = ({}) => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="dark:bg-bg-alt-dark bg-bg-alt-light dark:border-dark rounded-md border p-3 px-6 shadow-sm">
+                <div className="rounded-md border bg-bg-alt-light p-3 px-6 shadow-sm dark:border-dark dark:bg-bg-alt-dark">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
@@ -177,11 +177,11 @@ const JWTSettings: FC<Props> = ({}) => {
                                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                                 <div
                                   className={[
-                                    'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                                    'border-scale-200 border',
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <span className="text-scale-1200 text-xs">
+                                  <span className="text-xs text-scale-1200">
                                     You need additional permissions to generate a new JWT secret
                                   </span>
                                 </div>
@@ -284,7 +284,7 @@ const JWTSettings: FC<Props> = ({}) => {
       >
         <Modal.Content>
           <div className="space-y-2 py-4">
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>

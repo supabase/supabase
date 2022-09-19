@@ -2,7 +2,7 @@ import { FC } from 'react'
 import { includes, uniqBy, map as lodashMap } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Input, IconSearch, IconLoader } from '@supabase/ui'
+import { Button, Input, IconSearch, IconLoader } from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { checkPermissions, useStore } from 'hooks'
@@ -53,11 +53,11 @@ const TriggersList: FC<any> = ({
             onClickCta={() => createTrigger()}
           >
             <AlphaPreview />
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               A PostgreSQL trigger is a function invoked automatically whenever an event associated
               with a table occurs.
             </p>
-            <p className="text-scale-1100 text-sm">
+            <p className="text-sm text-scale-1100">
               An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a special
               user-defined function associated with a table.
             </p>
@@ -84,11 +84,11 @@ const TriggersList: FC<any> = ({
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                      'border-scale-200 border',
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-scale-1200 text-xs">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create triggers
                     </span>
                   </div>
@@ -97,7 +97,7 @@ const TriggersList: FC<any> = ({
             </Tooltip.Root>
           </div>
           {filteredTriggers.length <= 0 && (
-            <div className="dark:border-dark mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md">
+            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
               <p>No results match your filter query</p>
               <Button type="outline" onClick={() => setFilterString('')}>
                 Reset filter

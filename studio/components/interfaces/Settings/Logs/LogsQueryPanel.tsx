@@ -1,4 +1,4 @@
-import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from '@supabase/ui'
+import { Button, Dropdown, IconChevronDown, IconPlay, Badge, Popover, Alert } from 'common2'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -52,14 +52,14 @@ const LogsQueryPanel: React.FC<Props> = ({
   return (
     <div
       className="
-  border
-  border-panel-border-light dark:border-panel-border-dark rounded rounded-bl-none rounded-br-none
-  bg-panel-header-light dark:bg-panel-header-dark
+  rounded
+  rounded-bl-none rounded-br-none border border-panel-border-light bg-panel-header-light
+  dark:border-panel-border-dark dark:bg-panel-header-dark
   
   "
     >
-      <div className="px-5 py-2 flex items-center justify-between w-full">
-        <div className="flex flex-row gap-x-4 items-center justify-between w-full">
+      <div className="flex w-full items-center justify-between px-5 py-2">
+        <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             <Dropdown
               side="bottom"
@@ -69,7 +69,7 @@ const LogsQueryPanel: React.FC<Props> = ({
                 .map((source) => (
                   <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
                     <div className="flex flex-col gap-1">
-                      <span className="font-mono text-scale-1100 font-bold">{source}</span>
+                      <span className="font-mono font-bold text-scale-1100">{source}</span>
                       <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
                     </div>
                   </Dropdown.Item>
@@ -104,7 +104,7 @@ const LogsQueryPanel: React.FC<Props> = ({
             <div className="overflow-hidden">
               <div
                 className={` transition-all duration-300 ${
-                  warnings.length > 0 ? 'opacity-100' : 'invisible w-0 h-0 opacity-0'
+                  warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
                 }`}
               >
                 <Popover
@@ -153,11 +153,11 @@ const LogsQueryPanel: React.FC<Props> = ({
                         <Tooltip.Arrow className="radix-tooltip-arrow" />
                         <div
                           className={[
-                            'bg-scale-100 rounded py-1 px-2 leading-none shadow',
-                            'border-scale-200 border',
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-scale-1200 text-xs">
+                          <span className="text-xs text-scale-1200">
                             You need additional permissions to save your query
                           </span>
                         </div>

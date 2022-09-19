@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, Modal, Menu, IconExternalLink, IconTrash } from '@supabase/ui'
+import { Button, Modal, Menu, IconExternalLink, IconTrash } from 'common2'
 
 import { RowItem } from './RowItem'
 import { FilterHeader } from './FilterHeader'

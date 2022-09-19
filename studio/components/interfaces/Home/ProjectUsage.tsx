@@ -11,7 +11,7 @@ import {
   IconDatabase,
   IconKey,
   IconZap,
-} from '@supabase/ui'
+} from 'common2'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { get } from 'lib/common/fetch'
@@ -85,7 +85,7 @@ const ProjectUsage: FC<Props> = ({}) => {
             {selectedInterval.label}
           </Button>
         </Dropdown>
-        <span className="text-scale-1000 text-xs">
+        <span className="text-xs text-scale-1000">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -97,7 +97,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconDatabase strokeWidth={2} size={16} />
                       </div>
                     }
@@ -123,7 +123,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconKey strokeWidth={2} size={16} />
                       </div>
                     }
@@ -149,7 +149,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconArchive strokeWidth={2} size={16} />
                       </div>
                     }
@@ -175,7 +175,7 @@ const ProjectUsage: FC<Props> = ({}) => {
                 <Panel.Content className="space-y-4">
                   <PanelHeader
                     icon={
-                      <div className="bg-scale-600 text-scale-1000 rounded p-1.5 shadow-sm">
+                      <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                         <IconZap strokeWidth={2} size={16} />
                       </div>
                     }
@@ -214,7 +214,7 @@ const PanelHeader = (props: any) => {
       <div
         className={
           'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'hover:text-gray-1200 cursor-pointer hover:opacity-100' : '')
+          (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
         }
       >
         <p>{props.icon}</p>

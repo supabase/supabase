@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconCheckCircle } from '@supabase/ui'
+import { Button, IconCheckCircle } from 'common2'
 
 interface Props {
   title: string
@@ -14,7 +14,7 @@ const UpdateSuccess: FC<Props> = ({ title, message, projectRef }) => {
   return (
     <div
       style={{ height: 'calc(100vh - 5rem - 49.5px)' }}
-      className="space-y-4 flex flex-col justify-center max-w-xl mx-auto"
+      className="mx-auto flex max-w-xl flex-col justify-center space-y-4"
     >
       <div className="flex items-center space-x-4">
         <IconCheckCircle strokeWidth={2} />

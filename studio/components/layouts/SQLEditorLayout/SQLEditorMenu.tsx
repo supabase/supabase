@@ -13,7 +13,7 @@ import {
   IconChevronDown,
   Modal,
   IconEdit2,
-} from '@supabase/ui'
+} from 'common2'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useOptimisticSqlSnippetCreate, useStore, checkPermissions } from 'hooks'
@@ -121,7 +121,7 @@ const DropdownMenu = observer(({ tabInfo }: { tabInfo: QueryTab }) => {
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="text-scale-1100 py-4 text-sm">{`Are you sure you want to remove '${name}' ?`}</p>
+          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to remove '${name}' ?`}</p>
         </Modal.Content>
       </ConfirmationModal>
     </div>
