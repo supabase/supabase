@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "author": "",
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler publish"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^1.30.4"
+  },
+  "devDependencies": {
+    "@cloudflare/wrangler": "^1.19.8"
+  }
+}
